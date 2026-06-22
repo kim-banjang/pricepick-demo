@@ -1,0 +1,179 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ──────────────────────────────────────────
+    // Helpers
+    // ──────────────────────────────────────────
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    // CMS admin identified by email (sgkim.mixit@gmail.com)
+    // email claim is injected by Firebase Auth JWT
+    function isAdmin() {
+      return isSignedIn() &&
+             request.auth.token.email == 'sgkim.mixit@gmail.com' &&
+             request.auth.token.email_verified == true;
+    }
+
+    // The requesting user owns this document
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    // ──────────────────────────────────────────
+    // A. Users / Auth / Device
+    // ──────────────────────────────────────────
+    match /users/{userId} {
+      allow read: if isOwner(userId) || isAdmin();
+      allow write: if isAdmin();
+
+      match /auth_providers/{providerId} {
+        allow read: if isOwner(userId) || isAdmin();
+        allow write: if isAdmin();
+      }
+      match /consents/{consentId} {
+        allow read: if isOwner(userId) || isAdmin();
+        allow write: if isAdmin();
+      }
+      match /devices/{deviceId} {
+        allow read: if isOwner(userId) || isAdmin();
+        allow write: if isAdmin();
+      }
+    }
+
+    // ──────────────────────────────────────────
+    // B. Master Data (admin write, anyone can read active)
+    // ──────────────────────────────────────────
+    match /affiliate_malls/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /ticket_grades/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /grade_exchange_rules/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // ──────────────────────────────────────────
+    // C. Purchase Attribution
+    // ──────────────────────────────────────────
+    match /click_logs/{docId} {
+      allow read: if isAdmin();
+      allow create: if isSignedIn();
+      allow update, delete: if isAdmin();
+    }
+    match /postbacks/{docId} {
+      allow read: if isAdmin();
+      allow write: if isAdmin();
+    }
+    match /click_postback_matches/{docId} {
+      allow read: if isAdmin();
+      allow write: if isAdmin();
+    }
+
+    // Immutable ledger – append-only, no updates/deletes
+    match /ticket_transactions/{docId} {
+      allow read: if isAdmin() || (isSignedIn() && resource.data.user_id == request.auth.uid);
+      allow create: if isAdmin();
+      allow update, delete: if false;
+    }
+
+    // ──────────────────────────────────────────
+    // D. User Assets
+    // ──────────────────────────────────────────
+    match /user_tickets/{docId} {
+      allow read: if isAdmin() || (isSignedIn() && resource.data.user_id == request.auth.uid);
+      allow write: if isAdmin();
+    }
+    match /user_points/{userId} {
+      allow read: if isOwner(userId) || isAdmin();
+      allow write: if isAdmin();
+    }
+
+    // Immutable ledger – append-only
+    match /point_transactions/{docId} {
+      allow read: if isAdmin() || (isSignedIn() && resource.data.user_id == request.auth.uid);
+      allow create: if isAdmin();
+      allow update, delete: if false;
+    }
+
+    // ──────────────────────────────────────────
+    // E. Gifticards
+    // ──────────────────────────────────────────
+    match /gifticons/{docId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+    match /gifticon_stock/{docId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+    match /gifticon_exchanges/{docId} {
+      allow read: if isAdmin() || (isSignedIn() && resource.data.user_id == request.auth.uid);
+      allow write: if isAdmin();
+    }
+
+    // ──────────────────────────────────────────
+    // F. Contests / Events
+    // ──────────────────────────────────────────
+    match /raffles/{docId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+    match /raffle_entries/{docId} {
+      allow read: if isAdmin() || (isSignedIn() && resource.data.user_id == request.auth.uid);
+      allow create: if isSignedIn();
+      allow update, delete: if isAdmin();
+    }
+    match /weekly_draws/{docId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+    match /invites/{docId} {
+      allow read: if isAdmin();
+      allow write: if isAdmin();
+    }
+    match /daily_visits/{docId} {
+      allow read: if isAdmin() || (isSignedIn() && resource.data.user_id == request.auth.uid);
+      allow write: if isAdmin();
+    }
+    match /banners/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /events/{docId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+
+    // ──────────────────────────────────────────
+    // G. Operations / System
+    // ──────────────────────────────────────────
+    match /notices/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /notifications/{docId} {
+      allow read: if isAdmin() || (isSignedIn() && resource.data.user_id == request.auth.uid);
+      allow write: if isAdmin();
+    }
+    match /inquiries/{docId} {
+      allow read: if isAdmin() || (isSignedIn() && resource.data.user_id == request.auth.uid);
+      allow create: if isSignedIn();
+      allow update, delete: if isAdmin();
+    }
+    match /withdrawals/{docId} {
+      allow read: if isAdmin();
+      allow write: if isAdmin();
+    }
+    match /admin_accounts/{docId} {
+      allow read, write: if isAdmin();
+    }
+  }
+}
