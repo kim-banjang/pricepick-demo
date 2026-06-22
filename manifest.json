@@ -1,0 +1,18 @@
+{
+  "name": "PricePick",
+  "short_name": "PricePick",
+  "description": "쇼핑하면 티켓, 티켓으로 기프티콘",
+  "start_url": "/app",
+  "display": "standalone",
+  "background_color": "#845EEE",
+  "theme_color": "#845EEE",
+  "lang": "ko",
+  "icons": [
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
