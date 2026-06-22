@@ -1,0 +1,1149 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PricePick CMS — Admin</title>
+<style>
+  *,*::before,*::after{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:14px;color:#1e293b;background:#f8fafc;min-height:100vh}
+  /* Layout */
+  .flex{display:flex} .hidden{display:none!important} .flex-1{flex:1} .flex-shrink-0{flex-shrink:0} .flex-col{flex-direction:column}
+  .h-screen{height:100vh} .overflow-hidden{overflow:hidden} .overflow-y-auto{overflow-y:auto} .overflow-x-auto{overflow-x:auto}
+  .min-h-screen{min-height:100vh} .w-full{width:100%} .max-w-sm{max-width:24rem} .max-w-6xl{max-width:72rem} .max-h-96{max-height:24rem}
+  .mx-auto{margin-left:auto;margin-right:auto} .mx-4{margin:0 1rem}
+  .items-center{align-items:center} .items-start{align-items:flex-start} .justify-center{justify-content:center} .justify-between{justify-content:space-between} .justify-end{justify-content:flex-end}
+  .flex-wrap{flex-wrap:wrap} .gap-1{gap:0.25rem} .gap-1\\.5{gap:0.375rem} .gap-2{gap:0.5rem} .gap-3{gap:0.75rem} .gap-4{gap:1rem} .gap-5{gap:1.25rem}
+  .grid{display:grid} .grid-cols-2{grid-template-columns:repeat(2,1fr)} .grid-cols-3{grid-template-columns:repeat(3,1fr)} .col-span-2{grid-column:span 2}
+  .space-y-0\\.5>*+*{margin-top:0.125rem} .space-y-1>*+*{margin-top:0.25rem} .space-y-3>*+*{margin-top:0.75rem} .space-y-4>*+*{margin-top:1rem} .space-x-1>*+*{margin-left:0.25rem}
+  /* Spacing */
+  .p-3{padding:0.75rem} .p-4{padding:1rem} .p-5{padding:1.25rem} .p-6{padding:1.5rem} .p-10{padding:2.5rem}
+  .px-2{padding-left:0.5rem;padding-right:0.5rem} .px-3{padding-left:0.75rem;padding-right:0.75rem} .px-4{padding-left:1rem;padding-right:1rem} .px-5{padding-left:1.25rem;padding-right:1.25rem}
+  .py-0\\.5{padding-top:0.125rem;padding-bottom:0.125rem} .py-1{padding-top:0.25rem;padding-bottom:0.25rem} .py-1\\.5{padding-top:0.375rem;padding-bottom:0.375rem}
+  .py-2{padding-top:0.5rem;padding-bottom:0.5rem} .py-2\\.5{padding-top:0.625rem;padding-bottom:0.625rem} .py-3{padding-top:0.75rem;padding-bottom:0.75rem} .py-4{padding-top:1rem;padding-bottom:1rem}
+  .mb-1{margin-bottom:0.25rem} .mb-2{margin-bottom:0.5rem} .mb-3{margin-bottom:0.75rem} .mb-4{margin-bottom:1rem} .mb-5{margin-bottom:1.25rem} .mb-6{margin-bottom:1.5rem}
+  .mt-1{margin-top:0.25rem} .mt-2{margin-top:0.5rem} .mt-3{margin-top:0.75rem} .mt-4{margin-top:1rem} .ml-1{margin-left:0.25rem} .ml-2{margin-left:0.5rem}
+  /* Text */
+  .text-xs{font-size:0.75rem;line-height:1rem} .text-sm{font-size:0.875rem;line-height:1.25rem} .text-base{font-size:1rem} .text-lg{font-size:1.125rem;line-height:1.75rem} .text-xl{font-size:1.25rem;line-height:1.75rem}
+  .font-medium{font-weight:500} .font-semibold{font-weight:600} .font-bold{font-weight:700} .font-mono{font-family:ui-monospace,monospace}
+  .text-center{text-align:center} .text-left{text-align:left} .uppercase{text-transform:uppercase} .tracking-wide{letter-spacing:0.025em}
+  .truncate{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  /* Colors */
+  .text-white{color:#fff} .text-slate-400{color:#94a3b8} .text-slate-500{color:#64748b} .text-slate-600{color:#475569} .text-slate-700{color:#334155} .text-slate-900{color:#0f172a}
+  .text-red-600{color:#dc2626} .text-red-700{color:#b91c1c} .text-amber-700{color:#b45309} .text-amber-800{color:#92400e}
+  .text-green-700{color:#15803d} .text-green-800{color:#166534} .text-blue-800{color:#1e40af} .text-purple-700{color:#7e22ce} .text-yellow-800{color:#854d0e} .text-orange-800{color:#9a3412}
+  .text-brand-600{color:#3B55E6} .text-brand-700{color:#2D43CC}
+  .bg-white{background:#fff} .bg-slate-50{background:#f8fafc} .bg-slate-100{background:#f1f5f9} .bg-slate-200{background:#e2e8f0}
+  .bg-red-50{background:#fef2f2} .bg-amber-50{background:#fffbeb} .bg-green-50{background:#f0fdf4} .bg-blue-50{background:#eff6ff} .bg-purple-50{background:#faf5ff}
+  .bg-red-100{background:#fee2e2} .bg-amber-100{background:#fef3c7} .bg-green-100{background:#dcfce7} .bg-blue-100{background:#dbeafe} .bg-purple-100{background:#f3e8ff}
+  .bg-yellow-100{background:#fef9c3} .bg-orange-100{background:#ffedd5}
+  /* Borders */
+  .border{border:1px solid} .border-b{border-bottom:1px solid} .border-t{border-top:1px solid} .border-r{border-right:1px solid}
+  .border-slate-100{border-color:#f1f5f9} .border-slate-200{border-color:#e2e8f0} .border-red-200{border-color:#fecaca} .border-amber-200{border-color:#fde68a}
+  .border-green-300{border-color:#86efac} .border-amber-300{border-color:#fcd34d}
+  .rounded{border-radius:0.25rem} .rounded-lg{border-radius:0.5rem} .rounded-xl{border-radius:0.75rem} .rounded-2xl{border-radius:1rem}
+  /* Sidebar */
+  .sidebar-link{display:flex;align-items:center;gap:0.75rem;padding:0.625rem 1rem;border-radius:0.5rem;font-size:0.875rem;font-weight:500;color:#475569;cursor:pointer;transition:background 0.15s;border:none;background:transparent;width:100%;text-align:left}
+  .sidebar-link:hover{background:#f1f5f9}
+  .sidebar-link.active{background:#f0f4ff;color:#2D43CC;font-weight:600}
+  /* Badges */
+  .badge{display:inline-flex;align-items:center;padding:0.125rem 0.5rem;border-radius:0.25rem;font-size:0.75rem;font-weight:500;line-height:1.25rem}
+  .badge-pending{background:#fef3c7;color:#92400e} .badge-confirmed,.badge-active{background:#dcfce7;color:#166534}
+  .badge-refunded,.badge-suspended{background:#fee2e2;color:#b91c1c} .badge-withdrawn,.badge-expired{background:#e2e8f0;color:#475569}
+  .badge-linked{background:#dbeafe;color:#1e40af} .badge-guest{background:#f3e8ff;color:#7e22ce}
+  .badge-gold{background:#fef9c3;color:#854d0e} .badge-silver{background:#f1f5f9;color:#334155} .badge-bronze{background:#ffedd5;color:#9a3412}
+  .badge-earn{background:#dcfce7;color:#166534} .badge-clawback{background:#fee2e2;color:#b91c1c}
+  .badge-convert{background:#dbeafe;color:#1e40af} .badge-use{background:#f3e8ff;color:#7e22ce}
+  /* Buttons */
+  .btn{display:inline-flex;align-items:center;gap:0.375rem;padding:0.375rem 0.75rem;border-radius:0.5rem;font-size:0.875rem;font-weight:500;cursor:pointer;border:1px solid transparent;transition:background 0.15s,border-color 0.15s;text-decoration:none;line-height:1.25rem}
+  .btn-primary{background:#3B55E6;color:#fff;border-color:#3B55E6} .btn-primary:hover{background:#2D43CC;border-color:#2D43CC}
+  .btn-ghost{background:#fff;color:#334155;border-color:#e2e8f0} .btn-ghost:hover{background:#f8fafc}
+  .btn-danger{background:#dc2626;color:#fff;border-color:#dc2626} .btn-danger:hover{background:#b91c1c}
+  .btn-confirm{background:#16a34a;color:#fff;border-color:#16a34a} .btn-confirm:hover{background:#15803d}
+  .btn-sm{padding:0.25rem 0.5rem;font-size:0.75rem}
+  /* State tag */
+  .state-tag{font-size:0.7rem;font-family:ui-monospace,monospace;background:#f1f5f9;color:#475569;padding:0.125rem 0.5rem;border-radius:0.25rem;border:1px solid #e2e8f0;white-space:nowrap}
+  /* Table */
+  table{width:100%;font-size:0.875rem;border-collapse:collapse}
+  th{padding:0.5rem 0.75rem;text-align:left;font-size:0.7rem;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:0.05em;background:#f8fafc;border-bottom:1px solid #e2e8f0}
+  td{padding:0.625rem 0.75rem;border-bottom:1px solid #f1f5f9;vertical-align:middle}
+  tr:last-child td{border-bottom:none} tbody tr:hover td{background:#f8fafc}
+  /* Card */
+  .card{background:#fff;border-radius:0.75rem;border:1px solid #e2e8f0;overflow:hidden}
+  .section-header{padding:1rem 1.25rem;border-bottom:1px solid #f1f5f9;display:flex;align-items:center;justify-content:space-between;gap:0.5rem}
+  /* Form */
+  input,select,textarea{width:100%;border:1px solid #e2e8f0;border-radius:0.5rem;padding:0.5rem 0.75rem;font-size:0.875rem;outline:none;font-family:inherit;background:#fff}
+  input:focus,select:focus,textarea:focus{border-color:#3B55E6;box-shadow:0 0 0 2px rgba(59,85,230,0.15)}
+  label{font-size:0.8rem;font-weight:500;color:#475569;display:block;margin-bottom:0.25rem}
+  /* Flow */
+  .flow-box{padding:0.375rem 0.75rem;border-radius:0.5rem;font-size:0.75rem;font-weight:500;border:1px solid;line-height:1.4}
+  .flow-arrow{color:#94a3b8;font-size:0.875rem}
+  /* Toast */
+  .toast{position:fixed;bottom:24px;right:24px;z-index:9999;padding:0.75rem 1rem;border-radius:0.75rem;font-size:0.875rem;font-weight:500;box-shadow:0 4px 16px rgba(0,0,0,0.15)}
+  .toast-success{background:#1e293b;color:#fff} .toast-error{background:#dc2626;color:#fff} .toast-info{background:#1e293b;color:#fff}
+  /* Modal overlay */
+  .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.45);display:flex;align-items:center;justify-content:center;z-index:50}
+  /* Sidebar */
+  #adminShell aside{width:200px;min-width:200px}
+  .sidebar-link{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  /* Misc */
+  .border-b-0{border-bottom:none!important}
+  svg{display:inline-block;vertical-align:middle;flex-shrink:0}
+  /* Size utilities */
+  .w-3{width:0.75rem} .w-4{width:1rem} .w-5{width:1.25rem} .w-10{width:2.5rem} .w-56{width:14rem}
+  .h-3{height:0.75rem} .h-4{height:1rem} .h-5{height:1.25rem} .h-10{height:2.5rem} .h-14{height:3.5rem}
+  .w-full{width:100%} .h-screen{height:100vh}
+  /* Scrollbar */
+  ::-webkit-scrollbar{width:6px;height:6px} ::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:3px}
+</style>
+</head>
+<body class="bg-slate-50 min-h-screen font-sans text-slate-800">
+
+<!-- Toast -->
+<div id="toast" class="toast hidden"></div>
+
+<!-- Login Screen -->
+<div id="loginScreen" class="min-h-screen flex items-center justify-center">
+  <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-10 w-full max-w-sm text-center">
+    <div class="mb-6">
+      <svg class="w-10 h-10 mx-auto text-brand-600 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+      </svg>
+      <h1 class="text-xl font-bold text-slate-900">PricePick CMS</h1>
+      <p class="text-sm text-slate-500 mt-1">운영자 전용 어드민</p>
+    </div>
+    <button id="loginBtn" class="btn btn-primary w-full justify-center" style="padding-top:0.625rem;padding-bottom:0.625rem">
+      <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+        <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+        <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+        <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+      </svg>
+      Google로 로그인
+    </button>
+    <p id="loginErr" class="text-red-600 text-xs mt-3 hidden"></p>
+    <p class="text-xs text-slate-400 mt-4">승인된 어드민 계정만 접근 가능</p>
+  </div>
+</div>
+
+<!-- Admin Shell (hidden until auth) -->
+<div id="adminShell" class="hidden flex h-screen overflow-hidden">
+  <!-- Sidebar -->
+  <aside class="w-56 bg-white border-r border-slate-200 flex flex-col flex-shrink-0">
+    <div class="px-5 py-4 border-b border-slate-100">
+      <div class="flex items-center gap-2">
+        <svg class="w-5 h-5 text-brand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+        </svg>
+        <span class="font-bold text-sm text-slate-900">PricePick CMS</span>
+      </div>
+    </div>
+    <nav class="flex-1 p-3 space-y-1">
+      <div onclick="navigate('purchase')" class="sidebar-link active" id="nav-purchase">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+        포스트백·구매
+      </div>
+      <div onclick="navigate('master')" class="sidebar-link" id="nav-master">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+        마스터 데이터
+      </div>
+      <div onclick="navigate('users')" class="sidebar-link" id="nav-users">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+        유저·원장
+      </div>
+      <div onclick="navigate('ops')" class="sidebar-link" id="nav-ops">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+        운영
+      </div>
+    </nav>
+    <div class="p-3 border-t border-slate-100">
+      <div id="userInfo" class="text-xs text-slate-500 mb-2 truncate"></div>
+      <button onclick="doLogout()" class="btn btn-ghost w-full justify-center text-xs" style="padding:0.25rem 0.5rem">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+        로그아웃
+      </button>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="flex-1 overflow-y-auto">
+    <div id="contentArea" class="p-6 max-w-6xl mx-auto"></div>
+  </main>
+</div>
+
+<!-- Modal -->
+<div id="modal" class="hidden fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+  <div class="bg-white rounded-xl border border-slate-200 shadow-xl w-full max-w-lg mx-4">
+    <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
+      <h3 id="modalTitle" class="font-semibold text-slate-900"></h3>
+      <button onclick="closeModal()" class="text-slate-400 hover:text-slate-600">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div id="modalBody" class="p-5"></div>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script>
+'use strict';
+
+// ── Firebase init ──────────────────────────────────────────────
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyCElUPJAitnMZxttVYjboV0j4s_qpErAgA",
+  authDomain: "pricepick-demo.firebaseapp.com",
+  projectId: "pricepick-demo",
+  storageBucket: "pricepick-demo.firebasestorage.app",
+  messagingSenderId: "505137396208",
+  appId: "1:505137396208:web:cea9d208c7745854e14535"
+};
+const ADMIN_EMAIL = 'sgkim.mixit@gmail.com';
+const ADMIN_UID   = 'PxiPDUKN1fa93YuWpZDkxiN30pj2';
+
+firebase.initializeApp(FIREBASE_CONFIG);
+const auth = firebase.auth();
+const db   = firebase.firestore();
+
+// ── Auth ───────────────────────────────────────────────────────
+const provider = new firebase.auth.GoogleAuthProvider();
+provider.setCustomParameters({ prompt: 'select_account' });
+
+document.getElementById('loginBtn').addEventListener('click', async () => {
+  const btn = document.getElementById('loginBtn');
+  btn.disabled = true;
+  btn.textContent = '로그인 중...';
+  try {
+    await auth.signInWithPopup(provider);
+  } catch(e) {
+    if (e.code === 'auth/popup-blocked' || e.code === 'auth/popup-closed-by-user') {
+      try { await auth.signInWithRedirect(provider); } catch(e2) { showLoginErr(e2.message); }
+    } else {
+      showLoginErr(e.message);
+    }
+    btn.disabled = false;
+    btn.innerHTML = `<svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+      <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+      <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+      <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+    </svg> Google로 로그인`;
+  }
+});
+
+// Handle redirect result on load
+auth.getRedirectResult().then(result => {
+  if (result && result.user) checkAdminAccess(result.user);
+}).catch(e => showLoginErr(e.message));
+
+auth.onAuthStateChanged(user => {
+  if (user) checkAdminAccess(user);
+  else showLogin();
+});
+
+function checkAdminAccess(user) {
+  if (user.email !== ADMIN_EMAIL) {
+    auth.signOut();
+    showLoginErr('접근 권한 없음. 승인된 어드민 계정만 로그인 가능합니다.');
+    return;
+  }
+  showAdmin(user);
+}
+
+function showLogin() {
+  document.getElementById('loginScreen').classList.remove('hidden');
+  document.getElementById('adminShell').classList.add('hidden');
+}
+function showAdmin(user) {
+  document.getElementById('loginScreen').classList.add('hidden');
+  document.getElementById('adminShell').classList.remove('hidden');
+  document.getElementById('adminShell').classList.add('flex');
+  document.getElementById('userInfo').textContent = user.email;
+  navigate('purchase');
+}
+function showLoginErr(msg) {
+  const el = document.getElementById('loginErr');
+  el.textContent = msg;
+  el.classList.remove('hidden');
+}
+function doLogout() {
+  auth.signOut();
+}
+
+// ── Helpers ────────────────────────────────────────────────────
+function uuid() {
+  return crypto.randomUUID ? crypto.randomUUID() : 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,c=>{const r=Math.random()*16|0;return(c==='x'?r:r&0x3|0x8).toString(16)});
+}
+function fmtTs(ts) {
+  if (!ts) return '—';
+  const d = ts.toDate ? ts.toDate() : new Date(ts);
+  return d.toLocaleString('ko-KR',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'});
+}
+function fmtKRW(n) { return (n||0).toLocaleString('ko-KR') + '원'; }
+function fmtP(n) { return (n||0).toLocaleString('ko-KR') + 'P'; }
+function now() { return firebase.firestore.FieldValue.serverTimestamp(); }
+function ts(date) { return firebase.firestore.Timestamp.fromDate(new Date(date)); }
+function daysFromNow(n) { const d = new Date(); d.setDate(d.getDate()+n); return firebase.firestore.Timestamp.fromDate(d); }
+
+function showToast(msg, type='success') {
+  const t = document.getElementById('toast');
+  const colors = { success:'bg-green-800', error:'bg-red-700', info:'bg-slate-800' };
+  t.className = `toast ${colors[type]||colors.info} text-white text-sm px-4 py-3 rounded-xl shadow-lg`;
+  t.textContent = msg;
+  t.classList.remove('hidden');
+  setTimeout(() => t.classList.add('hidden'), 3000);
+}
+
+function openModal(title, html) {
+  document.getElementById('modalTitle').textContent = title;
+  document.getElementById('modalBody').innerHTML = html;
+  document.getElementById('modal').classList.remove('hidden');
+}
+function closeModal() {
+  document.getElementById('modal').classList.add('hidden');
+}
+document.getElementById('modal').addEventListener('click', e => { if(e.target===e.currentTarget) closeModal(); });
+
+// ── Navigation ─────────────────────────────────────────────────
+let currentSection = '';
+function navigate(section) {
+  ['purchase','master','users','ops'].forEach(s => {
+    document.getElementById('nav-'+s).classList.toggle('active', s===section);
+  });
+  currentSection = section;
+  const fn = { purchase: renderPurchase, master: renderMaster, users: renderUsers, ops: renderOps };
+  fn[section]();
+}
+
+// ── Greedy Algorithm ───────────────────────────────────────────
+// 적립단위: bronze=5000, silver=50000, gold=100000
+// 전등급 2% = 티켓 가치가 구매금액의 2% (bronze=100P, silver=1000P, gold=2000P)
+// Greedy: 구매금액을 5000원 올림 후 gold→silver→bronze 단위로 채움
+function greedyTickets(amount) {
+  const units = Math.ceil(amount / 5000);
+  let rem = units;
+  const gold   = Math.floor(rem / 20); rem -= gold * 20;
+  const silver = Math.floor(rem / 10); rem -= silver * 10;
+  const bronze = rem;
+  return { gold, silver, bronze };
+}
+function calcPoints(t) { return t.gold*2000 + t.silver*1000 + t.bronze*100; }
+function gradeLabel(g) { return { gold:'금', silver:'은', bronze:'동' }[g] || g; }
+function gradeClass(g) { return `badge badge-${g}`; }
+
+// ── SECTION 1: 포스트백·구매 ────────────────────────────────────
+async function renderPurchase() {
+  const area = document.getElementById('contentArea');
+  area.innerHTML = `
+    <div class="mb-6">
+      <h2 class="text-lg font-bold text-slate-900">포스트백·구매 관리</h2>
+      <p class="text-sm text-slate-500 mt-1">데모 구매를 주입하고 적립 인과를 단계별로 확인합니다.</p>
+    </div>
+
+    <!-- State Flow -->
+    <div class="card mb-5 p-4">
+      <p class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-3">상태 전이 흐름</p>
+      <div class="flex items-center gap-2 flex-wrap text-xs">
+        <div class="flow-box bg-amber-50 border-amber-200 text-amber-800">구매주입<br><span class="text-amber-500 font-mono">postbacks: pending</span></div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-box bg-blue-50 border-blue-200 text-blue-800">클릭매칭<br><span class="text-blue-500 font-mono">matches: matched</span></div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-box bg-green-50 border-green-200 text-green-800">확정<br><span class="text-green-600 font-mono">postbacks: confirmed<br>user_tickets: active<br>ticket_transactions: EARN</span></div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-box bg-red-50 border-red-200 text-red-800">환불<br><span class="text-red-500 font-mono">postbacks: refunded<br>user_tickets: refunded<br>ticket_transactions: CLAWBACK</span></div>
+      </div>
+    </div>
+
+    <!-- Inject Form -->
+    <div class="card mb-5">
+      <div class="section-header">
+        <h3 class="font-semibold text-slate-900">데모 구매 주입</h3>
+        <span class="state-tag">click_logs + postbacks + matches 생성</span>
+      </div>
+      <div class="p-5">
+        <div class="grid grid-cols-3 gap-3 mb-3">
+          <div>
+            <label class="block text-xs font-medium text-slate-600 mb-1">유저</label>
+            <select id="inj-user">
+              <option value="user-linked-alice">앨리스 (linked)</option>
+              <option value="user-linked-bob">밥 (linked)</option>
+              <option value="user-linked-carol">캐롤 (linked, suspended)</option>
+              <option value="user-guest-dave">데이브 (guest)</option>
+              <option value="user-guest-eve">이브 (guest)</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-600 mb-1">구매금액 (원)</label>
+            <input type="number" id="inj-amount" value="67000" min="5000" step="1000">
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-600 mb-1">쇼핑몰</label>
+            <select id="inj-mall">
+              <option value="coupang">쿠팡</option>
+            </select>
+          </div>
+        </div>
+        <div id="greedyPreview" class="bg-slate-50 rounded-lg px-4 text-sm mb-3" style="padding-top:0.625rem;padding-bottom:0.625rem"></div>
+        <button onclick="injectPurchase()" class="btn btn-primary">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+          구매 발생 (주입)
+        </button>
+      </div>
+    </div>
+
+    <!-- Postback List -->
+    <div class="card" id="postbackCard">
+      <div class="section-header">
+        <h3 class="font-semibold text-slate-900">포스트백 목록</h3>
+        <button onclick="renderPurchase()" class="btn btn-ghost btn-sm">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+          새로고침
+        </button>
+      </div>
+      <div id="postbackList" class="overflow-x-auto">
+        <div class="p-6 text-center text-slate-400 text-sm">불러오는 중...</div>
+      </div>
+    </div>
+  `;
+
+  // Live preview of greedy calc
+  const amtInput = document.getElementById('inj-amount');
+  function updatePreview() {
+    const amt = parseInt(amtInput.value) || 0;
+    const t = greedyTickets(amt);
+    const pts = calcPoints(t);
+    document.getElementById('greedyPreview').innerHTML =
+      `<span class="text-slate-500">Greedy 예상: </span>` +
+      (t.gold   ? `<span class="badge badge-gold mr-1">금 ${t.gold}장</span>` : '') +
+      (t.silver ? `<span class="badge badge-silver mr-1">은 ${t.silver}장</span>` : '') +
+      (t.bronze ? `<span class="badge badge-bronze mr-1">동 ${t.bronze}장</span>` : '') +
+      `<span class="text-slate-400 ml-2">→ ${fmtP(pts)} 적립 예정</span>`;
+  }
+  amtInput.addEventListener('input', updatePreview);
+  updatePreview();
+
+  loadPostbacks();
+}
+
+async function loadPostbacks() {
+  const el = document.getElementById('postbackList');
+  if (!el) return;
+  try {
+    const snap = await db.collection('postbacks').orderBy('created_at','desc').limit(30).get();
+    if (snap.empty) { el.innerHTML = '<div class="p-6 text-center text-slate-400 text-sm">포스트백 없음</div>'; return; }
+    const rows = snap.docs.map(doc => {
+      const d = doc.data();
+      const statusBadge = `<span class="badge badge-${d.status}">${d.status}</span>`;
+      let actions = '';
+      if (d.status === 'pending' && d.user_id) {
+        actions = `
+          <button onclick="confirmPostback('${doc.id}')" class="btn btn-confirm btn-sm">
+            확정
+            <span class="state-tag ml-1">→ confirmed + EARN</span>
+          </button>`;
+      } else if (d.status === 'confirmed') {
+        actions = `
+          <button onclick="refundPostback('${doc.id}')" class="btn btn-danger btn-sm">
+            환불
+            <span class="state-tag ml-1">→ refunded + CLAWBACK</span>
+          </button>`;
+      }
+      return `<tr>
+        <td class="font-mono text-xs text-slate-400">${doc.id.slice(0,8)}...</td>
+        <td>${d.user_id ? d.user_id.split('-').slice(-1)[0] : '<span class="text-slate-400">미매칭</span>'}</td>
+        <td>${d.mall_code||'—'}</td>
+        <td class="font-medium">${fmtKRW(d.purchase_amount)}</td>
+        <td>${statusBadge}</td>
+        <td class="text-xs text-slate-500">${fmtTs(d.created_at)}</td>
+        <td>${actions}</td>
+      </tr>`;
+    }).join('');
+    el.innerHTML = `<table>
+      <thead><tr>
+        <th>ID</th><th>유저</th><th>쇼핑몰</th><th>구매금액</th><th>상태</th><th>생성일</th><th>액션</th>
+      </tr></thead>
+      <tbody>${rows}</tbody>
+    </table>`;
+  } catch(e) {
+    el.innerHTML = `<div class="p-4 text-red-600 text-sm">오류: ${e.message}</div>`;
+  }
+}
+
+async function injectPurchase() {
+  const userId = document.getElementById('inj-user').value;
+  const amount = parseInt(document.getElementById('inj-amount').value);
+  const mall   = document.getElementById('inj-mall').value;
+  if (!amount || amount < 5000) { showToast('5,000원 이상 입력', 'error'); return; }
+
+  const clickId    = uuid();
+  const postbackId = uuid();
+  const matchId    = uuid();
+  const orderNum   = Math.floor(Math.random()*90000+10000);
+
+  const batch = db.batch();
+  // click_log
+  batch.set(db.collection('click_logs').doc(clickId), {
+    click_id: clickId, user_id: userId, mall_code: mall,
+    clicked_at: now(), valid_until: daysFromNow(1), created_at: now()
+  });
+  // postback
+  batch.set(db.collection('postbacks').doc(postbackId), {
+    postback_id: postbackId, user_id: userId, mall_code: mall,
+    order_id: `CPN-DEMO-${orderNum}`,
+    raw_payload: { event:'purchase', amount, commission: Math.round(amount*0.02) },
+    purchase_amount: amount, commission_amount: Math.round(amount*0.02),
+    status: 'pending',
+    purchased_at: now(), confirmed_at: null, received_at: now(), processed_at: null, created_at: now()
+  });
+  // match
+  batch.set(db.collection('click_postback_matches').doc(matchId), {
+    match_id: matchId, click_id: clickId, postback_id: postbackId, user_id: userId,
+    match_status: 'matched', matched_at: now(), created_at: now()
+  });
+
+  try {
+    await batch.commit();
+    showToast(`구매 주입 완료 — ${fmtKRW(amount)} / ${userId.split('-').pop()}`);
+    loadPostbacks();
+  } catch(e) {
+    showToast('오류: '+e.message, 'error');
+  }
+}
+
+async function confirmPostback(postbackId) {
+  const pbDoc = await db.collection('postbacks').doc(postbackId).get();
+  if (!pbDoc.exists) { showToast('포스트백 없음', 'error'); return; }
+  const pb = pbDoc.data();
+  if (pb.status !== 'pending') { showToast('이미 처리된 포스트백', 'error'); return; }
+
+  const t = greedyTickets(pb.purchase_amount);
+  const pts = calcPoints(t);
+  const grades = [
+    { code:'gold',   qty: t.gold,   pts: 2000 },
+    { code:'silver', qty: t.silver, pts: 1000 },
+    { code:'bronze', qty: t.bronze, pts: 100  },
+  ].filter(g => g.qty > 0);
+
+  // Show preview before confirming
+  const preview = grades.map(g =>
+    `<div class="flex items-center gap-2 py-1">
+      <span class="badge badge-${g.code}">${gradeLabel(g.code)}</span>
+      <span class="text-sm">${g.qty}장</span>
+      <span class="text-xs text-slate-400">(${fmtP(g.qty * g.pts)} 적립)</span>
+    </div>`
+  ).join('');
+
+  openModal('구매 확정 — Greedy 등급 산정', `
+    <div class="mb-4">
+      <p class="text-sm text-slate-600 mb-1">구매금액: <strong>${fmtKRW(pb.purchase_amount)}</strong></p>
+      <p class="text-xs text-slate-400 mb-3">ceil(${pb.purchase_amount}/5000)=${Math.ceil(pb.purchase_amount/5000)} 단위 → gold(×20)→silver(×10)→bronze 채움</p>
+      <div class="bg-slate-50 rounded-lg p-3 mb-3">${preview}
+        <div class="border-t border-slate-200 mt-2 pt-2 text-sm font-medium">총 적립: ${fmtP(pts)}</div>
+      </div>
+      <div class="text-xs bg-amber-50 border border-amber-200 rounded-lg p-3 space-y-1">
+        <div><span class="font-medium">postbacks.status</span> → <span class="text-green-700">confirmed</span></div>
+        <div><span class="font-medium">user_tickets</span> → 등급별 신규 문서 생성 (status: active)</div>
+        <div><span class="font-medium">ticket_transactions</span> → EARN 원장 추가</div>
+        <div><span class="font-medium">user_points.balance</span> → +${fmtP(pts)}</div>
+        <div><span class="font-medium">point_transactions</span> → EARN 원장 추가</div>
+      </div>
+    </div>
+    <div class="flex gap-2 justify-end">
+      <button onclick="closeModal()" class="btn btn-ghost">취소</button>
+      <button onclick="doConfirm('${postbackId}', '${pb.user_id}', ${pb.purchase_amount})" class="btn btn-confirm">확정 실행</button>
+    </div>
+  `);
+}
+
+window.doConfirm = async function(postbackId, userId, amount) {
+  closeModal();
+  const t = greedyTickets(amount);
+  const pts = calcPoints(t);
+  const grades = [
+    { code:'gold',   qty: t.gold   },
+    { code:'silver', qty: t.silver },
+    { code:'bronze', qty: t.bronze },
+  ].filter(g => g.qty > 0);
+
+  const batch = db.batch();
+  const expiresAt = daysFromNow(365);
+
+  // user_tickets + ticket_transactions per grade
+  grades.forEach(g => {
+    const tktId = uuid();
+    const ttxId = uuid();
+    const ptsPer = { gold:2000, silver:1000, bronze:100 }[g.code];
+    batch.set(db.collection('user_tickets').doc(tktId), {
+      id: tktId, user_id: userId, ticket_type: 'grade', grade_code: g.code,
+      qty: g.qty, status: 'active', source: 'purchase',
+      acquired_at: now(), confirmed_at: now(), expires_at: expiresAt,
+      created_at: now(), updated_at: now(), postback_id: postbackId
+    });
+    batch.set(db.collection('ticket_transactions').doc(ttxId), {
+      id: ttxId, user_id: userId, ticket_type: 'grade', grade_code: g.code,
+      type: 'EARN', qty: g.qty, source: 'purchase',
+      ref_type: 'postbacks', ref_id: postbackId,
+      expires_at: expiresAt, created_at: now()
+    });
+  });
+
+  // user_points upsert
+  const pointsRef = db.collection('user_points').doc(userId);
+  const pointsDoc = await pointsRef.get();
+  if (pointsDoc.exists) {
+    batch.update(pointsRef, { balance: firebase.firestore.FieldValue.increment(pts), updated_at: now() });
+  } else {
+    batch.set(pointsRef, { user_id: userId, balance: pts, updated_at: now(), created_at: now() });
+  }
+
+  // point_transaction EARN
+  const ptxId = uuid();
+  batch.set(db.collection('point_transactions').doc(ptxId), {
+    id: ptxId, user_id: userId, type: 'EARN', qty: pts,
+    source: 'purchase', ref_type: 'postbacks', ref_id: postbackId,
+    expires_at: expiresAt, created_at: now()
+  });
+
+  // postback status → confirmed
+  batch.update(db.collection('postbacks').doc(postbackId), {
+    status: 'confirmed', confirmed_at: now(), processed_at: now()
+  });
+
+  try {
+    await batch.commit();
+    showToast(`확정 완료 — ${fmtP(pts)} 적립`);
+    loadPostbacks();
+  } catch(e) {
+    showToast('확정 오류: '+e.message, 'error');
+  }
+};
+
+async function refundPostback(postbackId) {
+  const pbDoc = await db.collection('postbacks').doc(postbackId).get();
+  if (!pbDoc.exists || pbDoc.data().status !== 'confirmed') {
+    showToast('확정된 포스트백만 환불 가능', 'error'); return;
+  }
+  const pb = pbDoc.data();
+  const userId = pb.user_id;
+
+  // Find active tickets from this postback
+  const tktsSnap = await db.collection('user_tickets')
+    .where('postback_id','==',postbackId)
+    .where('status','==','active').get();
+
+  if (tktsSnap.empty) {
+    showToast('환불할 티켓 없음', 'error'); return;
+  }
+
+  openModal('환불 처리', `
+    <div class="mb-4">
+      <p class="text-sm text-slate-600 mb-3">구매금액 ${fmtKRW(pb.purchase_amount)} 환불 처리합니다.</p>
+      <div class="text-xs bg-red-50 border border-red-200 rounded-lg p-3 space-y-1">
+        <div><span class="font-medium">postbacks.status</span> → <span class="text-red-700">refunded</span></div>
+        <div><span class="font-medium">user_tickets.status</span> → <span class="text-red-700">refunded</span> (${tktsSnap.size}건)</div>
+        <div><span class="font-medium">ticket_transactions</span> → CLAWBACK 원장 추가</div>
+        <div><span class="font-medium">user_points.balance</span> → 적립 포인트 차감</div>
+        <div><span class="font-medium">point_transactions</span> → CLAWBACK 원장 추가</div>
+      </div>
+    </div>
+    <div class="flex gap-2 justify-end">
+      <button onclick="closeModal()" class="btn btn-ghost">취소</button>
+      <button onclick="doRefund('${postbackId}', '${userId}')" class="btn btn-danger">환불 실행</button>
+    </div>
+  `);
+}
+
+window.doRefund = async function(postbackId, userId) {
+  closeModal();
+  const tktsSnap = await db.collection('user_tickets')
+    .where('postback_id','==',postbackId)
+    .where('status','==','active').get();
+
+  const batch = db.batch();
+  let totalClawbackPts = 0;
+  const ptsPerGrade = { gold:2000, silver:1000, bronze:100 };
+
+  tktsSnap.docs.forEach(doc => {
+    const tkt = doc.data();
+    const ptsBack = (ptsPerGrade[tkt.grade_code]||0) * tkt.qty;
+    totalClawbackPts += ptsBack;
+
+    // Update ticket status
+    batch.update(doc.ref, { status:'refunded', updated_at: now() });
+
+    // CLAWBACK transaction
+    const ttxId = uuid();
+    batch.set(db.collection('ticket_transactions').doc(ttxId), {
+      id: ttxId, user_id: userId, ticket_type: 'grade', grade_code: tkt.grade_code,
+      type: 'CLAWBACK', qty: -tkt.qty, source: 'refund',
+      ref_type: 'postbacks', ref_id: postbackId,
+      expires_at: null, created_at: now()
+    });
+  });
+
+  // Deduct points
+  if (totalClawbackPts > 0) {
+    batch.update(db.collection('user_points').doc(userId), {
+      balance: firebase.firestore.FieldValue.increment(-totalClawbackPts), updated_at: now()
+    });
+    const ptxId = uuid();
+    batch.set(db.collection('point_transactions').doc(ptxId), {
+      id: ptxId, user_id: userId, type: 'CLAWBACK', qty: -totalClawbackPts,
+      source: 'refund', ref_type: 'postbacks', ref_id: postbackId,
+      expires_at: null, created_at: now()
+    });
+  }
+
+  // postback → refunded
+  batch.update(db.collection('postbacks').doc(postbackId), {
+    status: 'refunded', processed_at: now()
+  });
+
+  try {
+    await batch.commit();
+    showToast(`환불 완료 — ${fmtP(totalClawbackPts)} 회수`);
+    loadPostbacks();
+  } catch(e) {
+    showToast('환불 오류: '+e.message, 'error');
+  }
+};
+
+// ── SECTION 2: 마스터 데이터 ────────────────────────────────────
+async function renderMaster() {
+  document.getElementById('contentArea').innerHTML = `
+    <div class="mb-6">
+      <h2 class="text-lg font-bold text-slate-900">마스터 데이터</h2>
+      <p class="text-sm text-slate-500 mt-1">적립 기준값을 변경하면 이후 확정 계산에 즉시 반영됩니다.</p>
+    </div>
+    <div class="grid grid-cols-2 gap-5">
+      <div id="mallCard" class="card"><div class="p-4 text-slate-400 text-sm">불러오는 중...</div></div>
+      <div id="gradeCard" class="card"><div class="p-4 text-slate-400 text-sm">불러오는 중...</div></div>
+      <div id="exchangeCard" class="card col-span-2"><div class="p-4 text-slate-400 text-sm">불러오는 중...</div></div>
+      <div id="gifticonCard" class="card col-span-2"><div class="p-4 text-slate-400 text-sm">불러오는 중...</div></div>
+    </div>
+  `;
+  loadMalls(); loadGrades(); loadExchangeRules(); loadGifticons();
+}
+
+async function loadMalls() {
+  const el = document.getElementById('mallCard');
+  const snap = await db.collection('affiliate_malls').get();
+  const rows = snap.docs.map(doc => {
+    const d = doc.data();
+    return `<tr>
+      <td class="font-medium">${d.name}</td>
+      <td class="font-mono text-xs">${d.mall_code}</td>
+      <td>${(d.commission_rate*100).toFixed(2)}%</td>
+      <td><span class="badge ${d.active?'badge-confirmed':'badge-expired'}">${d.active?'활성':'비활성'}</span></td>
+    </tr>`;
+  }).join('');
+  el.innerHTML = `
+    <div class="section-header"><h3 class="font-semibold text-slate-900">제휴 쇼핑몰</h3><span class="state-tag">affiliate_malls</span></div>
+    <table><thead><tr><th>이름</th><th>코드</th><th>커미션율</th><th>상태</th></tr></thead><tbody>${rows}</tbody></table>`;
+}
+
+async function loadGrades() {
+  const el = document.getElementById('gradeCard');
+  const snap = await db.collection('ticket_grades').orderBy('sort_order').get();
+  const rows = snap.docs.map(doc => {
+    const d = doc.data();
+    return `<tr>
+      <td><span class="badge badge-${d.grade_code}">${gradeLabel(d.grade_code)}</span></td>
+      <td class="font-medium">${fmtKRW(d.accrual_unit_krw)}</td>
+      <td>${fmtP(d.reward_value_krw * 10)}<span class="text-xs text-slate-400 ml-1">(${d.reward_value_krw}원)</span></td>
+      <td>${(d.reward_rate*100).toFixed(0)}%</td>
+    </tr>`;
+  }).join('');
+  el.innerHTML = `
+    <div class="section-header"><h3 class="font-semibold text-slate-900">티켓 등급</h3><span class="state-tag">ticket_grades</span></div>
+    <table><thead><tr><th>등급</th><th>적립단위</th><th>가치</th><th>적립율</th></tr></thead><tbody>${rows}</tbody></table>`;
+}
+
+async function loadExchangeRules() {
+  const el = document.getElementById('exchangeCard');
+  const snap = await db.collection('grade_exchange_rules').get();
+  const rows = snap.docs.map(doc => {
+    const d = doc.data();
+    return `<tr>
+      <td class="font-mono text-xs text-slate-400">${doc.id}</td>
+      <td><span class="badge badge-${d.from_grade}">${gradeLabel(d.from_grade)} ${d.from_qty}장</span></td>
+      <td>→</td>
+      <td><span class="badge badge-${d.to_grade}">${gradeLabel(d.to_grade)} ${d.to_qty}장</span></td>
+    </tr>`;
+  }).join('');
+  el.innerHTML = `
+    <div class="section-header"><h3 class="font-semibold text-slate-900">등급 교환 규칙</h3><span class="state-tag">grade_exchange_rules</span></div>
+    <table><thead><tr><th>규칙 ID</th><th>소모</th><th></th><th>획득</th></tr></thead><tbody>${rows}</tbody></table>`;
+}
+
+async function loadGifticons() {
+  const el = document.getElementById('gifticonCard');
+  const [gifSnap, stockSnap] = await Promise.all([
+    db.collection('gifticons').get(),
+    db.collection('gifticon_stock').get()
+  ]);
+  const stock = {};
+  stockSnap.docs.forEach(d => { stock[d.id] = d.data(); });
+  const rows = gifSnap.docs.map(doc => {
+    const d = doc.data();
+    const s = stock[doc.id] || {};
+    return `<tr>
+      <td class="font-medium">${d.name}</td>
+      <td>${d.brand}</td>
+      <td>${fmtKRW(d.price)}</td>
+      <td><span class="badge badge-${d.required_grade}">${gradeLabel(d.required_grade)} ${d.required_qty}장</span></td>
+      <td>
+        <span class="font-medium">${s.remaining??'?'}</span>
+        <span class="text-xs text-slate-400">/ ${s.total_issued??'?'}</span>
+      </td>
+      <td><button onclick="editStock('${doc.id}','${d.name}',${s.remaining??0})" class="btn btn-ghost btn-sm">재고 수정</button></td>
+    </tr>`;
+  }).join('');
+  el.innerHTML = `
+    <div class="section-header"><h3 class="font-semibold text-slate-900">기프티콘 & 재고</h3><span class="state-tag">gifticons + gifticon_stock</span></div>
+    <div class="overflow-x-auto"><table><thead><tr><th>상품명</th><th>브랜드</th><th>가격</th><th>교환조건</th><th>재고</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>`;
+}
+
+window.editStock = function(gifId, name, current) {
+  openModal(`재고 수정 — ${name}`, `
+    <div class="mb-4">
+      <label class="block text-xs font-medium text-slate-600 mb-1">현재 재고: ${current}</label>
+      <input type="number" id="newStock" value="${current}" min="0">
+    </div>
+    <div class="flex gap-2 justify-end">
+      <button onclick="closeModal()" class="btn btn-ghost">취소</button>
+      <button onclick="saveStock('${gifId}')" class="btn btn-primary">저장</button>
+    </div>
+  `);
+};
+window.saveStock = async function(gifId) {
+  const val = parseInt(document.getElementById('newStock').value);
+  await db.collection('gifticon_stock').doc(gifId).update({ remaining: val, updated_at: now() });
+  closeModal(); showToast('재고 수정 완료'); loadGifticons();
+};
+
+// ── SECTION 3: 유저·원장 ────────────────────────────────────────
+async function renderUsers() {
+  document.getElementById('contentArea').innerHTML = `
+    <div class="mb-6">
+      <h2 class="text-lg font-bold text-slate-900">유저·원장</h2>
+      <p class="text-sm text-slate-500 mt-1">유저를 클릭하면 보유 자산 및 거래 원장을 조회합니다.</p>
+    </div>
+    <div id="userListCard" class="card"><div class="p-4 text-slate-400 text-sm">불러오는 중...</div></div>
+  `;
+  loadUsers();
+}
+
+async function loadUsers() {
+  const el = document.getElementById('userListCard');
+  const [usersSnap, pointsSnap] = await Promise.all([
+    db.collection('users').get(),
+    db.collection('user_points').get()
+  ]);
+  const pointsMap = {};
+  pointsSnap.docs.forEach(d => { pointsMap[d.id] = d.data().balance; });
+
+  const rows = usersSnap.docs.map(doc => {
+    const d = doc.data();
+    const pts = pointsMap[doc.id] ?? '—';
+    const statusBadge = `<span class="badge badge-${d.status}">${d.status}</span>`;
+    const linkBadge   = `<span class="badge badge-${d.link_status}">${d.link_status}</span>`;
+    let actions = `<button onclick="openUserDetail('${doc.id}')" class="btn btn-ghost btn-sm">상세 보기</button>`;
+    if (d.status === 'active') {
+      actions += ` <button onclick="suspendUser('${doc.id}')" class="btn btn-sm border border-amber-300 text-amber-700 hover:bg-amber-50">정지</button>`;
+    } else if (d.status === 'suspended') {
+      actions += ` <button onclick="unsuspendUser('${doc.id}')" class="btn btn-sm border border-green-300 text-green-700 hover:bg-green-50">정지해제</button>`;
+    }
+    if (d.status !== 'withdrawn') {
+      actions += ` <button onclick="withdrawUser('${doc.id}')" class="btn btn-sm border border-red-200 text-red-600 hover:bg-red-50">탈퇴</button>`;
+    }
+    return `<tr>
+      <td class="font-mono text-xs text-slate-400">${doc.id}</td>
+      <td class="font-medium">${d.nickname}</td>
+      <td>${statusBadge}</td>
+      <td>${linkBadge}</td>
+      <td class="font-medium">${typeof pts === 'number' ? fmtP(pts) : pts}</td>
+      <td class="text-xs text-slate-400">${fmtTs(d.joined_at)}</td>
+      <td class="space-x-1">${actions}</td>
+    </tr>`;
+  }).join('');
+
+  el.innerHTML = `
+    <div class="section-header"><h3 class="font-semibold text-slate-900">전체 유저</h3></div>
+    <div class="overflow-x-auto"><table>
+      <thead><tr><th>ID</th><th>닉네임</th><th>상태</th><th>연동</th><th>포인트</th><th>가입일</th><th>액션</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table></div>`;
+}
+
+window.openUserDetail = async function(userId) {
+  openModal('유저 상세 — 불러오는 중...', '<div class="text-slate-400 text-sm">불러오는 중...</div>');
+  const [userDoc, ticketsSnap, ttxSnap, ptxSnap] = await Promise.all([
+    db.collection('users').doc(userId).get(),
+    db.collection('user_tickets').where('user_id','==',userId).orderBy('created_at','desc').get(),
+    db.collection('ticket_transactions').where('user_id','==',userId).orderBy('created_at','desc').limit(20).get(),
+    db.collection('point_transactions').where('user_id','==',userId).orderBy('created_at','desc').limit(20).get()
+  ]);
+  const u = userDoc.data();
+  const pointsDoc = await db.collection('user_points').doc(userId).get();
+  const balance = pointsDoc.exists ? pointsDoc.data().balance : 0;
+
+  const tktRows = ticketsSnap.docs.map(doc => {
+    const d = doc.data();
+    return `<tr>
+      <td>${d.grade_code ? `<span class="badge badge-${d.grade_code}">${gradeLabel(d.grade_code)}</span>` : '<span class="badge">이벤트</span>'}</td>
+      <td>${d.qty}장</td>
+      <td><span class="badge badge-${d.status}">${d.status}</span></td>
+      <td class="text-xs text-slate-400">${fmtTs(d.confirmed_at)}</td>
+      <td class="text-xs text-slate-400">${fmtTs(d.expires_at)}</td>
+    </tr>`;
+  }).join('') || '<tr><td colspan="5" class="text-slate-400">티켓 없음</td></tr>';
+
+  const ttxRows = ttxSnap.docs.map(doc => {
+    const d = doc.data();
+    return `<tr>
+      <td><span class="badge badge-${d.type.toLowerCase()}">${d.type}</span></td>
+      <td>${d.grade_code ? `<span class="badge badge-${d.grade_code} badge-sm">${gradeLabel(d.grade_code)}</span>` : '—'}</td>
+      <td class="${d.qty>0?'text-green-700':'text-red-600'} font-medium">${d.qty>0?'+':''}${d.qty}</td>
+      <td class="text-xs text-slate-400">${fmtTs(d.created_at)}</td>
+    </tr>`;
+  }).join('') || '<tr><td colspan="4" class="text-slate-400">원장 없음</td></tr>';
+
+  const ptxRows = ptxSnap.docs.map(doc => {
+    const d = doc.data();
+    return `<tr>
+      <td><span class="badge badge-${d.type.toLowerCase()}">${d.type}</span></td>
+      <td class="${d.qty>0?'text-green-700':'text-red-600'} font-medium">${d.qty>0?'+':''}${fmtP(d.qty)}</td>
+      <td class="text-xs text-slate-400">${d.source}</td>
+      <td class="text-xs text-slate-400">${fmtTs(d.created_at)}</td>
+    </tr>`;
+  }).join('') || '<tr><td colspan="4" class="text-slate-400">원장 없음</td></tr>';
+
+  document.getElementById('modalTitle').textContent = `${u.nickname} 상세`;
+  document.getElementById('modalBody').innerHTML = `
+    <div class="space-y-4 max-h-96 overflow-y-auto">
+      <div class="flex gap-3 flex-wrap">
+        <span class="badge badge-${u.status}">${u.status}</span>
+        <span class="badge badge-${u.link_status}">${u.link_status}</span>
+        <span class="text-sm text-slate-500">잔액: <strong>${fmtP(balance)}</strong></span>
+        <span class="text-sm text-slate-500">가입: ${fmtTs(u.joined_at)}</span>
+      </div>
+
+      <div>
+        <p class="text-xs font-semibold text-slate-500 uppercase mb-1">보유 티켓 <span class="state-tag">user_tickets</span></p>
+        <table><thead><tr><th>등급</th><th>수량</th><th>상태</th><th>확정일</th><th>만료일</th></tr></thead>
+        <tbody>${tktRows}</tbody></table>
+      </div>
+
+      <div>
+        <p class="text-xs font-semibold text-slate-500 uppercase mb-1">티켓 원장 <span class="state-tag">ticket_transactions — 불변(삭제·수정 불가)</span></p>
+        <table><thead><tr><th>유형</th><th>등급</th><th>수량</th><th>일시</th></tr></thead>
+        <tbody>${ttxRows}</tbody></table>
+      </div>
+
+      <div>
+        <p class="text-xs font-semibold text-slate-500 uppercase mb-1">포인트 원장 <span class="state-tag">point_transactions — 불변</span></p>
+        <table><thead><tr><th>유형</th><th>포인트</th><th>출처</th><th>일시</th></tr></thead>
+        <tbody>${ptxRows}</tbody></table>
+      </div>
+    </div>
+  `;
+};
+
+window.suspendUser = async function(userId) {
+  if (!confirm('이 유저를 정지하시겠습니까?')) return;
+  await db.collection('users').doc(userId).update({ status:'suspended', updated_at: now() });
+  showToast('유저 정지 완료 — users.status: suspended');
+  loadUsers();
+};
+window.unsuspendUser = async function(userId) {
+  await db.collection('users').doc(userId).update({ status:'active', updated_at: now() });
+  showToast('정지 해제 — users.status: active');
+  loadUsers();
+};
+window.withdrawUser = async function(userId) {
+  if (!confirm('탈퇴 처리하시겠습니까? 되돌릴 수 없습니다.')) return;
+  await db.collection('users').doc(userId).update({ status:'withdrawn', withdrawn_at: now(), updated_at: now() });
+  showToast('탈퇴 처리 완료 — users.status: withdrawn');
+  loadUsers();
+};
+
+// ── SECTION 4: 운영 ─────────────────────────────────────────────
+async function renderOps() {
+  document.getElementById('contentArea').innerHTML = `
+    <div class="mb-6">
+      <h2 class="text-lg font-bold text-slate-900">운영</h2>
+      <p class="text-sm text-slate-500 mt-1">공지·문의·탈퇴 신청을 처리합니다.</p>
+    </div>
+    <div class="grid grid-cols-2 gap-5">
+      <div id="noticeCard" class="card"><div class="p-4 text-slate-400 text-sm">불러오는 중...</div></div>
+      <div id="inquiryCard" class="card"><div class="p-4 text-slate-400 text-sm">불러오는 중...</div></div>
+      <div id="notifCard" class="card col-span-2"><div class="p-4 text-slate-400 text-sm">불러오는 중...</div></div>
+    </div>
+  `;
+  loadNotices(); loadInquiries(); loadNotifications();
+}
+
+async function loadNotices() {
+  const el = document.getElementById('noticeCard');
+  const snap = await db.collection('notices').orderBy('created_at','desc').limit(10).get();
+  const rows = snap.docs.map(doc => {
+    const d = doc.data();
+    return `<tr>
+      <td class="font-medium text-sm">${d.title}</td>
+      <td>${d.is_pinned ? '<span class="badge badge-confirmed">고정</span>' : ''}</td>
+      <td class="text-xs text-slate-400">${fmtTs(d.created_at)}</td>
+      <td><button onclick="deleteNotice('${doc.id}')" class="btn btn-danger btn-sm">삭제</button></td>
+    </tr>`;
+  }).join('') || '<tr><td colspan="4" class="text-slate-400 p-3">공지 없음</td></tr>';
+
+  el.innerHTML = `
+    <div class="section-header">
+      <h3 class="font-semibold text-slate-900">공지사항</h3>
+      <button onclick="openCreateNotice()" class="btn btn-primary btn-sm">+ 작성</button>
+    </div>
+    <table><thead><tr><th>제목</th><th></th><th>작성일</th><th></th></tr></thead>
+    <tbody>${rows}</tbody></table>`;
+}
+
+window.openCreateNotice = function() {
+  openModal('공지 작성', `
+    <div class="space-y-3 mb-4">
+      <div>
+        <label class="block text-xs font-medium text-slate-600 mb-1">제목</label>
+        <input id="ntc-title" placeholder="공지 제목">
+      </div>
+      <div>
+        <label class="block text-xs font-medium text-slate-600 mb-1">내용</label>
+        <textarea id="ntc-content" rows="3" placeholder="공지 내용"></textarea>
+      </div>
+      <label class="flex items-center gap-2 text-sm">
+        <input type="checkbox" id="ntc-pinned"> 상단 고정
+      </label>
+    </div>
+    <div class="flex gap-2 justify-end">
+      <button onclick="closeModal()" class="btn btn-ghost">취소</button>
+      <button onclick="saveNotice()" class="btn btn-primary">저장</button>
+    </div>
+  `);
+};
+window.saveNotice = async function() {
+  const title   = document.getElementById('ntc-title').value.trim();
+  const content = document.getElementById('ntc-content').value.trim();
+  const pinned  = document.getElementById('ntc-pinned').checked;
+  if (!title) { showToast('제목 입력 필요', 'error'); return; }
+  const id = uuid();
+  await db.collection('notices').doc(id).set({ id, title, content, is_pinned: pinned, published_at: now(), created_at: now(), updated_at: now() });
+  closeModal(); showToast('공지 저장 완료'); loadNotices();
+};
+window.deleteNotice = async function(id) {
+  if (!confirm('삭제하시겠습니까?')) return;
+  await db.collection('notices').doc(id).delete();
+  showToast('삭제 완료'); loadNotices();
+};
+
+async function loadInquiries() {
+  const el = document.getElementById('inquiryCard');
+  const snap = await db.collection('inquiries').orderBy('created_at','desc').limit(10).get();
+  const rows = snap.docs.map(doc => {
+    const d = doc.data();
+    const statusBadge = `<span class="badge badge-${d.status==='answered'?'confirmed':'pending'}">${d.status}</span>`;
+    const btn = d.status !== 'answered'
+      ? `<button onclick="answerInquiry('${doc.id}','${d.title.replace(/'/g,"")}')" class="btn btn-ghost btn-sm">답변</button>`
+      : '';
+    return `<tr>
+      <td class="text-sm">${d.title}</td>
+      <td>${statusBadge}</td>
+      <td class="text-xs text-slate-400">${fmtTs(d.created_at)}</td>
+      <td>${btn}</td>
+    </tr>`;
+  }).join('') || '<tr><td colspan="4" class="text-slate-400 p-3">문의 없음</td></tr>';
+
+  el.innerHTML = `
+    <div class="section-header"><h3 class="font-semibold text-slate-900">문의</h3></div>
+    <table><thead><tr><th>제목</th><th>상태</th><th>접수일</th><th></th></tr></thead>
+    <tbody>${rows}</tbody></table>`;
+}
+window.answerInquiry = function(id, title) {
+  openModal(`문의 답변 — ${title}`, `
+    <div class="mb-4">
+      <label class="block text-xs font-medium text-slate-600 mb-1">답변 내용</label>
+      <textarea id="inq-answer" rows="4" placeholder="답변을 입력하세요"></textarea>
+    </div>
+    <div class="text-xs text-slate-400 mb-3">저장 시: inquiries.status → answered, answered_at 기록</div>
+    <div class="flex gap-2 justify-end">
+      <button onclick="closeModal()" class="btn btn-ghost">취소</button>
+      <button onclick="saveAnswer('${id}')" class="btn btn-primary">답변 저장</button>
+    </div>
+  `);
+};
+window.saveAnswer = async function(id) {
+  const answer = document.getElementById('inq-answer').value.trim();
+  if (!answer) { showToast('답변 입력 필요', 'error'); return; }
+  await db.collection('inquiries').doc(id).update({ status:'answered', answer, answered_at: now() });
+  closeModal(); showToast('답변 저장 완료 — inquiries.status: answered'); loadInquiries();
+};
+
+async function loadNotifications() {
+  const el = document.getElementById('notifCard');
+  const snap = await db.collection('notifications').orderBy('created_at','desc').limit(10).get();
+  const rows = snap.docs.map(doc => {
+    const d = doc.data();
+    return `<tr>
+      <td class="text-sm">${d.title||'—'}</td>
+      <td class="text-xs text-slate-500">${d.body||'—'}</td>
+      <td class="font-mono text-xs text-slate-400">${d.user_id||'전체'}</td>
+      <td class="text-xs text-slate-400">${fmtTs(d.created_at)}</td>
+    </tr>`;
+  }).join('') || '<tr><td colspan="4" class="text-slate-400 p-3">발송 내역 없음</td></tr>';
+
+  el.innerHTML = `
+    <div class="section-header">
+      <h3 class="font-semibold text-slate-900">알림 발송</h3>
+      <button onclick="openSendNotif()" class="btn btn-primary btn-sm">+ 발송</button>
+    </div>
+    <div class="overflow-x-auto"><table>
+      <thead><tr><th>제목</th><th>내용</th><th>대상 유저</th><th>발송일</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table></div>`;
+}
+window.openSendNotif = async function() {
+  const usersSnap = await db.collection('users').get();
+  const userOptions = usersSnap.docs.map(d => `<option value="${d.id}">${d.data().nickname}</option>`).join('');
+  openModal('알림 발송', `
+    <div class="space-y-3 mb-4">
+      <div>
+        <label class="block text-xs font-medium text-slate-600 mb-1">대상 유저</label>
+        <select id="ntf-user"><option value="">전체 발송</option>${userOptions}</select>
+      </div>
+      <div>
+        <label class="block text-xs font-medium text-slate-600 mb-1">제목</label>
+        <input id="ntf-title" placeholder="알림 제목">
+      </div>
+      <div>
+        <label class="block text-xs font-medium text-slate-600 mb-1">내용</label>
+        <textarea id="ntf-body" rows="2" placeholder="알림 내용"></textarea>
+      </div>
+    </div>
+    <div class="text-xs text-slate-400 mb-3">저장 시: notifications 컬렉션에 문서 추가 (실제 FCM 전송은 서버 구현 필요)</div>
+    <div class="flex gap-2 justify-end">
+      <button onclick="closeModal()" class="btn btn-ghost">취소</button>
+      <button onclick="sendNotif()" class="btn btn-primary">발송 기록</button>
+    </div>
+  `);
+};
+window.sendNotif = async function() {
+  const userId = document.getElementById('ntf-user').value || null;
+  const title  = document.getElementById('ntf-title').value.trim();
+  const body   = document.getElementById('ntf-body').value.trim();
+  if (!title) { showToast('제목 입력 필요', 'error'); return; }
+  const id = uuid();
+  await db.collection('notifications').doc(id).set({
+    id, user_id: userId, title, body, status:'sent', created_at: now()
+  });
+  closeModal(); showToast('알림 기록 저장 완료'); loadNotifications();
+};
+</script>
+</body>
+</html>
