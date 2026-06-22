@@ -2,323 +2,344 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
 <title>PricePick — 픽구매 적립 데모</title>
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.css">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
 <style>
-*,*::before,*::after{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;padding:0;height:100%;background:#e2e8f0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans KR',sans-serif;font-size:15px;color:#1e293b}
+:root {
+  --main: #845EEE;
+  --main-dark: #6C4AB6;
+  --sub-1: #9B78FF;
+  --sub-2: #C6AFFF;
+  --sub-3: #E2D9FF;
+  --sub-4: #F1EEFF;
+  --bg: #FAFAFA;
+  --card: #FFFFFF;
+  --text1: #1A1130;
+  --text2: #5A5370;
+  --text3: #9B93B0;
+  --text4: #C4BED0;
+  --border: #EEEAF3;
+  --border-strong: #E0D9ED;
+  --red: #FF4452;
+  --green: #22C55E;
+  --r-sm: 8px; --r: 12px; --r-lg: 16px; --r-xl: 20px;
+  --shadow-xs: 0 1px 2px rgba(26,17,48,0.04);
+  --shadow-sm: 0 2px 8px rgba(26,17,48,0.05);
+  --shadow: 0 4px 16px rgba(26,17,48,0.06);
+}
+*,*::before,*::after { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+html,body { height:100%; background:#454F5B; font-family:'Pretendard Variable','Pretendard',-apple-system,BlinkMacSystemFont,system-ui,'Apple SD Gothic Neo','Noto Sans KR',sans-serif; color:var(--text1); }
 
-/* Mobile frame */
-#root{max-width:390px;min-height:100vh;margin:0 auto;background:#f8fafc;position:relative;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 0 40px rgba(0,0,0,0.15)}
+#root {
+  max-width:390px; width:100%; height:100vh;
+  margin:0 auto; background:var(--bg); position:relative; overflow:hidden;
+  display:flex; flex-direction:column;
+  box-shadow:0 30px 80px rgba(0,0,0,0.5);
+}
 
-/* Hidden/Visible */
-.hidden{display:none!important}
+/* 상태바 */
+.statusbar {
+  height:44px; display:flex; justify-content:space-between; align-items:center;
+  padding:0 24px; font-size:14px; font-weight:600; color:var(--text1);
+  position:relative; z-index:10; flex-shrink:0;
+}
+.statusbar-icons { display:flex; gap:5px; }
 
-/* ── Loading ────────────────────────────────── */
-#loading{position:fixed;inset:0;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:100;max-width:390px;left:50%;transform:translateX(-50%)}
-.loader-logo{width:48px;height:48px;color:#3B55E6;animation:pulse 1.5s ease-in-out infinite}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
-.loader-text{margin-top:16px;font-size:13px;color:#94a3b8}
+/* 탭바 */
+.tabbar {
+  position:absolute; bottom:0; left:0; right:0; height:78px;
+  background:white; border-top:1px solid var(--border);
+  box-shadow:0 -4px 16px rgba(26,17,48,0.08);
+  display:flex; padding-top:8px; padding-bottom:24px; z-index:20;
+}
+.tab-item { flex:1; display:flex; flex-direction:column; align-items:center; gap:3px; cursor:pointer; padding:2px; }
+.tab-ico { width:24px; height:24px; display:flex; align-items:center; justify-content:center; color:var(--text4); }
+.tab-ico svg { width:22px; height:22px; }
+.tab-lbl { font-size:10px; color:var(--text4); font-weight:500; }
+.tab-ico .ico-line { display:block; }
+.tab-ico .ico-solid { display:none; }
+.tab-item.active .tab-ico { color:var(--text1); }
+.tab-item.active .tab-lbl { color:var(--text1); font-weight:700; }
+.tab-item.active .tab-ico .ico-line { display:none; }
+.tab-item.active .tab-ico .ico-solid { display:block; }
 
-/* ── Onboarding ─────────────────────────────── */
-#onboarding{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2rem 1.5rem;text-align:center;background:linear-gradient(160deg,#f0f4ff 0%,#fff 60%)}
-.ob-logo{width:56px;height:56px;color:#3B55E6;margin-bottom:1.5rem}
-.ob-title{font-size:1.5rem;font-weight:700;color:#0f172a;line-height:1.3;margin:0 0 0.5rem}
-.ob-sub{font-size:0.875rem;color:#64748b;margin:0 0 2.5rem;line-height:1.6}
-.ob-input-wrap{width:100%;margin-bottom:1rem}
-.ob-input{width:100%;border:2px solid #e2e8f0;border-radius:14px;padding:0.875rem 1rem;font-size:1rem;color:#1e293b;outline:none;font-family:inherit;transition:border-color 0.2s;background:#fff}
-.ob-input:focus{border-color:#3B55E6}
-.ob-btn{width:100%;background:#3B55E6;color:#fff;border:none;border-radius:14px;padding:0.9rem;font-size:1rem;font-weight:600;cursor:pointer;transition:background 0.2s}
-.ob-btn:hover{background:#2D43CC}
-.ob-hint{margin-top:0.75rem;font-size:0.75rem;color:#94a3b8}
+/* 스크롤 */
+.scroll { flex:1; overflow-y:auto; padding-bottom:90px; }
+.scroll::-webkit-scrollbar { display:none; }
 
-/* ── App Shell ──────────────────────────────── */
-#appShell{flex:1;display:flex;flex-direction:column;overflow:hidden;height:100vh}
-#appHeader{background:#fff;border-bottom:1px solid #f1f5f9;padding:0.75rem 1rem;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;min-height:52px}
-.header-logo{display:flex;align-items:center;gap:6px;font-weight:700;font-size:1rem;color:#3B55E6}
-.header-logo svg{width:20px;height:20px}
-.header-actions{display:flex;align-items:center;gap:8px}
-.icon-btn{background:none;border:none;cursor:pointer;color:#64748b;display:flex;align-items:center;padding:4px}
-.icon-btn svg{width:20px;height:20px}
+/* 버튼 */
+.btn-primary { width:100%; height:54px; background:var(--main); color:white; border:none; border-radius:var(--r-lg); font-size:15px; font-weight:700; cursor:pointer; font-family:inherit; transition:transform 0.1s; }
+.btn-primary:active { transform:scale(0.98); background:var(--main-dark); }
+.btn-ghost { width:100%; height:48px; background:transparent; border:none; color:var(--text3); font-size:14px; font-weight:500; cursor:pointer; font-family:inherit; }
 
-#tabContent{flex:1;overflow-y:auto;padding-bottom:70px}
+/* 홈 */
+.app-screen { height:100%; display:flex; flex-direction:column; background:var(--bg); overflow:hidden; position:relative; }
+.home-top { padding:10px 16px 14px; display:flex; align-items:center; justify-content:space-between; background:white; border-bottom:1px solid var(--border); flex-shrink:0; }
+.brand-logo { display:flex; align-items:center; gap:8px; }
+.brand-wordmark { font-family:'Poppins',sans-serif; font-size:18px; letter-spacing:0.5px; line-height:1; display:flex; align-items:center; }
+.brand-wordmark .bw-light { font-weight:300; color:var(--text1); }
+.brand-wordmark .bw-bold { font-weight:600; color:var(--main); }
+.top-icons { display:flex; gap:4px; }
+.top-icon-btn { width:38px; height:38px; background:transparent; border:none; border-radius:10px; cursor:pointer; display:flex; align-items:center; justify-content:center; color:var(--text1); }
 
-/* Tab Bar */
-#tabBar{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:390px;background:#fff;border-top:1px solid #f1f5f9;display:flex;z-index:40;padding-bottom:env(safe-area-inset-bottom,0)}
-.tab-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 4px;cursor:pointer;color:#94a3b8;font-size:11px;font-weight:500;border:none;background:none;transition:color 0.15s}
-.tab-item svg{width:22px;height:22px}
-.tab-item.active{color:#3B55E6}
+/* 홈 티켓 카드 */
+.home-ticket-card { margin:16px; border-radius:18px; background:#3D2A78; color:#fff; padding:18px 18px 14px; box-shadow:0 8px 24px rgba(61,42,120,0.22); }
+.htc-top { display:flex; align-items:center; justify-content:space-between; margin-bottom:6px; }
+.htc-label { font-size:12px; font-weight:700; opacity:0.85; }
+.htc-status { font-size:10.5px; font-weight:700; background:rgba(255,255,255,0.18); padding:3px 9px; border-radius:99px; }
+.htc-grades { display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; margin-top:10px; }
+.htc-grade { background:rgba(255,255,255,0.13); border-radius:10px; padding:9px 6px; text-align:center; }
+.htc-grade-name { font-size:9.5px; opacity:0.85; font-weight:600; margin-bottom:3px; }
+.htc-grade-count { font-size:18px; font-weight:800; letter-spacing:-0.4px; line-height:1; }
+.htc-grade-count .unit { font-size:9.5px; font-weight:600; opacity:0.8; margin-left:1px; }
+.htc-pending-row { margin-top:10px; padding-top:10px; border-top:1px solid rgba(255,255,255,0.18); display:flex; align-items:center; justify-content:space-between; }
+.htc-confirm-btn { background:rgba(255,255,255,0.22); color:#fff; border:none; border-radius:99px; padding:4px 12px; font-size:10.5px; font-weight:700; cursor:pointer; }
 
-/* ── Sections ───────────────────────────────── */
-.section{padding:1rem}
-.section-title{font-size:0.8rem;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:0.06em;margin:0 0 0.75rem}
+/* 홈 섹션 */
+.home-sec { margin:0 16px 16px; }
+.home-sec-title { font-size:14px; font-weight:700; color:var(--text1); margin-bottom:10px; display:flex; align-items:center; justify-content:space-between; }
+.home-sec-sub { font-size:11px; color:var(--text3); font-weight:500; }
+.home-mall-card { background:var(--card); border:1px solid var(--border); border-radius:14px; padding:14px; display:flex; align-items:center; gap:12px; cursor:pointer; transition:border-color 0.15s; }
+.home-mall-card:active { border-color:var(--sub-2); background:var(--sub-4); }
+.home-mall-card.best { border-color:var(--sub-2); box-shadow:0 2px 10px rgba(132,94,238,0.08); }
+.mall-logo-wrap { width:44px; height:44px; border-radius:10px; background:var(--bg); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; overflow:hidden; flex-shrink:0; }
+.mall-logo-wrap img { width:100%; height:100%; object-fit:contain; }
+.mall-info { flex:1; min-width:0; }
+.mall-name { font-size:14px; font-weight:700; color:var(--text1); }
+.mall-rate { font-size:11.5px; color:var(--text3); margin-top:2px; }
+.mall-go-btn { background:var(--sub-4); color:var(--main); padding:7px 12px; border-radius:99px; font-size:11.5px; font-weight:700; border:none; cursor:pointer; white-space:nowrap; }
 
-/* Cards */
-.card{background:#fff;border-radius:16px;border:1px solid #f1f5f9;overflow:hidden;margin-bottom:0.75rem;box-shadow:0 1px 3px rgba(0,0,0,0.04)}
-.card-p{padding:1rem}
-.card-header{padding:0.875rem 1rem;border-bottom:1px solid #f8fafc;display:flex;align-items:center;justify-content:space-between}
-.card-title{font-weight:600;font-size:0.9rem}
+/* 카카오 배너 */
+.kakao-banner { margin:0 16px 14px; background:linear-gradient(135deg,#FFFBEC,#FFF3D2); border:1px solid #FFE69C; border-radius:14px; padding:13px 15px; display:flex; align-items:center; gap:12px; cursor:pointer; }
+.kakao-banner-icon { width:40px; height:40px; background:#FEE500; border-radius:12px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.kakao-banner-t { font-size:13px; font-weight:800; color:var(--text1); }
+.kakao-banner-s { font-size:11px; color:var(--text2); margin-top:2px; line-height:1.45; }
 
-/* User greeting */
-.greeting-card{background:linear-gradient(135deg,#3B55E6 0%,#6366f1 100%);border-radius:16px;padding:1.25rem;color:#fff;margin-bottom:0.75rem}
-.greeting-name{font-size:1.1rem;font-weight:700;margin-bottom:0.25rem}
-.greeting-sub{font-size:0.8rem;opacity:0.8}
-.greeting-stats{display:flex;gap:1rem;margin-top:1rem}
-.stat-item{background:rgba(255,255,255,0.15);border-radius:10px;padding:0.5rem 0.75rem;flex:1;text-align:center}
-.stat-val{font-size:1.1rem;font-weight:700}
-.stat-lbl{font-size:0.7rem;opacity:0.8;margin-top:1px}
+/* 혜택 */
+.reward-screen { height:100%; background:var(--bg); display:flex; flex-direction:column; overflow:hidden; position:relative; }
+.reward-top { padding:12px 16px 8px; display:flex; align-items:center; justify-content:space-between; background:white; border-bottom:1px solid var(--border); flex-shrink:0; }
+.reward-top-title { font-size:17px; font-weight:700; color:var(--text1); letter-spacing:-0.4px; }
+.reward-scroll { flex:1; overflow-y:auto; padding-bottom:90px; }
+.reward-scroll::-webkit-scrollbar { display:none; }
 
-/* Status badge */
-.badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:100px;font-size:0.7rem;font-weight:600;gap:4px}
-.badge-guest{background:rgba(255,255,255,0.25);color:#fff}
-.badge-linked{background:rgba(254,240,138,0.3);color:#fef08a}
-.badge-bronze{background:#ffedd5;color:#9a3412}
-.badge-silver{background:#f1f5f9;color:#475569}
-.badge-gold{background:#fef9c3;color:#854d0e}
-.badge-pending{background:#fef3c7;color:#92400e}
-.badge-active{background:#dcfce7;color:#166534}
-.badge-expired{background:#f1f5f9;color:#64748b}
+/* 티켓 요약 카드 */
+.ticket-summary-card { margin:14px 16px; background:linear-gradient(135deg,#6B47D9 0%,#845EEE 100%); border-radius:18px; padding:18px; color:#fff; }
+.tsc-label { font-size:12px; font-weight:700; margin-bottom:10px; opacity:0.85; }
+.tsc-grades { display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; }
+.tsc-grade { background:rgba(255,255,255,0.13); border-radius:10px; padding:10px 6px; text-align:center; }
+.tsc-grade-name { font-size:9.5px; opacity:0.8; font-weight:600; margin-bottom:3px; }
+.tsc-grade-count { font-size:20px; font-weight:800; line-height:1; }
+.tsc-grade-count .unit { font-size:10px; font-weight:600; opacity:0.8; margin-left:1px; }
+.tsc-points { margin-top:12px; padding-top:12px; border-top:1px solid rgba(255,255,255,0.18); display:flex; align-items:center; justify-content:space-between; }
+.tsc-pts-label { font-size:11px; opacity:0.8; }
+.tsc-pts-value { font-size:16px; font-weight:800; }
 
-/* Mall card */
-.mall-card{background:#fff;border-radius:14px;border:1px solid #e2e8f0;padding:1rem;display:flex;align-items:center;gap:0.75rem;cursor:pointer;transition:all 0.15s;margin-bottom:0.5rem}
-.mall-card:hover{border-color:#3B55E6;background:#f0f4ff}
-.mall-icon{width:44px;height:44px;border-radius:10px;background:#e11d48;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:0.75rem;flex-shrink:0}
-.mall-info{flex:1}
-.mall-name{font-weight:600;font-size:0.9rem}
-.mall-desc{font-size:0.75rem;color:#64748b;margin-top:2px}
-.mall-action{color:#3B55E6}
-.mall-action svg{width:16px;height:16px}
+/* 기프티콘 */
+.reward-section { background:white; margin:0 16px 14px; border-radius:var(--r); padding:14px 16px; border:1px solid var(--border); }
+.reward-section-title { font-size:13px; font-weight:700; color:var(--text1); margin-bottom:12px; }
+.gif-row { display:flex; align-items:center; gap:12px; padding:10px 0; border-top:1px solid var(--border); }
+.gif-row:first-of-type { border-top:none; padding-top:0; }
+.gif-thumb { width:48px; height:48px; border-radius:10px; background:var(--bg); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:22px; }
+.gif-info { flex:1; min-width:0; }
+.gif-name { font-size:13px; font-weight:700; color:var(--text1); }
+.gif-req { font-size:11px; color:var(--text3); margin-top:2px; }
+.gif-btn { padding:7px 14px; border-radius:99px; font-size:12px; font-weight:700; border:none; cursor:pointer; font-family:inherit; flex-shrink:0; }
+.gif-btn.available { background:var(--main); color:#fff; }
+.gif-btn.unavailable { background:var(--bg); color:var(--text4); cursor:default; }
 
-/* Attendance */
-.attend-card{background:#fff;border-radius:14px;border:1px solid #e2e8f0;padding:1rem;display:flex;align-items:center;justify-content:space-between;cursor:pointer;margin-bottom:0.5rem}
-.attend-left{display:flex;align-items:center;gap:0.75rem}
-.attend-icon{width:40px;height:40px;background:#f0fdf4;border-radius:10px;display:flex;align-items:center;justify-content:center;color:#16a34a}
-.attend-icon svg{width:20px;height:20px}
-.attend-title{font-weight:600;font-size:0.875rem}
-.attend-sub{font-size:0.75rem;color:#64748b;margin-top:1px}
-.attend-btn{background:#3B55E6;color:#fff;border:none;border-radius:8px;padding:0.4rem 0.75rem;font-size:0.8rem;font-weight:600;cursor:pointer}
-.attend-done{background:#dcfce7;color:#16a34a;border-radius:8px;padding:0.4rem 0.75rem;font-size:0.8rem;font-weight:600}
+/* 등급 배지 */
+.grade-badge { display:inline-block; font-size:10px; font-weight:700; padding:2px 7px; border-radius:4px; }
+.grade-badge.bronze { background:rgba(180,100,30,0.12); color:#9a5a1a; }
+.grade-badge.silver { background:rgba(120,120,140,0.12); color:#555570; }
+.grade-badge.gold { background:rgba(200,160,0,0.12); color:#8a6a00; }
 
-/* Ticket item */
-.ticket-item{display:flex;align-items:center;justify-content:space-between;padding:0.875rem 1rem;border-bottom:1px solid #f8fafc}
-.ticket-item:last-child{border-bottom:none}
-.tkt-left{display:flex;align-items:center;gap:0.75rem}
-.tkt-icon{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:0.7rem;font-weight:700}
-.tkt-icon-gold{background:#fef9c3;color:#854d0e}
-.tkt-icon-silver{background:#f1f5f9;color:#475569}
-.tkt-icon-bronze{background:#ffedd5;color:#9a3412}
-.tkt-icon-event{background:#f0f4ff;color:#3B55E6}
-.tkt-name{font-weight:600;font-size:0.875rem}
-.tkt-sub{font-size:0.75rem;color:#64748b;margin-top:1px}
-.tkt-right{text-align:right}
-.tkt-qty{font-size:1.1rem;font-weight:700;color:#1e293b}
-.tkt-unit{font-size:0.7rem;color:#94a3b8}
+/* 마이 */
+.my-screen { height:100%; background:var(--bg); display:flex; flex-direction:column; overflow:hidden; }
+.my-scroll { flex:1; overflow-y:auto; padding-bottom:90px; }
+.my-scroll::-webkit-scrollbar { display:none; }
+.my-top { background:linear-gradient(135deg,#6B47D9 0%,#845EEE 100%); padding:16px 16px 24px; color:white; position:relative; flex-shrink:0; }
+.my-top-bar { display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; }
+.my-top-title { font-size:17px; font-weight:800; letter-spacing:-0.4px; }
+.my-top-actions { display:flex; gap:4px; }
+.my-top-btn { width:36px; height:36px; background:rgba(255,255,255,0.18); border:none; border-radius:10px; cursor:pointer; color:white; display:flex; align-items:center; justify-content:center; }
+.my-profile { display:flex; align-items:center; gap:14px; }
+.my-avatar { width:56px; height:56px; border-radius:50%; background:rgba(255,255,255,0.2); display:flex; align-items:center; justify-content:center; font-size:28px; flex-shrink:0; border:2px solid rgba(255,255,255,0.3); }
+.my-info { flex:1; min-width:0; }
+.my-nickname { font-size:18px; font-weight:800; letter-spacing:-0.4px; margin-bottom:4px; display:flex; align-items:center; gap:6px; flex-wrap:wrap; }
+.my-meta { font-size:11.5px; opacity:0.85; }
+.my-section-title { padding:14px 16px 4px; font-size:11.5px; font-weight:700; color:var(--text3); letter-spacing:0.2px; }
+.my-section { margin:0 16px 10px; background:white; border-radius:12px; overflow:hidden; border:1px solid var(--border); }
+.my-row { display:flex; align-items:center; gap:12px; padding:14px 16px; cursor:pointer; border-top:1px solid var(--border); }
+.my-row:first-child { border-top:none; }
+.my-row-ico { width:32px; height:32px; background:var(--sub-4); border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0; }
+.my-row-body { flex:1; min-width:0; }
+.my-row-name { font-size:14px; font-weight:600; color:var(--text1); }
+.my-row-desc { font-size:11.5px; color:var(--text3); margin-top:2px; }
+.my-row-right { color:var(--text3); font-size:13px; flex-shrink:0; }
+.my-row-right.value { font-size:12px; color:var(--text2); font-weight:600; }
+.kakao-pull-btn { background:#FEE500; color:#3A1D1D; border:none; padding:7px 11px; border-radius:8px; font-size:11.5px; font-weight:700; cursor:pointer; font-family:inherit; flex-shrink:0; }
 
-/* Gifticon item */
-.gif-item{display:flex;align-items:center;justify-content:space-between;padding:0.875rem 1rem;border-bottom:1px solid #f8fafc}
-.gif-item:last-child{border-bottom:none}
-.gif-left{display:flex;align-items:center;gap:0.75rem}
-.gif-thumb{width:44px;height:44px;border-radius:10px;background:#f1f5f9;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.gif-thumb svg{width:22px;height:22px;color:#64748b}
-.gif-name{font-weight:600;font-size:0.875rem}
-.gif-req{font-size:0.75rem;color:#64748b;margin-top:2px}
-.gif-btn{background:#3B55E6;color:#fff;border:none;border-radius:10px;padding:0.4rem 0.85rem;font-size:0.8rem;font-weight:600;cursor:pointer;white-space:nowrap}
-.gif-btn:disabled{background:#e2e8f0;color:#94a3b8;cursor:not-allowed}
+/* 온보딩 */
+.login-screen { height:100%; background:linear-gradient(180deg,#FAFAFA 0%,#F1EEFF 100%); display:flex; flex-direction:column; position:relative; overflow:hidden; }
+.login-content { flex:1; padding:24px 24px 0; display:flex; flex-direction:column; overflow-y:auto; }
+.login-content::-webkit-scrollbar { display:none; }
+.nick-input { width:100%; padding:14px 16px; border:1.5px solid var(--border-strong); border-radius:var(--r-lg); font-size:16px; font-weight:600; color:var(--text1); background:#fff; outline:none; font-family:inherit; transition:border-color 0.2s; }
+.nick-input:focus { border-color:var(--main); }
 
-/* Pending postback */
-.pb-item{background:#fffbeb;border:1px solid #fde68a;border-radius:12px;padding:0.875rem;margin-bottom:0.5rem}
-.pb-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:0.5rem}
-.pb-amount{font-weight:700;font-size:1rem}
-.pb-status{font-size:0.75rem}
-.pb-detail{font-size:0.75rem;color:#92400e;margin-bottom:0.75rem}
-.pb-confirm-btn{width:100%;background:#3B55E6;color:#fff;border:none;border-radius:10px;padding:0.6rem;font-size:0.875rem;font-weight:600;cursor:pointer}
+/* 브릿지 */
+.bridge-screen { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:24px; gap:16px; background:#fff; }
+.C-spin { width:96px; height:96px; position:relative; }
+.C-spin::before { content:''; position:absolute; inset:0; border-radius:50%; border:3px solid var(--sub-4); }
+.C-spin::after { content:''; position:absolute; inset:0; border-radius:50%; border:3px solid transparent; border-top-color:var(--main); animation:C-rot 1s linear infinite; }
+@keyframes C-rot { to { transform:rotate(360deg); } }
+.C-spin-logo { position:absolute; inset:18px; border-radius:14px; display:flex; align-items:center; justify-content:center; overflow:hidden; }
+.C-spin-logo img { position:absolute; inset:0; width:100%; height:100%; object-fit:contain; }
+.C-t { font-size:17px; font-weight:800; color:var(--text1); letter-spacing:-0.4px; text-align:center; }
+.C-s { font-size:12px; color:var(--text2); text-align:center; line-height:1.55; }
+.C-check-list { background:var(--bg); border:1px solid var(--border); border-radius:var(--r); padding:10px 14px; min-width:240px; }
+.C-check-list .C-row { display:flex; align-items:center; gap:8px; font-size:11.5px; color:var(--text1); padding:4px 0; font-weight:600; }
+.C-check-list .C-row .ico { color:var(--green); font-weight:800; }
+.C-check-list .C-row.muted { color:var(--text3); font-weight:500; }
 
-/* My page */
-.my-profile-card{background:linear-gradient(135deg,#3B55E6 0%,#6366f1 100%);border-radius:16px;padding:1.5rem 1.25rem;color:#fff;margin-bottom:0.75rem}
-.my-avatar{width:56px;height:56px;border-radius:50%;background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;margin-bottom:0.75rem}
-.my-avatar svg{width:28px;height:28px}
-.my-nickname{font-size:1.1rem;font-weight:700}
-.my-status{font-size:0.75rem;opacity:0.75;margin-top:2px}
+/* 서브헤더 */
+.sub-header { display:flex; align-items:center; gap:10px; padding:10px 14px 12px; background:#fff; border-bottom:1px solid var(--border); flex-shrink:0; }
+.back-btn { width:36px; height:36px; background:transparent; border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; color:var(--text1); }
+.sh-title { font-size:15px; font-weight:700; letter-spacing:-0.3px; color:var(--text1); }
 
-.kakao-card{background:#FEE500;border-radius:14px;padding:1rem;display:flex;align-items:center;justify-content:space-between;cursor:pointer;margin-bottom:0.75rem}
-.kakao-left{display:flex;align-items:center;gap:0.75rem}
-.kakao-logo{width:36px;height:36px;background:#3C1E1E;border-radius:8px;display:flex;align-items:center;justify-content:center}
-.kakao-logo svg{width:22px;height:22px;color:#FEE500}
-.kakao-title{font-weight:700;font-size:0.9rem;color:#3C1E1E}
-.kakao-sub{font-size:0.75rem;color:#5c3d3d;margin-top:1px}
-.kakao-arrow{color:#3C1E1E;opacity:0.6}
-.kakao-arrow svg{width:16px;height:16px}
-.kakao-linked{background:#dcfce7;border-radius:14px;padding:1rem;display:flex;align-items:center;gap:0.75rem;margin-bottom:0.75rem}
-.kakao-linked svg{width:20px;height:20px;color:#16a34a}
-.kakao-linked-text{font-size:0.875rem;font-weight:600;color:#15803d}
+/* 구매 시트 */
+.purchase-sheet { padding:0 20px 20px; }
+.ps-label { font-size:12px; font-weight:600; color:var(--text2); margin-bottom:8px; }
+.ps-input { width:100%; padding:16px; border:1.5px solid var(--border-strong); border-radius:var(--r-lg); font-size:20px; font-weight:700; color:var(--text1); outline:none; font-family:inherit; text-align:right; transition:border-color 0.2s; }
+.ps-input:focus { border-color:var(--main); }
+.greedy-preview { background:var(--sub-4); border-radius:var(--r); padding:12px 14px; margin-top:12px; }
+.gp-label { font-size:11px; color:var(--text3); font-weight:600; margin-bottom:7px; }
+.gp-grades { display:flex; gap:8px; }
+.gp-grade { background:#fff; border-radius:8px; padding:7px 10px; text-align:center; flex:1; }
+.gp-grade-name { font-size:9.5px; font-weight:700; color:var(--text2); }
+.gp-grade-count { font-size:16px; font-weight:800; color:var(--main); margin-top:2px; }
+.gp-pts { font-size:12px; font-weight:700; color:var(--main); margin-top:8px; text-align:center; }
+.state-note { background:#FFFBEB; border:1px solid #FDE68A; border-radius:8px; padding:8px 10px; margin-top:10px; font-size:10.5px; color:#92400E; line-height:1.6; font-family:ui-monospace,monospace; }
 
-.points-card{background:#fff;border-radius:14px;border:1px solid #e2e8f0;padding:1rem;margin-bottom:0.75rem}
-.points-label{font-size:0.75rem;color:#64748b;margin-bottom:0.25rem}
-.points-val{font-size:1.4rem;font-weight:700;color:#3B55E6}
-.points-sub{font-size:0.75rem;color:#94a3b8;margin-top:2px}
+/* 오버레이 */
+#overlay { position:absolute; inset:0; z-index:50; display:flex; flex-direction:column; justify-content:flex-end; pointer-events:none; }
+#overlay.active { pointer-events:all; }
+#overlayBg { position:absolute; inset:0; background:rgba(0,0,0,0); transition:background 0.3s; }
+#overlay.active #overlayBg { background:rgba(0,0,0,0.45); }
+#overlaySheet { background:#fff; border-radius:24px 24px 0 0; transform:translateY(100%); transition:transform 0.35s cubic-bezier(0.16,1,0.3,1); max-height:85%; overflow-y:auto; position:relative; }
+#overlaySheet::-webkit-scrollbar { display:none; }
+#overlay.active #overlaySheet { transform:translateY(0); }
+.sheet-handle { width:40px; height:4px; background:var(--border-strong); border-radius:2px; margin:12px auto 0; }
+.sheet-hd { padding:12px 16px 10px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
+.sheet-title { font-weight:800; font-size:16px; letter-spacing:-0.3px; }
+.sheet-close { background:none; border:none; cursor:pointer; color:var(--text3); width:32px; height:32px; display:flex; align-items:center; justify-content:center; border-radius:50%; }
+.sheet-body { padding:16px; }
 
-/* My menu list */
-.menu-list{background:#fff;border-radius:14px;border:1px solid #e2e8f0;overflow:hidden;margin-bottom:0.75rem}
-.menu-item{display:flex;align-items:center;justify-content:space-between;padding:0.875rem 1rem;border-bottom:1px solid #f8fafc;cursor:pointer}
-.menu-item:last-child{border-bottom:none}
-.menu-item:hover{background:#f8fafc}
-.menu-left{display:flex;align-items:center;gap:0.75rem;color:#475569}
-.menu-left svg{width:18px;height:18px}
-.menu-label{font-size:0.9rem;font-weight:500;color:#1e293b}
-.menu-right{color:#94a3b8}
-.menu-right svg{width:16px;height:16px}
+/* 로딩 */
+#loading { position:absolute; inset:0; background:#fff; display:flex; flex-direction:column; align-items:center; justify-content:center; z-index:100; }
+.loader-ico { animation:pulse 1.5s ease-in-out infinite; }
+@keyframes pulse { 0%,100%{opacity:1}50%{opacity:0.35} }
+.loader-text { margin-top:16px; font-size:13px; color:var(--text3); }
 
-/* Empty state */
-.empty-state{text-align:center;padding:2.5rem 1rem;color:#94a3b8}
-.empty-state svg{width:40px;height:40px;margin-bottom:0.75rem;opacity:0.4}
-.empty-title{font-size:0.875rem;font-weight:500;margin-bottom:0.25rem}
-.empty-sub{font-size:0.75rem}
-
-/* ── Overlay ────────────────────────────────── */
-#overlay{position:fixed;inset:0;z-index:50;display:flex;flex-direction:column;justify-content:flex-end;max-width:390px;left:50%;transform:translateX(-50%);pointer-events:none}
-#overlay.active{pointer-events:all}
-#overlayBg{position:absolute;inset:0;background:rgba(0,0,0,0);transition:background 0.3s}
-#overlay.active #overlayBg{background:rgba(0,0,0,0.45)}
-#overlaySheet{background:#fff;border-radius:20px 20px 0 0;padding:0 0 env(safe-area-inset-bottom,20px);transform:translateY(100%);transition:transform 0.35s cubic-bezier(0.16,1,0.3,1);max-height:90vh;overflow-y:auto;position:relative}
-#overlay.active #overlaySheet{transform:translateY(0)}
-.sheet-handle{width:40px;height:4px;background:#e2e8f0;border-radius:2px;margin:12px auto 0}
-.sheet-header{padding:1rem 1.25rem 0.75rem;border-bottom:1px solid #f1f5f9;display:flex;align-items:center;justify-content:space-between}
-.sheet-title{font-weight:700;font-size:1rem}
-.sheet-close{background:none;border:none;cursor:pointer;color:#94a3b8;display:flex;align-items:center;padding:4px}
-.sheet-close svg{width:20px;height:20px}
-.sheet-body{padding:1.25rem}
-
-/* Purchase flow */
-.purchase-mall-badge{display:flex;align-items:center;gap:0.5rem;background:#f8fafc;border-radius:10px;padding:0.5rem 0.75rem;margin-bottom:1rem;font-size:0.875rem;color:#475569;font-weight:500}
-.purchase-input-wrap{margin-bottom:1rem}
-.purchase-input-label{font-size:0.8rem;font-weight:600;color:#475569;margin-bottom:0.5rem;display:block}
-.purchase-input{width:100%;border:2px solid #e2e8f0;border-radius:12px;padding:0.875rem 1rem;font-size:1.1rem;font-weight:600;color:#1e293b;outline:none;font-family:inherit;transition:border-color 0.2s;background:#fff}
-.purchase-input:focus{border-color:#3B55E6}
-.greedy-preview{background:#f0f4ff;border-radius:10px;padding:0.75rem 1rem;margin-bottom:1rem;font-size:0.8rem}
-.greedy-label{color:#64748b;margin-bottom:0.375rem}
-.greedy-chips{display:flex;flex-wrap:wrap;gap:0.375rem}
-.greedy-chip{display:inline-flex;align-items:center;padding:0.2rem 0.5rem;border-radius:6px;font-size:0.75rem;font-weight:600}
-.chip-gold{background:#fef9c3;color:#854d0e}
-.chip-silver{background:#f1f5f9;color:#475569}
-.chip-bronze{background:#ffedd5;color:#9a3412}
-.greedy-pts{color:#3B55E6;font-weight:600;margin-top:0.375rem}
-.purchase-btn{width:100%;background:#3B55E6;color:#fff;border:none;border-radius:12px;padding:0.9rem;font-size:1rem;font-weight:700;cursor:pointer;transition:background 0.2s}
-.purchase-btn:hover{background:#2D43CC}
-.purchase-btn:disabled{background:#e2e8f0;color:#94a3b8;cursor:not-allowed}
-
-/* State annotation */
-.state-ann{background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:0.6rem 0.75rem;font-size:0.7rem;color:#92400e;margin-top:0.75rem;font-family:ui-monospace,monospace;line-height:1.6}
-
-/* Success screen */
-.success-icon{width:64px;height:64px;background:#dcfce7;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:1rem auto 1rem}
-.success-icon svg{width:32px;height:32px;color:#16a34a}
-.success-title{text-align:center;font-size:1.1rem;font-weight:700;margin-bottom:0.5rem}
-.success-sub{text-align:center;font-size:0.875rem;color:#64748b;margin-bottom:1.5rem;line-height:1.5}
-.success-btn{width:100%;background:#3B55E6;color:#fff;border:none;border-radius:12px;padding:0.875rem;font-size:1rem;font-weight:600;cursor:pointer}
-
-/* Toast */
-#toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:#1e293b;color:#fff;padding:0.625rem 1.25rem;border-radius:100px;font-size:0.8rem;font-weight:500;z-index:200;white-space:nowrap;transition:opacity 0.3s;max-width:300px;text-align:center}
-#toast.hidden{opacity:0;pointer-events:none}
-
-/* Divider notice */
-.demo-notice{background:#f0f4ff;border-left:3px solid #3B55E6;padding:0.5rem 0.75rem;border-radius:0 8px 8px 0;font-size:0.7rem;color:#3B55E6;margin-bottom:0.75rem;line-height:1.5}
-
-/* Button variants */
-.btn-outline{background:#fff;border:1.5px solid #3B55E6;color:#3B55E6;border-radius:10px;padding:0.5rem 1rem;font-size:0.85rem;font-weight:600;cursor:pointer}
-.btn-full{width:100%;background:#3B55E6;color:#fff;border:none;border-radius:12px;padding:0.875rem;font-size:1rem;font-weight:600;cursor:pointer}
+/* 토스트 */
+#toast { position:absolute; bottom:95px; left:50%; transform:translateX(-50%); background:rgba(26,17,48,0.9); color:#fff; padding:9px 18px; border-radius:100px; font-size:12px; font-weight:600; z-index:200; white-space:nowrap; transition:opacity 0.3s; max-width:320px; text-align:center; pointer-events:none; }
+#toast.hidden { opacity:0; }
+.hidden { display:none !important; }
 </style>
 </head>
 <body>
 <div id="root">
 
-<!-- Loading -->
+<!-- 로딩 -->
 <div id="loading">
-  <svg class="loader-logo" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
-  </svg>
-  <p class="loader-text">프라이스픽 로딩 중...</p>
-</div>
-
-<!-- Onboarding -->
-<div id="onboarding" class="hidden">
-  <svg class="ob-logo" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
-  </svg>
-  <h1 class="ob-title">프라이스픽에<br>오신 것을 환영합니다</h1>
-  <p class="ob-sub">쇼핑 경유 적립 앱 데모입니다.<br>닉네임을 입력하고 바로 시작해보세요.</p>
-  <div class="ob-input-wrap">
-    <input id="nicknameInput" class="ob-input" type="text" placeholder="닉네임 (예: 픽러버)" maxlength="12">
+  <div class="loader-ico">
+    <svg width="52" height="52" viewBox="0 0 360 363" fill="none">
+      <path d="M178.702 82.69C125.37 82.69 82.14 125.94 82.14 179.29V277.43H115.61V252.41C132.54 267.04 154.59 275.87 178.70 275.87C232.03 275.87 275.27 232.62 275.27 179.28C275.27 125.93 232.03 82.68 178.70 82.68V82.69ZM178.70 242.40C143.85 242.40 115.61 214.15 115.61 179.29C115.61 144.43 143.85 116.18 178.70 116.18C213.55 116.18 241.79 144.43 241.79 179.29C241.79 214.15 213.55 242.40 178.70 242.40Z" fill="#634C9E"/>
+      <path d="M180 0C80.59 0 0 80.62 0 180.06V363H62.40V316.37C93.94 343.63 135.04 360.12 180 360.12C279.41 360.12 360 279.50 360 180.06C360 80.62 279.42 0 180 0ZM180 297.70C115.05 297.70 62.40 245.02 62.40 180.06C62.40 115.10 115.06 62.42 180 62.42C244.94 62.42 297.60 115.10 297.60 180.06C297.60 245.02 244.94 297.70 180 297.70Z" fill="#7A49DE"/>
+    </svg>
   </div>
-  <button class="ob-btn" onclick="startOnboarding()">시작하기</button>
-  <p class="ob-hint">데모 환경 — Firebase Anonymous Auth 사용</p>
+  <p class="loader-text">프라이스픽 로딩 중…</p>
 </div>
 
-<!-- App Shell -->
-<div id="appShell" class="hidden">
-  <!-- Header -->
-  <div id="appHeader">
-    <div class="header-logo">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/>
-      </svg>
-      PricePick
+<!-- 온보딩 -->
+<div id="onboarding" class="hidden" style="height:100%;display:flex;flex-direction:column;">
+  <div class="statusbar" style="background:transparent;"><span>9:41</span>
+    <div class="statusbar-icons">
+      <svg width="17" height="12" viewBox="0 0 17 12" fill="currentColor"><rect x="0" y="4" width="3" height="8" rx="1"/><rect x="4.5" y="2.5" width="3" height="9.5" rx="1"/><rect x="9" y="1" width="3" height="11" rx="1"/><rect x="13.5" y="0" width="3" height="12" rx="1"/></svg>
     </div>
-    <div class="header-actions">
-      <button class="icon-btn" onclick="showToast('알림 기능은 3단계 이후 구현 예정')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+  </div>
+  <div class="login-content">
+    <div style="display:flex;flex-direction:column;align-items:center;padding-top:6px;padding-bottom:24px;">
+      <div style="width:54px;height:54px;border-radius:15px;background:var(--main);display:flex;align-items:center;justify-content:center;margin-bottom:12px;">
+        <svg width="30" height="30" viewBox="0 0 360 363" fill="none">
+          <path d="M178.702 82.69C125.37 82.69 82.14 125.94 82.14 179.29V277.43H115.61V252.41C132.54 267.04 154.59 275.87 178.70 275.87C232.03 275.87 275.27 232.62 275.27 179.28C275.27 125.93 232.03 82.68 178.70 82.68V82.69ZM178.70 242.40C143.85 242.40 115.61 214.15 115.61 179.29C115.61 144.43 143.85 116.18 178.70 116.18C213.55 116.18 241.79 144.43 241.79 179.29C241.79 214.15 213.55 242.40 178.70 242.40Z" fill="white"/>
+          <path d="M180 0C80.59 0 0 80.62 0 180.06V363H62.40V316.37C93.94 343.63 135.04 360.12 180 360.12C279.41 360.12 360 279.50 360 180.06C360 80.62 279.42 0 180 0ZM180 297.70C115.05 297.70 62.40 245.02 62.40 180.06C62.40 115.10 115.06 62.42 180 62.42C244.94 62.42 297.60 115.10 297.60 180.06C297.60 245.02 244.94 297.70 180 297.70Z" fill="rgba(255,255,255,0.92)"/>
         </svg>
-      </button>
+      </div>
+      <div style="font-size:23px;font-weight:800;color:var(--text1);letter-spacing:-1.1px;">프라이스픽 시작하기</div>
+      <div style="font-size:13px;color:var(--text3);margin-top:6px;text-align:center;line-height:1.5;">로그인 없이 닉네임만 정하면 바로 시작해요</div>
     </div>
-  </div>
-
-  <!-- Tab content -->
-  <div id="tabContent"></div>
-
-  <!-- Tab bar -->
-  <div id="tabBar">
-    <button class="tab-item active" id="tab-home" onclick="switchTab('home')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
-      </svg>
-      홈
-    </button>
-    <button class="tab-item" id="tab-benefits" onclick="switchTab('benefits')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/>
-      </svg>
-      혜택
-    </button>
-    <button class="tab-item" id="tab-my" onclick="switchTab('my')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-      </svg>
-      마이
-    </button>
+    <div style="margin-bottom:14px;">
+      <div style="font-size:12px;font-weight:600;color:var(--text2);margin-bottom:8px;">닉네임</div>
+      <input id="nickInput" class="nick-input" type="text" placeholder="닉네임 입력 (최대 10자)" maxlength="10">
+    </div>
+    <div style="font-size:11px;color:var(--text3);margin-bottom:20px;line-height:1.6;">
+      닉네임은 나중에 마이 탭에서 수정할 수 있어요.<br>
+      <span style="color:var(--main);font-weight:600;">카카오 연동</span>은 앱 내에서 언제든 할 수 있어요.
+    </div>
+    <button class="btn-primary" onclick="startOnboarding()">시작하기</button>
+    <button class="btn-ghost" style="margin-top:6px;font-size:11px;color:var(--text4);">Firebase Anonymous Auth · 데모 환경</button>
   </div>
 </div>
 
-<!-- Overlay (bottom sheet) -->
+<!-- 앱 셸 -->
+<div id="appShell" class="hidden" style="height:100%;display:flex;flex-direction:column;position:relative;">
+  <div id="tabContent" style="flex:1;overflow:hidden;position:relative;"></div>
+  <div class="tabbar" id="mainTabbar">
+    <div class="tab-item active" id="tab-home" onclick="switchTab('home')">
+      <div class="tab-ico">
+        <svg class="ico-line" width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M9.02 2.84L3.63 7.04C2.73 7.74 2 9.23 2 10.36V17.77C2 20.09 3.89 21.99 6.21 21.99H17.79C20.11 21.99 22 20.09 22 17.78V10.50C22 9.29 21.19 7.74 20.2 7.05L14.02 2.72C12.62 1.74 10.37 1.79 9.02 2.84Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 18V15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        <svg class="ico-solid" width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M20.04 6.82L14.28 2.79C12.71 1.69 10.30 1.75 8.79 2.92L3.78 6.83C2.78 7.61 1.99 9.21 1.99 10.47V17.37C1.99 19.92 4.06 21.99 6.61 21.99H17.39C19.94 21.99 22.01 19.93 22.01 17.38V10.60C22.01 9.25 21.14 7.59 20.04 6.82ZM12.75 18C12.75 18.41 12.41 18.75 12 18.75C11.59 18.75 11.25 18.41 11.25 18V15C11.25 14.59 11.59 14.25 12 14.25C12.41 14.25 12.75 14.59 12.75 15V18Z" fill="currentColor"/></svg>
+      </div>
+      <div class="tab-lbl">홈</div>
+    </div>
+    <div class="tab-item" id="tab-benefits" onclick="switchTab('benefits')">
+      <div class="tab-ico">
+        <svg class="ico-line" width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M19.5 12.5C19.5 11.12 20.62 10 22 10V9C22 5 21 4 17 4H7C3 4 2 5 2 9V9.5C3.38 9.5 4.5 10.62 4.5 12C4.5 13.38 3.38 14.5 2 14.5V15C2 19 3 20 7 20H17C21 20 22 19 22 15C20.62 15 19.5 13.88 19.5 12.5Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M10 4L10 20" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-dasharray="5 5"/></svg>
+        <svg class="ico-solid" width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M22 10.75C22.41 10.75 22.75 10.41 22.75 10V9C22.75 4.59 21.41 3.25 17 3.25H10.75V5.5C10.75 5.91 10.41 6.25 10 6.25C9.59 6.25 9.25 5.91 9.25 5.5V3.25H7C2.59 3.25 1.25 4.59 1.25 9V9.5C1.25 9.91 1.59 10.25 2 10.25C2.96 10.25 3.75 11.04 3.75 12C3.75 12.96 2.96 13.75 2 13.75C1.59 13.75 1.25 14.09 1.25 14.5V15C1.25 19.41 2.59 20.75 7 20.75H9.25V18.5C9.25 18.09 9.59 17.75 10 17.75C10.41 17.75 10.75 18.09 10.75 18.5V20.75H17C21.41 20.75 22.75 19.41 22.75 15C22.75 14.59 22.41 14.25 22 14.25C21.04 14.25 20.25 13.46 20.25 12.5C20.25 11.54 21.04 10.75 22 10.75Z" fill="currentColor"/></svg>
+      </div>
+      <div class="tab-lbl">혜택</div>
+    </div>
+    <div class="tab-item" id="tab-my" onclick="switchTab('my')">
+      <div class="tab-ico">
+        <svg class="ico-line" width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M12 12.75C8.83 12.75 6.25 10.17 6.25 7C6.25 3.83 8.83 1.25 12 1.25C15.17 1.25 17.75 3.83 17.75 7C17.75 10.17 15.17 12.75 12 12.75Z" stroke="currentColor" stroke-width="1.5"/><path d="M20.59 22.75C20.18 22.75 19.84 22.41 19.84 22C19.84 18.55 16.32 15.75 12 15.75C7.68 15.75 4.16 18.55 4.16 22C4.16 22.41 3.82 22.75 3.41 22.75C3.00 22.75 2.66 22.41 2.66 22C2.66 17.73 6.85 14.25 12 14.25C17.15 14.25 21.34 17.73 21.34 22C21.34 22.41 21.00 22.75 20.59 22.75Z" stroke="currentColor" stroke-width="1.5"/></svg>
+        <svg class="ico-solid" width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M12 12C14.76 12 17 9.76 17 7C17 4.24 14.76 2 12 2C9.24 2 7 4.24 7 7C7 9.76 9.24 12 12 12Z" fill="currentColor"/><path d="M12 14.5C6.85 14.5 2.66 17.73 2.66 22C2.66 22.41 3.00 22.75 3.41 22.75H20.59C21.00 22.75 21.34 22.41 21.34 22C21.34 17.73 17.15 14.5 12 14.5Z" fill="currentColor"/></svg>
+      </div>
+      <div class="tab-lbl">마이</div>
+    </div>
+  </div>
+</div>
+
+<!-- 오버레이 -->
 <div id="overlay">
   <div id="overlayBg" onclick="closeOverlay()"></div>
   <div id="overlaySheet">
     <div class="sheet-handle"></div>
-    <div class="sheet-header">
+    <div class="sheet-hd">
       <span class="sheet-title" id="sheetTitle"></span>
       <button class="sheet-close" onclick="closeOverlay()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
-        </svg>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
       </button>
     </div>
     <div class="sheet-body" id="sheetBody"></div>
   </div>
 </div>
 
-<!-- Toast -->
+<!-- 토스트 -->
 <div id="toast" class="hidden"></div>
 
-</div><!-- #root -->
+</div>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
@@ -326,878 +347,656 @@ html,body{margin:0;padding:0;height:100%;background:#e2e8f0;font-family:-apple-s
 <script>
 'use strict';
 
-// ── Firebase ───────────────────────────────────
-const FB_CONFIG = {
-  apiKey: "AIzaSyCElUPJAitnMZxttVYjboV0j4s_qpErAgA",
-  authDomain: "pricepick-demo.firebaseapp.com",
-  projectId: "pricepick-demo",
-  storageBucket: "pricepick-demo.firebasestorage.app",
-  messagingSenderId: "505137396208",
-  appId: "1:505137396208:web:cea9d208c7745854e14535"
-};
-firebase.initializeApp(FB_CONFIG);
+firebase.initializeApp({
+  apiKey:"AIzaSyCElUPJAitnMZxttVYjboV0j4s_qpErAgA",
+  authDomain:"pricepick-demo.firebaseapp.com",
+  projectId:"pricepick-demo",
+  storageBucket:"pricepick-demo.firebasestorage.app",
+  messagingSenderId:"505137396208",
+  appId:"1:505137396208:web:cea9d208c7745854e14535"
+});
 const auth = firebase.auth();
 const db   = firebase.firestore();
 
-// ── Helpers ────────────────────────────────────
-function uuid() {
-  return crypto.randomUUID ? crypto.randomUUID() : ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g,c=>(c^crypto.getRandomValues(new Uint8Array(1))[0]&15>>c/4).toString(16));
-}
-function nowTs() { return firebase.firestore.FieldValue.serverTimestamp(); }
-function daysFromNow(n) { const d = new Date(); d.setDate(d.getDate()+n); return firebase.firestore.Timestamp.fromDate(d); }
-function fmtKRW(n) { return (n||0).toLocaleString('ko-KR')+'원'; }
-function fmtP(n) { return (n||0).toLocaleString('ko-KR')+'P'; }
-function fmtTs(ts) {
-  if (!ts) return '—';
-  const d = ts.toDate ? ts.toDate() : new Date(ts);
-  return d.toLocaleString('ko-KR', {month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit'});
-}
+// ── 유틸 ──
+const uuid = () => (crypto.randomUUID ? crypto.randomUUID() : 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,c=>{const r=Math.random()*16|0;return(c=='x'?r:r&0x3|0x8).toString(16)}));
+const nowTs  = () => firebase.firestore.FieldValue.serverTimestamp();
+const addDays = n => { const d=new Date(); d.setDate(d.getDate()+n); return firebase.firestore.Timestamp.fromDate(d); };
+const fmtKRW = n => (n||0).toLocaleString('ko-KR')+'원';
+const fmtP   = n => (n||0).toLocaleString('ko-KR')+'P';
+const GRADE_KO = { gold:'금', silver:'은', bronze:'동' };
 
-// ── Greedy ─────────────────────────────────────
-function greedyTickets(amount) {
-  const units = Math.ceil(amount / 5000);
-  let rem = units;
-  const gold   = Math.floor(rem / 20); rem -= gold * 20;
-  const silver = Math.floor(rem / 10); rem -= silver * 10;
-  const bronze = rem;
-  return { gold, silver, bronze };
+// ── Greedy 산정 ──
+function greedy(amount) {
+  const units = Math.ceil(amount/5000); let r=units;
+  const gold=Math.floor(r/20); r-=gold*20;
+  const silver=Math.floor(r/10); r-=silver*10;
+  return { gold, silver, bronze:r, total:units };
 }
-function calcPoints(t) { return t.gold*2000 + t.silver*1000 + t.bronze*100; }
-function gradeLabel(g) { return { gold:'금', silver:'은', bronze:'동' }[g] || g; }
-function gradeKey(g) { return { gold:'chip-gold', silver:'chip-silver', bronze:'chip-bronze' }[g] || ''; }
+function calcPts(t) { return t.gold*2000+t.silver*1000+t.bronze*100; }
 
-// ── App State ──────────────────────────────────
-const S = {
-  user: null,       // Firebase Auth user
-  uid: null,
-  userData: null,   // Firestore /users/{uid}
-  points: 0,
-  tickets: [],
-  postbacks: [],    // user's postbacks (pending/confirmed)
-  gifticons: [],
-  tab: 'home',
-  attendedToday: false,
-};
+// ── 앱 상태 ──
+const S = { uid:null, userData:null, points:0, tickets:[], postbacks:[], gifticons:[], tab:'home', attendedToday:false };
 
-// ── Toast ──────────────────────────────────────
-let toastTimer = null;
-function showToast(msg, dur=2500) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.remove('hidden');
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => t.classList.add('hidden'), dur);
+// ── 토스트 ──
+let toastTmr=null;
+function showToast(msg,d=2600) {
+  const el=document.getElementById('toast');
+  el.textContent=msg; el.classList.remove('hidden');
+  clearTimeout(toastTmr); toastTmr=setTimeout(()=>el.classList.add('hidden'),d);
 }
 
-// ── Overlay ────────────────────────────────────
-function openOverlay(title, html) {
-  document.getElementById('sheetTitle').textContent = title;
-  document.getElementById('sheetBody').innerHTML = html;
+// ── 오버레이 ──
+function openOverlay(title,html) {
+  document.getElementById('sheetTitle').textContent=title;
+  document.getElementById('sheetBody').innerHTML=html;
   document.getElementById('overlay').classList.add('active');
 }
-function closeOverlay() {
-  document.getElementById('overlay').classList.remove('active');
-}
+function closeOverlay() { document.getElementById('overlay').classList.remove('active'); }
 
-// ── Auth Init ──────────────────────────────────
+// ── statusbar SVG ──
+const SBAR_ICONS = `<svg width="17" height="12" viewBox="0 0 17 12" fill="currentColor"><rect x="0" y="4" width="3" height="8" rx="1"/><rect x="4.5" y="2.5" width="3" height="9.5" rx="1"/><rect x="9" y="1" width="3" height="11" rx="1"/><rect x="13.5" y="0" width="3" height="12" rx="1"/></svg><svg width="16" height="12" viewBox="0 0 16 12" fill="currentColor"><path d="M8 2.5C10.2 2.5 12.2 3.4 13.6 4.9L15 3.4C13.2 1.5 10.7 0.3 8 0.3C5.3 0.3 2.8 1.5 1 3.4L2.4 4.9C3.8 3.4 5.8 2.5 8 2.5Z"/><path d="M8 5.5C9.4 5.5 10.7 6.1 11.6 7L13 5.5C11.7 4.2 10 3.3 8 3.3C6 3.3 4.3 4.2 3 5.5L4.4 7C5.3 6.1 6.6 5.5 8 5.5Z"/><circle cx="8" cy="10" r="1.8"/></svg><svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="currentColor" stroke-opacity="0.35"/><rect x="2" y="2" width="17" height="8" rx="2" fill="currentColor"/><path d="M23 4V8C23.8 7.6 24.5 6.9 24.5 6C24.5 5.1 23.8 4.4 23 4Z" fill="currentColor" fill-opacity="0.4"/></svg>`;
+const LOGO_SVG = `<svg width="28" height="28" viewBox="0 0 360 363" fill="none"><path d="M178.702 82.69C125.37 82.69 82.14 125.94 82.14 179.29V277.43H115.61V252.41C132.54 267.04 154.59 275.87 178.70 275.87C232.03 275.87 275.27 232.62 275.27 179.28C275.27 125.93 232.03 82.68 178.70 82.68V82.69ZM178.70 242.40C143.85 242.40 115.61 214.15 115.61 179.29C115.61 144.43 143.85 116.18 178.70 116.18C213.55 116.18 241.79 144.43 241.79 179.29C241.79 214.15 213.55 242.40 178.70 242.40Z" fill="#634C9E"/><path d="M180 0C80.59 0 0 80.62 0 180.06V363H62.40V316.37C93.94 343.63 135.04 360.12 180 360.12C279.41 360.12 360 279.50 360 180.06C360 80.62 279.42 0 180 0ZM180 297.70C115.05 297.70 62.40 245.02 62.40 180.06C62.40 115.10 115.06 62.42 180 62.42C244.94 62.42 297.60 115.10 297.60 180.06C297.60 245.02 244.94 297.70 180 297.70Z" fill="#7A49DE"/></svg>`;
+
+// ── Auth ──
 auth.onAuthStateChanged(async user => {
   if (user) {
-    S.user = user;
-    S.uid  = user.uid;
-    const userDoc = await db.collection('users').doc(S.uid).get();
-    if (userDoc.exists) {
-      S.userData = userDoc.data();
-      showApp();
-    } else {
-      showOnboarding();
-    }
+    S.uid=user.uid;
+    const doc=await db.collection('users').doc(S.uid).get();
+    if (doc.exists) { S.userData=doc.data(); showApp(); }
+    else showOnboarding();
   } else {
-    // Anonymous sign-in
-    try {
-      await auth.signInAnonymously();
-    } catch(e) {
-      document.getElementById('loading').innerHTML = `
-        <div style="text-align:center;padding:2rem;color:#dc2626">
-          <p style="font-weight:600">Firebase Anonymous Auth 비활성</p>
-          <p style="font-size:0.8rem;margin-top:0.5rem">Firebase Console → Authentication → Sign-in method에서<br>Anonymous 제공업체를 활성화해주세요.</p>
-        </div>`;
-    }
+    auth.signInAnonymously().catch(()=>{
+      document.getElementById('loading').innerHTML='<div style="padding:24px;text-align:center;color:var(--red)"><div style="font-size:15px;font-weight:700;margin-bottom:8px">Anonymous Auth 비활성</div><div style="font-size:12px;color:var(--text2)">Firebase Console → Authentication → 익명 로그인 활성화 필요</div></div>';
+    });
   }
 });
 
-// ── Onboarding ─────────────────────────────────
+// ── 온보딩 ──
 function showOnboarding() {
   document.getElementById('loading').classList.add('hidden');
-  document.getElementById('onboarding').classList.remove('hidden');
+  const ob=document.getElementById('onboarding');
+  ob.style.display='flex'; ob.classList.remove('hidden');
 }
-
 async function startOnboarding() {
-  const nick = document.getElementById('nicknameInput').value.trim();
+  const nick=document.getElementById('nickInput').value.trim();
   if (!nick) { showToast('닉네임을 입력해주세요'); return; }
-
-  const batch = db.batch();
-  batch.set(db.collection('users').doc(S.uid), {
-    user_id: S.uid,
-    nickname: nick,
-    link_status: 'guest',
-    status: 'active',
-    joined_at: nowTs(),
-    withdrawn_at: null,
-    created_at: nowTs(),
-    updated_at: nowTs(),
+  const batch=db.batch();
+  batch.set(db.collection('users').doc(S.uid),{
+    user_id:S.uid,nickname:nick,link_status:'guest',status:'active',
+    joined_at:nowTs(),withdrawn_at:null,created_at:nowTs(),updated_at:nowTs()
   });
-  batch.set(db.collection('user_points').doc(S.uid), {
-    user_id: S.uid,
-    balance: 0,
-    updated_at: nowTs(),
-    created_at: nowTs(),
+  batch.set(db.collection('user_points').doc(S.uid),{
+    user_id:S.uid,balance:0,updated_at:nowTs(),created_at:nowTs()
   });
-
   await batch.commit();
-  S.userData = { nickname: nick, link_status: 'guest', status: 'active' };
+  S.userData={nickname:nick,link_status:'guest',status:'active'};
   showApp();
 }
 
-// ── App Shell ──────────────────────────────────
-function showApp() {
+// ── 앱 초기화 ──
+async function showApp() {
   document.getElementById('loading').classList.add('hidden');
   document.getElementById('onboarding').classList.add('hidden');
-  document.getElementById('appShell').classList.remove('hidden');
-  loadUserData().then(() => renderTab('home'));
+  const sh=document.getElementById('appShell');
+  sh.style.display='flex'; sh.classList.remove('hidden');
+  await loadData(); renderTab('home');
 }
-
-async function loadUserData() {
-  const [userDoc, pointsDoc, ticketsSnap, pbSnap, gifSnap] = await Promise.all([
+async function loadData() {
+  const [uDoc,pDoc,tkSnap,pbSnap,gifSnap]=await Promise.all([
     db.collection('users').doc(S.uid).get(),
     db.collection('user_points').doc(S.uid).get(),
     db.collection('user_tickets').where('user_id','==',S.uid).orderBy('created_at','desc').get(),
     db.collection('postbacks').where('user_id','==',S.uid).orderBy('created_at','desc').limit(10).get(),
     db.collection('gifticons').where('on_sale','==',true).get(),
   ]);
-  if (userDoc.exists) S.userData = userDoc.data();
-  S.points = pointsDoc.exists ? (pointsDoc.data().balance || 0) : 0;
-  S.tickets = ticketsSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-  S.postbacks = pbSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-  S.gifticons = gifSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-
-  // Check today's attendance
-  const today = new Date().toISOString().slice(0, 10);
-  const visitSnap = await db.collection('daily_visits')
-    .where('user_id','==',S.uid).where('date','==',today).limit(1).get();
-  S.attendedToday = !visitSnap.empty;
+  if (uDoc.exists) S.userData=uDoc.data();
+  S.points=pDoc.exists?(pDoc.data().balance||0):0;
+  S.tickets=tkSnap.docs.map(d=>({id:d.id,...d.data()}));
+  S.postbacks=pbSnap.docs.map(d=>({id:d.id,...d.data()}));
+  S.gifticons=gifSnap.docs.map(d=>({id:d.id,...d.data()}));
+  const today=new Date().toISOString().slice(0,10);
+  const vSnap=await db.collection('daily_visits').where('user_id','==',S.uid).where('date','==',today).limit(1).get();
+  S.attendedToday=!vSnap.empty;
 }
-
 function switchTab(tab) {
-  S.tab = tab;
-  ['home','benefits','my'].forEach(t => {
-    document.getElementById('tab-'+t).classList.toggle('active', t===tab);
-  });
+  S.tab=tab;
+  ['home','benefits','my'].forEach(t=>document.getElementById('tab-'+t).classList.toggle('active',t===tab));
   renderTab(tab);
 }
-
 function renderTab(tab) {
-  const el = document.getElementById('tabContent');
-  if (tab === 'home')     el.innerHTML = renderHome();
-  if (tab === 'benefits') el.innerHTML = renderBenefits();
-  if (tab === 'my')       el.innerHTML = renderMy();
-  el.scrollTop = 0;
+  const el=document.getElementById('tabContent');
+  if (tab==='home')     el.innerHTML=renderHome();
+  if (tab==='benefits') el.innerHTML=renderBenefits();
+  if (tab==='my')       el.innerHTML=renderMy();
 }
 
-// ── HOME TAB ───────────────────────────────────
+// ═══════════════════════════════════════════
+// 홈 탭
+// ═══════════════════════════════════════════
 function renderHome() {
-  const u = S.userData || {};
-  const isLinked = u.link_status === 'linked';
-  const activeTickets = S.tickets.filter(t => t.status === 'active');
-  const pendingPb = S.postbacks.filter(p => p.status === 'pending');
+  const u=S.userData||{};
+  const isLinked=u.link_status==='linked';
+  const activeT=S.tickets.filter(t=>t.status==='active');
+  const pending=S.postbacks.filter(p=>p.status==='pending');
+  const byGrade=g=>activeT.filter(t=>t.grade_code===g).reduce((s,t)=>s+(t.qty||0),0);
 
-  const statsBadge = isLinked
-    ? `<span class="badge badge-linked"><svg style="width:10px;height:10px" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>카카오 연동</span>`
-    : `<span class="badge badge-guest">GUEST</span>`;
-
-  const totalActiveQty = activeTickets.reduce((sum, t) => sum + (t.qty||0), 0);
-
-  let pendingSection = '';
-  if (pendingPb.length > 0) {
-    const items = pendingPb.map(p => `
-      <div class="pb-item">
-        <div class="pb-top">
-          <span class="pb-amount">${fmtKRW(p.purchase_amount)}</span>
-          <span class="pb-status"><span class="badge badge-pending">티켓 적립 대기</span></span>
-        </div>
-        <div class="pb-detail">구매일: ${fmtTs(p.purchased_at)} · ${p.mall_code||'쿠팡'} · D+${p.link_status==='guest'?'30':'7'} 확정 예정</div>
-        <button class="pb-confirm-btn" onclick="confirmPostback('${p.id}')">지금 확정하기 (데모 즉시처리)</button>
-      </div>`).join('');
-    pendingSection = `<div class="section">
-      <div class="section-title">적립 대기 중</div>
-      <div class="demo-notice">실제 서비스: D+7(linked)/D+30(guest) 자동 확정. 데모에서는 즉시 처리합니다.</div>
-      ${items}
-    </div>`;
-  }
+  const pendingSection=pending.length?`
+    <div class="home-sec" style="margin-top:0">
+      <div class="home-sec-title" style="color:var(--text1)">
+        적립 대기
+        <span style="background:var(--red);color:#fff;font-size:10px;padding:2px 7px;border-radius:99px;margin-left:4px;font-weight:700">${pending.length}</span>
+        <span class="home-sec-sub">데모: 즉시 확정 가능</span>
+      </div>
+      ${pending.map(p=>`
+        <div style="background:#FFFBEB;border:1px solid #FDE68A;border-radius:14px;padding:14px;margin-bottom:8px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+            <div style="font-size:15px;font-weight:800;color:var(--text1)">${fmtKRW(p.purchase_amount)}</div>
+            <div style="font-size:10.5px;background:#FEF3C7;color:#92400E;padding:3px 9px;border-radius:99px;font-weight:700">대기 중</div>
+          </div>
+          <div style="font-size:11px;color:#92400E;margin-bottom:10px">${p.mall_code||'쿠팡'} · ${p.link_status==='guest'?'D+30 (guest)':'D+7 (linked)'} 자동 확정</div>
+          <button onclick="confirmPostback('${p.id}')" style="width:100%;height:40px;background:var(--main);color:#fff;border:none;border-radius:var(--r);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">지금 확정하기 (데모 즉시처리)</button>
+        </div>`).join('')}
+    </div>`:'';
 
   return `
-  <div class="section" style="padding-bottom:0.25rem">
-    <div class="greeting-card">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.5rem">
-        <div class="greeting-name">${u.nickname||'픽러버'}님</div>
-        ${statsBadge}
+  <div class="app-screen">
+    <div class="statusbar"><span>9:41</span><div class="statusbar-icons">${SBAR_ICONS}</div></div>
+    <div class="home-top">
+      <div class="brand-logo">
+        <div style="display:flex;align-items:center;justify-content:center">${LOGO_SVG}</div>
+        <div class="brand-wordmark"><span class="bw-light">PRICE</span><span class="bw-bold">PICK</span></div>
       </div>
-      <div class="greeting-sub">오늘도 픽구매로 티켓 적립해요</div>
-      <div class="greeting-stats">
-        <div class="stat-item">
-          <div class="stat-val">${totalActiveQty}장</div>
-          <div class="stat-lbl">보유 티켓</div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-val">${fmtP(S.points)}</div>
-          <div class="stat-lbl">포인트</div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-val">${pendingPb.length}건</div>
-          <div class="stat-lbl">적립 대기</div>
-        </div>
+      <div class="top-icons">
+        <button class="top-icon-btn" onclick="showToast('알림 기능은 추후 구현 예정')">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M12 6.44V9.77"/><path d="M12.02 2C8.34 2 5.36 4.98 5.36 8.66V10.76C5.36 11.44 5.08 12.46 4.73 13.04L3.46 15.16C2.68 16.47 3.22 17.93 4.66 18.41C9.44 20 14.61 20 19.39 18.41C20.74 17.96 21.32 16.38 20.59 15.16L19.32 13.04C18.98 12.46 18.7 11.44 18.7 10.76V8.66C18.69 5 15.69 2 12.02 2Z"/><path d="M15.33 18.82C15.33 20.65 13.83 22.15 12 22.15C11.09 22.15 10.25 21.77 9.65 21.17C9.05 20.57 8.67 19.73 8.67 18.82"/></svg>
+        </button>
       </div>
     </div>
-  </div>
-
-  <div class="section">
-    <div class="section-title">출석 체크</div>
-    <div class="attend-card" onclick="${S.attendedToday ? '' : 'doAttendance()'}">
-      <div class="attend-left">
-        <div class="attend-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-          </svg>
+    <div class="scroll">
+      ${!isLinked?`
+      <div class="kakao-banner" style="margin-top:14px" onclick="openKakaoLinkSheet()">
+        <div class="kakao-banner-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 3C6.48 3 2 6.58 2 11C2 13.79 3.79 16.23 6.47 17.66L5.5 21.5L9.5 18.94C10.31 19.06 11.14 19.13 12 19.13C17.52 19.13 22 15.55 22 11.13C22 6.58 17.52 3 12 3Z" fill="#3A1D1D"/></svg>
         </div>
         <div>
-          <div class="attend-title">오늘 출석 체크</div>
-          <div class="attend-sub">+100P 포인트 적립</div>
+          <div class="kakao-banner-t">카카오 연동하고 혜택 받기</div>
+          <div class="kakao-banner-s">데이터 영구 보관 · 적립 D+7 · 온보딩 보상</div>
+        </div>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;margin-left:auto"><path d="M9 18L15 12L9 6" stroke="var(--text3)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>`:''}
+
+      <div class="home-ticket-card">
+        <div class="htc-top">
+          <div class="htc-label">내 티켓 현황</div>
+          <div class="htc-status">● LIVE</div>
+        </div>
+        <div class="htc-grades">
+          ${['gold','silver','bronze'].map(g=>`
+          <div class="htc-grade">
+            <div class="htc-grade-name">${GRADE_KO[g]}등급</div>
+            <div class="htc-grade-count">${byGrade(g)}<span class="unit">장</span></div>
+          </div>`).join('')}
+        </div>
+        ${pending.length?`<div class="htc-pending-row"><div style="font-size:11px;font-weight:600;opacity:0.85">대기 ${pending.length}건</div><button class="htc-confirm-btn" onclick="switchTab('home')">확정</button></div>`:''}
+      </div>
+
+      ${pendingSection}
+
+      <div class="home-sec">
+        <div class="home-sec-title">픽구매 쇼핑몰 <span class="home-sec-sub">click_log → postback → 티켓</span></div>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          ${[
+            {code:'coupang',name:'쿠팡',domain:'coupang.com',best:true},
+            {code:'11st',name:'11번가',domain:'11st.co.kr',best:false},
+            {code:'gmarket',name:'G마켓',domain:'gmarket.co.kr',best:false},
+          ].map(m=>`
+          <div class="home-mall-card${m.best?' best':''}" onclick="openPurchaseFlow('${m.code}','${m.name}','${m.domain}')">
+            <div class="mall-logo-wrap"><img src="https://www.google.com/s2/favicons?domain=${m.domain}&sz=64" alt="${m.name}" onerror="this.parentElement.innerHTML='<span style=font-weight:800;font-size:11px;color:var(--text2)>${m.name[0]}</span>'"></div>
+            <div class="mall-info">
+              <div class="mall-name">${m.name}${m.best?' <span style="font-size:10px;background:var(--sub-4);color:var(--main);padding:2px 6px;border-radius:4px;font-weight:700">추천</span>':''}</div>
+              <div class="mall-rate">구매금액 2% 티켓 적립</div>
+            </div>
+            <button class="mall-go-btn">바로가기</button>
+          </div>`).join('')}
         </div>
       </div>
-      ${S.attendedToday
-        ? '<div class="attend-done">완료</div>'
-        : '<button class="attend-btn" onclick="doAttendance()">체크</button>'}
-    </div>
-  </div>
 
-  <div class="section">
-    <div class="section-title">픽구매</div>
-    <div class="demo-notice">mall 클릭 → click_log 생성 → 구매 시뮬 → postbacks + user_tickets(pending) 생성</div>
-    <div class="mall-card" onclick="openPurchaseFlow('coupang','쿠팡')">
-      <div class="mall-icon" style="background:#e11d48">쿠팡</div>
-      <div class="mall-info">
-        <div class="mall-name">쿠팡</div>
-        <div class="mall-desc">구매금액 2% 티켓 적립 · 최대 금 등급</div>
+      <div class="home-sec">
+        <div class="home-sec-title">출석 체크 <span class="home-sec-sub">+100P</span></div>
+        <div style="background:white;border:1px solid var(--border);border-radius:14px;padding:14px;display:flex;align-items:center;gap:12px">
+          <div style="width:44px;height:44px;background:${S.attendedToday?'#DCFCE7':'var(--sub-4)'};border-radius:10px;display:flex;align-items:center;justify-content:center">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="${S.attendedToday?'#16A34A':'var(--main)'}" stroke-width="1.5" stroke-linecap="round"><path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+          </div>
+          <div style="flex:1"><div style="font-size:13px;font-weight:700">오늘 출석 체크</div><div style="font-size:11px;color:var(--text3);margin-top:2px">매일 +100P</div></div>
+          ${S.attendedToday
+            ?'<div style="font-size:11.5px;font-weight:700;color:#16A34A;background:#DCFCE7;padding:5px 12px;border-radius:99px">완료</div>'
+            :'<button onclick="doAttendance()" style="background:var(--main);color:#fff;border:none;border-radius:99px;padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">체크</button>'}
+        </div>
       </div>
-      <div class="mall-action">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
-        </svg>
-      </div>
+      <div style="height:16px"></div>
     </div>
-  </div>
-
-  ${pendingSection}
-  `;
+  </div>`;
 }
 
-// ── BENEFITS TAB ───────────────────────────────
+// ═══════════════════════════════════════════
+// 혜택 탭
+// ═══════════════════════════════════════════
 function renderBenefits() {
-  const activeByGrade = { gold:[], silver:[], bronze:[] };
-  S.tickets.filter(t => t.status === 'active' && t.ticket_type === 'grade').forEach(t => {
-    if (activeByGrade[t.grade_code]) activeByGrade[t.grade_code].push(t);
-  });
-  const sumQty = (arr) => arr.reduce((s,t) => s + (t.qty||0), 0);
+  const isLinked=S.userData?.link_status==='linked';
+  const activeT=S.tickets.filter(t=>t.status==='active');
+  const byGrade=g=>activeT.filter(t=>t.grade_code===g).reduce((s,t)=>s+(t.qty||0),0);
 
-  const hasTickets = sumQty(activeByGrade.gold) + sumQty(activeByGrade.silver) + sumQty(activeByGrade.bronze) > 0;
-  const isLinked = S.userData?.link_status === 'linked';
-
-  const ticketRows = [
-    { code:'gold', label:'금 등급', pts:'2,000P/장', cls:'tkt-icon-gold' },
-    { code:'silver', label:'은 등급', pts:'1,000P/장', cls:'tkt-icon-silver' },
-    { code:'bronze', label:'동 등급', pts:'100P/장', cls:'tkt-icon-bronze' },
-  ].map(g => {
-    const qty = sumQty(activeByGrade[g.code]);
-    return `<div class="ticket-item">
-      <div class="tkt-left">
-        <div class="tkt-icon ${g.cls}">${gradeLabel(g.code)}</div>
-        <div>
-          <div class="tkt-name">${g.label}</div>
-          <div class="tkt-sub">${g.pts}</div>
-        </div>
+  const gifRows=S.gifticons.length?S.gifticons.map(g=>{
+    const rg=g.required_grade,rq=g.required_qty,uq=byGrade(rg);
+    const can=isLinked&&uq>=rq;
+    const reason=!isLinked?'카카오 연동 필요':uq<rq?`${GRADE_KO[rg]} ${rq}장 필요 (보유 ${uq})`:'';
+    return `<div class="gif-row">
+      <div class="gif-thumb">${rg==='gold'?'G':rg==='silver'?'S':'B'}</div>
+      <div class="gif-info">
+        <div class="gif-name">${g.name}</div>
+        <div class="gif-req"><span class="grade-badge ${rg}">${GRADE_KO[rg]} ${rq}장</span>${reason?' <span style="color:var(--red);font-size:10px"> · '+reason+'</span>':''}</div>
       </div>
-      <div class="tkt-right">
-        <div class="tkt-qty">${qty}</div>
-        <div class="tkt-unit">장</div>
-      </div>
+      <button class="gif-btn ${can?'available':'unavailable'}" ${can?`onclick="openGifExchange('${g.id}','${g.name}','${rg}',${rq},${uq})"`:''}>
+        ${can?'교환':'불가'}
+      </button>
     </div>`;
-  }).join('');
-
-  const gifRows = S.gifticons.map(g => {
-    const reqGrade = g.required_grade;
-    const reqQty   = g.required_qty;
-    const userQty  = sumQty(activeByGrade[reqGrade]||[]);
-    const canExchange = isLinked && userQty >= reqQty;
-    const reason = !isLinked ? '카카오 연동 필요' : userQty < reqQty ? `${gradeLabel(reqGrade)} ${reqQty}장 필요 (보유: ${userQty}장)` : '';
-    return `<div class="gif-item">
-      <div class="gif-left">
-        <div class="gif-thumb">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12z"/>
-          </svg>
-        </div>
-        <div>
-          <div class="gif-name">${g.name}</div>
-          <div class="gif-req"><span class="badge badge-${reqGrade}">${gradeLabel(reqGrade)} ${reqQty}장</span>${!canExchange ? ` · <span style="color:#ef4444">${reason}</span>` : ''}</div>
-        </div>
-      </div>
-      <button class="gif-btn" ${canExchange ? `onclick="openGifExchange('${g.id}','${g.name}','${reqGrade}',${reqQty},${userQty})"` : 'disabled'}>${canExchange ? '교환' : '불가'}</button>
-    </div>`;
-  }).join('') || '<div class="empty-state"><p class="empty-title">기프티콘 없음</p></div>';
+  }).join(''):'<div style="padding:20px;text-align:center;color:var(--text3);font-size:13px">기프티콘 없음<br><span style="font-size:11px">CMS에서 추가하세요</span></div>';
 
   return `
-  <div class="section">
-    <div class="section-title">내 티켓</div>
-    <div class="card">
-      ${hasTickets ? ticketRows : '<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"/></svg><p class="empty-title">보유 티켓 없음</p><p class="empty-sub">픽구매 후 티켓을 확정해보세요</p></div>'}
+  <div class="reward-screen">
+    <div class="statusbar"><span>9:41</span><div class="statusbar-icons">${SBAR_ICONS}</div></div>
+    <div class="reward-top">
+      <div class="reward-top-title">혜택</div>
     </div>
-    ${!isLinked ? '<div class="demo-notice">카카오 연동 후 기프티콘 교환·포인트 사용이 가능합니다.</div>' : ''}
-  </div>
+    <div class="reward-scroll">
+      ${!isLinked?`
+      <div class="kakao-banner" style="margin-top:14px" onclick="openKakaoLinkSheet()">
+        <div class="kakao-banner-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 3C6.48 3 2 6.58 2 11C2 13.79 3.79 16.23 6.47 17.66L5.5 21.5L9.5 18.94C10.31 19.06 11.14 19.13 12 19.13C17.52 19.13 22 15.55 22 11.13C22 6.58 17.52 3 12 3Z" fill="#3A1D1D"/></svg>
+        </div>
+        <div>
+          <div class="kakao-banner-t">카카오 연동 후 교환 가능</div>
+          <div class="kakao-banner-s">기프티콘 교환은 연동 필수예요</div>
+        </div>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;margin-left:auto"><path d="M9 18L15 12L9 6" stroke="var(--text3)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>`:''}
 
-  <div class="section">
-    <div class="section-title">기프티콘 교환</div>
-    <div class="card">${gifRows}</div>
-  </div>
-  `;
+      <div class="ticket-summary-card">
+        <div class="tsc-label">보유 티켓</div>
+        <div class="tsc-grades">
+          ${['gold','silver','bronze'].map(g=>`
+          <div class="tsc-grade">
+            <div class="tsc-grade-name">${GRADE_KO[g]}등급</div>
+            <div class="tsc-grade-count">${byGrade(g)}<span class="unit">장</span></div>
+          </div>`).join('')}
+        </div>
+        <div class="tsc-points">
+          <div class="tsc-pts-label">포인트 잔액</div>
+          <div class="tsc-pts-value">${fmtP(S.points)}</div>
+        </div>
+      </div>
+
+      <div class="reward-section">
+        <div class="reward-section-title">기프티콘 교환소</div>
+        ${gifRows}
+      </div>
+      <div style="height:16px"></div>
+    </div>
+  </div>`;
 }
 
-// ── MY TAB ─────────────────────────────────────
+// ═══════════════════════════════════════════
+// 마이 탭
+// ═══════════════════════════════════════════
 function renderMy() {
-  const u = S.userData || {};
-  const isLinked = u.link_status === 'linked';
+  const u=S.userData||{};
+  const isLinked=u.link_status==='linked';
 
-  const kakaoSection = isLinked
-    ? `<div class="kakao-linked">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-        </svg>
-        <div>
-          <div class="kakao-linked-text">카카오 연동 완료</div>
-          <div style="font-size:0.75rem;color:#166534;margin-top:1px">티켓 교환·포인트 사용 활성화됨</div>
-        </div>
-      </div>`
-    : `<div class="kakao-card" onclick="doKakaoLink()">
-        <div class="kakao-left">
-          <div class="kakao-logo">
-            <svg viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 3C6.48 3 2 6.714 2 11.286c0 2.884 1.875 5.429 4.714 6.857L5.571 22l5.143-3.214C11.143 18.857 11.571 18.857 12 18.857c5.52 0 10-3.714 10-8.286S17.52 3 12 3z"/>
-            </svg>
-          </div>
-          <div>
-            <div class="kakao-title">카카오 연동하기</div>
-            <div class="kakao-sub">티켓 교환·포인트 사용 활성화</div>
-          </div>
-        </div>
-        <div class="kakao-arrow">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
-          </svg>
-        </div>
-      </div>`;
+  const kakaoRow=isLinked?`
+    <div class="my-row" style="cursor:default">
+      <div class="my-row-ico" style="background:#FFF9C4">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 3C6.48 3 2 6.58 2 11C2 13.79 3.79 16.23 6.47 17.66L5.5 21.5L9.5 18.94C10.31 19.06 11.14 19.13 12 19.13C17.52 19.13 22 15.55 22 11.13C22 6.58 17.52 3 12 3Z" fill="#FEE500"/></svg>
+      </div>
+      <div class="my-row-body"><div class="my-row-name">카카오 연동됨</div><div class="my-row-desc" style="color:var(--green)">모든 기능 사용 가능</div></div>
+      <div class="my-row-right" style="color:var(--green);font-weight:800">✓</div>
+    </div>`:`
+    <div class="my-row" onclick="openKakaoLinkSheet()">
+      <div class="my-row-ico" style="background:#FFF9C4">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 3C6.48 3 2 6.58 2 11C2 13.79 3.79 16.23 6.47 17.66L5.5 21.5L9.5 18.94C10.31 19.06 11.14 19.13 12 19.13C17.52 19.13 22 15.55 22 11.13C22 6.58 17.52 3 12 3Z" fill="#FEE500"/></svg>
+      </div>
+      <div class="my-row-body"><div class="my-row-name">카카오 미연동</div><div class="my-row-desc">연동 시 데이터 영구 보관</div></div>
+      <button class="kakao-pull-btn" onclick="event.stopPropagation();openKakaoLinkSheet()">연동하기</button>
+    </div>`;
 
   return `
-  <div class="section">
-    <div class="my-profile-card">
-      <div class="my-avatar">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-        </svg>
-      </div>
-      <div class="my-nickname">${u.nickname||'—'}</div>
-      <div class="my-status">${isLinked ? '카카오 연동 완료' : '비회원(GUEST) — 카카오 연동 필요'}</div>
-    </div>
-    ${kakaoSection}
-    <div class="points-card">
-      <div class="points-label">포인트 잔액</div>
-      <div class="points-val">${fmtP(S.points)}</div>
-      <div class="points-sub">10P = 1원 (출석·이벤트 적립)</div>
-    </div>
-    <div class="menu-list">
-      <div class="menu-item" onclick="showTicketHistory()">
-        <div class="menu-left">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"/>
-          </svg>
-          <span class="menu-label">티켓 거래 원장</span>
+  <div class="my-screen">
+    <div class="statusbar" style="background:linear-gradient(135deg,#6B47D9,#845EEE);color:white"><span>9:41</span><div class="statusbar-icons">${SBAR_ICONS}</div></div>
+    <div class="my-scroll">
+      <div class="my-top">
+        <div class="my-top-bar">
+          <div class="my-top-title">마이</div>
+          <div class="my-top-actions">
+            <button class="my-top-btn" onclick="showToast('알림 기능 추후 구현')">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M12 6.44V9.77"/><path d="M12.02 2C8.34 2 5.36 4.98 5.36 8.66V10.76C5.36 11.44 5.08 12.46 4.73 13.04L3.46 15.16C2.68 16.47 3.22 17.93 4.66 18.41C9.44 20 14.61 20 19.39 18.41C20.74 17.96 21.32 16.38 20.59 15.16L19.32 13.04C18.98 12.46 18.7 11.44 18.7 10.76V8.66C18.69 5 15.69 2 12.02 2Z"/></svg>
+            </button>
+          </div>
         </div>
-        <div class="menu-right"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg></div>
-      </div>
-      <div class="menu-item" onclick="showPointHistory()">
-        <div class="menu-left">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-          </svg>
-          <span class="menu-label">포인트 거래 원장</span>
+        <div class="my-profile">
+          <div class="my-avatar" style="font-size:28px">👤</div>
+          <div class="my-info">
+            <div class="my-nickname">${u.nickname||'—'} ${isLinked?'<span style="font-size:10px;background:rgba(255,255,255,0.2);padding:2px 8px;border-radius:99px;font-weight:600">카카오 연동</span>':''}</div>
+            <div class="my-meta">${isLinked?'모든 기능 사용 가능':'카카오 연동 전 — GUEST 모드'}</div>
+          </div>
         </div>
-        <div class="menu-right"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg></div>
       </div>
-      <div class="menu-item" onclick="showToast('CMS 어드민: pricepick-demo.vercel.app/cms')">
-        <div class="menu-left">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 0v10a2 2 0 01-2 2h-2a2 2 0 01-2-2V7z"/>
-          </svg>
-          <span class="menu-label">운영자 CMS에서 내 데이터 보기</span>
+
+      <div class="my-section-title">회원 정보</div>
+      <div class="my-section">
+        <div class="my-row" style="cursor:default">
+          <div class="my-row-ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></div>
+          <div class="my-row-body"><div class="my-row-name">닉네임</div></div>
+          <div class="my-row-right value">${u.nickname||'—'}</div>
         </div>
-        <div class="menu-right"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg></div>
+        ${kakaoRow}
+      </div>
+
+      <div class="my-section-title">자산</div>
+      <div class="my-section">
+        <div class="my-row" style="cursor:default">
+          <div class="my-row-ico">P</div>
+          <div class="my-row-body"><div class="my-row-name">포인트 잔액</div><div class="my-row-desc">출석 · 이벤트 · 구매 적립</div></div>
+          <div class="my-row-right value" style="color:var(--main)">${fmtP(S.points)}</div>
+        </div>
+      </div>
+
+      <div class="my-section-title">거래 원장</div>
+      <div class="my-section">
+        <div class="my-row" onclick="showTicketLedger()">
+          <div class="my-row-ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M19.5 12.5C19.5 11.12 20.62 10 22 10V9C22 5 21 4 17 4H7C3 4 2 5 2 9V9.5C3.38 9.5 4.5 10.62 4.5 12C4.5 13.38 3.38 14.5 2 14.5V15C2 19 3 20 7 20H17C21 20 22 19 22 15C20.62 15 19.5 13.88 19.5 12.5Z"/><path d="M10 4v16" stroke-dasharray="5 5"/></svg></div>
+          <div class="my-row-body"><div class="my-row-name">티켓 원장</div><div class="my-row-desc">append-only 불변 원장</div></div>
+          <div class="my-row-right">›</div>
+        </div>
+        <div class="my-row" onclick="showPointLedger()">
+          <div class="my-row-ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg></div>
+          <div class="my-row-body"><div class="my-row-name">포인트 원장</div><div class="my-row-desc">append-only 불변 원장</div></div>
+          <div class="my-row-right">›</div>
+        </div>
+      </div>
+
+      <div style="margin:4px 16px 20px;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:10px;color:var(--text3);font-family:ui-monospace,monospace;line-height:1.7">
+        uid: ${S.uid?S.uid.slice(0,24)+'…':'—'}<br>
+        status: ${u.status||'—'} · link: ${u.link_status||'—'}
       </div>
     </div>
-    <div style="font-size:0.7rem;color:#94a3b8;text-align:center;padding:0.5rem;font-family:monospace">uid: ${S.uid ? S.uid.slice(0,16)+'...' : '—'}</div>
-  </div>
-  `;
+  </div>`;
 }
 
-// ── PURCHASE FLOW ──────────────────────────────
-let currentClickId = null;
-let currentMall = null;
+// ═══════════════════════════════════════════
+// 구매 플로우
+// ═══════════════════════════════════════════
+let _clickId=null,_mallCode=null;
 
-async function openPurchaseFlow(mallCode, mallName) {
-  // 1. Insert click_log
-  currentClickId = uuid();
-  currentMall = mallCode;
-  await db.collection('click_logs').doc(currentClickId).set({
-    click_id: currentClickId,
-    user_id: S.uid,
-    mall_code: mallCode,
-    clicked_at: nowTs(),
-    valid_until: daysFromNow(1),
-    created_at: nowTs(),
+async function openPurchaseFlow(mallCode,mallName,mallDomain) {
+  _clickId=uuid(); _mallCode=mallCode;
+  await db.collection('click_logs').doc(_clickId).set({
+    click_id:_clickId,user_id:S.uid,mall_code:mallCode,
+    clicked_at:nowTs(),valid_until:addDays(1),created_at:nowTs()
   });
-  showToast(`click_logs 생성 (${currentClickId.slice(0,8)}...)`);
-
-  openOverlay(`${mallName} 픽구매`, renderPurchaseSheet(mallName));
+  document.getElementById('tabContent').innerHTML=`
+  <div class="app-screen">
+    <div class="statusbar"><span>9:41</span><div class="statusbar-icons">${SBAR_ICONS}</div></div>
+    <div class="sub-header">
+      <button class="back-btn" onclick="switchTab('home')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+      <div class="sh-title">${mallName} 픽구매</div>
+    </div>
+    <div class="bridge-screen">
+      <div class="C-spin">
+        <div class="C-spin-logo"><img src="https://www.google.com/s2/favicons?domain=${mallDomain}&sz=64" alt="${mallName}" onerror="this.parentElement.innerHTML='<span style=font-weight:800;font-size:11px;color:var(--text2)>${mallName[0]}</span>'"></div>
+      </div>
+      <div class="C-t">${mallName}으로 이동 중</div>
+      <div class="C-s">지금부터 ${mallName}에서 구매하면<br>티켓이 자동으로 적립돼요</div>
+      <div class="C-check-list">
+        <div class="C-row"><span class="ico">✓</span>적립 추적 시작</div>
+        <div class="C-row"><span class="ico">✓</span>24시간 유효</div>
+        <div class="C-row muted">click_logs[${_clickId.slice(0,8)}…]</div>
+      </div>
+      <button onclick="openPurchaseAmountSheet('${mallName}')" style="width:240px;height:52px;background:var(--main);color:#fff;border:none;border-radius:14px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:8px">${mallName} 구경 완료 · 구매 신고</button>
+    </div>
+  </div>`;
 }
 
-function renderPurchaseSheet(mallName) {
-  return `
-    <div class="purchase-mall-badge">
-      <svg style="width:14px;height:14px;color:#3B55E6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
-      ${mallName} · click_log 생성됨
-    </div>
-    <div class="state-ann">click_logs[${currentClickId ? currentClickId.slice(0,8) : ''}...] created<br>user_id: ${S.uid ? S.uid.slice(0,8) : ''}...<br>mall_code: ${currentMall}</div>
-    <div style="height:1rem"></div>
-    <div class="purchase-input-wrap">
-      <label class="purchase-input-label">구매 금액 (원)</label>
-      <input type="number" id="purchaseAmt" class="purchase-input" placeholder="예: 67000" min="5000" step="1000" oninput="updateGreedyPreview()" value="67000">
-    </div>
-    <div class="greedy-preview" id="greedyPreview">
-      <div class="greedy-label">Greedy 예상 티켓:</div>
-      <div class="greedy-chips" id="greedyChips"></div>
-      <div class="greedy-pts" id="greedyPts"></div>
-    </div>
-    <div class="demo-notice">구매 완료 시: postbacks(pending) + click_postback_matches + user_tickets(pending) + ticket_transactions(EARN) 생성</div>
-    <button class="purchase-btn" onclick="completePurchase()">구매 완료 (시뮬레이션)</button>
-  `;
+function openPurchaseAmountSheet(mallName) {
+  openOverlay(`${mallName} 구매 금액`,`
+    <div class="purchase-sheet">
+      <div class="ps-label">구매 금액 (원)</div>
+      <input type="number" id="psAmt" class="ps-input" placeholder="0" min="5000" step="1000" value="67000" oninput="updateGP()">
+      <div class="greedy-preview" id="gpPreview">
+        <div class="gp-label">Greedy 등급 산정 미리보기</div>
+        <div class="gp-grades">
+          <div class="gp-grade"><div class="gp-grade-name">금</div><div class="gp-grade-count" id="gp-gold">0</div></div>
+          <div class="gp-grade"><div class="gp-grade-name">은</div><div class="gp-grade-count" id="gp-silver">0</div></div>
+          <div class="gp-grade"><div class="gp-grade-name">동</div><div class="gp-grade-count" id="gp-bronze">0</div></div>
+        </div>
+        <div class="gp-pts" id="gp-pts"></div>
+      </div>
+      <div class="state-note">포스트백 수신 → 매칭 → user_tickets(pending) → 확정 시 Greedy 산정</div>
+      <button class="btn-primary" style="margin-top:16px" onclick="completePurchase()">구매 완료 (시뮬레이션)</button>
+    </div>`);
+  setTimeout(updateGP,50);
 }
 
-function updateGreedyPreview() {
-  const amt = parseInt(document.getElementById('purchaseAmt')?.value) || 0;
-  const t = greedyTickets(amt);
-  const pts = calcPoints(t);
-  const chips = document.getElementById('greedyChips');
-  const ptsEl = document.getElementById('greedyPts');
-  if (!chips) return;
-  const parts = [];
-  if (t.gold)   parts.push(`<span class="greedy-chip chip-gold">금 ${t.gold}장</span>`);
-  if (t.silver) parts.push(`<span class="greedy-chip chip-silver">은 ${t.silver}장</span>`);
-  if (t.bronze) parts.push(`<span class="greedy-chip chip-bronze">동 ${t.bronze}장</span>`);
-  chips.innerHTML = parts.join('') || '<span style="color:#94a3b8">0장</span>';
-  ptsEl.textContent = pts > 0 ? `→ 확정 시 ${fmtP(pts)} 적립 예정` : '';
+function updateGP() {
+  const amt=parseInt(document.getElementById('psAmt')?.value)||0;
+  const t=greedy(amt); const pts=calcPts(t);
+  const el=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
+  el('gp-gold',t.gold);el('gp-silver',t.silver);el('gp-bronze',t.bronze);
+  el('gp-pts',pts>0?`확정 시 ${fmtP(pts)} 예상`:'');
 }
-
-// Call once on load
-setTimeout(updateGreedyPreview, 100);
 
 async function completePurchase() {
-  const amt = parseInt(document.getElementById('purchaseAmt')?.value) || 0;
-  if (amt < 5000) { showToast('5,000원 이상 입력해주세요'); return; }
-
-  const postbackId = uuid();
-  const matchId    = uuid();
-  const tktId      = uuid();
-  const ttxId      = uuid();
-  const totalUnits = Math.ceil(amt / 5000);
-  const orderNum   = Math.floor(Math.random()*900000+100000);
-
-  const batch = db.batch();
-
-  // postback
-  batch.set(db.collection('postbacks').doc(postbackId), {
-    postback_id: postbackId,
-    user_id: S.uid,
-    mall_code: currentMall,
-    order_id: `CPN-APP-${orderNum}`,
-    raw_payload: { event:'purchase', amount: amt, commission: Math.round(amt*0.02) },
-    purchase_amount: amt,
-    commission_amount: Math.round(amt * 0.02),
-    status: 'pending',
-    link_status: S.userData?.link_status || 'guest',
-    purchased_at: nowTs(),
-    confirmed_at: null,
-    received_at: nowTs(),
-    processed_at: null,
-    created_at: nowTs(),
+  const amt=parseInt(document.getElementById('psAmt')?.value)||0;
+  if (amt<5000) { showToast('5,000원 이상 입력해주세요'); return; }
+  const pbId=uuid(),matchId=uuid(),tktId=uuid(),ttxId=uuid();
+  const units=Math.ceil(amt/5000);
+  const batch=db.batch();
+  batch.set(db.collection('postbacks').doc(pbId),{
+    postback_id:pbId,user_id:S.uid,mall_code:_mallCode,
+    order_id:`APP-${Math.floor(Math.random()*900000+100000)}`,
+    raw_payload:{event:'purchase',amount:amt},purchase_amount:amt,
+    commission_amount:Math.round(amt*0.02),status:'pending',
+    link_status:S.userData?.link_status||'guest',
+    purchased_at:nowTs(),confirmed_at:null,received_at:nowTs(),
+    processed_at:null,created_at:nowTs()
   });
-
-  // match
-  batch.set(db.collection('click_postback_matches').doc(matchId), {
-    match_id: matchId,
-    click_id: currentClickId,
-    postback_id: postbackId,
-    user_id: S.uid,
-    match_status: 'matched',
-    matched_at: nowTs(),
-    created_at: nowTs(),
+  batch.set(db.collection('click_postback_matches').doc(matchId),{
+    match_id:matchId,click_id:_clickId,postback_id:pbId,
+    user_id:S.uid,match_status:'matched',matched_at:nowTs(),created_at:nowTs()
   });
-
-  // user_ticket (pending — raw bronze units before Greedy)
-  batch.set(db.collection('user_tickets').doc(tktId), {
-    id: tktId,
-    user_id: S.uid,
-    ticket_type: 'grade',
-    grade_code: 'bronze',
-    qty: totalUnits,
-    status: 'pending',
-    source: 'purchase',
-    postback_id: postbackId,
-    purchase_amount: amt,
-    acquired_at: nowTs(),
-    confirmed_at: null,
-    expires_at: daysFromNow(365),
-    created_at: nowTs(),
-    updated_at: nowTs(),
+  batch.set(db.collection('user_tickets').doc(tktId),{
+    id:tktId,user_id:S.uid,ticket_type:'grade',grade_code:'bronze',
+    qty:units,status:'pending',source:'purchase',postback_id:pbId,
+    purchase_amount:amt,acquired_at:nowTs(),confirmed_at:null,
+    expires_at:addDays(365),created_at:nowTs(),updated_at:nowTs()
   });
-
-  // ticket_transaction EARN (pending)
-  batch.set(db.collection('ticket_transactions').doc(ttxId), {
-    id: ttxId,
-    user_id: S.uid,
-    ticket_type: 'grade',
-    grade_code: 'bronze',
-    type: 'EARN',
-    qty: totalUnits,
-    status: 'pending',
-    source: 'purchase',
-    ref_type: 'postbacks',
-    ref_id: postbackId,
-    expires_at: daysFromNow(365),
-    created_at: nowTs(),
+  batch.set(db.collection('ticket_transactions').doc(ttxId),{
+    id:ttxId,user_id:S.uid,ticket_type:'grade',grade_code:'bronze',
+    type:'EARN',qty:units,status:'pending',source:'purchase',
+    ref_type:'postbacks',ref_id:pbId,expires_at:addDays(365),created_at:nowTs()
   });
-
   await batch.commit();
-
-  // Reload data
-  await loadUserData();
-
-  // Show success screen in overlay
-  const t = greedyTickets(amt);
-  const pts = calcPoints(t);
-  document.getElementById('sheetTitle').textContent = '구매 완료';
-  document.getElementById('sheetBody').innerHTML = `
-    <div class="success-icon">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
-      </svg>
-    </div>
-    <div class="success-title">구매 접수 완료</div>
-    <div class="success-sub">${fmtKRW(amt)} 구매가 접수되었습니다.<br>확정 시 티켓이 발급됩니다.</div>
-    <div class="state-ann">
-      postbacks[${postbackId.slice(0,8)}...].status = pending<br>
-      click_postback_matches: matched<br>
-      user_tickets[${tktId.slice(0,8)}...] bronze×${totalUnits} = pending<br>
-      ticket_transactions: EARN qty=${totalUnits}
-    </div>
-    <div style="margin-top:1rem;margin-bottom:0.5rem;font-size:0.8rem;color:#64748b;text-align:center">
-      확정 시 Greedy 등급 산정: ${t.gold?`금 ${t.gold}장 `:''}${t.silver?`은 ${t.silver}장 `:''}${t.bronze?`동 ${t.bronze}장`:''}
-    </div>
-    <button class="success-btn" onclick="closeOverlay(); switchTab('home')">홈으로</button>
-  `;
-}
-
-// ── CONFIRM POSTBACK (Greedy) ──────────────────
-async function confirmPostback(pbId) {
-  const pbDoc = await db.collection('postbacks').doc(pbId).get();
-  if (!pbDoc.exists) { showToast('포스트백 없음'); return; }
-  const pb = pbDoc.data();
-  if (pb.status !== 'pending') { showToast('이미 처리됨'); return; }
-
-  const t = greedyTickets(pb.purchase_amount);
-  const pts = calcPoints(t);
-  const grades = [
-    { code:'gold', qty:t.gold, ptsPer:2000 },
-    { code:'silver', qty:t.silver, ptsPer:1000 },
-    { code:'bronze', qty:t.bronze, ptsPer:100 },
-  ].filter(g => g.qty > 0);
-
-  const batch = db.batch();
-
-  // Mark pending user_ticket as confirmed_raw
-  const pendingTkts = S.tickets.filter(tk => tk.postback_id === pbId && tk.status === 'pending');
-  pendingTkts.forEach(tk => {
-    batch.update(db.collection('user_tickets').doc(tk.id), {
-      status: 'confirmed_raw', updated_at: nowTs()
-    });
-  });
-
-  // Create grade-specific active tickets + EARN transactions
-  grades.forEach(g => {
-    const tktId = uuid();
-    const ttxId = uuid();
-    batch.set(db.collection('user_tickets').doc(tktId), {
-      id: tktId, user_id: S.uid,
-      ticket_type: 'grade', grade_code: g.code,
-      qty: g.qty, status: 'active', source: 'purchase',
-      postback_id: pbId,
-      acquired_at: nowTs(), confirmed_at: nowTs(),
-      expires_at: daysFromNow(365),
-      created_at: nowTs(), updated_at: nowTs(),
-    });
-    batch.set(db.collection('ticket_transactions').doc(ttxId), {
-      id: ttxId, user_id: S.uid,
-      ticket_type: 'grade', grade_code: g.code,
-      type: 'EARN', qty: g.qty, status: 'active',
-      source: 'purchase', ref_type: 'postbacks', ref_id: pbId,
-      expires_at: daysFromNow(365), created_at: nowTs(),
-    });
-  });
-
-  // user_points update
-  const ptxId = uuid();
-  batch.update(db.collection('user_points').doc(S.uid), {
-    balance: firebase.firestore.FieldValue.increment(pts), updated_at: nowTs()
-  });
-  batch.set(db.collection('point_transactions').doc(ptxId), {
-    id: ptxId, user_id: S.uid,
-    type: 'EARN', qty: pts,
-    source: 'purchase', ref_type: 'postbacks', ref_id: pbId,
-    expires_at: daysFromNow(365), created_at: nowTs(),
-  });
-
-  // postback → confirmed
-  batch.update(db.collection('postbacks').doc(pbId), {
-    status: 'confirmed', confirmed_at: nowTs(), processed_at: nowTs()
-  });
-
-  await batch.commit();
-  await loadUserData();
-  showToast(`티켓 확정 완료 — ${fmtP(pts)} 적립`);
-  renderTab(S.tab);
-}
-
-// ── KAKAO LINK (Demo) ──────────────────────────
-async function doKakaoLink() {
-  openOverlay('카카오 연동', `
-    <div style="text-align:center;padding:1rem 0">
-      <div style="width:64px;height:64px;background:#FEE500;border-radius:16px;margin:0 auto 1rem;display:flex;align-items:center;justify-content:center">
-        <svg style="width:36px;height:36px;color:#3C1E1E" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M12 3C6.48 3 2 6.714 2 11.286c0 2.884 1.875 5.429 4.714 6.857L5.571 22l5.143-3.214C11.143 18.857 11.571 18.857 12 18.857c5.52 0 10-3.714 10-8.286S17.52 3 12 3z"/>
-        </svg>
-      </div>
-      <div style="font-size:1rem;font-weight:700;margin-bottom:0.5rem">카카오 연동</div>
-      <div style="font-size:0.8rem;color:#64748b;margin-bottom:1.5rem;line-height:1.6">
-        실제 서비스: Kakao OAuth 연동 후 계정 1:1 연결.<br>
-        <strong>데모: 실제 OAuth 없이 연동 상태로 전환합니다.</strong>
-      </div>
-      <div class="state-ann" style="text-align:left;margin-bottom:1rem">
-        users[${S.uid ? S.uid.slice(0,8) : ''}...].link_status<br>
-        guest → linked
-      </div>
-      <button class="btn-full" onclick="executeKakaoLink()">데모 연동하기 (즉시 처리)</button>
-    </div>
-  `);
-}
-
-async function executeKakaoLink() {
-  await db.collection('users').doc(S.uid).update({
-    link_status: 'linked', updated_at: nowTs()
-  });
-  S.userData = { ...S.userData, link_status: 'linked' };
+  await loadData();
   closeOverlay();
-  showToast('카카오 연동 완료 — linked 전환');
+  const t=greedy(amt);
+  openOverlay('구매 접수 완료',`
+    <div style="text-align:center;padding:8px 0">
+      <div style="width:64px;height:64px;background:#DCFCE7;border-radius:50%;margin:0 auto 16px;display:flex;align-items:center;justify-content:center">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>
+      </div>
+      <div style="font-size:18px;font-weight:800;margin-bottom:8px">${fmtKRW(amt)} 구매 접수</div>
+      <div style="font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:16px">포스트백 수신 완료. 홈에서 확정하세요.</div>
+      <div class="state-note" style="text-align:left">
+        postbacks[${pbId.slice(0,8)}…] pending<br>
+        user_tickets bronze×${units} pending<br>
+        확정 시: ${t.gold?`금${t.gold} `:''}${t.silver?`은${t.silver} `:''}${t.bronze?`동${t.bronze}`:''}
+      </div>
+      <button class="btn-primary" style="margin-top:20px" onclick="closeOverlay();switchTab('home')">홈으로</button>
+    </div>`);
+}
+
+// ═══════════════════════════════════════════
+// 포스트백 확정 (Greedy)
+// ═══════════════════════════════════════════
+async function confirmPostback(pbId) {
+  const pbDoc=await db.collection('postbacks').doc(pbId).get();
+  if (!pbDoc.exists||pbDoc.data().status!=='pending') { showToast('이미 처리됨'); return; }
+  const amt=pbDoc.data().purchase_amount;
+  const t=greedy(amt); const pts=calcPts(t);
+  const grades=[{code:'gold',qty:t.gold},{code:'silver',qty:t.silver},{code:'bronze',qty:t.bronze}].filter(g=>g.qty>0);
+  const batch=db.batch();
+  S.tickets.filter(tk=>tk.postback_id===pbId&&tk.status==='pending').forEach(tk=>{
+    batch.update(db.collection('user_tickets').doc(tk.id),{status:'confirmed_raw',updated_at:nowTs()});
+  });
+  grades.forEach(g=>{
+    const tId=uuid(),txId=uuid();
+    batch.set(db.collection('user_tickets').doc(tId),{
+      id:tId,user_id:S.uid,ticket_type:'grade',grade_code:g.code,
+      qty:g.qty,status:'active',source:'purchase',postback_id:pbId,
+      acquired_at:nowTs(),confirmed_at:nowTs(),expires_at:addDays(365),
+      created_at:nowTs(),updated_at:nowTs()
+    });
+    batch.set(db.collection('ticket_transactions').doc(txId),{
+      id:txId,user_id:S.uid,ticket_type:'grade',grade_code:g.code,
+      type:'EARN',qty:g.qty,status:'active',source:'purchase',
+      ref_type:'postbacks',ref_id:pbId,expires_at:addDays(365),created_at:nowTs()
+    });
+  });
+  batch.update(db.collection('user_points').doc(S.uid),{balance:firebase.firestore.FieldValue.increment(pts),updated_at:nowTs()});
+  batch.set(db.collection('point_transactions').doc(uuid()),{
+    user_id:S.uid,type:'EARN',qty:pts,source:'purchase',
+    ref_type:'postbacks',ref_id:pbId,expires_at:addDays(365),created_at:nowTs()
+  });
+  batch.update(db.collection('postbacks').doc(pbId),{status:'confirmed',confirmed_at:nowTs(),processed_at:nowTs()});
+  await batch.commit();
+  await loadData();
+  showToast(`티켓 확정 + ${fmtP(pts)} 적립`);
   renderTab(S.tab);
 }
-window.executeKakaoLink = executeKakaoLink;
 
-// ── ATTENDANCE ─────────────────────────────────
+// ═══════════════════════════════════════════
+// 카카오 연동 (mock)
+// ═══════════════════════════════════════════
+function openKakaoLinkSheet() {
+  openOverlay('카카오 연동',`
+    <div style="text-align:center;padding:8px 0 4px">
+      <div style="width:72px;height:72px;background:#FEE500;border-radius:20px;margin:0 auto 20px;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 24px rgba(254,229,0,0.4)">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none"><path d="M12 3C6.48 3 2 6.58 2 11C2 13.79 3.79 16.23 6.47 17.66L5.5 21.5L9.5 18.94C10.31 19.06 11.14 19.13 12 19.13C17.52 19.13 22 15.55 22 11.13C22 6.58 17.52 3 12 3Z" fill="#3A1D1D"/></svg>
+      </div>
+      <div style="font-size:20px;font-weight:800;margin-bottom:8px;letter-spacing:-0.5px">카카오 연동</div>
+      <div style="font-size:13px;color:var(--text2);line-height:1.65;margin-bottom:16px">실제: Kakao OAuth 흐름<br><strong>데모: 즉시 linked 전환</strong></div>
+      <div class="state-note" style="text-align:left;margin-bottom:16px">users[${S.uid?S.uid.slice(0,12):''}…].link_status<br>guest → linked</div>
+      <button class="btn-primary" onclick="execKakaoLink()">데모 연동하기 (즉시 처리)</button>
+    </div>`);
+}
+async function execKakaoLink() {
+  await db.collection('users').doc(S.uid).update({link_status:'linked',updated_at:nowTs()});
+  S.userData={...S.userData,link_status:'linked'};
+  closeOverlay(); showToast('카카오 연동 완료');
+  renderTab(S.tab);
+}
+
+// ═══════════════════════════════════════════
+// 출석
+// ═══════════════════════════════════════════
 async function doAttendance() {
   if (S.attendedToday) { showToast('오늘 이미 출석했습니다'); return; }
-  const today = new Date().toISOString().slice(0, 10);
-  const visitId = uuid();
-  const ptxId   = uuid();
-  const batch   = db.batch();
-
-  batch.set(db.collection('daily_visits').doc(visitId), {
-    id: visitId, user_id: S.uid,
-    date: today, created_at: nowTs(),
+  const today=new Date().toISOString().slice(0,10);
+  const batch=db.batch();
+  batch.set(db.collection('daily_visits').doc(uuid()),{user_id:S.uid,date:today,created_at:nowTs()});
+  batch.update(db.collection('user_points').doc(S.uid),{balance:firebase.firestore.FieldValue.increment(100),updated_at:nowTs()});
+  batch.set(db.collection('point_transactions').doc(uuid()),{
+    user_id:S.uid,type:'EARN',qty:100,source:'daily_visit',
+    ref_type:null,ref_id:null,expires_at:addDays(365),created_at:nowTs()
   });
-  batch.update(db.collection('user_points').doc(S.uid), {
-    balance: firebase.firestore.FieldValue.increment(100), updated_at: nowTs()
-  });
-  batch.set(db.collection('point_transactions').doc(ptxId), {
-    id: ptxId, user_id: S.uid,
-    type: 'EARN', qty: 100,
-    source: 'daily_visit', ref_type: null, ref_id: null,
-    expires_at: daysFromNow(365), created_at: nowTs(),
-  });
-
   await batch.commit();
-  S.attendedToday = true;
-  S.points += 100;
-  showToast('+100P 출석 체크 완료');
+  S.attendedToday=true; S.points+=100;
+  showToast('+100P 출석 완료');
   renderTab(S.tab);
 }
 
-// ── GIFTICON EXCHANGE ──────────────────────────
-function openGifExchange(gifId, gifName, reqGrade, reqQty, userQty) {
-  openOverlay('기프티콘 교환', `
-    <div style="text-align:center;margin-bottom:1.25rem">
-      <div style="width:56px;height:56px;background:#f1f5f9;border-radius:12px;margin:0 auto 0.75rem;display:flex;align-items:center;justify-content:center">
-        <svg style="width:28px;height:28px;color:#64748b" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12z"/></svg>
+// ═══════════════════════════════════════════
+// 기프티콘 교환
+// ═══════════════════════════════════════════
+function openGifExchange(gifId,gifName,reqGrade,reqQty,userQty) {
+  openOverlay('기프티콘 교환',`
+    <div style="text-align:center;padding:8px 0">
+      <div style="font-size:36px;margin-bottom:12px">${reqGrade==='gold'?'G':reqGrade==='silver'?'S':'B'}</div>
+      <div style="font-size:17px;font-weight:800;margin-bottom:6px">${gifName}</div>
+      <div style="font-size:12px;color:var(--text2);margin-bottom:16px"><span class="grade-badge ${reqGrade}">${GRADE_KO[reqGrade]} ${reqQty}장</span> 차감 · 보유 ${userQty}장</div>
+      <div class="state-note" style="text-align:left;margin-bottom:16px">
+        user_tickets[${reqGrade}].qty -= ${reqQty}<br>
+        ticket_transactions: USE −${reqQty}<br>
+        gifticon_exchanges: created
       </div>
-      <div style="font-weight:700;font-size:1rem;margin-bottom:0.25rem">${gifName}</div>
-      <div style="font-size:0.8rem;color:#64748b">
-        <span class="badge badge-${reqGrade}">${gradeLabel(reqGrade)} ${reqQty}장</span> 차감
-      </div>
-    </div>
-    <div class="state-ann" style="margin-bottom:1rem">
-      user_tickets[${reqGrade}].qty -= ${reqQty} (USE)<br>
-      ticket_transactions: USE qty=-${reqQty}<br>
-      gifticon_exchanges: created<br>
-      gifticon_stock.remaining -= 1
-    </div>
-    <button class="btn-full" onclick="executeGifExchange('${gifId}','${gifName}','${reqGrade}',${reqQty})">교환하기</button>
-  `);
+      <button class="btn-primary" onclick="execGifExchange('${gifId}','${gifName}','${reqGrade}',${reqQty})">교환하기</button>
+    </div>`);
 }
-window.openGifExchange = openGifExchange;
-
-async function executeGifExchange(gifId, gifName, reqGrade, reqQty) {
-  // Find enough active tickets of the required grade
-  const gradeTkts = S.tickets.filter(t => t.status === 'active' && t.grade_code === reqGrade);
-  const total = gradeTkts.reduce((s,t) => s+(t.qty||0), 0);
-  if (total < reqQty) { showToast('티켓이 부족합니다'); return; }
-
-  const exchId = uuid();
-  const ttxId  = uuid();
-  const batch  = db.batch();
-
-  // Deduct tickets (greedy: take from first ticket docs)
-  let remaining = reqQty;
+async function execGifExchange(gifId,gifName,reqGrade,reqQty) {
+  const gradeTkts=S.tickets.filter(t=>t.status==='active'&&t.grade_code===reqGrade);
+  const total=gradeTkts.reduce((s,t)=>s+(t.qty||0),0);
+  if (total<reqQty) { showToast('티켓 부족'); return; }
+  const exchId=uuid(),ttxId=uuid();
+  const batch=db.batch();
+  let rem=reqQty;
   for (const tkt of gradeTkts) {
-    if (remaining <= 0) break;
-    const deduct = Math.min(tkt.qty, remaining);
-    remaining -= deduct;
-    if (tkt.qty - deduct === 0) {
-      batch.update(db.collection('user_tickets').doc(tkt.id), {
-        qty: 0, status: 'expired', updated_at: nowTs()
-      });
-    } else {
-      batch.update(db.collection('user_tickets').doc(tkt.id), {
-        qty: tkt.qty - deduct, updated_at: nowTs()
-      });
-    }
+    if (rem<=0) break;
+    const deduct=Math.min(tkt.qty,rem); rem-=deduct;
+    batch.update(db.collection('user_tickets').doc(tkt.id),{qty:tkt.qty-deduct,status:tkt.qty-deduct===0?'expired':'active',updated_at:nowTs()});
   }
-
-  // ticket_transaction USE
-  batch.set(db.collection('ticket_transactions').doc(ttxId), {
-    id: ttxId, user_id: S.uid,
-    ticket_type: 'grade', grade_code: reqGrade,
-    type: 'USE', qty: -reqQty,
-    source: 'gifticon_exchange', ref_type: 'gifticon_exchanges', ref_id: exchId,
-    expires_at: null, created_at: nowTs(),
+  batch.set(db.collection('ticket_transactions').doc(ttxId),{
+    id:ttxId,user_id:S.uid,ticket_type:'grade',grade_code:reqGrade,
+    type:'USE',qty:-reqQty,source:'gifticon_exchange',
+    ref_type:'gifticon_exchanges',ref_id:exchId,expires_at:null,created_at:nowTs()
   });
-
-  // gifticon_exchange
-  batch.set(db.collection('gifticon_exchanges').doc(exchId), {
-    id: exchId, user_id: S.uid,
-    gifticon_id: gifId,
-    grade_code: reqGrade, qty_used: reqQty,
-    status: 'issued',
-    issued_at: nowTs(), expires_at: daysFromNow(30),
-    created_at: nowTs(),
+  batch.set(db.collection('gifticon_exchanges').doc(exchId),{
+    id:exchId,user_id:S.uid,gifticon_id:gifId,
+    grade_code:reqGrade,qty_used:reqQty,status:'issued',
+    issued_at:nowTs(),expires_at:addDays(30),created_at:nowTs()
   });
-
-  // gifticon_stock decrement (best effort)
-  try {
-    batch.update(db.collection('gifticon_stock').doc(gifId), {
-      remaining: firebase.firestore.FieldValue.increment(-1), updated_at: nowTs()
-    });
-  } catch(_) {}
-
   await batch.commit();
-  await loadUserData();
-  closeOverlay();
-  showToast(`${gifName} 교환 완료`);
+  await loadData();
+  closeOverlay(); showToast(`${gifName} 교환 완료`);
   renderTab(S.tab);
 }
-window.executeGifExchange = executeGifExchange;
 
-// ── LEDGER VIEWS ───────────────────────────────
-async function showTicketHistory() {
-  const snap = await db.collection('ticket_transactions')
-    .where('user_id','==',S.uid).orderBy('created_at','desc').limit(20).get();
-  const rows = snap.docs.map(doc => {
-    const d = doc.data();
-    const color = d.qty > 0 ? '#166534' : '#dc2626';
-    return `<div style="display:flex;align-items:center;justify-content:space-between;padding:0.75rem 0;border-bottom:1px solid #f1f5f9">
-      <div>
-        <div style="font-size:0.8rem;font-weight:600"><span class="badge badge-${(d.type||'').toLowerCase()}">${d.type}</span> ${d.grade_code ? gradeLabel(d.grade_code)+'등급' : ''}</div>
-        <div style="font-size:0.7rem;color:#64748b;margin-top:2px">${fmtTs(d.created_at)}</div>
-      </div>
-      <div style="font-weight:700;font-size:0.95rem;color:${color}">${d.qty>0?'+':''}${d.qty}장</div>
+// ═══════════════════════════════════════════
+// 원장 뷰어
+// ═══════════════════════════════════════════
+async function showTicketLedger() {
+  const snap=await db.collection('ticket_transactions').where('user_id','==',S.uid).orderBy('created_at','desc').limit(20).get();
+  const rows=snap.docs.map(d=>{
+    const t=d.data(); const pos=(t.qty||0)>0;
+    return `<div style="display:flex;justify-content:space-between;padding:10px 0;border-top:1px solid var(--border)">
+      <div><div style="font-size:12px;font-weight:700"><span class="grade-badge ${t.grade_code||''}">${t.type}</span></div><div style="font-size:10.5px;color:var(--text3);margin-top:3px">${GRADE_KO[t.grade_code]||''} · ${t.source||''}</div></div>
+      <div style="font-size:15px;font-weight:800;color:${pos?'#16A34A':'var(--red)'}">${pos?'+':''}${t.qty}장</div>
     </div>`;
-  }).join('') || '<div style="text-align:center;padding:2rem;color:#94a3b8;font-size:0.875rem">원장 없음</div>';
-
-  openOverlay('티켓 거래 원장 (불변)', `
-    <div style="font-size:0.7rem;color:#64748b;margin-bottom:0.75rem">append-only — 삭제·수정 불가 (Firestore rules)</div>
-    ${rows}
-  `);
+  }).join('')||'<div style="padding:24px;text-align:center;color:var(--text3)">내역 없음</div>';
+  openOverlay('티켓 원장 (불변)',`<div style="font-size:10px;color:var(--text3);margin-bottom:8px">삭제·수정 불가</div>${rows}`);
 }
-window.showTicketHistory = showTicketHistory;
-
-async function showPointHistory() {
-  const snap = await db.collection('point_transactions')
-    .where('user_id','==',S.uid).orderBy('created_at','desc').limit(20).get();
-  const rows = snap.docs.map(doc => {
-    const d = doc.data();
-    const color = d.qty > 0 ? '#166534' : '#dc2626';
-    return `<div style="display:flex;align-items:center;justify-content:space-between;padding:0.75rem 0;border-bottom:1px solid #f1f5f9">
-      <div>
-        <div style="font-size:0.8rem;font-weight:600"><span class="badge badge-${(d.type||'').toLowerCase()}">${d.type}</span> ${d.source||''}</div>
-        <div style="font-size:0.7rem;color:#64748b;margin-top:2px">${fmtTs(d.created_at)}</div>
-      </div>
-      <div style="font-weight:700;font-size:0.95rem;color:${color}">${d.qty>0?'+':''}${fmtP(d.qty)}</div>
+async function showPointLedger() {
+  const snap=await db.collection('point_transactions').where('user_id','==',S.uid).orderBy('created_at','desc').limit(20).get();
+  const rows=snap.docs.map(d=>{
+    const t=d.data(); const pos=(t.qty||0)>0;
+    return `<div style="display:flex;justify-content:space-between;padding:10px 0;border-top:1px solid var(--border)">
+      <div><div style="font-size:12px;font-weight:700">${t.type}</div><div style="font-size:10.5px;color:var(--text3);margin-top:3px">${t.source||''}</div></div>
+      <div style="font-size:15px;font-weight:800;color:${pos?'#16A34A':'var(--red)'}">${pos?'+':''}${fmtP(t.qty)}</div>
     </div>`;
-  }).join('') || '<div style="text-align:center;padding:2rem;color:#94a3b8;font-size:0.875rem">원장 없음</div>';
-
-  openOverlay('포인트 거래 원장 (불변)', `
-    <div style="font-size:0.7rem;color:#64748b;margin-bottom:0.75rem">append-only — 삭제·수정 불가 (Firestore rules)</div>
-    ${rows}
-  `);
+  }).join('')||'<div style="padding:24px;text-align:center;color:var(--text3)">내역 없음</div>';
+  openOverlay('포인트 원장 (불변)',`<div style="font-size:10px;color:var(--text3);margin-bottom:8px">삭제·수정 불가</div>${rows}`);
 }
-window.showPointHistory = showPointHistory;
 
-// Expose globals
-window.startOnboarding     = startOnboarding;
-window.switchTab           = switchTab;
-window.openPurchaseFlow    = openPurchaseFlow;
-window.updateGreedyPreview = updateGreedyPreview;
-window.completePurchase    = completePurchase;
-window.confirmPostback     = confirmPostback;
-window.doKakaoLink         = doKakaoLink;
-window.doAttendance        = doAttendance;
-window.closeOverlay        = closeOverlay;
-window.showToast           = showToast;
-window.showTicketHistory   = showTicketHistory;
-window.showPointHistory    = showPointHistory;
-window.renderTab           = renderTab;
+// 전역 노출
+Object.assign(window,{startOnboarding,switchTab,openPurchaseFlow,openPurchaseAmountSheet,updateGP,completePurchase,confirmPostback,openKakaoLinkSheet,execKakaoLink,doAttendance,openGifExchange,execGifExchange,showTicketLedger,showPointLedger,closeOverlay,showToast});
 </script>
 </body>
 </html>
