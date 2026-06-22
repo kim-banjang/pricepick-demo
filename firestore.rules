@@ -11,7 +11,6 @@ service cloud.firestore {
     }
 
     // CMS admin identified by email (sgkim.mixit@gmail.com)
-    // email claim is injected by Firebase Auth JWT
     function isAdmin() {
       return isSignedIn() &&
              request.auth.token.email == 'sgkim.mixit@gmail.com' &&
@@ -23,12 +22,20 @@ service cloud.firestore {
       return isSignedIn() && request.auth.uid == userId;
     }
 
+    // App user writing their own data (uid matches the user_id field)
+    function isMyData(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
     // ──────────────────────────────────────────
     // A. Users / Auth / Device
     // ──────────────────────────────────────────
     match /users/{userId} {
       allow read: if isOwner(userId) || isAdmin();
-      allow write: if isAdmin();
+      // App users can create/update their own doc; admin can do anything
+      allow create: if isOwner(userId) || isAdmin();
+      allow update: if isOwner(userId) || isAdmin();
+      allow delete: if isAdmin();
 
       match /auth_providers/{providerId} {
         allow read: if isOwner(userId) || isAdmin();
@@ -45,7 +52,7 @@ service cloud.firestore {
     }
 
     // ──────────────────────────────────────────
-    // B. Master Data (admin write, anyone can read active)
+    // B. Master Data (admin write, anyone can read)
     // ──────────────────────────────────────────
     match /affiliate_malls/{docId} {
       allow read: if true;
@@ -64,23 +71,27 @@ service cloud.firestore {
     // C. Purchase Attribution
     // ──────────────────────────────────────────
     match /click_logs/{docId} {
-      allow read: if isAdmin();
+      allow read: if isAdmin() || (isSignedIn() && resource.data.user_id == request.auth.uid);
       allow create: if isSignedIn();
       allow update, delete: if isAdmin();
     }
     match /postbacks/{docId} {
-      allow read: if isAdmin();
-      allow write: if isAdmin();
+      allow read: if isAdmin() || (isSignedIn() && resource.data.user_id == request.auth.uid);
+      // App user can create postbacks for themselves (demo; prod uses Cloud Functions)
+      allow create: if isAdmin() || (isSignedIn() && request.resource.data.user_id == request.auth.uid);
+      allow update: if isAdmin() || (isSignedIn() && resource.data.user_id == request.auth.uid);
+      allow delete: if isAdmin();
     }
     match /click_postback_matches/{docId} {
-      allow read: if isAdmin();
-      allow write: if isAdmin();
+      allow read: if isAdmin() || (isSignedIn() && resource.data.user_id == request.auth.uid);
+      allow create: if isSignedIn();
+      allow update, delete: if isAdmin();
     }
 
-    // Immutable ledger – append-only, no updates/deletes
+    // Immutable ledger – append-only, no updates/deletes ever
     match /ticket_transactions/{docId} {
       allow read: if isAdmin() || (isSignedIn() && resource.data.user_id == request.auth.uid);
-      allow create: if isAdmin();
+      allow create: if isAdmin() || (isSignedIn() && request.resource.data.user_id == request.auth.uid);
       allow update, delete: if false;
     }
 
@@ -89,17 +100,19 @@ service cloud.firestore {
     // ──────────────────────────────────────────
     match /user_tickets/{docId} {
       allow read: if isAdmin() || (isSignedIn() && resource.data.user_id == request.auth.uid);
-      allow write: if isAdmin();
+      allow create: if isAdmin() || (isSignedIn() && request.resource.data.user_id == request.auth.uid);
+      allow update: if isAdmin() || (isSignedIn() && resource.data.user_id == request.auth.uid);
+      allow delete: if isAdmin();
     }
     match /user_points/{userId} {
       allow read: if isOwner(userId) || isAdmin();
-      allow write: if isAdmin();
+      allow write: if isOwner(userId) || isAdmin();
     }
 
     // Immutable ledger – append-only
     match /point_transactions/{docId} {
       allow read: if isAdmin() || (isSignedIn() && resource.data.user_id == request.auth.uid);
-      allow create: if isAdmin();
+      allow create: if isAdmin() || (isSignedIn() && request.resource.data.user_id == request.auth.uid);
       allow update, delete: if false;
     }
 
@@ -116,7 +129,8 @@ service cloud.firestore {
     }
     match /gifticon_exchanges/{docId} {
       allow read: if isAdmin() || (isSignedIn() && resource.data.user_id == request.auth.uid);
-      allow write: if isAdmin();
+      allow create: if isSignedIn() && request.resource.data.user_id == request.auth.uid;
+      allow update, delete: if isAdmin();
     }
 
     // ──────────────────────────────────────────
@@ -141,7 +155,8 @@ service cloud.firestore {
     }
     match /daily_visits/{docId} {
       allow read: if isAdmin() || (isSignedIn() && resource.data.user_id == request.auth.uid);
-      allow write: if isAdmin();
+      allow create: if isSignedIn() && request.resource.data.user_id == request.auth.uid;
+      allow update, delete: if isAdmin();
     }
     match /banners/{docId} {
       allow read: if true;
