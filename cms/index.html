@@ -5645,7 +5645,62 @@ Object.assign(KO2VI, {"카카오 연동 회원과 미연동(게스트) 회원이
 })();
 </script>
 
-<!-- ════ PRICEPICK CMS: FIREBASE AUTH INJECTION ════ -->
+<!-- [추가] 기프티콘 상품 등록 모달 -->
+<div id="pp-gifticon-modal" style="display:none;position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,.45);align-items:center;justify-content:center;">
+  <div style="background:var(--surface);border-radius:var(--r-xl);padding:28px;width:100%;max-width:480px;margin:16px;max-height:90vh;overflow-y:auto;box-shadow:var(--shadow-lg);">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+      <div style="font-size:16px;font-weight:700;color:var(--text);">기프티콘 상품 등록</div>
+      <button id="pp-gi-modal-close" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--text-3);padding:4px;">&#x2715;</button>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+      <div style="grid-column:1/-1;">
+        <label style="font-size:12px;font-weight:600;color:var(--text-2);display:block;margin-bottom:5px;">브랜드 *</label>
+        <input id="pp-gi-brand" class="form-input" type="text" placeholder="예: 스타벅스">
+      </div>
+      <div style="grid-column:1/-1;">
+        <label style="font-size:12px;font-weight:600;color:var(--text-2);display:block;margin-bottom:5px;">상품명 *</label>
+        <input id="pp-gi-name" class="form-input" type="text" placeholder="예: 아이스 아메리카노 Tall">
+      </div>
+      <div>
+        <label style="font-size:12px;font-weight:600;color:var(--text-2);display:block;margin-bottom:5px;">이모지 *</label>
+        <input id="pp-gi-emoji" class="form-input" type="text" placeholder="예: ☕" maxlength="4" style="font-size:22px;text-align:center;">
+      </div>
+      <div>
+        <label style="font-size:12px;font-weight:600;color:var(--text-2);display:block;margin-bottom:5px;">카테고리</label>
+        <select id="pp-gi-category" class="form-input" style="appearance:auto;">
+          <option value="커피/음료">커피/음료</option>
+          <option value="편의점">편의점</option>
+          <option value="외식">외식</option>
+          <option value="문화/생활">문화/생활</option>
+          <option value="쇼핑">쇼핑</option>
+        </select>
+      </div>
+      <div>
+        <label style="font-size:12px;font-weight:600;color:var(--text-2);display:block;margin-bottom:5px;">필요 등급 *</label>
+        <select id="pp-gi-grade" class="form-input" style="appearance:auto;">
+          <option value="bronze">브론즈</option>
+          <option value="silver">실버</option>
+          <option value="gold">골드</option>
+        </select>
+      </div>
+      <div>
+        <label style="font-size:12px;font-weight:600;color:var(--text-2);display:block;margin-bottom:5px;">필요 수량 *</label>
+        <input id="pp-gi-count" class="form-input" type="number" min="1" max="50" value="1">
+      </div>
+      <div style="grid-column:1/-1;">
+        <label style="font-size:12px;font-weight:600;color:var(--text-2);display:block;margin-bottom:5px;">유효기간 (일)</label>
+        <input id="pp-gi-validity" class="form-input" type="number" min="1" max="365" value="90" placeholder="발급 후 유효 일수">
+      </div>
+    </div>
+    <div id="pp-gi-error" style="display:none;background:var(--danger-soft);color:var(--danger);border-radius:var(--r-md);padding:10px 14px;font-size:13px;margin-top:14px;"></div>
+    <div style="display:flex;gap:10px;margin-top:20px;">
+      <button id="pp-gi-cancel" class="btn btn-ghost" style="flex:1;">취소</button>
+      <button id="pp-gi-submit" class="btn btn-primary" style="flex:2;">등록하기</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════ PRICEPICK CMS: FIREBASE INJECTION ════ -->
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
@@ -5653,7 +5708,7 @@ Object.assign(KO2VI, {"카카오 연동 회원과 미연동(게스트) 회원이
 (function() {
 'use strict';
 
-var app = firebase.initializeApp({
+var fbApp = firebase.initializeApp({
   apiKey: "AIzaSyCElUPJAitnMZxttVYjboV0j4s_qpErAgA",
   authDomain: "pricepick-demo.firebaseapp.com",
   projectId: "pricepick-demo",
@@ -5663,118 +5718,334 @@ var app = firebase.initializeApp({
 });
 var auth = firebase.auth();
 var db = firebase.firestore();
+var FS = firebase.firestore;
 var ADMIN_EMAIL = 'sgkim.mixit@gmail.com';
+var _authed = false;
 
 function showApp(user) {
   document.getElementById('login-page').style.display = 'none';
   document.getElementById('main-app').style.display = 'flex';
   if (typeof applyRole === 'function') applyRole(window.currentRole || 'superadmin');
   if (typeof startClock === 'function') startClock();
-  // Update sidebar user info if available
   var nameEl = document.getElementById('sb-admin-name');
   if (nameEl && user && user.displayName) nameEl.textContent = user.displayName;
   var emailEl = document.getElementById('sb-admin-email');
   if (emailEl && user && user.email) emailEl.textContent = user.email;
-  loadDashboardStats();
+  loadAllData();
 }
 
 function showLoginError(msg) {
-  var subEl = document.getElementById('login-sub-el');
-  if (subEl) {
-    subEl.textContent = msg;
-    subEl.style.color = '#e53935';
-  }
+  var sub = document.getElementById('login-sub-el');
+  if (sub) { sub.textContent = msg; sub.style.color = 'var(--danger)'; }
   var btn = document.getElementById('login-btn-el');
-  if (btn) { btn.textContent = '로그인'; btn.disabled = false; }
+  if (btn) { btn.textContent = 'Google로 로그인'; btn.disabled = false; }
 }
 
-/* ── Override doLogin ── */
+/* ── doLogin override ── */
 window.doLogin = function() {
   var btn = document.getElementById('login-btn-el');
-  if (btn) { btn.textContent = '로그인 중...'; btn.disabled = true; }
+  if (btn) { btn.textContent = '인증 중...'; btn.disabled = true; }
   var provider = new firebase.auth.GoogleAuthProvider();
   provider.setCustomParameters({ prompt: 'select_account' });
   auth.signInWithPopup(provider).then(function(result) {
     var user = result.user;
     if (!user || user.email !== ADMIN_EMAIL) {
       auth.signOut();
-      showLoginError('접근 권한이 없습니다 (' + (user ? user.email : '') + ')');
+      showLoginError('접근 권한 없음: ' + (user ? user.email : '?'));
       return;
     }
     showApp(user);
   }).catch(function(err) {
-    console.error('CMS auth error:', err);
-    showLoginError('로그인 실패: ' + (err.message || err.code));
+    console.error('CMS auth:', err);
+    showLoginError('로그인 실패: ' + (err.code || err.message));
   });
 };
 
-/* ── Persist session ── */
-auth.onAuthStateChanged(function(user) {
-  if (user && user.email === ADMIN_EMAIL) {
-    // Auto-restore session
-    if (document.getElementById('main-app').style.display === 'none') {
-      showApp(user);
-    }
-  }
-});
-
-/* ── Override doLogout ── */
+/* ── doLogout override ── */
 window.doLogout = function() {
   auth.signOut().then(function() {
     document.getElementById('main-app').style.display = 'none';
     document.getElementById('login-page').style.display = 'flex';
-    var subEl = document.getElementById('login-sub-el');
-    if (subEl) { subEl.textContent = '권한에 따라 접근 메뉴가 달라집니다.'; subEl.style.color = ''; }
+    var sub = document.getElementById('login-sub-el');
+    if (sub) { sub.textContent = 'Google 계정으로 로그인합니다 (관리자 전용)'; sub.style.color = ''; }
     var btn = document.getElementById('login-btn-el');
-    if (btn) { btn.textContent = '로그인'; btn.disabled = false; }
+    if (btn) { btn.textContent = 'Google로 로그인'; btn.disabled = false; }
   });
 };
 
+/* ── Session restore ── */
+auth.onAuthStateChanged(function(user) {
+  if (user && user.email === ADMIN_EMAIL && !_authed) {
+    _authed = true;
+    if (document.getElementById('main-app').style.display === 'none') showApp(user);
+  }
+});
+
+/* ── Load all data ── */
+function loadAllData() {
+  loadDashboardStats();
+  setTimeout(function() {
+    loadGifticonProducts();
+    loadGifticonExchanges();
+    loadMembers();
+  }, 300);
+}
+
 /* ── Dashboard stats ── */
 function loadDashboardStats() {
-  // User count
   db.collection('users').get().then(function(snap) {
-    setStatCard('stat-users', snap.size);
+    updateStatValue('[data-pp-stat="users"]', snap.size);
   }).catch(function(){});
-  // Ticket count
-  db.collection('user_tickets').where('status', '==', 'active').get().then(function(snap) {
-    setStatCard('stat-tickets', snap.size);
+  db.collection('user_tickets').where('status','==','active').get().then(function(snap) {
+    updateStatValue('[data-pp-stat="tickets"]', snap.size);
   }).catch(function(){});
-  // Gifticon exchanges count
   db.collection('gifticon_exchanges').get().then(function(snap) {
-    setStatCard('stat-exchanges', snap.size);
+    updateStatValue('[data-pp-stat="exchanges"]', snap.size);
   }).catch(function(){});
-  // Postbacks count
   db.collection('postbacks').get().then(function(snap) {
-    setStatCard('stat-postbacks', snap.size);
+    updateStatValue('[data-pp-stat="postbacks"]', snap.size);
+  }).catch(function(){});
+  /* Update 전체 회원 stat */
+  db.collection('users').get().then(function(snap) {
+    var memStat = document.querySelector('#sec-dashboard .stat-value');
+    if (memStat) {
+      /* Find "전체 회원" label's sibling value */
+      var cards = document.querySelectorAll('#sec-dashboard .stat-card');
+      cards.forEach(function(card) {
+        var label = card.querySelector('.stat-label');
+        if (label && label.textContent.includes('전체 회원')) {
+          var val = card.querySelector('.stat-value');
+          if (val) val.textContent = snap.size.toLocaleString('ko-KR');
+          var change = card.querySelector('.stat-change');
+          if (change) change.textContent = '데모 실사용자';
+        }
+      });
+    }
   }).catch(function(){});
 }
 
-function setStatCard(id, value) {
-  var el = document.getElementById(id);
+function updateStatValue(selector, value) {
+  var el = document.querySelector(selector);
   if (el) el.textContent = value.toLocaleString('ko-KR');
-  // Also try to find by data-stat attr
-  var attr = document.querySelector('[data-stat="' + id + '"]');
-  if (attr) attr.textContent = value.toLocaleString('ko-KR');
 }
 
-/* ── Login button label update ── */
+/* ── Gifticon Products ── */
+function loadGifticonProducts() {
+  var tbody = document.getElementById('gifticon-tbody');
+  if (!tbody) return;
+  
+  /* Add "상품 추가" button to toolbar */
+  var toolbar = document.querySelector('#sec-gifticon-products .toolbar');
+  if (toolbar && !toolbar.querySelector('#pp-gi-add-btn')) {
+    var addBtn = document.createElement('button');
+    addBtn.id = 'pp-gi-add-btn';
+    addBtn.className = 'btn btn-primary btn-sm';
+    addBtn.style.marginLeft = 'auto';
+    addBtn.textContent = '+ 상품 추가';
+    addBtn.addEventListener('click', function() { openGifticonModal(); });
+    toolbar.appendChild(addBtn);
+  }
+
+  db.collection('gifticons').orderBy('created_at', 'desc').limit(20).get()
+    .then(function(snap) {
+      if (snap.empty) {
+        tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;padding:32px;color:var(--text-3);">등록된 상품이 없습니다. "상품 추가" 버튼으로 등록하세요.</td></tr>';
+        /* Update count */
+        var countEl = document.querySelector('#sec-gifticon-products .card-header span');
+        if (countEl) countEl.textContent = '총 0개 상품';
+        return;
+      }
+      var rows = [];
+      var n = 1;
+      snap.forEach(function(doc) {
+        var g = doc.data();
+        var gradeName = { bronze: '브론즈', silver: '실버', gold: '골드' }[g.required_grade || 'bronze'];
+        var statusBadge = g.status === 'active'
+          ? '<span style="background:var(--success-soft);color:var(--success);padding:3px 8px;border-radius:99px;font-size:11px;font-weight:600;">판매중</span>'
+          : '<span style="background:var(--danger-soft);color:var(--danger);padding:3px 8px;border-radius:99px;font-size:11px;font-weight:600;">판매중지</span>';
+        rows.push('<tr>'
+          + '<td style="text-align:center;color:var(--text-3);">' + n++ + '</td>'
+          + '<td>' + (g.category || '기타') + '</td>'
+          + '<td style="font-weight:600;">' + (g.brand || '') + '</td>'
+          + '<td>' + (g.emoji || '') + ' ' + (g.name || g.product_name || '') + '</td>'
+          + '<td style="font-family:monospace;font-size:11px;color:var(--text-3);">' + doc.id.slice(0,12) + '…</td>'
+          + '<td style="color:var(--text-3);">-</td>'
+          + '<td>' + (g.validity_days || 90) + '일</td>'
+          + '<td>-</td>'
+          + '<td><span style="background:var(--main-soft);color:var(--main);padding:3px 8px;border-radius:99px;font-size:11px;font-weight:700;">' + gradeName + ' ' + (g.required_count || 1) + '장</span></td>'
+          + '<td>' + statusBadge + '</td>'
+          + '</tr>');
+      });
+      tbody.innerHTML = rows.join('');
+      var countEl2 = document.querySelector('#sec-gifticon-products .card-header span');
+      if (countEl2) countEl2.textContent = '총 ' + snap.size + '개 상품';
+    }).catch(function(e){ console.error('gifticonProducts', e); });
+}
+
+/* ── Gifticon Exchanges ── */
+function loadGifticonExchanges() {
+  var sec = document.getElementById('sec-gifticons');
+  if (!sec) return;
+  var existingTbody = sec.querySelector('table tbody');
+  if (!existingTbody) return;
+  
+  db.collection('gifticon_exchanges').orderBy('exchanged_at', 'desc').limit(20).get()
+    .then(function(snap) {
+      if (snap.empty) {
+        existingTbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:32px;color:var(--text-3);">교환 내역이 없습니다.</td></tr>';
+        return;
+      }
+      var rows = [];
+      snap.forEach(function(doc) {
+        var g = doc.data();
+        var ts = g.exchanged_at ? (g.exchanged_at.toDate ? g.exchanged_at.toDate() : new Date()) : new Date();
+        var dateStr = ts.toLocaleDateString('ko-KR', { year:'numeric', month:'2-digit', day:'2-digit' });
+        var gradeName = { bronze: '브론즈', silver: '실버', gold: '골드' }[g.grade_used || 'bronze'];
+        rows.push('<tr>'
+          + '<td style="text-align:center"><div style="font-weight:700;">' + dateStr + '</div></td>'
+          + '<td style="text-align:center">-</td>'
+          + '<td style="font-size:11px;font-family:monospace;color:var(--text-3);">' + doc.id.slice(0,16) + '…</td>'
+          + '<td><div style="font-weight:500;">' + (g.user_id || '').slice(0,12) + '…</div></td>'
+          + '<td>' + (g.gifticon_id || '').slice(0,12) + '…</td>'
+          + '<td style="font-family:monospace;font-size:11px;">PP-XXXX-XXXX</td>'
+          + '<td>90일</td>'
+          + '<td><span style="background:var(--success-soft);color:var(--success);padding:3px 8px;border-radius:99px;font-size:11px;font-weight:600;">사용완료</span></td>'
+          + '<td><span style="background:var(--main-soft);color:var(--main);padding:3px 8px;border-radius:99px;font-size:11px;">' + gradeName + ' ' + (g.count_used || 1) + '장</span></td>'
+          + '</tr>');
+      });
+      existingTbody.innerHTML = rows.join('');
+    }).catch(function(e){ console.error('gifticonExchanges', e); });
+}
+
+/* ── Members ── */
+function loadMembers() {
+  var sec = document.getElementById('sec-members');
+  if (!sec) return;
+  var existingTbody = sec.querySelector('table tbody');
+  if (!existingTbody) return;
+  
+  db.collection('users').orderBy('created_at', 'desc').limit(30).get()
+    .then(function(snap) {
+      if (snap.empty) {
+        existingTbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:32px;color:var(--text-3);">등록된 회원이 없습니다.</td></tr>';
+        return;
+      }
+      var rows = [];
+      snap.forEach(function(doc) {
+        var u = doc.data();
+        var ts = u.created_at ? (u.created_at.toDate ? u.created_at.toDate() : new Date()) : new Date();
+        var dateStr = ts.toLocaleDateString('ko-KR', { year:'numeric', month:'2-digit', day:'2-digit' });
+        var kakaoType = u.linked_kakao
+          ? '<span class="member-type-kakao">카카오 연동</span>'
+          : '<span style="background:var(--warning-soft);color:var(--warning);padding:2px 8px;border-radius:99px;font-size:11px;font-weight:600;">게스트</span>';
+        rows.push('<tr>'
+          + '<td><div style="font-weight:500;">' + (u.nickname || '닉네임없음') + '</div><div style="font-size:11px;color:var(--text-3);font-family:monospace;">' + doc.id.slice(0,14) + '…</div></td>'
+          + '<td>' + kakaoType + '</td>'
+          + '<td style="text-align:center"><div style="font-weight:700;">' + dateStr + '</div></td>'
+          + '<td style="text-align:center">-</td>'
+          + '<td style="text-align:center">0</td>'
+          + '<td style="text-align:center">0</td>'
+          + '<td style="text-align:center">0</td>'
+          + '<td style="text-align:center"><span style="background:var(--success-soft);color:var(--success);padding:2px 8px;border-radius:99px;font-size:11px;font-weight:600;">정상</span></td>'
+          + '<td style="text-align:center;color:var(--text-3);">-</td>'
+          + '</tr>');
+      });
+      existingTbody.innerHTML = rows.join('');
+      /* Update count */
+      var countEls = sec.querySelectorAll('[style*="font-weight:700"]');
+      countEls.forEach(function(el) {
+        if (el.textContent.includes('회원 목록')) {
+          /* text is "회원 목록  총 12,847명" - update the span */
+        }
+      });
+    }).catch(function(e){ console.error('members', e); });
+}
+
+/* ── Gifticon Modal ── */
+function openGifticonModal() {
+  var modal = document.getElementById('pp-gifticon-modal');
+  if (modal) {
+    /* Reset form */
+    ['pp-gi-brand','pp-gi-name','pp-gi-emoji','pp-gi-count','pp-gi-validity'].forEach(function(id) {
+      var el = document.getElementById(id);
+      if (el) el.value = el.type === 'number' ? el.defaultValue : '';
+    });
+    var errEl = document.getElementById('pp-gi-error');
+    if (errEl) errEl.style.display = 'none';
+    modal.style.display = 'flex';
+  }
+}
+
+function closeGifticonModal() {
+  var modal = document.getElementById('pp-gifticon-modal');
+  if (modal) modal.style.display = 'none';
+}
+
+function submitGifticon() {
+  var brand = (document.getElementById('pp-gi-brand') || {}).value || '';
+  var name = (document.getElementById('pp-gi-name') || {}).value || '';
+  var emoji = (document.getElementById('pp-gi-emoji') || {}).value || '';
+  var grade = (document.getElementById('pp-gi-grade') || {}).value || 'bronze';
+  var category = (document.getElementById('pp-gi-category') || {}).value || '';
+  var count = parseInt((document.getElementById('pp-gi-count') || {}).value) || 1;
+  var validity = parseInt((document.getElementById('pp-gi-validity') || {}).value) || 90;
+  
+  var errEl = document.getElementById('pp-gi-error');
+  if (!brand || !name || !emoji) {
+    if (errEl) { errEl.textContent = '브랜드, 상품명, 이모지는 필수입력입니다.'; errEl.style.display = 'block'; }
+    return;
+  }
+  
+  var submitBtn = document.getElementById('pp-gi-submit');
+  if (submitBtn) { submitBtn.textContent = '등록 중...'; submitBtn.disabled = true; }
+  
+  db.collection('gifticons').add({
+    brand: brand,
+    name: name,
+    emoji: emoji,
+    category: category,
+    required_grade: grade,
+    required_count: count,
+    validity_days: validity,
+    status: 'active',
+    created_at: FS.FieldValue.serverTimestamp(),
+  }).then(function() {
+    closeGifticonModal();
+    if (typeof toast === 'function') toast('기프티콘 등록 완료: ' + name);
+    loadGifticonProducts();
+  }).catch(function(e) {
+    console.error('addGifticon', e);
+    if (errEl) { errEl.textContent = '등록 실패: ' + (e.message || '오류'); errEl.style.display = 'block'; }
+  }).finally(function() {
+    if (submitBtn) { submitBtn.textContent = '등록하기'; submitBtn.disabled = false; }
+  });
+}
+
+/* ── Login UI update ── */
 document.addEventListener('DOMContentLoaded', function() {
   var btn = document.getElementById('login-btn-el');
-  if (btn) {
-    btn.textContent = 'Google로 로그인';
-    btn.style.background = '#845EEE';
-  }
+  if (btn) { btn.textContent = 'Google로 로그인'; }
   var emailInput = document.getElementById('login-email-el');
   var pwInput = document.getElementById('login-pw-el');
   if (emailInput) emailInput.style.display = 'none';
   if (pwInput) pwInput.style.display = 'none';
   var sub = document.getElementById('login-sub-el');
   if (sub) sub.textContent = 'Google 계정으로 로그인합니다 (관리자 전용)';
-  var roleLabel = document.getElementById('login-role-label-el');
-  if (roleLabel) roleLabel.textContent = '관리자 인증';
   var roleBtns = document.querySelector('.role-btns');
   if (roleBtns) roleBtns.style.display = 'none';
+  var roleLabel = document.getElementById('login-role-label-el');
+  if (roleLabel) roleLabel.textContent = '관리자 인증';
+  
+  /* Modal bindings */
+  var modal = document.getElementById('pp-gifticon-modal');
+  if (modal) {
+    document.getElementById('pp-gi-modal-close').addEventListener('click', closeGifticonModal);
+    document.getElementById('pp-gi-cancel').addEventListener('click', closeGifticonModal);
+    document.getElementById('pp-gi-submit').addEventListener('click', submitGifticon);
+    modal.addEventListener('click', function(e) {
+      if (e.target === modal) closeGifticonModal();
+    });
+  }
 });
 
 })();

@@ -15989,6 +15989,113 @@ function csCheck() {
 })();</script>
 
 
+  <!-- [추가] 티켓 적립 완료 화면 -->
+  <div class="phone-wrap" id="pw-earn-done" data-screen="earn-done">
+    <div class="phone">
+      <div class="ac-screen">
+        <div class="statusbar">
+          <span>9:41</span>
+          <div class="statusbar-icons"><svg width="17" height="12" viewBox="0 0 17 12" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><rect x="0" y="4" width="3" height="8" rx="1"/><rect x="4.5" y="2.5" width="3" height="9.5" rx="1"/><rect x="9" y="1" width="3" height="11" rx="1"/><rect x="13.5" y="0" width="3" height="12" rx="1"/></svg><svg width="16" height="12" viewBox="0 0 16 12" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M8 2.5C10.2 2.5 12.2 3.4 13.6 4.9L15 3.4C13.2 1.5 10.7 0.3 8 0.3C5.3 0.3 2.8 1.5 1 3.4L2.4 4.9C3.8 3.4 5.8 2.5 8 2.5Z"/><path d="M8 5.5C9.4 5.5 10.7 6.1 11.6 7L13 5.5C11.7 4.2 10 3.3 8 3.3C6 3.3 4.3 4.2 3 5.5L4.4 7C5.3 6.1 6.6 5.5 8 5.5Z"/><circle cx="8" cy="10" r="1.8"/></svg><svg width="25" height="12" viewBox="0 0 25 12" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="currentColor" stroke-opacity="0.35"/><rect x="2" y="2" width="17" height="8" rx="2" fill="currentColor"/><path d="M23 4V8C23.8 7.6 24.5 6.9 24.5 6C24.5 5.1 23.8 4.4 23 4Z" fill="currentColor" fill-opacity="0.4"/></svg></div>
+        </div>
+        <div class="ac-header">
+          <button class="back-btn" data-ip-bound="1" onclick="showScreen('pw-10')" style="cursor:pointer;"><svg width="22" height="22" viewBox="0 0 18 18" fill="none"><path d="M11.25 15.5L5.96 10.45C5.17 9.65 5.17 8.35 5.96 7.55L11.25 2.66" stroke="currentColor" stroke-width="1.6" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <span class="ac-header-title">티켓 적립</span>
+          <div style="width:36px;"></div>
+        </div>
+        <div style="flex:1;overflow-y:auto;padding:16px 16px 100px;">
+          <!-- 성공 카드 -->
+          <div class="ac-win-card" style="margin:0 0 16px;">
+            <div class="ac-win-stars">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="#FFD700" stroke="#FFB800" stroke-width="1"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="#FFD700" stroke="#FFB800" stroke-width="1"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="#FFD700" stroke="#FFB800" stroke-width="1"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            </div>
+            <div class="ac-win-title">티켓 적립 완료!</div>
+            <div class="ac-win-sub" id="earn-mall-sub">쿠팡 구매 50,000원</div>
+            <div class="ac-win-ticket">
+              <svg width="18" height="18" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="earn-tk-g" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#C9AAFF"/><stop offset="100%" stop-color="#845EEE"/></linearGradient></defs><path d="M306.6,106.8l-49.5,49.5,2.4,2.4c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-2.4-2.4-138.6,138.6c-3.7,3.7-3.7,9.6,0,13.3l75.5,75.5c3.7,3.7,9.6,3.7,13.3,0l138.6-138.6-2.3-2.3c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l2.3,2.3,49.5-49.5c3.7-3.7,3.7-9.6,0-13.3l-75.5-75.5c-3.7-3.7-9.6-3.7-13.3,0Z" fill="url(#earn-tk-g)"/></svg>
+              <span><b id="earn-total-count">1</b>장 적립됨</span>
+            </div>
+          </div>
+          <!-- 등급별 내역 -->
+          <div style="background:white;border:1px solid var(--border);border-radius:16px;padding:18px;margin-bottom:12px;">
+            <div style="font-size:12px;font-weight:700;color:var(--text3);letter-spacing:0.3px;margin-bottom:14px;">등급별 내역</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;" id="earn-grade-grid">
+              <div style="background:#FFF8EC;border-radius:12px;padding:14px 8px;text-align:center;" id="earn-bronze-box">
+                <div style="font-size:10px;font-weight:700;color:#92400E;margin-bottom:6px;">브론즈</div>
+                <div style="font-size:22px;font-weight:800;color:#92400E;" id="earn-bronze-cnt">0</div>
+                <div style="font-size:10px;color:#B45309;">장</div>
+              </div>
+              <div style="background:#F3F3F3;border-radius:12px;padding:14px 8px;text-align:center;" id="earn-silver-box">
+                <div style="font-size:10px;font-weight:700;color:#374151;margin-bottom:6px;">실버</div>
+                <div style="font-size:22px;font-weight:800;color:#374151;" id="earn-silver-cnt">0</div>
+                <div style="font-size:10px;color:#6B7280;">장</div>
+              </div>
+              <div style="background:#FFFBEB;border-radius:12px;padding:14px 8px;text-align:center;" id="earn-gold-box">
+                <div style="font-size:10px;font-weight:700;color:#D97706;margin-bottom:6px;">골드</div>
+                <div style="font-size:22px;font-weight:800;color:#D97706;" id="earn-gold-cnt">0</div>
+                <div style="font-size:10px;color:#D97706;">장</div>
+              </div>
+            </div>
+          </div>
+          <!-- 안내 -->
+          <div style="background:var(--sub-4);border-radius:12px;padding:14px 16px;font-size:12px;color:var(--main-dark);line-height:1.7;">
+            <b>티켓 사용 안내</b><br>
+            적립된 티켓은 즉시 사용 가능합니다.<br>
+            혜택 탭 &gt; 티켓 교환소에서 기프티콘으로 교환하세요.
+          </div>
+        </div>
+        <!-- 하단 CTA -->
+        <div style="position:absolute;bottom:0;left:0;right:0;padding:16px;background:white;border-top:1px solid var(--border);">
+          <button class="btn-primary" data-ip-bound="1" onclick="showScreen('pw-10')" style="cursor:pointer;width:100%;">홈으로 가기</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- [추가] 기프티콘 교환 완료 화면 -->
+  <div class="phone-wrap" id="pw-ex-done" data-screen="ex-done">
+    <div class="phone">
+      <div class="login-screen">
+        <div class="statusbar">
+          <span>9:41</span>
+          <div class="statusbar-icons"><svg width="17" height="12" viewBox="0 0 17 12" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><rect x="0" y="4" width="3" height="8" rx="1"/><rect x="4.5" y="2.5" width="3" height="9.5" rx="1"/><rect x="9" y="1" width="3" height="11" rx="1"/><rect x="13.5" y="0" width="3" height="12" rx="1"/></svg><svg width="16" height="12" viewBox="0 0 16 12" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M8 2.5C10.2 2.5 12.2 3.4 13.6 4.9L15 3.4C13.2 1.5 10.7 0.3 8 0.3C5.3 0.3 2.8 1.5 1 3.4L2.4 4.9C3.8 3.4 5.8 2.5 8 2.5Z"/><path d="M8 5.5C9.4 5.5 10.7 6.1 11.6 7L13 5.5C11.7 4.2 10 3.3 8 3.3C6 3.3 4.3 4.2 3 5.5L4.4 7C5.3 6.1 6.6 5.5 8 5.5Z"/><circle cx="8" cy="10" r="1.8"/></svg><svg width="25" height="12" viewBox="0 0 25 12" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="currentColor" stroke-opacity="0.35"/><rect x="2" y="2" width="17" height="8" rx="2" fill="currentColor"/><path d="M23 4V8C23.8 7.6 24.5 6.9 24.5 6C24.5 5.1 23.8 4.4 23 4Z" fill="currentColor" fill-opacity="0.4"/></svg></div>
+        </div>
+        <div class="login-content" style="padding:32px 24px 24px;display:flex;flex-direction:column;height:100%;box-sizing:border-box;">
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;">
+            <!-- 성공 아이콘 -->
+            <div style="width:80px;height:80px;background:linear-gradient(135deg,#22C55E,#16A34A);border-radius:50%;display:flex;align-items:center;justify-content:center;margin-bottom:20px;box-shadow:0 8px 24px rgba(34,197,94,0.3);">
+              <svg width="38" height="38" viewBox="0 0 24 24" fill="none"><path d="M5 12L10 17L20 7" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div style="font-size:22px;font-weight:800;color:var(--text1);letter-spacing:-0.5px;margin-bottom:8px;">교환 완료!</div>
+            <div style="font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:24px;">기프티콘이 발급되었어요.<br>아래 코드로 사용하세요.</div>
+            <!-- 기프티콘 카드 -->
+            <div style="width:100%;background:white;border:1.5px solid var(--border);border-radius:18px;padding:20px;margin-bottom:16px;">
+              <div style="font-size:56px;margin-bottom:12px;" id="ex-done-emoji">☕</div>
+              <div style="font-size:12px;font-weight:700;color:var(--main);margin-bottom:4px;" id="ex-done-brand">스타벅스</div>
+              <div style="font-size:16px;font-weight:800;color:var(--text1);letter-spacing:-0.3px;margin-bottom:16px;" id="ex-done-name">아이스 아메리카노</div>
+              <!-- 바코드 영역 -->
+              <div style="background:#F8F7FF;border:1px dashed #C6AFFF;border-radius:12px;padding:16px;margin-bottom:10px;">
+                <div style="font-size:10px;font-weight:600;color:var(--text3);letter-spacing:0.5px;margin-bottom:8px;">교환 코드</div>
+                <div style="font-family:'Courier New',monospace;font-size:14px;font-weight:700;color:var(--text1);letter-spacing:2px;" id="ex-done-code">PP-XXXX-XXXX-XXXX</div>
+                <!-- 바코드 시각 -->
+                <div style="margin-top:12px;height:36px;display:flex;gap:2px;align-items:flex-end;justify-content:center;">
+                  <div style="width:2px;height:36px;background:#1A1130;"></div><div style="width:1px;height:28px;background:#1A1130;"></div><div style="width:3px;height:36px;background:#1A1130;"></div><div style="width:1px;height:30px;background:#1A1130;"></div><div style="width:2px;height:36px;background:#1A1130;"></div><div style="width:1px;height:22px;background:#1A1130;"></div><div style="width:3px;height:36px;background:#1A1130;"></div><div style="width:2px;height:28px;background:#1A1130;"></div><div style="width:1px;height:36px;background:#1A1130;"></div><div style="width:2px;height:24px;background:#1A1130;"></div><div style="width:3px;height:36px;background:#1A1130;"></div><div style="width:1px;height:30px;background:#1A1130;"></div><div style="width:2px;height:36px;background:#1A1130;"></div><div style="width:3px;height:20px;background:#1A1130;"></div><div style="width:1px;height:36px;background:#1A1130;"></div><div style="width:2px;height:26px;background:#1A1130;"></div><div style="width:1px;height:36px;background:#1A1130;"></div><div style="width:3px;height:30px;background:#1A1130;"></div>
+                </div>
+              </div>
+              <div style="font-size:11px;color:var(--text3);">발급일로부터 90일 유효</div>
+            </div>
+          </div>
+          <!-- 하단 CTA -->
+          <div style="padding-bottom:8px;">
+            <button class="btn-primary" data-ip-bound="1" onclick="showScreen('pw-20')" style="cursor:pointer;width:100%;margin-bottom:10px;">확인</button>
+            <button data-ip-bound="1" onclick="showScreen('pw-10')" style="width:100%;height:44px;background:none;border:none;color:var(--text3);font-size:14px;cursor:pointer;font-family:inherit;">홈으로 가기</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
 <!-- ════ PRICEPICK DEMO: FIREBASE INJECTION ════ -->
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
@@ -16028,7 +16135,7 @@ function greedyTickets(amount) {
   return { gold: gold, silver: silver, bronze: bronze, total: gold + silver + bronze };
 }
 
-/* ── wrap showScreen ── */
+/* ── showScreen hook ── */
 function hookShowScreen() {
   var orig = window.showScreen;
   if (!orig || orig._ppHooked) return;
@@ -16064,27 +16171,23 @@ function checkExistingUser() {
     if (doc.exists) {
       PP.user = doc.data();
       var cs = window.currentScreen;
-      if (cs === 'pw-00' || cs === 'pw-01' || cs === 'pw-01b' || cs === 'pw-02-nick') {
+      if (!cs || cs === 'pw-00' || cs === 'pw-01' || cs === 'pw-01b' || cs === 'pw-02-nick') {
         window.showScreen('pw-10', false);
       }
     }
   }).catch(function(e){ console.error('checkUser', e); });
 }
 
-/* ── override startSplashTimer ── */
 function hookSplashTimer() {
   var orig = window.startSplashTimer;
   if (!orig) return;
   window.startSplashTimer = function() {
-    if (PP.uid) {
-      checkExistingUser();
-    }
-    // Always run original as fallback
+    if (PP.uid) { checkExistingUser(); }
     orig();
   };
 }
 
-/* ── nick-start-btn ── */
+/* ── Nickname ── */
 function bindNickname() {
   var screen = document.getElementById('pw-02-nick');
   if (!screen || screen.dataset.ppNick) return;
@@ -16097,20 +16200,16 @@ function bindNickname() {
     if (!PP.uid) return;
     var now = FS.FieldValue.serverTimestamp();
     db.collection('users').doc(PP.uid).set({
-      uid: PP.uid,
-      nickname: nickname,
-      linked_kakao: false,
-      created_at: now,
-      status: 'active',
+      uid: PP.uid, nickname: nickname, linked_kakao: false, created_at: now, status: 'active',
     }, { merge: true }).catch(function(e){ console.error('saveUser', e); });
     db.collection('user_points').doc(PP.uid).set({
-      user_id: PP.uid, balance: 0, updated_at: now
+      user_id: PP.uid, balance: 0, updated_at: now,
     }, { merge: true }).catch(function(e){ console.error('savePoints', e); });
     PP.user = { nickname: nickname, linked_kakao: false, created_at: new Date() };
   }, true);
 }
 
-/* ── Home refresh ── */
+/* ── Home ── */
 function refreshHomeData() {
   if (!PP.uid) return;
   db.collection('user_tickets')
@@ -16140,6 +16239,23 @@ function renderHomeTickets() {
   }
   var tot = document.querySelector('#pw-10 .htc-tickets-grp b');
   if (tot) tot.textContent = PP.tickets.total;
+
+  /* 빈 상태 처리 */
+  var homeCard = document.querySelector('#pw-10 .home-ticket-card');
+  var homeEmpty = document.getElementById('pp-home-empty');
+  if (PP.tickets.total === 0) {
+    if (!homeEmpty && homeCard) {
+      var emp = document.createElement('div');
+      emp.id = 'pp-home-empty';
+      emp.style.cssText = 'margin:12px 0 0;background:#F8F7FF;border:1px dashed #C6AFFF;border-radius:14px;padding:18px 16px;text-align:center;font-size:13px;color:#6B5E8A;';
+      emp.innerHTML = '<div style="font-size:28px;margin-bottom:8px;">🎟</div>'
+        + '<div style="font-weight:700;color:var(--text1);margin-bottom:4px;">아직 티켓이 없어요</div>'
+        + '<div>쇼핑몰 구매 후 티켓을 적립해 보세요</div>';
+      homeCard.parentNode.insertBefore(emp, homeCard.nextSibling);
+    }
+  } else if (homeEmpty) {
+    homeEmpty.remove();
+  }
 }
 
 function renderHomePoints() {
@@ -16161,7 +16277,7 @@ function refreshBenefitBadges() {
   }
 }
 
-/* ── My page refresh ── */
+/* ── My page ── */
 function refreshMyData() {
   if (!PP.user) return;
   var nickEl = document.querySelector('#pw-30 .my-nickname');
@@ -16171,7 +16287,7 @@ function refreshMyData() {
     var created;
     if (PP.user.created_at.toDate) { created = PP.user.created_at.toDate(); }
     else if (PP.user.created_at instanceof Date) { created = PP.user.created_at; }
-    else { created = new Date(PP.user.created_at); }
+    else { created = new Date(); }
     var days = Math.max(1, Math.floor((Date.now() - created.getTime()) / 86400000) + 1);
     metaEl.textContent = '가입 ' + days + '일째';
   }
@@ -16185,7 +16301,7 @@ function refreshMyData() {
   }
 }
 
-/* ── selectMall override ── */
+/* ── Mall click logging ── */
 function hookSelectMall() {
   var orig = window.selectMall;
   if (!orig || orig._ppHooked) return;
@@ -16193,9 +16309,7 @@ function hookSelectMall() {
     PP.pendingMall = { name: name, domain: domain };
     if (PP.uid) {
       db.collection('click_logs').add({
-        user_id: PP.uid,
-        mall_name: name,
-        mall_domain: domain,
+        user_id: PP.uid, mall_name: name, mall_domain: domain,
         clicked_at: FS.FieldValue.serverTimestamp(),
       }).catch(function(e){ console.error('clickLog', e); });
     }
@@ -16204,15 +16318,13 @@ function hookSelectMall() {
   window.selectMall._ppHooked = true;
 }
 
-/* ── Purchase simulation overlay ── */
+/* ── Purchase simulation (bridge screen) ── */
 var _purchaseShown = false;
 
 function schedulePurchasePrompt() {
   _purchaseShown = false;
   setTimeout(function() {
-    if (window.currentScreen === 'pw-13') {
-      showPurchaseOverlay();
-    }
+    if (window.currentScreen === 'pw-13') showPurchaseOverlay();
   }, 3500);
 }
 
@@ -16286,12 +16398,8 @@ function processPurchase(amount, overlay) {
   var batch = db.batch();
   var postRef = db.collection('postbacks').doc();
   batch.set(postRef, {
-    user_id: PP.uid,
-    mall_name: mall.name,
-    mall_domain: mall.domain,
-    purchase_amount: amount,
-    status: 'confirmed',
-    created_at: now,
+    user_id: PP.uid, mall_name: mall.name, mall_domain: mall.domain,
+    purchase_amount: amount, status: 'confirmed', created_at: now,
   });
   var grades = ['bronze', 'silver', 'gold'];
   var cnts = [tk.bronze, tk.silver, tk.gold];
@@ -16310,12 +16418,23 @@ function processPurchase(amount, overlay) {
     PP.tickets.gold += tk.gold;
     PP.tickets.total += tk.total;
     renderHomeTickets();
-    window.showScreen('pw-10');
-    var parts = [];
-    if (tk.gold > 0) parts.push('골드 ' + tk.gold + '장');
-    if (tk.silver > 0) parts.push('실버 ' + tk.silver + '장');
-    if (tk.bronze > 0) parts.push('브론즈 ' + tk.bronze + '장');
-    showToast('티켓 ' + tk.total + '장 적립! (' + parts.join('+') + ')');
+    /* 결과 화면 이동 */
+    var sub = document.getElementById('earn-mall-sub');
+    if (sub) sub.textContent = mall.name + ' 구매 ' + amount.toLocaleString('ko-KR') + '원';
+    var tc = document.getElementById('earn-total-count');
+    if (tc) tc.textContent = tk.total;
+    var bc = document.getElementById('earn-bronze-cnt');
+    if (bc) bc.textContent = tk.bronze;
+    var sc = document.getElementById('earn-silver-cnt');
+    if (sc) sc.textContent = tk.silver;
+    var gc = document.getElementById('earn-gold-cnt');
+    if (gc) gc.textContent = tk.gold;
+    /* 0인 등급 박스 흐리게 */
+    ['bronze','silver','gold'].forEach(function(g) {
+      var box = document.getElementById('earn-' + g + '-box');
+      if (box) box.style.opacity = tk[g] === 0 ? '0.35' : '1';
+    });
+    window.showScreen('pw-earn-done');
   }).catch(function(e) {
     console.error('purchase', e);
     overlay.style.display = 'none';
@@ -16326,7 +16445,7 @@ function processPurchase(amount, overlay) {
 /* ── Gifticons ── */
 function loadGifticons() {
   if (!PP.uid) return;
-  db.collection('gifticons').where('status', '==', 'active').limit(8).get()
+  db.collection('gifticons').where('status', '==', 'active').limit(12).get()
     .then(function(snap) {
       PP.gifticonList = [];
       snap.forEach(function(doc) {
@@ -16339,9 +16458,16 @@ function loadGifticons() {
 
 function renderGifticons() {
   var list = PP.gifticonList;
-  if (!list.length) return;
   var grid = document.querySelector('#pw-24 .ex-grid');
   if (!grid) return;
+  if (!list.length) {
+    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px 16px;color:var(--text3);">'
+      + '<div style="font-size:32px;margin-bottom:12px;">🎁</div>'
+      + '<div style="font-weight:700;color:var(--text1);margin-bottom:6px;">교환 가능한 기프티콘이 없어요</div>'
+      + '<div style="font-size:13px;">관리자가 상품을 등록하면 여기에 나타나요</div>'
+      + '</div>';
+    return;
+  }
   grid.innerHTML = list.map(function(g, i) {
     var emoji = g.emoji || '🎁';
     var gradeName = { bronze: '브론즈', silver: '실버', gold: '골드' }[g.required_grade || 'bronze'];
@@ -16350,7 +16476,7 @@ function renderGifticons() {
     var ok = have >= cnt;
     return '<div class="ex-item" data-pp-gi="' + i + '" style="cursor:pointer;">'
       + (ok ? '<span class="ex-avail-pill">구매가능</span>' : '')
-      + '<div class="ex-img-wrap"><div class="ex-img" style="font-size:48px;display:flex;align-items:center;justify-content:center;">' + emoji + '</div></div>'
+      + '<div class="ex-img-wrap"><div class="ex-img" style="font-size:48px;display:flex;align-items:center;justify-content:center;line-height:1;">' + emoji + '</div></div>'
       + '<div class="ex-body">'
       + '<div class="ex-brand">' + (g.brand || '') + '</div>'
       + '<div class="ex-name">' + (g.name || g.product_name || '') + '</div>'
@@ -16382,6 +16508,8 @@ function populateGifticonDetail(g) {
   if (cost) cost.innerHTML = gradeName + ' 티켓 ' + cnt + '장';
   var haveEl = s.querySelector('.ex-cost-main span[style*="font-size:11px"]');
   if (haveEl) haveEl.textContent = '현재 보유: ' + (PP.tickets[g.required_grade || 'bronze'] || 0) + '장';
+  var noticeEl = s.querySelector('.ex-detail-bottom > div[style*="sub-4"]');
+  if (noticeEl) noticeEl.textContent = gradeName + ' 티켓 ' + cnt + '장 차감 → 잔여 ' + Math.max(0, (PP.tickets[g.required_grade || 'bronze'] || 0) - cnt) + '장';
 }
 
 /* ── pw-25 exchange ── */
@@ -16391,7 +16519,8 @@ function bindExchangeBtn() {
   s.dataset.ppExBound = '1';
   var btn = s.querySelector('.btn-primary, .btn-exchange');
   if (!btn) return;
-  btn.addEventListener('click', function() {
+  btn.addEventListener('click', function(e) {
+    e.stopPropagation();
     var g = PP.currentGifticon;
     if (!g || !PP.uid) return;
     var grade = g.required_grade || 'bronze';
@@ -16404,18 +16533,30 @@ function bindExchangeBtn() {
       PP.tickets[grade] -= cnt;
       PP.tickets.total -= cnt;
       renderHomeTickets();
-      showToast((g.name || '기프티콘') + ' 교환 완료!');
+      /* 교환 완료 화면 */
+      var code = 'PP-' + Math.random().toString(36).slice(2,6).toUpperCase() + '-'
+        + Math.random().toString(36).slice(2,6).toUpperCase() + '-'
+        + Math.random().toString(36).slice(2,6).toUpperCase();
+      var ej = document.getElementById('ex-done-emoji');
+      if (ej) ej.textContent = g.emoji || '🎁';
+      var eb = document.getElementById('ex-done-brand');
+      if (eb) eb.textContent = g.brand || '';
+      var en = document.getElementById('ex-done-name');
+      if (en) en.textContent = g.name || g.product_name || '';
+      var ec = document.getElementById('ex-done-code');
+      if (ec) ec.textContent = code;
+      window.showScreen('pw-ex-done');
     }).catch(function(e){ console.error('exchange', e); showToast('교환 중 오류'); });
   }, true);
 }
 
-/* ── Kakao mock ── */
+/* ── Kakao mock complete ── */
 function bindKakaoComplete() {
   ['pw-02-K-new', 'pw-02-K-existing'].forEach(function(sid) {
     var s = document.getElementById(sid);
     if (!s || s.dataset.ppKBound) return;
     s.dataset.ppKBound = '1';
-    var btn = s.querySelector('.btn-primary, [class*="start-btn"], [class*="confirm"]');
+    var btn = s.querySelector('.btn-primary');
     if (!btn) return;
     btn.addEventListener('click', function() {
       if (!PP.uid) return;
@@ -16429,7 +16570,7 @@ function bindKakaoComplete() {
 /* ── Toast ── */
 function showToast(msg) {
   var t = document.createElement('div');
-  t.style.cssText = 'position:fixed;bottom:100px;left:50%;transform:translateX(-50%);background:#1A1130;color:#fff;padding:10px 20px;border-radius:99px;font-size:13px;font-weight:600;z-index:10000;white-space:nowrap;pointer-events:none;opacity:1;transition:opacity .4s;';
+  t.style.cssText = 'position:fixed;bottom:100px;left:50%;transform:translateX(-50%);background:#1A1130;color:#fff;padding:10px 20px;border-radius:99px;font-size:13px;font-weight:600;z-index:10000;white-space:nowrap;pointer-events:none;transition:opacity .4s;';
   t.textContent = msg;
   document.body.appendChild(t);
   setTimeout(function() { t.style.opacity = '0'; setTimeout(function() { t.remove(); }, 400); }, 2100);
