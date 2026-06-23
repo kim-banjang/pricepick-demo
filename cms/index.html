@@ -1084,10 +1084,7 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
         <div class="card-header"><div class="card-title">최근 픽구매 현황 TOP 3</div><button class="btn btn-ghost btn-sm" onclick="go('postback',document.getElementById('nav-postback'))">포스트백 로그로</button></div>
         <table>
           <thead><tr><th>쇼핑몰</th><th>회원</th><th>구매금액</th><th>적립 티켓</th><th>구매일시</th></tr></thead>
-          <tbody>
-            <tr><td>쿠팡</td><td>rain***</td><td>128,000원</td><td style="color:var(--success)">+12장</td><td style="color:var(--text-2);font-size:12px">2026/05/28<br>13:42:17</td></tr>
-            <tr><td>쿠팡</td><td>sky***</td><td>54,900원</td><td style="color:var(--success)">+5장</td><td style="color:var(--text-2);font-size:12px">2026/05/28<br>11:05:33</td></tr>
-            <tr><td>쿠팡</td><td>han***</td><td>319,000원</td><td style="color:var(--success)">+31장</td><td style="color:var(--text-2);font-size:12px">2026/05/28<br>09:18:44</td></tr>
+          <tbody id="dash-recent-tbody">
           </tbody>
         </table>
       </div>
@@ -1096,12 +1093,7 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
           <div class="card-header"><div class="card-title">인기 제휴몰 TOP 5</div><span style="font-size:11px;color:var(--text-3)">이번달 클릭·전환 기준</span></div>
           <table>
             <thead><tr><th style="text-align:center">순위</th><th>제휴몰</th><th style="text-align:center">클릭 수</th><th style="text-align:center">구매 전환</th></tr></thead>
-            <tbody>
-              <tr><td style="text-align:center">1</td><td style="font-weight:600">쿠팡</td><td style="text-align:center">48,210</td><td style="text-align:center;color:var(--success)">3,842건</td></tr>
-              <tr><td style="text-align:center">2</td><td style="font-weight:600">11번가</td><td style="text-align:center">12,040</td><td style="text-align:center;color:var(--success)">684건</td></tr>
-              <tr><td style="text-align:center">3</td><td style="font-weight:600">G마켓</td><td style="text-align:center">9,820</td><td style="text-align:center;color:var(--success)">512건</td></tr>
-              <tr><td style="text-align:center">4</td><td style="font-weight:600">알리익스프레스</td><td style="text-align:center">7,310</td><td style="text-align:center;color:var(--success)">421건</td></tr>
-              <tr><td style="text-align:center">5</td><td style="font-weight:600">아이허브</td><td style="text-align:center">4,120</td><td style="text-align:center;color:var(--success)">288건</td></tr>
+            <tbody id="dash-mall-tbody">
             </tbody>
           </table>
         </div>
@@ -1109,10 +1101,7 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
           <div class="card-header"><div class="card-title">티켓 적립 TOP 회원</div><span style="font-size:11px;color:var(--text-3)">이번달 픽구매 적립 기준</span></div>
           <table>
             <thead><tr><th style="text-align:center">순위</th><th>닉네임(카카오톡 ID)</th><th style="text-align:center">이번달 적립</th><th style="text-align:center">누적 적립</th></tr></thead>
-            <tbody>
-              <tr><td style="text-align:center">1</td><td><div style="font-weight:500">쇼핑왕민준</div><div style="font-size:11px;color:var(--text-2);font-family:monospace">(minjun_kakao)</div></td><td style="text-align:center;color:var(--success)">42장</td><td style="text-align:center">318장</td></tr>
-              <tr><td style="text-align:center">2</td><td><div style="font-weight:500">가격헌터서연</div><div style="font-size:11px;color:var(--text-2);font-family:monospace">(seoyeon_kko)</div></td><td style="text-align:center;color:var(--success)">37장</td><td style="text-align:center">264장</td></tr>
-              <tr><td style="text-align:center">3</td><td><div style="font-weight:500">알뜰살뜰지호</div><div style="font-size:11px;color:var(--text-2);font-family:monospace">(jiho_kakao)</div></td><td style="text-align:center;color:var(--success)">31장</td><td style="text-align:center">205장</td></tr>
+            <tbody id="dash-top-tbody">
             </tbody>
           </table>
         </div>
@@ -1153,46 +1142,6 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
         <table>
           <thead><tr><th>닉네임 / 식별자</th><th>연동 상태</th><th>가입일</th><th>랜덤 티켓</th><th>전환예정</th><th>등급 티켓 (브론즈/실버/골드)</th><th>이벤트 티켓</th><th>마케팅 수신</th><th>상태</th><th>관리</th></tr></thead>
           <tbody>
-            <tr>
-              <td><div style="font-weight:500">쇼핑왕민준</div><div style="font-size:11px;color:var(--text-2);font-family:monospace">minjun_kakao</div></td>
-              <td><span class="member-type-kakao">카카오 연동</span><div style="font-size:10px;color:var(--text-3);margin-top:3px;">연동 2024/08/12</div></td>
-              <td style="text-align:center"><div style="font-weight:700;color:#333333">2024/08/12</div><div style="color:var(--text-3)">09:14:22</div></td>
-              <td><div class="rnd-chip-wrap"><span class="tk-chip random">2</span><span class="conv-arrow">→</span></div></td><td><div class="conv-preview"><span class="tk-chip bronze">+1</span><span class="tk-chip silver">+1</span></div></td><td><div style="display:flex;gap:5px;align-items:center;justify-content:center;"><span class="tk-chip bronze">12</span><span class="tk-chip silver">8</span><span class="tk-chip gold">27</span></div></td>
-              <td><span class="tk-chip event">3</span></td>
-              <td><span class="mkt-badge all">전체 동의</span></td>
-              <td><span class="badge badge-green">정상</span></td>
-              <td><div style="display:flex;gap:5px;justify-content:center;" id="mact-1"><button class="btn btn-ghost btn-sm" onclick="openMemberModal(1)">상세</button></div></td>
-            </tr>
-            <tr>
-              <td><div style="font-weight:500">가격헌터서연</div><div style="font-size:11px;color:var(--text-2);font-family:monospace">seoyeon_kakao</div></td>
-              <td><span class="member-type-kakao">카카오 연동</span><div style="font-size:10px;color:var(--text-3);margin-top:3px;">연동 2024/11/03</div></td>
-              <td style="text-align:center"><div style="font-weight:700;color:#333333">2024/11/03</div><div style="color:var(--text-3)">14:37:05</div></td>
-              <td><div class="rnd-chip-wrap"><span class="tk-chip random">1</span><span class="conv-arrow">→</span></div></td><td><div class="conv-preview"><span class="tk-chip gold">+1</span></div></td><td><div style="display:flex;gap:5px;align-items:center;justify-content:center;"><span class="tk-chip bronze">9</span><span class="tk-chip silver">14</span><span class="tk-chip gold dim">0</span></div></td>
-              <td><span class="tk-chip event">1</span></td>
-              <td><span class="mkt-badge sel">선택 동의</span></td>
-              <td><span class="badge badge-green">정상</span></td>
-              <td><div style="display:flex;gap:5px;justify-content:center;" id="mact-2"><button class="btn btn-ghost btn-sm" onclick="openMemberModal(2)">상세</button></div></td>
-            </tr>
-            <tr>
-              <td><div style="font-weight:500">절약러지호 <span style="font-size:10px;font-weight:700;color:#d97a17;background:#fdf1e3;border:1px solid #f3d2a0;border-radius:10px;padding:1px 7px;margin-left:3px;">미연동</span></div><div style="font-size:11px;color:var(--text-2);font-family:monospace">app_uid: 8f3a21c0</div></td>
-              <td><span style="display:inline-block;font-size:11px;font-weight:700;color:#d97a17;background:#fdf1e3;border:1px solid #f3d2a0;border-radius:20px;padding:3px 10px;">게스트(미연동)</span><div style="font-size:10px;color:var(--text-3);margin-top:3px;">적립만 누적 · 사용 불가</div></td>
-              <td style="text-align:center"><div style="font-weight:700;color:#333333">2025/02/28</div><div style="color:var(--text-3)">11:02:48</div></td>
-              <td><span class="tk-chip random dim">0</span></td><td></td><td><div style="display:flex;gap:5px;align-items:center;justify-content:center;"><span class="tk-chip bronze dim">0</span><span class="tk-chip silver dim">0</span><span class="tk-chip gold dim">0</span></div></td>
-              <td><span class="tk-chip event dim">0</span></td>
-              <td><span class="mkt-badge none">전체 거부</span></td>
-              <td><span class="badge badge-red">정지</span></td>
-              <td><div style="display:flex;gap:5px;justify-content:center;" id="mact-3"><button class="btn btn-ghost btn-sm" onclick="openMemberModal(3)">상세</button></div></td>
-            </tr>
-            <tr>
-              <td><div style="font-weight:500">핫딜탐정</div><div style="font-size:11px;color:var(--text-2);font-family:monospace">hotdeal_kakao</div></td>
-              <td><span class="member-type-kakao">카카오 연동</span><div style="font-size:10px;color:var(--text-3);margin-top:3px;">연동 2025/05/14</div></td>
-              <td style="text-align:center"><div style="font-weight:700;color:#333333">2025/05/14</div><div style="color:var(--text-3)">16:55:33</div></td>
-              <td><div class="rnd-chip-wrap"><span class="tk-chip random">3</span><span class="conv-arrow">→</span></div></td><td><div class="conv-preview"><span class="tk-chip bronze">+2</span><span class="tk-chip silver">+1</span></div></td><td><div style="display:flex;gap:5px;align-items:center;justify-content:center;"><span class="tk-chip bronze">5</span><span class="tk-chip silver">7</span><span class="tk-chip gold dim">0</span></div></td>
-              <td><span class="tk-chip event">2</span></td>
-              <td><span class="mkt-badge all">전체 동의</span></td>
-              <td><span class="badge badge-green">정상</span></td>
-              <td><div style="display:flex;gap:5px;justify-content:center;" id="mact-4"><button class="btn btn-ghost btn-sm" onclick="openMemberModal(4)">상세</button></div></td>
-            </tr>
           </tbody>
         </table>
         <div class="pagination"><button class="page-btn active">1</button><button class="page-btn">2</button><button class="page-btn">···</button><button class="page-btn">368</button><button class="page-btn">›</button></div>
@@ -1220,20 +1169,6 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
           <table>
             <thead><tr><th>닉네임(카카오톡 ID)</th><th>사유</th><th>티켓</th><th>상태</th><th>일시</th></tr></thead>
             <tbody>
-              <tr><td><div style="font-weight:500">쇼핑왕민준</div><div style="font-size:11px;color:var(--text-2);font-family:monospace">(minjun_kko)</div></td><td style="color:var(--success)">구매확정 전환</td><td><div style="display:flex;gap:4px;align-items:center;flex-wrap:wrap;justify-content:center;"><span class="tk-chip gold bare">골드 1장</span><span class="tk-chip bronze bare">브론즈 2장</span></div></td><td style="text-align:center"><span style="display:inline-block;font-size:11px;font-weight:700;color:#1f9d57;background:#e6f7ec;border:1px solid #b6e6c8;border-radius:20px;padding:3px 10px;white-space:nowrap;">보유 중</span></td><td style="color:var(--text-3);font-size:12px;white-space:nowrap;text-align:center"><div style="font-weight:700;color:#333333">2026/05/29</div><div>14:23:07</div></td></tr>
-              <tr><td><div style="font-weight:500">가격헌터서연</div><div style="font-size:11px;color:var(--text-2);font-family:monospace">(seoyeon_kko)</div></td><td style="color:var(--text-2)">구매 대기 (가지급)</td><td><span class="tk-chip random bare">랜덤 1장</span></td><td style="text-align:center"><span style="display:inline-block;font-size:11px;font-weight:700;color:#d97a17;background:#fdf1e3;border:1px solid #f3d2a0;border-radius:20px;padding:3px 10px;white-space:nowrap;">가지급(대기)</span></td><td style="color:var(--text-3);font-size:12px;white-space:nowrap;text-align:center"><div style="font-weight:700;color:#333333">2026/05/29</div><div>14:10:33</div></td></tr>
-              <tr><td><div style="font-weight:500">가격헌터서연</div><div style="font-size:11px;color:var(--text-2);font-family:monospace">(seoyeon_kko)</div></td><td style="color:var(--success)">구매확정 전환</td><td><span class="tk-chip bronze bare">브론즈 1장</span></td><td style="text-align:center"><span style="display:inline-block;font-size:11px;font-weight:700;color:#1f9d57;background:#e6f7ec;border:1px solid #b6e6c8;border-radius:20px;padding:3px 10px;white-space:nowrap;">보유 중</span></td><td style="color:var(--text-3);font-size:12px;white-space:nowrap;text-align:center"><div style="font-weight:700;color:#333333">2026/05/29</div><div>13:47:51</div></td></tr>
-              <tr><td><div style="font-weight:500">딜헌터지민</div><div style="font-size:11px;color:var(--text-2);font-family:monospace">(jiho_deal)</div></td><td style="color:var(--success)">구매확정 전환</td><td><span class="tk-chip silver bare">실버 1장</span></td><td style="text-align:center"><span style="display:inline-block;font-size:11px;font-weight:700;color:#1f9d57;background:#e6f7ec;border:1px solid #b6e6c8;border-radius:20px;padding:3px 10px;white-space:nowrap;">보유 중</span></td><td style="color:var(--text-3);font-size:12px;white-space:nowrap;text-align:center"><div style="font-weight:700;color:#333333">2026/05/29</div><div>13:05:22</div></td></tr>
-              <tr><td><div style="font-weight:500">핫딜탐정</div><div style="font-size:11px;color:var(--text-2);font-family:monospace">(hotdeal_kko)</div></td><td style="color:var(--text-2)">구매 대기 (가지급)</td><td><span class="tk-chip random bare">랜덤 1장</span></td><td style="text-align:center"><span style="display:inline-block;font-size:11px;font-weight:700;color:#d97a17;background:#fdf1e3;border:1px solid #f3d2a0;border-radius:20px;padding:3px 10px;white-space:nowrap;">가지급(대기)</span></td><td style="color:var(--text-3);font-size:12px;white-space:nowrap;text-align:center"><div style="font-weight:700;color:#333333">2026/05/29</div><div>12:51:09</div></td></tr>
-              <tr><td><div style="font-weight:500">가격마스터</div><div style="font-size:11px;color:var(--text-2);font-family:monospace">(price_master)</div></td><td style="color:var(--success)">구매확정 전환</td><td><div style="display:flex;gap:4px;align-items:center;flex-wrap:wrap;justify-content:center;"><span class="tk-chip gold bare">골드 2장</span><span class="tk-chip silver bare">실버 1장</span><span class="tk-chip bronze bare">브론즈 3장</span></div></td><td style="text-align:center"><span style="display:inline-block;font-size:11px;font-weight:700;color:#1f9d57;background:#e6f7ec;border:1px solid #b6e6c8;border-radius:20px;padding:3px 10px;white-space:nowrap;">보유 중</span></td><td style="color:var(--text-3);font-size:12px;white-space:nowrap;text-align:center"><div style="font-weight:700;color:#333333">2026/05/29</div><div>12:40:44</div></td></tr>
-              <tr><td><div style="font-weight:500">절약마스터</div><div style="font-size:11px;color:var(--text-2);font-family:monospace">(saving_master)</div></td><td style="color:#c084fc">주간 미션 완료</td><td><span class="tk-chip event bare">이벤트 2장</span></td><td style="text-align:center"><span style="display:inline-block;font-size:11px;font-weight:700;color:#1f9d57;background:#e6f7ec;border:1px solid #b6e6c8;border-radius:20px;padding:3px 10px;white-space:nowrap;">보유 중</span></td><td style="color:var(--text-3);font-size:12px;white-space:nowrap;text-align:center"><div style="font-weight:700;color:#333333">2026/05/29</div><div>12:31:18</div></td></tr>
-              <tr><td><div style="font-weight:500">쇼핑고수한나</div><div style="font-size:11px;color:var(--text-2);font-family:monospace">(hanna_shop)</div></td><td style="color:#c084fc">출석 체크</td><td><span class="tk-chip event bare">이벤트 1장</span></td><td style="text-align:center"><span style="display:inline-block;font-size:11px;font-weight:700;color:#1f9d57;background:#e6f7ec;border:1px solid #b6e6c8;border-radius:20px;padding:3px 10px;white-space:nowrap;">보유 중</span></td><td style="color:var(--text-3);font-size:12px;white-space:nowrap;text-align:center"><div style="font-weight:700;color:#333333">2026/05/29</div><div>12:15:03</div></td></tr>
-              <tr><td><div style="font-weight:500">딜헌터지민</div><div style="font-size:11px;color:var(--text-2);font-family:monospace">(jiho_deal)</div></td><td style="color:#c084fc">광고 시청</td><td><span class="tk-chip event bare">이벤트 1장</span></td><td style="text-align:center"><span style="display:inline-block;font-size:11px;font-weight:700;color:#1f9d57;background:#e6f7ec;border:1px solid #b6e6c8;border-radius:20px;padding:3px 10px;white-space:nowrap;">보유 중</span></td><td style="color:var(--text-3);font-size:12px;white-space:nowrap;text-align:center"><div style="font-weight:700;color:#333333">2026/05/29</div><div>11:50:37</div></td></tr>
-              <tr><td><div style="font-weight:500">친구초대왕</div><div style="font-size:11px;color:var(--text-2);font-family:monospace">(invite_king)</div></td><td style="color:#c084fc">친구초대 보상</td><td><span class="tk-chip event bare">이벤트 5장</span></td><td style="text-align:center"><span style="display:inline-block;font-size:11px;font-weight:700;color:#1f9d57;background:#e6f7ec;border:1px solid #b6e6c8;border-radius:20px;padding:3px 10px;white-space:nowrap;">보유 중</span></td><td style="color:var(--text-3);font-size:12px;white-space:nowrap;text-align:center"><div style="font-weight:700;color:#333333">2026/05/29</div><div>11:30:55</div></td></tr>
-              <tr><td><div style="font-weight:500">절약생활러</div><div style="font-size:11px;color:var(--text-2);font-family:monospace">(saving_life)</div></td><td style="color:var(--danger)">기프티콘 교환 소모</td><td><span style="color:var(--danger);font-size:12px;font-weight:700">−골드 1장</span></td><td style="text-align:center"><span style="display:inline-block;font-size:11px;font-weight:700;color:#6b7280;background:#f3f4f6;border:1px solid #e5e7eb;border-radius:20px;padding:3px 10px;white-space:nowrap;">사용 완료</span></td><td style="color:var(--text-3);font-size:12px;white-space:nowrap;text-align:center"><div style="font-weight:700;color:#333333">2026/05/29</div><div>11:10:29</div></td></tr>
-              <tr><td><div style="font-weight:500">가격사냥꾼</div><div style="font-size:11px;color:var(--text-2);font-family:monospace">(price_hunter)</div></td><td style="color:var(--danger)">경품 응모 소모</td><td><span style="color:var(--danger);font-size:12px;font-weight:700">−이벤트 3장</span></td><td style="text-align:center"><span style="display:inline-block;font-size:11px;font-weight:700;color:#6b7280;background:#f3f4f6;border:1px solid #e5e7eb;border-radius:20px;padding:3px 10px;white-space:nowrap;">사용 완료</span></td><td style="color:var(--text-3);font-size:12px;white-space:nowrap;text-align:center"><div style="font-weight:700;color:#333333">2026/05/29</div><div>10:55:14</div></td></tr>
-              <tr><td><div style="font-weight:500">최수아</div><div style="font-size:11px;color:var(--text-2);font-family:monospace">(choisua_kko)</div></td><td style="color:var(--danger)">부정행위 회수</td><td><span style="color:var(--danger);font-size:12px;font-weight:700">−5장 전액</span></td><td style="text-align:center"><span style="display:inline-block;font-size:11px;font-weight:700;color:#dc2626;background:#fef2f2;border:1px solid #fecaca;border-radius:20px;padding:3px 10px;white-space:nowrap;">회수</span></td><td style="color:var(--text-3);font-size:12px;white-space:nowrap;text-align:center"><div style="font-weight:700;color:#333333">2026/05/29</div><div>10:40:02</div></td></tr>
-              <tr><td><div style="font-weight:500">운영자지급</div><div style="font-size:11px;color:var(--text-2);font-family:monospace">(admin_system)</div></td><td style="color:var(--main)">관리자 지급</td><td><div style="display:flex;gap:4px;align-items:center;flex-wrap:wrap;justify-content:center;"><span class="tk-chip gold bare">골드 2장</span></div></td><td style="text-align:center"><span style="display:inline-block;font-size:11px;font-weight:700;color:#1f9d57;background:#e6f7ec;border:1px solid #b6e6c8;border-radius:20px;padding:3px 10px;white-space:nowrap;">보유 중</span></td><td style="color:var(--text-3);font-size:12px;white-space:nowrap;text-align:center"><div style="font-weight:700;color:#333333">2026/05/29</div><div>10:20:48</div></td></tr>
             </tbody>
           </table>
         </div>
@@ -1248,68 +1183,6 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
         <table>
           <thead><tr><th>회차</th><th>경품 구성</th><th>추첨 기간</th><th>마감일</th><th>참여 티켓</th><th>당첨자</th><th>상태</th><th>액션</th></tr></thead>
           <tbody>
-            <tr>
-              <td><strong>12회</strong></td>
-              <td>
-                <div style="font-size:12px;line-height:1.8">
-                  <div>🥇 에어팟 프로 2세대</div>
-                  <div>🥈 스타벅스 5만원권 ×3</div>
-                  <div>🥉 편의점 상품권 1만원 ×5</div>
-                </div>
-              </td>
-              <td>05/05 ~ 05/12</td>
-              <td><strong style="color:var(--danger)">05/12 (D-1)</strong></td>
-              <td>18,240장</td>
-              <td>
-                <div style="font-size:12px;line-height:1.8">
-                  <div>1등 1명</div>
-                  <div>2등 3명</div>
-                  <div>3등 5명</div>
-                </div>
-              </td>
-              <td><span class="badge badge-amber">마감 · 처리 대기</span></td>
-              <td id="draw-action-col"><button class="btn btn-primary btn-sm" onclick="openModal('m-draw')">당첨 처리(추첨 실행)</button></td>
-            </tr>
-            <tr>
-              <td><strong>11회</strong></td>
-              <td>
-                <div style="font-size:12px;line-height:1.8">
-                  <div>🥇 스타벅스 5만원권</div>
-                  <div>🥈 배스킨라빈스 아이스크림 교환권 ×3</div>
-                </div>
-              </td>
-              <td>04/28 ~ 05/05</td>
-              <td>05/05</td>
-              <td>14,820장</td>
-              <td>
-                <div style="font-size:12px;line-height:1.8">
-                  <div>1등 1명</div>
-                  <div>2등 3명</div>
-                </div>
-              </td>
-              <td><span class="badge badge-green">완료</span></td>
-              <td><button class="btn btn-ghost btn-sm">결과 보기</button></td>
-            </tr>
-            <tr>
-              <td><strong>10회</strong></td>
-              <td>
-                <div style="font-size:12px;line-height:1.8">
-                  <div>🥇 삼성 갤럭시 버즈</div>
-                  <div>🥈 투썸 케이크 교환권 ×5</div>
-                </div>
-              </td>
-              <td>04/21 ~ 04/28</td>
-              <td>04/28</td>
-              <td>12,340장</td>
-              <td>
-                <div style="font-size:12px;line-height:1.8">
-                  <div>1등 1명</div>
-                  <div>2등 5명</div>
-                </div>
-              </td>
-              <td><span class="badge badge-green">완료</span></td>
-              <td><button class="btn btn-ghost btn-sm">결과 보기</button></td>
-            </tr>
           </tbody>
         </table>
       </div>
@@ -1394,7 +1267,6 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
           <table>
             <thead><tr><th>닉네임</th><th>경품</th><th>당첨일</th><th>처리</th></tr></thead>
             <tbody>
-              <tr><td><div style="font-weight:500">쇼핑왕민준</div><div style="font-size:11px;color:var(--text-2);font-family:monospace">(minjun_kko)</div></td><td>스타벅스 아메리카노</td><td style="color:var(--text-3)";text-align:center"><div style="font-weight:700;color:#333333">2026/05/29</div><div>09:12:00</div></td><td><button class="btn btn-primary btn-sm" onclick="openModal('m-send-prize')">발송</button></td></tr>
             </tbody>
           </table>
         </div>
@@ -1404,10 +1276,6 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
         <table>
           <thead><tr><th>버전</th><th>변경 내용 (전 → 후)</th><th>변경자</th><th>변경일시</th><th>공표</th></tr></thead>
           <tbody>
-            <tr><td><strong>v4</strong></td><td>2등 경품 '편의점 상품권 1만' → '편의점 아이스크림 교환권'</td><td>이운영</td><td style="color:var(--text-3);font-size:12px">2026/05/20 10:32</td><td><span class="badge badge-green">공표됨 · 13회차~</span></td></tr>
-            <tr><td>v3</td><td>1등 당첨 확률 3% → 5%</td><td>이운영</td><td style="color:var(--text-3);font-size:12px">2026/05/06 14:10</td><td><span class="badge badge-green">공표됨 · 11회차~</span></td></tr>
-            <tr><td>v2</td><td>3등 '꽝(재도전)' 신설</td><td>김반장</td><td style="color:var(--text-3);font-size:12px">2026/04/22 09:05</td><td><span class="badge badge-green">공표됨 · 9회차~</span></td></tr>
-            <tr><td>v1</td><td>최초 경품 구성 등록</td><td>김반장</td><td style="color:var(--text-3);font-size:12px">2026/04/01 11:00</td><td><span class="badge badge-green">공표됨</span></td></tr>
           </tbody>
         </table>
       </div>
@@ -1438,10 +1306,7 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
           <div class="card-header"><div class="card-title">이번주 추첨 현황</div></div>
           <table>
             <thead><tr><th>순위</th><th>닉네임(카카오톡 ID)</th><th>이번주</th><th>누적</th><th>응모 사용 티켓</th></tr></thead>
-            <tbody>
-              <tr><td>🥇</td><td><div style="font-weight:500">쇼핑왕민준</div><div style="font-size:11px;color:var(--text-2);font-family:monospace">(minjun_kko)</div></td><td style="color:#c084fc">당첨</td><td>18회</td><td><span class="tk-chip event bare">3장</span></td></tr>
-              <tr><td>🥈</td><td><div style="font-weight:500">가격헌터서연</div><div style="font-size:11px;color:var(--text-2);font-family:monospace">(seoyeon_kko)</div></td><td style="color:#c084fc">당첨</td><td>15회</td><td><span class="tk-chip event bare">1장</span></td></tr>
-              <tr><td>🥉</td><td><div style="font-weight:500">절약마스터</div><div style="font-size:11px;color:var(--text-2);font-family:monospace">(saving_master)</div></td><td style="color:var(--text-2)">미당첨</td><td>12회</td><td><span class="tk-chip event bare">0장</span></td></tr>
+            <tbody id="attendance-tbody">
             </tbody>
           </table>
         </div>
@@ -1475,72 +1340,6 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
             </tr>
           </thead>
           <tbody>
-              <tr>
-                <td style="text-align:center"><div style="font-weight:700;color:#333333">2026/05/28</div><div style="color:var(--text-3)">18:20:31</div></td>
-                <td style="text-align:center"><div style="font-weight:700;color:#333333">2026/05/29</div><div style="color:var(--text-3)">01:25:05</div></td>
-                <td style="font-size:11px;font-family:monospace;color:var(--text-2)">PHTRX20260528182031</td>
-                <td><div style="font-weight:500">노윤희</div><div style="font-size:11px;color:var(--text-2);font-family:monospace">(haessaldurum)</div></td>
-                <td style="text-align:left">네이버페이 포인트 2만원</td>
-                <td style="font-size:11px;font-family:monospace">46073</td>
-                <td style="font-size:12px;color:var(--text-2)">2026/06/27</td>
-                <td><span class="badge badge-red" style="font-size:11px">사용</span></td>
-                <td><span class="tk-chip gold bare">골드 1장</span></td>
-              </tr>
-              <tr>
-                <td style="text-align:center"><div style="font-weight:700;color:#333333">2026/05/28</div><div style="color:var(--text-3)">18:20:31</div></td>
-                <td style="color:var(--text-3)">—</td>
-                <td style="font-size:11px;font-family:monospace;color:var(--text-2)">PHTRX20260528182031</td>
-                <td><div style="font-weight:500">노윤희</div><div style="font-size:11px;color:var(--text-2);font-family:monospace">(haessaldurum)</div></td>
-                <td style="text-align:left">네이버페이 포인트 2만원</td>
-                <td style="font-size:11px;font-family:monospace">46073</td>
-                <td style="font-size:12px;color:var(--text-2)">2026/06/27</td>
-                <td><span class="badge" style="font-size:11px;background:var(--surface-2);color:var(--text-2)">미사용</span></td>
-                <td><span class="tk-chip gold bare">골드 1장</span></td>
-              </tr>
-              <tr>
-                <td style="text-align:center"><div style="font-weight:700;color:#333333">2026/05/28</div><div style="color:var(--text-3)">01:37:39</div></td>
-                <td style="text-align:center"><div style="font-weight:700;color:#333333">2026/05/28</div><div style="color:var(--text-3)">23:05:03</div></td>
-                <td style="font-size:11px;font-family:monospace;color:var(--text-2)">PHTRX20260528013738</td>
-                <td><div style="font-weight:500">미리</div><div style="font-size:11px;color:var(--text-2);font-family:monospace">(himanwi)</div></td>
-                <td style="text-align:left">[SSG상품권] 2만원권</td>
-                <td style="font-size:11px;font-family:monospace">71229</td>
-                <td style="font-size:12px;color:var(--text-2)">2026/06/26</td>
-                <td><span class="badge badge-red" style="font-size:11px">사용</span></td>
-                <td><span class="tk-chip gold bare">골드 1장</span></td>
-              </tr>
-              <tr>
-                <td style="text-align:center"><div style="font-weight:700;color:#333333">2026/05/28</div><div style="color:var(--text-3)">09:22:26</div></td>
-                <td style="text-align:center"><div style="font-weight:700;color:#333333">2026/05/28</div><div style="color:var(--text-3)">16:25:05</div></td>
-                <td style="font-size:11px;font-family:monospace;color:var(--text-2)">PHTRX20260528092226</td>
-                <td><div style="font-weight:500">노윤희</div><div style="font-size:11px;color:var(--text-2);font-family:monospace">(haessaldurum)</div></td>
-                <td style="text-align:left">네이버페이 포인트 2만원</td>
-                <td style="font-size:11px;font-family:monospace">46073</td>
-                <td style="font-size:12px;color:var(--text-2)">2026/06/26</td>
-                <td><span class="badge badge-red" style="font-size:11px">사용</span></td>
-                <td><span class="tk-chip gold bare">골드 1장</span></td>
-              </tr>
-              <tr>
-                <td style="text-align:center"><div style="font-weight:700;color:#333333">2026/05/27</div><div style="color:var(--text-3)">16:33:38</div></td>
-                <td style="text-align:center"><div style="font-weight:700;color:#333333">2026/05/27</div><div style="color:var(--text-3)">23:35:12</div></td>
-                <td style="font-size:11px;font-family:monospace;color:var(--text-2)">PHTRX20260527163338</td>
-                <td><div style="font-weight:500">문금주</div><div style="font-size:11px;color:var(--text-2);font-family:monospace">(bueongbueong)</div></td>
-                <td style="text-align:left">네이버페이 포인트 2만원</td>
-                <td style="font-size:11px;font-family:monospace">46073</td>
-                <td style="font-size:12px;color:var(--text-2)">2026/06/26</td>
-                <td><span class="badge badge-red" style="font-size:11px">사용</span></td>
-                <td><span class="tk-chip gold bare">골드 1장</span></td>
-              </tr>
-              <tr>
-                <td style="text-align:center"><div style="font-weight:700;color:#333333">2026/05/27</div><div style="color:var(--text-3)">13:51:32</div></td>
-                <td style="text-align:center"><div style="font-weight:700;color:#333333">2026/05/27</div><div style="color:var(--text-3)">20:55:01</div></td>
-                <td style="font-size:11px;font-family:monospace;color:var(--text-2)">PHTRX20260527135132</td>
-                <td><div style="font-weight:500">강신성</div><div style="font-size:11px;color:var(--text-2);font-family:monospace">(ddongbal)</div></td>
-                <td style="text-align:left">네이버페이 포인트 5만원</td>
-                <td style="font-size:11px;font-family:monospace">46076</td>
-                <td style="font-size:12px;color:var(--text-2)">2026/06/25</td>
-                <td><span class="badge badge-red" style="font-size:11px">사용</span></td>
-                <td><span class="tk-chip gold bare">골드 2장</span></td>
-              </tr>
           </tbody>
         </table>
         <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 18px;border-top:1px solid var(--border)">
@@ -1571,62 +1370,6 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
         <table>
           <thead><tr><th>No</th><th>주문번호</th><th>닉네임(카카오톡 ID)</th><th>상품명</th><th>취소날짜</th><th>취소사유</th><th>환불 티켓</th><th>잔여 티켓</th></tr></thead>
           <tbody>
-            <tr>
-              <td>7</td>
-              <td style="font-size:11px;font-family:monospace;color:var(--text-2)">PHTRX2026012109341888...</td>
-<td><div style="font-weight:500">작은 들소</div><div style="font-size:11px;color:var(--text-2);font-family:monospace">(jogeun_deulso)</div></td>              <td style="text-align:left">달달연유라떼(HOT)</td>
-<td style="text-align:center"><div style="font-weight:700;color:#333333">2026/01/22</div><div style="color:var(--text-3)">11:32:16</div></td>              <td><span class="badge badge-amber" style="font-size:11px">관리자 취소</span></td>
-              <td><span class="tk-chip bronze bare" style="color:var(--danger)">브론즈 -1장</span></td>
-              <td><span class="tk-chip bronze bare">브론즈 1장</span></td>
-            </tr>
-            <tr>
-              <td>6</td>
-              <td style="font-size:11px;font-family:monospace;color:var(--text-2)">PHTRX202601210932242...</td>
-<td><div style="font-weight:500">작은 들소</div><div style="font-size:11px;color:var(--text-2);font-family:monospace">(jogeun_deulso)</div></td>              <td style="text-align:left">밀크티(M)</td>
-<td style="text-align:center"><div style="font-weight:700;color:#333333">2026/01/22</div><div style="color:var(--text-3)">11:32:34</div></td>              <td><span class="badge badge-amber" style="font-size:11px">관리자 취소</span></td>
-              <td><span class="tk-chip bronze bare" style="color:var(--danger)">브론즈 -1장</span></td>
-              <td><span class="tk-chip bronze bare">브론즈 2장</span></td>
-            </tr>
-            <tr>
-              <td>5</td>
-              <td style="font-size:11px;font-family:monospace;color:var(--text-2)">PHTRX202601210930566...</td>
-<td><div style="font-weight:500">작은 들소</div><div style="font-size:11px;color:var(--text-2);font-family:monospace">(jogeun_deulso)</div></td>              <td style="text-align:left">콜드브루(Hot)(TAKE-OUT)</td>
-<td style="text-align:center"><div style="font-weight:700;color:#333333">2026/01/22</div><div style="color:var(--text-3)">11:32:42</div></td>              <td><span class="badge badge-amber" style="font-size:11px">관리자 취소</span></td>
-              <td><span class="tk-chip bronze bare" style="color:var(--danger)">브론즈 -1장</span></td>
-              <td><span class="tk-chip bronze bare">브론즈 3장</span></td>
-            </tr>
-            <tr>
-              <td>4</td>
-              <td style="font-size:11px;font-family:monospace;color:var(--text-2)">PHTRX202601210921430...</td>
-<td><div style="font-weight:500">작은 들소</div><div style="font-size:11px;color:var(--text-2);font-family:monospace">(jogeun_deulso)</div></td>              <td style="text-align:left">컬쳐랜드 모바일문화상품권 5,000원</td>
-<td style="text-align:center"><div style="font-weight:700;color:#333333">2026/01/22</div><div style="color:var(--text-3)">11:32:56</div></td>              <td><span class="badge badge-amber" style="font-size:11px">관리자 취소</span></td>
-              <td><span class="tk-chip bronze bare" style="color:var(--danger)">브론즈 -1장</span></td>
-              <td><span class="tk-chip bronze bare">브론즈 4장</span></td>
-            </tr>
-            <tr>
-              <td>3</td>
-              <td style="font-size:11px;font-family:monospace;color:var(--text-2)">PHTRX202601210928588...</td>
-<td><div style="font-weight:500">SUBIN LIM / 착한 청새치</div><div style="font-size:11px;color:var(--text-2);font-family:monospace">(cheongsaechi)</div></td>              <td style="text-align:left">[공차] 1만원권</td>
-<td style="text-align:center"><div style="font-weight:700;color:#333333">2026/01/22</div><div style="color:var(--text-3)">11:32:59</div></td>              <td><span class="badge badge-amber" style="font-size:11px">관리자 취소</span></td>
-              <td><span class="tk-chip silver bare" style="color:var(--danger)">실버 -1장</span></td>
-              <td><span class="tk-chip silver bare">실버 1장</span></td>
-            </tr>
-            <tr>
-              <td>2</td>
-              <td style="font-size:11px;font-family:monospace;color:var(--text-2)">PHTRX202603040124260...</td>
-<td><div style="font-weight:500">이동주 / 순한 독수리</div><div style="font-size:11px;color:var(--text-2);font-family:monospace">(dongju_lee)</div></td>              <td style="text-align:left">구글기프트카드 5천원 교환권</td>
-<td style="text-align:center"><div style="font-weight:700;color:#333333">2026/03/09</div><div style="color:var(--text-3)">15:40:25</div></td>              <td><span class="badge badge-amber" style="font-size:11px">관리자 취소</span></td>
-              <td><span class="tk-chip bronze bare" style="color:var(--danger)">브론즈 -1장</span></td>
-              <td><span class="tk-chip bronze bare">브론즈 3장</span></td>
-            </tr>
-            <tr>
-              <td>1</td>
-              <td style="font-size:11px;font-family:monospace;color:var(--text-2)">PHTRX202602260145366...</td>
-<td><div style="font-weight:500">애드블루스 / 희망찬 바다거북</div><div style="font-size:11px;color:var(--text-2);font-family:monospace">(blue_turtle)</div></td>              <td style="text-align:left">구글기프트카드 5천원 교환권</td>
-<td style="text-align:center"><div style="font-weight:700;color:#333333">2026/03/09</div><div style="color:var(--text-3)">15:40:32</div></td>              <td><span class="badge badge-amber" style="font-size:11px">관리자 취소</span></td>
-              <td><span class="tk-chip bronze bare" style="color:var(--danger)">브론즈 -1장</span></td>
-              <td><span class="tk-chip bronze bare">브론즈 4장</span></td>
-            </tr>
           </tbody>
         </table>
         <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 18px;border-top:1px solid var(--border)">
@@ -1722,7 +1465,7 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
       <div class="info-box"><strong>정책 확정 반영</strong> — 온보딩·이벤트 보상 확정 적용. 이벤트 생성·수정 시 <strong>운영정책과의 보상 정합 검증</strong>(중복 보상·만료 충돌 차단) 후 저장.</div>
       <div class="card">
         <div class="card-header"><div><div class="card-title">이벤트 관리</div></div><div id="event-hdr-actions"><button class="btn btn-primary btn-sm" onclick="openModal('m-event')">+ 이벤트 생성</button></div></div>
-        <div style="padding:16px">
+        <div id="event-list" style="padding:16px">
           <div class="event-card">
             <div class="event-header"><div><div class="event-title">5월 출석 체크</div><div class="event-period">05/01 ~ 05/31 &nbsp;·&nbsp; 전체 회원</div></div><span class="badge badge-green">진행 중</span></div>
             <div class="event-desc">5일 연속 출석 달성 시 500P + 이벤트 티켓 1장 지급.</div>
@@ -1757,30 +1500,6 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
         <table>
           <thead><tr><th style="text-align:center">순위</th><th>닉네임(카카오톡 ID)</th><th style="text-align:center">누적 초대</th><th style="text-align:center">성공 초대</th><th style="text-align:center">지급 포인트</th><th style="text-align:center">이번달</th></tr></thead>
           <tbody>
-            <tr>
-              <td style="text-align:center;font-weight:700">1</td>
-              <td><div style="font-weight:500">친구초대왕</div><div style="font-size:11px;color:var(--text-2);font-family:monospace">(invite_king)</div></td>
-              <td style="text-align:center">47명</td>
-              <td style="text-align:center">31명</td>
-              <td style="text-align:center">15,500P</td>
-              <td style="text-align:center">8명</td>
-            </tr>
-            <tr>
-              <td style="text-align:center;font-weight:700">2</td>
-              <td><div style="font-weight:500">쇼핑왕민준</div><div style="font-size:11px;color:var(--text-2);font-family:monospace">(minjun_kakao)</div></td>
-              <td style="text-align:center">23명</td>
-              <td style="text-align:center">18명</td>
-              <td style="text-align:center">9,000P</td>
-              <td style="text-align:center">3명</td>
-            </tr>
-            <tr>
-              <td style="text-align:center;font-weight:700">3</td>
-              <td><div style="font-weight:500">가격헌터서연</div><div style="font-size:11px;color:var(--text-2);font-family:monospace">(seoyeon_kko)</div></td>
-              <td style="text-align:center">19명</td>
-              <td style="text-align:center">12명</td>
-              <td style="text-align:center">6,000P</td>
-              <td style="text-align:center">5명</td>
-            </tr>
           </tbody>
         </table>
       </div>
@@ -1966,11 +1685,6 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
         <table>
           <thead><tr><th>제목</th><th style="text-align:center">분류</th><th style="text-align:center">게시일</th><th style="text-align:center">조회수</th><th style="text-align:center">노출</th><th style="text-align:center">관리</th></tr></thead>
           <tbody>
-            <tr><td style="font-weight:500">[점검] 5/15 새벽 서버 정기 점검 안내</td><td style="text-align:center"><span class="badge badge-amber">서비스 점검</span></td><td style="text-align:center;white-space:nowrap"><div style="font-weight:700;color:#333333">2026/05/12</div></td><td style="text-align:center">1,204</td><td style="text-align:center"><span class="badge badge-green">노출</span></td><td style="text-align:center"><button class="btn btn-ghost btn-sm">수정</button> <button class="btn btn-ghost btn-sm" onclick="toast('공지를 숨김 처리했습니다(소프트삭제·보존).')">숨김</button></td></tr>
-            <tr><td style="font-weight:500">v1.4.3 업데이트 안내 (ATT·포스트백 개선)</td><td style="text-align:center"><span class="badge badge-purple">업데이트</span></td><td style="text-align:center;white-space:nowrap"><div style="font-weight:700;color:#333333">2026/05/08</div></td><td style="text-align:center">3,821</td><td style="text-align:center"><span class="badge badge-green">노출</span></td><td style="text-align:center"><button class="btn btn-ghost btn-sm">수정</button> <button class="btn btn-ghost btn-sm" onclick="toast('공지를 숨김 처리했습니다(소프트삭제·보존).')">숨김</button></td></tr>
-            <tr><td style="font-weight:500">개인정보처리방침 개정 안내 (시행 6/1)</td><td style="text-align:center"><span class="badge badge-red">정책 변경</span></td><td style="text-align:center;white-space:nowrap"><div style="font-weight:700;color:#333333">2026/05/05</div></td><td style="text-align:center">2,015</td><td style="text-align:center"><span class="badge badge-green">노출</span></td><td style="text-align:center"><button class="btn btn-ghost btn-sm">수정</button> <button class="btn btn-ghost btn-sm" onclick="toast('공지를 숨김 처리했습니다(소프트삭제·보존).')">숨김</button></td></tr>
-            <tr><td style="font-weight:500">제휴몰 추가 안내 (11번가·G마켓 오픈)</td><td style="text-align:center"><span class="badge badge-gray">일반</span></td><td style="text-align:center;white-space:nowrap"><div style="font-weight:700;color:#333333">2026/04/28</div></td><td style="text-align:center">5,640</td><td style="text-align:center"><span class="badge badge-green">노출</span></td><td style="text-align:center"><button class="btn btn-ghost btn-sm">수정</button> <button class="btn btn-ghost btn-sm" onclick="toast('공지를 숨김 처리했습니다(소프트삭제·보존).')">숨김</button></td></tr>
-            <tr><td style="font-weight:500">[임시저장] 여름 시즌 이벤트 사전 공지</td><td style="text-align:center"><span class="badge badge-green">이벤트</span></td><td style="text-align:center;white-space:nowrap"><div style="font-weight:700;color:#333333">2026/05/13</div></td><td style="text-align:center">—</td><td style="text-align:center"><span class="badge badge-gray">숨김</span></td><td style="text-align:center"><button class="btn btn-ghost btn-sm">수정</button> <button class="btn btn-ghost btn-sm" onclick="toast('공지를 숨김 처리했습니다(소프트삭제·보존).')">숨김</button></td></tr>
           </tbody>
         </table>
         <div class="pagination"><button class="page-btn active">1</button><button class="page-btn">2</button><button class="page-btn">›</button></div>
@@ -2033,12 +1747,6 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
         <table>
           <thead><tr><th style="text-align:center">발송일시</th><th style="text-align:center">채널</th><th>제목</th><th style="text-align:center">대상</th><th style="text-align:center">발송 수</th><th style="text-align:center">열람율</th><th style="text-align:center">상태 / 액션</th></tr></thead>
           <tbody>
-            <tr><td style="text-align:center;white-space:nowrap"><div style="font-weight:700;color:#333333">2026/06/02</div><div style="color:var(--text-3)">10:00 예정</div></td><td style="text-align:center"><span class="badge badge-purple">앱 푸시</span></td><td>6월 첫째주 추첨 안내</td><td style="text-align:center">전체</td><td style="text-align:center">—</td><td style="text-align:center">—</td><td style="text-align:center"><span class="badge badge-amber">예약</span> <button class="btn btn-ghost btn-sm" onclick="toast('예약 발송을 취소했습니다.')">취소</button> <button class="btn btn-ghost btn-sm" onclick="toast('예약 알림 수정')">수정</button></td></tr>
-            <tr><td style="text-align:center;white-space:nowrap"><div style="font-weight:700;color:#333333">2026/05/30</div><div style="color:var(--text-3)">04:00</div></td><td style="text-align:center"><span class="badge badge-purple">앱 푸시</span></td><td>등급 티켓 만료 7일 전 안내</td><td style="text-align:center">맞춤</td><td style="text-align:center">284명</td><td style="text-align:center;color:var(--success)">46.5%</td><td style="text-align:center"><span class="badge badge-green">완료</span></td></tr>
-            <tr><td style="text-align:center;white-space:nowrap"><div style="font-weight:700;color:#333333">2026/05/11</div><div style="color:var(--text-3)">10:00</div></td><td style="text-align:center"><span class="badge badge-purple">앱 푸시</span></td><td>이번 주 추첨 마감 D-1</td><td style="text-align:center">전체</td><td style="text-align:center">12,840명</td><td style="text-align:center;color:var(--success)">38.2%</td><td style="text-align:center"><span class="badge badge-green">완료</span></td></tr>
-            <tr><td style="text-align:center;white-space:nowrap"><div style="font-weight:700;color:#333333">2026/05/10</div><div style="color:var(--text-3)">09:00</div></td><td style="text-align:center"><span class="badge badge-amber">알림톡</span></td><td>골드 등급 이벤트 안내</td><td style="text-align:center">골드</td><td style="text-align:center">1,240명</td><td style="text-align:center;color:var(--success)">52.1%</td><td style="text-align:center"><span class="badge badge-green">완료</span></td></tr>
-            <tr><td style="text-align:center;white-space:nowrap"><div style="font-weight:700;color:#333333">2026/05/09</div><div style="color:var(--text-3)">18:00</div></td><td style="text-align:center"><span class="badge badge-purple">앱 푸시</span></td><td>기프티콘 신규 입고 안내</td><td style="text-align:center">전체</td><td style="text-align:center">12,840명</td><td style="text-align:center;color:var(--amber)">24.7%</td><td style="text-align:center"><span class="badge badge-green">완료</span></td></tr>
-            <tr><td style="text-align:center;white-space:nowrap"><div style="font-weight:700;color:#333333">2026/05/14</div><div style="color:var(--text-3)">10:00</div></td><td style="text-align:center"><span class="badge badge-purple">앱 푸시</span></td><td>주말 적립 2배 이벤트</td><td style="text-align:center">전체</td><td style="text-align:center">—</td><td style="text-align:center;color:var(--text-3)">—</td><td style="text-align:center"><span class="badge badge-amber">예약</span></td></tr>
           </tbody>
         </table>
       </div>
@@ -2355,35 +2063,7 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
       </div>
       <div class="card">
         <div class="card-header"><div class="card-title">문의 목록</div></div>
-        <div>
-          <div class="inquiry-item" onclick="openModal('m-inquiry')">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
-              <div class="inquiry-title">티켓이 적립되지 않았어요</div>
-              <span class="badge badge-red">미처리</span>
-            </div>
-            <div class="inquiry-meta"><span>쇼핑왕민준</span><span>05/11 14:21</span><span>티켓 문의</span></div>
-          </div>
-          <div class="inquiry-item" onclick="openModal('m-inquiry')">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
-              <div class="inquiry-title">픽구매했는데 티켓이 적립 안 됐어요</div>
-              <span class="badge badge-red">미처리</span>
-            </div>
-            <div class="inquiry-meta"><span>알뜰살뜰지호</span><span>05/11 11:05</span><span>적립 문의</span></div>
-          </div>
-          <div class="inquiry-item" onclick="openModal('m-inquiry')">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
-              <div class="inquiry-title">카카오 연동 해제하고 싶어요</div>
-              <span class="badge badge-amber">처리 중</span>
-            </div>
-            <div class="inquiry-meta"><span>가격헌터서연</span><span>05/10 18:30</span><span>계정 문의</span></div>
-          </div>
-          <div class="inquiry-item" onclick="openModal('m-inquiry')">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
-              <div class="inquiry-title">기프티콘 발급이 안 됩니다</div>
-              <span class="badge badge-green">완료</span>
-            </div>
-            <div class="inquiry-meta"><span>기프티콘러</span><span>05/10 09:12</span><span>기타</span></div>
-          </div>
+        <div id="inquiry-list">
         </div>
         <div class="pagination"><button class="page-btn active">1</button><button class="page-btn">2</button><button class="page-btn">›</button></div>
       </div>
@@ -2435,10 +2115,6 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
         <table>
           <thead><tr><th>닉네임(카카오톡 ID)</th><th style="text-align:center">가입 유형</th><th style="text-align:center">보유 티켓</th><th style="text-align:center">요청일</th><th style="text-align:center">상태</th><th style="text-align:center">처리</th></tr></thead>
           <tbody>
-            <tr><td><div style="font-weight:500">탈퇴요청자A</div><div style="font-size:11px;color:var(--text-2);font-family:monospace">(withdraw_a)</div></td><td style="text-align:center"><span class="member-type-kakao">카카오</span></td><td><div style="display:flex;gap:5px;justify-content:center;"><span class="tk-chip bronze bare">3</span><span class="tk-chip silver bare dim">0</span></div></td><td style="text-align:center;white-space:nowrap"><div style="font-weight:700;color:#333333">2026-05-10</div><div style="font-size:12px;color:var(--text-3)">09:24:11</div></td><td style="text-align:center"><span class="badge badge-amber">유예중</span></td><td><div style="display:flex;gap:5px;justify-content:center;"><button class="btn btn-ghost btn-sm">상세</button></div></td></tr>
-            <tr><td><div style="font-weight:500">탈퇴요청자B</div><div style="font-size:11px;color:var(--text-2);font-family:monospace">(withdraw_b)</div></td><td style="text-align:center"><span class="member-type-kakao">카카오</span></td><td><div style="display:flex;gap:5px;justify-content:center;"><span class="tk-chip bronze bare dim">0</span></div></td><td style="text-align:center;white-space:nowrap"><div style="font-weight:700;color:#333333">2026-05-09</div><div style="font-size:12px;color:var(--text-3)">16:42:33</div></td><td style="text-align:center"><span class="badge badge-amber">유예중</span></td><td><div style="display:flex;gap:5px;justify-content:center;"><button class="btn btn-ghost btn-sm">상세</button></div></td></tr>
-            <tr style="background:var(--danger-soft)"><td><div style="font-weight:500">D30임박자</div><div style="font-size:11px;color:var(--text-2);font-family:monospace">(d30_user)</div></td><td style="text-align:center"><span class="member-type-kakao">카카오</span></td><td style="text-align:center"><span style="color:var(--text-3)">없음</span></td><td style="text-align:center;white-space:nowrap"><div style="font-weight:700;color:#333333">2026-04-11</div><div style="font-size:12px;color:var(--text-3)">11:08:50</div></td><td style="text-align:center"><span class="badge badge-red">영구 삭제 임박</span></td><td style="text-align:center"><button class="btn btn-danger btn-sm" onclick="toast('영구 삭제 처리 완료')">즉시 처리</button></td></tr>
-            <tr><td><div style="font-weight:500">이미탈퇴한계정</div><div style="font-size:11px;color:var(--text-2);font-family:monospace">(left_user)</div></td><td style="text-align:center"><span class="member-type-kakao">카카오</span></td><td style="text-align:center"><span style="color:var(--text-3)">없음</span></td><td style="text-align:center;white-space:nowrap"><div style="font-weight:700;color:#333333">2026-05-07</div><div style="font-size:12px;color:var(--text-3)">14:20:05</div></td><td style="text-align:center"><span class="badge badge-gray">처리 완료</span></td><td style="text-align:center"><span style="font-size:11px;color:var(--text-3)">완료</span></td></tr>
           </tbody>
         </table>
       </div>
@@ -2480,12 +2156,6 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
           <table>
             <thead><tr><th>제휴몰</th><th>거래액(GMV)</th><th style="text-align:center">수수료율</th><th>수수료 매출</th></tr></thead>
             <tbody>
-              <tr><td style="font-weight:600">쿠팡</td><td>93,300,000원</td><td style="text-align:center">3.0%</td><td style="color:var(--success);font-weight:600">2,800,000원</td></tr>
-              <tr><td style="font-weight:600">11번가</td><td>17,100,000원</td><td style="text-align:center">3.5%</td><td style="color:var(--success);font-weight:600">600,000원</td></tr>
-              <tr><td style="font-weight:600">G마켓</td><td>13,300,000원</td><td style="text-align:center">3.0%</td><td style="color:var(--success);font-weight:600">400,000원</td></tr>
-              <tr><td style="font-weight:600">알리익스프레스</td><td>6,000,000원</td><td style="text-align:center">5.0%</td><td style="color:var(--success);font-weight:600">300,000원</td></tr>
-              <tr><td style="font-weight:600">아이허브</td><td>2,000,000원</td><td style="text-align:center">5.0%</td><td style="color:var(--success);font-weight:600">100,000원</td></tr>
-              <tr style="border-top:2px solid var(--border)"><td style="font-weight:700">합계</td><td style="font-weight:700">131,700,000원</td><td style="text-align:center">—</td><td style="font-weight:700;color:var(--success)">4,200,000원</td></tr>
             </tbody>
           </table>
         </div>
@@ -2507,10 +2177,6 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
           <table>
             <thead><tr><th>등급</th><th style="text-align:center">적립 수량</th><th>환산가치(장당)</th><th>적립 비용</th></tr></thead>
             <tbody>
-              <tr><td><span class="tk-chip bronze bare">브론즈</span></td><td style="text-align:center">8,400장</td><td>100원</td><td style="color:var(--amber);font-weight:600">840,000원</td></tr>
-              <tr><td><span class="tk-chip silver bare">실버</span></td><td style="text-align:center">420장</td><td>1,000원</td><td style="color:var(--amber);font-weight:600">420,000원</td></tr>
-              <tr><td><span class="tk-chip gold bare">골드</span></td><td style="text-align:center">70장</td><td>2,000원</td><td style="color:var(--amber);font-weight:600">140,000원</td></tr>
-              <tr style="border-top:2px solid var(--border)"><td style="font-weight:700">합계</td><td style="text-align:center;font-weight:700">8,890장</td><td>—</td><td style="font-weight:700;color:var(--amber)">1,400,000원</td></tr>
             </tbody>
           </table>
         </div>
@@ -2558,10 +2224,6 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
             <table>
               <thead><tr><th style="text-align:center">발생 일시</th><th style="text-align:center">제휴몰</th><th>회원(UID)</th><th style="text-align:center">주문번호</th><th>구매금액</th><th style="text-align:center">수수료율</th><th>수수료 매출</th><th>적립 금액(티켓)</th><th style="text-align:center">상태</th></tr></thead>
               <tbody>
-                <tr><td style="text-align:center;white-space:nowrap"><div style="font-weight:700;color:#333333">2026/05/29</div><div style="color:var(--text-3)">14:23:01</div></td><td style="text-align:center"><span style="font-weight:500">쿠팡</span></td><td><div style="font-weight:500">쇼핑왕민준</div><div style="font-size:11px;color:var(--text-2);font-family:monospace">#10042</div></td><td style="text-align:center;font-family:monospace;font-size:11.5px;color:var(--text-2)">20260529-1423042</td><td>129,000원</td><td style="text-align:center">3.0%</td><td style="color:var(--success);font-weight:600">+3,870원</td><td style="color:var(--amber)">−2,500원</td><td style="text-align:center"><span class="badge badge-green">정상</span></td></tr>
-                <tr><td style="text-align:center;white-space:nowrap"><div style="font-weight:700;color:#333333">2026/05/29</div><div style="color:var(--text-3)">13:47:22</div></td><td style="text-align:center"><span style="font-weight:500">11번가</span></td><td><div style="font-weight:500">알뜰살뜰지호</div><div style="font-size:11px;color:var(--text-2);font-family:monospace">#10039</div></td><td style="text-align:center;font-family:monospace;font-size:11.5px;color:var(--text-2)">11ST-0529-88412</td><td>28,900원</td><td style="text-align:center">3.5%</td><td style="color:var(--success);font-weight:600">+1,011원</td><td style="color:var(--amber)">−500원</td><td style="text-align:center"><span class="badge badge-green">정상</span></td></tr>
-                <tr><td style="text-align:center;white-space:nowrap"><div style="font-weight:700;color:#333333">2026/05/29</div><div style="color:var(--text-3)">13:02:18</div></td><td style="text-align:center"><span style="font-weight:500">G마켓</span></td><td><div style="font-weight:500">쇼핑고수한나</div><div style="font-size:11px;color:var(--text-2);font-family:monospace">#10071</div></td><td style="text-align:center;font-family:monospace;font-size:11.5px;color:var(--text-2)">GM-0529-33207</td><td>67,000원</td><td style="text-align:center">3.0%</td><td style="color:var(--success);font-weight:600">+2,010원</td><td style="color:var(--amber)">−1,300원</td><td style="text-align:center"><span class="badge badge-green">정상</span></td></tr>
-                <tr><td style="text-align:center;white-space:nowrap"><div style="font-weight:700;color:#333333">2026/05/29</div><div style="color:var(--text-3)">12:41:09</div></td><td style="text-align:center"><span style="font-weight:500">알리익스프레스</span></td><td><div style="font-weight:500">딜헌터지민</div><div style="font-size:11px;color:var(--text-2);font-family:monospace">#10088</div></td><td style="text-align:center;font-family:monospace;font-size:11.5px;color:var(--text-2)">ALI-0529-77150</td><td>15,400원</td><td style="text-align:center">5.0%</td><td style="color:var(--success);font-weight:600">+770원</td><td style="color:var(--amber)">−300원</td><td style="text-align:center"><span class="badge badge-green">정상</span></td></tr>
               </tbody>
             </table>
             <div class="pagination"><button class="page-btn active">1</button><button class="page-btn">2</button><button class="page-btn">···</button><button class="page-btn">›</button></div>
@@ -2575,9 +2237,6 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
             <table>
               <thead><tr><th style="text-align:center">발생 일시</th><th style="text-align:center">기프티콘 상품</th><th>회원(UID)</th><th>교환가(실가)</th><th>도매 원가</th><th>판매 마진</th><th style="text-align:center">상태</th></tr></thead>
               <tbody>
-                <tr><td style="text-align:center;white-space:nowrap"><div style="font-weight:700;color:#333333">2026/05/29</div><div style="color:var(--text-3)">14:05:33</div></td><td style="text-align:center"><span style="font-weight:500">스타벅스 아메리카노 T</span></td><td><div style="font-weight:500">가격헌터서연</div><div style="font-size:11px;color:var(--text-2);font-family:monospace">#10055</div></td><td>4,500원</td><td>4,090원</td><td style="color:var(--success);font-weight:600">+410원</td><td style="text-align:center"><span class="badge badge-green">완료</span></td></tr>
-                <tr><td style="text-align:center;white-space:nowrap"><div style="font-weight:700;color:#333333">2026/05/29</div><div style="color:var(--text-3)">13:20:10</div></td><td style="text-align:center"><span style="font-weight:500">CGV 영화관람권</span></td><td><div style="font-weight:500">쇼핑고수한나</div><div style="font-size:11px;color:var(--text-2);font-family:monospace">#10071</div></td><td>14,000원</td><td>12,730원</td><td style="color:var(--success);font-weight:600">+1,270원</td><td style="text-align:center"><span class="badge badge-green">완료</span></td></tr>
-                <tr><td style="text-align:center;white-space:nowrap"><div style="font-weight:700;color:#333333">2026/05/29</div><div style="color:var(--text-3)">12:55:40</div></td><td style="text-align:center"><span style="font-weight:500">배스킨라빈스 파인트</span></td><td><div style="font-weight:500">쇼핑왕민준</div><div style="font-size:11px;color:var(--text-2);font-family:monospace">#10042</div></td><td>8,500원</td><td>7,730원</td><td style="color:var(--success);font-weight:600">+770원</td><td style="text-align:center"><span class="badge badge-green">완료</span></td></tr>
               </tbody>
             </table>
             <div class="pagination"><button class="page-btn active">1</button><button class="page-btn">2</button><button class="page-btn">›</button></div>
@@ -2603,12 +2262,6 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
         <table>
           <thead><tr><th>제휴몰</th><th>우리 기록</th><th>확정 정산금</th><th>차액</th><th>정산 주기</th><th>상태</th></tr></thead>
           <tbody>
-            <tr><td style="font-weight:600">쿠팡</td><td>2,550,000원</td><td>2,550,000원</td><td>0원</td><td style="font-size:12px">익월 15일</td><td><span class="badge badge-green">일치</span></td></tr>
-            <tr><td style="font-weight:600">11번가</td><td>540,000원</td><td>540,000원</td><td>0원</td><td style="font-size:12px">익월 말</td><td><span class="badge badge-green">일치</span></td></tr>
-            <tr><td style="font-weight:600">G마켓</td><td>360,000원</td><td>360,000원</td><td>0원</td><td style="font-size:12px">익월 말</td><td><span class="badge badge-green">일치</span></td></tr>
-            <tr><td style="font-weight:600">알리익스프레스</td><td>270,000원</td><td>265,000원</td><td style="color:var(--danger)">-5,000원</td><td style="font-size:12px">D+45</td><td><span class="badge badge-amber">검증 중</span></td></tr>
-            <tr><td style="font-weight:600">아이허브</td><td>100,000원</td><td>100,000원</td><td>0원</td><td style="font-size:12px">익월 15일</td><td><span class="badge badge-green">일치</span></td></tr>
-            <tr style="border-top:2px solid var(--border)"><td style="font-weight:700">합계</td><td style="font-weight:700">3,820,000원</td><td style="font-weight:700">3,815,000원</td><td style="font-weight:700;color:var(--danger)">-5,000원</td><td>—</td><td>—</td></tr>
           </tbody>
         </table>
       </div>
@@ -2617,9 +2270,6 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
         <table>
           <thead><tr><th>정산 월</th><th>추정 매출</th><th>확정 정산금</th><th>차액</th><th>상태</th></tr></thead>
           <tbody>
-            <tr><td><strong>2026년 5월</strong></td><td>4,200,000원</td><td style="color:var(--text-3)">집계 중</td><td style="color:var(--text-3)">—</td><td><span class="badge badge-amber">집계 중</span></td></tr>
-            <tr><td><strong>2026년 4월</strong></td><td>3,820,000원</td><td>3,815,000원</td><td style="color:var(--danger)">-5,000원</td><td><span class="badge badge-green">확정</span></td></tr>
-            <tr><td><strong>2026년 3월</strong></td><td>3,505,000원</td><td>3,480,000원</td><td style="color:var(--danger)">-25,000원</td><td><span class="badge badge-green">처리완료</span></td></tr>
           </tbody>
         </table>
       </div>
@@ -2647,11 +2297,6 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
         <table>
           <thead><tr><th style="text-align:center">수신 시각</th><th style="text-align:center">제휴몰</th><th>회원(UID)</th><th style="text-align:center">주문번호</th><th style="text-align:center">구매금액</th><th style="text-align:center">제휴 수수료 (매출)</th><th style="text-align:center">상태</th></tr></thead>
           <tbody>
-            <tr><td style="text-align:center;white-space:nowrap"><div style="font-weight:700;color:#333333">2026/05/29</div><div style="color:var(--text-3)">14:23:01</div></td><td style="text-align:center;font-weight:500">쿠팡</td><td><div style="font-weight:500">쇼핑왕민준</div><div style="font-size:11px;color:var(--text-2);font-family:monospace">#10042</div></td><td style="text-align:center;font-family:monospace;font-size:11.5px;color:var(--text-2)">20260529-1423042</td><td style="text-align:center">129,000원</td><td style="text-align:center"><div style="color:var(--success);font-weight:600">3,870원</div><div style="font-size:11px;color:var(--text-3)">수수료율 3.0%</div></td><td style="text-align:center"><span class="badge badge-green">정상</span></td></tr>
-            <tr><td style="text-align:center;white-space:nowrap"><div style="font-weight:700;color:#333333">2026/05/29</div><div style="color:var(--text-3)">13:47:22</div></td><td style="text-align:center;font-weight:500">11번가</td><td><div style="font-weight:500">알뜰살뜰지호</div><div style="font-size:11px;color:var(--text-2);font-family:monospace">#10039</div></td><td style="text-align:center;font-family:monospace;font-size:11.5px;color:var(--text-2)">11ST-0529-88412</td><td style="text-align:center">28,900원</td><td style="text-align:center"><div style="color:var(--success);font-weight:600">1,011원</div><div style="font-size:11px;color:var(--text-3)">수수료율 3.5%</div></td><td style="text-align:center"><span class="badge badge-green">정상</span></td></tr>
-            <tr><td style="text-align:center;white-space:nowrap"><div style="font-weight:700;color:#333333">2026/05/29</div><div style="color:var(--text-3)">13:02:18</div></td><td style="text-align:center;font-weight:500">G마켓</td><td><div style="font-weight:500">쇼핑고수한나</div><div style="font-size:11px;color:var(--text-2);font-family:monospace">#10071</div></td><td style="text-align:center;font-family:monospace;font-size:11.5px;color:var(--text-2)">GM-0529-33207</td><td style="text-align:center">67,000원</td><td style="text-align:center"><div style="color:var(--success);font-weight:600">2,010원</div><div style="font-size:11px;color:var(--text-3)">수수료율 3.0%</div></td><td style="text-align:center"><span class="badge badge-green">정상</span></td></tr>
-            <tr><td style="text-align:center;white-space:nowrap"><div style="font-weight:700;color:#333333">2026/05/29</div><div style="color:var(--text-3)">12:41:09</div></td><td style="text-align:center;font-weight:500">알리익스프레스</td><td><div style="font-weight:500">딜헌터지민</div><div style="font-size:11px;color:var(--text-2);font-family:monospace">#10088</div></td><td style="text-align:center;font-family:monospace;font-size:11.5px;color:var(--text-2)">ALI-0529-77150</td><td style="text-align:center">15,400원</td><td style="text-align:center"><div style="color:var(--success);font-weight:600">770원</div><div style="font-size:11px;color:var(--text-3)">수수료율 5.0%</div></td><td style="text-align:center"><span class="badge badge-green">정상</span></td></tr>
-            <tr><td style="text-align:center;white-space:nowrap"><div style="font-weight:700;color:#333333">2026/05/29</div><div style="color:var(--text-3)">12:10:55</div></td><td style="text-align:center;font-weight:500">쿠팡</td><td><div style="font-weight:500">가격헌터서연</div><div style="font-size:11px;color:var(--danger);font-family:monospace">#10055</div></td><td style="text-align:center;font-family:monospace;font-size:11.5px;color:var(--text-2)">20260529-1210055</td><td style="text-align:center">259,000원</td><td style="text-align:center"><div style="color:var(--danger);font-size:12px">회수</div><div style="font-size:11px;color:var(--text-3)">수수료율 3.0%</div></td><td style="text-align:center"><span class="badge badge-red">중복 감지</span></td></tr>
           </tbody>
         </table>
         <div class="pagination"><button class="page-btn active">1</button><button class="page-btn">2</button><button class="page-btn">···</button><button class="page-btn">›</button></div>
@@ -2772,9 +2417,6 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
         <table>
           <thead><tr><th>이름</th><th>이메일</th><th>역할</th><th>최종 로그인</th><th>상태</th><th>액션</th></tr></thead>
           <tbody>
-            <tr><td><strong>김반장</strong> <span style="font-size:10px;color:var(--text-3)">(본인)</span></td><td>admin@pricepick.co.kr</td><td><span class="role-tag superadmin">슈퍼어드민</span></td><td>방금</td><td><span class="badge badge-green">활성</span></td><td><span style="font-size:11px;color:var(--text-3)">삭제 불가</span></td></tr>
-            <tr><td><strong>이운영</strong></td><td>ops@pricepick.co.kr</td><td><span class="role-tag operator">운영자</span></td><td>2026-05-10</td><td><span class="badge badge-green">활성</span></td><td id="account-action-1"><div style="display:flex;gap:6px"><button class="btn btn-ghost btn-sm" onclick="toast('역할이 변경되었습니다.')">역할 변경</button><button class="btn btn-danger btn-sm" onclick="toast('계정이 삭제되었습니다.')">삭제</button></div></td></tr>
-            <tr><td><strong>박CS</strong></td><td>cs@pricepick.co.kr</td><td><span class="role-tag cs">CS</span></td><td>2026-05-09</td><td><span class="badge badge-green">활성</span></td><td id="account-action-2"><div style="display:flex;gap:6px"><button class="btn btn-ghost btn-sm" onclick="toast('역할이 변경되었습니다.')">역할 변경</button><button class="btn btn-danger btn-sm" onclick="toast('계정이 삭제되었습니다.')">삭제</button></div></td></tr>
           </tbody>
         </table>
       </div>
@@ -2791,10 +2433,7 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
           <div class="card-header"><div><div class="card-title">최근 접근 로그</div><div class="card-sub">IP 마스킹 저장 · 보존 90일 · 정책/계정/API키 변경은 별도 강조 로깅</div></div></div>
           <table>
             <thead><tr><th>시각</th><th>이름</th><th>작업</th><th>IP</th></tr></thead>
-            <tbody>
-              <tr><td style="color:var(--text-3)">방금</td><td>김반장</td><td>로그인</td><td style="font-family:monospace;font-size:11px;color:var(--text-2)">211.234.x.x</td></tr>
-              <tr><td style="color:var(--text-3)">12분 전</td><td>이운영</td><td>이벤트 등록</td><td style="font-family:monospace;font-size:11px;color:var(--text-2)">121.5.x.x</td></tr>
-              <tr><td style="color:var(--text-3)">3시간 전</td><td>박CS</td><td>1:1 문의 답변</td><td style="font-family:monospace;font-size:11px;color:var(--text-2)">59.18.x.x</td></tr>
+            <tbody id="account-log-tbody">
             </tbody>
           </table>
         </div>
@@ -2825,51 +2464,6 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
         <table>
           <thead><tr><th>처리일시</th><th>닉네임(카카오톡 ID)</th><th>주문 ID</th><th>환수 티켓</th><th>원인</th><th>원 적립일</th><th>상세</th></tr></thead>
           <tbody>
-            <tr>
-              <td style="text-align:center"><div style="font-weight:700;color:#333333">2026/05/30</div><div style="color:var(--text-3)">04:00:00</div></td>
-              <td><div style="font-weight:500">절약마스터</div><div style="font-size:11px;color:var(--text-2);font-family:monospace">(saving_master)</div></td>
-              <td style="font-family:monospace;font-size:11px;color:var(--text-2)">—</td>
-              <td><span class="tk-chip bronze bare">브론즈 2장</span></td>
-              <td><span class="badge" style="background:var(--surface-2);color:var(--text-2)">만료</span></td>
-              <td style="font-size:12px;color:var(--text-3);text-align:center"><div style="font-weight:700;color:#333333">2025/05/29</div><div>03:58:00</div></td>
-              <td><button class="btn btn-ghost btn-sm" onclick="openModal('m-clawback-detail')">상세</button></td>
-            </tr>
-            <tr>
-              <td style="text-align:center"><div style="font-weight:700;color:#333333">2026/05/11</div><div style="color:var(--text-3)">14:32:00</div></td>
-              <td><div style="font-weight:500">쇼핑왕민준</div><div style="font-size:11px;color:var(--text-2);font-family:monospace">(minjun_kko)</div></td>
-              <td style="font-family:monospace;font-size:11px;color:var(--text-2)">CP-20260510-8821</td>
-              <td><span class="tk-chip silver bare">실버 1장</span> <span class="tk-chip bronze bare">브론즈 5장</span></td>
-              <td><span class="badge badge-red">반품</span></td>
-              <td style="font-size:12px;color:var(--text-3);text-align:center"><div style="font-weight:700;color:#333333">2026/05/10</div><div>09:14:00</div></td>
-              <td><button class="btn btn-ghost btn-sm" onclick="toast('포스트백 로그 이동')">로그</button></td>
-            </tr>
-            <tr>
-              <td style="text-align:center"><div style="font-weight:700;color:#333333">2026/05/10</div><div style="color:var(--text-3)">22:17:00</div></td>
-              <td><div style="font-weight:500">절약러지호</div><div style="font-size:11px;color:var(--text-2);font-family:monospace">(jiho_kko)</div></td>
-              <td style="font-family:monospace;font-size:11px;color:var(--text-2)">CP-20260509-4421</td>
-              <td><span class="tk-chip bronze bare">브론즈 8장</span></td>
-              <td><span class="badge badge-amber">취소</span></td>
-              <td style="font-size:12px;color:var(--text-3);text-align:center"><div style="font-weight:700;color:#333333">2026/05/09</div><div>18:44:00</div></td>
-              <td><button class="btn btn-ghost btn-sm" onclick="toast('포스트백 로그 이동')">로그</button></td>
-            </tr>
-            <tr>
-              <td style="text-align:center"><div style="font-weight:700;color:#333333">2026/05/10</div><div style="color:var(--text-3)">11:03:00</div></td>
-              <td><div style="font-weight:500">가격헌터서연</div><div style="font-size:11px;color:var(--text-2);font-family:monospace">(seoyeon_kko)</div></td>
-              <td style="font-family:monospace;font-size:11px;color:var(--text-2)">CP-20260508-1104</td>
-              <td><span class="tk-chip gold bare">골드 1장</span> <span class="tk-chip silver bare">실버 2장</span></td>
-              <td><span class="badge badge-red">반품</span></td>
-              <td style="font-size:12px;color:var(--text-3);text-align:center"><div style="font-weight:700;color:#333333">2026/05/08</div><div>13:21:00</div></td>
-              <td><button class="btn btn-ghost btn-sm" onclick="toast('포스트백 로그 이동')">로그</button></td>
-            </tr>
-            <tr>
-              <td style="text-align:center"><div style="font-weight:700;color:#333333">2026/05/09</div><div style="color:var(--text-3)">08:55:00</div></td>
-              <td><div style="font-weight:500">핫딜탐정</div><div style="font-size:11px;color:var(--text-2);font-family:monospace">(hotdeal_kko)</div></td>
-              <td style="font-family:monospace;font-size:11px;color:var(--text-2)">CP-20260507-9982</td>
-              <td><span class="tk-chip bronze bare">브론즈 3장</span></td>
-              <td><span class="badge badge-amber">취소</span></td>
-              <td style="font-size:12px;color:var(--text-3);text-align:center"><div style="font-weight:700;color:#333333">2026/05/07</div><div>20:10:00</div></td>
-              <td><button class="btn btn-ghost btn-sm" onclick="toast('포스트백 로그 이동')">로그</button></td>
-            </tr>
           </tbody>
         </table>
         <div class="pagination"><button class="page-btn active">1</button><button class="page-btn">2</button><button class="page-btn">3</button><button class="page-btn">›</button></div>
@@ -2881,8 +2475,6 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
           <table>
             <thead><tr><th>닉네임(카카오톡 ID)</th><th>부채 티켓</th><th>발생일</th><th>예상 상계일</th><th>상태</th></tr></thead>
             <tbody>
-              <tr><td><div style="font-weight:500">쇼핑고수준혁</div><div style="font-size:11px;color:var(--text-2);font-family:monospace">(shop_junhyuk)</div></td><td><span class="tk-chip silver bare" style="color:var(--danger)">실버 -2장</span></td><td style="font-size:12px;color:var(--text-3);text-align:center"><div style="font-weight:700;color:#333333">2026/05/08</div><div style="color:var(--text-3)">13:21:00</div></td><td style="font-size:12px;color:var(--text-2)">다음 적립 시</td><td><span class="badge badge-amber">상계 대기</span></td></tr>
-              <tr><td><div style="font-weight:500">알뜰소비민지</div><div style="font-size:11px;color:var(--text-2);font-family:monospace">(minji_save)</div></td><td><span class="tk-chip bronze bare" style="color:var(--danger)">브론즈 -12장</span></td><td style="font-size:12px;color:var(--text-3);text-align:center"><div style="font-weight:700;color:#333333">2026/05/01</div><div style="color:var(--text-3)">09:05:33</div></td><td style="font-size:12px;color:var(--text-2)">다음 적립 시</td><td><span class="badge badge-amber">상계 대기</span></td></tr>
             </tbody>
           </table>
         </div>
@@ -2909,12 +2501,6 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
         <table>
           <thead><tr><th>닉네임(카카오톡 ID)</th><th>유형</th><th>포인트</th><th>교환 후 잔액</th><th>일시</th></tr></thead>
           <tbody>
-            <tr><td><div style="font-weight:500">쇼핑왕민준</div><div style="font-size:11px;color:var(--text-2);font-family:monospace">(minjun_kko)</div></td><td style="color:#c084fc">출석 적립</td><td style="text-align:center;color:var(--success);font-weight:700">+100P</td><td style="text-align:center;font-weight:600">1,300P</td><td style="color:var(--text-3);font-size:12px;white-space:nowrap;text-align:center"><div style="font-weight:700;color:#333333">2026/06/06</div><div>09:12:41</div></td></tr>
-            <tr><td><div style="font-weight:500">가격헌터서연</div><div style="font-size:11px;color:var(--text-2);font-family:monospace">(seoyeon_kko)</div></td><td style="color:var(--main)">티켓 교환 (브론즈)</td><td style="text-align:center;color:var(--success);font-weight:700">+1,000P</td><td style="text-align:center;font-weight:600">3,420P</td><td style="color:var(--text-3);font-size:12px;white-space:nowrap;text-align:center"><div style="font-weight:700;color:#333333">2026/06/06</div><div>08:55:10</div></td></tr>
-            <tr><td><div style="font-weight:500">딜헌터지민</div><div style="font-size:11px;color:var(--text-2);font-family:monospace">(jiho_deal)</div></td><td style="color:var(--danger)">티켓 교환 (실버 받기)</td><td style="text-align:center;color:var(--danger);font-weight:700">−10,000P</td><td style="text-align:center;font-weight:600">2,140P</td><td style="color:var(--text-3);font-size:12px;white-space:nowrap;text-align:center"><div style="font-weight:700;color:#333333">2026/06/05</div><div>21:33:02</div></td></tr>
-            <tr><td><div style="font-weight:500">절약마스터</div><div style="font-size:11px;color:var(--text-2);font-family:monospace">(saving_master)</div></td><td style="color:#c084fc">출석 적립</td><td style="text-align:center;color:var(--success);font-weight:700">+100P</td><td style="text-align:center;font-weight:600">980P</td><td style="color:var(--text-3);font-size:12px;white-space:nowrap;text-align:center"><div style="font-weight:700;color:#333333">2026/06/05</div><div>10:04:55</div></td></tr>
-            <tr><td><div style="font-weight:500">핫딜탐정</div><div style="font-size:11px;color:var(--text-2);font-family:monospace">(hotdeal_kko)</div></td><td style="color:var(--text-2)">만료 소멸</td><td style="text-align:center;color:var(--danger);font-weight:700">−300P</td><td style="text-align:center;font-weight:600">1,520P</td><td style="color:var(--text-3);font-size:12px;white-space:nowrap;text-align:center"><div style="font-weight:700;color:#333333">2026/06/05</div><div>04:00:00</div></td></tr>
-            <tr><td><div style="font-weight:500">가격마스터</div><div style="font-size:11px;color:var(--text-2);font-family:monospace">(price_master)</div></td><td style="color:var(--main)">관리자 지급</td><td style="text-align:center;color:var(--success);font-weight:700">+500P</td><td style="text-align:center;font-weight:600">4,500P</td><td style="color:var(--text-3);font-size:12px;white-space:nowrap;text-align:center"><div style="font-weight:700;color:#333333">2026/06/04</div><div>16:20:18</div></td></tr>
           </tbody>
         </table>
         <div class="pagination"><button class="page-btn active">1</button><button class="page-btn">2</button><button class="page-btn">···</button><button class="page-btn">›</button></div>
@@ -3432,8 +3018,8 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
     <div class="modal-header"><div class="modal-title">문의 상세 / 답변</div><button class="modal-close" onclick="closeModal('m-inquiry')"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
     <div class="modal-body">
       <div class="info-box">
-        <strong>쇼핑왕민준</strong> &nbsp;·&nbsp; 카카오 연동 &nbsp;·&nbsp; 2026-05-11 14:21<br>
-        <strong>유형:</strong> 티켓 문의
+        <strong>—</strong> &nbsp;·&nbsp; — &nbsp;·&nbsp; —<br>
+        <strong>유형:</strong> —
       </div>
       <div style="background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r-md);padding:14px;margin-bottom:14px;font-size:13px;line-height:1.7;">
         안녕하세요, 어제 쿠팡에서 15만원짜리 상품을 구매했는데 골드 티켓이 적립되지 않았습니다. 확인 부탁드립니다.
@@ -3510,7 +3096,7 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
   <div class="modal">
     <div class="modal-header"><div class="modal-title">경품 발송</div><button class="modal-close" onclick="closeModal('m-send-prize')"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
     <div class="modal-body">
-      <div class="form-group"><label class="form-label">수신자</label><input class="form-input" value="쇼핑왕민준" readonly></div>
+      <div class="form-group"><label class="form-label">수신자</label><input class="form-input" value="" readonly></div>
       <div class="form-group"><label class="form-label">경품</label><input class="form-input" value="스타벅스 아메리카노 (Tall)" readonly></div>
       <div class="form-group"><label class="form-label">발송 방법</label><select class="form-select"><option>카카오 알림톡</option><option>앱 푸시</option><option>수동 처리</option></select></div>
       <div class="form-group"><label class="form-label">기프티콘 코드 (수동 시)</label><input class="form-input" type="text" placeholder="코드 입력"></div>
@@ -3675,46 +3261,7 @@ function applyTicketIcons() {
 
 
 // ── 회원 목록 데이터 ──
-const MEMBERS = {
-  1: {
-    name: '쇼핑왕민준',
-    accounts: [{type:'kakao', label:'카카오', email:'minjun_kakao'}],
-    status: '정상',
-    joinType: '카카오 연동',
-    tickets: {random:2, bronze:12, silver:8, gold:27, event:3},
-    conversion: [{type:'bronze',n:'+1'},{type:'silver',n:'+1'}]
-  },
-  2: {
-    name: '가격헌터서연',
-    accounts: [
-      {type:'apple',  label:'Apple',  email:'seoyeon@icloud.com'},
-      {type:'kakao',  label:'카카오', email:'seoyeon_kakao'}
-    ],
-    status: '정상',
-    joinType: 'Apple+카카오 연동',
-    tickets: {random:1, bronze:9, silver:14, gold:0, event:1},
-    conversion: [{type:'gold',n:'+1'}]
-  },
-  3: {
-    name: '절약러지호',
-    accounts: [
-      {type:'google', label:'Google', email:'jiho@gmail.com'},
-      {type:'kakao',  label:'카카오', email:'jiho_kakao'}
-    ],
-    status: '정지',
-    joinType: 'Google+카카오 연동',
-    tickets: {random:0, bronze:0, silver:0, gold:0, event:0},
-    conversion: []
-  },
-  4: {
-    name: '핫딜탐정',
-    accounts: [{type:'kakao', label:'카카오', email:'hotdeal_kko'}],
-    status: '정상',
-    joinType: '카카오 연동',
-    tickets: {random:3, bronze:5, silver:7, gold:0, event:2},
-    conversion: [{type:'bronze',n:'+2'},{type:'silver',n:'+1'}]
-  }
-};
+const MEMBERS = {};
 
 function openMemberModal(id) {
   const m = MEMBERS[id];
@@ -4988,7 +4535,6 @@ function saveTicketEdit() {
   "친구초대왕":"Vua mời bạn",
   "쿠팡 단독":"Coupang độc quyền",
   "가격마스터":"Bậc thầy giá",
-  "쇼핑왕민준":"Vua mua sắm Minjun",
   "운영자지급":"Quản trị cấp",
   "상계 대기":"Chờ bù trừ",
   "만료 기간":"Thời hạn hết",
@@ -5335,13 +4881,7 @@ function saveTicketEdit() {
   "5,000원당":"per 5.000 won",
   "50,000원당":"per 50.000 won",
   "100,000회":"100.000 lần",
-  "최수아":"Choi Sua",
-  "노윤희":"No Yunhee",
-  "이운영":"Lee Unyeong",
-  "문금주":"Mun Geumju",
-  "강신성":"Kang Sinseong",
-  "김반장":"Kim Banjang",
-  "박CS":"Park CS",
+  "이미탈퇴한계정_placeholder":"",
   "이미탈퇴한계정":"Tài khoản đã xóa",
   "G마켓":"Gmarket",
   "11번가":"11번가",
@@ -5898,6 +5438,23 @@ function loadAllData() {
     loadGifticonProducts();
     loadGifticonExchanges();
     loadMembers();
+    loadTickets();
+    loadDraws();
+    loadPrizes();
+    loadAttendance();
+    loadGifticonCancel();
+    loadBanners();
+    loadEvents();
+    loadInvites();
+    loadNotices();
+    loadNotifications();
+    loadInquiries();
+    loadWithdrawal();
+    loadPostback();
+    loadAccounts();
+    loadClawback();
+    loadPoints();
+    loadRevenueStats();
   }, 300);
 }
 
@@ -5914,6 +5471,49 @@ function loadDashboardStats() {
   }).catch(function(){});
   db.collection('postbacks').get().then(function(snap) {
     updateStatValue('[data-pp-stat="postbacks"]', snap.size);
+    /* dash-recent-tbody: top 3 recent postbacks */
+    var recentTbody = document.getElementById('dash-recent-tbody');
+    if (recentTbody) {
+      var sorted = snap.docs.sort(function(a,b){
+        var ta = a.data().created_at; var tb = b.data().created_at;
+        return (tb&&tb.toDate?tb.toDate():new Date(0)) - (ta&&ta.toDate?ta.toDate():new Date(0));
+      }).slice(0,3);
+      if (!sorted.length) { recentTbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:16px;color:var(--text-3)">구매 이력 없음</td></tr>'; }
+      else {
+        var rate = { '쿠팡':0.03,'11번가':0.035,'G마켓':0.03,'알리익스프레스':0.05,'아이허브':0.05 };
+        recentTbody.innerHTML = sorted.map(function(doc){
+          var d = doc.data();
+          var amt = d.purchase_amount||0;
+          var r = rate[d.mall_name]||0.03;
+          var tickets = Math.round(amt*r/1000);
+          var uid = (d.user_id||'').replace('user-','').split('-')[0];
+          var dt = d.created_at&&d.created_at.toDate?d.created_at.toDate():new Date();
+          return '<tr><td>' + (d.mall_name||'—') + '</td><td>' + uid + '***</td><td>' + (amt).toLocaleString('ko-KR') + '원</td><td style="color:var(--success)">+' + tickets + '장</td><td style="color:var(--text-2);font-size:12px">' + dt.getFullYear() + '/' + String(dt.getMonth()+1).padStart(2,'0') + '/' + String(dt.getDate()).padStart(2,'0') + '<br>' + String(dt.getHours()).padStart(2,'0') + ':' + String(dt.getMinutes()).padStart(2,'0') + '</td></tr>';
+        }).join('');
+      }
+    }
+    /* dash-mall-tbody: top 5 malls by count */
+    var mallTbody = document.getElementById('dash-mall-tbody');
+    if (mallTbody) {
+      var mallCount = {};
+      snap.docs.forEach(function(doc){ var m=doc.data().mall_name||'기타'; mallCount[m]=(mallCount[m]||0)+1; });
+      var mallList = Object.keys(mallCount).sort(function(a,b){return mallCount[b]-mallCount[a];}).slice(0,5);
+      mallTbody.innerHTML = mallList.map(function(m,i){
+        return '<tr><td style="text-align:center">'+(i+1)+'</td><td style="font-weight:600">'+m+'</td><td style="text-align:center">—</td><td style="text-align:center;color:var(--success)">'+(mallCount[m]||0)+'건</td></tr>';
+      }).join('') || '<tr><td colspan="4" style="text-align:center;padding:16px;color:var(--text-3)">데이터 없음</td></tr>';
+    }
+  }).catch(function(){});
+  /* dash-top-tbody: top 3 users by ticket_transactions earn count */
+  db.collection('ticket_transactions').where('type','==','earn').get().then(function(snap) {
+    var topTbody = document.getElementById('dash-top-tbody');
+    if (!topTbody) return;
+    var byUser = {};
+    snap.docs.forEach(function(doc){ var uid=doc.data().user_id||''; byUser[uid]=(byUser[uid]||0)+1; });
+    var sorted = Object.keys(byUser).sort(function(a,b){return byUser[b]-byUser[a];}).slice(0,3);
+    topTbody.innerHTML = sorted.map(function(uid,i){
+      var label = uid.replace('user-','').split('-')[0];
+      return '<tr><td style="text-align:center">'+(i+1)+'</td><td><div style="font-weight:500">'+label+'</div><div style="font-size:11px;color:var(--text-2)">('+uid+')</div></td><td style="text-align:center;color:var(--success)">'+byUser[uid]+'장</td><td style="text-align:center">'+byUser[uid]+'장</td></tr>';
+    }).join('') || '<tr><td colspan="4" style="text-align:center;padding:16px;color:var(--text-3)">데이터 없음</td></tr>';
   }).catch(function(){});
   /* Update 전체 회원 stat */
   db.collection('users').get().then(function(snap) {
@@ -6069,6 +5669,500 @@ function loadMembers() {
         }
       });
     }).catch(function(e){ console.error('members', e); });
+}
+
+/* ─────────────────────────────────────────────────────────────
+   PP SECTION LOAD FUNCTIONS (real-data / empty-state)
+   ───────────────────────────────────────────────────────────── */
+
+function ppDt(ts) {
+  var d = ts ? (ts.toDate ? ts.toDate() : new Date(ts)) : new Date();
+  return d.getFullYear() + '/' + String(d.getMonth()+1).padStart(2,'0') + '/' + String(d.getDate()).padStart(2,'0');
+}
+function ppTm(ts) {
+  var d = ts ? (ts.toDate ? ts.toDate() : new Date(ts)) : new Date();
+  return String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0') + ':' + String(d.getSeconds()).padStart(2,'0');
+}
+function ppEmpty(cols, msg) {
+  return '<tr><td colspan="' + cols + '" style="text-align:center;padding:32px;color:var(--text-3);font-size:13px">' + (msg || '데이터가 없습니다.') + '</td></tr>';
+}
+function ppN(n) { return (n||0).toLocaleString('ko-KR'); }
+var MALL_RATES = { '쿠팡':0.03, '11번가':0.035, 'G마켓':0.03, '알리익스프레스':0.05, '아이허브':0.05 };
+
+/* ── sec-tickets ── ticket_transactions */
+function loadTickets() {
+  var tbody = document.querySelector('#sec-tickets table tbody');
+  if (!tbody) return;
+  db.collection('ticket_transactions').orderBy('created_at','desc').limit(20).get()
+    .then(function(snap) {
+      if (snap.empty) { tbody.innerHTML = ppEmpty(5,'티켓 이력이 없습니다.'); return; }
+      var TYPE_LABELS = { earn:'<span style="color:var(--success)">구매확정 적립</span>', use:'<span style="color:var(--danger)">기프티콘 교환</span>', clawback:'<span style="color:var(--danger)">환수(취소/반품)</span>', expire:'<span style="color:var(--text-3)">만료 소멸</span>', pending:'<span style="color:var(--text-2)">구매 대기</span>' };
+      var GRADE_CHIPS = { gold:'<span class="tk-chip gold bare">골드</span>', silver:'<span class="tk-chip silver bare">실버</span>', bronze:'<span class="tk-chip bronze bare">브론즈</span>' };
+      var STATUS_MAP = {
+        earn: '<span style="display:inline-block;font-size:11px;font-weight:700;color:#1f9d57;background:#e6f7ec;border:1px solid #b6e6c8;border-radius:20px;padding:3px 10px">보유 중</span>',
+        use:  '<span style="display:inline-block;font-size:11px;font-weight:700;color:#6b7280;background:#f3f4f6;border:1px solid #e5e7eb;border-radius:20px;padding:3px 10px">사용 완료</span>',
+        clawback:'<span style="display:inline-block;font-size:11px;font-weight:700;color:#dc2626;background:#fef2f2;border:1px solid #fecaca;border-radius:20px;padding:3px 10px">회수</span>',
+        expire:'<span style="display:inline-block;font-size:11px;font-weight:700;color:#6b7280;background:#f3f4f6;border:1px solid #e5e7eb;border-radius:20px;padding:3px 10px">만료</span>',
+        pending:'<span style="display:inline-block;font-size:11px;font-weight:700;color:#d97a17;background:#fdf1e3;border:1px solid #f3d2a0;border-radius:20px;padding:3px 10px">가지급(대기)</span>'
+      };
+      var rows = snap.docs.map(function(doc) {
+        var d = doc.data();
+        var uid = (d.user_id||'').replace('user-','').replace(/-\d+$/,'');
+        return '<tr><td><div style="font-weight:500">' + uid + '</div><div style="font-size:11px;color:var(--text-2);font-family:monospace">(' + (d.user_id||'') + ')</div></td>'
+          + '<td>' + (TYPE_LABELS[d.type]||d.type) + '</td>'
+          + '<td style="text-align:center">' + (GRADE_CHIPS[d.ticket_grade]||'<span style="color:var(--text-3)">—</span>') + '</td>'
+          + '<td style="text-align:center">' + (STATUS_MAP[d.type]||'') + '</td>'
+          + '<td style="color:var(--text-3);font-size:12px;text-align:center"><div style="font-weight:700;color:#333">' + ppDt(d.created_at) + '</div><div>' + ppTm(d.created_at) + '</div></td></tr>';
+      });
+      tbody.innerHTML = rows.join('');
+      /* update stats */
+      var earnCnt = snap.docs.filter(function(d){ return d.data().type==='earn'; }).length;
+      var statCards = document.querySelectorAll('#sec-tickets .stat-card');
+      if (statCards[0]) statCards[0].querySelector('.stat-value').textContent = ppN(snap.size);
+      if (statCards[1]) statCards[1].querySelector('.stat-value').textContent = ppN(earnCnt);
+    }).catch(function(e){ console.error('loadTickets',e); tbody.innerHTML = ppEmpty(5,'로드 오류'); });
+}
+
+/* ── sec-draws ── empty state */
+function loadDraws() {
+  var tbody = document.querySelector('#sec-draws table tbody');
+  if (tbody) tbody.innerHTML = ppEmpty(8,'등록된 추첨 회차가 없습니다. "+ 회차 등록" 버튼으로 추가하세요.');
+}
+
+/* ── sec-prizes ── empty state */
+function loadPrizes() {
+  var tbodies = document.querySelectorAll('#sec-prizes table tbody');
+  if (tbodies[0]) tbodies[0].innerHTML = ppEmpty(4,'미발송 경품이 없습니다.');
+  if (tbodies[1]) tbodies[1].innerHTML = ppEmpty(5,'경품 변경 이력이 없습니다.');
+  var statCards = document.querySelectorAll('#sec-prizes .stat-card');
+  ['0','0','0','0'].forEach(function(v,i){ if(statCards[i]) statCards[i].querySelector('.stat-value').textContent=v; });
+}
+
+/* ── sec-attendance ── empty state */
+function loadAttendance() {
+  var tbody = document.querySelector('#sec-attendance table tbody');
+  if (tbody) tbody.innerHTML = ppEmpty(5,'이번주 추첨 현황이 없습니다.');
+  var statCards = document.querySelectorAll('#sec-attendance .stat-card');
+  ['0','0','0','0'].forEach(function(v,i){ if(statCards[i]) statCards[i].querySelector('.stat-value').textContent=v; });
+}
+
+/* ── sec-gifticon-cancel ── empty state */
+function loadGifticonCancel() {
+  var tbody = document.querySelector('#sec-gifticon-cancel table tbody');
+  if (!tbody) return;
+  tbody.innerHTML = ppEmpty(8,'취소 내역이 없습니다.');
+  var countEl = document.querySelector('#sec-gifticon-cancel .card-header span');
+  if (countEl) countEl.textContent = '총 0건';
+}
+
+/* ── sec-banners ── banners collection */
+function loadBanners() {
+  var grid = document.querySelector('#sec-banners .banner-grid');
+  if (!grid) return;
+  db.collection('banners').limit(10).get().then(function(snap) {
+    if (snap.empty) {
+      grid.innerHTML = '<div style="padding:24px;color:var(--text-3);font-size:13px;text-align:center">등록된 배너가 없습니다. "+ 배너 추가" 버튼으로 추가하세요.</div>';
+      return;
+    }
+    var cards = snap.docs.map(function(doc) {
+      var b = doc.data();
+      var bg = b.bg_gradient || 'linear-gradient(135deg,#6366f1,#a5b4fc)';
+      var badge = (b.status==='active') ? '<span class="badge badge-green">노출 중</span>' : '<span class="badge badge-gray">비노출</span>';
+      return '<div class="banner-card"><div class="banner-preview" style="background:' + bg + '">' + (b.title||'') + '</div>'
+        + '<div class="banner-info"><div class="banner-name">' + (b.title||'') + '</div>'
+        + '<div class="banner-meta">' + (b.link_path||b.description||'') + '</div>'
+        + '<div class="banner-meta" style="margin-top:4px">' + badge + '</div>'
+        + '<div class="banner-actions"><button class="btn btn-ghost btn-sm" onclick="openModal(\'m-banner\')">수정</button>'
+        + '<button class="btn btn-ghost btn-sm" onclick="toast(\'노출/비노출 전환\')">노출 전환</button></div></div></div>';
+    });
+    grid.innerHTML = cards.join('');
+  }).catch(function(e){ console.error('loadBanners',e); });
+}
+
+/* ── sec-events ── events collection */
+function loadEvents() {
+  var list = document.getElementById('event-list');
+  if (!list) return;
+  db.collection('events').limit(10).get().then(function(snap) {
+    if (snap.empty) {
+      list.innerHTML = '<div style="padding:24px;color:var(--text-3);font-size:13px;text-align:center">등록된 이벤트가 없습니다. "+ 이벤트 생성" 버튼으로 추가하세요.</div>';
+      return;
+    }
+    var cards = snap.docs.map(function(doc) {
+      var e = doc.data();
+      var badge = (e.status==='active') ? '<span class="badge badge-green">진행 중</span>' : '<span class="badge badge-gray">종료</span>';
+      return '<div class="event-card"><div class="event-header"><div><div class="event-title">' + (e.title||'') + '</div><div class="event-period">' + (e.period||'') + '</div></div>' + badge + '</div>'
+        + '<div class="event-desc">' + (e.description||'') + '</div>'
+        + '<div class="event-actions"><button class="btn btn-ghost btn-sm" onclick="openModal(\'m-event\')">수정</button></div></div>';
+    });
+    list.innerHTML = cards.join('');
+  }).catch(function(e){ console.error('loadEvents',e); list.innerHTML='<div style="padding:24px;color:var(--text-3);text-align:center">로드 오류: ' + e.message + '</div>'; });
+}
+
+/* ── sec-invite ── invites collection (group by inviter) */
+function loadInvites() {
+  var tbody = document.querySelector('#sec-invite table tbody');
+  if (!tbody) return;
+  db.collection('invites').get().then(function(snap) {
+    if (snap.empty) { tbody.innerHTML = ppEmpty(6,'친구초대 현황이 없습니다.'); return; }
+    /* aggregate by inviter */
+    var byInviter = {};
+    snap.docs.forEach(function(doc) {
+      var d = doc.data();
+      var k = d.inviter_id || d.user_id;
+      if (!k) return;
+      if (!byInviter[k]) byInviter[k] = { total:0, success:0 };
+      byInviter[k].total++;
+      if (d.status === 'completed') byInviter[k].success++;
+    });
+    var sorted = Object.keys(byInviter).sort(function(a,b){ return byInviter[b].success - byInviter[a].success; });
+    var rows = sorted.map(function(uid, i) {
+      var v = byInviter[uid];
+      var label = uid.replace('user-','').replace(/-\d+$/,'');
+      return '<tr><td style="text-align:center;font-weight:700">' + (i+1) + '</td>'
+        + '<td><div style="font-weight:500">' + label + '</div><div style="font-size:11px;color:var(--text-2);font-family:monospace">(' + uid + ')</div></td>'
+        + '<td style="text-align:center">' + ppN(v.total) + '명</td>'
+        + '<td style="text-align:center">' + ppN(v.success) + '명</td>'
+        + '<td style="text-align:center">' + ppN(v.success * 500) + 'P</td>'
+        + '<td style="text-align:center">—</td></tr>';
+    });
+    tbody.innerHTML = rows.join('');
+    /* update stat cards */
+    var total = snap.size;
+    var success = snap.docs.filter(function(d){ return d.data().status==='completed'; }).length;
+    var invStatCards = document.querySelectorAll('#sec-invite .invite-card');
+    if (invStatCards[0]) invStatCards[0].querySelector('.invite-card-value').textContent = ppN(total);
+    if (invStatCards[1]) invStatCards[1].querySelector('.invite-card-value').textContent = ppN(success);
+    if (invStatCards[2]) { var rate = total>0 ? (success/total*100).toFixed(1) : '0.0'; invStatCards[2].querySelector('.invite-card-value').textContent = rate + '%'; }
+    if (invStatCards[3]) invStatCards[3].querySelector('.invite-card-value').textContent = ppN(success * 500) + 'P';
+  }).catch(function(e){ console.error('loadInvites',e); tbody.innerHTML = ppEmpty(6,'로드 오류'); });
+}
+
+/* ── sec-notice ── notices collection */
+function loadNotices() {
+  var tbody = document.querySelector('#sec-notice table tbody');
+  if (!tbody) return;
+  db.collection('notices').orderBy('created_at','desc').limit(20).get().then(function(snap) {
+    if (snap.empty) { tbody.innerHTML = ppEmpty(6,'등록된 공지사항이 없습니다.'); return; }
+    var TYPE_BADGE = { service:'<span class="badge badge-amber">서비스 점검</span>', update:'<span class="badge badge-purple">업데이트</span>', policy:'<span class="badge badge-red">정책 변경</span>', event:'<span class="badge badge-green">이벤트</span>' };
+    var rows = snap.docs.map(function(doc) {
+      var n = doc.data();
+      var badge = TYPE_BADGE[n.type] || '<span class="badge badge-gray">일반</span>';
+      var statusBadge = n.status === 'published' ? '<span class="badge badge-green">노출</span>' : '<span class="badge badge-gray">숨김</span>';
+      return '<tr><td style="font-weight:500">' + (n.title||'') + '</td><td style="text-align:center">' + badge + '</td>'
+        + '<td style="text-align:center;white-space:nowrap"><div style="font-weight:700;color:#333">' + ppDt(n.created_at) + '</div></td>'
+        + '<td style="text-align:center">—</td><td style="text-align:center">' + statusBadge + '</td>'
+        + '<td style="text-align:center"><button class="btn btn-ghost btn-sm">수정</button> <button class="btn btn-ghost btn-sm" onclick="toast(\'숨김 처리\')">숨김</button></td></tr>';
+    });
+    tbody.innerHTML = rows.join('');
+    var statCards = document.querySelectorAll('#sec-notice .stat-card');
+    var published = snap.docs.filter(function(d){ return d.data().status==='published'; }).length;
+    if (statCards[0]) statCards[0].querySelector('.stat-value').textContent = ppN(published) + '건';
+    if (statCards[1]) statCards[1].querySelector('.stat-value').textContent = ppN(snap.size) + '건';
+    if (statCards[2]) statCards[2].querySelector('.stat-value').textContent = '0건';
+  }).catch(function(e){ console.error('loadNotices',e); tbody.innerHTML = ppEmpty(6,'로드 오류'); });
+}
+
+/* ── sec-notifications ── empty state */
+function loadNotifications() {
+  var tbody = document.querySelector('#sec-notifications table tbody');
+  if (tbody) tbody.innerHTML = ppEmpty(7,'발송 내역이 없습니다.');
+  var statCards = document.querySelectorAll('#sec-notifications .stat-card');
+  if (statCards[0]) statCards[0].querySelector('.stat-value').textContent = '0건';
+  if (statCards[1]) statCards[1].querySelector('.stat-value').textContent = '—';
+  if (statCards[2]) statCards[2].querySelector('.stat-value').textContent = '0건';
+}
+
+/* ── sec-inquiries ── inquiries collection */
+function loadInquiries() {
+  var list = document.getElementById('inquiry-list');
+  if (!list) return;
+  db.collection('inquiries').orderBy('created_at','desc').limit(20).get().then(function(snap) {
+    var statCards = document.querySelectorAll('#sec-inquiries .stat-card');
+    if (snap.empty) {
+      list.innerHTML = '<div style="padding:24px;color:var(--text-3);font-size:13px;text-align:center">문의 내역이 없습니다.</div>';
+      ['0','0','0'].forEach(function(v,i){ if(statCards[i]) statCards[i].querySelector('.stat-value').textContent=v; });
+      return;
+    }
+    var STATUS_BADGE = { pending:'<span class="badge badge-red">미처리</span>', processing:'<span class="badge badge-amber">처리 중</span>', answered:'<span class="badge badge-green">완료</span>', completed:'<span class="badge badge-green">완료</span>' };
+    var CAT_LABEL = { postback:'적립 문의', account:'계정 문의', gifticon:'기프티콘 문의', general:'기타' };
+    var pending=0, processing=0, done=0;
+    var items = snap.docs.map(function(doc) {
+      var d = doc.data();
+      if (d.status === 'pending') pending++;
+      else if (d.status === 'processing') processing++;
+      else done++;
+      var badge = STATUS_BADGE[d.status] || '<span class="badge badge-gray">알 수 없음</span>';
+      var cat = CAT_LABEL[d.category] || d.category || '기타';
+      var uid = (d.user_id||'').replace('user-','').replace(/-\d+$/,'');
+      return '<div class="inquiry-item" onclick="openModal(\'m-inquiry\')">'
+        + '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">'
+        + '<div class="inquiry-title">' + (d.title||'제목없음') + '</div>' + badge + '</div>'
+        + '<div class="inquiry-meta"><span>' + uid + '</span><span>' + ppDt(d.created_at) + '</span><span>' + cat + '</span></div></div>';
+    });
+    list.innerHTML = items.join('');
+    if (statCards[0]) statCards[0].querySelector('.stat-value').textContent = ppN(pending);
+    if (statCards[1]) statCards[1].querySelector('.stat-value').textContent = ppN(processing);
+    if (statCards[2]) statCards[2].querySelector('.stat-value').textContent = ppN(done);
+  }).catch(function(e){ console.error('loadInquiries',e); list.innerHTML='<div style="padding:24px;color:var(--text-3);text-align:center">로드 오류: '+e.message+'</div>'; });
+}
+
+/* ── sec-withdrawal ── withdrawals collection (empty state) */
+function loadWithdrawal() {
+  var tbody = document.querySelector('#sec-withdrawal table tbody');
+  if (!tbody) return;
+  db.collection('withdrawals').limit(20).get().then(function(snap) {
+    if (snap.empty) { tbody.innerHTML = ppEmpty(6,'탈퇴 요청이 없습니다.'); }
+    else {
+      var rows = snap.docs.map(function(doc) {
+        var d = doc.data();
+        return '<tr><td><div style="font-weight:500">' + (d.user_id||'') + '</div></td>'
+          + '<td style="text-align:center"><span class="member-type-kakao">카카오</span></td>'
+          + '<td style="text-align:center">—</td>'
+          + '<td style="text-align:center">' + ppDt(d.requested_at||d.created_at) + '</td>'
+          + '<td style="text-align:center"><span class="badge badge-amber">유예중</span></td>'
+          + '<td><button class="btn btn-ghost btn-sm">상세</button></td></tr>';
+      });
+      tbody.innerHTML = rows.join('');
+    }
+  }).catch(function(){ tbody.innerHTML = ppEmpty(6,'탈퇴 요청이 없습니다.'); });
+  var statCards = document.querySelectorAll('#sec-withdrawal .stat-card');
+  ['0명','0명','0명','0명'].forEach(function(v,i){ if(statCards[i]) statCards[i].querySelector('.stat-value').textContent=v; });
+}
+
+/* ── sec-postback ── postbacks collection */
+function loadPostback() {
+  var tbody = document.querySelector('#sec-postback table tbody');
+  if (!tbody) return;
+  db.collection('postbacks').orderBy('created_at','desc').limit(20).get().then(function(snap) {
+    if (snap.empty) { tbody.innerHTML = ppEmpty(7,'포스트백 로그가 없습니다.'); return; }
+    var STATUS_BADGE = { confirmed:'<span class="badge badge-green">정상</span>', pending:'<span class="badge badge-amber">대기</span>', refunded:'<span class="badge badge-red">환불</span>' };
+    var rows = snap.docs.map(function(doc) {
+      var d = doc.data();
+      var rate = MALL_RATES[d.mall_name] || 0.03;
+      var amt = d.purchase_amount || 0;
+      var comm = d.status === 'refunded' ? '<span style="color:var(--danger)">회수</span>' : '<span style="color:var(--success);font-weight:600">+' + ppN(Math.round(amt*rate)) + '원</span>';
+      var uid = (d.user_id||'').replace('user-','').replace(/-\d+$/,'');
+      return '<tr><td style="text-align:center;white-space:nowrap"><div style="font-weight:700;color:#333">' + ppDt(d.created_at) + '</div><div style="color:var(--text-3)">' + ppTm(d.created_at) + '</div></td>'
+        + '<td style="text-align:center;font-weight:500">' + (d.mall_name||'—') + '</td>'
+        + '<td><div style="font-weight:500">' + uid + '</div><div style="font-size:11px;color:var(--text-2);font-family:monospace">' + (d.user_id||'') + '</div></td>'
+        + '<td style="text-align:center;font-family:monospace;font-size:11px;color:var(--text-2)">' + doc.id + '</td>'
+        + '<td style="text-align:center">' + ppN(amt) + '원</td>'
+        + '<td style="text-align:center">' + comm + '<div style="font-size:11px;color:var(--text-3)">수수료율 ' + (rate*100) + '%</div></td>'
+        + '<td style="text-align:center">' + (STATUS_BADGE[d.status]||'<span class="badge badge-gray">' + d.status + '</span>') + '</td></tr>';
+    });
+    tbody.innerHTML = rows.join('');
+  }).catch(function(e){ console.error('loadPostback',e); tbody.innerHTML = ppEmpty(7,'로드 오류'); });
+}
+
+/* ── sec-accounts ── admin_accounts collection */
+function loadAccounts() {
+  var tbodies = document.querySelectorAll('#sec-accounts table tbody');
+  var tbody = tbodies[0];
+  if (!tbody) return;
+  var isSuper = window.currentAdmin && window.currentAdmin.role === 'superadmin';
+  var meId = window.currentAdmin ? window.currentAdmin.username : '';
+  db.collection('admin_accounts').get().then(function(snap) {
+    if (snap.empty) { tbody.innerHTML = ppEmpty(6,'등록된 관리자 계정이 없습니다.'); return; }
+    var hdrEl = document.getElementById('account-hdr-actions');
+    if (hdrEl && isSuper && !hdrEl.querySelector('button')) {
+      hdrEl.innerHTML = '<button class="btn btn-primary btn-sm" onclick="toast(\'계정 추가 준비 중\')">+ 계정 추가</button>';
+    }
+    var rows = snap.docs.map(function(doc) {
+      var d = doc.data();
+      var isMe = d.username === meId;
+      var roleTag = d.role === 'superadmin' ? '<span class="role-tag superadmin">슈퍼어드민</span>' : '<span class="role-tag operator">운영자</span>';
+      var statusBadge = d.status === 'active' ? '<span class="badge badge-green">활성</span>' : '<span class="badge badge-gray">비활성</span>';
+      var nameCell = '<strong>' + (d.display_name||d.username) + '</strong>' + (isMe?' <span style="font-size:10px;color:var(--text-3)">(본인)</span>':'');
+      var actions = (isSuper && !isMe)
+        ? '<div style="display:flex;gap:6px"><button class="btn btn-ghost btn-sm" onclick="toast(\'역할 변경 준비 중\')">역할 변경</button><button class="btn btn-danger btn-sm" onclick="toast(\'계정 삭제 준비 중\')">삭제</button></div>'
+        : '<span style="font-size:11px;color:var(--text-3)">' + (isMe?'삭제 불가':'권한 없음') + '</span>';
+      return '<tr><td>' + nameCell + '</td><td>' + (d.username||'') + '</td><td>' + roleTag + '</td><td style="color:var(--text-3)">—</td><td>' + statusBadge + '</td><td>' + actions + '</td></tr>';
+    });
+    tbody.innerHTML = rows.join('');
+  }).catch(function(e){ console.error('loadAccounts',e); tbody.innerHTML = ppEmpty(6,'로드 오류'); });
+}
+
+/* ── sec-clawback ── ticket_transactions where type in [clawback,expire] */
+function loadClawback() {
+  var tbodies = document.querySelectorAll('#sec-clawback table tbody');
+  var tbody = tbodies[0];
+  var debtTbody = tbodies[1];
+  if (!tbody) return;
+  db.collection('ticket_transactions').where('type','in',['clawback','expire']).orderBy('created_at','desc').limit(20).get()
+    .then(function(snap) {
+      if (snap.empty) { tbody.innerHTML = ppEmpty(7,'회수·소멸 이력이 없습니다.'); }
+      else {
+        var TYPE_BADGE = { clawback:'<span class="badge badge-red">반품/취소</span>', expire:'<span class="badge" style="background:var(--surface-2);color:var(--text-2)">만료</span>' };
+        var GRADE_CHIP = { gold:'<span class="tk-chip gold bare">골드 1장</span>', silver:'<span class="tk-chip silver bare">실버 1장</span>', bronze:'<span class="tk-chip bronze bare">브론즈 1장</span>' };
+        var rows = snap.docs.map(function(doc) {
+          var d = doc.data();
+          var uid = (d.user_id||'').replace('user-','').replace(/-\d+$/,'');
+          return '<tr><td style="text-align:center"><div style="font-weight:700;color:#333">' + ppDt(d.created_at) + '</div><div style="color:var(--text-3)">' + ppTm(d.created_at) + '</div></td>'
+            + '<td><div style="font-weight:500">' + uid + '</div><div style="font-size:11px;color:var(--text-2);font-family:monospace">(' + (d.user_id||'') + ')</div></td>'
+            + '<td style="font-family:monospace;font-size:11px;color:var(--text-2)">' + (d.postback_id||'—') + '</td>'
+            + '<td>' + (GRADE_CHIP[d.ticket_grade]||'—') + '</td>'
+            + '<td>' + (TYPE_BADGE[d.type]||d.type) + '</td>'
+            + '<td style="font-size:12px;color:var(--text-3)">—</td>'
+            + '<td><button class="btn btn-ghost btn-sm">상세</button></td></tr>';
+        });
+        tbody.innerHTML = rows.join('');
+        var statCards = document.querySelectorAll('#sec-clawback .stat-card');
+        if (statCards[0]) statCards[0].querySelector('.stat-value').textContent = ppN(snap.size);
+        var bCnt = snap.docs.filter(function(d){ return d.data().ticket_grade==='bronze'; }).length;
+        var sCnt = snap.docs.filter(function(d){ return d.data().ticket_grade==='silver'; }).length;
+        var gCnt = snap.docs.filter(function(d){ return d.data().ticket_grade==='gold'; }).length;
+        if (statCards[1]) statCards[1].querySelector('.stat-value').textContent = ppN(bCnt)+'장';
+        if (statCards[2]) statCards[2].querySelector('.stat-value').textContent = ppN(sCnt)+'장';
+        if (statCards[3]) statCards[3].querySelector('.stat-value').textContent = ppN(gCnt)+'장';
+      }
+      if (debtTbody) debtTbody.innerHTML = ppEmpty(5,'부채 추적 데이터가 없습니다.');
+  /* access log tbody */
+  var logTbody = document.getElementById('account-log-tbody');
+  if (logTbody) logTbody.innerHTML = ppEmpty(4,'접근 로그가 없습니다.');
+    }).catch(function(e){ console.error('loadClawback',e); if(tbody) tbody.innerHTML = ppEmpty(7,'로드 오류'); });
+}
+
+/* ── sec-points ── point_transactions */
+function loadPoints() {
+  var tbody = document.querySelector('#sec-points table tbody');
+  if (!tbody) return;
+  db.collection('point_transactions').orderBy('created_at','desc').limit(20).get().then(function(snap) {
+    if (snap.empty) { tbody.innerHTML = ppEmpty(5,'포인트 이력이 없습니다.'); return; }
+    var TYPE_LABEL = { referral:'<span style="color:var(--main)">친구초대 보상</span>', attendance:'<span style="color:#c084fc">출석 적립</span>', exchange:'<span style="color:var(--main)">기프티콘 교환 보너스</span>', daily_visit:'<span style="color:#c084fc">일일 방문 보상</span>', earn:'<span style="color:var(--success)">적립</span>', spend:'<span style="color:var(--danger)">사용 차감</span>', expire:'<span style="color:var(--text-2)">만료 소멸</span>' };
+    var totalEarned = 0;
+    snap.docs.forEach(function(d){ var a=d.data().amount||0; if(a>0) totalEarned+=a; });
+    var rows = snap.docs.map(function(doc) {
+      var d = doc.data();
+      var amt = d.amount||0;
+      var sign = amt >= 0 ? '+' : '';
+      var color = amt >= 0 ? 'color:var(--success);font-weight:700' : 'color:var(--danger);font-weight:700';
+      var uid = (d.user_id||'').replace('user-','').replace(/-\d+$/,'');
+      return '<tr><td><div style="font-weight:500">' + uid + '</div><div style="font-size:11px;color:var(--text-2);font-family:monospace">(' + (d.user_id||'') + ')</div></td>'
+        + '<td>' + (TYPE_LABEL[d.type]||d.type) + '</td>'
+        + '<td style="text-align:center;' + color + '">' + sign + ppN(amt) + 'P</td>'
+        + '<td style="text-align:center;font-weight:600">—</td>'
+        + '<td style="color:var(--text-3);font-size:12px;text-align:center"><div style="font-weight:700;color:#333">' + ppDt(d.created_at) + '</div><div>' + ppTm(d.created_at) + '</div></td></tr>';
+    });
+    tbody.innerHTML = rows.join('');
+    var statCards = document.querySelectorAll('#sec-points .stat-card');
+    if (statCards[0]) statCards[0].querySelector('.stat-value').textContent = ppN(totalEarned)+'P';
+    if (statCards[1]) statCards[1].querySelector('.stat-value').textContent = ppN(snap.size)+'건';
+  }).catch(function(e){ console.error('loadPoints',e); tbody.innerHTML = ppEmpty(5,'로드 오류'); });
+}
+
+/* ── sec-stats / sec-revenue / sec-settlement ── computed from postbacks */
+function loadRevenueStats() {
+  db.collection('postbacks').get().then(function(pbSnap) {
+    var byMall = {};
+    var totalGMV=0, totalCommission=0;
+    pbSnap.docs.forEach(function(doc) {
+      var d = doc.data();
+      if (d.status !== 'confirmed') return;
+      var mall = d.mall_name || '기타';
+      var amt = d.purchase_amount || 0;
+      var rate = MALL_RATES[mall] || 0.03;
+      var comm = Math.round(amt * rate);
+      if (!byMall[mall]) byMall[mall] = { gmv:0, commission:0, count:0 };
+      byMall[mall].gmv += amt;
+      byMall[mall].commission += comm;
+      byMall[mall].count++;
+      totalGMV += amt;
+      totalCommission += comm;
+    });
+    var mallOrder = ['쿠팡','11번가','G마켓','알리익스프레스','아이허브'];
+
+    /* sec-stats: 매출 구조 표 */
+    var statsTbodies = document.querySelectorAll('#sec-stats table tbody');
+    if (statsTbodies[0]) {
+      var rows = mallOrder.map(function(mall) {
+        var m = byMall[mall]||{gmv:0,commission:0};
+        var rate = MALL_RATES[mall]||0.03;
+        return '<tr><td style="font-weight:600">' + mall + '</td><td>' + ppN(m.gmv) + '원</td><td style="text-align:center">' + (rate*100).toFixed(1) + '%</td><td style="color:var(--success);font-weight:600">' + ppN(m.commission) + '원</td></tr>';
+      });
+      rows.push('<tr style="border-top:2px solid var(--border)"><td style="font-weight:700">합계</td><td style="font-weight:700">' + ppN(totalGMV) + '원</td><td style="text-align:center">—</td><td style="font-weight:700;color:var(--success)">' + ppN(totalCommission) + '원</td></tr>');
+      statsTbodies[0].innerHTML = rows.join('');
+    }
+    /* sec-stats: 순수익 종합 */
+    if (statsTbodies[3]) {
+      statsTbodies[3].innerHTML = '<tr><td>제휴 수수료 매출</td><td style="color:var(--success);font-weight:600">+ ' + ppN(totalCommission) + '원</td></tr>'
+        + '<tr><td>기프티콘 판매 수익</td><td style="color:var(--success)">집계 중</td></tr>'
+        + '<tr><td>티켓 적립 비용</td><td style="color:var(--amber)">집계 중</td></tr>'
+        + '<tr style="border-top:2px solid var(--border)"><td style="font-weight:700">순수익 (추정)</td><td style="font-weight:800;font-size:15px;color:var(--success)">' + ppN(totalCommission) + '원</td></tr>'
+        + '<tr><td style="color:var(--text-2);font-size:12px">기준: 데모 Firestore 데이터</td><td style="color:var(--text-2);font-size:12px">—</td></tr>';
+    }
+
+    /* sec-revenue: 제휴 수수료 매출 내역 */
+    var revFee = document.querySelector('#rev-fee table tbody');
+    if (revFee) {
+      var confirmed = pbSnap.docs.filter(function(d){ return d.data().status==='confirmed'; });
+      if (!confirmed.length) { revFee.innerHTML = ppEmpty(9,'확정된 포스트백이 없습니다.'); }
+      else {
+        var rRows = confirmed.slice(0,10).map(function(doc) {
+          var d = doc.data();
+          var rate = MALL_RATES[d.mall_name]||0.03;
+          var comm = Math.round((d.purchase_amount||0)*rate);
+          var uid = (d.user_id||'').replace('user-','').replace(/-\d+$/,'');
+          return '<tr><td style="text-align:center;white-space:nowrap"><div style="font-weight:700;color:#333">' + ppDt(d.created_at) + '</div><div style="color:var(--text-3)">' + ppTm(d.created_at) + '</div></td>'
+            + '<td style="text-align:center;font-weight:500">' + (d.mall_name||'—') + '</td>'
+            + '<td><div style="font-weight:500">' + uid + '</div><div style="font-size:11px;color:var(--text-2);font-family:monospace">' + (d.user_id||'') + '</div></td>'
+            + '<td style="text-align:center;font-family:monospace;font-size:11.5px;color:var(--text-2)">' + doc.id + '</td>'
+            + '<td>' + ppN(d.purchase_amount) + '원</td>'
+            + '<td style="text-align:center">' + (rate*100).toFixed(1) + '%</td>'
+            + '<td style="color:var(--success);font-weight:600">+' + ppN(comm) + '원</td>'
+            + '<td style="color:var(--amber)">—</td>'
+            + '<td style="text-align:center"><span class="badge badge-green">정상</span></td></tr>';
+        });
+        revFee.innerHTML = rRows.join('');
+      }
+      var hdrInfo = document.querySelector('#rev-fee .card-header div:last-child');
+      if (hdrInfo && !hdrInfo.classList.contains('card-title')) hdrInfo.textContent = '총 ' + confirmed.length + '건 · 합 ' + ppN(totalCommission) + '원 (데모)';
+    }
+    /* sec-revenue gifticon tab */
+    var revGi = document.querySelector('#rev-gifticon table tbody');
+    if (revGi) {
+      db.collection('gifticon_exchanges').get().then(function(giSnap) {
+        if (giSnap.empty) { revGi.innerHTML = ppEmpty(7,'기프티콘 판매 내역이 없습니다.'); return; }
+        var giRows = giSnap.docs.slice(0,10).map(function(doc) {
+          var d = doc.data();
+          var uid = (d.user_id||'').replace('user-','').replace(/-\d+$/,'');
+          var val = (d.count_used||1) * 2000;
+          var cost = Math.round(val * 0.8);
+          var margin = val - cost;
+          return '<tr><td style="text-align:center;white-space:nowrap"><div style="font-weight:700;color:#333">' + ppDt(d.exchanged_at) + '</div><div style="color:var(--text-3)">' + ppTm(d.exchanged_at) + '</div></td>'
+            + '<td style="text-align:center;font-weight:500">' + (d.gifticon_id||'—') + '</td>'
+            + '<td><div style="font-weight:500">' + uid + '</div><div style="font-size:11px;color:var(--text-2);font-family:monospace">' + (d.user_id||'') + '</div></td>'
+            + '<td>' + ppN(val) + '원</td><td>' + ppN(cost) + '원</td>'
+            + '<td style="color:var(--success);font-weight:600">+' + ppN(margin) + '원</td>'
+            + '<td style="text-align:center"><span class="badge badge-green">완료</span></td></tr>';
+        });
+        revGi.innerHTML = giRows.join('');
+      }).catch(function(){});
+    }
+    /* sec-revenue stat cards */
+    var revStats = document.querySelectorAll('#sec-revenue .stat-card');
+    if (revStats[0]) revStats[0].querySelector('.stat-value').textContent = Math.round(totalCommission/10000)+'만';
+    if (revStats[2]) revStats[2].querySelector('.stat-value').textContent = Math.round(totalCommission/10000)+'만';
+
+    /* sec-settlement: 제휴몰별 정산 현황 */
+    var settleTbodies = document.querySelectorAll('#sec-settlement table tbody');
+    if (settleTbodies[0]) {
+      var sRows = mallOrder.map(function(mall) {
+        var m = byMall[mall]||{commission:0};
+        return '<tr><td style="font-weight:600">' + mall + '</td><td>' + ppN(m.commission) + '원</td><td>' + ppN(m.commission) + '원</td><td>0원</td><td style="font-size:12px">—</td><td><span class="badge badge-green">일치</span></td></tr>';
+      });
+      sRows.push('<tr style="border-top:2px solid var(--border)"><td style="font-weight:700">합계</td><td style="font-weight:700">' + ppN(totalCommission) + '원</td><td style="font-weight:700">' + ppN(totalCommission) + '원</td><td style="font-weight:700">0원</td><td>—</td><td>—</td></tr>');
+      settleTbodies[0].innerHTML = sRows.join('');
+    }
+    if (settleTbodies[1]) {
+      settleTbodies[1].innerHTML = '<tr><td><strong>데모 집계</strong></td><td>' + ppN(totalCommission) + '원</td><td style="color:var(--text-3)">집계 중</td><td style="color:var(--text-3)">—</td><td><span class="badge badge-amber">집계 중</span></td></tr>';
+    }
+    /* sec-settlement stat cards */
+    var settleStats = document.querySelectorAll('#sec-settlement .stat-card');
+    if (settleStats[0]) settleStats[0].querySelector('.stat-value').textContent = Math.round(totalCommission/10000)+'만';
+    if (settleStats[1]) settleStats[1].querySelector('.stat-value').textContent = Math.round(totalCommission/10000)+'만';
+
+  }).catch(function(e){ console.error('loadRevenueStats',e); });
 }
 
 /* ── Gifticon Modal ── */
