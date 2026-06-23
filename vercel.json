@@ -3,6 +3,7 @@
     { "source": "/cms", "destination": "/cms/index.html" },
     { "source": "/app", "destination": "/app/index.html" },
     { "source": "/app/", "destination": "/app/index.html" },
+    { "source": "/scenario", "destination": "/scenario/index.html" },
     { "source": "/",    "destination": "/cms/index.html" }
   ]
 }

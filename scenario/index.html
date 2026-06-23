@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PricePick — DEMO 시나리오 데이터</title>
+<style>
+  :root{
+    --bg:#f5f6fa; --card:#ffffff; --ink:#1f2433; --sub:#5b6478;
+    --line:#e6e8f0; --accent:#3b5bdb; --accent-soft:#eef1fd;
+    --green:#1f9d57; --green-bg:#e7f6ee; --amber:#b9770a; --amber-bg:#fdf3e3;
+    --red:#c0392b; --red-bg:#fbeceb; --gray:#5b6478; --gray-bg:#eef0f4;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+    line-height:1.6;-webkit-font-smoothing:antialiased;}
+  .wrap{max-width:980px;margin:0 auto;padding:40px 24px 80px;}
+  header.doc{border-bottom:2px solid var(--accent);padding-bottom:20px;margin-bottom:8px;}
+  header.doc h1{margin:0 0 8px;font-size:28px;letter-spacing:-.01em;}
+  .lead{color:var(--sub);font-size:15px;margin:0 0 4px;}
+  .meta{color:var(--sub);font-size:13px;margin:2px 0 0;}
+  .note-top{background:var(--accent-soft);border:1px solid #d7ddf8;border-radius:10px;
+    padding:12px 16px;margin:20px 0 28px;font-size:13.5px;color:#33406b;}
+  h2.sec{font-size:18px;margin:40px 0 14px;padding-left:10px;border-left:4px solid var(--accent);}
+  table.sum{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--line);
+    border-radius:12px;overflow:hidden;font-size:13.5px;}
+  table.sum th,table.sum td{padding:10px 12px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top;}
+  table.sum th{background:#f0f2f8;color:var(--sub);font-weight:600;font-size:12.5px;}
+  table.sum tr:last-child td{border-bottom:none;}
+  table.sum td.num{color:var(--sub);font-variant-numeric:tabular-nums;width:38px;}
+  table.sum td.nm{font-weight:600;white-space:nowrap;}
+  .b{display:inline-block;padding:1px 9px;border-radius:999px;font-size:11.5px;font-weight:600;white-space:nowrap;}
+  .b-link{background:var(--accent-soft);color:var(--accent);}
+  .b-guest{background:var(--gray-bg);color:var(--gray);}
+  .b-ok{background:var(--green-bg);color:var(--green);}
+  .b-susp{background:var(--amber-bg);color:var(--amber);}
+  .b-wd{background:var(--red-bg);color:var(--red);}
+  .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-top:8px;}
+  @media(max-width:720px){.grid{grid-template-columns:1fr;} .wrap{padding:28px 16px 60px;}}
+  .mc{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;
+    box-shadow:0 1px 2px rgba(20,30,60,.04);}
+  .mc h3{margin:0 0 2px;font-size:15.5px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+  .mc .uid{font-size:11.5px;color:var(--sub);font-family:ui-monospace,Menlo,monospace;margin:0 0 10px;}
+  .mc ul{margin:0;padding:0;list-style:none;font-size:13px;}
+  .mc li{padding:3px 0 3px 14px;position:relative;color:var(--ink);}
+  .mc li::before{content:"";position:absolute;left:0;top:11px;width:5px;height:5px;border-radius:50%;background:#c2c8da;}
+  .mc li .k{color:var(--sub);}
+  .mc .scn{margin-top:10px;padding-top:10px;border-top:1px dashed var(--line);font-size:13px;}
+  .mc .scn b{color:var(--accent);}
+  .tag-pend{color:var(--amber);font-weight:600;}
+  .tag-bad{color:var(--red);font-weight:600;}
+  footer.notes{margin-top:44px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px 20px;font-size:13px;color:var(--sub);}
+  footer.notes h4{margin:0 0 8px;color:var(--ink);font-size:14px;}
+  footer.notes ul{margin:0;padding-left:18px;}
+  footer.notes li{margin:4px 0;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="doc">
+    <h1>PricePick — DEMO 시나리오 데이터</h1>
+    <p class="lead">PricePick 데모용 시드 회원 시나리오. 실제 운영 데이터 아님 · 케이스별 검증용 캐릭터 설계.</p>
+    <p class="meta">출처: scripts/seed-extended.js (확장 15명) + scripts/seed.js (기본 5명)</p>
+    <p class="meta">날짜는 시드 정의 기준 상대값(N일 전)이며, 마지막 접속은 대부분 미정의(CMS "-" 표시).</p>
+  </header>
+  <div class="note-top">
+    총 20명 — 연동 헤비유저 · 기프티콘 교환 · 가지급 대기 · 환불 회수(clawback) · 티켓 만료(expire) · 친구초대 · 미연동 게스트 · 정지 · 탈퇴 등 운영 케이스를 한 명씩 분담하도록 설계.
+  </div>
+  <h2 class="sec">전체 요약</h2>
+  <table class="sum">
+    <thead><tr><th>#</th><th>닉네임</th><th>연동</th><th>상태</th><th>한줄 시나리오</th></tr></thead>
+    <tbody>
+      <tr><td class="num">01</td><td class="nm">프랭크</td><td><span class="b b-link">연동</span></td><td><span class="b b-ok">정상</span></td><td>연동 헤비 구매자(고액 2회) + 미적립 문의</td></tr>
+      <tr><td class="num">02</td><td class="nm">그레이스</td><td><span class="b b-link">연동</span></td><td><span class="b b-ok">정상</span></td><td>기프티콘 교환 경험자 + 문의 답변완료</td></tr>
+      <tr><td class="num">03</td><td class="nm">헨리</td><td><span class="b b-link">연동</span></td><td><span class="b b-ok">정상</span></td><td>기프티콘 교환 + 다양한 포인트 적립</td></tr>
+      <tr><td class="num">04</td><td class="nm">아이리스</td><td><span class="b b-link">연동</span></td><td><span class="b b-ok">정상</span></td><td>친구초대 주도(2명 성공) + 골드 보유</td></tr>
+      <tr><td class="num">05</td><td class="nm">제이크</td><td><span class="b b-link">연동</span></td><td><span class="b b-ok">정상</span></td><td>최근 구매 후 적립 대기(가지급)</td></tr>
+      <tr><td class="num">06</td><td class="nm">케이트</td><td><span class="b b-link">연동</span></td><td><span class="b b-ok">정상</span></td><td>구매취소·환불 → 티켓 회수(clawback)</td></tr>
+      <tr><td class="num">07</td><td class="nm">레오</td><td><span class="b b-link">연동</span></td><td><span class="b b-ok">정상</span></td><td>고액 골드 헤비유저 + 탈퇴 문의중</td></tr>
+      <tr><td class="num">08</td><td class="nm">미아</td><td><span class="b b-link">연동</span></td><td><span class="b b-ok">정상</span></td><td>티켓 유효기간 만료(expire) 케이스</td></tr>
+      <tr><td class="num">09</td><td class="nm">노아</td><td><span class="b b-link">연동</span></td><td><span class="b b-ok">정상</span></td><td>초대로 가입한 신규 소액 구매자</td></tr>
+      <tr><td class="num">10</td><td class="nm">올리비아</td><td><span class="b b-link">연동</span></td><td><span class="b b-ok">정상</span></td><td>최고액 구매 + 최다 포인트 + 초대 (모범 활성)</td></tr>
+      <tr><td class="num">11</td><td class="nm">피터</td><td><span class="b b-guest">게스트</span></td><td><span class="b b-ok">정상</span></td><td>미연동 게스트, 구매 후 D+30 적립 대기</td></tr>
+      <tr><td class="num">12</td><td class="nm">퀸</td><td><span class="b b-guest">게스트</span></td><td><span class="b b-ok">정상</span></td><td>초대로 가입한 신규 게스트(활동 전)</td></tr>
+      <tr><td class="num">13</td><td class="nm">라이언</td><td><span class="b b-link">연동</span></td><td><span class="b b-susp">정지</span></td><td>정지 계정 — 티켓 보유 유지</td></tr>
+      <tr><td class="num">14</td><td class="nm">사라</td><td><span class="b b-link">연동</span></td><td><span class="b b-susp">정지</span></td><td>정지 계정(소액)</td></tr>
+      <tr><td class="num">15</td><td class="nm">탈퇴회원</td><td><span class="b b-link">연동</span></td><td><span class="b b-wd">탈퇴</span></td><td>탈퇴 처리된 계정</td></tr>
+      <tr><td class="num">16</td><td class="nm">앨리스</td><td><span class="b b-link">linked</span></td><td><span class="b b-ok">정상</span></td><td>표준 연동 유저(이벤트티켓 보유)</td></tr>
+      <tr><td class="num">17</td><td class="nm">밥</td><td><span class="b b-link">linked</span></td><td><span class="b b-ok">정상</span></td><td>고액 구매 골드 유저 + 교환 문의</td></tr>
+      <tr><td class="num">18</td><td class="nm">캐롤</td><td><span class="b b-link">linked</span></td><td><span class="b b-susp">정지</span></td><td>정지 + 티켓 만료 케이스</td></tr>
+      <tr><td class="num">19</td><td class="nm">데이브</td><td><span class="b b-guest">게스트</span></td><td><span class="b b-ok">정상</span></td><td>게스트 적립 대기(D+30)</td></tr>
+      <tr><td class="num">20</td><td class="nm">이브</td><td><span class="b b-guest">게스트</span></td><td><span class="b b-ok">정상</span></td><td>게스트 신규</td></tr>
+    </tbody>
+  </table>
+  <h2 class="sec">A. 확장 시드 15명 <span style="font-size:13px;color:var(--sub);font-weight:400;">(scripts/seed-extended.js)</span></h2>
+  <div class="grid">
+    <div class="mc"><h3>01 프랭크 <span class="b b-link">연동</span><span class="b b-ok">정상</span></h3><p class="uid">user-frank-001</p><ul><li><span class="k">가입</span> 2026-01-15 / updated 2026-06-20</li><li><span class="k">포스트백</span> 쿠팡 150,000원 confirmed(60일전), 쿠팡 150,000원 confirmed(30일전)</li><li><span class="k">티켓</span> 골드2 + 실버2 (전부 active)</li><li><span class="k">포인트</span> 500P (초대보상 300[아이리스가 초대] + 출석 200)</li><li><span class="k">문의</span> "포스트백 확인 요청" — <span class="tag-pend">pending</span> ("15만원 구매했는데 적립 안 됨")</li><li><span class="k">방문</span> 2회</li></ul><p class="scn"><b>시나리오</b> · 연동 헤비 구매자(고액 2회) + 미적립 문의 케이스</p></div>
+    <div class="mc"><h3>02 그레이스 <span class="b b-link">연동</span><span class="b b-ok">정상</span></h3><p class="uid">user-grace-001</p><ul><li><span class="k">가입</span> 2026-02-20</li><li><span class="k">포스트백</span> 쿠팡 67,000 confirmed(45일전), 11번가 25,000 confirmed(20일전)</li><li><span class="k">티켓</span> 실버1 + 브론즈7 active, 브론즈2 used(교환 소모)</li><li><span class="k">포인트</span> 200P (출석)</li><li><span class="k">기프티콘</span> 이디야 아메리카노 교환(브론즈2) 완료(25일전)</li><li><span class="k">문의</span> "기프티콘 교환 후 쿠폰이 안 와요" — answered</li></ul><p class="scn"><b>시나리오</b> · 기프티콘 교환 경험자 + 문의 답변완료</p></div>
+    <div class="mc"><h3>03 헨리 <span class="b b-link">연동</span><span class="b b-ok">정상</span></h3><p class="uid">user-henry-001</p><ul><li><span class="k">가입</span> 2026-03-05</li><li><span class="k">포스트백</span> 쿠팡 67,000 confirmed(35일전)</li><li><span class="k">티켓</span> 실버1 + 브론즈2 active, 브론즈2 used(교환)</li><li><span class="k">포인트</span> 1,000P (교환보너스 500 + 초대보상 300 + 출석 200)</li><li><span class="k">기프티콘</span> 이디야 아메리카노 교환(브론즈2) 완료(20일전)</li></ul><p class="scn"><b>시나리오</b> · 기프티콘 교환 + 다양한 포인트 적립 유저</p></div>
+    <div class="mc"><h3>04 아이리스 <span class="b b-link">연동</span><span class="b b-ok">정상</span></h3><p class="uid">user-iris-001</p><ul><li><span class="k">가입</span> 2026-03-20</li><li><span class="k">포스트백</span> G마켓 100,000 confirmed(20일전)</li><li><span class="k">티켓</span> 골드1 active</li><li><span class="k">포인트</span> 300P (초대보상 — 노아 초대)</li><li><span class="k">초대</span> 프랭크·노아 2명 초대 성공</li></ul><p class="scn"><b>시나리오</b> · 친구초대 주도 유저(2명 성공) + 골드 보유</p></div>
+    <div class="mc"><h3>05 제이크 <span class="b b-link">연동</span><span class="b b-ok">정상</span></h3><p class="uid">user-jake-001</p><ul><li><span class="k">가입</span> 2026-04-01</li><li><span class="k">포스트백</span> 쿠팡 67,000 <span class="tag-pend">PENDING</span>(3일전)</li><li><span class="k">티켓</span> 실버1 + 브론즈4 전부 pending(가지급)</li><li><span class="k">포인트</span> 50P (첫 출석)</li></ul><p class="scn"><b>시나리오</b> · 최근 구매 후 적립 대기(가지급) 상태</p></div>
+    <div class="mc"><h3>06 케이트 <span class="b b-link">연동</span><span class="b b-ok">정상</span></h3><p class="uid">user-kate-001</p><ul><li><span class="k">가입</span> 2026-04-15</li><li><span class="k">포스트백</span> 쿠팡 50,000 confirmed(40일전), 쿠팡 100,000 <span class="tag-bad">REFUNDED</span>(25일전)</li><li><span class="k">티켓</span> 실버1 active, 골드1 used(clawback — 환불 회수)</li><li><span class="k">티켓원장</span> earn 실버, earn 골드, clawback 골드</li><li><span class="k">포인트</span> 0P</li></ul><p class="scn"><b>시나리오</b> · 구매취소·환불 → 티켓 회수(clawback) 케이스</p></div>
+    <div class="mc"><h3>07 레오 <span class="b b-link">연동</span><span class="b b-ok">정상</span></h3><p class="uid">user-leo-001</p><ul><li><span class="k">가입</span> 2026-05-01</li><li><span class="k">포스트백</span> 11번가 200,000 confirmed(50일전), 쿠팡 100,000 confirmed(20일전)</li><li><span class="k">티켓</span> 골드3 active</li><li><span class="k">포인트</span> 400P (출석 200 + 일일방문 200)</li><li><span class="k">문의</span> "탈퇴 방법 문의" — <span class="tag-pend">pending</span></li><li><span class="k">방문</span> 2회</li></ul><p class="scn"><b>시나리오</b> · 고액 골드 헤비유저 + 탈퇴 문의중</p></div>
+    <div class="mc"><h3>08 미아 <span class="b b-link">연동</span><span class="b b-ok">정상</span></h3><p class="uid">user-mia-001</p><ul><li><span class="k">가입</span> 2026-05-10</li><li><span class="k">포스트백</span> G마켓 50,000 confirmed(370일전), 쿠팡 25,000 confirmed(15일전)</li><li><span class="k">티켓</span> 실버1 <span class="tag-bad">EXPIRED</span>(370일전 적립→5일전 만료), 브론즈5 active</li><li><span class="k">티켓원장</span> earn 실버 → expire 실버, earn 브론즈×5</li><li><span class="k">포인트</span> 100P (일일방문)</li></ul><p class="scn"><b>시나리오</b> · 티켓 유효기간 만료(expire) 케이스</p></div>
+    <div class="mc"><h3>09 노아 <span class="b b-link">연동</span><span class="b b-ok">정상</span></h3><p class="uid">user-noah-001</p><ul><li><span class="k">가입</span> 2026-06-01</li><li><span class="k">포스트백</span> 쿠팡 10,000 confirmed(10일전)</li><li><span class="k">티켓</span> 브론즈2 active / <span class="k">포인트</span> 50P(첫 출석)</li><li><span class="k">초대</span> 아이리스가 초대(피초대자)</li></ul><p class="scn"><b>시나리오</b> · 초대로 가입한 신규 소액 구매자</p></div>
+    <div class="mc"><h3>10 올리비아 <span class="b b-link">연동</span><span class="b b-ok">정상</span></h3><p class="uid">user-olivia-001</p><ul><li><span class="k">가입</span> 2026-06-10</li><li><span class="k">포스트백</span> 쿠팡 200,000 confirmed(40일전), 11번가 200,000 confirmed(15일전)</li><li><span class="k">티켓</span> 골드4 active</li><li><span class="k">포인트</span> 1,500P (초대 500[퀸] + 출석 500 + 일일방문 500)</li><li><span class="k">초대</span> 퀸 초대 성공 / <span class="k">방문</span> 3회</li></ul><p class="scn"><b>시나리오</b> · 최고액 구매 + 최다 포인트 + 친구초대까지 (모범 활성 유저)</p></div>
+    <div class="mc"><h3>11 피터 <span class="b b-guest">게스트</span><span class="b b-ok">정상</span></h3><p class="uid">user-peter-001 · 미연동</p><ul><li><span class="k">가입</span> 2026-06-15</li><li><span class="k">포스트백</span> 쿠팡 50,000 <span class="tag-pend">PENDING</span>(5일전)</li><li><span class="k">티켓</span> 실버1 pending / <span class="k">포인트</span> 0</li></ul><p class="scn"><b>시나리오</b> · 미연동 게스트, 구매 후 D+30 적립 대기</p></div>
+    <div class="mc"><h3>12 퀸 <span class="b b-guest">게스트</span><span class="b b-ok">정상</span></h3><p class="uid">user-quinn-001</p><ul><li><span class="k">가입</span> 2026-06-20</li><li><span class="k">거래·티켓</span> 없음 / <span class="k">포인트</span> 0</li><li><span class="k">초대</span> 올리비아가 초대(피초대자)</li></ul><p class="scn"><b>시나리오</b> · 초대로 가입한 신규 게스트(활동 전)</p></div>
+    <div class="mc"><h3>13 라이언 <span class="b b-link">연동</span><span class="b b-susp">정지</span></h3><p class="uid">user-ryan-001</p><ul><li><span class="k">가입</span> 2026-03-10</li><li><span class="k">포스트백</span> 쿠팡 50,000 + 쿠팡 100,000 confirmed</li><li><span class="k">티켓</span> 실버1 + 골드1 active(정지여도 보유 유지) / <span class="k">포인트</span> 0</li></ul><p class="scn"><b>시나리오</b> · 정지 계정 — 티켓 보유 유지 케이스</p></div>
+    <div class="mc"><h3>14 사라 <span class="b b-link">연동</span><span class="b b-susp">정지</span></h3><p class="uid">user-sara-001</p><ul><li><span class="k">가입</span> 2026-04-05</li><li><span class="k">포스트백</span> 11번가 25,000 confirmed(30일전)</li><li><span class="k">티켓</span> 브론즈5 active / <span class="k">포인트</span> 0</li></ul><p class="scn"><b>시나리오</b> · 정지 계정(소액)</p></div>
+    <div class="mc"><h3>15 탈퇴회원 <span class="b b-link">연동</span><span class="b b-wd">탈퇴</span></h3><p class="uid">user-tom-001</p><ul><li><span class="k">가입</span> 2026-02-01</li><li><span class="k">거래·티켓</span> 없음 / <span class="k">포인트</span> 0</li></ul><p class="scn"><b>시나리오</b> · 탈퇴 처리된 계정</p></div>
+  </div>
+  <h2 class="sec">B. 기본 시드 5명 <span style="font-size:13px;color:var(--sub);font-weight:400;">(scripts/seed.js · 구 스키마)</span></h2>
+  <div class="grid">
+    <div class="mc"><h3>16 앨리스 <span class="b b-link">linked</span><span class="b b-ok">정상</span></h3><p class="uid">user-linked-alice · 마지막접속 1일전</p><ul><li><span class="k">가입</span> 2026-03-01</li><li><span class="k">포스트백</span> 쿠팡 67,000 confirmed (CPN-ORDER-20260612-001)</li><li><span class="k">티켓</span> 실버1 + 브론즈4 active + 이벤트티켓2(출석) / <span class="k">포인트</span> 3,500P</li><li><span class="k">문의</span> "티켓이 확정되지 않아요" — answered</li></ul><p class="scn"><b>시나리오</b> · 표준 연동 유저(이벤트티켓 보유)</p></div>
+    <div class="mc"><h3>17 밥 <span class="b b-link">linked</span><span class="b b-ok">정상</span></h3><p class="uid">user-linked-bob · 마지막접속 3일전</p><ul><li><span class="k">가입</span> 2026-04-10</li><li><span class="k">포스트백</span> 쿠팡 120,000 confirmed (CPN-ORDER-20260617-002)</li><li><span class="k">티켓</span> 골드1 + 브론즈4 active / <span class="k">포인트</span> 1,200P</li><li><span class="k">문의</span> "기프티콘 교환이 안 됩니다" — <span class="tag-pend">pending</span></li></ul><p class="scn"><b>시나리오</b> · 고액 구매 골드 유저 + 교환 문의</p></div>
+    <div class="mc"><h3>18 캐롤 <span class="b b-link">linked</span><span class="b b-susp">정지</span></h3><p class="uid">user-linked-carol</p><ul><li><span class="k">가입</span> 2026-02-15</li><li><span class="k">티켓</span> 브론즈 만료(expired, 370일전 적립→5일전 만료) / <span class="k">포인트</span> 0</li></ul><p class="scn"><b>시나리오</b> · 정지 + 티켓 만료 케이스</p></div>
+    <div class="mc"><h3>19 데이브 <span class="b b-guest">게스트</span><span class="b b-ok">정상</span></h3><p class="uid">user-guest-dave · 마지막접속 2일전</p><ul><li><span class="k">가입</span> 2026-06-01</li><li><span class="k">포스트백</span> 쿠팡 15,000 pending (CPN-ORDER-20260620-003)</li><li><span class="k">티켓</span> 브론즈3 pending / <span class="k">포인트</span> 100P</li></ul><p class="scn"><b>시나리오</b> · 게스트 적립 대기(D+30)</p></div>
+    <div class="mc"><h3>20 이브 <span class="b b-guest">게스트</span><span class="b b-ok">정상</span></h3><p class="uid">user-guest-eve</p><ul><li><span class="k">가입</span> 2026-06-10</li><li><span class="k">티켓</span> 브론즈1 pending / <span class="k">포인트</span> 0</li></ul><p class="scn"><b>시나리오</b> · 게스트 신규</p></div>
+  </div>
+  <footer class="notes">
+    <h4>참고</h4>
+    <ul>
+      <li>그 외 사용자 없는 <b>미매칭 포스트백 1건</b>: 쿠팡 34,000원, order CPN-ORDER-20260621-004, unmatched (포스트백 로그 데모용).</li>
+      <li><b>스키마 주의</b>: 확장 15명은 <code>linked_kakao</code> 필드 사용(CMS가 읽는 필드) / 기본 5명은 구 <code>link_status</code> 사용 → 기본 5명은 CMS 회원목록에서 게스트로 보일 수 있음.</li>
+      <li>라이브 Firestore엔 회원 <b>23명</b> 존재(시드 정의 20명 + CMS 데모 시드주입 버튼 등으로 추가된 3명 추정, 무해).</li>
+    </ul>
+  </footer>
+</div>
+</body>
+</html>
