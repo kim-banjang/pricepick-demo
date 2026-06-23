@@ -3916,20 +3916,9 @@ function applyLang() {
   setTxt('login-logo-sub', t('login.subtitle'));
   setTxt('login-title-el', t('login.title'));
   setTxt('login-sub-el', t('login.sub'));
-  setTxt('login-role-label-el', t('login.role.label'));
   setTxt('login-btn-el', t('login.btn'));
   setPlaceholder('login-id-el', '아이디');
   setPlaceholder('login-pw-el', t('login.pw.placeholder'));
-  // 역할 버튼
-  const rbtns = document.querySelectorAll('.role-btn');
-  const roleKeys = ['superadmin','operator','cs'];
-  rbtns.forEach((btn, i) => {
-    const k = roleKeys[i];
-    if (!k) return;
-    const span = btn.querySelector('span');
-    btn.childNodes[0].textContent = t('login.role.' + k);
-    if (span) span.textContent = t('login.role.' + k + '.sub');
-  });
   // 사이드바
   setTxt('sidebar-sub-el', t('sidebar.subtitle'));
   setTxt('sidebar-access-label-el', t('sidebar.access.label'));
@@ -6142,21 +6131,8 @@ function submitGifticon() {
   });
 }
 
-/* ── Login UI update ── */
+/* ── DOMContentLoaded bindings ── */
 document.addEventListener('DOMContentLoaded', function() {
-  var btn = document.getElementById('login-btn-el');
-  if (btn) { btn.textContent = 'Google로 로그인'; }
-  var emailInput = document.getElementById('login-email-el');
-  var pwInput = document.getElementById('login-pw-el');
-  if (emailInput) emailInput.style.display = 'none';
-  if (pwInput) pwInput.style.display = 'none';
-  var sub = document.getElementById('login-sub-el');
-  if (sub) sub.textContent = 'Google 계정으로 로그인합니다 (관리자 전용)';
-  var roleBtns = document.querySelector('.role-btns');
-  if (roleBtns) roleBtns.style.display = 'none';
-  var roleLabel = document.getElementById('login-role-label-el');
-  if (roleLabel) roleLabel.textContent = '관리자 인증';
-  
   /* Modal bindings */
   var modal = document.getElementById('pp-gifticon-modal');
   if (modal) {
