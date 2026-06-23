@@ -705,14 +705,8 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
     </div>
     <div id="login-title-el" class="login-title">로그인</div>
     <div id="login-sub-el" class="login-sub">권한에 따라 접근 메뉴가 달라집니다.</div>
-    <span id="login-role-label-el" class="role-select-label">역할 선택 (데모)</span>
-    <div class="role-btns">
-      <button class="role-btn active" onclick="selectRole('superadmin',this)">슈퍼어드민<span>전체 + 계정관리</span></button>
-      <button class="role-btn" onclick="selectRole('operator',this)">운영자<span>전체 관리</span></button>
-      <button class="role-btn" onclick="selectRole('cs',this)">CS<span>조회 전용</span></button>
-    </div>
-    <input id="login-email-el" class="login-input" type="email" value="admin@pricepick.co.kr" placeholder="이메일">
-    <input id="login-pw-el" class="login-input" type="password" value="••••••••" placeholder="비밀번호">
+    <input id="login-id-el" class="login-input" type="text" placeholder="아이디" autocomplete="username" onkeydown="if(event.key==='Enter')document.getElementById('login-pw-el').focus()">
+    <input id="login-pw-el" class="login-input" type="password" placeholder="비밀번호" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
     <button id="login-btn-el" class="login-btn" onclick="doLogin()">로그인</button>
   </div>
 </div>
@@ -3924,7 +3918,7 @@ function applyLang() {
   setTxt('login-sub-el', t('login.sub'));
   setTxt('login-role-label-el', t('login.role.label'));
   setTxt('login-btn-el', t('login.btn'));
-  setPlaceholder('login-email-el', t('login.email.placeholder'));
+  setPlaceholder('login-id-el', '아이디');
   setPlaceholder('login-pw-el', t('login.pw.placeholder'));
   // 역할 버튼
   const rbtns = document.querySelectorAll('.role-btn');
@@ -4050,13 +4044,14 @@ function toggleTheme() {
 }
 
 function applyRole(role) {
-  const r = ROLES[role];
+  const r = ROLES[role] || ROLES['operator'];
   const label = getRoleLabel(role);
-  document.getElementById('sb-role-name').textContent = label;
-  document.getElementById('sb-role-id').textContent = r.email;
-  document.getElementById('footer-avatar').textContent = r.initial;
-  document.getElementById('footer-name').textContent = label;
-  document.getElementById('footer-role').textContent = r.email;
+  const adm = window.currentAdmin || {};
+  document.getElementById('sb-role-name').textContent = adm.displayName || label;
+  document.getElementById('sb-role-id').textContent = adm.username || r.email;
+  document.getElementById('footer-avatar').textContent = adm.displayName ? adm.displayName[0].toUpperCase() : r.initial;
+  document.getElementById('footer-name').textContent = adm.displayName || label;
+  document.getElementById('footer-role').textContent = adm.username || r.email;
   document.getElementById('topbar-role').textContent = label;
 
   const isSA = role === 'superadmin';
@@ -5820,46 +5815,90 @@ function showLoginError(msg) {
   var sub = document.getElementById('login-sub-el');
   if (sub) { sub.textContent = msg; sub.style.color = 'var(--danger)'; }
   var btn = document.getElementById('login-btn-el');
-  if (btn) { btn.textContent = 'Google로 로그인'; btn.disabled = false; }
+  if (btn) { btn.textContent = '로그인'; btn.disabled = false; }
 }
 
-/* ── doLogin override ── */
+/* ── SHA-256 helper (Web Crypto API) ── */
+function cmsHash(str) {
+  return crypto.subtle.digest('SHA-256', new TextEncoder().encode(str))
+    .then(function(buf) {
+      return Array.from(new Uint8Array(buf)).map(function(b) { return b.toString(16).padStart(2,'0'); }).join('');
+    });
+}
+
+/* ── doLogin override (ID / PW → Firestore admin_accounts) ── */
 window.doLogin = function() {
-  var btn = document.getElementById('login-btn-el');
-  if (btn) { btn.textContent = '인증 중...'; btn.disabled = true; }
-  var provider = new firebase.auth.GoogleAuthProvider();
-  provider.setCustomParameters({ prompt: 'select_account' });
-  auth.signInWithPopup(provider).then(function(result) {
-    var user = result.user;
-    if (!user || user.email !== ADMIN_EMAIL) {
-      auth.signOut();
-      showLoginError('접근 권한 없음: ' + (user ? user.email : '?'));
-      return;
-    }
-    showApp(user);
+  var btn   = document.getElementById('login-btn-el');
+  var idEl  = document.getElementById('login-id-el');
+  var pwEl  = document.getElementById('login-pw-el');
+  var username = idEl ? idEl.value.trim() : '';
+  var password = pwEl ? pwEl.value : '';
+
+  if (!username || !password) {
+    showLoginError('아이디와 비밀번호를 입력하세요.');
+    return;
+  }
+  if (btn) { btn.textContent = '로그인 중...'; btn.disabled = true; }
+
+  var resolvedHash = '';
+  cmsHash(password).then(function(hash) {
+    resolvedHash = hash;
+    var email = username + '@pricepick-cms.internal';
+    return auth.signInWithEmailAndPassword(email, hash);
+  }).then(function() {
+    return db.collection('admin_accounts').where('username', '==', username).limit(1).get();
+  }).then(function(snap) {
+    if (snap.empty) { auth.signOut(); throw { message: '계정 정보가 없습니다.' }; }
+    var data = snap.docs[0].data();
+    if (data.status === 'inactive') { auth.signOut(); throw { message: '비활성화된 계정입니다.' }; }
+    var role = (data.role === 'superadmin' || data.role === 'operator') ? data.role : 'operator';
+    window.currentAdmin = { username: data.username, role: role, displayName: data.display_name || data.username };
+    window.currentRole  = role;
+    showApp({ displayName: data.display_name || data.username, email: data.username });
   }).catch(function(err) {
-    console.error('CMS auth:', err);
-    showLoginError('로그인 실패: ' + (err.code || err.message));
+    console.error('CMS login:', err);
+    if (btn) { btn.textContent = '로그인'; btn.disabled = false; }
+    var code = err.code || '';
+    var msg = (code === 'auth/user-not-found' || code === 'auth/wrong-password' || code === 'auth/invalid-credential' || code === 'auth/invalid-email')
+      ? '아이디 또는 비밀번호가 올바르지 않습니다.'
+      : (err.message || '로그인 실패');
+    showLoginError(msg);
   });
 };
 
 /* ── doLogout override ── */
 window.doLogout = function() {
   auth.signOut().then(function() {
+    window.currentAdmin = null;
+    window.currentRole  = 'superadmin';
     document.getElementById('main-app').style.display = 'none';
     document.getElementById('login-page').style.display = 'flex';
     var sub = document.getElementById('login-sub-el');
-    if (sub) { sub.textContent = 'Google 계정으로 로그인합니다 (관리자 전용)'; sub.style.color = ''; }
+    if (sub) { sub.textContent = '권한에 따라 접근 메뉴가 달라집니다.'; sub.style.color = ''; }
     var btn = document.getElementById('login-btn-el');
-    if (btn) { btn.textContent = 'Google로 로그인'; btn.disabled = false; }
+    if (btn) { btn.textContent = '로그인'; btn.disabled = false; }
+    var idEl = document.getElementById('login-id-el');
+    if (idEl) idEl.value = '';
+    var pwEl = document.getElementById('login-pw-el');
+    if (pwEl) pwEl.value = '';
   });
 };
 
-/* ── Session restore ── */
+/* ── Session restore on page load ── */
 auth.onAuthStateChanged(function(user) {
-  if (user && user.email === ADMIN_EMAIL && !_authed) {
+  if (user && user.email && user.email.endsWith('@pricepick-cms.internal') && !_authed) {
     _authed = true;
-    if (document.getElementById('main-app').style.display === 'none') showApp(user);
+    var uname = user.email.replace('@pricepick-cms.internal', '');
+    db.collection('admin_accounts').where('username', '==', uname).limit(1).get().then(function(snap) {
+      if (snap.empty) return;
+      var data = snap.docs[0].data();
+      var role = (data.role === 'superadmin' || data.role === 'operator') ? data.role : 'operator';
+      window.currentAdmin = { username: data.username, role: role, displayName: data.display_name || data.username };
+      window.currentRole  = role;
+      if (document.getElementById('main-app').style.display === 'none') {
+        showApp({ displayName: data.display_name || data.username, email: data.username });
+      }
+    });
   }
 });
 
