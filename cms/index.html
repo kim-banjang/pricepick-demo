@@ -1037,47 +1037,31 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
     <!-- ── 대시보드 ── -->
     <div class="section active" id="sec-dashboard">
       <div class="stats-grid">
-        <div class="stat-card green"><div class="stat-label">이번달 순수익</div><div class="stat-value">3.0M</div><div class="stat-change">↑ 전월 +21%</div></div>
-        <div class="stat-card purple"><div class="stat-label">제휴 수수료 매출</div><div class="stat-value">4.2M</div><div class="stat-change">↑ 전월 +18%</div></div>
-        <div class="stat-card info"><div class="stat-label">기프티콘 판매 수익</div><div class="stat-value">0.2M</div><div class="stat-change">↑ 전월 +12%</div></div>
-        <div class="stat-card amber"><div class="stat-label">티켓 적립 비용</div><div class="stat-value">1.4M</div><div class="stat-change neutral">차감 항목</div></div>
+        <div class="stat-card green"><div class="stat-label">순수익 (추정)</div><div class="stat-value" id="kpi-net">—</div><div class="stat-change neutral">데모 Firestore 집계</div></div>
+        <div class="stat-card purple"><div class="stat-label">제휴 수수료 매출</div><div class="stat-value" id="kpi-commission">—</div><div class="stat-change neutral">포스트백 확정 기준</div></div>
+        <div class="stat-card info"><div class="stat-label">기프티콘 판매 수익</div><div class="stat-value" id="kpi-gifticon-rev">—</div><div class="stat-change neutral">교환 마진</div></div>
+        <div class="stat-card amber"><div class="stat-label">티켓 적립 비용</div><div class="stat-value" id="kpi-ticket-cost">—</div><div class="stat-change neutral">차감 항목</div></div>
       </div>
       <div class="stats-grid">
-        <div class="stat-card purple"><div class="stat-label">전체 회원</div><div class="stat-value">12,847</div><div class="stat-change">↑ 오늘 +234명</div></div>
-        <div class="stat-card green"><div class="stat-label">오늘 발행 티켓</div><div class="stat-value">3,421</div><div class="stat-change">↑ 12.4%</div></div>
-        <div class="stat-card amber"><div class="stat-label">미처리 문의</div><div class="stat-value">7</div><div class="stat-change down">빠른 처리 필요</div></div>
-        <div class="stat-card red"><div class="stat-label">미처리 추첨</div><div class="stat-value">1</div><div class="stat-change down">마감 D-1</div></div>
+        <div class="stat-card purple"><div class="stat-label">전체 회원</div><div class="stat-value" id="kpi-users">—</div><div class="stat-change neutral">데모 실데이터</div></div>
+        <div class="stat-card green"><div class="stat-label">발행 티켓 (누적 적립)</div><div class="stat-value" id="kpi-tickets">—</div><div class="stat-change neutral">적립 확정 기준</div></div>
+        <div class="stat-card amber"><div class="stat-label">미처리 문의</div><div class="stat-value" id="kpi-inquiries">—</div><div class="stat-change neutral">pending 상태</div></div>
+        <div class="stat-card red"><div class="stat-label">미처리 추첨</div><div class="stat-value" id="kpi-draws">—</div><div class="stat-change neutral">마감 후 미처리</div></div>
       </div>
       <div class="stats-grid">
-        <div class="stat-card"><div class="stat-label">DAU</div><div class="stat-value">2,841</div><div class="stat-change">↑ 어제 +142</div></div>
-        <div class="stat-card"><div class="stat-label">클릭 → 구매 전환율</div><div class="stat-value">3.8%</div><div class="stat-change">↑ 0.4%p</div></div>
-        <div class="stat-card"><div class="stat-label">이탈율 (7일)</div><div class="stat-value">12.3%</div><div class="stat-change down">↑ 1.2%p</div></div>
-        <div class="stat-card"><div class="stat-label">이번달 신규 가입</div><div class="stat-value">1,284</div><div class="stat-change">↑ 전월 +9%</div></div>
+        <div class="stat-card"><div class="stat-label">DAU</div><div class="stat-value">—</div><div class="stat-change neutral">운영 데이터 없음</div></div>
+        <div class="stat-card"><div class="stat-label">클릭 → 구매 전환율</div><div class="stat-value">—</div><div class="stat-change neutral">운영 데이터 없음</div></div>
+        <div class="stat-card"><div class="stat-label">이탈율 (7일)</div><div class="stat-value">—</div><div class="stat-change neutral">운영 데이터 없음</div></div>
+        <div class="stat-card"><div class="stat-label">이번달 신규 가입</div><div class="stat-value">—</div><div class="stat-change neutral">운영 데이터 없음</div></div>
       </div>
       <div class="card-grid">
         <div class="card">
           <div class="card-header"><div class="card-title">일별 신규 회원 (최근 7일)</div></div>
-          <div style="padding:16px 18px">
-            <div class="chart-bar-wrap">
-              <div class="chart-bar-col"><div class="chart-value">+98</div><div class="chart-bar" style="height:42%"></div><div class="chart-label">5/5</div></div>
-              <div class="chart-bar-col"><div class="chart-value">+142</div><div class="chart-bar" style="height:60%"></div><div class="chart-label">5/6</div></div>
-              <div class="chart-bar-col"><div class="chart-value">+118</div><div class="chart-bar" style="height:50%"></div><div class="chart-label">5/7</div></div>
-              <div class="chart-bar-col"><div class="chart-value">+196</div><div class="chart-bar" style="height:82%"></div><div class="chart-label">5/8</div></div>
-              <div class="chart-bar-col"><div class="chart-value">+163</div><div class="chart-bar" style="height:68%"></div><div class="chart-label">5/9</div></div>
-              <div class="chart-bar-col"><div class="chart-value">+201</div><div class="chart-bar" style="height:84%"></div><div class="chart-label">5/10</div></div>
-              <div class="chart-bar-col"><div class="chart-value">+234</div><div class="chart-bar today" style="height:100%"></div><div class="chart-label">오늘</div></div>
-            </div>
-          </div>
+          <div style="padding:32px 18px;text-align:center;color:var(--text-3);font-size:13px">운영 누적 데이터 없음 (시계열 집계는 실서비스 운영 후 표시)</div>
         </div>
         <div class="card">
           <div class="card-header"><div class="card-title">스케줄러 현황</div></div>
-          <div>
-            <div class="scheduler-item"><div class="scheduler-info"><div class="scheduler-dot running"></div><div><div class="scheduler-name">포스트백 수신 처리</div><div class="scheduler-desc">실시간</div></div></div><div class="scheduler-stat"><div class="scheduler-last">방금 전</div><div class="scheduler-next" style="color:var(--success)">정상</div></div></div>
-            <div class="scheduler-item"><div class="scheduler-info"><div class="scheduler-dot running"></div><div><div class="scheduler-name">티켓 확정 처리 (연동 D+7 / 미연동 D+30)</div><div class="scheduler-desc">매일 자정</div></div></div><div class="scheduler-stat"><div class="scheduler-last">어제 00:00</div><div class="scheduler-next" style="color:var(--success)">정상</div></div></div>
-            <div class="scheduler-item"><div class="scheduler-info"><div class="scheduler-dot running"></div><div><div class="scheduler-name">알림 발송</div><div class="scheduler-desc">매 5분</div></div></div><div class="scheduler-stat"><div class="scheduler-last">2분 전</div><div class="scheduler-next" style="color:var(--success)">정상</div></div></div>
-            <div class="scheduler-item"><div class="scheduler-info"><div class="scheduler-dot running"></div><div><div class="scheduler-name">주간 추첨 티켓 집계</div><div class="scheduler-desc">매주 월요일 자정</div></div></div><div class="scheduler-stat"><div class="scheduler-last">지난 월요일</div><div class="scheduler-next" style="color:var(--success)">정상</div></div></div>
-            <div class="scheduler-item"><div class="scheduler-info"><div class="scheduler-dot stopped"></div><div><div class="scheduler-name">DB 백업</div><div class="scheduler-desc">매일 새벽 3시</div></div></div><div class="scheduler-stat"><div class="scheduler-last">2일 전</div><div class="scheduler-next" style="color:var(--danger)">오류</div></div></div>
-          </div>
+          <div style="padding:32px 18px;text-align:center;color:var(--text-3);font-size:13px">실행 이력 없음 (배치 스케줄러 미가동)</div>
         </div>
       </div>
       <div class="card">
@@ -1131,11 +1115,11 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
         <div style="margin-left:auto;display:flex;gap:8px;" id="member-hdr-actions"></div>
       </div>
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;padding:0 2px;">
-        <div style="font-size:13px;font-weight:700;">회원 목록 <span style="color:var(--text-3);font-weight:500">총 12,847명</span></div>
+        <div style="font-size:13px;font-weight:700;">회원 목록 <span style="color:var(--text-3);font-weight:500">총 <span id="mem-total">—</span>명</span></div>
         <div style="display:flex;align-items:center;gap:16px;font-size:12px;">
-          <span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--main);margin-right:5px;vertical-align:middle;"></span>카카오 연동 <strong style="color:var(--main-hover)">10,432명</strong> (81.2%)</span>
-          <span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#d97a17;margin-right:5px;vertical-align:middle;"></span>게스트(미연동) <strong style="color:#d97a17">2,415명</strong> (18.8%)</span>
-          <span style="color:var(--text-3)">마케팅 수신 동의 <strong style="color:var(--text-2)">12,418명</strong> (67.4%)</span>
+          <span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--main);margin-right:5px;vertical-align:middle;"></span>카카오 연동 <strong style="color:var(--main-hover)" id="mem-kakao">—</strong></span>
+          <span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#d97a17;margin-right:5px;vertical-align:middle;"></span>게스트(미연동) <strong style="color:#d97a17" id="mem-guest">—</strong></span>
+          <span style="color:var(--text-3)">마케팅 수신 동의 <strong style="color:var(--text-2)" id="mem-mkt">—</strong></span>
         </div>
       </div>
       <div class="card">
@@ -1144,18 +1128,17 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
           <tbody>
           </tbody>
         </table>
-        <div class="pagination"><button class="page-btn active">1</button><button class="page-btn">2</button><button class="page-btn">···</button><button class="page-btn">368</button><button class="page-btn">›</button></div>
       </div>
     </div>
 
     <!-- ── 티켓 내역 ── -->
     <div class="section" id="sec-tickets">
       <div class="stats-grid" style="grid-template-columns:repeat(5,1fr)">
-        <div class="stat-card purple"><div class="stat-label">누적 발행</div><div class="stat-value">248,312</div><div class="stat-change neutral">전체 누적</div></div>
-        <div class="stat-card green"><div class="stat-label">오늘 발행</div><div class="stat-value">3,421</div><div class="stat-change">↑ 12.4%</div></div>
-        <div class="stat-card amber"><div class="stat-label">기프티콘 교환</div><div class="stat-value">2,847</div><div class="stat-change neutral">이번달 누적</div></div>
-        <div class="stat-card blue"><div class="stat-label">경품 응모 소모</div><div class="stat-value">1,204</div><div class="stat-change neutral">이벤트 티켓</div></div>
-        <div class="stat-card red"><div class="stat-label">부정행위 회수</div><div class="stat-value">23</div><div class="stat-change down">이번달 누적</div></div>
+        <div class="stat-card purple"><div class="stat-label">누적 발행 (적립)</div><div class="stat-value" id="tk-earn">—</div><div class="stat-change neutral">전체 누적</div></div>
+        <div class="stat-card green"><div class="stat-label">기프티콘 교환</div><div class="stat-value" id="tk-use">—</div><div class="stat-change neutral">티켓 소모</div></div>
+        <div class="stat-card amber"><div class="stat-label">전체 원장 레코드</div><div class="stat-value" id="tk-total">—</div><div class="stat-change neutral">append-only</div></div>
+        <div class="stat-card blue"><div class="stat-label">만료 소멸</div><div class="stat-value" id="tk-expire">—</div><div class="stat-change neutral">유효기간 경과</div></div>
+        <div class="stat-card red"><div class="stat-label">부정행위 회수</div><div class="stat-value" id="tk-clawback">—</div><div class="stat-change neutral">취소·반품</div></div>
       </div>
       <div class="info-box"><strong>티켓 원장은 절대 삭제 금지</strong> — 회계/세무/부정거래 추적의 근거. 회수 시에도 음수 레코드로 추가, 원본 보존. (append-only)</div>
       <div class="toolbar">
@@ -1236,10 +1219,10 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
       <div class="info-box"><strong>정책 확정 반영</strong> — 이벤트 티켓 획득 경로·만료·한도 확정 적용. 경품 추첨 주기(월1/격주)만 미정.</div>
       <div class="info-box">🎟 <strong>이벤트 티켓 전용</strong> — 이벤트 티켓 1장 소모 · 1회 추첨 최대 10장 · 추첨 회차 기준 응모</div>
       <div class="stats-grid">
-        <div class="stat-card purple"><div class="stat-label">오늘 응모 수</div><div class="stat-value">3,421</div><div class="stat-change neutral">1회 추첨 최대 10장</div></div>
-        <div class="stat-card green"><div class="stat-label">오늘 당첨자</div><div class="stat-value">127</div><div class="stat-change">1등17 · 2등51 · 3등59</div></div>
-        <div class="stat-card amber"><div class="stat-label">소모 이벤트 티켓</div><div class="stat-value">3,421</div><div class="stat-change neutral">응모당 1장</div></div>
-        <div class="stat-card red"><div class="stat-label">미발송 경품</div><div class="stat-value">3</div><div class="stat-change down">빠른 발송 필요</div></div>
+        <div class="stat-card purple"><div class="stat-label">오늘 응모 수</div><div class="stat-value">—</div><div class="stat-change neutral">운영 데이터 없음</div></div>
+        <div class="stat-card green"><div class="stat-label">오늘 당첨자</div><div class="stat-value">—</div><div class="stat-change neutral">운영 데이터 없음</div></div>
+        <div class="stat-card amber"><div class="stat-label">소모 이벤트 티켓</div><div class="stat-value">—</div><div class="stat-change neutral">운영 데이터 없음</div></div>
+        <div class="stat-card red"><div class="stat-label">미발송 경품</div><div class="stat-value">—</div><div class="stat-change neutral">운영 데이터 없음</div></div>
       </div>
       <div class="card-grid">
         <div class="card">
@@ -1286,10 +1269,10 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
       <div class="info-box"><strong>주간 이벤트 추첨 = 이벤트 티켓 소비처(자동 응모)</strong> — 보유한 이벤트 티켓으로 자동 응모되며, 당첨 시 <strong>경품(기프티콘·실물 등)</strong>을 지급합니다. 추첨이 이벤트 티켓을 새로 발급하지 않습니다. (이벤트 티켓 획득 경로는 출석 5연속·행운룰렛·이부장 패키지 5종 등 별도 경로)</div>
       <div class="info-box"><strong>주간 이벤트 추첨</strong> — 매주 월요일, 보유 이벤트 티켓으로 자동 응모된 회원 중 추첨하여 당첨자에게 경품(기프티콘·실물 등)을 지급합니다. 이벤트 티켓은 이 추첨의 <strong>응모 수단(소비)</strong>이며, 추첨이 이벤트 티켓을 발급하지 않습니다.</div>
       <div class="stats-grid">
-        <div class="stat-card purple"><div class="stat-label">이번주 자동 응모자</div><div class="stat-value">12,841</div><div class="stat-change neutral">이벤트 티켓 보유 회원</div></div>
-        <div class="stat-card green"><div class="stat-label">당첨자 수</div><div class="stat-value">6,184</div><div class="stat-change">당첨률 48.2%</div></div>
-        <div class="stat-card amber"><div class="stat-label">지급된 당첨 경품</div><div class="stat-value">6,184</div><div class="stat-change neutral">기프티콘·실물 등</div></div>
-        <div class="stat-card red"><div class="stat-label">이번주 소진 티켓</div><div class="stat-value">3,421</div><div class="stat-change down">경품 응모 사용</div></div>
+        <div class="stat-card purple"><div class="stat-label">이번주 자동 응모자</div><div class="stat-value">—</div><div class="stat-change neutral">운영 데이터 없음</div></div>
+        <div class="stat-card green"><div class="stat-label">당첨자 수</div><div class="stat-value">—</div><div class="stat-change neutral">운영 데이터 없음</div></div>
+        <div class="stat-card amber"><div class="stat-label">지급된 당첨 경품</div><div class="stat-value">—</div><div class="stat-change neutral">운영 데이터 없음</div></div>
+        <div class="stat-card red"><div class="stat-label">이번주 소진 티켓</div><div class="stat-value">—</div><div class="stat-change neutral">운영 데이터 없음</div></div>
       </div>
       <div class="card-grid">
         <div class="card">
@@ -1330,7 +1313,7 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
         <button class="btn btn-ghost btn-sm" style="margin-left:auto" onclick="toast('CSV 내보내기 완료')">CSV 내보내기</button>
       </div>
       <div class="card">
-        <div class="card-header"><div class="card-title">구매/사용 내역</div><span style="font-size:12px;color:var(--text-2)">총 1,050건</span></div>
+        <div class="card-header"><div class="card-title">구매/사용 내역</div><span style="font-size:12px;color:var(--text-2)" id="gex-count">—</span></div>
         <table>
           <thead>
             <tr>
@@ -1346,7 +1329,6 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
           <span style="font-size:12px;color:var(--text-2)">페이지당 <select class="filter-sel" style="width:60px;padding:4px"><option>10</option><option>25</option><option>50</option></select> 행</span>
           <div style="display:flex;gap:4px;align-items:center">
             <button class="btn btn-ghost btn-sm" disabled>이전</button>
-            <span style="font-size:12px;padding:0 8px">1–10 / 1,050</span>
             <button class="btn btn-ghost btn-sm" onclick="toast('다음 페이지')">다음</button>
           </div>
         </div>
@@ -1366,14 +1348,13 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
         <button class="btn btn-ghost btn-sm" style="margin-left:auto" onclick="toast('CSV 내보내기 완료')">CSV 내보내기</button>
       </div>
       <div class="card">
-        <div class="card-header"><div class="card-title">취소 내역</div><span style="font-size:12px;color:var(--text-2)">총 7건</span></div>
+        <div class="card-header"><div class="card-title">취소 내역</div><span style="font-size:12px;color:var(--text-2)" id="gcancel-count">—</span></div>
         <table>
           <thead><tr><th>No</th><th>주문번호</th><th>닉네임(카카오톡 ID)</th><th>상품명</th><th>취소날짜</th><th>취소사유</th><th>환불 티켓</th><th>잔여 티켓</th></tr></thead>
           <tbody>
           </tbody>
         </table>
         <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 18px;border-top:1px solid var(--border)">
-          <span style="font-size:12px;color:var(--text-2)">1–7 / 7</span>
           <div style="display:flex;gap:4px;align-items:center">
             <button class="btn btn-ghost btn-sm" disabled>이전</button>
             <button class="btn btn-ghost btn-sm" disabled>다음</button>
@@ -1397,7 +1378,6 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
           <tbody id="gifticon-tbody"></tbody>
         </table>
         <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 18px;border-top:1px solid var(--border)">
-          <span style="font-size:12px;color:var(--text-2)">1–10 / 455</span>
           <div style="display:flex;gap:4px;">
             <button class="btn btn-ghost btn-sm" disabled>이전</button>
             <button class="btn btn-ghost btn-sm" onclick="toast('다음 페이지')">다음</button>
@@ -1427,7 +1407,7 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
     <!-- ── 배너 관리 ── -->
     <div class="section" id="sec-banners">
       <div class="card">
-        <div class="card-header"><div><div class="card-title">배너 관리</div><div class="card-sub">홈 상단 슬라이드 · 현재 2개 노출 · 카드 순서 드래그로 노출 순서 변경</div></div><div id="banner-hdr-actions"><button class="btn btn-primary btn-sm" onclick="openModal('m-banner')">+ 배너 추가</button></div></div>
+        <div class="card-header"><div><div class="card-title">배너 관리</div><div class="card-sub">홈 상단 슬라이드 · 카드 순서 드래그로 노출 순서 변경</div></div><div id="banner-hdr-actions"><button class="btn btn-primary btn-sm" onclick="openModal('m-banner')">+ 배너 추가</button></div></div>
         <div class="banner-grid">
           <div class="banner-card">
             <div class="banner-preview" style="background:linear-gradient(135deg,#845EEE,#C6AFFF)">이번 주 추첨 참여하기</div>
@@ -1489,10 +1469,10 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
     <div class="section" id="sec-invite">
       <div class="info-box"><strong>정책 확정 반영</strong> — 친구초대 보상 = 양쪽 각 500P(포인트), 초대자 월 최대 50명. (이벤트 티켓 → 포인트 변경)</div>
       <div class="invite-stat-grid">
-        <div class="invite-card"><div class="invite-card-value" style="color:var(--main)">4,821</div><div class="invite-card-label">누적 초대 링크 발송</div></div>
-        <div class="invite-card"><div class="invite-card-value" style="color:var(--success)">1,284</div><div class="invite-card-label">초대 성공 (가입 완료)</div></div>
-        <div class="invite-card"><div class="invite-card-value" style="color:var(--amber)">26.6%</div><div class="invite-card-label">초대 전환율</div></div>
-        <div class="invite-card"><div class="invite-card-value" style="color:var(--info)">642,000P</div><div class="invite-card-label">지급된 초대 포인트</div></div>
+        <div class="invite-card"><div class="invite-card-value" style="color:var(--main)">—</div><div class="invite-card-label">누적 초대 링크 발송</div></div>
+        <div class="invite-card"><div class="invite-card-value" style="color:var(--success)">—</div><div class="invite-card-label">초대 성공 (가입 완료)</div></div>
+        <div class="invite-card"><div class="invite-card-value" style="color:var(--amber)">—</div><div class="invite-card-label">초대 전환율</div></div>
+        <div class="invite-card"><div class="invite-card-value" style="color:var(--info)">—</div><div class="invite-card-label">지급된 초대 포인트</div></div>
       </div>
       <div class="info-box"><strong>친구초대 보상</strong> — 초대자·피초대자 양쪽 각 <strong>500P(포인트)</strong> · 성사 기준 피초대자 첫 픽구매 완료(성사 시점 양쪽 지급) · 초대자 월 최대 50명. 상세 정책은 <strong>운영 정책 &gt; 참여·이벤트</strong> 탭 참조.</div>
       <div class="card">
@@ -1649,9 +1629,9 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
     <!-- ── 공지사항 관리 (신규) ── -->
     <div class="section" id="sec-notice">
       <div class="stats-grid" style="grid-template-columns:repeat(3,1fr)">
-        <div class="stat-card purple"><div class="stat-label">게시 중 공지</div><div class="stat-value">8건</div><div class="stat-change neutral">앱 공지사항 노출</div></div>
-        <div class="stat-card green"><div class="stat-label">이번달 등록</div><div class="stat-value">5건</div><div class="stat-change">↑ 전월 +2</div></div>
-        <div class="stat-card amber"><div class="stat-label">임시저장</div><div class="stat-value">1건</div><div class="stat-change neutral">미게시</div></div>
+        <div class="stat-card purple"><div class="stat-label">게시 중 공지</div><div class="stat-value">—</div><div class="stat-change neutral">앱 공지사항 노출</div></div>
+        <div class="stat-card green"><div class="stat-label">전체 공지</div><div class="stat-value">—</div><div class="stat-change neutral">등록 누적</div></div>
+        <div class="stat-card amber"><div class="stat-label">임시저장</div><div class="stat-value">—</div><div class="stat-change neutral">미게시</div></div>
       </div>
       <div class="card">
         <div class="card-header"><div class="card-title">공지 작성</div></div>
@@ -1681,7 +1661,7 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
         </div>
       </div>
       <div class="card">
-        <div class="card-header"><div class="card-title">공지 목록</div><div style="font-size:12px;color:var(--text-2)">총 8건</div></div>
+        <div class="card-header"><div class="card-title">공지 목록</div><div style="font-size:12px;color:var(--text-2)" id="notice-count">—</div></div>
         <table>
           <thead><tr><th>제목</th><th style="text-align:center">분류</th><th style="text-align:center">게시일</th><th style="text-align:center">조회수</th><th style="text-align:center">노출</th><th style="text-align:center">관리</th></tr></thead>
           <tbody>
@@ -1693,9 +1673,9 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
 
     <div class="section" id="sec-notifications">
       <div class="stats-grid" style="grid-template-columns:repeat(3,1fr)">
-        <div class="stat-card purple"><div class="stat-label">이번달 발송</div><div class="stat-value">42건</div><div class="stat-change">푸시 31 · 알림톡 11</div></div>
-        <div class="stat-card green"><div class="stat-label">평균 열람율</div><div class="stat-value">31.4%</div><div class="stat-change">↑ 전월 +2.1%p</div></div>
-        <div class="stat-card amber"><div class="stat-label">예약 대기</div><div class="stat-value">2건</div><div class="stat-change neutral">발송 예정</div></div>
+        <div class="stat-card purple"><div class="stat-label">이번달 발송</div><div class="stat-value">—</div><div class="stat-change neutral">발송 내역 없음</div></div>
+        <div class="stat-card green"><div class="stat-label">평균 열람율</div><div class="stat-value">—</div><div class="stat-change neutral">운영 데이터 없음</div></div>
+        <div class="stat-card amber"><div class="stat-label">예약 대기</div><div class="stat-value">—</div><div class="stat-change neutral">발송 예정 없음</div></div>
       </div>
       <div class="card">
         <div class="card-header"><div class="card-title">FCM 푸시 발송 상한 정책 <span style="font-size:11px;color:var(--success);font-weight:600">정책 확정</span></div></div>
@@ -2163,9 +2143,6 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
           <div class="card-header"><div class="card-title">기프티콘 판매 수익</div><span style="font-size:11px;color:var(--text-3)">티켓 교환 시 발생 마진</span></div>
           <table>
             <tbody>
-              <tr><td>교환 기프티콘 환산가치 <span style="font-size:11px;color:var(--text-3)">(유저 티켓 소진)</span></td><td>1,000,000원</td></tr>
-              <tr><td>기프티콘 매입원가 <span style="font-size:11px;color:var(--text-3)">(도매)</span></td><td style="text-align:right;color:var(--amber)">− 800,000원</td></tr>
-              <tr style="border-top:2px solid var(--border)"><td style="font-weight:700">기프티콘 판매 수익 (마진)</td><td style="font-weight:700;color:var(--success)">+ 200,000원</td></tr>
             </tbody>
           </table>
           <div style="margin-top:12px;padding:10px 12px;background:var(--surface-2);border-radius:8px;font-size:11.5px;color:var(--text-2);line-height:1.6">기프티콘 교환가는 티켓 환산가치 기준으로 책정되고, 실제 매입은 도매가로 이루어져 그 차액이 추가 수익이 됩니다.</div>
@@ -2184,11 +2161,6 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
           <div class="card-header"><div class="card-title">순수익 종합</div><span style="font-size:11px;color:var(--text-3)">이번달 손익 요약</span></div>
           <table>
             <tbody>
-              <tr><td>제휴 수수료 매출</td><td style="color:var(--success);font-weight:600">+ 4,200,000원</td></tr>
-              <tr><td>기프티콘 판매 수익</td><td style="color:var(--success);font-weight:600">+ 200,000원</td></tr>
-              <tr><td>티켓 적립 비용</td><td style="color:var(--amber);font-weight:600">− 1,400,000원</td></tr>
-              <tr style="border-top:2px solid var(--border)"><td style="font-weight:700">순수익</td><td style="font-weight:800;font-size:15px;color:var(--success)">3,000,000원</td></tr>
-              <tr><td style="color:var(--text-2);font-size:12px">순수익률 (총수익 대비)</td><td style="color:var(--text-2);font-size:12px">68.2%</td></tr>
             </tbody>
           </table>
         </div>
@@ -2204,9 +2176,9 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
       </div>
       <div class="info-box"><strong>매출 내역</strong> — 매출 발생 건별 기록입니다. <strong>제휴 수수료</strong>(제휴몰 D+30 정산)와 <strong>기프티콘 판매</strong>(교환 시 즉시 발생 마진)는 정산 주체·시점이 달라 유형별로 분리해 관리합니다. 합산 지표는 <strong>수익 분석</strong> 페이지 참고.</div>
       <div class="stats-grid">
-        <div class="stat-card purple"><div class="stat-label">이번달 제휴 수수료 매출</div><div class="stat-value">4.2M</div><div class="stat-change">제휴몰 D+30 정산</div></div>
-        <div class="stat-card amber"><div class="stat-label">이번달 기프티콘 판매 매출</div><div class="stat-value">0.2M</div><div class="stat-change">교환 마진 · 즉시</div></div>
-        <div class="stat-card green"><div class="stat-label">이번달 총 매출</div><div class="stat-value">4.4M</div><div class="stat-change">↑ 전월 +17%</div></div>
+        <div class="stat-card purple"><div class="stat-label">제휴 수수료 매출</div><div class="stat-value" id="rev-commission">—</div><div class="stat-change neutral">제휴몰 D+30 정산</div></div>
+        <div class="stat-card amber"><div class="stat-label">기프티콘 판매 매출</div><div class="stat-value" id="rev-gifticon-val">—</div><div class="stat-change neutral">교환 마진 · 즉시</div></div>
+        <div class="stat-card green"><div class="stat-label">총 매출</div><div class="stat-value" id="rev-total">—</div><div class="stat-change neutral">포스트백 + 교환 마진</div></div>
       </div>
       <div class="card">
         <div style="padding:18px;">
@@ -2220,7 +2192,7 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
               <select class="filter-sel"><option>전체 제휴몰</option><option>쿠팡</option><option>11번가</option><option>G마켓</option><option>알리익스프레스</option><option>아이허브</option></select>
               <select class="filter-sel"><option>오늘</option><option>이번주</option><option>이번달</option></select>
             </div>
-            <div class="card-header"><div class="card-title">제휴 수수료 매출 내역</div><div style="font-size:12px;color:var(--text-2)">오늘 3,421건 · 합 4,240,000원</div></div>
+            <div class="card-header"><div class="card-title">제휴 수수료 매출 내역</div><div style="font-size:12px;color:var(--text-2)" id="rev-fee-sub">—</div></div>
             <table>
               <thead><tr><th style="text-align:center">발생 일시</th><th style="text-align:center">제휴몰</th><th>회원(UID)</th><th style="text-align:center">주문번호</th><th>구매금액</th><th style="text-align:center">수수료율</th><th>수수료 매출</th><th>적립 금액(티켓)</th><th style="text-align:center">상태</th></tr></thead>
               <tbody>
@@ -2233,7 +2205,7 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
               <input class="search-box" placeholder="회원, 상품 검색...">
               <select class="filter-sel"><option>오늘</option><option>이번주</option><option>이번달</option></select>
             </div>
-            <div class="card-header"><div class="card-title">기프티콘 판매 매출 내역</div><div style="font-size:12px;color:var(--text-2)">오늘 47건 · 마진 합 38,600원</div></div>
+            <div class="card-header"><div class="card-title">기프티콘 판매 매출 내역</div><div style="font-size:12px;color:var(--text-2)" id="rev-gi-sub">—</div></div>
             <table>
               <thead><tr><th style="text-align:center">발생 일시</th><th style="text-align:center">기프티콘 상품</th><th>회원(UID)</th><th>교환가(실가)</th><th>도매 원가</th><th>판매 마진</th><th style="text-align:center">상태</th></tr></thead>
               <tbody>
@@ -2253,9 +2225,9 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
         <span class="ds-tag calc">우리 DB 집계 · 추정 매출 (포스트백 기준)</span>
       </div>
       <div class="stats-grid" style="grid-template-columns:repeat(3,1fr)">
-        <div class="stat-card green"><div class="stat-label">이번달 확정 정산</div><div class="stat-value">3.8M</div><div class="stat-change">2026년 4월분 · 5개 제휴몰</div></div>
-        <div class="stat-card purple"><div class="stat-label">이번달 추정 매출</div><div class="stat-value">4.2M</div><div class="stat-change neutral">5월 포스트백 기준</div></div>
-        <div class="stat-card amber"><div class="stat-label">누적 수익 (올해)</div><div class="stat-value">18.4M</div><div class="stat-change">↑ 전년 대비 +34%</div></div>
+        <div class="stat-card green"><div class="stat-label">확정 정산 (집계)</div><div class="stat-value" id="settle-confirmed">—</div><div class="stat-change neutral">데모 집계</div></div>
+        <div class="stat-card purple"><div class="stat-label">추정 매출</div><div class="stat-value" id="settle-estimate">—</div><div class="stat-change neutral">포스트백 기준</div></div>
+        <div class="stat-card amber"><div class="stat-label">누적 수익</div><div class="stat-value">—</div><div class="stat-change neutral">운영 데이터 없음</div></div>
       </div>
       <div class="card">
         <div class="card-header"><div class="card-title">제휴몰별 정산 현황</div><span style="font-size:11px;color:var(--text-3)">2026년 4월 확정분</span></div>
@@ -2274,7 +2246,7 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
         </table>
       </div>
       <div style="margin-top:4px;padding:14px 16px;background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r-md);font-size:12px;color:var(--text-2);line-height:1.7">
-        <strong style="color:var(--text)">차액 사유 (이번달)</strong> &nbsp;—&nbsp; <strong>환불 처리 누락</strong> 2건 · -38,000원 (제휴몰은 차감, 우리 시스템 미반영 → 포스트백 재처리 필요) &nbsp;/&nbsp; <strong>부정거래 검증 지연</strong> 5건 · -5,000원 (제휴몰 검증 후 차감, 다음달 정산 반영). &nbsp;차이 발생 원인: 환불 누락 · 포스트백 미수신 · 제휴몰별 수수료율 변경 · 부정거래 검증 지연.
+        <strong style="color:var(--text)">차액 사유</strong> &nbsp;—&nbsp; 차이 발생 원인: 환불 누락 · 포스트백 미수신 · 제휴몰별 수수료율 변경 · 부정거래 검증 지연. (실제 차액 데이터는 제휴몰 정산 확정 후 표시)
       </div>
     </div>
 
@@ -2293,7 +2265,7 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
         <select class="filter-sel"><option>오늘</option><option>이번주</option><option>이번달</option></select>
       </div>
       <div class="card">
-        <div class="card-header"><div class="card-title">포스트백 로그</div><div style="font-size:12px;color:var(--text-2)">오늘 3,421건 수신</div></div>
+        <div class="card-header"><div class="card-title">포스트백 로그</div><div style="font-size:12px;color:var(--text-2)" id="pb-sub">—</div></div>
         <table>
           <thead><tr><th style="text-align:center">수신 시각</th><th style="text-align:center">제휴몰</th><th>회원(UID)</th><th style="text-align:center">주문번호</th><th style="text-align:center">구매금액</th><th style="text-align:center">제휴 수수료 (매출)</th><th style="text-align:center">상태</th></tr></thead>
           <tbody>
@@ -2333,9 +2305,7 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
         <table>
           <thead><tr><th>버전</th><th>플랫폼</th><th>배포일</th><th>주요 변경사항</th><th>강제 업데이트</th></tr></thead>
           <tbody>
-            <tr><td><strong>1.4.3</strong></td><td>iOS</td><td>2026-05-08</td><td>ATT 팝업 추가, 포스트백 오류 수정</td><td><span class="badge badge-green">활성</span></td></tr>
-            <tr><td><strong>1.4.2</strong></td><td>Android</td><td>2026-05-06</td><td>UI 개선, 알림 버그 수정</td><td><span class="badge badge-green">활성</span></td></tr>
-            <tr><td><strong>1.4.0</strong></td><td>iOS/Android</td><td>2026-04-20</td><td>기프티콘 교환 기능 출시</td><td><span class="badge badge-gray">비활성</span></td></tr>
+            <tr><td colspan="5" style="text-align:center;padding:32px;color:var(--text-3);font-size:13px">배포 이력 없음</td></tr>
           </tbody>
         </table>
       </div>
@@ -2351,34 +2321,24 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
           <div>
             <div class="policy-item"><div class="policy-label">Access Key</div><div class="policy-value" style="font-family:monospace;font-size:13px;color:var(--main)">CPAP_••••••••••••••••••3f82</div><div class="policy-desc">마지막 업데이트: 2026-03-15</div></div>
             <div class="policy-item"><div class="policy-label">Secret Key</div><div class="policy-value" style="font-family:monospace;font-size:13px;color:var(--main)">••••••••••••••••••••••••••••</div><div class="policy-desc">마지막 업데이트: 2026-03-15</div></div>
-            <div class="policy-item"><div class="policy-label">API 상태</div><div class="policy-value"><span class="badge badge-green">정상</span></div><div class="policy-desc">마지막 확인: 8분 전</div></div>
-            <div class="policy-item"><div class="policy-label">일일 호출 한도</div><div class="policy-value">100,000회</div><div class="policy-desc">오늘 사용: 28,420회 (28.4%)</div></div>
+            <div class="policy-item"><div class="policy-label">API 상태</div><div class="policy-value"><span class="badge badge-gray">미확인</span></div><div class="policy-desc">운영 데이터 없음</div></div>
+            <div class="policy-item"><div class="policy-label">일일 호출 한도</div><div class="policy-value">100,000회</div><div class="policy-desc">오늘 사용: 운영 데이터 없음</div></div>
           </div>
         </div>
         <div class="card">
           <div class="card-header"><div class="card-title">API 호출 현황</div></div>
-          <div style="padding:16px;">
-            <div class="chart-bar-wrap">
-              <div class="chart-bar-col"><div class="chart-value">22K</div><div class="chart-bar" style="height:44%"></div><div class="chart-label">5/5</div></div>
-              <div class="chart-bar-col"><div class="chart-value">26K</div><div class="chart-bar" style="height:52%"></div><div class="chart-label">5/6</div></div>
-              <div class="chart-bar-col"><div class="chart-value">24K</div><div class="chart-bar" style="height:48%"></div><div class="chart-label">5/7</div></div>
-              <div class="chart-bar-col"><div class="chart-value">31K</div><div class="chart-bar" style="height:62%"></div><div class="chart-label">5/8</div></div>
-              <div class="chart-bar-col"><div class="chart-value">29K</div><div class="chart-bar" style="height:58%"></div><div class="chart-label">5/9</div></div>
-              <div class="chart-bar-col"><div class="chart-value">27K</div><div class="chart-bar" style="height:54%"></div><div class="chart-label">5/10</div></div>
-              <div class="chart-bar-col"><div class="chart-value">28K</div><div class="chart-bar today" style="height:56%"></div><div class="chart-label">오늘</div></div>
-            </div>
-          </div>
+          <div style="padding:32px 18px;text-align:center;color:var(--text-3);font-size:13px">운영 누적 데이터 없음</div>
         </div>
         <div class="card">
           <div class="card-header"><div class="card-title">제휴몰 연동 현황</div><button class="btn btn-ghost btn-sm" onclick="toast('제휴몰 추가 연동')">제휴몰 추가</button></div>
           <table>
             <thead><tr><th>제휴몰</th><th>Access Key</th><th>상태</th><th>마지막 확인</th></tr></thead>
             <tbody>
-              <tr><td style="font-weight:600">쿠팡 파트너스</td><td style="font-family:monospace;font-size:12px">CPAP_••••3f82</td><td><span class="badge badge-green">정상</span></td><td>8분 전</td></tr>
-              <tr><td style="font-weight:600">11번가</td><td style="font-family:monospace;font-size:12px">ST11_••••a907</td><td><span class="badge badge-green">정상</span></td><td>15분 전</td></tr>
-              <tr><td style="font-weight:600">G마켓</td><td style="font-family:monospace;font-size:12px">GMKT_••••11c4</td><td><span class="badge badge-green">정상</span></td><td>22분 전</td></tr>
-              <tr><td style="font-weight:600">알리익스프레스</td><td style="font-family:monospace;font-size:12px">ALIE_••••7d30</td><td><span class="badge badge-amber">점검 중</span></td><td>1시간 전</td></tr>
-              <tr><td style="font-weight:600">아이허브</td><td style="font-family:monospace;font-size:12px">IHRB_••••5e88</td><td><span class="badge badge-green">정상</span></td><td>33분 전</td></tr>
+              <tr><td style="font-weight:600">쿠팡 파트너스</td><td style="font-family:monospace;font-size:12px">CPAP_••••3f82</td><td><span class="badge badge-gray">미확인</span></td><td style="color:var(--text-3)">—</td></tr>
+              <tr><td style="font-weight:600">11번가</td><td style="font-family:monospace;font-size:12px">ST11_••••a907</td><td><span class="badge badge-gray">미확인</span></td><td style="color:var(--text-3)">—</td></tr>
+              <tr><td style="font-weight:600">G마켓</td><td style="font-family:monospace;font-size:12px">GMKT_••••11c4</td><td><span class="badge badge-gray">미확인</span></td><td style="color:var(--text-3)">—</td></tr>
+              <tr><td style="font-weight:600">알리익스프레스</td><td style="font-family:monospace;font-size:12px">ALIE_••••7d30</td><td><span class="badge badge-gray">미확인</span></td><td style="color:var(--text-3)">—</td></tr>
+              <tr><td style="font-weight:600">아이허브</td><td style="font-family:monospace;font-size:12px">IHRB_••••5e88</td><td><span class="badge badge-gray">미확인</span></td><td style="color:var(--text-3)">—</td></tr>
             </tbody>
           </table>
         </div>
@@ -2391,10 +2351,10 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
       <div class="card">
         <div class="card-header"><div><div class="card-title">스케줄러 목록</div><div class="card-sub">시스템 정의 배치 — 생성·삭제 없음 · 활성/비활성 토글·주기 조정·즉시 실행만 제공</div></div></div>
         <div>
-          <div class="scheduler-item"><div class="scheduler-info"><div class="scheduler-dot running"></div><div><div class="scheduler-name">알림 발송</div><div class="scheduler-desc">매 5분 · 예약·이벤트 알림 큐 처리</div></div></div><div style="display:flex;align-items:center;gap:10px;"><div class="scheduler-stat"><div class="scheduler-last">2분 전</div><div class="scheduler-next" style="color:var(--success)">정상</div></div><button class="btn btn-ghost btn-sm" onclick="toast('일시정지 처리')">일시정지</button><button class="btn btn-success btn-sm" onclick="toast('즉시 실행 완료')">즉시 실행</button></div></div>
-          <div class="scheduler-item"><div class="scheduler-info"><div class="scheduler-dot running"></div><div><div class="scheduler-name">주간 추첨 집계</div><div class="scheduler-desc">매주 월요일 자정 · 자동 당첨 처리</div></div></div><div style="display:flex;align-items:center;gap:10px;"><div class="scheduler-stat"><div class="scheduler-last">지난 월요일</div><div class="scheduler-next" style="color:var(--success)">정상</div></div><button class="btn btn-ghost btn-sm" onclick="toast('일시정지 처리')">일시정지</button><button class="btn btn-success btn-sm" onclick="toast('즉시 실행 완료')">즉시 실행</button></div></div>
-          <div class="scheduler-item"><div class="scheduler-info"><div class="scheduler-dot running"></div><div><div class="scheduler-name">티켓 확정 배치</div><div class="scheduler-desc">매일 오전 3시 · 대기 티켓 자동 확정 (연동 D+7 / 미연동 D+30)</div></div></div><div style="display:flex;align-items:center;gap:10px;"><div class="scheduler-stat"><div class="scheduler-last">어제 03:00</div><div class="scheduler-next" style="color:var(--success)">정상</div></div><button class="btn btn-ghost btn-sm" onclick="toast('일시정지 처리')">일시정지</button><button class="btn btn-success btn-sm" onclick="toast('즉시 실행 완료')">즉시 실행</button></div></div><div class="scheduler-item"><div class="scheduler-info"><div class="scheduler-dot running"></div><div><div class="scheduler-name">티켓 만료 배치</div><div class="scheduler-desc">매일 새벽 4시 · 등급 티켓 만료 소멸 + D-30/D-7 임박 알림</div></div></div><div style="display:flex;align-items:center;gap:10px;"><div class="scheduler-stat"><div class="scheduler-last">오늘 04:00</div><div class="scheduler-next" style="color:var(--success)">정상</div></div><button class="btn btn-ghost btn-sm" onclick="toast('일시정지 처리')">일시정지</button><button class="btn btn-success btn-sm" onclick="toast('즉시 실행 완료')">즉시 실행</button></div></div>
-          <div class="scheduler-item"><div class="scheduler-info"><div class="scheduler-dot stopped"></div><div><div class="scheduler-name">DB 백업</div><div class="scheduler-desc">매일 새벽 3시 · S3 자동 업로드</div></div></div><div style="display:flex;align-items:center;gap:10px;"><div class="scheduler-stat"><div class="scheduler-last">2일 전</div><div class="scheduler-next" style="color:var(--danger)">오류</div></div><button class="btn btn-primary btn-sm" onclick="toast('재시작 처리')">재시작</button><button class="btn btn-success btn-sm" onclick="toast('즉시 실행 완료')">즉시 실행</button></div></div>
+          <div class="scheduler-item"><div class="scheduler-info"><div class="scheduler-dot running"></div><div><div class="scheduler-name">알림 발송</div><div class="scheduler-desc">매 5분 · 예약·이벤트 알림 큐 처리</div></div></div><div style="display:flex;align-items:center;gap:10px;"><div class="scheduler-stat"><div class="scheduler-last">—</div><div class="scheduler-next" style="color:var(--text-3)">미가동</div></div><button class="btn btn-ghost btn-sm" onclick="toast('일시정지 처리')">일시정지</button><button class="btn btn-success btn-sm" onclick="toast('즉시 실행 완료')">즉시 실행</button></div></div>
+          <div class="scheduler-item"><div class="scheduler-info"><div class="scheduler-dot running"></div><div><div class="scheduler-name">주간 추첨 집계</div><div class="scheduler-desc">매주 월요일 자정 · 자동 당첨 처리</div></div></div><div style="display:flex;align-items:center;gap:10px;"><div class="scheduler-stat"><div class="scheduler-last">—</div><div class="scheduler-next" style="color:var(--text-3)">미가동</div></div><button class="btn btn-ghost btn-sm" onclick="toast('일시정지 처리')">일시정지</button><button class="btn btn-success btn-sm" onclick="toast('즉시 실행 완료')">즉시 실행</button></div></div>
+          <div class="scheduler-item"><div class="scheduler-info"><div class="scheduler-dot running"></div><div><div class="scheduler-name">티켓 확정 배치</div><div class="scheduler-desc">매일 오전 3시 · 대기 티켓 자동 확정 (연동 D+7 / 미연동 D+30)</div></div></div><div style="display:flex;align-items:center;gap:10px;"><div class="scheduler-stat"><div class="scheduler-last">—</div><div class="scheduler-next" style="color:var(--text-3)">미가동</div></div><button class="btn btn-ghost btn-sm" onclick="toast('일시정지 처리')">일시정지</button><button class="btn btn-success btn-sm" onclick="toast('즉시 실행 완료')">즉시 실행</button></div></div><div class="scheduler-item"><div class="scheduler-info"><div class="scheduler-dot running"></div><div><div class="scheduler-name">티켓 만료 배치</div><div class="scheduler-desc">매일 새벽 4시 · 등급 티켓 만료 소멸 + D-30/D-7 임박 알림</div></div></div><div style="display:flex;align-items:center;gap:10px;"><div class="scheduler-stat"><div class="scheduler-last">—</div><div class="scheduler-next" style="color:var(--text-3)">미가동</div></div><button class="btn btn-ghost btn-sm" onclick="toast('일시정지 처리')">일시정지</button><button class="btn btn-success btn-sm" onclick="toast('즉시 실행 완료')">즉시 실행</button></div></div>
+          <div class="scheduler-item"><div class="scheduler-info"><div class="scheduler-dot stopped"></div><div><div class="scheduler-name">DB 백업</div><div class="scheduler-desc">매일 새벽 3시 · S3 자동 업로드</div></div></div><div style="display:flex;align-items:center;gap:10px;"><div class="scheduler-stat"><div class="scheduler-last">—</div><div class="scheduler-next" style="color:var(--text-3)">미가동</div></div><button class="btn btn-primary btn-sm" onclick="toast('재시작 처리')">재시작</button><button class="btn btn-success btn-sm" onclick="toast('즉시 실행 완료')">즉시 실행</button></div></div>
         </div>
       </div>
       <div class="card" style="margin-top:16px">
@@ -2402,8 +2362,7 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
         <table>
           <thead><tr><th>스케줄러</th><th>실행 시간</th><th>처리 건수</th><th>소요 시간</th><th>결과</th></tr></thead>
           <tbody>
-            <tr><td>티켓 확정 배치</td><td style="color:var(--text-3);text-align:center"><div style="font-weight:700;color:#333333">2026/05/29</div><div>03:00:00</div></td><td>1,284건</td><td>1.8초</td><td><span class="badge badge-green">성공</span></td></tr><tr><td>티켓 만료 배치</td><td style="color:var(--text-3);text-align:center"><div style="font-weight:700;color:#333333">2026/05/30</div><div>04:00:00</div></td><td>312건</td><td>2.1초</td><td><span class="badge badge-green">성공</span></td></tr>
-            <tr><td>DB 백업</td><td style="color:var(--text-3);text-align:center"><div style="font-weight:700;color:#333333">2026/03/22</div><div>03:00:00</div></td><td>-</td><td>-</td><td><span class="badge badge-red">실패</span></td></tr>
+            <tr><td colspan="5" style="text-align:center;padding:32px;color:var(--text-3);font-size:13px">실행 로그 없음 (배치 스케줄러 미가동)</td></tr>
           </tbody>
         </table>
       </div>
@@ -2447,10 +2406,10 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
     <div class="section" id="sec-clawback">
       <div class="info-box"><strong>티켓 회수·소멸 이력</strong>은 구매 취소·반품에 의한 회수 및 등급 티켓 유효기간 만료 소멸 내역입니다. TicketTransaction 테이블의 type='CLAWBACK'·'EXPIRE' 레코드를 조회합니다.</div>
       <div class="stats-grid" style="grid-template-columns:repeat(4,1fr)">
-        <div class="stat-card red"><div class="stat-label">이번달 환수 건수</div><div class="stat-value">47</div><div class="stat-change down">↑ 전월 +8건</div></div>
-        <div class="stat-card amber"><div class="stat-label">환수 티켓 (브론즈)</div><div class="stat-value">312장</div><div class="stat-change down">이번달 누적</div></div>
-        <div class="stat-card amber"><div class="stat-label">환수 티켓 (실버)</div><div class="stat-value">28장</div><div class="stat-change neutral">이번달 누적</div></div>
-        <div class="stat-card"><div class="stat-label">환수 티켓 (골드)</div><div class="stat-value">4장</div><div class="stat-change neutral">이번달 누적</div></div>
+        <div class="stat-card red"><div class="stat-label">환수·소멸 건수</div><div class="stat-value">—</div><div class="stat-change neutral">누적</div></div>
+        <div class="stat-card amber"><div class="stat-label">환수 티켓 (브론즈)</div><div class="stat-value">—</div><div class="stat-change neutral">누적</div></div>
+        <div class="stat-card amber"><div class="stat-label">환수 티켓 (실버)</div><div class="stat-value">—</div><div class="stat-change neutral">누적</div></div>
+        <div class="stat-card"><div class="stat-label">환수 티켓 (골드)</div><div class="stat-value">—</div><div class="stat-change neutral">누적</div></div>
       </div>
       <div class="toolbar">
         <input class="search-box" placeholder="닉네임 또는 주문 ID 검색...">
@@ -2485,10 +2444,10 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
     <div class="section" id="sec-points">
       <div class="info-box"><strong>포인트 원장은 append-only</strong> — 적립·사용·만료·교환 모두 레코드로 누적되며 삭제 금지. 회수도 음수 레코드로 추가합니다. (10P = 1원)</div>
       <div class="stats-grid" style="grid-template-columns:repeat(4,1fr)">
-        <div class="stat-card purple"><div class="stat-label">누적 적립 포인트</div><div class="stat-value">48,210,400P</div><div class="stat-change neutral">전체 누적</div></div>
-        <div class="stat-card green"><div class="stat-label">오늘 적립</div><div class="stat-value">1,284,100P</div><div class="stat-change">↑ 8.2%</div></div>
-        <div class="stat-card amber"><div class="stat-label">누적 사용·교환</div><div class="stat-value">31,902,000P</div><div class="stat-change neutral">티켓 교환 포함</div></div>
-        <div class="stat-card red"><div class="stat-label">이번달 만료</div><div class="stat-value">204,500P</div><div class="stat-change down">유효기간 1년 경과</div></div>
+        <div class="stat-card purple"><div class="stat-label">누적 적립 포인트</div><div class="stat-value">—</div><div class="stat-change neutral">전체 누적</div></div>
+        <div class="stat-card green"><div class="stat-label">전체 원장 레코드</div><div class="stat-value">—</div><div class="stat-change neutral">append-only</div></div>
+        <div class="stat-card amber"><div class="stat-label">누적 사용·차감</div><div class="stat-value">—</div><div class="stat-change neutral">티켓 교환 포함</div></div>
+        <div class="stat-card red"><div class="stat-label">만료 소멸</div><div class="stat-value">—</div><div class="stat-change neutral">유효기간 경과</div></div>
       </div>
       <div class="toolbar">
         <input class="search-box" placeholder="회원명, 카카오 ID 검색">
@@ -2511,10 +2470,10 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
     <div class="section" id="sec-point-attendance">
       <div class="info-box"><strong>출석체크 = 제휴몰 방문 후 복귀 시 적립</strong> — 회원이 연결 제휴몰을 방문하고 앱으로 복귀하면 일일 포인트가 지급됩니다. (폴센트형 UX) · 5일 연속 달성 시 500P + 이벤트 티켓 1장 추가 지급.</div>
       <div class="stats-grid" style="grid-template-columns:repeat(4,1fr)">
-        <div class="stat-card purple"><div class="stat-label">오늘 출석 회원</div><div class="stat-value">9,420</div><div class="stat-change neutral">복귀 완료 기준</div></div>
-        <div class="stat-card green"><div class="stat-label">오늘 지급 포인트</div><div class="stat-value">942,000P</div><div class="stat-change">9,420명 × 100P</div></div>
-        <div class="stat-card amber"><div class="stat-label">5일 연속 달성</div><div class="stat-value">1,204</div><div class="stat-change neutral">500P+이벤트티켓 지급</div></div>
-        <div class="stat-card blue"><div class="stat-label">제휴몰 방문 전환율</div><div class="stat-value">81.3%</div><div class="stat-change">방문→복귀 완료</div></div>
+        <div class="stat-card purple"><div class="stat-label">오늘 출석 회원</div><div class="stat-value">—</div><div class="stat-change neutral">운영 데이터 없음</div></div>
+        <div class="stat-card green"><div class="stat-label">오늘 지급 포인트</div><div class="stat-value">—</div><div class="stat-change neutral">운영 데이터 없음</div></div>
+        <div class="stat-card amber"><div class="stat-label">5일 연속 달성</div><div class="stat-value">—</div><div class="stat-change neutral">운영 데이터 없음</div></div>
+        <div class="stat-card blue"><div class="stat-label">제휴몰 방문 전환율</div><div class="stat-value">—</div><div class="stat-change neutral">운영 데이터 없음</div></div>
       </div>
       <div class="card-grid">
         <div class="card">
@@ -2918,7 +2877,7 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
   <div class="modal">
     <div class="modal-header"><div class="modal-title">당첨 처리 — 12회차</div><button class="modal-close" onclick="closeModal('m-draw')"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
     <div class="modal-body">
-      <div class="info-box"><strong>에어팟 프로 2세대</strong> 외 2종 &nbsp;·&nbsp; 참여 티켓 18,240장 &nbsp;·&nbsp; 마감 05/12</div>
+      <div class="info-box">선택한 추첨 회차의 경품·참여 티켓·마감 정보가 표시됩니다. (등록된 회차 선택 시 자동 표시)</div>
 
       <!-- 등수별 당첨 처리 -->
       <div style="margin-bottom:16px">
@@ -3172,10 +3131,10 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
   <div class="modal">
     <div class="modal-header"><div class="modal-title">티켓 회수·소멸 상세</div><button class="modal-close" onclick="closeModal('m-clawback-detail')"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
     <div class="modal-body">
-      <div class="policy-item"><div class="policy-label">원본 티켓</div><div class="policy-value">실버 1장 (등급 티켓)</div><div class="policy-desc">적립일 2025/11/02 · 원 주문 ORD-20251102-8841 (쿠팡 · 289,000원)</div></div>
-      <div class="policy-item"><div class="policy-label">회수 사유</div><div class="policy-value">반품 (구매 취소)</div><div class="policy-desc">주문 ORD-20251102-8841 반품 확정 → 가지급 환수. CS 메모: 단순 변심 반품.</div></div>
-      <div class="policy-item"><div class="policy-label">회수 전후 잔액</div><div class="policy-value">실버 5장 → 4장</div><div class="policy-desc">사용 가능 잔액에서 즉시 차감.</div></div>
-      <div class="policy-item"><div class="policy-label">관련 환수 부채</div><div class="policy-value">없음 (잔액 충분, 즉시 회수)</div><div class="policy-desc">잔액 부족 시 음수 부채로 기록 후 다음 적립 시 자동 상계.</div></div>
+      <div class="policy-item"><div class="policy-label">원본 티켓</div><div class="policy-value">—</div><div class="policy-desc">선택한 회수·소멸 건의 원본 티켓·원 주문 정보가 표시됩니다.</div></div>
+      <div class="policy-item"><div class="policy-label">회수 사유</div><div class="policy-value">—</div><div class="policy-desc">취소·반품·만료 등 회수 사유와 CS 메모가 표시됩니다.</div></div>
+      <div class="policy-item"><div class="policy-label">회수 전후 잔액</div><div class="policy-value">—</div><div class="policy-desc">사용 가능 잔액에서 즉시 차감.</div></div>
+      <div class="policy-item"><div class="policy-label">관련 환수 부채</div><div class="policy-value">—</div><div class="policy-desc">잔액 부족 시 음수 부채로 기록 후 다음 적립 시 자동 상계.</div></div>
     </div>
     <div class="modal-footer"><button class="btn btn-primary" onclick="closeModal('m-clawback-detail')">닫기</button></div>
   </div>
@@ -3583,24 +3542,29 @@ function applyRole(role) {
   const r = ROLES[role] || ROLES['operator'];
   const label = getRoleLabel(role);
   const adm = window.currentAdmin || {};
-  document.getElementById('sb-role-name').textContent = adm.displayName || label;
-  document.getElementById('sb-role-id').textContent = adm.username || r.email;
-  document.getElementById('footer-avatar').textContent = adm.displayName ? adm.displayName[0].toUpperCase() : r.initial;
-  document.getElementById('footer-name').textContent = adm.displayName || label;
-  document.getElementById('footer-role').textContent = adm.username || r.email;
-  document.getElementById('topbar-role').textContent = label;
+  const setT = function(id, v){ const e = document.getElementById(id); if (e) e.textContent = v; };
+  setT('sb-role-name', adm.displayName || label);
+  setT('sb-role-id', adm.username || r.email);
+  setT('footer-avatar', adm.displayName ? adm.displayName[0].toUpperCase() : r.initial);
+  setT('footer-name', adm.displayName || label);
+  setT('footer-role', adm.username || r.email);
+  setT('topbar-role', label);
 
   const isSA = role === 'superadmin';
   const canWrite = role !== 'cs';
 
   // 계정 관리 — 슈퍼어드민만
   const grpAdmin = document.getElementById('grp-admin');
-  grpAdmin.style.opacity = isSA ? '1' : '0.3';
-  grpAdmin.style.pointerEvents = isSA ? 'auto' : 'none';
-  document.getElementById('nav-accounts').classList.toggle('disabled', !isSA);
+  if (grpAdmin) {
+    grpAdmin.style.opacity = isSA ? '1' : '0.3';
+    grpAdmin.style.pointerEvents = isSA ? 'auto' : 'none';
+  }
+  const navAcc = document.getElementById('nav-accounts');
+  if (navAcc) navAcc.classList.toggle('disabled', !isSA);
 
   // 회원 액션
-  document.getElementById('member-hdr-actions').innerHTML = canWrite
+  const memHdr = document.getElementById('member-hdr-actions');
+  if (memHdr) memHdr.innerHTML = canWrite
     ? `<button class="btn btn-ghost btn-sm" onclick="toast('CSV 내보내기')">내보내기</button>`
     : '';
   ['mact-1','mact-2','mact-3','mact-4'].forEach(id => {
@@ -4078,7 +4042,7 @@ function saveTicketEdit() {
     "닉네임 검색...":"Tìm biệt danh...","전체 유형":"Tất cả loại","전체 상태":"Tất cả trạng thái",
     "전체 마케팅":"Tất cả marketing","Apple+카카오":"Apple+Kakao","Google+카카오":"Google+Kakao",
     "전체 동의":"Đồng ý tất cả","선택 동의":"Đồng ý chọn lọc","전체 거부":"Từ chối tất cả",
-    "회원 목록":"Danh sách thành viên","총 12,847명":"Tổng 12.847 người",
+    "회원 목록":"Danh sách thành viên",
     "마케팅 수신 동의":"Đồng ý nhận marketing",
     "가입 유형":"Loại đăng ký","가입일":"Ngày tham gia","랜덤 티켓":"Vé ngẫu nhiên",
     "전환예정":"Dự kiến chuyển","등급 티켓 (브론즈/실버/골드)":"Vé hạng (Đồng/Bạc/Vàng)",
@@ -4820,7 +4784,6 @@ function saveTicketEdit() {
   "3,870원":"3.870 won",
   "4,000원":"4.000 won",
   "4,090원":"4.090 won",
-  "4,200,000원":"4.200.000 won",
   "4,500원":"4.500 won",
   "5,800원":"5.800 won",
   "6,500원":"6.500 won",
@@ -4830,7 +4793,6 @@ function saveTicketEdit() {
   "8,890장":"8.890 vé",
   "9,841명":"9.841 người",
   "12,340장":"12.340 vé",
-  "12,418명":"12.418 người",
   "12,730원":"12.730 won",
   "12,840명":"12.840 người",
   "13,300,000원":"13.300.000 won",
@@ -4838,7 +4800,6 @@ function saveTicketEdit() {
   "14,820장":"14.820 vé",
   "15,400원":"15.400 won",
   "17,100,000원":"17.100.000 won",
-  "18,240장":"18.240 vé",
   "19,000원":"19.000 won",
   "22,000원":"22.000 won",
   "28,900원":"28.900 won",
@@ -4865,18 +4826,12 @@ function saveTicketEdit() {
   "540,000원":"540.000 won",
   "600,000원":"600.000 won",
   "840,000원":"840.000 won",
-  "1,000,000원":"1.000.000 won",
   "2,000,000원":"2.000.000 won",
   "2,550,000원":"2.550.000 won",
-  "2,800,000원":"2.800.000 won",
-  "3,000,000원":"3.000.000 won",
   "6,000,000원":"6.000.000 won",
   "-5,000원":"-5.000 won",
   "-25,000원":"-25.000 won",
-  "− 800,000원":"− 800.000 won",
   "− 1,400,000원":"− 1.400.000 won",
-  "+ 200,000원":"+ 200.000 won",
-  "+ 4,200,000원":"+ 4.200.000 won",
   "100,000원당":"per 100.000 won",
   "5,000원당":"per 5.000 won",
   "50,000원당":"per 50.000 won",
@@ -4932,14 +4887,12 @@ function saveTicketEdit() {
   "[임시저장] 여름 시즌 이벤트 사전 공지":"[Lưu tạm] Thông báo trước sự kiện mùa hè",
   "입니다. 정산은 제휴몰별 D+30 확정.":"đây. Quyết toán xác nhận D+30 theo cửa hàng LK.",
   "(회원이 제휴몰에서 구매할 때 발생) ②":"(Phát sinh khi thành viên mua tại cửa hàng LK) ②",
-  "오늘 사용: 28,420회 (28.4%)":"Hôm nay dùng: 28.420 lần (28,4%)",
   "개인정보처리방침 개정 안내 (시행 6/1)":"Hướng dẫn sửa đổi chính sách bảo mật (áp dụng 1/6)",
   "출석체크 = 제휴몰 방문 후 복귀 시 적립":"Điểm danh = Tích lũy khi quay lại sau khi thăm cửa hàng LK",
   "(친구초대·광고시청은 포인트 경로로 이동)":"(Mời bạn·xem quảng cáo chuyển sang đường điểm)",
   "1일 1회, 제휴몰 방문 후 복귀 시 지급":"1 lần/ngày, cấp khi quay lại sau khi thăm cửa hàng LK",
   "제휴몰 추가 안내 (11번가·G마켓 오픈)":"Thông báo thêm cửa hàng LK (mở 11번가·Gmarket)",
   "[점검] 5/15 새벽 서버 정기 점검 안내":"[Bảo trì] Thông báo bảo trì máy chủ định kỳ rạng sáng 15/5",
-  "오늘 3,421건 · 합 4,240,000원":"Hôm nay 3.421 tr.hợp · Tổng 4.240.000 won",
   "설정/정책/콘텐츠 변경 가능 · 계정 관리 ❌":"Có thể thay đổi cài đặt/chính sách/nội dung · Quản lý tài khoản ❌",
   "우리 DB 집계 · 추정 매출 (포스트백 기준)":"Tổng hợp DB · Doanh thu ước tính (theo postback)",
   "이며, 추첨이 이벤트 티켓을 발급하지 않습니다.":"đây, rút thăm không phát hành vé sự kiện.",
@@ -4980,7 +4933,6 @@ function saveTicketEdit() {
   "(교환 시 즉시 발생 마진)는 정산 주체·시점이 달라 유형별로 분리해 관리합니다. 합산 지표는":"(Biên phát sinh ngay khi đổi) được quản lý tách biệt theo loại vì chủ thể·thời điểm quyết toán khác nhau. Chỉ số tổng hợp thì",
   "— 10P = 1원. 포인트는 티켓과 양방향 교환되며, 교환 비율은 환산가치 1:1 등가입니다.":"— 10P = 1 won. Điểm đổi hai chiều với vé, tỷ lệ đổi 1:1 ngang giá trị quy đổi.",
   ": 벤더사(Giftishow 등)와 사전 계약 + API 연동 필수. 마진 -10% 미만은 적자.":": Hợp đồng trước với nhà cung cấp (Giftishow v.v.) + Bắt buộc liên kết API. Biên dưới -10% là lỗ.",
-  "외 2종 &nbsp;·&nbsp; 참여 티켓 18,240장 &nbsp;·&nbsp; 마감 05/12":"và 2 loại khác &nbsp;·&nbsp; Vé tham dự 18.240 &nbsp;·&nbsp; Đóng 05/12",
   "— 약관 변경 시 법적 요건을 반드시 확인하고, 변경 30일 전 회원에게 사전 공지 후 적용하세요.":"— Khi thay đổi điều khoản, bắt buộc xác nhận yêu cầu pháp lý và thông báo trước cho thành viên 30 ngày trước khi áp dụng.",
   "· 성사 기준 피초대자 첫 픽구매 완료(성사 시점 양쪽 지급) · 초대자 월 최대 50명. 상세 정책은":"· Tiêu chuẩn thành công: người được mời hoàn thành mua Pick lần đầu (cấp cả hai khi thành công) · Người mời tối đa 50 người/tháng. Chính sách chi tiết xem",
   "제외 대상 카테고리·상품은 적립 계산에서 제외되며, 앱 10e 화면에 \"적립 제외 상품\"으로 안내됩니다.":"Danh mục·sản phẩm loại trừ không tính vào tích lũy, được thông báo là \"Sản phẩm loại trừ tích lũy\" trên màn hình 10e của ứng dụng.",
@@ -5049,8 +5001,6 @@ function saveTicketEdit() {
   "10P = 1원":"10P = 1 won",
   "100P (10원 상당)":"100P (tương đương 10 won)",
   "500P(포인트)":"500P (điểm)",
-  "9,420명 × 100P":"9.420 người × 100P",
-  "오늘 3,421건 수신":"Hôm nay nhận 3.421 trường hợp",
   "마지막 확인: 8분 전":"Lần xác nhận cuối: 8 phút trước",
   "푸시 31 · 알림톡 11":"Push 31 · Alimtalk 11",
   "등급은 구매 금액 기준으로":"Hạng dựa trên số tiền mua",
@@ -5143,7 +5093,7 @@ function saveTicketEdit() {
   "매 5분 · 예약·이벤트 알림 큐 처리":"Mỗi 5 phút · Xử lý hàng đợi thông báo đặt trước·sự kiện",
 };
 Object.assign(KO2VI,{"카카오 연동 회원과 미연동 회원이 모두 존재(로그인 정책 변경). 미연동 회원은 적립 확정 대기":"Tồn tại cả thành viên đã liên kết Kakao và chưa liên kết (thay đổi chính sách đăng nhập). Thành viên chưa liên kết đang chờ xác nhận tích lũy","+ 수동 발행":"+ Phát hành thủ công","+ 회차 등록":"+ Đăng ký đợt","투썸플레이스":"Twosome Place","[투썸플레이스] 5천원권":"[Twosome Place] Phiếu 5,000 won","유효기간 내":"Trong thời hạn sử dụng","5,000원":"5,000 won","실버 6장":"Bạc 6 vé","[투썸플레이스] 1만원권":"[Twosome Place] Phiếu 10,000 won","10,000원":"10,000 won","골드 6장":"Vàng 6 vé","[투썸플레이스] 3만원권":"[Twosome Place] Phiếu 30,000 won","30,000원":"30,000 won","골드 17장":"Vàng 17 vé","북앤라이프":"Book&Life","도서문화상품권 5만원권":"Phiếu văn hóa sách 50,000 won","50,000원":"50,000 won","골드 28장":"Vàng 28 vé","도서문화상품권 3만원권":"Phiếu văn hóa sách 30,000 won","도서문화상품권 2만원권":"Phiếu văn hóa sách 20,000 won","20,000원":"20,000 won","골드 11장":"Vàng 11 vé","도서문화상품권 1만원권":"Phiếu văn hóa sách 10,000 won","도서문화상품권 5천원권":"Phiếu văn hóa sách 5,000 won","도서문화상품권 3천원권":"Phiếu văn hóa sách 3,000 won","실버 4장":"Bạc 4 vé","도서문화상품권 1천원권":"Phiếu văn hóa sách 1,000 won","브론즈 11장":"Đồng 11 vé","+ 배너 추가":"+ Thêm banner","상시  ·  /onboarding":"Thường xuyên  ·  /onboarding","+ 이벤트 추가":"+ Thêm sự kiện","05/01 ~ 05/31  ·  전체 회원":"05/01 ~ 05/31  ·  Toàn bộ thành viên","상시  ·  신규 가입자":"Thường xuyên  ·  Người mới đăng ký","상시  ·  신규 가입 7일 내":"Thường xuyên  ·  Trong 7 ngày sau khi đăng ký mới","운영 정책 > 참여·이벤트":"Chính sách vận hành > Tham gia·Sự kiện","제1조 (목적)\n이 약관은 PricePick(이하 \"회사\")이 제공하는 제휴몰 경유 쇼핑 리워드 적립 서비스(이하 \"서비스\")의 이용조건과 회사·회원 간의 권리·의무 및 책임사항을 규정함을 목적으로 합니다.\n\n제2조 (정의)\n① \"서비스\"란 제휴몰(쿠팡 등) 경유 쇼핑을 통한 티켓 적립, 티켓 등급 교환, 기프티콘 교환, 경품 응모 등 회사가 제공하는 모든 기능을 말합니다.\n② \"회원\"이란 본 약관에 동의하고 가입을 완료한 자를 말합니다.\n③ \"티켓\"이란 서비스 내 보상 단위로 브론즈·실버·골드 등급이 있습니다.\n④ \"기프티콘\"이란 티켓 교환을 통해 지급되는 디지털 상품권을 말합니다.\n⑤ \"포스트백\"이란 쿠팡 파트너스를 통해 구매가 완료될 때 회사 서버로 전송되는 구매 확인 신호를 말합니다.\n\n제3조 (약관의 효력 및 변경)\n① 본 약관은 서비스 화면에 게시하거나 기타 방법으로 회원에게 공지함으로써 효력이 발생합니다.\n② 회사는 필요한 경우 약관을 개정할 수 있으며, 개정 시 적용일 7일 전에 앱 내 공지사항을 통해 고지합니다.\n③ 회원이 개정 약관에 동의하지 않을 경우 서비스 이용을 중단하고 탈퇴할 수 있습니다.\n\n제4조 (회원 가입)\n① 회원가입은 카카오 계정 연동으로 진행되며, 카카오 연동은 가입 및 서비스 이용의 필수 조건입니다.\n② 만 14세 미만은 가입할 수 없습니다.\n③ 타인 명의 도용, 허위 정보 등록 시 가입이 제한되거나 탈퇴 처리될 수 있습니다.\n\n제5조 (서비스 이용 및 금지행위)\n다음 행위는 엄격히 금지됩니다:\n· 자동화 프로그램(매크로, 봇 등)을 이용한 티켓 적립 행위\n· VPN, 가상 기기 등을 이용한 비정상적 접속\n· 타인 계정 무단 사용 또는 계정 공유\n· 구매 후 의도적 반복 취소·반품을 통한 티켓 편취\n· 친구초대 코드를 악용한 부정 적립 (자기 초대, 동일 IP/기기)\n적발 시 사전 통보 없이 이용 제한, 보유 티켓 전액 회수, 계정 영구 정지 조치됩니다.\n\n제6조 (티켓 및 보상)\n① 티켓은 서비스 내에서만 사용 가능하며 현금 환불 및 타인 양도가 불가합니다.\n② 티켓 지급은 제휴몰 최종 결제 금액(할인·쿠폰 적용 후) 기준으로 산정됩니다.\n③ 구매 취소·반품 시 대기 중인 티켓은 즉시 회수되며 등급 티켓은 지급되지 않습니다.\n④ 기프티콘은 발급일로부터 30일 이내에 사용해야 하며 미사용 시 자동 소멸합니다.\n\n제7조 (서비스 중단 및 책임의 제한)\n① 회사는 시스템 점검, 천재지변, 제휴몰 파트너스 API(쿠팡 파트너스 등) 정책 변경 등 불가피한 사유로 서비스를 일시 중단할 수 있습니다.\n② 회사는 제휴몰 파트너스 API(쿠팡 파트너스 등)의 변경·중단으로 인한 서비스 제한에 대해 책임을 지지 않습니다.\n\n제8조 (회원 탈퇴 및 자격 상실)\n① 회원은 앱 내 [마이 > 계정 탈퇴] 메뉴를 통해 언제든지 탈퇴할 수 있습니다.\n② 탈퇴 시 보유 티켓 및 미사용 기프티콘은 즉시 소멸하며 복구되지 않습니다.\n③ 탈퇴 후 동일 카카오 계정으로 즉시 재가입이 가능합니다. (쿨타임 없음, 1단계 확정)\n\n부칙: 본 약관은 2026년 3월 1일부터 시행합니다.":"Điều 1 (Mục đích)\nĐiều khoản này nhằm quy định các điều kiện sử dụng dịch vụ tích lũy thưởng mua sắm qua cửa hàng LK (sau đây gọi là \"Dịch vụ\") do PricePick (sau đây gọi là \"Công ty\") cung cấp, cũng như quyền·nghĩa vụ và trách nhiệm giữa Công ty·thành viên.\n\nĐiều 2 (Định nghĩa)\n① \"Dịch vụ\" là tất cả các chức năng do Công ty cung cấp như tích lũy vé qua mua sắm qua cửa hàng LK (Coupang v.v.), đổi hạng vé, đổi Gifticon, tham dự giải thưởng.\n② \"Thành viên\" là người đã đồng ý với điều khoản này và hoàn tất đăng ký.\n③ \"Vé\" là đơn vị thưởng trong Dịch vụ, gồm các hạng Đồng·Bạc·Vàng.\n④ \"Gifticon\" là phiếu quà tặng kỹ thuật số được cấp thông qua đổi vé.\n⑤ \"Postback\" là tín hiệu xác nhận mua hàng được gửi đến máy chủ Công ty khi việc mua hàng hoàn tất thông qua Coupang Partners.\n\nĐiều 3 (Hiệu lực và thay đổi điều khoản)\n① Điều khoản này có hiệu lực bằng việc đăng trên màn hình Dịch vụ hoặc thông báo cho thành viên bằng phương thức khác.\n② Khi cần thiết Công ty có thể sửa đổi điều khoản, và khi sửa đổi sẽ thông báo qua mục Thông báo trong ứng dụng trước ngày áp dụng 7 ngày.\n③ Trường hợp thành viên không đồng ý với điều khoản sửa đổi, có thể ngừng sử dụng Dịch vụ và rút tư cách thành viên.\n\nĐiều 4 (Đăng ký thành viên)\n① Việc đăng ký thành viên được tiến hành bằng liên kết tài khoản Kakao, và liên kết Kakao là điều kiện bắt buộc để đăng ký và sử dụng Dịch vụ.\n② Người dưới 14 tuổi không thể đăng ký.\n③ Khi mạo danh người khác hoặc đăng ký thông tin sai sự thật, việc đăng ký có thể bị hạn chế hoặc bị xử lý rút tư cách thành viên.\n\nĐiều 5 (Sử dụng Dịch vụ và hành vi bị cấm)\nCác hành vi sau đây bị nghiêm cấm:\n· Hành vi tích lũy vé bằng chương trình tự động (macro, bot v.v.)\n· Truy cập bất thường bằng VPN, thiết bị ảo v.v.\n· Sử dụng trái phép tài khoản người khác hoặc chia sẻ tài khoản\n· Trục lợi vé bằng cách cố ý lặp lại hủy·trả hàng sau khi mua\n· Tích lũy gian lận bằng cách lạm dụng mã mời bạn bè (tự mời, cùng IP/thiết bị)\nKhi bị phát hiện sẽ bị hạn chế sử dụng mà không cần thông báo trước, thu hồi toàn bộ vé sở hữu, và đình chỉ tài khoản vĩnh viễn.\n\nĐiều 6 (Vé và phần thưởng)\n① Vé chỉ có thể sử dụng trong Dịch vụ, không thể hoàn tiền mặt và không thể chuyển nhượng cho người khác.\n② Việc cấp vé được tính dựa trên số tiền thanh toán cuối cùng tại cửa hàng LK (sau khi áp dụng giảm giá·phiếu).\n③ Khi hủy·trả hàng, vé đang chờ sẽ bị thu hồi ngay lập tức và vé hạng sẽ không được cấp.\n④ Gifticon phải được sử dụng trong vòng 30 ngày kể từ ngày cấp, nếu không sử dụng sẽ tự động hết hạn.\n\nĐiều 7 (Ngừng Dịch vụ và giới hạn trách nhiệm)\n① Công ty có thể tạm ngừng Dịch vụ vì những lý do bất khả kháng như bảo trì hệ thống, thiên tai, thay đổi chính sách API đối tác cửa hàng LK (Coupang Partners v.v.).\n② Công ty không chịu trách nhiệm về việc hạn chế Dịch vụ do thay đổi·ngừng API đối tác cửa hàng LK (Coupang Partners v.v.).\n\nĐiều 8 (Rút tư cách thành viên và mất tư cách)\n① Thành viên có thể rút tư cách bất cứ lúc nào qua menu [Của tôi > Hủy tài khoản] trong ứng dụng.\n② Khi rút tư cách, vé sở hữu và Gifticon chưa sử dụng sẽ biến mất ngay lập tức và không được khôi phục.\n③ Sau khi rút tư cách có thể đăng ký lại ngay lập tức bằng cùng tài khoản Kakao. (Không có thời gian chờ, xác nhận giai đoạn 1)\n\nPhụ lục: Điều khoản này có hiệu lực từ ngày 1 tháng 3 năm 2026.","PricePick 개인정보처리방침\n\n회사는 개인정보보호법 등 관련 법령을 준수하며, 이용자의 개인정보 보호를 위해 다음과 같이 처리방침을 수립합니다.\n\n1. 수집하는 개인정보 항목\n① 카카오 연동 회원 (필수): 카카오 고유 식별자, 닉네임, 프로필 이미지, 카카오 이메일\n② 자동 수집 항목: 접속 IP, 기기 식별자(UUID), 앱 버전, OS 정보, 서비스 이용 기록, 티켓 적립·사용 기록, 구매 포스트백 데이터\n\n2. 개인정보 수집 및 이용 목적\n· 회원 식별 및 서비스 제공\n· 티켓 적립, 등급 산정, 기프티콘 발송\n· 포스트백 기반 구매 확인 및 취소·반품 처리\n· 친구초대 연결 및 보상 처리\n· 부정행위 탐지 및 계정 보안 유지\n· 카카오 알림톡 발송 (연동 회원만 해당)\n· 앱 푸시 알림 발송 (티켓 지급, 기프티콘 발송, 경품 당첨, 이벤트 안내 등)\n\n3. 개인정보 보유 및 이용기간\n· 회원 탈퇴 시 즉시 삭제 (단, 법령에 따른 보존 기간은 제외)\n· 전자상거래법에 따른 거래 기록: 5년 보존\n· 부정이용 기록 (블랙리스트): 적발일로부터 3년\n· 앱 접속 로그: 6개월\n\n4. 제3자 제공\n원칙적으로 제3자에게 제공하지 않습니다. 다음의 경우에만 예외적으로 제공됩니다:\n· 기프티콘 발송을 위한 벤더사 연동 (수신자 식별 정보 한정)\n· 법령에 의한 수사기관 요청\n\n5. 정보주체의 권리\n회원은 언제든지 다음의 권리를 행사할 수 있습니다:\n· 개인정보 열람 요청\n· 개인정보 수정·삭제 요청\n· 처리 정지 요청\n앱 내 [마이 > 계정 탈퇴] 또는 고객센터를 통해 요청할 수 있습니다.\n\n시행일: 2026년 3월 1일":"Chính sách xử lý thông tin cá nhân PricePick\n\nCông ty tuân thủ các quy định pháp luật liên quan như Luật Bảo vệ Thông tin Cá nhân, và thiết lập chính sách xử lý như sau để bảo vệ thông tin cá nhân của người dùng.\n\n1. Các mục thông tin cá nhân thu thập\n① Thành viên liên kết Kakao (bắt buộc): mã định danh duy nhất Kakao, biệt danh, ảnh hồ sơ, email Kakao\n② Mục thu thập tự động: IP truy cập, mã định danh thiết bị (UUID), phiên bản ứng dụng, thông tin OS, lịch sử sử dụng Dịch vụ, lịch sử tích lũy·sử dụng vé, dữ liệu postback mua hàng\n\n2. Mục đích thu thập và sử dụng thông tin cá nhân\n· Nhận diện thành viên và cung cấp Dịch vụ\n· Tích lũy vé, tính hạng, gửi Gifticon\n· Xác nhận mua hàng dựa trên postback và xử lý hủy·trả hàng\n· Kết nối mời bạn bè và xử lý phần thưởng\n· Phát hiện hành vi gian lận và duy trì bảo mật tài khoản\n· Gửi Kakao AlimTalk (chỉ áp dụng cho thành viên liên kết)\n· Gửi thông báo đẩy ứng dụng (cấp vé, gửi Gifticon, trúng giải thưởng, thông báo sự kiện v.v.)\n\n3. Thời gian lưu giữ và sử dụng thông tin cá nhân\n· Xóa ngay khi rút tư cách thành viên (trừ thời gian lưu giữ theo quy định pháp luật)\n· Hồ sơ giao dịch theo Luật Thương mại điện tử: lưu giữ 5 năm\n· Hồ sơ sử dụng gian lận (danh sách đen): 3 năm kể từ ngày phát hiện\n· Nhật ký truy cập ứng dụng: 6 tháng\n\n4. Cung cấp cho bên thứ ba\nVề nguyên tắc không cung cấp cho bên thứ ba. Chỉ cung cấp ngoại lệ trong các trường hợp sau:\n· Liên kết với nhà cung cấp để gửi Gifticon (giới hạn ở thông tin nhận diện người nhận)\n· Yêu cầu của cơ quan điều tra theo quy định pháp luật\n\n5. Quyền của chủ thể thông tin\nThành viên có thể thực hiện các quyền sau bất cứ lúc nào:\n· Yêu cầu xem thông tin cá nhân\n· Yêu cầu sửa·xóa thông tin cá nhân\n· Yêu cầu ngừng xử lý\nCó thể yêu cầu qua [Của tôi > Hủy tài khoản] trong ứng dụng hoặc qua trung tâm khách hàng.\n\nNgày hiệu lực: 1 tháng 3 năm 2026","리워드 정책\n\n본 정책은 서비스 내 티켓 적립·사용·교환에 관한 기준을 안내합니다.\n\n1. 티켓 적립\n· 제휴몰을 경유하여 구매한 뒤 구매가 확정되면, 구매 내역에 따라 티켓이 적립됩니다.\n· 구체적인 적립 기준 및 적립량은 앱 내 안내 화면과 이벤트 공지를 따릅니다.\n· 적립된 티켓은 기프티콘 교환, 경품 응모 등 서비스 내에서 사용할 수 있습니다.\n\n2. 적립 시점 및 취소·반품\n· 티켓은 구매가 최종 확정된 후 적립되며, 확정 전 구매가 취소·반품되는 경우 적립 예정 티켓은 지급되지 않습니다.\n\n3. 기프티콘 교환\n· 적립한 티켓으로 앱 내 교환소에서 기프티콘으로 교환할 수 있습니다.\n· 발급된 기프티콘에는 유효기간이 있으며, 기간 내 미사용 시 자동 소멸하고 재발급되지 않습니다.\n\n4. 경품 응모\n· 이벤트로 지급되는 티켓으로 경품 응모에 참여할 수 있습니다.\n· 응모 조건 및 당첨자 선정 기준은 각 이벤트 공지를 따릅니다.\n\n시행일: 2026년 5월 8일":"Chính sách thưởng\n\nChính sách này hướng dẫn các tiêu chuẩn về tích lũy·sử dụng·đổi vé trong Dịch vụ.\n\n1. Tích lũy vé\n· Sau khi mua hàng qua cửa hàng LK và việc mua được xác nhận, vé sẽ được tích lũy theo nội dung mua hàng.\n· Tiêu chuẩn tích lũy và lượng tích lũy cụ thể tuân theo màn hình hướng dẫn trong ứng dụng và thông báo sự kiện.\n· Vé đã tích lũy có thể sử dụng trong Dịch vụ như đổi Gifticon, tham dự giải thưởng.\n\n2. Thời điểm tích lũy và hủy·trả hàng\n· Vé được tích lũy sau khi việc mua được xác nhận cuối cùng, và nếu việc mua bị hủy·trả hàng trước khi xác nhận thì vé dự kiến tích lũy sẽ không được cấp.\n\n3. Đổi Gifticon\n· Có thể đổi vé đã tích lũy lấy Gifticon tại điểm đổi trong ứng dụng.\n· Gifticon đã cấp có thời hạn sử dụng, nếu không sử dụng trong thời hạn sẽ tự động hết hạn và không được cấp lại.\n\n4. Tham dự giải thưởng\n· Có thể tham gia tham dự giải thưởng bằng vé được cấp qua sự kiện.\n· Điều kiện tham dự và tiêu chuẩn chọn người trúng tuân theo thông báo của từng sự kiện.\n\nNgày hiệu lực: 8 tháng 5 năm 2026","마케팅 정보 수신 동의\n\n본 동의는 선택 사항이며, 동의하지 않더라도 기본 서비스 이용에는 제한이 없습니다.\n\n1. 수신 동의 항목\n① 앱 푸시 알림: 이벤트, 프로모션, 티켓 적립 혜택 안내\n② 카카오 알림톡 (카카오 연동 회원): 특별 할인 정보, 기획전 안내\n\n2. 마케팅 발송 내용\n· 신규 이벤트 및 프로모션 안내\n· 티켓 2배 적립 등 한정 혜택 안내\n· 제휴몰 기획전 및 추천 적립 상품 안내\n\n3. 수신 거부 방법\n· 앱 내 [마이 > 알림 설정]에서 언제든지 개별 항목별 수신 거부 가능\n· 카카오 알림톡: 알림톡 하단의 \"수신거부\" 링크 클릭\n\n4. 유의사항\n· 마케팅 수신 동의를 철회해도 서비스 필수 알림(티켓 지급, 기프티콘 발송, 경품 당첨 등)은 계속 수신됩니다.\n\n시행일: 2026년 3월 1일":"Đồng ý nhận thông tin tiếp thị\n\nViệc đồng ý này là tùy chọn, dù không đồng ý cũng không bị hạn chế trong việc sử dụng Dịch vụ cơ bản.\n\n1. Các mục đồng ý nhận\n① Thông báo đẩy ứng dụng: hướng dẫn sự kiện, khuyến mãi, ưu đãi tích lũy vé\n② Kakao AlimTalk (thành viên liên kết Kakao): thông tin giảm giá đặc biệt, hướng dẫn triển lãm chuyên đề\n\n2. Nội dung gửi tiếp thị\n· Hướng dẫn sự kiện và khuyến mãi mới\n· Hướng dẫn ưu đãi giới hạn như tích lũy vé gấp 2 lần\n· Hướng dẫn triển lãm chuyên đề cửa hàng LK và sản phẩm tích lũy đề xuất\n\n3. Cách từ chối nhận\n· Có thể từ chối nhận theo từng mục bất cứ lúc nào tại [Của tôi > Cài đặt thông báo] trong ứng dụng\n· Kakao AlimTalk: nhấp vào liên kết \"Từ chối nhận\" ở cuối AlimTalk\n\n4. Lưu ý\n· Dù rút lại đồng ý nhận tiếp thị, các thông báo bắt buộc của Dịch vụ (cấp vé, gửi Gifticon, trúng giải thưởng v.v.) vẫn tiếp tục được nhận.\n\nNgày hiệu lực: 1 tháng 3 năm 2026","+ 알림 발송":"+ Gửi thông báo","— 기프티콘 교환은 단일 등급으로만 가능. 부족하거나 남는 등급은 자유롭게 교환할 수 있도록 허용. 환산가치가 동일하므로 운영 손익에 영향 없음.":"— Đổi Gifticon chỉ thực hiện được trong một hạng duy nhất. Cho phép đổi tự do phần hạng thiếu hoặc dư. Vì giá trị quy đổi như nhau nên không ảnh hưởng đến lãi lỗ vận hành.","— 브론즈 100원 / 실버 1,000원 / 골드 2,000원. 교환 비율은 환산가치 1:1 등가이므로 어느 방향으로 교환해도 보유 가치는 동일하게 유지됩니다.":"— Đồng 100 won / Bạc 1,000 won / Vàng 2,000 won. Tỷ lệ đổi là tương đương 1:1 theo giá trị quy đổi nên đổi theo hướng nào thì giá trị sở hữu vẫn được giữ nguyên.","약 +10%  |":"khoảng +10%  |","1장 = 100원 환산. 소액 적립 사용자의 첫 보상 경험에 적합.":"1 vé = quy đổi 100 won. Phù hợp với trải nghiệm thưởng đầu tiên của người dùng tích lũy số tiền nhỏ.","1장 = 1,000원 환산. 메인 교환 등급. 적립 빈도 vs 보상 가치의 균형점.":"1 vé = quy đổi 1,000 won. Hạng đổi chính. Điểm cân bằng giữa tần suất tích lũy và giá trị thưởng.","1장 = 2,000원 환산. 큰 보상감으로 적립 동기 부여 (게이미피케이션).":"1 vé = quy đổi 2,000 won. Tạo động lực tích lũy bằng cảm giác thưởng lớn (gamification).","2건 · -38,000원 (제휴몰은 차감, 우리 시스템 미반영 → 포스트백 재처리 필요)  /":"2 trường hợp · -38,000 won (cửa hàng LK đã trừ, hệ thống của ta chưa phản ánh → cần xử lý lại postback)  /","5건 · -5,000원 (제휴몰 검증 후 차감, 다음달 정산 반영).  차이 발생 원인: 환불 누락 · 포스트백 미수신 · 제휴몰별 수수료율 변경 · 부정거래 검증 지연.":"5 trường hợp · -5,000 won (trừ sau khi cửa hàng LK xác minh, phản ánh vào quyết toán tháng sau).  Nguyên nhân phát sinh chênh lệch: bỏ sót hoàn tiền · không nhận được postback · thay đổi tỷ lệ hoa hồng theo từng cửa hàng LK · chậm xác minh giao dịch gian lận.","+ 계정 추가":"+ Thêm tài khoản","외 2종  ·  참여 티켓 18,240장  ·  마감 05/12":"Ngoài ra 2 loại  ·  Vé tham dự 18,240 vé  ·  Kết thúc 05/12","·  카카오 연동  ·  2026-05-11 14:21":"·  Liên kết Kakao  ·  2026-05-11 14:21","11번가":"11st","쿠팡 + 11번가":"Coupang + 11st","제휴몰 추가 안내 (11번가·G마켓 오픈)":"Thông báo thêm cửa hàng LK (mở 11st·Gmarket)","제휴몰 포스트백 (쿠팡·11번가·G마켓·알리·아이허브) · 구매 완료 시 콜백":"Postback cửa hàng LK (Coupang·11st·Gmarket·AliExpress·iHerb) · Callback khi mua hoàn tất","메뉴":"Menu","공지 본문 (앱 마이 > 공지사항에 게시됩니다)":"Nội dung thông báo (đăng tại Của tôi > Thông báo trong ứng dụng)","알림 본문을 입력하세요. 변수: {닉네임}, {보유티켓}":"Nhập nội dung thông báo. Biến: {Biệt danh}, {Vé sở hữu}"});
-Object.assign(KO2VI, {"카카오 연동 회원과 미연동(게스트) 회원이 모두 존재(로그인 정책 변경). 미연동 회원은 적립 확정 대기": "Tồn tại cả thành viên đã liên kết Kakao và chưa liên kết (Guest) (thay đổi chính sách đăng nhập). Thành viên chưa liên kết phải chờ xác nhận tích lũy", "계정 모델:": "Mô hình tài khoản:", "게스트(닉네임)로 시작": "Bắt đầu bằng Guest (biệt danh)", "→ 앱 내": "→ trong ứng dụng", "카카오 연동": "Liên kết Kakao", "(애플·구글 로그인 폐지). 게스트는 적립만 누적, 사용·교환은 연동 후 가능.": "(bỏ đăng nhập Apple·Google). Guest chỉ tích lũy, việc sử dụng·đổi chỉ thực hiện được sau khi liên kết.", "전체 연동상태": "Tất cả trạng thái liên kết", "게스트(미연동)": "Guest (chưa liên kết)", "10,432명": "10.432 người", "2,415명": "2.415 người", "닉네임 / 식별자": "Biệt danh / Định danh", "연동 상태": "Trạng thái liên kết", "연동 2024/08/12": "Liên kết 2024/08/12", "연동 2024/11/03": "Liên kết 2024/11/03", "적립만 누적 · 사용 불가": "Chỉ tích lũy · không thể sử dụng", "연동 2025/05/14": "Liên kết 2025/05/14", "가지급(대기)": "Tạm cấp (chờ)", "좌측 메뉴 (1) 배지 = 관리자 처리 대기 추첨 건수": "Badge (1) ở menu trái = số đợt rút thăm đang chờ admin xử lý", "— 마감됐으나 아직 '당첨 처리(추첨 실행)'를 안 한 회차 수입니다. 해당 회차의 당첨 처리를 완료하면 카운트가 줄고, 0이 되면 배지가 사라집니다.": "— là số đợt đã đóng nhưng chưa thực hiện '당첨 처리(추첨 실행)'. Hoàn tất xử lý trúng thưởng của đợt đó thì số đếm giảm, bằng 0 thì badge biến mất.", "추첨 방식: 매주 월요일 자동 발표 (자동/수동 전환 가능)": "Phương thức rút thăm: tự động công bố mỗi Thứ Hai (chuyển đổi tự động/thủ công được)", "마감 · 처리 대기": "Đã đóng · chờ xử lý", "당첨 처리(추첨 실행)": "Xử lý trúng thưởng (chạy rút thăm)", "✕ 닫기": "✕ Đóng", "· 등수당 1행(중복 등수 금지), 한 등수에 경품 여러 개 가능": "· Mỗi hạng 1 dòng (cấm trùng hạng), một hạng có thể nhiều quà", "경품 변경 이력": "Lịch sử thay đổi giải thưởng", "현재 버전 v4 · 변경·공표 추적(누가·언제·전후·공표 여부)": "Phiên bản hiện tại v4 · theo dõi thay đổi·công bố (ai·khi nào·trước-sau·đã công bố?)", "변경 내용 (전 → 후)": "Nội dung thay đổi (trước → sau)", "변경자": "Người thay đổi", "변경일시": "Thời điểm thay đổi", "공표": "Công bố", "2등 경품 '편의점 상품권 1만' → '편의점 아이스크림 교환권'": "Quà hạng 2 'Phiếu cửa hàng tiện lợi 10.000' → 'Phiếu đổi kem cửa hàng tiện lợi'", "공표됨 · 13회차~": "Đã công bố · từ đợt 13~", "1등 당첨 확률 3% → 5%": "Xác suất trúng hạng 1: 3% → 5%", "공표됨 · 11회차~": "Đã công bố · từ đợt 11~", "3등 '꽝(재도전)' 신설": "Lập mới hạng 3 'Trượt (thử lại)'", "공표됨 · 9회차~": "Đã công bố · từ đợt 9~", "최초 경품 구성 등록": "Đăng ký cấu hình quà ban đầu", "공표됨": "Đã công bố", "홈 상단 슬라이드 · 현재 2개 노출 · 카드 순서 드래그로 노출 순서 변경": "Slide đầu trang chủ · hiện hiển thị 2 cái · kéo thứ tự thẻ để đổi thứ tự hiển thị", "노출 전환": "Chuyển hiển thị", "— 온보딩·이벤트 보상 확정 적용. 이벤트 생성·수정 시": "— Áp dụng xác nhận thưởng onboarding·sự kiện. Khi tạo·sửa sự kiện", "운영정책과의 보상 정합 검증": "kiểm tra tính nhất quán thưởng với chính sách vận hành", "(중복 보상·만료 충돌 차단) 후 저장.": "(chặn trùng thưởng·xung đột hết hạn) rồi lưu.", "+ 이벤트 생성": "+ Tạo sự kiện", "발송 완료 건은 불변 로그 · '예약' 상태만 발송 전 취소·수정 가능": "Lượt đã gửi là log bất biến · chỉ trạng thái 'đặt trước' mới hủy·sửa được trước khi gửi", "상태 / 액션": "Trạng thái / Hành động", "10:00 예정": "Dự kiến 10:00", "6월 첫째주 추첨 안내": "Thông báo rút thăm tuần đầu tháng 6", "운영 정책은": "Chính sách vận hành là", "입니다 — 정책 수치·기준 변경은 별도 승인 절차로 반영되며 이 화면에서 직접 수정하지 않습니다.": "— việc thay đổi số liệu·tiêu chuẩn chính sách được phản ánh qua quy trình phê duyệt riêng và không sửa trực tiếp ở màn này.", "500P + 이벤트티켓 1장": "500P + 1 vé sự kiện", "1:1 문의 처리 — 수정에서": "Xử lý hỏi đáp 1:1 — ở phần sửa", "처리 상태는 '완료' 건도 변경(재오픈) 가능": "trạng thái xử lý của cả lượt 'hoàn tất' cũng có thể đổi (mở lại)", "합니다. 재오픈 시 변경 사유·이력(누가·언제)을 기록합니다.": ". Khi mở lại sẽ ghi lý do thay đổi·nhật ký (ai·khi nào).", "탈퇴 사유 분포": "Phân bố lý do hủy tài khoản", "이번 달": "Tháng này", "지난 달": "Tháng trước", "최근 3개월": "3 tháng gần đây", "사용자 지정": "Tùy chọn", "강제 업데이트 게이트": "Cổng ép cập nhật", "— '최소 지원 버전' 미만 사용자는 앱 진입 시 강제 업데이트로 차단합니다(결함·보안 패치 시 구버전 차단 필수).": "— người dùng dưới 'phiên bản hỗ trợ tối thiểu' bị chặn bằng ép cập nhật khi vào ứng dụng (bắt buộc chặn bản cũ khi vá lỗi·bảo mật).", "제휴몰 API 모니터링 — 키 상태·일일 호출 한도·장애를 추적합니다.": "Giám sát API cửa hàng LK — theo dõi trạng thái khóa·hạn mức gọi mỗi ngày·sự cố.", "쿠팡 파트너스 우선 연동": "Ưu tiên liên kết Coupang Partners", ", 나머지 제휴몰은 표시·추후 연동 단계.": ", các cửa hàng LK còn lại ở bước chỉ hiển thị·liên kết sau.", "시스템 정의 배치 — 생성·삭제 없음 · 활성/비활성 토글·주기 조정·즉시 실행만 제공": "Batch do hệ thống định nghĩa — không tạo·xóa · chỉ cung cấp toggle bật/tắt·điều chỉnh chu kỳ·chạy ngay", "IP 마스킹 저장 · 보존 90일 · 정책/계정/API키 변경은 별도 강조 로깅": "Lưu IP dạng ẩn · giữ 90 ngày · thay đổi chính sách/tài khoản/khóa API được log nổi bật riêng", "500P+이벤트티켓 지급": "Cấp 500P + vé sự kiện", "500P + 이벤트 티켓 1장": "500P + 1 vé sự kiện", "주간 이벤트 추첨 설정 수정": "Sửa cài đặt rút thăm sự kiện tuần", "당첨 확률 (%)": "Xác suất trúng (%)", "자동 (매주 월요일 00:00)": "Tự động (mỗi Thứ Hai 00:00)", "수동 (관리자 실행)": "Thủ công (admin chạy)", "추첨 요일": "Thứ rút thăm", "월요일": "Thứ Hai", "화요일": "Thứ Ba", "수요일": "Thứ Tư", "목요일": "Thứ Năm", "금요일": "Thứ Sáu", "추첨 시각": "Giờ rút thăm", "당첨 보상 구성": "Cấu hình quà trúng thưởng", "이벤트 티켓 만료 (발급일+30일 고정)": "Hết hạn vé sự kiện (cố định ngày phát hành+30 ngày)", "이월 없음 (당회 미응모 시 소멸)": "Không rollover (chưa dự thưởng đợt này thì tiêu hủy)", "변경 시 변경 이력(누가·언제·전후)이 기록됩니다.": "Khi thay đổi sẽ ghi nhật ký (ai·khi nào·trước-sau).", "포인트 정책 수정": "Sửa chính sách điểm", "교환 비율 (P = 원)": "Tỷ lệ đổi (P = won)", "적립일 + 1년 (FIFO 소멸)": "Ngày tích lũy + 1 năm (tiêu hủy FIFO)", "적립일 + 6개월": "Ngày tích lũy + 6 tháng", "만료 없음": "Không hết hạn", "양방향 (포인트 ↔ 티켓)": "Hai chiều (điểm ↔ vé)", "단방향 (포인트 → 티켓)": "Một chiều (điểm → vé)", "적용 시점": "Thời điểm áp dụng", "즉시 적용": "Áp dụng ngay", "예약 적용": "Áp dụng theo hẹn", "포인트 환율·만료는 비용·민원 직결. 저장 시 변경 전후 비교 + 변경 이력이 기록됩니다.": "Tỷ giá·hết hạn điểm liên quan trực tiếp chi phí·khiếu nại. Khi lưu sẽ ghi so sánh trước-sau + nhật ký thay đổi.", "유예 기간 (일)": "Thời gian gia hạn (ngày)", "재가입 쿨타임": "Thời gian chờ đăng ký lại", "없음 (즉시 재가입)": "Không có (đăng ký lại ngay)", "7일": "7 ngày", "유예 만료 시 회수": "Thu hồi khi hết gia hạn", "통계용 보존 항목 (익명화)": "Mục lưu giữ cho thống kê (ẩn danh)", "설정값이 바뀌면 탈퇴 처리 절차·D-day 계산이 이 값을 따라 동적으로 반영됩니다.": "Khi đổi giá trị cài đặt thì quy trình xử lý hủy·tính D-day sẽ tự động phản ánh theo giá trị này.", "티켓 회수·소멸 상세": "Chi tiết thu hồi·tiêu hủy vé", "원본 티켓": "Vé gốc", "실버 1장 (등급 티켓)": "Bạc 1 vé (vé hạng)", "적립일 2025/11/02 · 원 주문 ORD-20251102-8841 (쿠팡 · 289,000원)": "Ngày tích lũy 2025/11/02 · đơn gốc ORD-20251102-8841 (Coupang · 289.000 won)", "회수 사유": "Lý do thu hồi", "반품 (구매 취소)": "Trả hàng (hủy mua)", "주문 ORD-20251102-8841 반품 확정 → 가지급 환수. CS 메모: 단순 변심 반품.": "Xác nhận trả hàng đơn ORD-20251102-8841 → thu hồi phần tạm cấp. Ghi chú CS: trả hàng do đổi ý đơn thuần.", "회수 전후 잔액": "Số dư trước-sau thu hồi", "실버 5장 → 4장": "Bạc 5 vé → 4 vé", "사용 가능 잔액에서 즉시 차감.": "Trừ ngay từ số dư khả dụng.", "관련 환수 부채": "Khoản nợ thu hồi liên quan", "없음 (잔액 충분, 즉시 회수)": "Không có (đủ số dư, thu hồi ngay)", "잔액 부족 시 음수 부채로 기록 후 다음 적립 시 자동 상계.": "Khi thiếu số dư thì ghi thành nợ âm rồi tự bù khi tích lũy lần sau."});
+Object.assign(KO2VI, {"카카오 연동 회원과 미연동(게스트) 회원이 모두 존재(로그인 정책 변경). 미연동 회원은 적립 확정 대기": "Tồn tại cả thành viên đã liên kết Kakao và chưa liên kết (Guest) (thay đổi chính sách đăng nhập). Thành viên chưa liên kết phải chờ xác nhận tích lũy", "계정 모델:": "Mô hình tài khoản:", "게스트(닉네임)로 시작": "Bắt đầu bằng Guest (biệt danh)", "→ 앱 내": "→ trong ứng dụng", "카카오 연동": "Liên kết Kakao", "(애플·구글 로그인 폐지). 게스트는 적립만 누적, 사용·교환은 연동 후 가능.": "(bỏ đăng nhập Apple·Google). Guest chỉ tích lũy, việc sử dụng·đổi chỉ thực hiện được sau khi liên kết.", "전체 연동상태": "Tất cả trạng thái liên kết", "게스트(미연동)": "Guest (chưa liên kết)", "닉네임 / 식별자": "Biệt danh / Định danh", "연동 상태": "Trạng thái liên kết", "연동 2024/08/12": "Liên kết 2024/08/12", "연동 2024/11/03": "Liên kết 2024/11/03", "적립만 누적 · 사용 불가": "Chỉ tích lũy · không thể sử dụng", "연동 2025/05/14": "Liên kết 2025/05/14", "가지급(대기)": "Tạm cấp (chờ)", "좌측 메뉴 (1) 배지 = 관리자 처리 대기 추첨 건수": "Badge (1) ở menu trái = số đợt rút thăm đang chờ admin xử lý", "— 마감됐으나 아직 '당첨 처리(추첨 실행)'를 안 한 회차 수입니다. 해당 회차의 당첨 처리를 완료하면 카운트가 줄고, 0이 되면 배지가 사라집니다.": "— là số đợt đã đóng nhưng chưa thực hiện '당첨 처리(추첨 실행)'. Hoàn tất xử lý trúng thưởng của đợt đó thì số đếm giảm, bằng 0 thì badge biến mất.", "추첨 방식: 매주 월요일 자동 발표 (자동/수동 전환 가능)": "Phương thức rút thăm: tự động công bố mỗi Thứ Hai (chuyển đổi tự động/thủ công được)", "마감 · 처리 대기": "Đã đóng · chờ xử lý", "당첨 처리(추첨 실행)": "Xử lý trúng thưởng (chạy rút thăm)", "✕ 닫기": "✕ Đóng", "· 등수당 1행(중복 등수 금지), 한 등수에 경품 여러 개 가능": "· Mỗi hạng 1 dòng (cấm trùng hạng), một hạng có thể nhiều quà", "경품 변경 이력": "Lịch sử thay đổi giải thưởng", "현재 버전 v4 · 변경·공표 추적(누가·언제·전후·공표 여부)": "Phiên bản hiện tại v4 · theo dõi thay đổi·công bố (ai·khi nào·trước-sau·đã công bố?)", "변경 내용 (전 → 후)": "Nội dung thay đổi (trước → sau)", "변경자": "Người thay đổi", "변경일시": "Thời điểm thay đổi", "공표": "Công bố", "2등 경품 '편의점 상품권 1만' → '편의점 아이스크림 교환권'": "Quà hạng 2 'Phiếu cửa hàng tiện lợi 10.000' → 'Phiếu đổi kem cửa hàng tiện lợi'", "공표됨 · 13회차~": "Đã công bố · từ đợt 13~", "1등 당첨 확률 3% → 5%": "Xác suất trúng hạng 1: 3% → 5%", "공표됨 · 11회차~": "Đã công bố · từ đợt 11~", "3등 '꽝(재도전)' 신설": "Lập mới hạng 3 'Trượt (thử lại)'", "공표됨 · 9회차~": "Đã công bố · từ đợt 9~", "최초 경품 구성 등록": "Đăng ký cấu hình quà ban đầu", "공표됨": "Đã công bố", "홈 상단 슬라이드 · 현재 2개 노출 · 카드 순서 드래그로 노출 순서 변경": "Slide đầu trang chủ · hiện hiển thị 2 cái · kéo thứ tự thẻ để đổi thứ tự hiển thị", "노출 전환": "Chuyển hiển thị", "— 온보딩·이벤트 보상 확정 적용. 이벤트 생성·수정 시": "— Áp dụng xác nhận thưởng onboarding·sự kiện. Khi tạo·sửa sự kiện", "운영정책과의 보상 정합 검증": "kiểm tra tính nhất quán thưởng với chính sách vận hành", "(중복 보상·만료 충돌 차단) 후 저장.": "(chặn trùng thưởng·xung đột hết hạn) rồi lưu.", "+ 이벤트 생성": "+ Tạo sự kiện", "발송 완료 건은 불변 로그 · '예약' 상태만 발송 전 취소·수정 가능": "Lượt đã gửi là log bất biến · chỉ trạng thái 'đặt trước' mới hủy·sửa được trước khi gửi", "상태 / 액션": "Trạng thái / Hành động", "10:00 예정": "Dự kiến 10:00", "6월 첫째주 추첨 안내": "Thông báo rút thăm tuần đầu tháng 6", "운영 정책은": "Chính sách vận hành là", "입니다 — 정책 수치·기준 변경은 별도 승인 절차로 반영되며 이 화면에서 직접 수정하지 않습니다.": "— việc thay đổi số liệu·tiêu chuẩn chính sách được phản ánh qua quy trình phê duyệt riêng và không sửa trực tiếp ở màn này.", "500P + 이벤트티켓 1장": "500P + 1 vé sự kiện", "1:1 문의 처리 — 수정에서": "Xử lý hỏi đáp 1:1 — ở phần sửa", "처리 상태는 '완료' 건도 변경(재오픈) 가능": "trạng thái xử lý của cả lượt 'hoàn tất' cũng có thể đổi (mở lại)", "합니다. 재오픈 시 변경 사유·이력(누가·언제)을 기록합니다.": ". Khi mở lại sẽ ghi lý do thay đổi·nhật ký (ai·khi nào).", "탈퇴 사유 분포": "Phân bố lý do hủy tài khoản", "이번 달": "Tháng này", "지난 달": "Tháng trước", "최근 3개월": "3 tháng gần đây", "사용자 지정": "Tùy chọn", "강제 업데이트 게이트": "Cổng ép cập nhật", "— '최소 지원 버전' 미만 사용자는 앱 진입 시 강제 업데이트로 차단합니다(결함·보안 패치 시 구버전 차단 필수).": "— người dùng dưới 'phiên bản hỗ trợ tối thiểu' bị chặn bằng ép cập nhật khi vào ứng dụng (bắt buộc chặn bản cũ khi vá lỗi·bảo mật).", "제휴몰 API 모니터링 — 키 상태·일일 호출 한도·장애를 추적합니다.": "Giám sát API cửa hàng LK — theo dõi trạng thái khóa·hạn mức gọi mỗi ngày·sự cố.", "쿠팡 파트너스 우선 연동": "Ưu tiên liên kết Coupang Partners", ", 나머지 제휴몰은 표시·추후 연동 단계.": ", các cửa hàng LK còn lại ở bước chỉ hiển thị·liên kết sau.", "시스템 정의 배치 — 생성·삭제 없음 · 활성/비활성 토글·주기 조정·즉시 실행만 제공": "Batch do hệ thống định nghĩa — không tạo·xóa · chỉ cung cấp toggle bật/tắt·điều chỉnh chu kỳ·chạy ngay", "IP 마스킹 저장 · 보존 90일 · 정책/계정/API키 변경은 별도 강조 로깅": "Lưu IP dạng ẩn · giữ 90 ngày · thay đổi chính sách/tài khoản/khóa API được log nổi bật riêng", "500P+이벤트티켓 지급": "Cấp 500P + vé sự kiện", "500P + 이벤트 티켓 1장": "500P + 1 vé sự kiện", "주간 이벤트 추첨 설정 수정": "Sửa cài đặt rút thăm sự kiện tuần", "당첨 확률 (%)": "Xác suất trúng (%)", "자동 (매주 월요일 00:00)": "Tự động (mỗi Thứ Hai 00:00)", "수동 (관리자 실행)": "Thủ công (admin chạy)", "추첨 요일": "Thứ rút thăm", "월요일": "Thứ Hai", "화요일": "Thứ Ba", "수요일": "Thứ Tư", "목요일": "Thứ Năm", "금요일": "Thứ Sáu", "추첨 시각": "Giờ rút thăm", "당첨 보상 구성": "Cấu hình quà trúng thưởng", "이벤트 티켓 만료 (발급일+30일 고정)": "Hết hạn vé sự kiện (cố định ngày phát hành+30 ngày)", "이월 없음 (당회 미응모 시 소멸)": "Không rollover (chưa dự thưởng đợt này thì tiêu hủy)", "변경 시 변경 이력(누가·언제·전후)이 기록됩니다.": "Khi thay đổi sẽ ghi nhật ký (ai·khi nào·trước-sau).", "포인트 정책 수정": "Sửa chính sách điểm", "교환 비율 (P = 원)": "Tỷ lệ đổi (P = won)", "적립일 + 1년 (FIFO 소멸)": "Ngày tích lũy + 1 năm (tiêu hủy FIFO)", "적립일 + 6개월": "Ngày tích lũy + 6 tháng", "만료 없음": "Không hết hạn", "양방향 (포인트 ↔ 티켓)": "Hai chiều (điểm ↔ vé)", "단방향 (포인트 → 티켓)": "Một chiều (điểm → vé)", "적용 시점": "Thời điểm áp dụng", "즉시 적용": "Áp dụng ngay", "예약 적용": "Áp dụng theo hẹn", "포인트 환율·만료는 비용·민원 직결. 저장 시 변경 전후 비교 + 변경 이력이 기록됩니다.": "Tỷ giá·hết hạn điểm liên quan trực tiếp chi phí·khiếu nại. Khi lưu sẽ ghi so sánh trước-sau + nhật ký thay đổi.", "유예 기간 (일)": "Thời gian gia hạn (ngày)", "재가입 쿨타임": "Thời gian chờ đăng ký lại", "없음 (즉시 재가입)": "Không có (đăng ký lại ngay)", "7일": "7 ngày", "유예 만료 시 회수": "Thu hồi khi hết gia hạn", "통계용 보존 항목 (익명화)": "Mục lưu giữ cho thống kê (ẩn danh)", "설정값이 바뀌면 탈퇴 처리 절차·D-day 계산이 이 값을 따라 동적으로 반영됩니다.": "Khi đổi giá trị cài đặt thì quy trình xử lý hủy·tính D-day sẽ tự động phản ánh theo giá trị này.", "티켓 회수·소멸 상세": "Chi tiết thu hồi·tiêu hủy vé", "원본 티켓": "Vé gốc", "회수 사유": "Lý do thu hồi", "반품 (구매 취소)": "Trả hàng (hủy mua)", "회수 전후 잔액": "Số dư trước-sau thu hồi","사용 가능 잔액에서 즉시 차감.": "Trừ ngay từ số dư khả dụng.", "관련 환수 부채": "Khoản nợ thu hồi liên quan", "없음 (잔액 충분, 즉시 회수)": "Không có (đủ số dư, thu hồi ngay)", "잔액 부족 시 음수 부채로 기록 후 다음 적립 시 자동 상계.": "Khi thiếu số dư thì ghi thành nợ âm rồi tự bù khi tích lũy lần sau."});
 
 
   var _orig=new Map(), _tracked=new Set(), _applying=false;
@@ -5459,18 +5409,49 @@ function loadAllData() {
 }
 
 /* ── Dashboard stats ── */
+function setKpi(id, txt){ var el=document.getElementById(id); if(el) el.textContent=txt; }
+function kpiWon(n){ return (Math.round(n)||0).toLocaleString('ko-KR')+'원'; }
+function recompNet(){
+  if (window.__ppCommission==null || window.__ppGifticonRev==null || window.__ppTicketCost==null) return;
+  setKpi('kpi-net', kpiWon(window.__ppCommission + window.__ppGifticonRev - window.__ppTicketCost));
+}
 function loadDashboardStats() {
+  var GRADE_VAL = { bronze:100, silver:1000, gold:2000 };
+  /* 전체 회원 */
   db.collection('users').get().then(function(snap) {
-    updateStatValue('[data-pp-stat="users"]', snap.size);
+    setKpi('kpi-users', snap.size.toLocaleString('ko-KR'));
   }).catch(function(){});
-  db.collection('user_tickets').where('status','==','active').get().then(function(snap) {
-    updateStatValue('[data-pp-stat="tickets"]', snap.size);
+  /* 발행 티켓(누적 적립) + 티켓 적립 비용 */
+  db.collection('ticket_transactions').where('type','==','earn').get().then(function(snap) {
+    setKpi('kpi-tickets', snap.size.toLocaleString('ko-KR'));
+    var cost = 0;
+    snap.docs.forEach(function(d){ cost += (GRADE_VAL[d.data().ticket_grade]||0); });
+    setKpi('kpi-ticket-cost', kpiWon(cost));
+    window.__ppTicketCost = cost; recompNet();
   }).catch(function(){});
+  /* 미처리 문의 */
+  db.collection('inquiries').where('status','==','pending').get().then(function(snap) {
+    setKpi('kpi-inquiries', snap.size.toLocaleString('ko-KR'));
+  }).catch(function(){ setKpi('kpi-inquiries','0'); });
+  /* 미처리 추첨 (마감 후 미처리 회차) */
+  db.collection('draws').get().then(function(snap) {
+    var n = snap.docs.filter(function(d){ var s=d.data().status; return s && s!=='completed' && s!=='done'; }).length;
+    setKpi('kpi-draws', n.toLocaleString('ko-KR'));
+  }).catch(function(){ setKpi('kpi-draws','0'); });
+  /* 기프티콘 판매 수익(마진) */
   db.collection('gifticon_exchanges').get().then(function(snap) {
-    updateStatValue('[data-pp-stat="exchanges"]', snap.size);
+    var rev = 0;
+    snap.docs.forEach(function(d){ var v=(d.data().count_used||1)*2000; rev += v - Math.round(v*0.8); });
+    setKpi('kpi-gifticon-rev', kpiWon(rev));
+    window.__ppGifticonRev = rev; recompNet();
   }).catch(function(){});
+  /* 제휴 수수료 매출 + 대시보드 표 */
   db.collection('postbacks').get().then(function(snap) {
-    updateStatValue('[data-pp-stat="postbacks"]', snap.size);
+    var MR = { '쿠팡':0.03,'11번가':0.035,'G마켓':0.03,'알리익스프레스':0.05,'아이허브':0.05 };
+    var commission = 0;
+    snap.docs.forEach(function(doc){ var d=doc.data(); if(d.status!=='confirmed') return; commission += Math.round((d.purchase_amount||0)*(MR[d.mall_name]||0.03)); });
+    setKpi('kpi-commission', kpiWon(commission));
+    window.__ppCommission = commission; recompNet();
     /* dash-recent-tbody: top 3 recent postbacks */
     var recentTbody = document.getElementById('dash-recent-tbody');
     if (recentTbody) {
@@ -5514,23 +5495,6 @@ function loadDashboardStats() {
       var label = uid.replace('user-','').split('-')[0];
       return '<tr><td style="text-align:center">'+(i+1)+'</td><td><div style="font-weight:500">'+label+'</div><div style="font-size:11px;color:var(--text-2)">('+uid+')</div></td><td style="text-align:center;color:var(--success)">'+byUser[uid]+'장</td><td style="text-align:center">'+byUser[uid]+'장</td></tr>';
     }).join('') || '<tr><td colspan="4" style="text-align:center;padding:16px;color:var(--text-3)">데이터 없음</td></tr>';
-  }).catch(function(){});
-  /* Update 전체 회원 stat */
-  db.collection('users').get().then(function(snap) {
-    var memStat = document.querySelector('#sec-dashboard .stat-value');
-    if (memStat) {
-      /* Find "전체 회원" label's sibling value */
-      var cards = document.querySelectorAll('#sec-dashboard .stat-card');
-      cards.forEach(function(card) {
-        var label = card.querySelector('.stat-label');
-        if (label && label.textContent.includes('전체 회원')) {
-          var val = card.querySelector('.stat-value');
-          if (val) val.textContent = snap.size.toLocaleString('ko-KR');
-          var change = card.querySelector('.stat-change');
-          if (change) change.textContent = '데모 실사용자';
-        }
-      });
-    }
   }).catch(function(){});
 }
 
@@ -5625,6 +5589,9 @@ function loadGifticonExchanges() {
       });
       existingTbody.innerHTML = rows.join('');
     }).catch(function(e){ console.error('gifticonExchanges', e); });
+  db.collection('gifticon_exchanges').get().then(function(s){
+    var el = document.getElementById('gex-count'); if (el) el.textContent = '총 ' + s.size + '건';
+  }).catch(function(){});
 }
 
 /* ── Members ── */
@@ -5661,14 +5628,19 @@ function loadMembers() {
           + '</tr>');
       });
       existingTbody.innerHTML = rows.join('');
-      /* Update count */
-      var countEls = sec.querySelectorAll('[style*="font-weight:700"]');
-      countEls.forEach(function(el) {
-        if (el.textContent.includes('회원 목록')) {
-          /* text is "회원 목록  총 12,847명" - update the span */
-        }
-      });
     }).catch(function(e){ console.error('members', e); });
+  /* 전체 회원 집계 (연동/게스트/마케팅 동의) */
+  db.collection('users').get().then(function(s){
+    var total = s.size, kakao = 0, mkt = 0;
+    s.docs.forEach(function(d){ var u=d.data(); if(u.linked_kakao) kakao++; if(u.marketing_consent===true||u.marketing_agree===true) mkt++; });
+    var guest = total - kakao;
+    var pct = function(n){ return total ? ' (' + (n/total*100).toFixed(1) + '%)' : ''; };
+    var set = function(id,t){ var e=document.getElementById(id); if(e) e.textContent=t; };
+    set('mem-total', total.toLocaleString('ko-KR'));
+    set('mem-kakao', kakao.toLocaleString('ko-KR') + '명' + pct(kakao));
+    set('mem-guest', guest.toLocaleString('ko-KR') + '명' + pct(guest));
+    set('mem-mkt', mkt > 0 ? (mkt.toLocaleString('ko-KR') + '명' + pct(mkt)) : '운영 데이터 없음');
+  }).catch(function(){});
 }
 
 /* ─────────────────────────────────────────────────────────────
@@ -5715,12 +5687,14 @@ function loadTickets() {
           + '<td style="color:var(--text-3);font-size:12px;text-align:center"><div style="font-weight:700;color:#333">' + ppDt(d.created_at) + '</div><div>' + ppTm(d.created_at) + '</div></td></tr>';
       });
       tbody.innerHTML = rows.join('');
-      /* update stats */
-      var earnCnt = snap.docs.filter(function(d){ return d.data().type==='earn'; }).length;
-      var statCards = document.querySelectorAll('#sec-tickets .stat-card');
-      if (statCards[0]) statCards[0].querySelector('.stat-value').textContent = ppN(snap.size);
-      if (statCards[1]) statCards[1].querySelector('.stat-value').textContent = ppN(earnCnt);
     }).catch(function(e){ console.error('loadTickets',e); tbody.innerHTML = ppEmpty(5,'로드 오류'); });
+  /* 전체 원장 기준 통계 */
+  db.collection('ticket_transactions').get().then(function(all){
+    var c = { earn:0, use:0, expire:0, clawback:0 };
+    all.docs.forEach(function(dd){ var t=dd.data().type; if(c[t]!=null) c[t]++; });
+    var byId = { 'tk-earn':c.earn, 'tk-use':c.use, 'tk-total':all.size, 'tk-expire':c.expire, 'tk-clawback':c.clawback };
+    Object.keys(byId).forEach(function(id){ var e=document.getElementById(id); if(e) e.textContent=ppN(byId[id]); });
+  }).catch(function(){});
 }
 
 /* ── sec-draws ── empty state */
@@ -5804,7 +5778,12 @@ function loadInvites() {
   var tbody = document.querySelector('#sec-invite table tbody');
   if (!tbody) return;
   db.collection('invites').get().then(function(snap) {
-    if (snap.empty) { tbody.innerHTML = ppEmpty(6,'친구초대 현황이 없습니다.'); return; }
+    if (snap.empty) {
+      tbody.innerHTML = ppEmpty(6,'친구초대 현황이 없습니다.');
+      var ic = document.querySelectorAll('#sec-invite .invite-card');
+      ['0','0','0.0%','0P'].forEach(function(v,i){ if(ic[i]) ic[i].querySelector('.invite-card-value').textContent=v; });
+      return;
+    }
     /* aggregate by inviter */
     var byInviter = {};
     snap.docs.forEach(function(doc) {
@@ -5843,7 +5822,15 @@ function loadNotices() {
   var tbody = document.querySelector('#sec-notice table tbody');
   if (!tbody) return;
   db.collection('notices').orderBy('created_at','desc').limit(20).get().then(function(snap) {
-    if (snap.empty) { tbody.innerHTML = ppEmpty(6,'등록된 공지사항이 없습니다.'); return; }
+    var nc = document.getElementById('notice-count');
+    if (snap.empty) {
+      tbody.innerHTML = ppEmpty(6,'등록된 공지사항이 없습니다.');
+      var sc = document.querySelectorAll('#sec-notice .stat-card');
+      ['0건','0건','0건'].forEach(function(v,i){ if(sc[i]) sc[i].querySelector('.stat-value').textContent=v; });
+      if (nc) nc.textContent = '총 0건';
+      return;
+    }
+    if (nc) nc.textContent = '총 ' + snap.size + '건';
     var TYPE_BADGE = { service:'<span class="badge badge-amber">서비스 점검</span>', update:'<span class="badge badge-purple">업데이트</span>', policy:'<span class="badge badge-red">정책 변경</span>', event:'<span class="badge badge-green">이벤트</span>' };
     var rows = snap.docs.map(function(doc) {
       var n = doc.data();
@@ -5989,9 +5976,17 @@ function loadClawback() {
   var tbody = tbodies[0];
   var debtTbody = tbodies[1];
   if (!tbody) return;
-  db.collection('ticket_transactions').where('type','in',['clawback','expire']).orderBy('created_at','desc').limit(20).get()
-    .then(function(snap) {
-      if (snap.empty) { tbody.innerHTML = ppEmpty(7,'회수·소멸 이력이 없습니다.'); }
+  db.collection('ticket_transactions').get()
+    .then(function(allSnap) {
+      var docs = allSnap.docs.filter(function(d){ var t=d.data().type; return t==='clawback'||t==='expire'; })
+        .sort(function(a,b){ var ta=a.data().created_at, tb=b.data().created_at; return (tb&&tb.toDate?tb.toDate():new Date(0)) - (ta&&ta.toDate?ta.toDate():new Date(0)); })
+        .slice(0,20);
+      var snap = { empty: docs.length===0, size: docs.length, docs: docs };
+      if (snap.empty) {
+        tbody.innerHTML = ppEmpty(7,'회수·소멸 이력이 없습니다.');
+        var ec = document.querySelectorAll('#sec-clawback .stat-card');
+        ['0','0장','0장','0장'].forEach(function(v,i){ if(ec[i]) ec[i].querySelector('.stat-value').textContent=v; });
+      }
       else {
         var TYPE_BADGE = { clawback:'<span class="badge badge-red">반품/취소</span>', expire:'<span class="badge" style="background:var(--surface-2);color:var(--text-2)">만료</span>' };
         var GRADE_CHIP = { gold:'<span class="tk-chip gold bare">골드 1장</span>', silver:'<span class="tk-chip silver bare">실버 1장</span>', bronze:'<span class="tk-chip bronze bare">브론즈 1장</span>' };
@@ -6028,7 +6023,12 @@ function loadPoints() {
   var tbody = document.querySelector('#sec-points table tbody');
   if (!tbody) return;
   db.collection('point_transactions').orderBy('created_at','desc').limit(20).get().then(function(snap) {
-    if (snap.empty) { tbody.innerHTML = ppEmpty(5,'포인트 이력이 없습니다.'); return; }
+    if (snap.empty) {
+      tbody.innerHTML = ppEmpty(5,'포인트 이력이 없습니다.');
+      var pc = document.querySelectorAll('#sec-points .stat-card');
+      ['0P','0건','0P','0P'].forEach(function(v,i){ if(pc[i]) pc[i].querySelector('.stat-value').textContent=v; });
+      return;
+    }
     var TYPE_LABEL = { referral:'<span style="color:var(--main)">친구초대 보상</span>', attendance:'<span style="color:#c084fc">출석 적립</span>', exchange:'<span style="color:var(--main)">기프티콘 교환 보너스</span>', daily_visit:'<span style="color:#c084fc">일일 방문 보상</span>', earn:'<span style="color:var(--success)">적립</span>', spend:'<span style="color:var(--danger)">사용 차감</span>', expire:'<span style="color:var(--text-2)">만료 소멸</span>' };
     var totalEarned = 0;
     snap.docs.forEach(function(d){ var a=d.data().amount||0; if(a>0) totalEarned+=a; });
@@ -6045,17 +6045,35 @@ function loadPoints() {
         + '<td style="color:var(--text-3);font-size:12px;text-align:center"><div style="font-weight:700;color:#333">' + ppDt(d.created_at) + '</div><div>' + ppTm(d.created_at) + '</div></td></tr>';
     });
     tbody.innerHTML = rows.join('');
-    var statCards = document.querySelectorAll('#sec-points .stat-card');
-    if (statCards[0]) statCards[0].querySelector('.stat-value').textContent = ppN(totalEarned)+'P';
-    if (statCards[1]) statCards[1].querySelector('.stat-value').textContent = ppN(snap.size)+'건';
   }).catch(function(e){ console.error('loadPoints',e); tbody.innerHTML = ppEmpty(5,'로드 오류'); });
+  /* 전체 원장 기준 통계 */
+  db.collection('point_transactions').get().then(function(all){
+    var earned=0, used=0, expired=0;
+    all.docs.forEach(function(dd){
+      var d=dd.data(); var a=d.amount||0;
+      if (d.type==='expire') expired += Math.abs(a);
+      else if (a>0) earned += a;
+      else used += Math.abs(a);
+    });
+    var pc = document.querySelectorAll('#sec-points .stat-card');
+    if (pc[0]) pc[0].querySelector('.stat-value').textContent = ppN(earned)+'P';
+    if (pc[1]) pc[1].querySelector('.stat-value').textContent = ppN(all.size)+'건';
+    if (pc[2]) pc[2].querySelector('.stat-value').textContent = ppN(used)+'P';
+    if (pc[3]) pc[3].querySelector('.stat-value').textContent = ppN(expired)+'P';
+  }).catch(function(){});
 }
 
-/* ── sec-stats / sec-revenue / sec-settlement ── computed from postbacks */
+/* ── sec-stats / sec-revenue / sec-settlement ── computed from real data */
 function loadRevenueStats() {
-  db.collection('postbacks').get().then(function(pbSnap) {
-    var byMall = {};
-    var totalGMV=0, totalCommission=0;
+  var GRADE_VAL = { bronze:100, silver:1000, gold:2000 };
+  function setTxt(id, t){ var e=document.getElementById(id); if(e) e.textContent=t; }
+  Promise.all([
+    db.collection('postbacks').get(),
+    db.collection('gifticon_exchanges').get(),
+    db.collection('ticket_transactions').where('type','==','earn').get()
+  ]).then(function(res) {
+    var pbSnap = res[0], giSnap = res[1], tkSnap = res[2];
+    var byMall = {}, totalGMV = 0, totalCommission = 0;
     pbSnap.docs.forEach(function(doc) {
       var d = doc.data();
       if (d.status !== 'confirmed') return;
@@ -6064,16 +6082,25 @@ function loadRevenueStats() {
       var rate = MALL_RATES[mall] || 0.03;
       var comm = Math.round(amt * rate);
       if (!byMall[mall]) byMall[mall] = { gmv:0, commission:0, count:0 };
-      byMall[mall].gmv += amt;
-      byMall[mall].commission += comm;
-      byMall[mall].count++;
-      totalGMV += amt;
-      totalCommission += comm;
+      byMall[mall].gmv += amt; byMall[mall].commission += comm; byMall[mall].count++;
+      totalGMV += amt; totalCommission += comm;
     });
     var mallOrder = ['쿠팡','11번가','G마켓','알리익스프레스','아이허브'];
 
-    /* sec-stats: 매출 구조 표 */
+    /* 기프티콘 판매 마진 */
+    var giValue=0, giCost=0, giMargin=0;
+    giSnap.docs.forEach(function(doc){ var v=(doc.data().count_used||1)*2000; var c=Math.round(v*0.8); giValue+=v; giCost+=c; giMargin+=(v-c); });
+
+    /* 티켓 적립 비용(등급별) */
+    var tkCost={bronze:0,silver:0,gold:0}, tkCnt={bronze:0,silver:0,gold:0}, ticketCost=0;
+    tkSnap.docs.forEach(function(doc){ var g=doc.data().ticket_grade; if(GRADE_VAL[g]!=null){ tkCost[g]+=GRADE_VAL[g]; tkCnt[g]++; ticketCost+=GRADE_VAL[g]; } });
+
+    var totalRevenue = totalCommission + giMargin;
+    var net = totalRevenue - ticketCost;
+    var netRate = totalRevenue>0 ? (net/totalRevenue*100).toFixed(1) : '0.0';
+
     var statsTbodies = document.querySelectorAll('#sec-stats table tbody');
+    /* [0] 매출 구조 — 제휴몰별 */
     if (statsTbodies[0]) {
       var rows = mallOrder.map(function(mall) {
         var m = byMall[mall]||{gmv:0,commission:0};
@@ -6083,22 +6110,36 @@ function loadRevenueStats() {
       rows.push('<tr style="border-top:2px solid var(--border)"><td style="font-weight:700">합계</td><td style="font-weight:700">' + ppN(totalGMV) + '원</td><td style="text-align:center">—</td><td style="font-weight:700;color:var(--success)">' + ppN(totalCommission) + '원</td></tr>');
       statsTbodies[0].innerHTML = rows.join('');
     }
-    /* sec-stats: 순수익 종합 */
+    /* [1] 기프티콘 판매 수익 P&L */
+    if (statsTbodies[1]) {
+      statsTbodies[1].innerHTML =
+        '<tr><td>교환 기프티콘 환산가치 <span style="font-size:11px;color:var(--text-3)">(유저 티켓 소진)</span></td><td>' + ppN(giValue) + '원</td></tr>'
+        + '<tr><td>기프티콘 매입원가 <span style="font-size:11px;color:var(--text-3)">(도매)</span></td><td style="text-align:right;color:var(--amber)">− ' + ppN(giCost) + '원</td></tr>'
+        + '<tr style="border-top:2px solid var(--border)"><td style="font-weight:700">기프티콘 판매 수익 (마진)</td><td style="font-weight:700;color:var(--success)">+ ' + ppN(giMargin) + '원</td></tr>';
+    }
+    /* [2] 티켓 적립 비용 — 등급별 */
+    if (statsTbodies[2]) {
+      statsTbodies[2].innerHTML = ['bronze','silver','gold'].map(function(g){
+        var nm={bronze:'브론즈',silver:'실버',gold:'골드'}[g];
+        return '<tr><td><span class="tk-chip ' + g + ' bare">' + nm + '</span></td><td style="text-align:center">' + ppN(tkCnt[g]) + '장</td><td>' + ppN(GRADE_VAL[g]) + '원</td><td style="color:var(--amber)">' + ppN(tkCost[g]) + '원</td></tr>';
+      }).join('') + '<tr style="border-top:2px solid var(--border)"><td style="font-weight:700">합계</td><td style="text-align:center">—</td><td>—</td><td style="font-weight:700;color:var(--amber)">' + ppN(ticketCost) + '원</td></tr>';
+    }
+    /* [3] 순수익 종합 */
     if (statsTbodies[3]) {
       statsTbodies[3].innerHTML = '<tr><td>제휴 수수료 매출</td><td style="color:var(--success);font-weight:600">+ ' + ppN(totalCommission) + '원</td></tr>'
-        + '<tr><td>기프티콘 판매 수익</td><td style="color:var(--success)">집계 중</td></tr>'
-        + '<tr><td>티켓 적립 비용</td><td style="color:var(--amber)">집계 중</td></tr>'
-        + '<tr style="border-top:2px solid var(--border)"><td style="font-weight:700">순수익 (추정)</td><td style="font-weight:800;font-size:15px;color:var(--success)">' + ppN(totalCommission) + '원</td></tr>'
-        + '<tr><td style="color:var(--text-2);font-size:12px">기준: 데모 Firestore 데이터</td><td style="color:var(--text-2);font-size:12px">—</td></tr>';
+        + '<tr><td>기프티콘 판매 수익</td><td style="color:var(--success);font-weight:600">+ ' + ppN(giMargin) + '원</td></tr>'
+        + '<tr><td>티켓 적립 비용</td><td style="color:var(--amber);font-weight:600">− ' + ppN(ticketCost) + '원</td></tr>'
+        + '<tr style="border-top:2px solid var(--border)"><td style="font-weight:700">순수익 (추정)</td><td style="font-weight:800;font-size:15px;color:' + (net>=0?'var(--success)':'var(--danger)') + '">' + ppN(net) + '원</td></tr>'
+        + '<tr><td style="color:var(--text-2);font-size:12px">순수익률 (총수익 대비)</td><td style="color:var(--text-2);font-size:12px">' + netRate + '%</td></tr>';
     }
 
     /* sec-revenue: 제휴 수수료 매출 내역 */
     var revFee = document.querySelector('#rev-fee table tbody');
+    var confirmed = pbSnap.docs.filter(function(d){ return d.data().status==='confirmed'; });
     if (revFee) {
-      var confirmed = pbSnap.docs.filter(function(d){ return d.data().status==='confirmed'; });
       if (!confirmed.length) { revFee.innerHTML = ppEmpty(9,'확정된 포스트백이 없습니다.'); }
       else {
-        var rRows = confirmed.slice(0,10).map(function(doc) {
+        revFee.innerHTML = confirmed.slice(0,10).map(function(doc) {
           var d = doc.data();
           var rate = MALL_RATES[d.mall_name]||0.03;
           var comm = Math.round((d.purchase_amount||0)*rate);
@@ -6112,37 +6153,35 @@ function loadRevenueStats() {
             + '<td style="color:var(--success);font-weight:600">+' + ppN(comm) + '원</td>'
             + '<td style="color:var(--amber)">—</td>'
             + '<td style="text-align:center"><span class="badge badge-green">정상</span></td></tr>';
-        });
-        revFee.innerHTML = rRows.join('');
+        }).join('');
       }
-      var hdrInfo = document.querySelector('#rev-fee .card-header div:last-child');
-      if (hdrInfo && !hdrInfo.classList.contains('card-title')) hdrInfo.textContent = '총 ' + confirmed.length + '건 · 합 ' + ppN(totalCommission) + '원 (데모)';
     }
-    /* sec-revenue gifticon tab */
+    setTxt('rev-fee-sub', '총 ' + confirmed.length + '건 · 합 ' + ppN(totalCommission) + '원 (데모)');
+
+    /* sec-revenue: 기프티콘 판매 내역 */
     var revGi = document.querySelector('#rev-gifticon table tbody');
     if (revGi) {
-      db.collection('gifticon_exchanges').get().then(function(giSnap) {
-        if (giSnap.empty) { revGi.innerHTML = ppEmpty(7,'기프티콘 판매 내역이 없습니다.'); return; }
-        var giRows = giSnap.docs.slice(0,10).map(function(doc) {
+      if (giSnap.empty) { revGi.innerHTML = ppEmpty(7,'기프티콘 판매 내역이 없습니다.'); }
+      else {
+        revGi.innerHTML = giSnap.docs.slice(0,10).map(function(doc) {
           var d = doc.data();
           var uid = (d.user_id||'').replace('user-','').replace(/-\d+$/,'');
-          var val = (d.count_used||1) * 2000;
-          var cost = Math.round(val * 0.8);
-          var margin = val - cost;
+          var val = (d.count_used||1) * 2000; var cost = Math.round(val * 0.8); var margin = val - cost;
           return '<tr><td style="text-align:center;white-space:nowrap"><div style="font-weight:700;color:#333">' + ppDt(d.exchanged_at) + '</div><div style="color:var(--text-3)">' + ppTm(d.exchanged_at) + '</div></td>'
             + '<td style="text-align:center;font-weight:500">' + (d.gifticon_id||'—') + '</td>'
             + '<td><div style="font-weight:500">' + uid + '</div><div style="font-size:11px;color:var(--text-2);font-family:monospace">' + (d.user_id||'') + '</div></td>'
             + '<td>' + ppN(val) + '원</td><td>' + ppN(cost) + '원</td>'
             + '<td style="color:var(--success);font-weight:600">+' + ppN(margin) + '원</td>'
             + '<td style="text-align:center"><span class="badge badge-green">완료</span></td></tr>';
-        });
-        revGi.innerHTML = giRows.join('');
-      }).catch(function(){});
+        }).join('');
+      }
     }
+    setTxt('rev-gi-sub', '총 ' + giSnap.size + '건 · 마진 합 ' + ppN(giMargin) + '원');
+
     /* sec-revenue stat cards */
-    var revStats = document.querySelectorAll('#sec-revenue .stat-card');
-    if (revStats[0]) revStats[0].querySelector('.stat-value').textContent = Math.round(totalCommission/10000)+'만';
-    if (revStats[2]) revStats[2].querySelector('.stat-value').textContent = Math.round(totalCommission/10000)+'만';
+    setTxt('rev-commission', ppN(totalCommission)+'원');
+    setTxt('rev-gifticon-val', ppN(giMargin)+'원');
+    setTxt('rev-total', ppN(totalRevenue)+'원');
 
     /* sec-settlement: 제휴몰별 정산 현황 */
     var settleTbodies = document.querySelectorAll('#sec-settlement table tbody');
@@ -6158,10 +6197,11 @@ function loadRevenueStats() {
       settleTbodies[1].innerHTML = '<tr><td><strong>데모 집계</strong></td><td>' + ppN(totalCommission) + '원</td><td style="color:var(--text-3)">집계 중</td><td style="color:var(--text-3)">—</td><td><span class="badge badge-amber">집계 중</span></td></tr>';
     }
     /* sec-settlement stat cards */
-    var settleStats = document.querySelectorAll('#sec-settlement .stat-card');
-    if (settleStats[0]) settleStats[0].querySelector('.stat-value').textContent = Math.round(totalCommission/10000)+'만';
-    if (settleStats[1]) settleStats[1].querySelector('.stat-value').textContent = Math.round(totalCommission/10000)+'만';
+    setTxt('settle-confirmed', ppN(totalCommission)+'원');
+    setTxt('settle-estimate', ppN(totalCommission)+'원');
 
+    /* sec-postback header */
+    setTxt('pb-sub', '총 ' + pbSnap.size + '건 수신');
   }).catch(function(e){ console.error('loadRevenueStats',e); });
 }
 
