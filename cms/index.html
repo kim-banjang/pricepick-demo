@@ -2035,10 +2035,10 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
     <div class="section" id="sec-inquiries">
       <div class="info-box">1:1 문의 처리 — 수정에서 <strong>처리 상태는 '완료' 건도 변경(재오픈) 가능</strong>합니다. 재오픈 시 변경 사유·이력(누가·언제)을 기록합니다.</div>
       <div class="stats-grid" style="grid-template-columns:repeat(4,1fr)">
-        <div class="stat-card red"><div class="stat-label">미처리</div><div class="stat-value">7</div><div class="stat-change down">빠른 처리 필요</div></div>
-        <div class="stat-card amber"><div class="stat-label">처리 중</div><div class="stat-value">3</div><div class="stat-change neutral">답변 대기</div></div>
-        <div class="stat-card green"><div class="stat-label">오늘 처리</div><div class="stat-value">12</div><div class="stat-change">↑ 전일 +4</div></div>
-        <div class="stat-card purple"><div class="stat-label">평균 응답 시간</div><div class="stat-value">4.2h</div><div class="stat-change neutral">이번달 기준</div></div>
+        <div class="stat-card red"><div class="stat-label">미처리</div><div class="stat-value">0</div><div class="stat-change down">빠른 처리 필요</div></div>
+        <div class="stat-card amber"><div class="stat-label">처리 중</div><div class="stat-value">0</div><div class="stat-change neutral">답변 대기</div></div>
+        <div class="stat-card green"><div class="stat-label">완료</div><div class="stat-value">0</div><div class="stat-change neutral">누적</div></div>
+        <div class="stat-card purple"><div class="stat-label">평균 응답 시간</div><div class="stat-value">—</div><div class="stat-change neutral">답변 완료 기준</div></div>
       </div>
       <div class="toolbar">
         <input class="search-box" placeholder="닉네임, 문의 내용 검색...">
@@ -2057,10 +2057,10 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
     <div class="section" id="sec-withdrawal">
       <div class="warn-box"><strong>법적 필수 화면</strong> — 회원이 앱 "마이 → 계정탈퇴" 누르면 여기로 들어옵니다. <strong>30일 유예 기간</strong> 동안 철회 가능, 이후 PII 영구 삭제. 처리 누락 시 개인정보보호법 위반 + Apple 심사 거절 사유.</div>
       <div class="stats-grid">
-        <div class="stat-card amber"><div class="stat-label">유예 기간 중 (철회 가능)</div><div class="stat-value">23명</div><div class="stat-change neutral">D+1 ~ D+29</div></div>
-        <div class="stat-card red"><div class="stat-label">오늘 영구 삭제 예정</div><div class="stat-value">4명</div><div class="stat-change down">D+30 도달</div></div>
-        <div class="stat-card purple"><div class="stat-label">이번달 탈퇴</div><div class="stat-value">142명</div><div class="stat-change down">↓ 지난달 -8명</div></div>
-        <div class="stat-card green"><div class="stat-label">철회 (재가입 의사)</div><div class="stat-value">12명</div><div class="stat-change">탈퇴자의 8.4%</div></div>
+        <div class="stat-card amber"><div class="stat-label">유예 기간 중 (철회 가능)</div><div class="stat-value">0명</div><div class="stat-change neutral">D+1 ~ D+29</div></div>
+        <div class="stat-card red"><div class="stat-label">오늘 영구 삭제 예정</div><div class="stat-value">0명</div><div class="stat-change down">D+30 도달</div></div>
+        <div class="stat-card purple"><div class="stat-label">이번달 탈퇴</div><div class="stat-value">0명</div><div class="stat-change neutral">누적</div></div>
+        <div class="stat-card green"><div class="stat-label">철회 (재가입 의사)</div><div class="stat-value">0명</div><div class="stat-change neutral">누적</div></div>
       </div>
       <div class="card" style="margin-bottom:16px">
         <div class="card-header"><div class="card-title">탈퇴 처리 흐름</div></div>
@@ -2105,13 +2105,7 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
       <div class="card-grid" style="margin-top:16px">
         <div class="card">
           <div class="card-header"><div class="card-title">탈퇴 사유 분포</div><select class="filter-sel"><option>이번 달</option><option>지난 달</option><option>최근 3개월</option><option>사용자 지정</option></select></div>
-          <div>
-            <div class="policy-item"><div class="policy-label">알림이 너무 많음</div><div class="policy-value">42명 (29.6%)</div><div class="policy-desc">→ 알림 정책 검토 필요</div></div>
-            <div class="policy-item"><div class="policy-label">앱 자주 안 씀</div><div class="policy-value">38명 (26.8%)</div><div class="policy-desc">→ 리텐션 캠페인 검토</div></div>
-            <div class="policy-item"><div class="policy-label">티켓 적립이 어려움</div><div class="policy-value">28명 (19.7%)</div><div class="policy-desc">→ 적립 기준 재검토 필요</div></div>
-            <div class="policy-item"><div class="policy-label">기프티콘 발급 문제</div><div class="policy-value">14명 (9.9%)</div><div class="policy-desc">→ 발급 자동화 안정화 시급</div></div>
-            <div class="policy-item"><div class="policy-label">기타/무응답</div><div class="policy-value">20명 (14.0%)</div></div>
-          </div>
+          <div id="wd-reasons"><!-- PP: 실데이터 (withdrawals.reason 집계) --></div>
         </div>
         <div class="card">
           <div class="card-header"><div class="card-title">탈퇴 정책 설정</div><button class="btn btn-ghost btn-sm" onclick="openModal('m-withdrawal-policy')">수정</button></div>
@@ -5872,7 +5866,7 @@ function loadInquiries() {
     var statCards = document.querySelectorAll('#sec-inquiries .stat-card');
     if (snap.empty) {
       list.innerHTML = '<div style="padding:24px;color:var(--text-3);font-size:13px;text-align:center">문의 내역이 없습니다.</div>';
-      ['0','0','0'].forEach(function(v,i){ if(statCards[i]) statCards[i].querySelector('.stat-value').textContent=v; });
+      ['0','0','0','—'].forEach(function(v,i){ if(statCards[i]) statCards[i].querySelector('.stat-value').textContent=v; });
       return;
     }
     var STATUS_BADGE = { pending:'<span class="badge badge-red">미처리</span>', processing:'<span class="badge badge-amber">처리 중</span>', answered:'<span class="badge badge-green">완료</span>', completed:'<span class="badge badge-green">완료</span>' };
@@ -5895,6 +5889,8 @@ function loadInquiries() {
     if (statCards[0]) statCards[0].querySelector('.stat-value').textContent = ppN(pending);
     if (statCards[1]) statCards[1].querySelector('.stat-value').textContent = ppN(processing);
     if (statCards[2]) statCards[2].querySelector('.stat-value').textContent = ppN(done);
+    var rt=[]; snap.docs.forEach(function(doc){ var d=doc.data(); var c=(d.created_at&&d.created_at.toDate)?d.created_at.toDate():null; var a=(d.answered_at&&d.answered_at.toDate)?d.answered_at.toDate():null; if(c&&a&&a>c) rt.push((a-c)/3600000); });
+    if (statCards[3]) statCards[3].querySelector('.stat-value').textContent = rt.length ? (rt.reduce(function(x,y){return x+y;},0)/rt.length).toFixed(1)+'h' : '—';
   }).catch(function(e){ console.error('loadInquiries',e); list.innerHTML='<div style="padding:24px;color:var(--text-3);text-align:center">로드 오류: '+e.message+'</div>'; });
 }
 
@@ -5918,7 +5914,29 @@ function loadWithdrawal() {
     }
   }).catch(function(){ tbody.innerHTML = ppEmpty(6,'탈퇴 요청이 없습니다.'); });
   var statCards = document.querySelectorAll('#sec-withdrawal .stat-card');
-  ['0명','0명','0명','0명'].forEach(function(v,i){ if(statCards[i]) statCards[i].querySelector('.stat-value').textContent=v; });
+  db.collection('withdrawals').get().then(function(snap){
+    var grace=0, today=0, month=0, cancel=0, reasons={}, total=0;
+    var now=new Date(), mS=new Date(now.getFullYear(),now.getMonth(),1);
+    snap.forEach(function(doc){ var d=doc.data();
+      var req=(d.requested_at&&d.requested_at.toDate)?d.requested_at.toDate():((d.created_at&&d.created_at.toDate)?d.created_at.toDate():null);
+      if(d.status==='cancelled'||d.status==='withdrawn_cancel') cancel++;
+      else { grace++; }
+      if(req&&req>=mS) month++;
+      if(d.reason){ reasons[d.reason]=(reasons[d.reason]||0)+1; total++; }
+    });
+    if(statCards[0]) statCards[0].querySelector('.stat-value').textContent=grace+'명';
+    if(statCards[1]) statCards[1].querySelector('.stat-value').textContent=today+'명';
+    if(statCards[2]) statCards[2].querySelector('.stat-value').textContent=month+'명';
+    if(statCards[3]) statCards[3].querySelector('.stat-value').textContent=cancel+'명';
+    var wr=document.getElementById('wd-reasons');
+    if(wr){
+      if(!total){ wr.innerHTML='<div style="padding:20px;color:var(--text-3);font-size:13px;text-align:center">집계할 탈퇴 사유 데이터가 없습니다.</div>'; }
+      else { wr.innerHTML=Object.keys(reasons).sort(function(a,b){return reasons[b]-reasons[a];}).map(function(k){ var p=(reasons[k]/total*100).toFixed(1); return '<div class="policy-item"><div class="policy-label">'+k+'</div><div class="policy-value">'+reasons[k]+'명 ('+p+'%)</div></div>'; }).join(''); }
+    }
+  }).catch(function(){
+    ['0명','0명','0명','0명'].forEach(function(v,i){ if(statCards[i]) statCards[i].querySelector('.stat-value').textContent=v; });
+    var wr=document.getElementById('wd-reasons'); if(wr) wr.innerHTML='<div style="padding:20px;color:var(--text-3);font-size:13px;text-align:center">집계할 탈퇴 사유 데이터가 없습니다.</div>';
+  });
 }
 
 /* ── sec-postback ── postbacks collection */
