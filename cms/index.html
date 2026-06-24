@@ -700,7 +700,7 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
       </div>
       <div>
         <div class="login-logo-text">PricePick CMS</div>
-        <div class="login-logo-sub">v5.16 · 관리자 전용</div>
+        <div class="login-logo-sub">관리자 전용</div>
       </div>
     </div>
     <div id="login-title-el" class="login-title">로그인</div>
@@ -919,12 +919,15 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
           <button class="sb-item" id="nav-inquiries" data-label="1:1 문의" onclick="go('inquiries',this)">
             <span class="sb-item-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>
             <span class="sb-item-lbl" id="nav-label-inquiries">1:1 문의</span>
-            <span class="sb-item-badge" id="badge-inquiries">7</span>
+            <span class="sb-item-badge" id="badge-inquiries" style="display:none">0</span>
           </button>
           <button class="sb-item" id="nav-withdrawal" data-label="계정 탈퇴 처리" onclick="go('withdrawal',this)">
             <span class="sb-item-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="18" y1="8" x2="23" y2="13"/><line x1="23" y1="8" x2="18" y2="13"/></svg></span>
             <span class="sb-item-lbl" id="nav-label-withdrawal">계정 탈퇴 처리</span>
-            
+          </button>
+          <button class="sb-item" id="nav-abuse" data-label="어뷰징 모니터링" onclick="go('abuse',this)">
+            <span class="sb-item-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span>
+            <span class="sb-item-lbl" id="nav-label-abuse">어뷰징 모니터링</span>
           </button>
         </div>
       </div>
@@ -2120,6 +2123,24 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
     </div>
 
 
+    <!-- ── 어뷰징·이상적립 모니터링 (신규) ── -->
+    <div class="section" id="sec-abuse">
+      <div class="warn-box"><strong>어뷰징·이상적립 모니터링</strong> — 적립형 서비스 부정 사용(다계정·부정적립·환불 어뷰징)을 탐지합니다. 환불 포스트백·정지 계정·티켓 환수 기록을 실시간 집계합니다.</div>
+      <div class="stats-grid" style="grid-template-columns:repeat(4,1fr)">
+        <div class="stat-card red"><div class="stat-label">이상 징후 계정</div><div class="stat-value" id="abuse-flagged">—</div><div class="stat-change neutral">중복 제거</div></div>
+        <div class="stat-card amber"><div class="stat-label">환불 어뷰징</div><div class="stat-value" id="abuse-refund">—</div><div class="stat-change neutral">환불 포스트백</div></div>
+        <div class="stat-card purple"><div class="stat-label">정지 계정</div><div class="stat-value" id="abuse-suspended">—</div><div class="stat-change neutral">운영자 차단</div></div>
+        <div class="stat-card green"><div class="stat-label">티켓 환수</div><div class="stat-value" id="abuse-clawback">—</div><div class="stat-change neutral">누적</div></div>
+      </div>
+      <div class="card">
+        <div class="card-header"><div><div class="card-title">탐지 케이스</div><div class="card-sub">환불 어뷰징 · 정지 계정 · 티켓 환수 — 최신순</div></div></div>
+        <table>
+          <thead><tr><th>회원</th><th>유형</th><th>근거</th><th>일시</th><th style="text-align:center">상태</th></tr></thead>
+          <tbody id="abuse-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
     <!-- ── 수익 분석 ── -->
     <div class="section" id="sec-stats">
       <div class="data-source-bar">
@@ -3314,7 +3335,7 @@ let currentLang = 'ko';
 const I18N = {
   ko: {
     // 로그인
-    'login.subtitle': 'v5.16 · 관리자 전용',
+    'login.subtitle': '관리자 전용',
     'login.title': '로그인',
     'login.sub': '권한에 따라 접근 메뉴가 달라집니다.',
     'login.role.label': '역할 선택 (데모)',
@@ -3328,7 +3349,7 @@ const I18N = {
     'login.pw.placeholder': '비밀번호',
     'login.btn': '로그인',
     // 사이드바
-    'sidebar.subtitle': 'CMS v5.16',
+    'sidebar.subtitle': 'Admin Panel',
     'sidebar.access.label': '접속 권한',
     'nav.group.overview': '개요',
     'nav.dashboard': '대시보드',
@@ -3350,6 +3371,7 @@ const I18N = {
     'nav.group.ops': '운영',
     'nav.inquiries': '1:1 문의',
     'nav.withdrawal': '계정 탈퇴 처리',
+    'nav.abuse': '어뷰징 모니터링',
     'nav.group.revenue': '매출 · 수익',
     'nav.group.system': '시스템',
     'nav.stats': '수익 분석',
@@ -3383,6 +3405,7 @@ const I18N = {
     'page.notifications.title': '알림 관리', 'page.notifications.bc': '콘텐츠',
     'page.inquiries.title': '1:1 문의', 'page.inquiries.bc': '운영',
     'page.withdrawal.title': '계정 탈퇴 처리', 'page.withdrawal.bc': '운영',
+    'page.abuse.title': '어뷰징·이상적립 모니터링', 'page.abuse.bc': '운영',
     'page.stats.title': '수익 분석', 'page.stats.bc': '매출 · 수익',
     'nav.revenue': '매출 내역', 'page.revenue.title': '매출 내역', 'page.revenue.bc': '매출 · 수익',
     'page.settlement.title': '정산 내역', 'page.settlement.bc': '매출 · 수익',
@@ -3453,6 +3476,7 @@ function applyLang() {
     'nav-label-op-policy': 'nav.op-policy',
     'nav-label-inquiries': 'nav.inquiries',
     'nav-label-withdrawal': 'nav.withdrawal',
+    'nav-label-abuse': 'nav.abuse',
     'nav-group-label-revenue': 'nav.group.revenue',
     'nav-group-label-system': 'nav.group.system',
     'nav-label-stats': 'nav.stats',
@@ -3916,7 +3940,6 @@ function saveTicketEdit() {
 })();
 
 </script>
-<div style="position:fixed;bottom:24px;left:24px;z-index:9999;font-family:Inter,sans-serif;font-size:12px;color:#333333;line-height:1.4;pointer-events:none;">Last Update 2026.06.12 17:58</div>
 
 <!-- 교환 티켓 수정 모달 -->
 <div class="modal-overlay" id="m-ticket-edit">
@@ -4847,7 +4870,6 @@ function saveTicketEdit() {
   "33분 전":"33 phút trước",
   "(도매)":"(Bán buôn)",
   "(본인)":"(Bản thân)",
-  "v5.16 · 관리자 전용":"v5.16 · Chỉ quản trị viên",
   "10% 마진":"Biên 10%",
   "기프티콘 판매":"Bán Gifticon",
   "기프티콘 상품":"Sản phẩm Gifticon",
@@ -5332,6 +5354,7 @@ window.doLogin = function() {
     window.currentAdmin = { username: data.username, role: role, displayName: data.display_name || data.username };
     window.currentRole  = role;
     showApp({ displayName: data.display_name || data.username, email: data.username });
+    logAdmin('로그인');
   }).catch(function(err) {
     console.error('CMS login:', err);
     if (btn) { btn.textContent = '로그인'; btn.disabled = false; }
@@ -5398,6 +5421,7 @@ function loadAllData() {
     loadNotifications();
     loadInquiries();
     loadWithdrawal();
+  loadAbuse();
     loadPostback();
     loadAccounts();
     loadClawback();
@@ -5889,6 +5913,7 @@ function loadInquiries() {
     if (statCards[0]) statCards[0].querySelector('.stat-value').textContent = ppN(pending);
     if (statCards[1]) statCards[1].querySelector('.stat-value').textContent = ppN(processing);
     if (statCards[2]) statCards[2].querySelector('.stat-value').textContent = ppN(done);
+    var bi=document.getElementById('badge-inquiries'); if(bi){ bi.textContent=pending; bi.style.display=pending>0?'':'none'; }
     var rt=[]; snap.docs.forEach(function(doc){ var d=doc.data(); var c=(d.created_at&&d.created_at.toDate)?d.created_at.toDate():null; var a=(d.answered_at&&d.answered_at.toDate)?d.answered_at.toDate():null; if(c&&a&&a>c) rt.push((a-c)/3600000); });
     if (statCards[3]) statCards[3].querySelector('.stat-value').textContent = rt.length ? (rt.reduce(function(x,y){return x+y;},0)/rt.length).toFixed(1)+'h' : '—';
   }).catch(function(e){ console.error('loadInquiries',e); list.innerHTML='<div style="padding:24px;color:var(--text-3);text-align:center">로드 오류: '+e.message+'</div>'; });
@@ -5981,15 +6006,90 @@ function loadAccounts() {
       var d = doc.data();
       var isMe = d.username === meId;
       var roleTag = d.role === 'superadmin' ? '<span class="role-tag superadmin">슈퍼어드민</span>' : '<span class="role-tag operator">운영자</span>';
-      var statusBadge = d.status === 'active' ? '<span class="badge badge-green">활성</span>' : '<span class="badge badge-gray">비활성</span>';
-      var nameCell = '<strong>' + (d.display_name||d.username) + '</strong>' + (isMe?' <span style="font-size:10px;color:var(--text-3)">(본인)</span>':'');
+      var statusBadge = (d.status === 'active' || d.active === true) ? '<span class="badge badge-green">활성</span>' : '<span class="badge badge-gray">비활성</span>';
+      var nameCell = '<strong>' + (d.display_name||d.name||d.username||doc.id) + '</strong>' + (isMe?' <span style="font-size:10px;color:var(--text-3)">(본인)</span>':'');
       var actions = (isSuper && !isMe)
         ? '<div style="display:flex;gap:6px"><button class="btn btn-ghost btn-sm" onclick="toast(\'역할 변경 준비 중\')">역할 변경</button><button class="btn btn-danger btn-sm" onclick="toast(\'계정 삭제 준비 중\')">삭제</button></div>'
         : '<span style="font-size:11px;color:var(--text-3)">' + (isMe?'삭제 불가':'권한 없음') + '</span>';
-      return '<tr><td>' + nameCell + '</td><td>' + (d.username||'') + '</td><td>' + roleTag + '</td><td style="color:var(--text-3)">—</td><td>' + statusBadge + '</td><td>' + actions + '</td></tr>';
+      return '<tr><td>' + nameCell + '</td><td>' + (d.username||doc.id||'') + '</td><td>' + roleTag + '</td><td style="color:var(--text-3)">—</td><td>' + statusBadge + '</td><td>' + actions + '</td></tr>';
     });
     tbody.innerHTML = rows.join('');
   }).catch(function(e){ console.error('loadAccounts',e); tbody.innerHTML = ppEmpty(6,'로드 오류'); });
+  renderAccessLog();
+}
+
+/* ── 관리자 접근 로그 (admin_logs) ── */
+function renderAccessLog() {
+  var logTbody = document.getElementById('account-log-tbody');
+  if (!logTbody) return;
+  db.collection('admin_logs').get().then(function(snap) {
+    var docs = snap.docs.map(function(d){ return d.data(); })
+      .filter(function(x){ return x.at; })
+      .sort(function(a,b){ return (b.at&&b.at.toDate?b.at.toDate():new Date(0)) - (a.at&&a.at.toDate?a.at.toDate():new Date(0)); })
+      .slice(0,20);
+    if (!docs.length) { logTbody.innerHTML = ppEmpty(4,'접근 로그가 없습니다.'); return; }
+    logTbody.innerHTML = docs.map(function(x){
+      return '<tr><td style="text-align:center"><div style="font-weight:600;color:#333">'+ppDt(x.at)+'</div><div style="color:var(--text-3);font-size:11px">'+ppTm(x.at)+'</div></td>'
+        + '<td>'+(x.admin_name||x.admin_username||'-')+'</td>'
+        + '<td>'+(x.action||'-')+'</td>'
+        + '<td style="font-family:monospace;font-size:11px;color:var(--text-3)">'+(x.ip||'—')+'</td></tr>';
+    }).join('');
+  }).catch(function(e){ console.error('renderAccessLog',e); logTbody.innerHTML = ppEmpty(4,'접근 로그가 없습니다.'); });
+}
+
+/* ── 관리자 행위 로깅 ── */
+function logAdmin(action) {
+  try {
+    var a = window.currentAdmin || {};
+    db.collection('admin_logs').add({
+      admin_username: a.username || '',
+      admin_name: a.displayName || a.username || '',
+      action: action,
+      ip: '—',
+      at: firebase.firestore.FieldValue.serverTimestamp()
+    });
+  } catch (e) { console.error('logAdmin', e); }
+}
+
+/* ── sec-abuse ── 어뷰징·이상적립 모니터링 (postbacks/users/ticket_transactions 집계) */
+function loadAbuse() {
+  var tbody = document.getElementById('abuse-tbody');
+  if (!tbody) return;
+  Promise.all([
+    db.collection('postbacks').get(),
+    db.collection('users').get(),
+    db.collection('ticket_transactions').get()
+  ]).then(function(res){
+    var uname = function(uid){ return (uid||'').replace('user-','').replace(/-\d+$/,'') || uid || '-'; };
+    var cases = [], flagged = {};
+    // 환불 어뷰징
+    var refund = 0;
+    res[0].forEach(function(doc){ var d=doc.data(); if(d.status==='refunded'){ refund++; flagged[d.user_id]=1;
+      cases.push({ user:d.user_id, type:'환불 어뷰징', basis:(d.mall_name||'')+' '+((d.purchase_amount||0).toLocaleString('ko-KR'))+'원 환불', at:d.confirmed_at||d.created_at, badge:'<span class="badge badge-red">환불</span>' }); } });
+    // 정지 계정
+    var suspended = 0;
+    res[1].forEach(function(doc){ var d=doc.data(); if(d.status==='suspended'){ suspended++; flagged[doc.id]=1;
+      cases.push({ user:doc.id, type:'정지 계정', basis:'운영자 차단'+(d.nickname?(' · '+d.nickname):''), at:d.updated_at||d.created_at, badge:'<span class="badge badge-gray">정지</span>' }); } });
+    // 티켓 환수
+    var clawback = 0;
+    res[2].forEach(function(doc){ var d=doc.data(); if(d.type==='clawback'){ clawback++; flagged[d.user_id]=1;
+      cases.push({ user:d.user_id, type:'부정적립 환수', basis:(d.ticket_grade||'')+' 티켓 환수', at:d.created_at, badge:'<span class="badge badge-amber">환수</span>' }); } });
+    // KPI
+    var set=function(id,v){ var e=document.getElementById(id); if(e) e.textContent=v; };
+    set('abuse-flagged', ppN(Object.keys(flagged).length));
+    set('abuse-refund', ppN(refund));
+    set('abuse-suspended', ppN(suspended));
+    set('abuse-clawback', ppN(clawback));
+    if(!cases.length){ tbody.innerHTML = ppEmpty(5,'탐지된 이상 징후가 없습니다.'); return; }
+    cases.sort(function(a,b){ var ta=(a.at&&a.at.toDate?a.at.toDate():new Date(0)), tb=(b.at&&b.at.toDate?b.at.toDate():new Date(0)); return tb-ta; });
+    tbody.innerHTML = cases.slice(0,30).map(function(c){
+      return '<tr><td><div style="font-weight:500">'+uname(c.user)+'</div><div style="font-size:11px;color:var(--text-2);font-family:monospace">('+(c.user||'')+')</div></td>'
+        + '<td>'+c.type+'</td>'
+        + '<td style="font-size:12px;color:var(--text-2)">'+c.basis+'</td>'
+        + '<td style="color:var(--text-3)">'+ppDt(c.at)+'</td>'
+        + '<td style="text-align:center">'+c.badge+'</td></tr>';
+    }).join('');
+  }).catch(function(e){ console.error('loadAbuse',e); tbody.innerHTML = ppEmpty(5,'로드 오류'); });
 }
 
 /* ── sec-clawback ── ticket_transactions where type in [clawback,expire] */
@@ -6034,9 +6134,6 @@ function loadClawback() {
         if (statCards[3]) statCards[3].querySelector('.stat-value').textContent = ppN(gCnt)+'장';
       }
       if (debtTbody) debtTbody.innerHTML = ppEmpty(5,'부채 추적 데이터가 없습니다.');
-  /* access log tbody */
-  var logTbody = document.getElementById('account-log-tbody');
-  if (logTbody) logTbody.innerHTML = ppEmpty(4,'접근 로그가 없습니다.');
     }).catch(function(e){ console.error('loadClawback',e); if(tbody) tbody.innerHTML = ppEmpty(7,'로드 오류'); });
 }
 

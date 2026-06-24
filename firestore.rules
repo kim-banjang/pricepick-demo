@@ -191,5 +191,11 @@ service cloud.firestore {
       allow read: if isAdmin();
       allow write: if isAdmin();
     }
+    // 관리자 행위/접근 로그 — 생성만 허용, 수정·삭제 불가(불변 감사 로그)
+    match /admin_logs/{docId} {
+      allow read: if isAdmin();
+      allow create: if isAdmin();
+      allow update, delete: if false;
+    }
   }
 }
