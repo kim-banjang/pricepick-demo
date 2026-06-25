@@ -7152,6 +7152,7 @@ window.scenLoadList = function() {
         + ' · 구매 ' + ((d.purchase_amount||0).toLocaleString('ko-KR')) + '원'
         + ' · 티켓 골' + tk.gold + '·실' + tk.silver + '·동' + tk.bronze
         + ' · 적립 ' + earn.toLocaleString('ko-KR') + '원 · 수수료 ' + comm.toLocaleString('ko-KR') + '원</span>'
+        + '<button class="dm-del-btn" style="border-color:var(--success);color:var(--success);" onclick="scenFillOne(\'' + doc.id + '\')">채우기</button>'
         + '<button class="dm-del-btn" style="border-color:var(--main);color:var(--main);" onclick="scenEdit(\'' + doc.id + '\')">편집</button>'
         + '<button class="dm-del-btn" onclick="scenDelete(\'' + doc.id + '\')">삭제</button>'
         + '</div>';
@@ -7176,6 +7177,80 @@ window.scenLoadDefaults = function() {
   });
   b.commit().then(function(){ if(btn){btn.disabled=false;btn.textContent='기본 시나리오 14명 불러오기';} dmShowToast('기본 시나리오 ' + DEF.length + '명 추가됨'); scenLoadList(); })
    .catch(function(e){ if(btn){btn.disabled=false;btn.textContent='기본 시나리오 14명 불러오기';} dmShowToast('실패: '+(e.message||e), true); });
+};
+
+// ── 단건 빌더 (전체/개별 채우기 공용 — 시나리오 1건 → 신 스키마 문서 묶음) ──
+function scenMakeDocs(sid, s, created, confirmedAt, seq) {
+  var TS = FS.Timestamp;
+  function future(n){ var d=new Date(); d.setDate(d.getDate()+n); return TS.fromDate(d); }
+  function ymd(tsv){ var d=tsv.toDate(); return ''+d.getFullYear()+String(d.getMonth()+1).padStart(2,'0')+String(d.getDate()).padStart(2,'0'); }
+  var linked = !!s.linked, amount = s.purchase_amount||0;
+  var uid='user-scn-'+sid, pbId='pb-scn-'+sid, clId='cl-scn-'+sid;
+  var orderId='CPN-ORDER-'+ymd(created)+'-'+String(seq).padStart(3,'0');
+  var out = { USERS:{}, UP:{}, PB:{}, CL:{}, CPM:{}, TK:{}, TTX:{}, PTX:{}, uid:uid, pbId:pbId };
+  out.USERS[uid] = { nickname:s.name||'손님', linked_kakao:linked, status:'active', rep_grade:s.grade||null, scenario_id:sid, created_at:created, updated_at:TS.now() };
+  out.PB[pbId] = { user_id:uid, mall_name:SCEN_MALL.name, mall_domain:SCEN_MALL.domain, purchase_amount:amount, order_id:orderId, status:(linked?'confirmed':'pending'), created_at:created, confirmed_at:confirmedAt };
+  out.CL[clId] = { user_id:uid, mall_name:SCEN_MALL.name, mall_domain:SCEN_MALL.domain, clicked_at:created };
+  out.CPM['cpm-scn-'+sid] = { user_id:uid, click_id:clId, postback_id:pbId, created_at:created };
+  var tk = scenGreedy(amount), tkStatus = linked ? 'active' : 'pending', grades = [];
+  for (var gi=0; gi<tk.gold; gi++) grades.push('gold');
+  for (var si=0; si<tk.silver; si++) grades.push('silver');
+  for (var bi=0; bi<tk.bronze; bi++) grades.push('bronze');
+  grades.forEach(function(g, n){
+    out.TK['tk-scn-'+sid+'-'+(n+1)] = { user_id:uid, grade:g, status:tkStatus, postback_id:pbId, earned_at:created, confirmed_at:confirmedAt, expires_at:future(365) };
+    out.TTX['ttx-scn-'+sid+'-'+(n+1)] = { user_id:uid, ticket_grade:g, type:'earn', postback_id:pbId, created_at:(confirmedAt||created) };
+  });
+  var pts = linked ? 500 : 0;
+  out.UP[uid] = { user_id:uid, balance:pts, updated_at:TS.now(), created_at:created };
+  if (pts > 0) out.PTX['ptx-scn-'+sid] = { user_id:uid, amount:pts, type:'onboarding', reason:'가입 축하 보상', created_at:created };
+  return out;
+}
+
+// ── 개별 채우기 (시나리오 1건만 주입; 같은 시나리오 재클릭 시 멱등 재생성 = 1건만 유지) ──
+window.scenFillOne = function(id) {
+  db.collection('demo_scenarios').doc(id).get().then(function(doc){
+    if (!doc.exists) { dmShowToast('시나리오를 찾을 수 없습니다.', true); return; }
+    var s = doc.data(), sid = id, TS = FS.Timestamp;
+    function ago(n){ var d=new Date(); d.setDate(d.getDate()-n); return TS.fromDate(d); }
+    var linked = !!s.linked, created = ago(2), confirmedAt = linked ? ago(1) : null;
+    var seq = Math.floor(Math.random()*900) + 100;
+    var uid = 'user-scn-'+sid, pbId = 'pb-scn-'+sid;
+    dmShowToast('"' + (s.name||'시나리오') + '" 채우는 중…');
+    // 1) 동일 시나리오의 기존 생성물 정리 (멱등 — 1건만 유지)
+    function delWhere(col, field, val){
+      return db.collection(col).where(field,'==',val).get().then(function(snap){
+        if (snap.empty) return null;
+        var b = db.batch(); snap.forEach(function(d){ b.delete(d.ref); }); return b.commit();
+      }).catch(function(){});
+    }
+    Promise.all([
+      db.collection('users').doc(uid).delete().catch(function(){}),
+      db.collection('user_points').doc(uid).delete().catch(function(){}),
+      db.collection('postbacks').doc(pbId).delete().catch(function(){}),
+      db.collection('click_logs').doc('cl-scn-'+sid).delete().catch(function(){}),
+      db.collection('click_postback_matches').doc('cpm-scn-'+sid).delete().catch(function(){}),
+      delWhere('user_tickets','postback_id',pbId),
+      delWhere('ticket_transactions','postback_id',pbId),
+      delWhere('point_transactions','user_id',uid),
+    ]).then(function(){
+      // 2) 생성
+      var m = scenMakeDocs(sid, s, created, confirmedAt, seq);
+      function setAll(col, map){
+        if (!Object.keys(map).length) return Promise.resolve();
+        var b = db.batch();
+        Object.entries(map).forEach(function(e){ b.set(db.collection(col).doc(e[0]), e[1]); });
+        return b.commit();
+      }
+      return Promise.all([
+        setAll('users', m.USERS), setAll('user_points', m.UP), setAll('postbacks', m.PB),
+        setAll('click_logs', m.CL), setAll('click_postback_matches', m.CPM),
+        setAll('user_tickets', m.TK), setAll('ticket_transactions', m.TTX), setAll('point_transactions', m.PTX),
+      ]);
+    }).then(function(){
+      dmShowToast('"' + (s.name||'시나리오') + '" 채우기 완료 (단건)');
+      if (window.dmLoadStats) dmLoadStats();
+    }).catch(function(e){ dmShowToast('단건 채우기 실패: '+(e.message||e), true); });
+  }).catch(function(e){ dmShowToast('단건 채우기 실패: '+(e.message||e), true); });
 };
 
 // ── 시나리오 기반 채우기 (회원·포스트백·티켓·포인트 자동 생성) ──
