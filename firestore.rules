@@ -88,11 +88,12 @@ service cloud.firestore {
       allow update, delete: if isAdmin();
     }
 
-    // Immutable ledger – append-only, no updates/deletes ever
+    // Immutable ledger – append-only. 수정 불가(불변). 단, 데모 리셋을 위해 admin 삭제만 허용.
     match /ticket_transactions/{docId} {
       allow read: if isAdmin() || (isSignedIn() && resource.data.user_id == request.auth.uid);
       allow create: if isAdmin() || (isSignedIn() && request.resource.data.user_id == request.auth.uid);
-      allow update, delete: if false;
+      allow update: if false;
+      allow delete: if isAdmin();
     }
 
     // ──────────────────────────────────────────
@@ -109,11 +110,12 @@ service cloud.firestore {
       allow write: if isOwner(userId) || isAdmin();
     }
 
-    // Immutable ledger – append-only
+    // Immutable ledger – append-only. 수정 불가(불변). 단, 데모 리셋을 위해 admin 삭제만 허용.
     match /point_transactions/{docId} {
       allow read: if isAdmin() || (isSignedIn() && resource.data.user_id == request.auth.uid);
       allow create: if isAdmin() || (isSignedIn() && request.resource.data.user_id == request.auth.uid);
-      allow update, delete: if false;
+      allow update: if false;
+      allow delete: if isAdmin();
     }
 
     // ──────────────────────────────────────────
@@ -196,6 +198,11 @@ service cloud.firestore {
       allow read: if isAdmin();
       allow create: if isAdmin();
       allow update, delete: if false;
+    }
+
+    // 데모 시나리오 정의 (CMS 시나리오 관리 — 데모 전용, admin 전용)
+    match /demo_scenarios/{docId} {
+      allow read, write: if isAdmin();
     }
   }
 }
