@@ -4,6 +4,9 @@
     { "source": "/app", "destination": "/app/index.html" },
     { "source": "/app/", "destination": "/app/index.html" },
     { "source": "/scenario", "destination": "/scenario/index.html" },
+    { "source": "/flutter", "destination": "/flutter-web/index.html" },
+    { "source": "/flutter/", "destination": "/flutter-web/index.html" },
+    { "source": "/flutter/:path*", "destination": "/flutter-web/:path*" },
     { "source": "/",    "destination": "/cms/index.html" }
   ]
 }
