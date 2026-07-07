@@ -54,6 +54,9 @@ html,body{font-family:var(--font);background:var(--bg);color:var(--text);-webkit
 /* ── 로그인 ── */
 .login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;
   background:radial-gradient(ellipse at 60% 30%,rgba(132,94,238,.1),transparent 60%),#EDE8F8;}
+#cms-auth-gate{position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;background:var(--bg);}
+#cms-auth-gate .spinner{width:32px;height:32px;border:3px solid var(--main-line);border-top-color:var(--main);border-radius:50%;animation:cms-gate-spin .8s linear infinite;}
+@keyframes cms-gate-spin{to{transform:rotate(360deg);}}
 .login-box{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:40px;width:400px;box-shadow:var(--shadow-lg);}
 .login-logo{display:flex;align-items:center;gap:12px;margin-bottom:28px;}
 .login-logo-mark{width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,var(--main),#9B78FF);
@@ -688,8 +691,11 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
 </head>
 <body>
 
+<!-- ── 인증 상태 확인 중 (세션 복원 판단 전, 로그인 화면 깜빡임 방지) ── -->
+<div id="cms-auth-gate"><div class="spinner"></div></div>
+
 <!-- ── 로그인 ── -->
-<div id="login-page" class="login-wrap">
+<div id="login-page" class="login-wrap" style="display:none">
   <div class="login-box">
     <div class="login-logo">
       <div class="login-logo-mark">
@@ -5350,7 +5356,19 @@ var FS = firebase.firestore;
 var ADMIN_EMAIL = 'sgkim.mixit@gmail.com';
 var _authed = false;
 
+function hideAuthGate() {
+  var gate = document.getElementById('cms-auth-gate');
+  if (gate) gate.style.display = 'none';
+}
+
+function showLoginPage() {
+  hideAuthGate();
+  document.getElementById('main-app').style.display = 'none';
+  document.getElementById('login-page').style.display = 'flex';
+}
+
 function showApp(user) {
+  hideAuthGate();
   document.getElementById('login-page').style.display = 'none';
   document.getElementById('main-app').style.display = 'flex';
   if (typeof applyRole === 'function') applyRole(window.currentRole || 'superadmin');
@@ -5436,22 +5454,36 @@ window.doLogout = function() {
   });
 };
 
-/* ── Session restore on page load ── */
+/* ── Session restore on page load ──
+   로그인 여부 판단(로그인 화면 노출 여부)은 onAuthStateChanged의 최초 발화(Firebase의
+   로컬 세션 복원 완료 시점) 이후에만 내린다. 그 전까지는 #cms-auth-gate로 대기시켜
+   "새로고침하면 로그인 화면으로 튕기는 것처럼 보이는" 타이밍 문제를 막는다. */
 auth.onAuthStateChanged(function(user) {
-  if (user && user.email && user.email.endsWith('@pricepick-cms.internal') && !_authed) {
-    _authed = true;
-    var uname = user.email.replace('@pricepick-cms.internal', '');
-    db.collection('admin_accounts').where('username', '==', uname).limit(1).get().then(function(snap) {
-      if (snap.empty) return;
-      var data = snap.docs[0].data();
-      var role = (data.role === 'superadmin' || data.role === 'operator') ? data.role : 'operator';
-      window.currentAdmin = { username: data.username, role: role, displayName: data.display_name || data.username };
-      window.currentRole  = role;
-      if (document.getElementById('main-app').style.display === 'none') {
-        showApp({ displayName: data.display_name || data.username, email: data.username });
-      }
-    });
+  if (_authed) return;
+  _authed = true;
+
+  if (!user || !user.email || !user.email.endsWith('@pricepick-cms.internal')) {
+    showLoginPage();
+    return;
   }
+
+  var uname = user.email.replace('@pricepick-cms.internal', '');
+  db.collection('admin_accounts').where('username', '==', uname).limit(1).get().then(function(snap) {
+    if (snap.empty) { showLoginPage(); return; }
+    var data = snap.docs[0].data();
+    if (data.status === 'inactive') { auth.signOut(); showLoginPage(); return; }
+    var role = (data.role === 'superadmin' || data.role === 'operator') ? data.role : 'operator';
+    window.currentAdmin = { username: data.username, role: role, displayName: data.display_name || data.username };
+    window.currentRole  = role;
+    if (document.getElementById('main-app').style.display === 'none') {
+      showApp({ displayName: data.display_name || data.username, email: data.username });
+    } else {
+      hideAuthGate();
+    }
+  }).catch(function(err) {
+    console.error('CMS session restore:', err);
+    showLoginPage();
+  });
 });
 
 /* ── Load all data ── */
