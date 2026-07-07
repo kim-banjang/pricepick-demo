@@ -4058,7 +4058,9 @@ function saveTicketEdit() {
     <div class="modal-body">
       <input type="hidden" id="dmue-id">
       <div class="form-group"><label class="form-label">닉네임</label><input class="form-input" id="dmue-nickname" placeholder="닉네임"></div>
-      <div class="form-group"><label class="form-label">카카오연동</label><select class="form-select" id="dmue-linked"><option value="true">연동</option><option value="false">미연동</option></select></div>
+      <div class="form-group"><label class="form-label">카카오연동</label><select class="form-select" id="dmue-linked" onchange="dmToggleKakaoFields('dmue')"><option value="true">연동</option><option value="false">미연동</option></select></div>
+      <div class="form-group" id="dmuew-kakao_nickname"><label class="form-label">카카오 닉네임</label><input class="form-input" id="dmue-kakao_nickname" placeholder="카카오 닉네임"></div>
+      <div class="form-group" id="dmuew-kakao_login_id"><label class="form-label">카카오 로그인 ID</label><input class="form-input" id="dmue-kakao_login_id" placeholder="카카오 로그인 아이디"></div>
       <div class="form-group"><label class="form-label">가입일</label><input class="form-input" type="datetime-local" id="dmue-created"></div>
     </div>
     <div class="modal-footer">
@@ -5762,7 +5764,7 @@ function loadMembers() {
   db.collection('users').orderBy('created_at', 'desc').limit(30).get()
     .then(function(snap) {
       if (snap.empty) {
-        existingTbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:32px;color:var(--text-3);">등록된 회원이 없습니다.</td></tr>';
+        existingTbody.innerHTML = '<tr><td colspan="10" style="text-align:center;padding:32px;color:var(--text-3);">등록된 회원이 없습니다.</td></tr>';
         return;
       }
       var rows = [];
@@ -5771,19 +5773,22 @@ function loadMembers() {
         var kakaoType = u.linked_kakao
           ? '<span class="member-type-kakao">카카오 연동</span>'
           : '<span style="background:var(--warning-soft);color:var(--warning);padding:2px 8px;border-radius:99px;font-size:11px;font-weight:600;">게스트</span>';
+        var idLine = (u.linked_kakao && u.kakao_login_id) ? u.kakao_login_id : (doc.id.slice(0,14) + '…');
         rows.push('<tr>'
-          + '<td><div style="font-weight:500;">' + (u.nickname || '닉네임없음') + '</div><div style="font-size:11px;color:var(--text-3);font-family:monospace;">' + doc.id.slice(0,14) + '…</div></td>'
+          + '<td><div style="font-weight:500;">' + (u.nickname || '닉네임없음') + '</div><div style="font-size:11px;color:var(--text-3);font-family:monospace;">' + idLine + '</div></td>'
           + '<td>' + kakaoType + '</td>'
           + '<td style="text-align:center;white-space:nowrap"><div style="font-weight:700;">' + ppDt(u.created_at) + '</div><div style="color:var(--text-3);font-size:11px">' + ppTm(u.created_at) + '</div></td>'
+          + '<td style="text-align:center"><span id="mem-rand-' + doc.id + '">…</span></td>'
           + '<td style="text-align:center">-</td>'
+          + '<td style="text-align:center"><span id="mem-grade-' + doc.id + '">…</span></td>'
           + '<td style="text-align:center">0</td>'
-          + '<td style="text-align:center">0</td>'
-          + '<td style="text-align:center">0</td>'
+          + '<td style="text-align:center">-</td>'
           + '<td style="text-align:center"><span style="background:var(--success-soft);color:var(--success);padding:2px 8px;border-radius:99px;font-size:11px;font-weight:600;">정상</span></td>'
           + '<td style="text-align:center;color:var(--text-3);">-</td>'
           + '</tr>');
       });
       existingTbody.innerHTML = rows.join('');
+      loadMemberTicketCounts(snap.docs.map(function(d){ return d.id; }));
     }).catch(function(e){ console.error('members', e); });
   /* 전체 회원 집계 (연동/게스트/마케팅 동의) */
   db.collection('users').get().then(function(s){
@@ -5797,6 +5802,38 @@ function loadMembers() {
     set('mem-guest', guest.toLocaleString('ko-KR') + '명' + pct(guest));
     set('mem-mkt', mkt > 0 ? (mkt.toLocaleString('ko-KR') + '명' + pct(mkt)) : '운영 데이터 없음');
   }).catch(function(){});
+}
+
+// 회원 목록의 "랜덤 티켓"·"등급 티켓" 컬럼 집계.
+// user_tickets.status로 가지급/확정을 구분한다 — status:'pending' = 아직 등급 미확정(가지급, 랜덤 티켓),
+// status:'active' = 등급 확정(등급 티켓, grade별 카운트). used/expired/revoked는 현재 보유 수량이 아니라 제외.
+// (포스트백 자동적립·수동 지급 경로는 현재 늘 status:'active'로 즉시 생성하므로 대부분 등급 티켓으로 집계되고,
+//  status:'pending'은 시나리오 채우기의 미연동 손님 데이터에서만 나타난다 — 데이터 구조상 실제 구분 기준 그대로 반영.)
+function loadMemberTicketCounts(userIds) {
+  if (!userIds || !userIds.length) return;
+  var counts = {};
+  userIds.forEach(function(uid) { counts[uid] = { pending: 0, bronze: 0, silver: 0, gold: 0 }; });
+  var chunks = [];
+  for (var i = 0; i < userIds.length; i += 10) chunks.push(userIds.slice(i, i + 10));
+  Promise.all(chunks.map(function(chunk) {
+    return db.collection('user_tickets').where('user_id', 'in', chunk).get().then(function(snap) {
+      snap.forEach(function(doc) {
+        var d = doc.data();
+        var c = counts[d.user_id];
+        if (!c) return;
+        if (d.status === 'pending') { c.pending++; }
+        else if (d.status === 'active' && (d.grade === 'bronze' || d.grade === 'silver' || d.grade === 'gold')) { c[d.grade]++; }
+      });
+    }).catch(function(e) { console.error('loadMemberTicketCounts', e); });
+  })).then(function() {
+    Object.keys(counts).forEach(function(uid) {
+      var c = counts[uid];
+      var randEl = document.getElementById('mem-rand-' + uid);
+      if (randEl) randEl.textContent = c.pending + '장';
+      var gradeEl = document.getElementById('mem-grade-' + uid);
+      if (gradeEl) gradeEl.textContent = '브' + c.bronze + '·실' + c.silver + '·골' + c.gold;
+    });
+  });
 }
 
 /* ─────────────────────────────────────────────────────────────
@@ -6598,9 +6635,11 @@ var DEMO_COLS = [
 // ──────────────────────────────────────────
 var DM_FIELDS = {
   users: [
-    { id:'nickname',   label:'닉네임',     type:'text',   def:'테스트유저' },
-    { id:'linked',     label:'카카오연동', type:'select', opts:['true','false'], def:'true', labels:{ 'true':'연동', 'false':'미연동' } },
-    { id:'created_at', label:'가입일',     type:'datetime-local', def:'' },
+    { id:'nickname',        label:'닉네임',         type:'text',   def:'테스트유저' },
+    { id:'linked',          label:'카카오연동',     type:'select', opts:['true','false'], def:'true', labels:{ 'true':'연동', 'false':'미연동' } },
+    { id:'kakao_nickname',  label:'카카오 닉네임',  type:'text',   def:'' },
+    { id:'kakao_login_id',  label:'카카오 로그인 ID', type:'text', def:'' },
+    { id:'created_at',      label:'가입일',         type:'datetime-local', def:'' },
   ],
   postbacks: [
     { id:'user_id',         label:'유저ID',   type:'user-select', def:'' },
@@ -6718,9 +6757,11 @@ function dmRenderForm(col) {
   var html = '<div style="font-size:11px;font-weight:700;color:var(--text-3);margin-bottom:8px;text-transform:uppercase;">문서 추가 — ' + col + hint + '</div>';
   html += '<div class="dm-form-row" id="dm-form-' + col + '">';
   fields.forEach(function(f) {
-    html += '<div class="dm-field"><label>' + f.label + '</label>';
+    var isKakaoField = (col === 'users' && (f.id === 'kakao_nickname' || f.id === 'kakao_login_id'));
+    html += '<div class="dm-field"' + (isKakaoField ? ' id="dmw-' + f.id + '"' : '') + '><label>' + f.label + '</label>';
     if (f.type === 'select') {
-      html += '<select id="dmf-' + f.id + '">' + f.opts.map(function(o) {
+      var linkedAttr = (col === 'users' && f.id === 'linked') ? ' onchange="dmToggleKakaoFields(\'dmf\')"' : '';
+      html += '<select id="dmf-' + f.id + '"' + linkedAttr + '>' + f.opts.map(function(o) {
         var text = (f.labels && f.labels[o]) || o;
         return '<option value="' + o + '"' + (o === f.def ? ' selected' : '') + '>' + text + '</option>';
       }).join('') + '</select>';
@@ -6744,7 +6785,25 @@ function dmRenderForm(col) {
     if (f.type === 'user-select') dmPopulateUserSelect('dmf-' + f.id);
     if (f.type === 'mall-select') dmPopulateMallSelect('dmf-' + f.id);
   });
+  if (col === 'users') dmToggleKakaoFields('dmf');
 }
+
+// 카카오연동이 '연동'일 때만 카카오 닉네임/로그인ID 입력칸 노출 (미연동 전환 시 값 비움)
+// prefix: 'dmf'(문서추가 폼) 또는 'dmue'(회원 수정 모달) — 각각 dmw-/dmuew- 래퍼를 토글한다.
+window.dmToggleKakaoFields = function(prefix) {
+  var linkedEl = document.getElementById(prefix + '-linked');
+  if (!linkedEl) return;
+  var show = linkedEl.value === 'true';
+  var wrapPrefix = (prefix === 'dmf') ? 'dmw-' : 'dmuew-';
+  var nickWrap = document.getElementById(wrapPrefix + 'kakao_nickname');
+  var loginWrap = document.getElementById(wrapPrefix + 'kakao_login_id');
+  if (nickWrap) nickWrap.style.display = show ? '' : 'none';
+  if (loginWrap) loginWrap.style.display = show ? '' : 'none';
+  if (!show) {
+    var ne = document.getElementById(prefix + '-kakao_nickname'); if (ne) ne.value = '';
+    var le = document.getElementById(prefix + '-kakao_login_id'); if (le) le.value = '';
+  }
+};
 
 // <input type="date"> 값(YYYY-MM-DD) ↔ Date 객체 변환 헬퍼
 function dmDateInputValue(d) {
@@ -6769,7 +6828,8 @@ function dmPopulateUserSelect(elId, selectedValue) {
     if (snap.empty) { sel2.innerHTML = '<option value="">등록된 회원이 없습니다</option>'; return; }
     sel2.innerHTML = snap.docs.map(function(doc) {
       var u = doc.data();
-      var label = (u.nickname || '닉네임없음') + ' · ' + doc.id + (u.linked_kakao ? ' · 카카오연동' : ' · 게스트') + (u.rep_grade ? (' · ' + u.rep_grade) : '');
+      var idLabel = (u.linked_kakao && u.kakao_login_id) ? u.kakao_login_id : doc.id;
+      var label = (u.nickname || '닉네임없음') + ' · ' + idLabel + (u.linked_kakao ? ' · 카카오연동' : ' · 게스트') + (u.rep_grade ? (' · ' + u.rep_grade) : '');
       return '<option value="' + doc.id + '">' + label + '</option>';
     }).join('');
     if (selectedValue) sel2.value = selectedValue;
@@ -6855,7 +6915,11 @@ window.dmAdd = function(col) {
   }
 
   // 컬렉션별 추가 필드
-  if (col === 'users') { data['status'] = 'active'; data['updated_at'] = FS.Timestamp.now(); }
+  if (col === 'users') {
+    data['status'] = 'active';
+    data['updated_at'] = FS.Timestamp.now();
+    if (!data.linked_kakao) { delete data.kakao_nickname; delete data.kakao_login_id; }
+  }
   if (col === 'gifticons') { data['status'] = 'active'; data['updated_at'] = FS.Timestamp.now(); }
   if (col === 'user_points') { data['updated_at'] = FS.Timestamp.now(); }
   if (col === 'gifticon_exchanges') { data['exchanged_at'] = FS.Timestamp.now(); data['status'] = 'completed'; }
@@ -7094,9 +7158,12 @@ window.dmEditUserOpen = function(id) {
     document.getElementById('dmue-id').value = id;
     document.getElementById('dmue-nickname').value = d.nickname || '';
     document.getElementById('dmue-linked').value = d.linked_kakao ? 'true' : 'false';
+    document.getElementById('dmue-kakao_nickname').value = d.kakao_nickname || '';
+    document.getElementById('dmue-kakao_login_id').value = d.kakao_login_id || '';
     var created = (d.created_at && d.created_at.toDate) ? d.created_at.toDate() : new Date();
     document.getElementById('dmue-created').value = dmDateTimeInputValue(created);
     openModal('m-dm-user-edit');
+    dmToggleKakaoFields('dmue');
   }).catch(function(e) {
     dmShowToast('불러오기 실패: ' + (e.message||e), true);
   });
@@ -7107,9 +7174,12 @@ window.dmEditUserSave = function() {
   if (!id) return;
   var nickname = document.getElementById('dmue-nickname').value.trim();
   if (!nickname) { dmShowToast('닉네임을 입력하세요.', true); return; }
+  var linked = document.getElementById('dmue-linked').value === 'true';
   var data = {
     nickname: nickname,
-    linked_kakao: document.getElementById('dmue-linked').value === 'true',
+    linked_kakao: linked,
+    kakao_nickname: linked ? (document.getElementById('dmue-kakao_nickname').value.trim() || null) : null,
+    kakao_login_id: linked ? (document.getElementById('dmue-kakao_login_id').value.trim() || null) : null,
     updated_at: FS.Timestamp.now(),
   };
   var dateStr = document.getElementById('dmue-created').value;
