@@ -4059,7 +4059,7 @@ function saveTicketEdit() {
       <input type="hidden" id="dmue-id">
       <div class="form-group"><label class="form-label">닉네임</label><input class="form-input" id="dmue-nickname" placeholder="닉네임"></div>
       <div class="form-group"><label class="form-label">카카오연동</label><select class="form-select" id="dmue-linked"><option value="true">연동</option><option value="false">미연동</option></select></div>
-      <div class="form-group"><label class="form-label">가입일</label><input class="form-input" type="date" id="dmue-created"></div>
+      <div class="form-group"><label class="form-label">가입일</label><input class="form-input" type="datetime-local" id="dmue-created"></div>
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModal('m-dm-user-edit')">취소</button>
@@ -5768,15 +5768,13 @@ function loadMembers() {
       var rows = [];
       snap.forEach(function(doc) {
         var u = doc.data();
-        var ts = u.created_at ? (u.created_at.toDate ? u.created_at.toDate() : new Date()) : new Date();
-        var dateStr = ts.toLocaleDateString('ko-KR', { year:'numeric', month:'2-digit', day:'2-digit' });
         var kakaoType = u.linked_kakao
           ? '<span class="member-type-kakao">카카오 연동</span>'
           : '<span style="background:var(--warning-soft);color:var(--warning);padding:2px 8px;border-radius:99px;font-size:11px;font-weight:600;">게스트</span>';
         rows.push('<tr>'
           + '<td><div style="font-weight:500;">' + (u.nickname || '닉네임없음') + '</div><div style="font-size:11px;color:var(--text-3);font-family:monospace;">' + doc.id.slice(0,14) + '…</div></td>'
           + '<td>' + kakaoType + '</td>'
-          + '<td style="text-align:center"><div style="font-weight:700;">' + dateStr + '</div></td>'
+          + '<td style="text-align:center;white-space:nowrap"><div style="font-weight:700;">' + ppDt(u.created_at) + '</div><div style="color:var(--text-3);font-size:11px">' + ppTm(u.created_at) + '</div></td>'
           + '<td style="text-align:center">-</td>'
           + '<td style="text-align:center">0</td>'
           + '<td style="text-align:center">0</td>'
@@ -6568,7 +6566,8 @@ dmStyle.textContent = '.dm-tab{padding:7px 14px;border:none;background:none;curs
   '.dm-form-row{display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;}' +
   '.dm-field{display:flex;flex-direction:column;gap:3px;min-width:120px;}' +
   '.dm-field label{font-size:10px;font-weight:700;color:var(--text-3);text-transform:uppercase;}' +
-  '.dm-field input,.dm-field select{padding:6px 8px;border:1px solid var(--border);border-radius:6px;font-size:12px;background:var(--bg);color:var(--text);}' +
+  '.dm-field input,.dm-field select{height:32px;box-sizing:border-box;padding:0 8px;border:1px solid var(--border);border-radius:6px;font-size:12px;background:var(--bg);color:var(--text);}' +
+  '.dm-field button{height:32px;box-sizing:border-box;padding:0 14px;display:inline-flex;align-items:center;justify-content:center;}' +
   '.dm-stat-chip{background:var(--bg-soft,#F9FAFB);border:1px solid var(--border);border-radius:8px;padding:8px 10px;text-align:center;}' +
   '.dm-stat-chip .n{font-size:18px;font-weight:700;color:var(--main);}' +
   '.dm-stat-chip .l{font-size:10px;color:var(--text-3);margin-top:2px;}';
@@ -6601,7 +6600,7 @@ var DM_FIELDS = {
   users: [
     { id:'nickname',   label:'닉네임',     type:'text',   def:'테스트유저' },
     { id:'linked',     label:'카카오연동', type:'select', opts:['true','false'], def:'true', labels:{ 'true':'연동', 'false':'미연동' } },
-    { id:'created_at', label:'가입일',     type:'date',   def:'' },
+    { id:'created_at', label:'가입일',     type:'datetime-local', def:'' },
   ],
   postbacks: [
     { id:'user_id',         label:'유저ID',   type:'user-select', def:'' },
@@ -6731,6 +6730,8 @@ function dmRenderForm(col) {
       html += '<select id="dmf-' + f.id + '" data-domain-target="dmf-mall_domain" style="min-width:140px" onchange="dmOnMallSelectChange(this)"><option value="">불러오는 중…</option></select>';
     } else if (f.type === 'date') {
       html += '<input type="date" id="dmf-' + f.id + '" value="' + (f.def || dmTodayStr()) + '">';
+    } else if (f.type === 'datetime-local') {
+      html += '<input type="datetime-local" id="dmf-' + f.id + '" value="' + (f.def || dmNowStr()) + '">';
     } else {
       html += '<input type="' + f.type + '" id="dmf-' + f.id + '" value="' + (f.def||'') + '" placeholder="' + f.label + '">';
     }
@@ -6750,6 +6751,12 @@ function dmDateInputValue(d) {
   return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
 }
 function dmTodayStr() { return dmDateInputValue(new Date()); }
+
+// <input type="datetime-local"> 값(YYYY-MM-DDTHH:MM) ↔ Date 객체 변환 헬퍼
+function dmDateTimeInputValue(d) {
+  return dmDateInputValue(d) + 'T' + String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
+}
+function dmNowStr() { return dmDateTimeInputValue(new Date()); }
 
 // 회원(users) 목록을 드롭다운 옵션으로 채움 — 오타 없이 회원 선택으로 유저ID를 지정하기 위함
 // elId: 채울 <select>의 실제 element id. selectedValue를 주면 로드 후 그 값으로 선택해둔다(수정 폼 용도).
@@ -6832,6 +6839,7 @@ window.dmAdd = function(col) {
     var v = el.value.trim();
     if (f.type === 'number') v = parseFloat(v) || 0;
     if (f.type === 'date') v = v ? FS.Timestamp.fromDate(new Date(v + 'T00:00:00')) : null;
+    if (f.type === 'datetime-local') v = v ? FS.Timestamp.fromDate(new Date(v)) : null;
     if (f.id === 'linked') {
       data['linked_kakao'] = (v === 'true');
     } else if (f.id === 'balance' || f.id === 'amount' || f.id === 'required_count' || f.id === 'validity_days' || f.id === 'count_used' || f.id === 'purchase_amount') {
@@ -7087,7 +7095,7 @@ window.dmEditUserOpen = function(id) {
     document.getElementById('dmue-nickname').value = d.nickname || '';
     document.getElementById('dmue-linked').value = d.linked_kakao ? 'true' : 'false';
     var created = (d.created_at && d.created_at.toDate) ? d.created_at.toDate() : new Date();
-    document.getElementById('dmue-created').value = dmDateInputValue(created);
+    document.getElementById('dmue-created').value = dmDateTimeInputValue(created);
     openModal('m-dm-user-edit');
   }).catch(function(e) {
     dmShowToast('불러오기 실패: ' + (e.message||e), true);
@@ -7105,7 +7113,7 @@ window.dmEditUserSave = function() {
     updated_at: FS.Timestamp.now(),
   };
   var dateStr = document.getElementById('dmue-created').value;
-  if (dateStr) data.created_at = FS.Timestamp.fromDate(new Date(dateStr + 'T00:00:00'));
+  if (dateStr) data.created_at = FS.Timestamp.fromDate(new Date(dateStr));
   db.collection('users').doc(id).set(data, { merge: true }).then(function() {
     dmShowToast('회원 정보 저장 완료');
     closeModal('m-dm-user-edit');
