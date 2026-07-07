@@ -2612,7 +2612,7 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
         </div>
 
         <!-- 상태 현황 -->
-        <div id="dm-stats-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px;padding:0 20px 16px;"></div>
+        <div id="dm-stats-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px;padding:16px 20px;"></div>
 
         <!-- 일괄 작업 -->
         <div style="display:flex;gap:10px;flex-wrap:wrap;padding:0 20px 20px;border-bottom:1px solid var(--border);">
@@ -2648,10 +2648,6 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
           <button class="dm-tab"        data-col="postbacks"          onclick="dmSwitchTab(this,'postbacks')">포스트백</button>
           <button class="dm-tab"        data-col="user_points"        onclick="dmSwitchTab(this,'user_points')">포인트</button>
           <button class="dm-tab"        data-col="gifticons"          onclick="dmSwitchTab(this,'gifticons')">기프티콘</button>
-          <button class="dm-tab"        data-col="gifticon_exchanges" onclick="dmSwitchTab(this,'gifticon_exchanges')">교환이력</button>
-          <button class="dm-tab"        data-col="ticket_transactions" onclick="dmSwitchTab(this,'ticket_transactions')">티켓원장</button>
-          <button class="dm-tab"        data-col="point_transactions" onclick="dmSwitchTab(this,'point_transactions')">포인트원장</button>
-          <button class="dm-tab"        data-col="inquiries"          onclick="dmSwitchTab(this,'inquiries')">문의</button>
         </div>
         <!-- 추가 폼 영역 -->
         <div id="dm-form-area" style="padding:16px 20px;border-bottom:1px solid var(--border);background:var(--bg-soft,#F9FAFB);"></div>
@@ -6771,30 +6767,6 @@ var DM_FIELDS = {
     { id:'required_count',label:'필요장수',   type:'number', def:'2' },
     { id:'validity_days', label:'유효일수',   type:'number', def:'30' },
   ],
-  gifticon_exchanges: [
-    { id:'user_id',    label:'회원 선택', type:'user-select', def:'' },
-    { id:'gifticon_id',label:'기프티콘ID', type:'text', def:'gif-ediya-2000' },
-    { id:'grade_used', label:'사용등급', type:'select', opts:['bronze','silver','gold'], def:'bronze' },
-    { id:'count_used', label:'사용장수', type:'number', def:'2' },
-  ],
-  ticket_transactions: [
-    { id:'user_id',      label:'회원 선택', type:'user-select', def:'' },
-    { id:'ticket_grade', label:'등급',     type:'select', opts:['bronze','silver','gold'], def:'bronze' },
-    { id:'type',         label:'타입',     type:'select', opts:['earn','use','expire','clawback'], def:'earn' },
-    { id:'postback_id',  label:'포스트백ID', type:'text', def:'' },
-  ],
-  point_transactions: [
-    { id:'user_id', label:'회원 선택', type:'user-select', def:'' },
-    { id:'amount',  label:'금액',   type:'number', def:'100' },
-    { id:'type',    label:'타입',   type:'select', opts:['referral','attendance','daily_visit','exchange','ad','earn'], def:'attendance' },
-    { id:'reason',  label:'사유',   type:'text',   def:'데모 추가' },
-  ],
-  inquiries: [
-    { id:'user_id',  label:'회원 선택', type:'user-select', def:'' },
-    { id:'title',    label:'제목',   type:'text',   def:'문의 제목' },
-    { id:'content',  label:'내용',   type:'text',   def:'문의 내용입니다.' },
-    { id:'status',   label:'상태',   type:'select', opts:['pending','answered'], def:'pending' },
-  ],
 };
 
 // ──────────────────────────────────────────
@@ -7029,7 +7001,6 @@ window.dmAdd = function(col) {
   }
   if (col === 'gifticons') { data['status'] = 'active'; data['updated_at'] = FS.Timestamp.now(); }
   if (col === 'user_points') { data['updated_at'] = FS.Timestamp.now(); }
-  if (col === 'gifticon_exchanges') { data['exchanged_at'] = FS.Timestamp.now(); data['status'] = 'completed'; }
   if (col === 'postbacks') { data['confirmed_at'] = data.status === 'confirmed' ? FS.Timestamp.now() : null; }
 
   var ref = db.collection(col).doc();
@@ -7150,7 +7121,6 @@ window.tmSubmit = function() {
     if (typeof loadDashboardStats === 'function') loadDashboardStats();
     if (typeof loadTickets === 'function') loadTickets();
     if (typeof dmLoadStats === 'function') dmLoadStats();
-    if (typeof DM !== 'undefined' && DM.col && (DM.col === 'user_tickets' || DM.col === 'ticket_transactions') && typeof dmLoadList === 'function') dmLoadList(DM.col);
   }).catch(function(e) {
     dmShowToast('처리 실패: ' + (e.message || e), true);
   });
@@ -7319,7 +7289,7 @@ window.pmSubmit = function() {
     closeModal('m-point-manual');
     if (typeof loadPoints === 'function') loadPoints();
     if (typeof dmLoadStats === 'function') dmLoadStats();
-    if (typeof DM !== 'undefined' && DM.col && (DM.col === 'user_points' || DM.col === 'point_transactions') && typeof dmLoadList === 'function') dmLoadList(DM.col);
+    if (typeof DM !== 'undefined' && DM.col === 'user_points' && typeof dmLoadList === 'function') dmLoadList(DM.col);
   }).catch(function(e) {
     dmShowToast('처리 실패: ' + (e.message || e), true);
   });
@@ -7362,7 +7332,7 @@ function dmLoadList(col) {
       area.innerHTML = '<div style="color:var(--text-3);font-size:12px;padding:8px 0;">데이터 없음</div>';
       return;
     }
-    var USER_ID_COLS = ['user_tickets','postbacks','user_points','gifticon_exchanges','ticket_transactions','point_transactions','inquiries'];
+    var USER_ID_COLS = ['postbacks','user_points'];
     var needsUserLookup = USER_ID_COLS.indexOf(col) !== -1;
     var userIdsPromise = needsUserLookup
       ? dmFetchUsersByIds(snap.docs.map(function(doc){ return doc.data().user_id; }))
@@ -7383,10 +7353,6 @@ function dmLoadList(col) {
         }
         else if (col === 'user_points') info = memberInline + ' · ' + ((d.balance||0).toLocaleString()) + 'P';
         else if (col === 'gifticons') info = (d.emoji||'') + ' ' + (d.brand||'?') + ' ' + (d.name||'?') + ' · ' + (d.required_grade||'?') + ' ' + (d.required_count||0) + '장';
-        else if (col === 'gifticon_exchanges') info = memberInline + ' · ' + (d.gifticon_id||'?').slice(0,15) + '… · ' + (d.grade_used||'?') + ' ' + (d.count_used||0) + '장';
-        else if (col === 'ticket_transactions') info = memberInline + ' · ' + (d.ticket_grade||'?') + ' · ' + (d.type||'?');
-        else if (col === 'point_transactions') info = memberInline + ' · ' + (d.amount||d.qty||0) + 'P · ' + (d.type||'?');
-        else if (col === 'inquiries') info = memberInline + ' · ' + (d.title||'').slice(0,20) + ' · ' + (d.status||'?');
         else info = doc.id.slice(0,20) + '…';
         var delBtn = isImmutable
           ? '<span style="font-size:10px;color:var(--text-3);">불변</span>'
