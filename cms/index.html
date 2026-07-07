@@ -2682,6 +2682,7 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
   <div class="modal">
     <div class="modal-header"><div class="modal-title">회원 상세</div><button class="modal-close" onclick="closeModal('m-member')"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
     <div class="modal-body">
+      <input type="hidden" id="m-member-id">
       <div class="form-row">
         <div class="form-group"><label class="form-label">닉네임</label><input class="form-input" id="m-name"></div>
         <div class="form-group">
@@ -2723,16 +2724,16 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
       <div class="form-group" id="m-ticket-section">
         <label class="form-label">티켓 수동 지급</label>
         <div style="display:flex;gap:8px">
-          <select class="form-select" style="width:120px;"><option>브론즈</option><option>실버</option><option>골드</option><option>이벤트</option></select>
-          <input class="form-input" placeholder="수량" type="number" style="width:100px" id="m-ticket-qty">
-          <button class="btn btn-success" id="m-ticket-btn" onclick="toast('티켓이 지급되었습니다.');closeModal('m-member')">지급</button>
+          <select class="form-select" style="width:120px;" id="m-ticket-grade"><option value="bronze">브론즈</option><option value="silver">실버</option><option value="gold">골드</option></select>
+          <input class="form-input" placeholder="수량" type="number" min="1" style="width:100px" id="m-ticket-qty">
+          <button class="btn btn-success" id="m-ticket-btn" onclick="dmMemberDetailGrant()">지급</button>
         </div>
         <div class="form-hint">지급 이력은 티켓 내역에 '관리자 지급'으로 기록됩니다.</div>
       </div>
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModal('m-member')">닫기</button>
-      <button class="btn btn-primary" id="m-save-btn" onclick="toast('저장되었습니다.');closeModal('m-member')">저장</button>
+      <button class="btn btn-primary" id="m-save-btn" onclick="dmMemberDetailSave()">저장</button>
     </div>
   </div>
 </div>
@@ -5755,6 +5756,9 @@ function loadGifticonExchanges() {
 }
 
 /* ── Members ── */
+// 회원 목록/상세 팝업의 상태 한글 라벨 (저장값 active/suspended/withdrawn은 그대로)
+var MEMBER_STATUS_KO = { active:'정상', suspended:'정지', withdrawn:'탈퇴' };
+var MEMBER_STATUS_KO_TO_EN = { '정상':'active', '정지':'suspended', '탈퇴':'withdrawn' };
 function loadMembers() {
   var sec = document.getElementById('sec-members');
   if (!sec) return;
@@ -5774,6 +5778,7 @@ function loadMembers() {
           ? '<span class="member-type-kakao">카카오 연동</span>'
           : '<span style="background:var(--warning-soft);color:var(--warning);padding:2px 8px;border-radius:99px;font-size:11px;font-weight:600;">게스트</span>';
         var idLine = (u.linked_kakao && u.kakao_login_id) ? u.kakao_login_id : (doc.id.slice(0,14) + '…');
+        var statusKo = MEMBER_STATUS_KO[u.status] || '정상';
         rows.push('<tr>'
           + '<td><div style="font-weight:500;">' + (u.nickname || '닉네임없음') + '</div><div style="font-size:11px;color:var(--text-3);font-family:monospace;">' + idLine + '</div></td>'
           + '<td>' + kakaoType + '</td>'
@@ -5783,8 +5788,8 @@ function loadMembers() {
           + '<td style="text-align:center"><span id="mem-grade-' + doc.id + '">…</span></td>'
           + '<td style="text-align:center">0</td>'
           + '<td style="text-align:center">-</td>'
-          + '<td style="text-align:center"><span style="background:var(--success-soft);color:var(--success);padding:2px 8px;border-radius:99px;font-size:11px;font-weight:600;">정상</span></td>'
-          + '<td style="text-align:center;color:var(--text-3);">-</td>'
+          + '<td style="text-align:center"><span style="background:var(--success-soft);color:var(--success);padding:2px 8px;border-radius:99px;font-size:11px;font-weight:600;">' + statusKo + '</span></td>'
+          + '<td style="text-align:center"><button class="btn btn-ghost btn-sm" onclick="openMemberDetail(\'' + doc.id + '\')">상세</button></td>'
           + '</tr>');
       });
       existingTbody.innerHTML = rows.join('');
@@ -5804,31 +5809,37 @@ function loadMembers() {
   }).catch(function(){});
 }
 
-// 회원 목록의 "랜덤 티켓"·"전환예정"·"등급 티켓" 컬럼 집계.
+// 회원 목록의 "랜덤 티켓"·"전환예정"·"등급 티켓" 컬럼(및 회원 상세 팝업)이 공유하는 집계 기준.
 // "랜덤 티켓"은 별개 티켓이 아니라 가지급(pending) 상태 등급 티켓들을 구매건(postback_id) 단위로
-// 묶어 부르는 이름이다 — 컬럼 값은 pending 티켓 "장수"가 아니라 그 pending 티켓들이 걸린
-// distinct postback_id 개수("묶음 수"). "전환예정"은 그 pending 티켓들의 등급별 합(확정 시 될 값
-// 미리보기), "등급 티켓"은 status:active인 확정 티켓의 등급별 합이다. used/expired/revoked는
-// 현재 보유가 아니므로 전부 제외 — 데이터관리 생성이든 시나리오 채우기든 수동 지급/회수든
-// 전부 같은 user_tickets 컬렉션·status 규칙을 보므로 출처와 무관하게 동일하게 집계된다.
+// 묶어 부르는 이름이다 — 값은 pending 티켓 "장수"가 아니라 그 pending 티켓들이 걸린 distinct
+// postback_id 개수("묶음 수"). "전환예정"은 그 pending 티켓들의 등급별 합(확정 시 될 값 미리보기),
+// "등급 티켓"은 status:active인 확정 티켓의 등급별 합이다. used/expired/revoked는 현재 보유가
+// 아니므로 전부 제외 — 데이터관리 생성이든 시나리오 채우기든 수동 지급/회수든 전부 같은
+// user_tickets 컬렉션·status 규칙을 보므로 출처와 무관하게 동일하게 집계된다.
+// 회원 목록(다건)과 회원 상세 팝업(단건)이 이 두 헬퍼를 그대로 같이 써서 집계 기준이 어긋나지 않는다.
+function dmNewTicketCounter() {
+  return { pendingBundles: {}, pending: { bronze:0, silver:0, gold:0 }, active: { bronze:0, silver:0, gold:0 } };
+}
+function dmClassifyTicketInto(c, d) {
+  if (d.status === 'pending') {
+    if (d.postback_id) c.pendingBundles[d.postback_id] = true;
+    if (d.grade === 'bronze' || d.grade === 'silver' || d.grade === 'gold') c.pending[d.grade]++;
+  } else if (d.status === 'active' && (d.grade === 'bronze' || d.grade === 'silver' || d.grade === 'gold')) {
+    c.active[d.grade]++;
+  }
+}
+
 function loadMemberTicketCounts(userIds) {
   if (!userIds || !userIds.length) return;
   var counts = {};
-  userIds.forEach(function(uid) { counts[uid] = { pendingBundles: {}, pending: { bronze:0, silver:0, gold:0 }, active: { bronze:0, silver:0, gold:0 } }; });
+  userIds.forEach(function(uid) { counts[uid] = dmNewTicketCounter(); });
   var chunks = [];
   for (var i = 0; i < userIds.length; i += 10) chunks.push(userIds.slice(i, i + 10));
   Promise.all(chunks.map(function(chunk) {
     return db.collection('user_tickets').where('user_id', 'in', chunk).get().then(function(snap) {
       snap.forEach(function(doc) {
-        var d = doc.data();
-        var c = counts[d.user_id];
-        if (!c) return;
-        if (d.status === 'pending') {
-          if (d.postback_id) c.pendingBundles[d.postback_id] = true;
-          if (d.grade === 'bronze' || d.grade === 'silver' || d.grade === 'gold') c.pending[d.grade]++;
-        } else if (d.status === 'active' && (d.grade === 'bronze' || d.grade === 'silver' || d.grade === 'gold')) {
-          c.active[d.grade]++;
-        }
+        var c = counts[doc.data().user_id];
+        if (c) dmClassifyTicketInto(c, doc.data());
       });
     }).catch(function(e) { console.error('loadMemberTicketCounts', e); });
   })).then(function() {
@@ -5841,6 +5852,15 @@ function loadMemberTicketCounts(userIds) {
       var gradeEl = document.getElementById('mem-grade-' + uid);
       if (gradeEl) gradeEl.textContent = '브' + c.active.bronze + '·실' + c.active.silver + '·골' + c.active.gold;
     });
+  });
+}
+
+// 회원 상세 팝업용 단건 집계 — 위 두 헬퍼(dmNewTicketCounter/dmClassifyTicketInto)를 그대로 재사용.
+function dmLoadMemberDetailTickets(userId) {
+  return db.collection('user_tickets').where('user_id', '==', userId).get().then(function(snap) {
+    var c = dmNewTicketCounter();
+    snap.forEach(function(doc) { dmClassifyTicketInto(c, doc.data()); });
+    return c;
   });
 }
 
@@ -7104,6 +7124,84 @@ function tmRevokeTickets(userId, grade, qty, reason) {
       });
     });
 }
+
+// ════════════════════════════════════════════════
+// 정식 "회원 목록" — 회원 상세 팝업(m-member) 실동작
+// ════════════════════════════════════════════════
+window.openMemberDetail = function(id) {
+  db.collection('users').doc(id).get().then(function(doc) {
+    if (!doc.exists) { dmShowToast('회원을 찾을 수 없습니다.', true); return; }
+    var u = doc.data();
+    document.getElementById('m-member-id').value = id;
+    document.getElementById('m-name').value = u.nickname || '';
+    document.getElementById('m-status').value = MEMBER_STATUS_KO[u.status] || '정상';
+    document.getElementById('m-join-type').value = u.linked_kakao ? '카카오 연동' : '게스트';
+    var accEl = document.getElementById('m-accounts');
+    accEl.innerHTML = u.linked_kakao
+      ? '<div style="display:flex;align-items:center;gap:6px;font-size:12px;">'
+        + '<span style="display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:5px;background:#FEE500;font-size:11px;font-weight:700;">K</span>'
+        + '<span>' + (u.kakao_login_id || '(카카오 로그인ID 미등록)') + '</span></div>'
+      : '<span style="font-size:12px;color:var(--text-3);">게스트(비연동)</span>';
+    openModal('m-member');
+    return dmLoadMemberDetailTickets(id);
+  }).then(function(c) {
+    if (!c) return;
+    dmRenderMemberDetailTickets(c);
+  }).catch(function(e) {
+    dmShowToast('불러오기 실패: ' + (e.message||e), true);
+  });
+};
+
+function dmRenderMemberDetailTickets(c) {
+  var bundleCount = Object.keys(c.pendingBundles).length;
+  document.getElementById('m-random-count').textContent = bundleCount;
+  document.getElementById('m-bronze-count').textContent = c.active.bronze;
+  document.getElementById('m-silver-count').textContent = c.active.silver;
+  document.getElementById('m-gold-count').textContent = c.active.gold;
+  document.getElementById('m-event-count').textContent = 0;
+  var convEl = document.getElementById('m-conv-preview');
+  if (bundleCount > 0) {
+    convEl.style.display = 'flex';
+    convEl.innerHTML = '<span style="font-size:10px;color:var(--text-3);">전환예정</span> <span style="font-size:11px;font-weight:700;color:var(--text-2)">브+' + c.pending.bronze + '·실+' + c.pending.silver + '·골+' + c.pending.gold + '</span>';
+  } else {
+    convEl.style.display = 'none';
+    convEl.innerHTML = '';
+  }
+}
+
+window.dmMemberDetailGrant = function() {
+  var userId = document.getElementById('m-member-id').value;
+  if (!userId) return;
+  var grade = document.getElementById('m-ticket-grade').value;
+  var qty = parseInt(document.getElementById('m-ticket-qty').value, 10) || 0;
+  if (qty < 1) { dmShowToast('수량을 입력하세요.', true); return; }
+  tmGrantTickets(userId, grade, qty, '관리자 지급(회원 상세)').then(function(result) {
+    dmShowToast(result.message);
+    document.getElementById('m-ticket-qty').value = '';
+    logAdmin('수동 티켓 지급(회원 상세): ' + userId + ' · ' + (TM_GRADE_KO[grade] || grade) + ' · ' + result.count + '장');
+    if (typeof loadMemberTicketCounts === 'function') loadMemberTicketCounts([userId]);
+    return dmLoadMemberDetailTickets(userId);
+  }).then(function(c) {
+    if (c) dmRenderMemberDetailTickets(c);
+  }).catch(function(e) {
+    dmShowToast('지급 실패: ' + (e.message||e), true);
+  });
+};
+
+window.dmMemberDetailSave = function() {
+  var userId = document.getElementById('m-member-id').value;
+  if (!userId) return;
+  var nickname = document.getElementById('m-name').value.trim();
+  if (!nickname) { dmShowToast('닉네임을 입력하세요.', true); return; }
+  var statusEn = MEMBER_STATUS_KO_TO_EN[document.getElementById('m-status').value] || 'active';
+  db.collection('users').doc(userId).set({ nickname: nickname, status: statusEn, updated_at: FS.Timestamp.now() }, { merge: true }).then(function() {
+    dmShowToast('회원 정보가 저장되었습니다.');
+    closeModal('m-member');
+    if (typeof loadMembers === 'function') loadMembers();
+  }).catch(function(e) {
+    dmShowToast('저장 실패: ' + (e.message||e), true);
+  });
+};
 
 // ──────────────────────────────────────────
 // 목록 로드
