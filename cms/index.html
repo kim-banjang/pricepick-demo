@@ -2645,7 +2645,6 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
       <div class="card">
         <div style="display:flex;gap:4px;flex-wrap:wrap;padding:12px 16px 0;border-bottom:1px solid var(--border);overflow-x:auto;">
           <button class="dm-tab active" data-col="users"             onclick="dmSwitchTab(this,'users')">회원</button>
-          <button class="dm-tab"        data-col="user_tickets"       onclick="dmSwitchTab(this,'user_tickets')">티켓</button>
           <button class="dm-tab"        data-col="postbacks"          onclick="dmSwitchTab(this,'postbacks')">포스트백</button>
           <button class="dm-tab"        data-col="user_points"        onclick="dmSwitchTab(this,'user_points')">포인트</button>
           <button class="dm-tab"        data-col="gifticons"          onclick="dmSwitchTab(this,'gifticons')">기프티콘</button>
@@ -6604,12 +6603,6 @@ var DM_FIELDS = {
     { id:'linked',     label:'카카오연동', type:'select', opts:['true','false'], def:'true', labels:{ 'true':'연동', 'false':'미연동' } },
     { id:'created_at', label:'가입일',     type:'date',   def:'' },
   ],
-  user_tickets: [
-    { id:'user_id',  label:'유저ID', type:'text', def:'user-frank-001' },
-    { id:'grade',    label:'등급',   type:'select', opts:['bronze','silver','gold'], def:'bronze' },
-    { id:'status',   label:'상태',   type:'select', opts:['active','pending','expired','used','revoked'], def:'active' },
-    { id:'postback_id', label:'포스트백ID', type:'text', def:'' },
-  ],
   postbacks: [
     { id:'user_id',         label:'유저ID',   type:'user-select', def:'' },
     { id:'mall_name',       label:'쇼핑몰',   type:'mall-select', def:'' },
@@ -6857,7 +6850,6 @@ window.dmAdd = function(col) {
   if (col === 'users') { data['status'] = 'active'; data['updated_at'] = FS.Timestamp.now(); }
   if (col === 'gifticons') { data['status'] = 'active'; data['updated_at'] = FS.Timestamp.now(); }
   if (col === 'user_points') { data['updated_at'] = FS.Timestamp.now(); }
-  if (col === 'user_tickets') { data['earned_at'] = FS.Timestamp.now(); data['expires_at'] = null; data['confirmed_at'] = null; }
   if (col === 'gifticon_exchanges') { data['exchanged_at'] = FS.Timestamp.now(); data['status'] = 'completed'; }
   if (col === 'postbacks') { data['confirmed_at'] = data.status === 'confirmed' ? FS.Timestamp.now() : null; }
 
