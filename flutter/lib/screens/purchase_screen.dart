@@ -2,12 +2,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 import '../services/pricepick_repository.dart';
-import '../services/ticket_policy.dart';
 import '../theme/app_theme.dart';
 
 /// 경유구매. 제휴몰 목록은 Firestore(affiliate_malls)에서 읽어온다.
-/// 실제 제휴몰 API 없이 구매 금액을 입력받아 click_logs/postbacks/click_postback_matches를
-/// 실제로 기록하고, 랜덤(가지급) 티켓 묶음을 pending으로 발급한다 (등급 확정은 티켓 화면에서).
+/// 구매 금액을 입력받아 "구매가 일어났다"는 이벤트(click_logs/postbacks/click_postback_matches)만
+/// 기록한다. 등급 티켓 계산·발급은 백엔드 몫이라 이 앱에서는 하지 않는다.
 class PurchaseScreen extends StatefulWidget {
   const PurchaseScreen({super.key, required this.repository});
 
@@ -51,7 +50,6 @@ class _PurchaseScreenState extends State<PurchaseScreen> {
       builder: (dialogContext) => StatefulBuilder(
         builder: (dialogContext, setDialogState) {
           final amount = int.tryParse(controller.text) ?? 0;
-          final preview = amount >= 5000 ? greedyBreakdown(amount) : null;
           return AlertDialog(
             title: Text('$mallName 구매 시뮬레이션'),
             content: Column(
@@ -66,12 +64,10 @@ class _PurchaseScreenState extends State<PurchaseScreen> {
                   onChanged: (_) => setDialogState(() {}),
                 ),
                 const SizedBox(height: 12),
-                if (preview != null)
-                  Text(
-                    '적립 예정(가지급): 최대 ${preview.total}장 랜덤 묶음\n'
-                    '(확정 시 실제 금액 기준 Greedy로 재계산)',
-                    style: const TextStyle(color: AppTheme.textSecondary, fontSize: 12),
-                  ),
+                const Text(
+                  '등급 티켓 적립은 서버에서 처리됩니다 (이 데모에는 아직 연결되어 있지 않아요).',
+                  style: TextStyle(color: AppTheme.textSecondary, fontSize: 12),
+                ),
               ],
             ),
             actions: [
@@ -92,7 +88,7 @@ class _PurchaseScreenState extends State<PurchaseScreen> {
     );
   }
 
-  Future<void> _simulatePurchase(
+  Future<void> _recordPurchase(
     QueryDocumentSnapshot<Map<String, dynamic>> mall,
   ) async {
     final data = mall.data();
@@ -105,7 +101,7 @@ class _PurchaseScreenState extends State<PurchaseScreen> {
 
     setState(() => _submitting = true);
     try {
-      await widget.repository.simulatePurchase(
+      await widget.repository.recordPurchase(
         uid: uid,
         mallCode: mall.id,
         mallName: mallName,
@@ -119,7 +115,7 @@ class _PurchaseScreenState extends State<PurchaseScreen> {
           title: const Text('구매 접수 완료'),
           content: Text(
             '$mallName ${amount.toString()}원 구매가 접수됐습니다.\n'
-            '가지급 티켓이 발급됐어요 — 티켓 화면에서 등급을 확정해 주세요.',
+            '등급 티켓 적립은 서버 처리 결과가 반영되면 티켓 화면에서 보여요.',
           ),
           actions: [
             TextButton(
@@ -170,7 +166,7 @@ class _PurchaseScreenState extends State<PurchaseScreen> {
                             ),
                             subtitle: Text(mall.id, style: const TextStyle(color: AppTheme.textSecondary, fontSize: 12)),
                             trailing: ElevatedButton(
-                              onPressed: _submitting ? null : () => _simulatePurchase(mall),
+                              onPressed: _submitting ? null : () => _recordPurchase(mall),
                               style: ElevatedButton.styleFrom(minimumSize: const Size(88, 40)),
                               child: const Text('구매 시뮬'),
                             ),

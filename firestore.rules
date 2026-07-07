@@ -78,12 +78,13 @@ service cloud.firestore {
       allow update, delete: if isAdmin();
     }
     match /postbacks/{docId} {
-      // read/write 모두 isSignedIn()까지 완화: "카카오 연동 회원 시뮬 로그인"으로 들어온 세션은
+      // read/create를 isSignedIn()까지 완화: "카카오 연동 회원 시뮬 로그인"으로 들어온 세션은
       // Firebase Auth uid가 CMS 세팅 회원의 실제 문서 ID와 다르므로 uid 일치 검사를 통과할 수 없다.
-      // 실 Kakao SDK/Cloud Functions 없는 데모 한정 조치 (프로덕션 이관 시 반드시 owner-uid 검증으로 되돌릴 것).
+      // 앱은 postback을 "구매 발생" 이벤트로 생성만 하고(recordPurchase) 이후 상태 변경은 하지 않으므로
+      // update는 owner-uid 검증을 유지한다.
       allow read: if isSignedIn();
       allow create: if isSignedIn();
-      allow update: if isSignedIn();
+      allow update: if isAdmin() || (isSignedIn() && resource.data.user_id == request.auth.uid);
       allow delete: if isAdmin();
     }
     match /click_postback_matches/{docId} {
@@ -93,9 +94,10 @@ service cloud.firestore {
     }
 
     // Immutable ledger – append-only. 수정 불가(불변). 단, 데모 리셋을 위해 admin 삭제만 허용.
+    // 앱은 이 컬렉션을 전혀 쓰지 않는다(등급 확정·차감 계산은 백엔드 몫) — 원래 owner-uid 검증 유지.
     match /ticket_transactions/{docId} {
-      allow read: if isSignedIn();
-      allow create: if isSignedIn();
+      allow read: if isAdmin() || (isSignedIn() && resource.data.user_id == request.auth.uid);
+      allow create: if isAdmin() || (isSignedIn() && request.resource.data.user_id == request.auth.uid);
       allow update: if false;
       allow delete: if isAdmin();
     }
@@ -103,11 +105,12 @@ service cloud.firestore {
     // ──────────────────────────────────────────
     // D. User Assets
     // ──────────────────────────────────────────
+    // 앱은 이 컬렉션을 읽기만 한다(가지급 묶음 노출, persona 지원 위해 read만 완화) —
+    // 등급 확정으로 인한 생성/전환은 백엔드 몫이라 create/update는 owner-uid 검증을 유지한다.
     match /user_tickets/{docId} {
-      // 시뮬 로그인(카카오 연동 회원 체험) 지원을 위해 uid 일치 검사를 뺐다 — 위 postbacks 주석 참고.
       allow read: if isSignedIn();
-      allow create: if isSignedIn();
-      allow update: if isSignedIn();
+      allow create: if isAdmin() || (isSignedIn() && request.resource.data.user_id == request.auth.uid);
+      allow update: if isAdmin() || (isSignedIn() && resource.data.user_id == request.auth.uid);
       allow delete: if isAdmin();
     }
     match /user_points/{userId} {
@@ -134,18 +137,13 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
     match /gifticon_stock/{docId} {
+      // 재고 차감은 백엔드 몫 — 앱은 요청만 남기고 재고를 직접 건드리지 않으므로 admin 전용으로 유지.
       allow read: if isSignedIn();
-      // 앱(비-admin)은 교환 트랜잭션에서 remaining을 정확히 1만 깎을 수 있다 (Cloud Functions 없는 데모 한정 조치).
-      allow update: if isAdmin() || (
-        isSignedIn() &&
-        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['remaining', 'updated_at']) &&
-        request.resource.data.remaining == resource.data.remaining - 1 &&
-        resource.data.remaining > 0
-      );
-      allow create, delete: if isAdmin();
+      allow write: if isAdmin();
     }
     match /gifticon_exchanges/{docId} {
-      // 시뮬 로그인 지원을 위해 uid 일치 검사를 뺐다 — postbacks 주석 참고.
+      // create를 isSignedIn()까지 완화: 시뮬 로그인 지원 + 앱은 "요청(requested)"만 남기고
+      // 실제 차감·완료 처리는 백엔드가 담당 — 그래서 update는 admin(백엔드/CMS) 전용으로 유지한다.
       allow read: if isSignedIn();
       allow create: if isSignedIn();
       allow update, delete: if isAdmin();

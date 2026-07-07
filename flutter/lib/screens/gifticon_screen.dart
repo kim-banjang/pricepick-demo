@@ -5,8 +5,8 @@ import '../services/pricepick_repository.dart';
 import '../theme/app_theme.dart';
 
 /// 기프티콘 교환. gifticons/gifticon_stock을 Firestore에서 읽어 목록 표시.
-/// 교환은 포인트가 아니라 required_grade/required_count로 지정된 등급 티켓 수량을
-/// 실제로 차감하는 트랜잭션(티켓 used 처리 + 재고 감소 + 교환 이력 기록)으로 처리한다.
+/// "교환하기"는 요청 이벤트(gifticon_exchanges, status: requested)만 남긴다 —
+/// 실제 티켓 소진·재고 차감은 백엔드가 처리할 영역이라 이 앱은 하지 않는다.
 class GifticonScreen extends StatefulWidget {
   const GifticonScreen({super.key, required this.repository});
 
@@ -70,7 +70,7 @@ class _GifticonScreenState extends State<GifticonScreen> {
       context: context,
       builder: (dialogContext) => AlertDialog(
         title: const Text('기프티콘 교환'),
-        content: Text('$name — $requiredGrade 티켓 $requiredCount장을 사용합니다. 교환할까요?'),
+        content: Text('$name — $requiredGrade 티켓 $requiredCount장이 필요합니다. 교환을 요청할까요?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(false),
@@ -78,7 +78,7 @@ class _GifticonScreenState extends State<GifticonScreen> {
           ),
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(true),
-            child: const Text('교환하기'),
+            child: const Text('교환 요청'),
           ),
         ],
       ),
@@ -87,7 +87,7 @@ class _GifticonScreenState extends State<GifticonScreen> {
 
     setState(() => _exchangingId = gifticon.id);
     try {
-      await widget.repository.exchangeGifticon(
+      await widget.repository.requestGifticonExchange(
         uid: uid,
         gifticonId: gifticon.id,
         requiredGrade: requiredGrade,
@@ -97,8 +97,11 @@ class _GifticonScreenState extends State<GifticonScreen> {
       await showDialog(
         context: context,
         builder: (_) => AlertDialog(
-          title: const Text('교환 완료'),
-          content: Text('$name 교환이 완료됐습니다.'),
+          title: const Text('교환 요청 완료'),
+          content: Text(
+            '$name 교환 요청이 접수됐습니다.\n'
+            '실제 티켓 차감·재고 처리는 서버에서 이뤄집니다.',
+          ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
@@ -110,7 +113,7 @@ class _GifticonScreenState extends State<GifticonScreen> {
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('교환 실패: $e')),
+        SnackBar(content: Text('교환 요청 실패: $e')),
       );
     } finally {
       if (mounted) setState(() => _exchangingId = null);

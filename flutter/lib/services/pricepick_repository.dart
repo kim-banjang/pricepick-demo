@@ -1,13 +1,17 @@
-import 'dart:math';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 import '../models/pending_bundle.dart';
-import 'ticket_policy.dart';
 
 /// pricepick-demo Firestore 스키마 접근 레이어.
 /// 컬렉션 구조는 docs/schema-mapping.md (pricepick-demo repo) 기준.
+///
+/// 이 앱은 노출(표시) 중심이다: Firestore에서 CMS/백엔드가 만들어 둔 결과값을 읽어 보여주고,
+/// 구매·교환 같은 사용자 액션은 "일어났다"는 이벤트만 최소한으로 기록한다.
+/// 등급 티켓 Greedy 전환, 재고·티켓 차감 같은 비즈니스 계산은 이 앱이 하지 않는다 —
+/// 원래 백엔드(Cloud Functions 등)가 처리해야 할 영역이며, 이 데모 프로젝트엔 아직 그 백엔드가
+/// 없어 CMS 쪽에서 임시로 계산 중이다. 클라이언트가 계산을 떠맡으면 조작·정합성 문제가 생기므로
+/// 여기서는 절대 흉내내지 않는다.
 class PricePickRepository {
   PricePickRepository({FirebaseAuth? auth, FirebaseFirestore? firestore})
       : _auth = auth ?? FirebaseAuth.instance,
@@ -120,9 +124,14 @@ class PricePickRepository {
     return _db.collection('gifticon_stock').doc(gifticonId).get();
   }
 
-  /// 경유구매 시뮬레이션. click_logs → postbacks(pending) → click_postback_matches를 실제로 기록하고,
-  /// 랜덤(가지급) 티켓 1묶음을 pending 상태로 발급한다. 최종 등급은 [confirmBundle]에서 Greedy로 확정된다.
-  Future<void> simulatePurchase({
+  /// 경유구매 액션 기록. click_logs → postbacks(status: pending) → click_postback_matches를
+  /// "구매가 발생했다"는 이벤트로만 남긴다.
+  ///
+  /// TODO(백엔드): 이 postback을 트리거로 실제 등급 티켓을 Greedy 규칙(골드 100,000원당·
+  /// 실버 50,000원당·브론즈 5,000원당 1장, 큰 단위부터 배분)으로 계산해 user_tickets를
+  /// 생성하는 건 서버(Cloud Functions 등)의 몫이다. 이 데모 프로젝트엔 아직 그 백엔드가
+  /// 연결돼 있지 않아, 여기서는 postback만 남기고 티켓 생성/계산은 하지 않는다.
+  Future<void> recordPurchase({
     required String uid,
     required String mallCode,
     required String mallName,
@@ -158,25 +167,11 @@ class PricePickRepository {
       'matched_at': now,
     });
 
-    final rand = Random();
-    const pendingGradePool = ['bronze', 'bronze', 'bronze', 'silver', 'gold'];
-    final pendingCount = 1 + rand.nextInt(3);
-    for (var i = 0; i < pendingCount; i++) {
-      batch.set(_db.collection('user_tickets').doc(), {
-        'user_id': uid,
-        'grade': pendingGradePool[rand.nextInt(pendingGradePool.length)],
-        'status': 'pending',
-        'postback_id': postbackRef.id,
-        'earned_at': now,
-        'confirmed_at': null,
-        'expires_at': null,
-      });
-    }
-
     await batch.commit();
   }
 
-  /// postback(구매 1건) 단위로 그룹핑한 확정 대기 묶음 목록.
+  /// postback(구매 1건) 단위로 그룹핑한, 등급 확정을 기다리는 pending 티켓 노출용 목록.
+  /// 순수 읽기 전용 — 티켓 생성/등급 계산은 백엔드가 처리한 결과를 그대로 보여줄 뿐이다.
   Future<List<PendingBundle>> fetchPendingBundles(String uid) async {
     final pendingSnap = await _db
         .collection('user_tickets')
@@ -206,135 +201,25 @@ class PricePickRepository {
     return bundles;
   }
 
-  /// pending 묶음을 실제 구매 금액 기준 Greedy로 재계산해 active 티켓으로 확정한다.
-  /// 기존 pending 문서를 재사용(부족하면 신규 생성, 남으면 expired 처리)하고
-  /// 확정된 티켓마다 ticket_transactions(earn) 원장을 남긴다.
-  Future<TicketBreakdown> confirmBundle({
-    required String uid,
-    required String postbackId,
-  }) async {
-    final pendingSnap = await _db
-        .collection('user_tickets')
-        .where('user_id', isEqualTo: uid)
-        .where('postback_id', isEqualTo: postbackId)
-        .where('status', isEqualTo: 'pending')
-        .get();
-    final pendingRefs = pendingSnap.docs.map((d) => d.reference).toList();
-    final postbackRef = _db.collection('postbacks').doc(postbackId);
-
-    return _db.runTransaction<TicketBreakdown>((tx) async {
-      final postbackSnap = await tx.get(postbackRef);
-      final amount = (postbackSnap.data()?['purchase_amount'] as num?)?.toInt() ?? 0;
-      final target = greedyBreakdown(amount);
-      final flatGrades = target.toFlatGradeList();
-
-      final pendingSnaps = <DocumentSnapshot<Map<String, dynamic>>>[];
-      for (final ref in pendingRefs) {
-        pendingSnaps.add(await tx.get(ref));
-      }
-
-      final expiresAt = Timestamp.fromDate(DateTime.now().add(gradeTicketValidity));
-      var i = 0;
-      for (final snap in pendingSnaps) {
-        if (i < flatGrades.length) {
-          tx.update(snap.reference, {
-            'grade': flatGrades[i],
-            'status': 'active',
-            'confirmed_at': FieldValue.serverTimestamp(),
-            'expires_at': expiresAt,
-          });
-          tx.set(_db.collection('ticket_transactions').doc(), {
-            'user_id': uid,
-            'ticket_grade': flatGrades[i],
-            'type': 'earn',
-            'postback_id': postbackId,
-            'created_at': FieldValue.serverTimestamp(),
-          });
-        } else {
-          tx.update(snap.reference, {'status': 'expired'});
-        }
-        i++;
-      }
-      while (i < flatGrades.length) {
-        tx.set(_db.collection('user_tickets').doc(), {
-          'user_id': uid,
-          'grade': flatGrades[i],
-          'status': 'active',
-          'postback_id': postbackId,
-          'earned_at': FieldValue.serverTimestamp(),
-          'confirmed_at': FieldValue.serverTimestamp(),
-          'expires_at': expiresAt,
-        });
-        tx.set(_db.collection('ticket_transactions').doc(), {
-          'user_id': uid,
-          'ticket_grade': flatGrades[i],
-          'type': 'earn',
-          'postback_id': postbackId,
-          'created_at': FieldValue.serverTimestamp(),
-        });
-        i++;
-      }
-
-      tx.update(postbackRef, {
-        'status': 'confirmed',
-        'confirmed_at': FieldValue.serverTimestamp(),
-      });
-
-      return target;
-    });
-  }
-
-  /// 보유 등급 티켓 수량으로 기프티콘을 교환한다 (포인트 아님).
-  /// active 티켓 [requiredCount]장을 used 처리하고 재고를 1 감소시키는 것을 하나의 트랜잭션으로 묶는다.
-  Future<void> exchangeGifticon({
+  /// 기프티콘 교환 "요청" 기록. 실제로 보유 중인지는 화면에서 읽은 값으로만 안내하고,
+  /// 여기서는 어떤 등급/수량을 요청했는지 이벤트로만 남긴다 (status: requested).
+  ///
+  /// TODO(백엔드): 티켓을 실제로 소진 처리(user_tickets status → used)하고
+  /// gifticon_stock.remaining을 차감하는 건 서버가 이 요청을 트리거로 처리해야 한다.
+  /// 클라이언트가 재고·보유수량을 직접 차감하면 조작·동시성 문제가 생기므로 여기서 하지 않는다.
+  Future<void> requestGifticonExchange({
     required String uid,
     required String gifticonId,
     required String requiredGrade,
     required int requiredCount,
-  }) async {
-    final activeSnap = await _db
-        .collection('user_tickets')
-        .where('user_id', isEqualTo: uid)
-        .where('status', isEqualTo: 'active')
-        .where('grade', isEqualTo: requiredGrade)
-        .get();
-    if (activeSnap.docs.length < requiredCount) {
-      throw StateError(
-        '보유한 $requiredGrade 티켓이 부족합니다 (${activeSnap.docs.length}/$requiredCount장)',
-      );
-    }
-    final ticketRefs =
-        activeSnap.docs.take(requiredCount).map((d) => d.reference).toList();
-    final stockRef = _db.collection('gifticon_stock').doc(gifticonId);
-
-    await _db.runTransaction((tx) async {
-      final stockSnap = await tx.get(stockRef);
-      final remaining = (stockSnap.data()?['remaining'] as num?)?.toInt() ?? 0;
-      if (remaining <= 0) {
-        throw StateError('재고가 소진되었습니다.');
-      }
-      for (final ref in ticketRefs) {
-        tx.update(ref, {'status': 'used'});
-        tx.set(_db.collection('ticket_transactions').doc(), {
-          'user_id': uid,
-          'ticket_grade': requiredGrade,
-          'type': 'use',
-          'gifticon_id': gifticonId,
-          'created_at': FieldValue.serverTimestamp(),
-        });
-      }
-      tx.update(stockRef, {
-        'remaining': remaining - 1,
-        'updated_at': FieldValue.serverTimestamp(),
-      });
-      tx.set(_db.collection('gifticon_exchanges').doc(), {
-        'user_id': uid,
-        'gifticon_id': gifticonId,
-        'grade_used': requiredGrade,
-        'count_used': requiredCount,
-        'status': 'completed',
-        'exchanged_at': FieldValue.serverTimestamp(),
-      });
+  }) {
+    return _db.collection('gifticon_exchanges').add({
+      'user_id': uid,
+      'gifticon_id': gifticonId,
+      'grade_used': requiredGrade,
+      'count_used': requiredCount,
+      'status': 'requested',
+      'exchanged_at': FieldValue.serverTimestamp(),
     });
   }
 
