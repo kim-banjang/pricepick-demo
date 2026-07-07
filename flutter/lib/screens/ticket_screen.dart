@@ -1,12 +1,11 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
+import '../models/pending_bundle.dart';
 import '../services/pricepick_repository.dart';
 import '../theme/app_theme.dart';
 
-/// 랜덤 가지급된 pending 티켓 묶음을 보여주고, 등급 확정 액션을 노출한다.
-/// Greedy 등급 전환(골드 100,000원당·실버 50,000원당·브론즈 5,000원당 1장) 실제 연산은
-/// 코어 로직 단계(다음 세션)에서 Cloud Function 또는 클라이언트 트랜잭션으로 연결한다.
+/// 랜덤 가지급된 pending 티켓 묶음(postback 단위)을 보여주고,
+/// 확정 시 실제 구매 금액 기준 Greedy로 재계산해 active 티켓으로 전환한다.
 class TicketScreen extends StatefulWidget {
   const TicketScreen({super.key, required this.repository});
 
@@ -17,8 +16,9 @@ class TicketScreen extends StatefulWidget {
 }
 
 class _TicketScreenState extends State<TicketScreen> {
-  List<QueryDocumentSnapshot<Map<String, dynamic>>> _pending = [];
+  List<PendingBundle> _bundles = [];
   bool _loading = true;
+  String? _confirmingPostbackId;
   String? _error;
 
   @override
@@ -31,9 +31,9 @@ class _TicketScreenState extends State<TicketScreen> {
     final uid = widget.repository.uid;
     if (uid == null) return;
     try {
-      final pending = await widget.repository.fetchPendingTickets(uid);
+      final bundles = await widget.repository.fetchPendingBundles(uid);
       setState(() {
-        _pending = pending;
+        _bundles = bundles;
         _loading = false;
       });
     } catch (e) {
@@ -44,23 +44,41 @@ class _TicketScreenState extends State<TicketScreen> {
     }
   }
 
-  void _confirmGrade(QueryDocumentSnapshot<Map<String, dynamic>> ticket) {
-    showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        title: const Text('등급 확정'),
-        content: const Text(
-          'Greedy 등급 전환 로직은 다음 단계(코어 로직)에서 연결됩니다.\n'
-          '지금은 화면 흐름만 확인하는 단계입니다.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('확인'),
+  Future<void> _confirm(PendingBundle bundle) async {
+    final uid = widget.repository.uid;
+    if (uid == null) return;
+    setState(() => _confirmingPostbackId = bundle.postbackId);
+    try {
+      final result = await widget.repository.confirmBundle(
+        uid: uid,
+        postbackId: bundle.postbackId,
+      );
+      if (!mounted) return;
+      await showDialog(
+        context: context,
+        builder: (_) => AlertDialog(
+          title: const Text('등급 확정 완료'),
+          content: Text(
+            '${bundle.mallName} ${bundle.purchaseAmount}원 구매 확정\n'
+            '골드 ${result.gold}장 · 실버 ${result.silver}장 · 브론즈 ${result.bronze}장',
           ),
-        ],
-      ),
-    );
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('확인'),
+            ),
+          ],
+        ),
+      );
+      await _load();
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('확정 실패: $e')),
+      );
+    } finally {
+      if (mounted) setState(() => _confirmingPostbackId = null);
+    }
   }
 
   @override
@@ -71,15 +89,15 @@ class _TicketScreenState extends State<TicketScreen> {
           ? const Center(child: CircularProgressIndicator())
           : _error != null
               ? Center(child: Text('불러오기 실패: $_error'))
-              : _pending.isEmpty
+              : _bundles.isEmpty
                   ? const Center(child: Text('확정 대기 중인 티켓이 없습니다.'))
                   : ListView.separated(
                       padding: const EdgeInsets.all(20),
-                      itemCount: _pending.length,
+                      itemCount: _bundles.length,
                       separatorBuilder: (_, _) => const SizedBox(height: 12),
                       itemBuilder: (context, i) {
-                        final ticket = _pending[i];
-                        final data = ticket.data();
+                        final bundle = _bundles[i];
+                        final confirming = _confirmingPostbackId == bundle.postbackId;
                         return Card(
                           child: ListTile(
                             contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -89,14 +107,23 @@ class _TicketScreenState extends State<TicketScreen> {
                               child: Icon(Icons.confirmation_num_outlined),
                             ),
                             title: Text(
-                              '가지급 티켓 · ${data['grade'] ?? '미확정'}',
+                              '${bundle.mallName} 구매 · ${bundle.purchaseAmount}원',
                               style: const TextStyle(fontWeight: FontWeight.w700),
                             ),
-                            subtitle: Text('상태: ${data['status']}', style: const TextStyle(color: AppTheme.textSecondary, fontSize: 12)),
+                            subtitle: Text(
+                              '가지급 티켓 ${bundle.pendingTicketCount}장 (확정 대기)',
+                              style: const TextStyle(color: AppTheme.textSecondary, fontSize: 12),
+                            ),
                             trailing: ElevatedButton(
-                              onPressed: () => _confirmGrade(ticket),
+                              onPressed: confirming ? null : () => _confirm(bundle),
                               style: ElevatedButton.styleFrom(minimumSize: const Size(88, 40)),
-                              child: const Text('확정'),
+                              child: confirming
+                                  ? const SizedBox(
+                                      width: 16,
+                                      height: 16,
+                                      child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                                    )
+                                  : const Text('확정'),
                             ),
                           ),
                         );

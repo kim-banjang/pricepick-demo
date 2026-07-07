@@ -127,7 +127,14 @@ service cloud.firestore {
     }
     match /gifticon_stock/{docId} {
       allow read: if isSignedIn();
-      allow write: if isAdmin();
+      // 앱(비-admin)은 교환 트랜잭션에서 remaining을 정확히 1만 깎을 수 있다 (Cloud Functions 없는 데모 한정 조치).
+      allow update: if isAdmin() || (
+        isSignedIn() &&
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['remaining', 'updated_at']) &&
+        request.resource.data.remaining == resource.data.remaining - 1 &&
+        resource.data.remaining > 0
+      );
+      allow create, delete: if isAdmin();
     }
     match /gifticon_exchanges/{docId} {
       allow read: if isAdmin() || (isSignedIn() && resource.data.user_id == request.auth.uid);
