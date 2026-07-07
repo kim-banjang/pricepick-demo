@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "505137396208",
+    "project_id": "pricepick-demo",
+    "storage_bucket": "pricepick-demo.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:505137396208:android:7e2a3c28bf9da5bce14535",
+        "android_client_info": {
+          "package_name": "com.pricepick.pricepick_flutter"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "505137396208-gvqpka7njoc2i9qg1shqmedt9vhhl07q.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD-Eh5F5Pqc-_6bfuwGU6CWURSbp2H82Fc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "505137396208-gvqpka7njoc2i9qg1shqmedt9vhhl07q.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "505137396208-p4fhtajvfhi850vbq2uv9nonaj9ivc13.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.pricepick.pricepickFlutter"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
