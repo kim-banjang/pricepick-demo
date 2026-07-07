@@ -10163,19 +10163,19 @@ body.interactive-mode #ip-nav { display: block; }
           <div style="padding:12px 0 10px;text-align:center;position:relative;border-right:1px solid var(--border);">
             <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#C68250,#8B5A2B);"></div>
             <div style="font-size:10px;font-weight:700;color:var(--text2);margin-bottom:5px;">브론즈</div>
-            <div><span style="font-size:22px;font-weight:800;color:var(--text1);letter-spacing:-1px;line-height:1;">12</span><span style="font-size:10px;font-weight:600;color:var(--text2);"> 장</span></div>
+            <div><span id="ex-sum-bronze" style="font-size:22px;font-weight:800;color:var(--text1);letter-spacing:-1px;line-height:1;">0</span><span style="font-size:10px;font-weight:600;color:var(--text2);"> 장</span></div>
             <div style="font-size:9.5px;color:var(--text3);margin-top:3px;"></div>
           </div>
           <div style="padding:12px 0 10px;text-align:center;position:relative;border-right:1px solid var(--border);">
             <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#D0D0D0,#999);"></div>
             <div style="font-size:10px;font-weight:700;color:var(--text2);margin-bottom:5px;">실버</div>
-            <div><span style="font-size:22px;font-weight:800;color:var(--text1);letter-spacing:-1px;line-height:1;">4</span><span style="font-size:10px;font-weight:600;color:var(--text2);"> 장</span></div>
+            <div><span id="ex-sum-silver" style="font-size:22px;font-weight:800;color:var(--text1);letter-spacing:-1px;line-height:1;">0</span><span style="font-size:10px;font-weight:600;color:var(--text2);"> 장</span></div>
             <div style="font-size:9.5px;color:var(--text3);margin-top:3px;"></div>
           </div>
           <div style="padding:12px 0 10px;text-align:center;position:relative;">
             <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#FFD93B,#E6A800);"></div>
             <div style="font-size:10px;font-weight:700;color:var(--text2);margin-bottom:5px;">골드</div>
-            <div><span style="font-size:22px;font-weight:800;color:var(--text1);letter-spacing:-1px;line-height:1;">2</span><span style="font-size:10px;font-weight:600;color:var(--text2);"> 장</span></div>
+            <div><span id="ex-sum-gold" style="font-size:22px;font-weight:800;color:var(--text1);letter-spacing:-1px;line-height:1;">0</span><span style="font-size:10px;font-weight:600;color:var(--text2);"> 장</span></div>
             <div style="font-size:9.5px;color:var(--text3);margin-top:3px;"></div>
           </div>
         </div>
@@ -13796,6 +13796,9 @@ function acGrantCheckin(sid) {
     window.CHECKIN_CONFIGS[sid].checkedToday = true;
     if (window.renderCheckinScreen) window.renderCheckinScreen(sid);
   }
+  if (window.ppGrantPoints) window.ppGrantPoints(100, '쿠팡 구경 출석체크');
+  // pw-14는 5일 연속 달성 화면 — 이벤트 티켓 1장 추가 지급
+  if (sid === 'pw-14' && window.ppGrantEventTicket) window.ppGrantEventTicket(1, '출석 5일 연속 달성');
   if (window.ipToast) ipToast('쿠팡 구경 완료! 100P가 적립됐어요');
   // 결과 화면: pw-14는 5일차 → 달성, 그 외 → 당일완료
   setTimeout(function(){ showScreen(sid === 'pw-14' ? 'pw-14-win' : 'pw-14-done'); }, 300);
@@ -13942,6 +13945,11 @@ function bindFortuneRoulette() {
     setTimeout(function() {
       rlShowResult(idx);
       rlMarkPlayed();
+      var rw = RL_REWARDS[idx];
+      if (rw.win && window.ppGrantEventTicket) {
+        var qty = parseInt(rw.sub) || 1;
+        window.ppGrantEventTicket(qty, '행운 룰렛 당첨');
+      }
       _rlSpinning = false;
       rlApplyDailyLock();
     }, 4350);
@@ -15385,7 +15393,7 @@ function csCheck() {
           </div>
           <!-- 등급별 내역 -->
           <div style="background:white;border:1px solid var(--border);border-radius:16px;padding:18px;margin-bottom:12px;">
-            <div style="font-size:12px;font-weight:700;color:var(--text3);letter-spacing:0.3px;margin-bottom:14px;">등급별 내역</div>
+            <div style="font-size:12px;font-weight:700;color:var(--text3);letter-spacing:0.3px;margin-bottom:14px;">적립 안내</div>
             <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;" id="earn-grade-grid">
               <div style="background:#FFF8EC;border-radius:12px;padding:14px 8px;text-align:center;" id="earn-bronze-box">
                 <div style="font-size:10px;font-weight:700;color:#92400E;margin-bottom:6px;">브론즈</div>
@@ -15407,7 +15415,7 @@ function csCheck() {
           <!-- 안내 -->
           <div style="background:var(--sub-4);border-radius:12px;padding:14px 16px;font-size:12px;color:var(--main-dark);line-height:1.7;">
             <b>티켓 사용 안내</b><br>
-            적립된 티켓은 즉시 사용 가능합니다.<br>
+            구매 확정 후 등급 티켓으로 전환되면 사용 가능해요.<br>
             혜택 탭 &gt; 티켓 교환소에서 기프티콘으로 교환하세요.
           </div>
         </div>
@@ -15540,6 +15548,51 @@ function greedyTickets(amount) {
   return { gold: gold, silver: silver, bronze: bronze, total: gold + silver + bronze };
 }
 
+/* ── 출석체크·행운룰렛 실지급 (포인트/이벤트 티켓) ──
+   출석체크·룰렛은 자기완결형(단일 유저) 액션이라 CMS 개입 없이 즉시 지급.
+   구매 티켓처럼 등급을 새로 "계산"하지 않고, 정해진 보상값을 그대로 기록만 한다. */
+var EVENT_TICKET_VALID_DAYS = 100;
+function ppEventTicketExpiry() {
+  var ms = Date.now() + EVENT_TICKET_VALID_DAYS * 86400000;
+  return FS.Timestamp.fromMillis(ms);
+}
+function ppGrantPoints(amount, reason) {
+  if (!PP.uid || !amount) return Promise.resolve();
+  var now = FS.FieldValue.serverTimestamp();
+  var batch = db.batch();
+  batch.set(db.collection('point_transactions').doc(), {
+    user_id: PP.uid, amount: amount, type: 'earn', reason: reason || '적립', manual: false, created_at: now,
+  });
+  batch.set(db.collection('user_points').doc(PP.uid), {
+    user_id: PP.uid, balance: FS.FieldValue.increment(amount), updated_at: now,
+  }, { merge: true });
+  return batch.commit().then(function() {
+    PP.points = (PP.points || 0) + amount;
+    renderHomePoints();
+  }).catch(function(e) { console.error('ppGrantPoints', e); });
+}
+function ppGrantEventTicket(qty, reason) {
+  if (!PP.uid || !qty) return Promise.resolve();
+  var now = FS.FieldValue.serverTimestamp();
+  var expiresAt = ppEventTicketExpiry();
+  var batch = db.batch();
+  for (var i = 0; i < qty; i++) {
+    batch.set(db.collection('user_tickets').doc(), {
+      user_id: PP.uid, grade: 'event', status: 'active', postback_id: null,
+      earned_at: now, confirmed_at: now, expires_at: expiresAt,
+    });
+    batch.set(db.collection('ticket_transactions').doc(), {
+      user_id: PP.uid, ticket_grade: 'event', type: 'earn', postback_id: null, created_at: now,
+    });
+  }
+  return batch.commit().then(function() {
+    PP.tickets.event = (PP.tickets.event || 0) + qty;
+    renderMyTicketCard();
+  }).catch(function(e) { console.error('ppGrantEventTicket', e); });
+}
+window.ppGrantPoints = ppGrantPoints;
+window.ppGrantEventTicket = ppGrantEventTicket;
+
 /* ── showScreen hook ── */
 function hookShowScreen() {
   var orig = window.showScreen;
@@ -15581,11 +15634,17 @@ auth.onAuthStateChanged(function(user) {
   }
 });
 
+/* let currentScreen(원본 스크립트, 별도 <script> 태그)은 window에 안 붙어서
+   window.currentScreen은 항상 undefined였다 — DOM에서 직접 활성 화면을 읽는다. */
+function ppActiveScreen() {
+  var el = document.querySelector('.phone-wrap.ip-active');
+  return el ? el.id : null;
+}
 function checkExistingUser() {
   db.collection('users').doc(PP.uid).get().then(function(doc) {
     if (doc.exists) {
       PP.user = doc.data();
-      var cs = window.currentScreen;
+      var cs = ppActiveScreen();
       if (!cs || cs === 'pw-00' || cs === 'pw-01' || cs === 'pw-01b' || cs === 'pw-02-nick') {
         window.showScreen('pw-10', false);
       }
@@ -15662,7 +15721,7 @@ function renderHomeTickets() {
   var tot = document.querySelector('#pw-10 .htc-tickets-grp b');
   if (tot) tot.textContent = PP.tickets.total;
 
-  /* 빈 상태 처리 */
+  /* 빈 상태 처리 — 대기 중인 랜덤 티켓이 있으면 "적립 없음"이 아니라 "확정 대기" 안내 */
   var homeCard = document.querySelector('#pw-10 .home-ticket-card');
   var homeEmpty = document.getElementById('pp-home-empty');
   if (PP.tickets.total === 0) {
@@ -15670,14 +15729,24 @@ function renderHomeTickets() {
       var emp = document.createElement('div');
       emp.id = 'pp-home-empty';
       emp.style.cssText = 'margin:12px 0 0;background:#F8F7FF;border:1px dashed #C6AFFF;border-radius:14px;padding:18px 16px;text-align:center;font-size:13px;color:#6B5E8A;';
-      emp.innerHTML = '<div style="font-size:28px;margin-bottom:8px;">🎟</div>'
-        + '<div style="font-weight:700;color:var(--text1);margin-bottom:4px;">아직 티켓이 없어요</div>'
-        + '<div>쇼핑몰 구매 후 티켓을 적립해 보세요</div>';
       homeCard.parentNode.insertBefore(emp, homeCard.nextSibling);
+    }
+    if (homeEmpty || document.getElementById('pp-home-empty')) {
+      var e2 = document.getElementById('pp-home-empty');
+      if (PP.randomBundleCount > 0) {
+        e2.innerHTML = '<div style="font-size:28px;margin-bottom:8px;">⏳</div>'
+          + '<div style="font-weight:700;color:var(--text1);margin-bottom:4px;">랜덤 티켓 확정 대기 중</div>'
+          + '<div>구매 확정되면 등급 티켓으로 바뀌어요</div>';
+      } else {
+        e2.innerHTML = '<div style="font-size:28px;margin-bottom:8px;">🎟</div>'
+          + '<div style="font-weight:700;color:var(--text1);margin-bottom:4px;">아직 티켓이 없어요</div>'
+          + '<div>쇼핑몰 구매 후 티켓을 적립해 보세요</div>';
+      }
     }
   } else if (homeEmpty) {
     homeEmpty.remove();
   }
+  if (typeof renderExGifticonSummary === 'function') renderExGifticonSummary();
 }
 
 function renderHomePoints() {
@@ -15764,7 +15833,7 @@ var _purchaseShown = false;
 function schedulePurchasePrompt() {
   _purchaseShown = false;
   setTimeout(function() {
-    if (window.currentScreen === 'pw-13') showPurchaseOverlay();
+    if (ppActiveScreen() === 'pw-13') showPurchaseOverlay();
   }, 3500);
 }
 
@@ -15837,43 +15906,40 @@ function processPurchase(amount, overlay) {
   var now = FS.FieldValue.serverTimestamp();
   var batch = db.batch();
   var postRef = db.collection('postbacks').doc();
+  /* 정책: 구매 즉시 '가지급(랜덤) 티켓'만 지급 — 실제 등급(브/실/골)은 이미 Greedy로 계산해
+     티켓 문서에 저장하되 status는 pending. 확정(연동 D+7·미연동 D+30)은 CMS 포스트백 관리에서
+     상태를 '확정'으로 바꿔야 처리됨(dmConfirmPostbackTickets) — 앱이 스스로 확정하지 않는다. */
   batch.set(postRef, {
     user_id: PP.uid, mall_name: mall.name, mall_domain: mall.domain,
-    purchase_amount: amount, status: 'confirmed', created_at: now,
+    purchase_amount: amount, status: 'pending', created_at: now,
   });
   var grades = ['bronze', 'silver', 'gold'];
   var cnts = [tk.bronze, tk.silver, tk.gold];
   grades.forEach(function(grade, gi) {
     for (var j = 0; j < cnts[gi]; j++) {
       var tRef = db.collection('user_tickets').doc();
-      batch.set(tRef, { user_id: PP.uid, grade: grade, status: 'active', postback_id: postRef.id, earned_at: now, expires_at: null });
+      batch.set(tRef, { user_id: PP.uid, grade: grade, status: 'pending', postback_id: postRef.id, earned_at: now, confirmed_at: null, expires_at: null });
       var txRef = db.collection('ticket_transactions').doc();
       batch.set(txRef, { user_id: PP.uid, ticket_grade: grade, type: 'earn', postback_id: postRef.id, created_at: now });
     }
   });
   batch.commit().then(function() {
     overlay.style.display = 'none';
-    PP.tickets.bronze += tk.bronze;
-    PP.tickets.silver += tk.silver;
-    PP.tickets.gold += tk.gold;
-    PP.tickets.total += tk.total;
+    PP.randomBundleCount = (PP.randomBundleCount || 0) + (tk.total > 0 ? 1 : 0);
     renderHomeTickets();
-    /* 결과 화면 이동 */
+    renderMyTicketCard();
+    /* 결과 화면 이동 — 확정 전까지 실제 등급은 비공개, 랜덤 티켓 장수만 안내 */
     var sub = document.getElementById('earn-mall-sub');
     if (sub) sub.textContent = mall.name + ' 구매 ' + amount.toLocaleString('ko-KR') + '원';
     var tc = document.getElementById('earn-total-count');
     if (tc) tc.textContent = tk.total;
-    var bc = document.getElementById('earn-bronze-cnt');
-    if (bc) bc.textContent = tk.bronze;
-    var sc = document.getElementById('earn-silver-cnt');
-    if (sc) sc.textContent = tk.silver;
-    var gc = document.getElementById('earn-gold-cnt');
-    if (gc) gc.textContent = tk.gold;
-    /* 0인 등급 박스 흐리게 */
-    ['bronze','silver','gold'].forEach(function(g) {
-      var box = document.getElementById('earn-' + g + '-box');
-      if (box) box.style.opacity = tk[g] === 0 ? '0.35' : '1';
-    });
+    var grid = document.getElementById('earn-grade-grid');
+    if (grid) {
+      grid.style.display = 'block';
+      grid.innerHTML = '<div style="background:#FFF6F5;border:1px solid #FFB8AC;border-radius:12px;padding:14px 16px;text-align:left;">'
+        + '<div style="font-size:12px;font-weight:700;color:#C0291A;margin-bottom:4px;">랜덤 티켓 ' + tk.total + '장 · 대기중</div>'
+        + '<div style="font-size:11.5px;color:#C0291A;opacity:0.85;line-height:1.5;">구매 확정(카카오 연동 시 D+7, 미연동 D+30) 후<br>실제 등급(브론즈·실버·골드)이 공개되고 사용 가능해져요.</div></div>';
+    }
     window.showScreen('pw-earn-done');
   }).catch(function(e) {
     console.error('purchase', e);
@@ -15883,8 +15949,14 @@ function processPurchase(amount, overlay) {
 }
 
 /* ── Gifticons ── */
+function renderExGifticonSummary() {
+  var b = document.getElementById('ex-sum-bronze'); if (b) b.textContent = PP.tickets.bronze || 0;
+  var s = document.getElementById('ex-sum-silver'); if (s) s.textContent = PP.tickets.silver || 0;
+  var g = document.getElementById('ex-sum-gold'); if (g) g.textContent = PP.tickets.gold || 0;
+}
 function loadGifticons() {
   if (!PP.uid) return;
+  renderExGifticonSummary();
   db.collection('gifticons').where('status', '==', 'active').limit(12).get()
     .then(function(snap) {
       PP.gifticonList = [];
@@ -15952,7 +16024,11 @@ function populateGifticonDetail(g) {
   if (noticeEl) noticeEl.textContent = gradeName + ' 티켓 ' + cnt + '장 차감 → 잔여 ' + Math.max(0, (PP.tickets[g.required_grade || 'bronze'] || 0) - cnt) + '장';
 }
 
-/* ── pw-25 exchange ── */
+/* ── pw-25 exchange ──
+   실제 user_tickets 문서를 소진 처리(status:'used')해야 새로고침 후에도 잔여 수량이
+   맞는다 — 이전엔 화면(PP.tickets) 숫자만 줄이고 Firestore 티켓은 그대로 active라
+   새로고침하면 차감이 사라지는 버그였음. 만료 임박(적립일이 오래된) 티켓부터 소진(FIFO),
+   기프티콘 화면 안내문구("만료 임박 티켓부터 자동 사용")와 실제 동작을 일치시킴. */
 function bindExchangeBtn() {
   var s = document.getElementById('pw-25');
   if (!s || s.dataset.ppExBound) return;
@@ -15966,43 +16042,83 @@ function bindExchangeBtn() {
     var grade = g.required_grade || 'bronze';
     var cnt = g.required_count || 1;
     if ((PP.tickets[grade] || 0) < cnt) { showToast('티켓이 부족합니다'); return; }
-    var now = FS.FieldValue.serverTimestamp();
-    db.collection('gifticon_exchanges').add({
-      user_id: PP.uid, gifticon_id: g._id, grade_used: grade, count_used: cnt, status: 'completed', exchanged_at: now,
-    }).then(function() {
-      PP.tickets[grade] -= cnt;
-      PP.tickets.total -= cnt;
-      renderHomeTickets();
-      /* 교환 완료 화면 */
-      var code = 'PP-' + Math.random().toString(36).slice(2,6).toUpperCase() + '-'
-        + Math.random().toString(36).slice(2,6).toUpperCase() + '-'
-        + Math.random().toString(36).slice(2,6).toUpperCase();
-      var ej = document.getElementById('ex-done-emoji');
-      if (ej) ej.textContent = g.emoji || '🎁';
-      var eb = document.getElementById('ex-done-brand');
-      if (eb) eb.textContent = g.brand || '';
-      var en = document.getElementById('ex-done-name');
-      if (en) en.textContent = g.name || g.product_name || '';
-      var ec = document.getElementById('ex-done-code');
-      if (ec) ec.textContent = code;
-      window.showScreen('pw-ex-done');
-    }).catch(function(e){ console.error('exchange', e); showToast('교환 중 오류'); });
+    btn.disabled = true;
+    db.collection('user_tickets')
+      .where('user_id', '==', PP.uid)
+      .where('grade', '==', grade)
+      .where('status', '==', 'active')
+      .get()
+      .then(function(snap) {
+        var docs = snap.docs.slice().sort(function(a, b) {
+          var ea = a.data().earned_at, eb = b.data().earned_at;
+          var ta = (ea && ea.toMillis) ? ea.toMillis() : 0;
+          var tb = (eb && eb.toMillis) ? eb.toMillis() : 0;
+          return ta - tb;
+        });
+        if (docs.length < cnt) { showToast('티켓이 부족합니다'); btn.disabled = false; return null; }
+        var now = FS.FieldValue.serverTimestamp();
+        var code = 'PP-' + Math.random().toString(36).slice(2,6).toUpperCase() + '-'
+          + Math.random().toString(36).slice(2,6).toUpperCase() + '-'
+          + Math.random().toString(36).slice(2,6).toUpperCase();
+        var expiresAt = FS.Timestamp.fromMillis(Date.now() + 90 * 86400000);
+        var batch = db.batch();
+        docs.slice(0, cnt).forEach(function(doc) {
+          batch.update(doc.ref, { status: 'used', used_at: now });
+          batch.set(db.collection('ticket_transactions').doc(), {
+            user_id: PP.uid, ticket_grade: grade, type: 'use', postback_id: null, created_at: now,
+          });
+        });
+        var exRef = db.collection('gifticon_exchanges').doc();
+        batch.set(exRef, {
+          user_id: PP.uid, gifticon_id: g._id, grade_used: grade, count_used: cnt,
+          status: 'completed', code: code, expires_at: expiresAt, exchanged_at: now,
+        });
+        return batch.commit().then(function() { return code; });
+      })
+      .then(function(code) {
+        if (!code) return;
+        PP.tickets[grade] -= cnt;
+        PP.tickets.total -= cnt;
+        renderHomeTickets();
+        renderMyTicketCard();
+        /* 교환 완료 화면 */
+        var ej = document.getElementById('ex-done-emoji');
+        if (ej) ej.textContent = g.emoji || '🎁';
+        var eb = document.getElementById('ex-done-brand');
+        if (eb) eb.textContent = g.brand || '';
+        var en = document.getElementById('ex-done-name');
+        if (en) en.textContent = g.name || g.product_name || '';
+        var ec = document.getElementById('ex-done-code');
+        if (ec) ec.textContent = code;
+        btn.disabled = false;
+        window.showScreen('pw-ex-done');
+      }).catch(function(e){ console.error('exchange', e); showToast('교환 중 오류'); btn.disabled = false; });
   }, true);
 }
 
 /* ── Kakao mock complete ── */
 function bindKakaoComplete() {
+  /* 두 화면 다 CTA 버튼에 .btn-primary 클래스가 없어(마크업 누락) 기존 셀렉터가
+     항상 매치 실패 → 카카오 연동 플래그조차 저장되지 않던 상태였다. 화면당 버튼이
+     하나뿐이라 'button' 셀렉터로 교체. */
   ['pw-02-K-new', 'pw-02-K-existing'].forEach(function(sid) {
     var s = document.getElementById(sid);
     if (!s || s.dataset.ppKBound) return;
     s.dataset.ppKBound = '1';
-    var btn = s.querySelector('.btn-primary');
+    var btn = s.querySelector('button');
     if (!btn) return;
     btn.addEventListener('click', function() {
       if (!PP.uid) return;
       db.collection('users').doc(PP.uid).update({ linked_kakao: true }).then(function() {
         if (PP.user) PP.user.linked_kakao = true;
       }).catch(function(e){ console.error('kakaoLink', e); });
+      /* pw-02-K-new(신규 연동) 화면이 "이벤트 티켓 1장 + 가입 축하 200P 즉시 지급"을
+         명시적으로 약속하므로 실제로 지급. pw-02-K-existing(기존 계정 재로그인 데모)은
+         실제 Kakao SDK 없이는 "기존 데이터 인식"을 구현할 수 없어 정적 미리보기로 유지. */
+      if (sid === 'pw-02-K-new') {
+        if (window.ppGrantEventTicket) window.ppGrantEventTicket(1, '카카오 신규 연동 보상');
+        if (window.ppGrantPoints) window.ppGrantPoints(200, '카카오 연동 가입 축하');
+      }
     }, true);
   });
 }
@@ -16107,7 +16223,7 @@ function bindPersonaEntryPoints() {
    - 로그인 유저(PP.uid)의 실제 Firestore 데이터로 렌더
    - 데이터 없으면 빈 상태(empty state)
    ══════════════════════════════════════════════════ */
-var GRADE_KO = { bronze: '브론즈', silver: '실버', gold: '골드' };
+var GRADE_KO = { bronze: '브론즈', silver: '실버', gold: '골드', event: '이벤트' };
 
 function ppDate(v) {
   if (!v) return null;
@@ -16393,18 +16509,30 @@ function renderGifticonHistory() {
       box.innerHTML = '<div style="padding:18px 12px;text-align:center;font-size:12px;color:var(--text3);">아직 교환한 기프티콘이 없어요</div>';
       return;
     }
-    box.innerHTML = ex.map(function (x) {
-      var nm = '기프티콘';
+    box.innerHTML = ex.map(function (x, i) {
+      var nm = '기프티콘', emoji = '🎁', brand = '';
       if (PP.gifticonList && PP.gifticonList.length) {
         var g = PP.gifticonList.filter(function (it) { return it._id === x.gifticon_id; })[0];
-        if (g) nm = (g.brand ? g.brand + ' ' : '') + (g.name || g.product_name || '');
+        if (g) { nm = g.name || g.product_name || nm; brand = g.brand || ''; emoji = g.emoji || emoji; }
       }
       var done = (x.status === 'completed' || x.status === 'issued');
-      return '<div style="padding:10px 12px;border-top:1px solid #F3EFFA;"><div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;">'
-        + '<span style="font-weight:600;">' + ppEsc(nm) + '</span>'
+      return '<div data-gx="' + i + '" style="padding:10px 12px;border-top:1px solid #F3EFFA;cursor:' + (x.code ? 'pointer' : 'default') + ';"><div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;">'
+        + '<span style="font-weight:600;">' + ppEsc((brand ? brand + ' ' : '') + nm) + '</span>'
         + '<span style="font-size:10.5px;font-weight:700;color:' + (done ? '#1f9d57' : '#6b7280') + ';background:' + (done ? '#e6f7ec' : '#f3f4f6') + ';border-radius:8px;padding:2px 7px;">' + (done ? '발급완료' : '처리중') + '</span></div>'
-        + '<div style="font-size:10.5px;color:var(--text3);margin-top:3px;">' + (GRADE_KO[x.grade_used] || '') + ' ' + (x.count_used || 1) + '장 사용 · ' + ppFmt(ppDate(x.exchanged_at)) + ' 교환</div></div>';
+        + '<div style="font-size:10.5px;color:var(--text3);margin-top:3px;">' + (GRADE_KO[x.grade_used] || '') + ' ' + (x.count_used || 1) + '장 사용 · ' + ppFmt(ppDate(x.exchanged_at)) + ' 교환' + (x.code ? ' · 코드 보기 ›' : '') + '</div></div>';
     }).join('');
+    box.querySelectorAll('[data-gx]').forEach(function (row) {
+      row.addEventListener('click', function () {
+        var x = ex[parseInt(row.dataset.gx)];
+        if (!x.code) return;
+        var g = (PP.gifticonList || []).filter(function (it) { return it._id === x.gifticon_id; })[0] || {};
+        var ej = document.getElementById('ex-done-emoji'); if (ej) ej.textContent = g.emoji || '🎁';
+        var eb = document.getElementById('ex-done-brand'); if (eb) eb.textContent = g.brand || '';
+        var en = document.getElementById('ex-done-name'); if (en) en.textContent = g.name || g.product_name || '기프티콘';
+        var ec = document.getElementById('ex-done-code'); if (ec) ec.textContent = x.code;
+        window.showScreen('pw-ex-done');
+      });
+    });
   });
 }
 
