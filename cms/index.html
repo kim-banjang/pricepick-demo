@@ -6919,7 +6919,12 @@ function dmLoadList(col) {
       var info = '';
       if (col === 'users') info = (d.nickname||'?') + ' · ' + (d.linked_kakao ? '연동' : '미연동') + ' · ' + (DM_STATUS_KO[d.status] || d.status || '?');
       else if (col === 'user_tickets') info = (d.user_id||'').slice(0,16) + '… · ' + (d.grade||'?') + ' · ' + (d.status||'?');
-      else if (col === 'postbacks') info = (d.user_id||'').slice(0,14) + '… · ' + (d.mall_name||'?') + ' · ￦' + ((d.purchase_amount||0).toLocaleString()) + ' · ' + (DM_POSTBACK_STATUS_KO[d.status] || d.status || '?');
+      else if (col === 'postbacks') {
+        info = (d.user_id||'').slice(0,14) + '… · ' + (d.mall_name||'?') + ' · ￦' + ((d.purchase_amount||0).toLocaleString()) + ' · ' + (DM_POSTBACK_STATUS_KO[d.status] || d.status || '?');
+        info += ' · ' + ((d.status === 'pending' || d.status === 'refunded')
+          ? '<span style="color:var(--text-3);">미지급</span>'
+          : '<span id="dm-pb-tk-' + doc.id + '" style="color:var(--success);">티켓 확인 중…</span>');
+      }
       else if (col === 'user_points') info = (d.user_id||'').slice(0,16) + '… · ' + ((d.balance||0).toLocaleString()) + 'P';
       else if (col === 'gifticons') info = (d.emoji||'') + ' ' + (d.brand||'?') + ' ' + (d.name||'?') + ' · ' + (d.required_grade||'?') + ' ' + (d.required_count||0) + '장';
       else if (col === 'gifticon_exchanges') info = (d.user_id||'').slice(0,14) + '… · ' + (d.gifticon_id||'?').slice(0,15) + '… · ' + (d.grade_used||'?') + ' ' + (d.count_used||0) + '장';
@@ -6937,8 +6942,41 @@ function dmLoadList(col) {
     });
     var note = snap.size >= 30 ? '<div style="font-size:11px;color:var(--text-3);padding:6px 0;">최근 30건만 표시</div>' : '';
     area.innerHTML = rows.join('') + note;
+    if (col === 'postbacks') dmLoadPostbackTicketCounts(snap.docs);
   }).catch(function(e) {
     area.innerHTML = '<div style="color:var(--danger);font-size:12px;">오류: ' + (e.message||e) + '</div>';
+  });
+}
+
+// 포스트백별 지급 티켓 등급 집계 — ticket_transactions(type:'earn')를 postback_id로 조인해서
+// 목록의 "티켓 확인 중…" 자리를 "랜덤티켓 N장 지급 (브 x · 실 y · 골 z)"로 채운다.
+function dmLoadPostbackTicketCounts(docs) {
+  var targetIds = docs
+    .filter(function(doc) { var s = doc.data().status; return s !== 'pending' && s !== 'refunded'; })
+    .map(function(doc) { return doc.id; });
+  if (!targetIds.length) return;
+  var counts = {};
+  targetIds.forEach(function(id) { counts[id] = { bronze: 0, silver: 0, gold: 0 }; });
+  var chunks = [];
+  for (var i = 0; i < targetIds.length; i += 10) chunks.push(targetIds.slice(i, i + 10));
+  Promise.all(chunks.map(function(chunk) {
+    return db.collection('ticket_transactions').where('postback_id', 'in', chunk).get().then(function(snap) {
+      snap.forEach(function(doc) {
+        var d = doc.data();
+        if (d.type !== 'earn') return;
+        var c = counts[d.postback_id];
+        if (!c) return;
+        if (d.ticket_grade === 'bronze' || d.ticket_grade === 'silver' || d.ticket_grade === 'gold') c[d.ticket_grade]++;
+      });
+    }).catch(function(e) { console.error('dmLoadPostbackTicketCounts', e); });
+  })).then(function() {
+    Object.keys(counts).forEach(function(pid) {
+      var el = document.getElementById('dm-pb-tk-' + pid);
+      if (!el) return;
+      var c = counts[pid];
+      var total = c.bronze + c.silver + c.gold;
+      el.textContent = '랜덤티켓 ' + total + '장 지급 (브 ' + c.bronze + ' · 실 ' + c.silver + ' · 골 ' + c.gold + ')';
+    });
   });
 }
 
