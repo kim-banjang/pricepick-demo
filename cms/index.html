@@ -2482,7 +2482,7 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
         <input class="search-box" placeholder="회원명, 카카오 ID 검색">
         <select class="filter-sel"><option>전체 유형</option><option>출석 적립</option><option>티켓 교환</option><option>관리자 지급</option><option>사용 차감</option><option>만료 소멸</option></select>
         <select class="filter-sel"><option>최근 30일</option><option>최근 7일</option><option>최근 90일</option><option>기간 직접 입력</option></select>
-        <div style="margin-left:auto;display:flex;gap:8px;"><button class="btn btn-ghost btn-sm" onclick="toast('CSV 내보내기')">내보내기</button><button class="btn btn-ghost btn-sm" onclick="toast('수동 지급/회수 준비중')">수동 지급 / 회수</button></div>
+        <div style="margin-left:auto;display:flex;gap:8px;"><button class="btn btn-ghost btn-sm" onclick="toast('CSV 내보내기')">내보내기</button><button class="btn btn-ghost btn-sm" onclick="pmOpenModal()">수동 지급 / 회수</button></div>
       </div>
       <div class="card">
         <div class="card-header"><div class="card-title">최근 포인트 이력</div></div>
@@ -2825,6 +2825,32 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModal('m-ticket-manual')">취소</button>
       <button class="btn btn-primary" onclick="tmSubmit()">처리하기</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── 모달: 수동 포인트 지급/회수 ── -->
+<div class="modal-overlay" id="m-point-manual">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">수동 포인트 지급 / 회수</div>
+      <button class="modal-close" onclick="closeModal('m-point-manual')"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <div class="warn-box"><strong>주의:</strong> 포인트 원장은 append-only입니다 — 회수도 삭제가 아니라 음수 레코드 추가로 처리되며 되돌릴 수 없습니다.</div>
+      <div class="form-group"><label class="form-label">대상 회원</label><select class="form-select" id="pm-user"><option value="">불러오는 중…</option></select></div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">처리 유형</label>
+          <select class="form-select" id="pm-action"><option value="grant">지급</option><option value="revoke">회수</option></select>
+        </div>
+        <div class="form-group"><label class="form-label">포인트 금액(P)</label><input class="form-input" type="number" id="pm-amount" placeholder="0" min="1"></div>
+      </div>
+      <div class="form-group"><label class="form-label">사유</label><input class="form-input" id="pm-reason" placeholder="처리 사유 (필수)"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('m-point-manual')">취소</button>
+      <button class="btn btn-primary" onclick="pmSubmit()">처리하기</button>
     </div>
   </div>
 </div>
@@ -7202,6 +7228,72 @@ window.dmMemberDetailSave = function() {
     dmShowToast('저장 실패: ' + (e.message||e), true);
   });
 };
+
+// ════════════════════════════════════════════════
+// 포인트 내역 화면 — 수동 지급 / 회수 (m-point-manual)
+// point_transactions는 append-only 원장 — 회수도 레코드 삭제가 아니라 음수 레코드 추가로 처리.
+// user_points.balance는 FieldValue.increment로 원자적으로 갱신(문서가 없으면 새로 생성됨).
+// ════════════════════════════════════════════════
+window.pmOpenModal = function() {
+  var amountEl = document.getElementById('pm-amount'); if (amountEl) amountEl.value = '';
+  var reasonEl = document.getElementById('pm-reason'); if (reasonEl) reasonEl.value = '';
+  var actionEl = document.getElementById('pm-action'); if (actionEl) actionEl.value = 'grant';
+  dmPopulateUserSelect('pm-user');
+  openModal('m-point-manual');
+};
+
+window.pmSubmit = function() {
+  var userId = document.getElementById('pm-user').value;
+  if (!userId) { dmShowToast('대상 회원을 선택하세요.', true); return; }
+  var action = document.getElementById('pm-action').value; // grant | revoke
+  var amount = parseInt(document.getElementById('pm-amount').value, 10) || 0;
+  if (amount < 1) { dmShowToast('포인트 금액을 입력하세요.', true); return; }
+  var reason = document.getElementById('pm-reason').value.trim();
+  if (!reason) { dmShowToast('사유를 입력하세요.', true); return; }
+
+  var task = action === 'revoke' ? pmRevokePoints(userId, amount, reason) : pmGrantPoints(userId, amount, reason);
+  task.then(function(result) {
+    var msg;
+    if (action === 'revoke') {
+      msg = result.amount + 'P 회수 완료';
+      if (result.amount < amount) msg += (result.amount === 0 ? ' (보유 포인트가 없어 회수하지 못했습니다)' : ' (요청 ' + amount + 'P 중 보유 부족으로 ' + result.amount + 'P만 처리됨)');
+    } else {
+      msg = result.amount + 'P 지급 완료';
+    }
+    dmShowToast(msg);
+    logAdmin((action === 'revoke' ? '수동 포인트 회수: ' : '수동 포인트 지급: ') + userId + ' · ' + result.amount + 'P · 사유: ' + reason);
+    closeModal('m-point-manual');
+    if (typeof loadPoints === 'function') loadPoints();
+    if (typeof dmLoadStats === 'function') dmLoadStats();
+    if (typeof DM !== 'undefined' && DM.col && (DM.col === 'user_points' || DM.col === 'point_transactions') && typeof dmLoadList === 'function') dmLoadList(DM.col);
+  }).catch(function(e) {
+    dmShowToast('처리 실패: ' + (e.message || e), true);
+  });
+};
+
+// 지급 — point_transactions에 양수 earn 레코드 추가 + user_points.balance 증가
+function pmGrantPoints(userId, amount, reason) {
+  var now = FS.Timestamp.now();
+  var b = db.batch();
+  b.set(db.collection('point_transactions').doc(), { user_id: userId, amount: amount, type: 'earn', reason: reason, manual: true, created_at: now });
+  b.set(db.collection('user_points').doc(userId), { user_id: userId, balance: firebase.firestore.FieldValue.increment(amount), updated_at: now }, { merge: true });
+  return b.commit().then(function() { return { amount: amount }; });
+}
+
+// 회수 — 보유 잔액 범위 내로 제한(부족하면 있는 만큼만, 에러 아님). point_transactions에
+// 음수 spend 레코드 추가 + user_points.balance 감소. 레코드 삭제는 하지 않는다(append-only).
+function pmRevokePoints(userId, amount, reason) {
+  return db.collection('user_points').doc(userId).get().then(function(doc) {
+    var balance = doc.exists ? (doc.data().balance || 0) : 0;
+    var actual = Math.min(amount, Math.max(balance, 0));
+    if (actual <= 0) return { amount: 0 };
+    var now = FS.Timestamp.now();
+    var b = db.batch();
+    b.set(db.collection('point_transactions').doc(), { user_id: userId, amount: -actual, type: 'spend', reason: reason, manual: true, created_at: now });
+    b.set(db.collection('user_points').doc(userId), { user_id: userId, balance: firebase.firestore.FieldValue.increment(-actual), updated_at: now }, { merge: true });
+    return b.commit().then(function() { return { amount: actual }; });
+  });
+}
 
 // ──────────────────────────────────────────
 // 목록 로드
