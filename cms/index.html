@@ -4052,6 +4052,23 @@ function saveTicketEdit() {
   </div>
 </div>
 
+<!-- 데이터 관리(데모) — 회원 수정 모달 -->
+<div class="modal-overlay" id="m-dm-user-edit">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title">회원 정보 수정</div><button class="modal-close" onclick="closeModal('m-dm-user-edit')"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
+    <div class="modal-body">
+      <input type="hidden" id="dmue-id">
+      <div class="form-group"><label class="form-label">닉네임</label><input class="form-input" id="dmue-nickname" placeholder="닉네임"></div>
+      <div class="form-group"><label class="form-label">카카오연동</label><select class="form-select" id="dmue-linked"><option value="true">연동</option><option value="false">미연동</option></select></div>
+      <div class="form-group"><label class="form-label">가입일</label><input class="form-input" type="date" id="dmue-created"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('m-dm-user-edit')">취소</button>
+      <button class="btn btn-primary" onclick="dmEditUserSave()">저장</button>
+    </div>
+  </div>
+</div>
+
 <script id="ip-i18n-engine">
 (function(){
   var KO2VI={"30일 이내 재가입이 제한됩니다":"Đăng ký lại ngay lập tức sau khi hủy tài khoản là có thể","즉시 재가입이 가능합니다":"Đăng ký lại ngay lập tức là có thể","쿨타임 없음":"Không có thời gian chờ","1단계 확정":"Xác nhận giai đoạn 1",
@@ -6541,6 +6558,9 @@ document.head.appendChild(dmStyle);
 // ── 현재 탭 상태 ──
 var DM = { col: 'users' };
 
+// ── 회원 상태 한글 라벨 (저장값은 영문 그대로, 표시만 한글) ──
+var DM_STATUS_KO = { active:'활성', suspended:'정지', withdrawn:'탈퇴' };
+
 // ── 보호 컬렉션 (삭제/초기화 불가) ──
 var PROTECTED = ['affiliate_malls','ticket_grades','grade_exchange_rules','banners','notices','admin_accounts'];
 
@@ -6557,9 +6577,9 @@ var DEMO_COLS = [
 // ──────────────────────────────────────────
 var DM_FIELDS = {
   users: [
-    { id:'nickname', label:'닉네임', type:'text', def:'테스트유저' },
-    { id:'status',   label:'상태',   type:'select', opts:['active','suspended','withdrawn'], def:'active' },
-    { id:'linked',   label:'카카오연동', type:'select', opts:['true','false'], def:'true' },
+    { id:'nickname',   label:'닉네임',     type:'text',   def:'테스트유저' },
+    { id:'linked',     label:'카카오연동', type:'select', opts:['true','false'], def:'true', labels:{ 'true':'연동', 'false':'미연동' } },
+    { id:'created_at', label:'가입일',     type:'date',   def:'' },
   ],
   user_tickets: [
     { id:'user_id',  label:'유저ID', type:'text', def:'user-frank-001' },
@@ -6686,10 +6706,13 @@ function dmRenderForm(col) {
     html += '<div class="dm-field"><label>' + f.label + '</label>';
     if (f.type === 'select') {
       html += '<select id="dmf-' + f.id + '">' + f.opts.map(function(o) {
-        return '<option value="' + o + '"' + (o === f.def ? ' selected' : '') + '>' + o + '</option>';
+        var text = (f.labels && f.labels[o]) || o;
+        return '<option value="' + o + '"' + (o === f.def ? ' selected' : '') + '>' + text + '</option>';
       }).join('') + '</select>';
     } else if (f.type === 'user-select') {
       html += '<select id="dmf-' + f.id + '" style="min-width:220px"><option value="">불러오는 중…</option></select>';
+    } else if (f.type === 'date') {
+      html += '<input type="date" id="dmf-' + f.id + '" value="' + (f.def || dmTodayStr()) + '">';
     } else {
       html += '<input type="' + f.type + '" id="dmf-' + f.id + '" value="' + (f.def||'') + '" placeholder="' + f.label + '">';
     }
@@ -6702,6 +6725,12 @@ function dmRenderForm(col) {
     if (f.type === 'user-select') dmPopulateUserSelect(f.id);
   });
 }
+
+// <input type="date"> 값(YYYY-MM-DD) ↔ Date 객체 변환 헬퍼
+function dmDateInputValue(d) {
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+}
+function dmTodayStr() { return dmDateInputValue(new Date()); }
 
 // 회원(users) 목록을 드롭다운 옵션으로 채움 — 오타 없이 회원 선택으로 유저ID를 지정하기 위함
 function dmPopulateUserSelect(fieldId) {
@@ -6735,6 +6764,7 @@ window.dmAdd = function(col) {
     if (!el) return;
     var v = el.value.trim();
     if (f.type === 'number') v = parseFloat(v) || 0;
+    if (f.type === 'date') v = v ? FS.Timestamp.fromDate(new Date(v + 'T00:00:00')) : null;
     if (f.id === 'linked') {
       data['linked_kakao'] = (v === 'true');
     } else if (f.id === 'balance' || f.id === 'amount' || f.id === 'required_count' || f.id === 'validity_days' || f.id === 'count_used' || f.id === 'purchase_amount') {
@@ -6750,6 +6780,7 @@ window.dmAdd = function(col) {
   }
 
   // 컬렉션별 추가 필드
+  if (col === 'users') { data['status'] = 'active'; data['updated_at'] = FS.Timestamp.now(); }
   if (col === 'gifticons') { data['status'] = 'active'; data['updated_at'] = FS.Timestamp.now(); }
   if (col === 'user_points') { data['updated_at'] = FS.Timestamp.now(); }
   if (col === 'user_tickets') { data['earned_at'] = FS.Timestamp.now(); data['expires_at'] = null; data['confirmed_at'] = null; }
@@ -6812,7 +6843,7 @@ function dmLoadList(col) {
     snap.forEach(function(doc) {
       var d = doc.data();
       var info = '';
-      if (col === 'users') info = (d.nickname||'?') + ' · ' + (d.linked_kakao ? '카카오' : '게스트') + ' · ' + (d.status||'?');
+      if (col === 'users') info = (d.nickname||'?') + ' · ' + (d.linked_kakao ? '연동' : '미연동') + ' · ' + (DM_STATUS_KO[d.status] || d.status || '?');
       else if (col === 'user_tickets') info = (d.user_id||'').slice(0,16) + '… · ' + (d.grade||'?') + ' · ' + (d.status||'?');
       else if (col === 'postbacks') info = (d.user_id||'').slice(0,14) + '… · ￦' + ((d.purchase_amount||0).toLocaleString()) + ' · ' + (d.status||'?');
       else if (col === 'user_points') info = (d.user_id||'').slice(0,16) + '… · ' + ((d.balance||0).toLocaleString()) + 'P';
@@ -6825,7 +6856,10 @@ function dmLoadList(col) {
       var delBtn = isImmutable
         ? '<span style="font-size:10px;color:var(--text-3);">불변</span>'
         : '<button class="dm-del-btn" onclick="dmDelete(\'' + col + '\',\'' + doc.id + '\')">삭제</button>';
-      rows.push('<div class="dm-row"><span class="dm-row-id">' + doc.id.slice(0,18) + (doc.id.length>18?'…':'') + '</span><span class="dm-row-info">' + info + '</span>' + delBtn + '</div>');
+      var editBtn = (col === 'users')
+        ? '<button class="dm-del-btn" style="border-color:var(--main);color:var(--main);" onclick="dmEditUserOpen(\'' + doc.id + '\')">수정</button>'
+        : '';
+      rows.push('<div class="dm-row"><span class="dm-row-id">' + doc.id.slice(0,18) + (doc.id.length>18?'…':'') + '</span><span class="dm-row-info">' + info + '</span>' + editBtn + delBtn + '</div>');
     });
     var note = snap.size >= 30 ? '<div style="font-size:11px;color:var(--text-3);padding:6px 0;">최근 30건만 표시</div>' : '';
     area.innerHTML = rows.join('') + note;
@@ -6846,6 +6880,46 @@ window.dmDelete = function(col, id) {
     dmLoadStats();
   }).catch(function(e) {
     dmShowToast('삭제 실패: ' + (e.message||e), true);
+  });
+};
+
+// ──────────────────────────────────────────
+// 회원 수정 (닉네임 · 카카오연동 · 가입일)
+// ──────────────────────────────────────────
+window.dmEditUserOpen = function(id) {
+  db.collection('users').doc(id).get().then(function(doc) {
+    if (!doc.exists) { dmShowToast('회원을 찾을 수 없습니다.', true); return; }
+    var d = doc.data();
+    document.getElementById('dmue-id').value = id;
+    document.getElementById('dmue-nickname').value = d.nickname || '';
+    document.getElementById('dmue-linked').value = d.linked_kakao ? 'true' : 'false';
+    var created = (d.created_at && d.created_at.toDate) ? d.created_at.toDate() : new Date();
+    document.getElementById('dmue-created').value = dmDateInputValue(created);
+    openModal('m-dm-user-edit');
+  }).catch(function(e) {
+    dmShowToast('불러오기 실패: ' + (e.message||e), true);
+  });
+};
+
+window.dmEditUserSave = function() {
+  var id = document.getElementById('dmue-id').value;
+  if (!id) return;
+  var nickname = document.getElementById('dmue-nickname').value.trim();
+  if (!nickname) { dmShowToast('닉네임을 입력하세요.', true); return; }
+  var data = {
+    nickname: nickname,
+    linked_kakao: document.getElementById('dmue-linked').value === 'true',
+    updated_at: FS.Timestamp.now(),
+  };
+  var dateStr = document.getElementById('dmue-created').value;
+  if (dateStr) data.created_at = FS.Timestamp.fromDate(new Date(dateStr + 'T00:00:00'));
+  db.collection('users').doc(id).set(data, { merge: true }).then(function() {
+    dmShowToast('회원 정보 저장 완료');
+    closeModal('m-dm-user-edit');
+    dmLoadList('users');
+    dmLoadStats();
+  }).catch(function(e) {
+    dmShowToast('저장 실패: ' + (e.message||e), true);
   });
 };
 
