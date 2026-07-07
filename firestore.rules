@@ -31,7 +31,9 @@ service cloud.firestore {
     // A. Users / Auth / Device
     // ──────────────────────────────────────────
     match /users/{userId} {
-      allow read: if isOwner(userId) || isAdmin();
+      // read를 isSignedIn()까지 완화: 앱의 "카카오 연동 회원 시뮬 로그인"이 CMS에 세팅된
+      // 다른 회원 프로필을 조회해서 보여줘야 하기 때문(실제 Kakao SDK 연동 없이 데모용으로 흉내만 냄).
+      allow read: if isSignedIn();
       // App users can create/update their own doc; admin can do anything
       allow create: if isOwner(userId) || isAdmin();
       allow update: if isOwner(userId) || isAdmin();
@@ -71,27 +73,29 @@ service cloud.firestore {
     // C. Purchase Attribution
     // ──────────────────────────────────────────
     match /click_logs/{docId} {
-      allow read: if isAdmin() || (isSignedIn() && resource.data.user_id == request.auth.uid);
+      allow read: if isAdmin() || isSignedIn();
       allow create: if isSignedIn();
       allow update, delete: if isAdmin();
     }
     match /postbacks/{docId} {
-      allow read: if isAdmin() || (isSignedIn() && resource.data.user_id == request.auth.uid);
-      // App user can create postbacks for themselves (demo; prod uses Cloud Functions)
-      allow create: if isAdmin() || (isSignedIn() && request.resource.data.user_id == request.auth.uid);
-      allow update: if isAdmin() || (isSignedIn() && resource.data.user_id == request.auth.uid);
+      // read/write 모두 isSignedIn()까지 완화: "카카오 연동 회원 시뮬 로그인"으로 들어온 세션은
+      // Firebase Auth uid가 CMS 세팅 회원의 실제 문서 ID와 다르므로 uid 일치 검사를 통과할 수 없다.
+      // 실 Kakao SDK/Cloud Functions 없는 데모 한정 조치 (프로덕션 이관 시 반드시 owner-uid 검증으로 되돌릴 것).
+      allow read: if isSignedIn();
+      allow create: if isSignedIn();
+      allow update: if isSignedIn();
       allow delete: if isAdmin();
     }
     match /click_postback_matches/{docId} {
-      allow read: if isAdmin() || (isSignedIn() && resource.data.user_id == request.auth.uid);
+      allow read: if isAdmin() || isSignedIn();
       allow create: if isSignedIn();
       allow update, delete: if isAdmin();
     }
 
     // Immutable ledger – append-only. 수정 불가(불변). 단, 데모 리셋을 위해 admin 삭제만 허용.
     match /ticket_transactions/{docId} {
-      allow read: if isAdmin() || (isSignedIn() && resource.data.user_id == request.auth.uid);
-      allow create: if isAdmin() || (isSignedIn() && request.resource.data.user_id == request.auth.uid);
+      allow read: if isSignedIn();
+      allow create: if isSignedIn();
       allow update: if false;
       allow delete: if isAdmin();
     }
@@ -100,13 +104,14 @@ service cloud.firestore {
     // D. User Assets
     // ──────────────────────────────────────────
     match /user_tickets/{docId} {
-      allow read: if isAdmin() || (isSignedIn() && resource.data.user_id == request.auth.uid);
-      allow create: if isAdmin() || (isSignedIn() && request.resource.data.user_id == request.auth.uid);
-      allow update: if isAdmin() || (isSignedIn() && resource.data.user_id == request.auth.uid);
+      // 시뮬 로그인(카카오 연동 회원 체험) 지원을 위해 uid 일치 검사를 뺐다 — 위 postbacks 주석 참고.
+      allow read: if isSignedIn();
+      allow create: if isSignedIn();
+      allow update: if isSignedIn();
       allow delete: if isAdmin();
     }
     match /user_points/{userId} {
-      allow read: if isOwner(userId) || isAdmin();
+      allow read: if isSignedIn();
       allow write: if isOwner(userId) || isAdmin();
     }
 
@@ -137,8 +142,9 @@ service cloud.firestore {
       allow create, delete: if isAdmin();
     }
     match /gifticon_exchanges/{docId} {
-      allow read: if isAdmin() || (isSignedIn() && resource.data.user_id == request.auth.uid);
-      allow create: if isSignedIn() && request.resource.data.user_id == request.auth.uid;
+      // 시뮬 로그인 지원을 위해 uid 일치 검사를 뺐다 — postbacks 주석 참고.
+      allow read: if isSignedIn();
+      allow create: if isSignedIn();
       allow update, delete: if isAdmin();
     }
 
@@ -188,7 +194,7 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
     match /inquiries/{docId} {
-      allow read: if isAdmin() || (isSignedIn() && resource.data.user_id == request.auth.uid);
+      allow read: if isSignedIn();
       allow create: if isSignedIn();
       allow update, delete: if isAdmin();
     }

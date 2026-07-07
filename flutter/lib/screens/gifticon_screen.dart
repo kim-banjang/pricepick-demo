@@ -53,7 +53,7 @@ class _GifticonScreenState extends State<GifticonScreen> {
   }
 
   Future<void> _exchange(QueryDocumentSnapshot<Map<String, dynamic>> gifticon) async {
-    final uid = widget.repository.uid;
+    final uid = widget.repository.activeUserId;
     if (uid == null) return;
     if ((_remainingStock[gifticon.id] ?? 0) <= 0) {
       ScaffoldMessenger.of(context).showSnackBar(

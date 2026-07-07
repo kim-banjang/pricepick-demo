@@ -26,7 +26,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _load() async {
-    final uid = widget.repository.uid;
+    final uid = widget.repository.activeUserId;
     if (uid == null) return;
     setState(() {
       _loading = true;

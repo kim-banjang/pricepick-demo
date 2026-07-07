@@ -100,7 +100,7 @@ class _PurchaseScreenState extends State<PurchaseScreen> {
     final amount = await _promptAmount(mallName);
     if (amount == null) return;
 
-    final uid = widget.repository.uid;
+    final uid = widget.repository.activeUserId;
     if (uid == null) return;
 
     setState(() => _submitting = true);

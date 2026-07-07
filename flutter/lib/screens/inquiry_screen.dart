@@ -29,7 +29,7 @@ class _InquiryScreenState extends State<InquiryScreen> {
   }
 
   Future<void> _load() async {
-    final uid = widget.repository.uid;
+    final uid = widget.repository.activeUserId;
     if (uid == null) return;
     try {
       final inquiries = await widget.repository.fetchInquiries(uid);
@@ -46,7 +46,7 @@ class _InquiryScreenState extends State<InquiryScreen> {
   }
 
   Future<void> _openNewInquiry() async {
-    final uid = widget.repository.uid;
+    final uid = widget.repository.activeUserId;
     if (uid == null) return;
     final titleController = TextEditingController();
     final contentController = TextEditingController();

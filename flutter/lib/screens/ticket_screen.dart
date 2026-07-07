@@ -28,7 +28,7 @@ class _TicketScreenState extends State<TicketScreen> {
   }
 
   Future<void> _load() async {
-    final uid = widget.repository.uid;
+    final uid = widget.repository.activeUserId;
     if (uid == null) return;
     try {
       final bundles = await widget.repository.fetchPendingBundles(uid);
@@ -45,7 +45,7 @@ class _TicketScreenState extends State<TicketScreen> {
   }
 
   Future<void> _confirm(PendingBundle bundle) async {
-    final uid = widget.repository.uid;
+    final uid = widget.repository.activeUserId;
     if (uid == null) return;
     setState(() => _confirmingPostbackId = bundle.postbackId);
     try {

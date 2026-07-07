@@ -25,7 +25,7 @@ class _MyScreenState extends State<MyScreen> {
   }
 
   Future<void> _load() async {
-    final uid = widget.repository.uid;
+    final uid = widget.repository.activeUserId;
     if (uid == null) return;
     final doc = await widget.repository.fetchUserDoc(uid);
     final data = doc.data();
@@ -67,7 +67,9 @@ class _MyScreenState extends State<MyScreen> {
                               ),
                               const SizedBox(height: 4),
                               Text(
-                                _linkedKakao ? '카카오 연동됨' : '게스트 계정',
+                                widget.repository.isPersonaMode
+                                    ? '카카오 연동 회원 시뮬 로그인 중'
+                                    : (_linkedKakao ? '카카오 연동됨' : '게스트 계정'),
                                 style: const TextStyle(color: AppTheme.textSecondary, fontSize: 12),
                               ),
                             ],
@@ -77,6 +79,17 @@ class _MyScreenState extends State<MyScreen> {
                     ),
                   ),
                 ),
+                if (widget.repository.isPersonaMode) ...[
+                  const SizedBox(height: 12),
+                  _MenuTile(
+                    icon: Icons.logout,
+                    title: '시뮬 로그인 종료 (다시 시작하기로)',
+                    onTap: () {
+                      widget.repository.exitPersona();
+                      Navigator.of(context).pushNamedAndRemoveUntil('/signup', (route) => false);
+                    },
+                  ),
+                ],
                 const SizedBox(height: 24),
                 _MenuTile(
                   icon: Icons.campaign_outlined,

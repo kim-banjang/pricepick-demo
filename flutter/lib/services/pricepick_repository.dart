@@ -16,15 +16,43 @@ class PricePickRepository {
   final FirebaseAuth _auth;
   final FirebaseFirestore _db;
 
+  String? _personaUserId;
+
   Stream<User?> get authState => _auth.authStateChanges();
 
   String? get uid => _auth.currentUser?.uid;
+
+  /// 실제로 화면이 데이터를 읽고 써야 할 대상 유저 ID.
+  /// 시뮬 로그인(카카오 연동 회원 체험) 중이면 그 회원의 ID, 아니면 본인 Firebase Auth uid.
+  String? get activeUserId => _personaUserId ?? uid;
+
+  bool get isPersonaMode => _personaUserId != null;
+
+  /// CMS에 세팅된 카카오 연동 회원으로 시뮬 로그인한다 (실제 Kakao SDK 인증 없음, 데모 전용).
+  void enterAsPersona(String userId) {
+    _personaUserId = userId;
+  }
+
+  void exitPersona() {
+    _personaUserId = null;
+  }
 
   Future<User> signInAnonymously() async {
     final current = _auth.currentUser;
     if (current != null) return current;
     final cred = await _auth.signInAnonymously();
     return cred.user!;
+  }
+
+  /// 카카오 연동 회원 시뮬 로그인 후보 목록.
+  Future<List<QueryDocumentSnapshot<Map<String, dynamic>>>>
+      fetchLinkedKakaoMembers() async {
+    final snap = await _db
+        .collection('users')
+        .where('linked_kakao', isEqualTo: true)
+        .limit(8)
+        .get();
+    return snap.docs;
   }
 
   Future<DocumentSnapshot<Map<String, dynamic>>> fetchUser(String uid) {
