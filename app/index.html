@@ -15493,7 +15493,7 @@ var PP = {
 };
 
 function greedyTickets(amount) {
-  var units = Math.ceil(amount / 5000);
+  var units = Math.floor(amount / 5000);
   var gold = Math.floor(units / 20);
   var rem1 = units % 20;
   var silver = Math.floor(rem1 / 10);

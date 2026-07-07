@@ -4081,7 +4081,7 @@ function saveTicketEdit() {
       <div class="form-group"><label class="form-label">도메인</label><input class="form-input" id="dmpe-domain"></div>
       <div class="form-group"><label class="form-label">구매금액</label><input class="form-input" type="number" id="dmpe-amount"></div>
       <div class="form-group"><label class="form-label">상태</label><select class="form-select" id="dmpe-status"><option value="pending">대기</option><option value="confirmed">확정</option><option value="refunded">환불</option></select></div>
-      <div class="form-hint">저장하면 포스트백 문서만 갱신됩니다 — 이미 적립된 티켓(user_tickets/ticket_transactions)은 자동으로 재계산·회수되지 않습니다.</div>
+      <div class="form-hint">상태를 대기→확정으로 바꾸면 가지급 티켓이 등급 티켓으로 전환되고, 환불로 바꾸면 해당 티켓이 회수됩니다. 그 외 필드(유저·쇼핑몰·금액 등) 변경은 포스트백 문서만 갱신하며 티켓은 재계산되지 않습니다.</div>
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModal('m-dm-postback-edit')">취소</button>
@@ -5779,7 +5779,7 @@ function loadMembers() {
           + '<td>' + kakaoType + '</td>'
           + '<td style="text-align:center;white-space:nowrap"><div style="font-weight:700;">' + ppDt(u.created_at) + '</div><div style="color:var(--text-3);font-size:11px">' + ppTm(u.created_at) + '</div></td>'
           + '<td style="text-align:center"><span id="mem-rand-' + doc.id + '">…</span></td>'
-          + '<td style="text-align:center">-</td>'
+          + '<td style="text-align:center"><span id="mem-upcoming-' + doc.id + '" style="font-size:11px;color:var(--text-3)">…</span></td>'
           + '<td style="text-align:center"><span id="mem-grade-' + doc.id + '">…</span></td>'
           + '<td style="text-align:center">0</td>'
           + '<td style="text-align:center">-</td>'
@@ -5804,15 +5804,17 @@ function loadMembers() {
   }).catch(function(){});
 }
 
-// 회원 목록의 "랜덤 티켓"·"등급 티켓" 컬럼 집계.
-// user_tickets.status로 가지급/확정을 구분한다 — status:'pending' = 아직 등급 미확정(가지급, 랜덤 티켓),
-// status:'active' = 등급 확정(등급 티켓, grade별 카운트). used/expired/revoked는 현재 보유 수량이 아니라 제외.
-// (포스트백 자동적립·수동 지급 경로는 현재 늘 status:'active'로 즉시 생성하므로 대부분 등급 티켓으로 집계되고,
-//  status:'pending'은 시나리오 채우기의 미연동 손님 데이터에서만 나타난다 — 데이터 구조상 실제 구분 기준 그대로 반영.)
+// 회원 목록의 "랜덤 티켓"·"전환예정"·"등급 티켓" 컬럼 집계.
+// "랜덤 티켓"은 별개 티켓이 아니라 가지급(pending) 상태 등급 티켓들을 구매건(postback_id) 단위로
+// 묶어 부르는 이름이다 — 컬럼 값은 pending 티켓 "장수"가 아니라 그 pending 티켓들이 걸린
+// distinct postback_id 개수("묶음 수"). "전환예정"은 그 pending 티켓들의 등급별 합(확정 시 될 값
+// 미리보기), "등급 티켓"은 status:active인 확정 티켓의 등급별 합이다. used/expired/revoked는
+// 현재 보유가 아니므로 전부 제외 — 데이터관리 생성이든 시나리오 채우기든 수동 지급/회수든
+// 전부 같은 user_tickets 컬렉션·status 규칙을 보므로 출처와 무관하게 동일하게 집계된다.
 function loadMemberTicketCounts(userIds) {
   if (!userIds || !userIds.length) return;
   var counts = {};
-  userIds.forEach(function(uid) { counts[uid] = { pending: 0, bronze: 0, silver: 0, gold: 0 }; });
+  userIds.forEach(function(uid) { counts[uid] = { pendingBundles: {}, pending: { bronze:0, silver:0, gold:0 }, active: { bronze:0, silver:0, gold:0 } }; });
   var chunks = [];
   for (var i = 0; i < userIds.length; i += 10) chunks.push(userIds.slice(i, i + 10));
   Promise.all(chunks.map(function(chunk) {
@@ -5821,17 +5823,23 @@ function loadMemberTicketCounts(userIds) {
         var d = doc.data();
         var c = counts[d.user_id];
         if (!c) return;
-        if (d.status === 'pending') { c.pending++; }
-        else if (d.status === 'active' && (d.grade === 'bronze' || d.grade === 'silver' || d.grade === 'gold')) { c[d.grade]++; }
+        if (d.status === 'pending') {
+          if (d.postback_id) c.pendingBundles[d.postback_id] = true;
+          if (d.grade === 'bronze' || d.grade === 'silver' || d.grade === 'gold') c.pending[d.grade]++;
+        } else if (d.status === 'active' && (d.grade === 'bronze' || d.grade === 'silver' || d.grade === 'gold')) {
+          c.active[d.grade]++;
+        }
       });
     }).catch(function(e) { console.error('loadMemberTicketCounts', e); });
   })).then(function() {
     Object.keys(counts).forEach(function(uid) {
       var c = counts[uid];
       var randEl = document.getElementById('mem-rand-' + uid);
-      if (randEl) randEl.textContent = c.pending + '장';
+      if (randEl) randEl.textContent = Object.keys(c.pendingBundles).length + '개';
+      var upcomingEl = document.getElementById('mem-upcoming-' + uid);
+      if (upcomingEl) upcomingEl.textContent = '브+' + c.pending.bronze + '·실+' + c.pending.silver + '·골+' + c.pending.gold;
       var gradeEl = document.getElementById('mem-grade-' + uid);
-      if (gradeEl) gradeEl.textContent = '브' + c.bronze + '·실' + c.silver + '·골' + c.gold;
+      if (gradeEl) gradeEl.textContent = '브' + c.active.bronze + '·실' + c.active.silver + '·골' + c.active.gold;
     });
   });
 }
@@ -6616,8 +6624,8 @@ var DM = { col: 'users' };
 // ── 회원 상태 한글 라벨 (저장값은 영문 그대로, 표시만 한글) ──
 var DM_STATUS_KO = { active:'활성', suspended:'정지', withdrawn:'탈퇴' };
 
-// ── 포스트백 상태 한글 라벨 (저장값은 영문 그대로, 표시만 한글) ──
-var DM_POSTBACK_STATUS_KO = { pending:'대기', confirmed:'확정', refunded:'환불' };
+// ── 포스트백 상태 한글 라벨 (저장값은 pending/confirmed/refunded 그대로, 표시만 한글) ──
+var DM_POSTBACK_STATUS_KO = { pending:'가지급(랜덤티켓)', confirmed:'확정(등급티켓)', refunded:'환불' };
 
 // ── 보호 컬렉션 (삭제/초기화 불가) ──
 var PROTECTED = ['affiliate_malls','ticket_grades','grade_exchange_rules','banners','notices','admin_accounts'];
@@ -6646,7 +6654,7 @@ var DM_FIELDS = {
     { id:'mall_name',       label:'쇼핑몰',   type:'mall-select', def:'' },
     { id:'mall_domain',     label:'도메인',   type:'text',   def:'' },
     { id:'purchase_amount', label:'구매금액', type:'number', def:'67000' },
-    { id:'status',          label:'상태',     type:'select', opts:['pending','confirmed','refunded'], def:'confirmed', labels:{ pending:'대기', confirmed:'확정', refunded:'환불' } },
+    { id:'status',          label:'상태',     type:'select', opts:['pending','confirmed','refunded'], def:'confirmed', labels:DM_POSTBACK_STATUS_KO },
   ],
   user_points: [
     { id:'user_id', label:'유저ID',  type:'text',   def:'user-frank-001' },
@@ -6927,16 +6935,17 @@ window.dmAdd = function(col) {
 
   var ref = db.collection(col).doc();
   ref.set(data).then(function() {
-    // 포스트백을 구매확정(confirmed)으로 추가하면 실제 구매확정 플로우(app의 processPurchase)와
-    // 동일하게 Greedy 등급환산(scenGreedy)으로 user_tickets/ticket_transactions를 적립한다.
-    if (col === 'postbacks' && data.status === 'confirmed') {
-      return dmAccruePostbackTickets(ref.id, data.user_id, data.purchase_amount || 0);
+    // 포스트백 1건 = 랜덤 티켓 1묶음 — 대기(pending)든 확정(confirmed)이든 이 시점에 Greedy
+    // 등급환산으로 등급 티켓을 만든다. 대기면 status:pending(가지급), 확정이면 바로 active.
+    if (col === 'postbacks' && (data.status === 'pending' || data.status === 'confirmed')) {
+      return dmAccruePostbackTickets(ref.id, data.user_id, data.purchase_amount || 0, data.status === 'confirmed' ? 'active' : 'pending');
     }
     return null;
   }).then(function(tk) {
     var msg = col + ' 문서 추가 완료 (' + ref.id.slice(0,10) + '…)';
     if (tk && tk.total > 0) {
-      msg += ' · 티켓 ' + tk.total + '장 적립(골' + tk.gold + '·실' + tk.silver + '·동' + tk.bronze + ')';
+      var label = data.status === 'confirmed' ? '등급 티켓' : '가지급(랜덤 티켓 1개)';
+      msg += ' · ' + label + ' ' + tk.total + '장(골' + tk.gold + '·실' + tk.silver + '·동' + tk.bronze + ')';
     }
     dmShowToast(msg);
     dmLoadList(col);
@@ -6946,11 +6955,14 @@ window.dmAdd = function(col) {
   });
 };
 
-// 포스트백 구매확정 → Greedy 등급환산(scenGreedy 재사용) → user_tickets/ticket_transactions 적립
-// (app/index.html의 processPurchase()와 동일한 필드 구조: status:'active', expires_at:null)
-function dmAccruePostbackTickets(postbackId, userId, amount) {
+// 포스트백 1건 = "랜덤 티켓" 1묶음. 구매금액을 Greedy 등급환산(scenGreedy)해 등급 티켓 N장을
+// 만들되, 아직 확정 전(대기/pending)이면 status:'pending'(가지급)으로, 바로 확정(confirmed)이면
+// status:'active'로 생성한다. ticket_transactions(type:'earn')는 티켓이 실제로 새로 만들어지는
+// 이 시점에만 1회 기록 — 이후 확정 전환(dmConfirmPostbackTickets)은 상태만 바꿀 뿐 새로 만들지 않는다.
+function dmAccruePostbackTickets(postbackId, userId, amount, status) {
   var tk = scenGreedy(amount);
   if (!tk.total) return Promise.resolve(tk);
+  var ticketStatus = status || 'active';
   var now = FS.Timestamp.now();
   var grades = [];
   for (var gi = 0; gi < tk.gold; gi++) grades.push('gold');
@@ -6958,10 +6970,50 @@ function dmAccruePostbackTickets(postbackId, userId, amount) {
   for (var bi = 0; bi < tk.bronze; bi++) grades.push('bronze');
   var b = db.batch();
   grades.forEach(function(g) {
-    b.set(db.collection('user_tickets').doc(), { user_id: userId, grade: g, status: 'active', postback_id: postbackId, earned_at: now, expires_at: null });
+    b.set(db.collection('user_tickets').doc(), {
+      user_id: userId, grade: g, status: ticketStatus, postback_id: postbackId,
+      earned_at: now, confirmed_at: ticketStatus === 'active' ? now : null, expires_at: null,
+    });
     b.set(db.collection('ticket_transactions').doc(), { user_id: userId, ticket_grade: g, type: 'earn', postback_id: postbackId, created_at: now });
   });
   return b.commit().then(function() { return tk; });
+}
+
+// 구매확정(D+7) — 같은 구매건(postback_id)의 가지급(pending) 티켓들을 등급 티켓(active)으로
+// 전환한다. 새 티켓을 만들지 않고 기존 문서의 status만 바꾼다("수량 증가 아님").
+function dmConfirmPostbackTickets(postbackId) {
+  return db.collection('user_tickets')
+    .where('postback_id', '==', postbackId)
+    .where('status', '==', 'pending')
+    .get()
+    .then(function(snap) {
+      if (snap.empty) return { converted: 0 };
+      var now = FS.Timestamp.now();
+      var b = db.batch();
+      snap.forEach(function(doc) { b.update(doc.ref, { status: 'active', confirmed_at: now }); });
+      return b.commit().then(function() { return { converted: snap.size }; });
+    });
+}
+
+// 환불 — 그 구매건에 걸린 티켓(가지급이든 확정이든)을 회수 처리한다. 원장(ticket_transactions)은
+// 불변이라 삭제 없이 clawback 기록만 추가하고, user_tickets는 status:'revoked'로 바꾼다
+// (간단화: 가지급/확정 구분 없이 동일하게 회수 상태로 처리 — 보고 참고).
+function dmRevokePostbackTickets(postbackId, reason) {
+  return Promise.all([
+    db.collection('user_tickets').where('postback_id', '==', postbackId).where('status', '==', 'pending').get(),
+    db.collection('user_tickets').where('postback_id', '==', postbackId).where('status', '==', 'active').get(),
+  ]).then(function(results) {
+    var docs = results[0].docs.concat(results[1].docs);
+    if (!docs.length) return { revoked: 0 };
+    var now = FS.Timestamp.now();
+    var b = db.batch();
+    docs.forEach(function(doc) {
+      var d = doc.data();
+      b.update(doc.ref, { status: 'revoked', revoked_at: now, revoke_reason: reason || '포스트백 환불' });
+      b.set(db.collection('ticket_transactions').doc(), { user_id: d.user_id, ticket_grade: d.grade, type: 'clawback', postback_id: postbackId, created_at: now });
+    });
+    return b.commit().then(function() { return { revoked: docs.length }; });
+  });
 }
 
 // ════════════════════════════════════════════════
@@ -7074,8 +7126,8 @@ function dmLoadList(col) {
       else if (col === 'user_tickets') info = (d.user_id||'').slice(0,16) + '… · ' + (d.grade||'?') + ' · ' + (d.status||'?');
       else if (col === 'postbacks') {
         info = (d.user_id||'').slice(0,14) + '… · ' + (d.mall_name||'?') + ' · ￦' + ((d.purchase_amount||0).toLocaleString()) + ' · ' + (DM_POSTBACK_STATUS_KO[d.status] || d.status || '?');
-        info += ' · ' + ((d.status === 'pending' || d.status === 'refunded')
-          ? '<span style="color:var(--text-3);">미지급</span>'
+        info += ' · ' + (d.status === 'refunded'
+          ? '<span style="color:var(--text-3);">환불 처리됨</span>'
           : '<span id="dm-pb-tk-' + doc.id + '" style="color:var(--success);">티켓 확인 중…</span>');
       }
       else if (col === 'user_points') info = (d.user_id||'').slice(0,16) + '… · ' + ((d.balance||0).toLocaleString()) + 'P';
@@ -7101,25 +7153,26 @@ function dmLoadList(col) {
   });
 }
 
-// 포스트백별 지급 티켓 등급 집계 — ticket_transactions(type:'earn')를 postback_id로 조인해서
-// 목록의 "티켓 확인 중…" 자리를 "랜덤티켓 N장 지급 (브 x · 실 y · 골 z)"로 채운다.
+// 포스트백별 티켓 등급 집계 — user_tickets를 postback_id로 조인한다(환불 건은 이미 회수돼 제외).
+// 대기(pending) 건은 "가지급 · 랜덤티켓 1개"(그 구매건 자체가 랜덤티켓 1묶음), 확정(confirmed)
+// 건은 "확정 · 등급티켓 브x·실y·골z"로 표시한다.
 function dmLoadPostbackTicketCounts(docs) {
+  var statusById = {};
   var targetIds = docs
-    .filter(function(doc) { var s = doc.data().status; return s !== 'pending' && s !== 'refunded'; })
-    .map(function(doc) { return doc.id; });
+    .filter(function(doc) { return doc.data().status !== 'refunded'; })
+    .map(function(doc) { statusById[doc.id] = doc.data().status; return doc.id; });
   if (!targetIds.length) return;
   var counts = {};
   targetIds.forEach(function(id) { counts[id] = { bronze: 0, silver: 0, gold: 0 }; });
   var chunks = [];
   for (var i = 0; i < targetIds.length; i += 10) chunks.push(targetIds.slice(i, i + 10));
   Promise.all(chunks.map(function(chunk) {
-    return db.collection('ticket_transactions').where('postback_id', 'in', chunk).get().then(function(snap) {
+    return db.collection('user_tickets').where('postback_id', 'in', chunk).get().then(function(snap) {
       snap.forEach(function(doc) {
         var d = doc.data();
-        if (d.type !== 'earn') return;
         var c = counts[d.postback_id];
         if (!c) return;
-        if (d.ticket_grade === 'bronze' || d.ticket_grade === 'silver' || d.ticket_grade === 'gold') c[d.ticket_grade]++;
+        if (d.grade === 'bronze' || d.grade === 'silver' || d.grade === 'gold') c[d.grade]++;
       });
     }).catch(function(e) { console.error('dmLoadPostbackTicketCounts', e); });
   })).then(function() {
@@ -7127,8 +7180,10 @@ function dmLoadPostbackTicketCounts(docs) {
       var el = document.getElementById('dm-pb-tk-' + pid);
       if (!el) return;
       var c = counts[pid];
-      var total = c.bronze + c.silver + c.gold;
-      el.textContent = '랜덤티켓 ' + total + '장 지급 (브 ' + c.bronze + ' · 실 ' + c.silver + ' · 골 ' + c.gold + ')';
+      var detail = '브' + c.bronze + '·실' + c.silver + '·골' + c.gold;
+      el.textContent = (statusById[pid] === 'pending')
+        ? ('가지급 · 랜덤티켓 1개 (' + detail + ')')
+        : ('확정 · 등급티켓 ' + detail);
     });
   });
 }
@@ -7227,15 +7282,32 @@ window.dmEditPostbackSave = function() {
   var mallEl = document.getElementById('dmpe-mall');
   var mallName = mallEl ? mallEl.value.trim() : '';
   if (!mallName) { dmShowToast('쇼핑몰을 선택하세요.', true); return; }
+  var newStatus = document.getElementById('dmpe-status').value;
   var data = {
     user_id: userId,
     mall_name: mallName,
     mall_domain: document.getElementById('dmpe-domain').value.trim(),
     purchase_amount: parseFloat(document.getElementById('dmpe-amount').value) || 0,
-    status: document.getElementById('dmpe-status').value,
+    status: newStatus,
   };
-  db.collection('postbacks').doc(id).set(data, { merge: true }).then(function() {
-    dmShowToast('포스트백 저장 완료 (티켓은 재계산되지 않음)');
+  // 상태 전환(대기→확정, →환불)에 따라 그 구매건 티켓 묶음도 함께 처리한다.
+  db.collection('postbacks').doc(id).get().then(function(doc) {
+    var oldStatus = doc.exists ? doc.data().status : null;
+    return db.collection('postbacks').doc(id).set(data, { merge: true }).then(function() {
+      if (oldStatus === 'pending' && newStatus === 'confirmed') {
+        return dmConfirmPostbackTickets(id).then(function(r) {
+          return r.converted > 0 ? ('가지급 티켓 ' + r.converted + '장 → 등급 티켓 전환') : null;
+        });
+      }
+      if (newStatus === 'refunded' && oldStatus !== 'refunded') {
+        return dmRevokePostbackTickets(id, '포스트백 환불 처리').then(function(r) {
+          return r.revoked > 0 ? ('티켓 ' + r.revoked + '장 환수') : '회수할 티켓 없음';
+        });
+      }
+      return null;
+    });
+  }).then(function(ticketMsg) {
+    dmShowToast('포스트백 저장 완료' + (ticketMsg ? (' · ' + ticketMsg) : ''));
     closeModal('m-dm-postback-edit');
     dmLoadList('postbacks');
     dmLoadStats();
@@ -7563,8 +7635,11 @@ function dmShowToast(msg, isErr) {
 var SCEN_EDIT_ID = null;
 var SCEN_MALL = { name:'쿠팡', domain:'coupang.com', rate:0.03 };
 
+// Greedy 등급환산 정책 확정값: 골드=100,000원당 1장 · 실버=50,000원당 1장 · 브론즈=5,000원당 1장.
+// 큰 단위부터 차감, 남는 금액은 버림(반올림 아님). 예: 67,000원 → 실버1(50,000)+브론즈3(15,000), 2,000원 버림.
+// (과거엔 Math.ceil로 단가 이하 금액을 올림 처리해 브론즈가 1장 더 나오는 버그가 있었음 — floor로 수정)
 function scenGreedy(amount) {
-  var u = Math.ceil((amount||0)/5000);
+  var u = Math.floor((amount||0)/5000);
   var g = Math.floor(u/20), r = u%20, s = Math.floor(r/10), b = r%10;
   return { gold:g, silver:s, bronze:b, total:g+s+b };
 }
