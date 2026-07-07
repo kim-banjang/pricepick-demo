@@ -116,8 +116,11 @@ service cloud.firestore {
     }
 
     // Immutable ledger – append-only. 수정 불가(불변). 단, 데모 리셋을 위해 admin 삭제만 허용.
+    // read를 isSignedIn()까지 완화: /app(html 프로토타입)의 "카카오 연동 회원 시뮬 로그인"이
+    // 포인트 내역(마이 > 포인트)을 조회해야 함 — 다른 컬렉션과 동일한 이유(uid 불일치, postbacks 주석 참고).
+    // 앱은 이 컬렉션에 쓰지 않으므로(포인트 적립/차감 계산은 CMS·백엔드 몫) create는 owner-uid 검증 유지.
     match /point_transactions/{docId} {
-      allow read: if isAdmin() || (isSignedIn() && resource.data.user_id == request.auth.uid);
+      allow read: if isSignedIn();
       allow create: if isAdmin() || (isSignedIn() && request.resource.data.user_id == request.auth.uid);
       allow update: if false;
       allow delete: if isAdmin();

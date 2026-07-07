@@ -15486,11 +15486,50 @@ var PP = {
   uid: null,
   user: null,
   points: 0,
-  tickets: { bronze: 0, silver: 0, gold: 0, total: 0 },
+  tickets: { bronze: 0, silver: 0, gold: 0, event: 0, total: 0 },
+  randomBundleCount: 0,
   pendingMall: null,
   currentGifticon: null,
   gifticonList: [],
+  personaUserId: null,
 };
+var REAL_UID = null;
+
+/* ── 시뮬 로그인 (CMS에서 세팅한 카카오 연동 회원으로 체험) ──
+   flutter 앱의 enterAsPersona/exitPersona와 동일한 개념: PP.uid를
+   실제 익명 인증 uid(REAL_UID) 대신 CMS 회원 문서 ID로 덮어써서 그 회원의
+   실데이터를 그대로 조회한다. 세션 내 메모리만 유지(새로고침 시 초기화). */
+function fetchLinkedKakaoMembers() {
+  return db.collection('users').where('linked_kakao', '==', true).limit(20).get()
+    .then(function(snap) {
+      var out = [];
+      snap.forEach(function(d) { var x = d.data(); x._id = d.id; out.push(x); });
+      return out;
+    }).catch(function(e) { console.error('fetchMembers', e); return []; });
+}
+function enterAsPersona(userId) {
+  PP.personaUserId = userId;
+  PP.uid = userId;
+  PP._actEvents = null;
+  db.collection('users').doc(userId).get().then(function(doc) {
+    PP.user = doc.exists ? doc.data() : { nickname: '회원' };
+    closeDemoLoginPicker();
+    window.showScreen('pw-10', false);
+    refreshHomeData();
+    refreshMyData();
+    updatePersonaBadge();
+  }).catch(function(e) { console.error('enterAsPersona', e); });
+}
+function exitPersona() {
+  PP.personaUserId = null;
+  PP.uid = REAL_UID;
+  PP.user = null;
+  PP._actEvents = null;
+  updatePersonaBadge();
+  window.showScreen('pw-00', false);
+  checkExistingUser();
+}
+window.ppExitPersona = exitPersona;
 
 function greedyTickets(amount) {
   var units = Math.floor(amount / 5000);
@@ -15516,7 +15555,7 @@ function hookShowScreen() {
 function onScreenShown(id) {
   if (!PP.uid) return;
   if (id === 'pw-10') refreshHomeData();
-  if (id === 'pw-20') { refreshBenefitBadges(); renderPointPanel(); }
+  if (id === 'pw-20') { refreshBenefitBadges(); renderPointPanel(); renderMyTicketCard(); }
   if (id === 'pw-24') loadGifticons();
   if (id === 'pw-30') refreshMyData();
   if (id === 'pw-13') schedulePurchasePrompt();
@@ -15534,7 +15573,8 @@ function onScreenShown(id) {
 /* ── Auth ── */
 auth.onAuthStateChanged(function(user) {
   if (user) {
-    PP.uid = user.uid;
+    REAL_UID = user.uid;
+    PP.uid = PP.personaUserId || REAL_UID;
     checkExistingUser();
   } else {
     auth.signInAnonymously().catch(function(err){ console.error('signIn', err); });
@@ -15584,20 +15624,27 @@ function bindNickname() {
   }, true);
 }
 
-/* ── Home ── */
+/* ── Home ──
+   등급 티켓(브/실/골)은 status='active'만 집계, 이벤트 티켓은 별도 버킷(안 섞임),
+   랜덤 티켓은 CMS와 동일하게 "묶음 수"(대기 중 postback_id distinct count)로 집계 —
+   Greedy 등 티켓 계산 로직은 재계산하지 않고 CMS가 만든 결과 데이터를 읽기만 한다. */
 function refreshHomeData() {
   if (!PP.uid) return;
   db.collection('user_tickets')
     .where('user_id', '==', PP.uid)
-    .where('status', '==', 'active')
     .get().then(function(snap) {
-      var c = { bronze: 0, silver: 0, gold: 0 };
+      var c = { bronze: 0, silver: 0, gold: 0, event: 0 };
+      var pendingBundles = {};
       snap.forEach(function(d) {
-        var g = (d.data().grade || 'bronze').toLowerCase();
-        if (c.hasOwnProperty(g)) c[g]++;
+        var t = d.data();
+        var g = (t.grade || 'bronze').toLowerCase();
+        if (t.status === 'active' && c.hasOwnProperty(g)) c[g]++;
+        if (t.status === 'pending' && t.postback_id) pendingBundles[t.postback_id] = true;
       });
-      PP.tickets = { bronze: c.bronze, silver: c.silver, gold: c.gold, total: c.bronze + c.silver + c.gold };
+      PP.tickets = { bronze: c.bronze, silver: c.silver, gold: c.gold, event: c.event, total: c.bronze + c.silver + c.gold };
+      PP.randomBundleCount = Object.keys(pendingBundles).length;
       renderHomeTickets();
+      renderMyTicketCard();
     }).catch(function(e){ console.error('tickets', e); });
   db.collection('user_points').doc(PP.uid).get().then(function(doc) {
     PP.points = doc.exists ? (doc.data().balance || 0) : 0;
@@ -15650,6 +15697,20 @@ function refreshBenefitBadges() {
     gradeVals[1].textContent = PP.tickets.silver;
     gradeVals[2].textContent = PP.tickets.gold;
   }
+}
+
+/* ── 내 티켓 카드 (혜택 탭, 등급별 3분할 + 랜덤 + 이벤트) — 실데이터 반영 ── */
+function renderMyTicketCard() {
+  var card = document.querySelector('#pw-20 .my-ticket-card');
+  if (!card) return;
+  var randomEl = card.querySelector('.mtc-grade-item[data-grade="random"] .mtc-grade-num');
+  if (randomEl) randomEl.textContent = PP.randomBundleCount || 0;
+  ['bronze', 'silver', 'gold'].forEach(function(g) {
+    var el = card.querySelector('.mtc-grade-item[data-grade="' + g + '"] .mtc-grade-num');
+    if (el) el.textContent = PP.tickets[g] || 0;
+  });
+  var eventEl = card.querySelector('.mtc-event-num');
+  if (eventEl) eventEl.textContent = PP.tickets.event || 0;
 }
 
 /* ── My page ── */
@@ -15955,6 +16016,92 @@ function showToast(msg) {
   setTimeout(function() { t.style.opacity = '0'; setTimeout(function() { t.remove(); }, 400); }, 2100);
 }
 
+/* ── 시뮬 로그인 회원 선택 팝업 ── */
+function ppMemberLine(m) {
+  var kakao = (m.linked_kakao && m.kakao_login_id) ? m.kakao_login_id : '카카오 연동';
+  var idShort = (m._id || '').length > 14 ? (m._id.slice(0, 14) + '…') : (m._id || '');
+  return { nick: m.nickname || '회원', sub: kakao + ' · ' + idShort };
+}
+function closeDemoLoginPicker() {
+  var ov = document.getElementById('pp-demo-login-overlay');
+  if (ov) ov.remove();
+}
+function ppOpenDemoLoginPicker() {
+  closeDemoLoginPicker();
+  var el = document.createElement('div');
+  el.id = 'pp-demo-login-overlay';
+  el.style.cssText = 'position:fixed;inset:0;z-index:10001;display:flex;align-items:flex-end;justify-content:center;background:rgba(0,0,0,.48);';
+  el.innerHTML = '<div style="background:#fff;border-radius:20px 20px 0 0;padding:22px 20px 32px;width:100%;max-width:480px;max-height:78vh;display:flex;flex-direction:column;">'
+    + '<div style="text-align:center;font-size:15px;font-weight:800;color:#1A1130;margin-bottom:4px;">카카오 연동 회원 시뮬 로그인</div>'
+    + '<div style="text-align:center;font-size:12.5px;color:#6B5E8A;margin-bottom:16px;">CMS에서 세팅한 회원을 골라 그 회원의 티켓·포인트를 그대로 볼 수 있어요</div>'
+    + '<div id="pp-demo-login-list" style="overflow-y:auto;flex:1;min-height:60px;"><div style="text-align:center;padding:24px;color:#9A8FB5;font-size:13px;">불러오는 중…</div></div>'
+    + '<button id="pp-demo-login-cancel" style="width:100%;height:46px;background:none;border:none;color:#9A8FB5;font-size:14px;cursor:pointer;margin-top:10px;font-family:inherit;">취소</button>'
+    + '</div>';
+  document.body.appendChild(el);
+  el.querySelector('#pp-demo-login-cancel').addEventListener('click', closeDemoLoginPicker);
+  fetchLinkedKakaoMembers().then(function(members) {
+    var list = document.getElementById('pp-demo-login-list');
+    if (!list) return;
+    if (!members.length) {
+      list.innerHTML = '<div style="text-align:center;padding:24px;color:#9A8FB5;font-size:13px;">CMS에 카카오 연동 회원이 없어요.<br>CMS 데이터관리에서 회원을 먼저 만들어 주세요.</div>';
+      return;
+    }
+    list.innerHTML = members.map(function(m, i) {
+      var line = ppMemberLine(m);
+      return '<div data-i="' + i + '" style="display:flex;align-items:center;justify-content:space-between;padding:13px 6px;border-bottom:1px solid #F0EBFA;cursor:pointer;">'
+        + '<div><div style="font-size:14px;font-weight:700;color:#1A1130;">' + ppEsc(line.nick) + '</div>'
+        + '<div style="font-size:11.5px;color:#9A8FB5;margin-top:2px;">' + ppEsc(line.sub) + '</div></div>'
+        + '<span style="color:#C6AFFF;font-size:16px;">›</span></div>';
+    }).join('');
+    list.querySelectorAll('[data-i]').forEach(function(row) {
+      row.addEventListener('click', function() {
+        var m = members[parseInt(row.dataset.i)];
+        enterAsPersona(m._id);
+      });
+    });
+  });
+}
+window.ppOpenDemoLoginPicker = ppOpenDemoLoginPicker;
+
+/* ── 시뮬 로그인 진입점 배지/버튼 ── */
+function updatePersonaBadge() {
+  var badge = document.getElementById('pp-persona-badge');
+  if (PP.personaUserId) {
+    if (!badge) {
+      badge = document.createElement('button');
+      badge.id = 'pp-persona-badge';
+      badge.style.cssText = 'position:fixed;top:10px;left:50%;transform:translateX(-50%);z-index:10002;background:#1A1130;color:#fff;font-size:11px;font-weight:700;padding:6px 12px;border:none;border-radius:99px;cursor:pointer;font-family:inherit;box-shadow:0 2px 8px rgba(0,0,0,.25);';
+      badge.addEventListener('click', function() { exitPersona(); });
+      document.body.appendChild(badge);
+    }
+    badge.textContent = '🎭 시뮬 로그인: ' + ((PP.user && PP.user.nickname) || '회원') + ' · 종료 ✕';
+  } else if (badge) {
+    badge.remove();
+  }
+}
+function bindPersonaEntryPoints() {
+  var splash = document.querySelector('#pw-00 .si');
+  if (splash && !splash.dataset.ppPersonaBound) {
+    splash.dataset.ppPersonaBound = '1';
+    var link = document.createElement('button');
+    link.textContent = 'CMS 데모 회원으로 보기';
+    link.style.cssText = 'position:absolute;bottom:16px;left:50%;transform:translateX(-50%);background:none;border:none;color:rgba(255,255,255,.55);font-size:11px;text-decoration:underline;cursor:pointer;font-family:inherit;';
+    link.addEventListener('click', function(e) { e.stopPropagation(); ppOpenDemoLoginPicker(); });
+    splash.appendChild(link);
+  }
+  var actions = document.querySelector('#pw-30 .my-top-actions');
+  if (actions && !actions.dataset.ppPersonaBound) {
+    actions.dataset.ppPersonaBound = '1';
+    var btn = document.createElement('button');
+    btn.className = 'my-top-btn';
+    btn.title = '시뮬 로그인';
+    btn.textContent = '🎭';
+    btn.style.fontSize = '14px';
+    btn.addEventListener('click', function() { ppOpenDemoLoginPicker(); });
+    actions.appendChild(btn);
+  }
+}
+
 /* ══════════════════════════════════════════════════
    비코어 화면 실데이터 렌더 (활동/알림/초대/구매/티켓/포인트)
    - 로그인 유저(PP.uid)의 실제 Firestore 데이터로 렌더
@@ -16182,12 +16329,26 @@ function renderTicketDetail() {
     });
     if (!rows) rows = '<div style="font-size:11.5px;color:var(--text3);padding:10px 2px;">보유한 등급 티켓이 없어요. 쇼핑몰 구매로 티켓을 적립해 보세요.</div>';
     document.querySelectorAll('#gd-holdings, #gd-holdings-19').forEach(function (el) { el.innerHTML = rows; });
-    /* 대기/활성 목록 */
+    /* 대기/활성 목록 — CMS와 동일하게 postback_id 단위로 "랜덤 티켓 묶음" 1개로 표시 */
+    var bundles = {};
+    pend.forEach(function (t) {
+      var key = t.postback_id || t._id;
+      if (!bundles[key]) bundles[key] = { bronze: 0, silver: 0, gold: 0, total: 0 };
+      var g = (t.grade || '').toLowerCase();
+      if (bundles[key].hasOwnProperty(g)) bundles[key][g]++;
+      bundles[key].total++;
+    });
+    var bundleKeys = Object.keys(bundles);
     var pm = '';
-    if (pend.length) {
-      pm = pend.map(function (t) {
+    if (bundleKeys.length) {
+      pm = bundleKeys.map(function (key) {
+        var b = bundles[key];
+        var parts = [];
+        if (b.gold) parts.push('골드' + b.gold);
+        if (b.silver) parts.push('실버' + b.silver);
+        if (b.bronze) parts.push('브론즈' + b.bronze);
         return '<div class="gd-pending-item"><div class="gd-pending-head">'
-          + '<div class="gd-pending-info" style="flex:1;">' + (GRADE_KO[(t.grade || '').toLowerCase()] || '랜덤') + ' 티켓 1장<span class="dim"> · 전환 대기</span></div>'
+          + '<div class="gd-pending-info" style="flex:1;">랜덤 티켓 ' + b.total + '장<span class="dim"> · ' + parts.join('·') + ' 전환 예정</span></div>'
           + '<div style="font-size:10px;font-weight:600;color:#FF6B55;background:#FFF4F2;padding:2px 7px;border-radius:20px;flex-shrink:0;">대기중</div></div></div>';
       }).join('');
     } else {
@@ -16330,6 +16491,7 @@ document.addEventListener('DOMContentLoaded', function() {
   bindNickname();
   bindExchangeBtn();
   bindKakaoComplete();
+  bindPersonaEntryPoints();
 });
 
 })();
