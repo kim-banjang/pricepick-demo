@@ -2,7 +2,7 @@
 
 PricePick 서비스의 Flutter 참조 구현. 개발자 인계용 레퍼런스 소스이며, 데이터는 목업이 아니라
 같은 저장소의 `../app` (웹 데모)와 **동일한 Firebase 프로젝트(`pricepick-demo`)**를 실시간으로 공유한다.
-CMS에서 세팅한 회원·티켓·포인트가 이 앱에도 그대로 보인다.
+CMS에서 세팅한 회원·티켓·포인트가 이 앱에도 그대로 보이고, 이 앱에서 발생시킨 구매·교환도 CMS에 그대로 보인다.
 
 ## 구조
 
@@ -12,20 +12,28 @@ flutter/
     main.dart              # Firebase 초기화 + 앱 실행
     app.dart                # MaterialApp, 라우트 테이블
     theme/app_theme.dart    # 라이트 전용 테마 (화이트 + 소프트블루/파스텔, 다크모드 없음)
+    models/
+      pending_bundle.dart   # 확정 대기 중인 가지급 티켓 묶음(postback 단위) 뷰 모델
     services/
-      pricepick_repository.dart  # Firestore/Auth 접근 계층 (스키마 매핑은 이 파일에만 있음)
+      pricepick_repository.dart  # Firestore/Auth 접근 계층 — 스키마·쿼리·쓰기 트랜잭션이 전부 이 파일에 모여 있다
+      ticket_policy.dart    # Greedy 등급 전환 계산 + 만료 정책 상수 (순수 함수, 테스트하기 쉽게 분리)
     screens/
       splash_screen.dart    # 익명 로그인 → users/{uid} 존재 여부로 가입/홈 분기
       signup_screen.dart    # 카카오(스텁)/게스트 가입
-      home_screen.dart      # 티켓 현황 + 포인트 잔액 (허브)
-      purchase_screen.dart  # 경유구매 — 제휴몰 목록 + 구매 시뮬
-      ticket_screen.dart    # 랜덤 가지급(pending) 티켓 → 등급 확정
-      gifticon_screen.dart  # 기프티콘 목록 + 교환
+      home_screen.dart      # 티켓 현황 + 포인트 잔액 (허브 — 나머지 화면 진입점)
+      purchase_screen.dart  # 경유구매 — 제휴몰 목록 + 구매 시뮬(금액 입력) → 실제 Firestore 기록
+      ticket_screen.dart    # pending 묶음(postback 단위) 목록 → 확정 시 Greedy 트랜잭션
+      gifticon_screen.dart  # 기프티콘 목록 + 재고 표시 + 교환 트랜잭션
+      my_screen.dart        # 마이 — 프로필 + 공지/문의/이벤트/응모 진입 메뉴
+      notice_screen.dart    # 공지사항 (notices 읽기)
+      inquiry_screen.dart   # 문의 (inquiries 읽기 + 작성)
+      event_screen.dart     # 이벤트 (events 읽기, 현재 시드 비어 있어 빈 상태)
+      raffle_screen.dart    # 응모 (raffles 읽기, 참여는 스텁)
   android/, ios/, web/      # flutter create 표준 플랫폼 폴더
   firebase.json, lib/firebase_options.dart  # flutterfire configure 산출물 (커밋 대상)
 ```
 
-화면 ↔ 서비스 계층을 분리했다: 화면(`screens/`)은 UI만 다루고, Firestore 쿼리·필드명은
+화면 ↔ 서비스 계층을 분리했다: 화면(`screens/`)은 UI만 다루고, Firestore 쿼리·필드명·트랜잭션 로직은
 전부 `services/pricepick_repository.dart`에 모아둔다. 스키마가 바뀌면 이 파일만 고치면 된다.
 
 ## 실행법
@@ -40,7 +48,7 @@ flutter run -d chrome             # 웹(크롬)
 flutter run -d <ios-sim-udid>     # iOS 시뮬레이터
 
 # 빌드
-flutter build web --release       # 웹 정적 산출물 → build/web/
+flutter build web --release --base-href /flutter/   # 웹 정적 산출물 → build/web/ (배포 절차는 저장소 루트 README 참고)
 flutter build apk --release       # 안드로이드 APK (Play 등록용은 appbundle)
 flutter build ipa                 # iOS (배포는 Xcode/Transporter 필요)
 ```
@@ -69,41 +77,47 @@ flutter build ipa                 # iOS (배포는 Xcode/Transporter 필요)
 - **Firestore 보안 규칙**: 저장소 루트의 `firestore.rules` 기준. 익명 사용자도 `isSignedIn()`을 통과하므로
   본인 소유 문서(`users/{uid}`, `user_tickets` 등 `user_id == uid`)는 읽고 쓸 수 있다.
   마스터 데이터(`affiliate_malls`, `gifticons` 등)는 로그인 사용자면 누구나 읽기 가능.
+  - ⚠️ **`gifticon_stock` 규칙을 완화했다**: 원래 `write: if isAdmin()`만 허용이었는데, 이 데모에는
+    재고 차감을 대신 처리할 Cloud Functions가 없어서 클라이언트(교환 트랜잭션)가 직접 `remaining`을
+    깎아야 한다. `remaining` 필드를 **정확히 1만** 감소시키고 0 미만으로 못 내려가게 제한하는 조건부
+    `update` 규칙을 추가했다 (다른 필드 수정이나 임의의 값 설정은 여전히 admin만 가능). 실서비스 이관 시
+    이 부분은 Cloud Function 기반 트랜잭션으로 교체하는 게 정석이다.
 - **컬렉션 스키마 정본**: `../docs/schema-mapping.md` — 필드명이 헷갈리면 이 문서와 `pricepick_repository.dart`를 대조할 것.
   (`affiliate_malls.active`는 boolean, `gifticons.price`/`required_grade`/`required_count`처럼 화면에 보이는
-  라벨과 실제 필드명이 다른 경우가 있으니 주의.)
+  라벨과 실제 필드명이 다른 경우가 있으니 주의. CMS에서 수기로 추가한 문서 중 일부는 `price`나
+  `gifticon_stock` 없이 등록돼 있을 수 있다 — 화면은 이런 누락 필드를 `-`/품절로 안전하게 처리한다.)
 
-## 핵심 정책 (반드시 준수)
+## 핵심 정책 (실제 구현됨)
 
-- **티켓 적립**: 구매 1건 → 랜덤(가지급/`pending`) 티켓 1묶음 발급 → 포스트백 확정 시 Greedy 방식으로 등급 전환.
-  - 골드: 100,000원당 1장, 실버: 50,000원당 1장, 브론즈: 5,000원당 1장.
-  - 큰 단위(골드)부터 채우고 남는 금액을 순차로 실버·브론즈에 배분한다. **수량이 늘어나는 게 아니라 단가(금액 기준)로 등급이 정해진다.**
-- **만료**: 이벤트 티켓(`grade: 'event'`) 100일, 등급 티켓(bronze/silver/gold) 1년.
-- **기프티콘 교환**: 포인트가 아니라 **등급 티켓 수량**으로 교환한다 (`gifticons.required_grade` + `required_count`).
-  예: 배민 10,000원권 = silver 11장. 포인트(`user_points.balance`)는 별도 자산이며 이번 단계 화면에서는 표시만 한다.
+- **티켓 적립 흐름**: 경유구매(`purchase_screen.dart`) → `click_logs` + `postbacks`(status: `pending`) +
+  `click_postback_matches` 실제 기록 → 랜덤(가지급) 티켓 1~3장을 `user_tickets`(status: `pending`)로 발급.
+  → 티켓 화면(`ticket_screen.dart`)에서 "확정" → `PricePickRepository.confirmBundle`이 postback의
+  실제 `purchase_amount`로 Greedy를 재계산해 pending 문서를 active로 전환(부족하면 신규 생성, 남으면
+  `expired` 처리)하고 `ticket_transactions`(`earn`)를 기록, `postbacks.status`를 `confirmed`로 변경.
+  - Greedy 공식(`services/ticket_policy.dart`): 골드 100,000원당·실버 50,000원당·브론즈 5,000원당 1장,
+    큰 단위(골드)부터 채우고 남는 금액을 순차 배분한다. **수량이 아니라 단가(금액 기준)로 등급이 정해진다.**
+- **만료**: 등급 티켓(bronze/silver/gold) 확정일로부터 1년(`gradeTicketValidity`). 이벤트 티켓(100일,
+  `eventTicketValidity`)은 상수만 정의해뒀고, 이벤트 티켓을 발급하는 소스(응모/초대 등)는 아직 없다.
+- **기프티콘 교환**(`gifticon_screen.dart` → `PricePickRepository.exchangeGifticon`): 포인트가 아니라
+  **등급 티켓 수량**으로 교환한다(`gifticons.required_grade` + `required_count`). 트랜잭션 하나로
+  active 티켓 N장을 `used` 처리 + `gifticon_stock.remaining` -1 + `gifticon_exchanges` 기록 +
+  `ticket_transactions`(`use`)를 남긴다. 포인트(`user_points.balance`)는 별도 자산이며 화면에는 표시만 한다.
 - **불변 원장**: `ticket_transactions`, `point_transactions`는 앱에서 update/delete 불가 (Firestore 규칙으로 강제).
   취소/환불은 반대 부호 신규 문서로 처리한다 — 절대 기존 문서를 고치지 않는다.
 
 ## 아직 안 된 것 / 다음 세션에서 이어갈 것
 
-이번 단계(1단계)는 **프로젝트 생성 + Firebase 완전 세팅 + 코어 스파인 골격**까지만 진행했다.
-아래는 의도적으로 비워둔 부분이다 (스텁 UI만 있고 실제 쓰기 로직 없음):
+1. **카카오 로그인 실연동**: 위 "Firebase 연동" 절 참고. 안드로이드 실기기 + SHA-1 + 카카오 앱 키 필요 (형님 개입 구간).
+2. **안드로이드 서명 빌드**: Play 등록용 keystore 생성·서명 설정이 아직 없다 (형님 개입 구간).
+3. **응모 참여 실동작**: `raffle_screen.dart`의 "응모하기"는 스낵바만 띄운다. `raffle_entries` 기록
+   로직이 필요하다 (규칙은 이미 `create: if isSignedIn()`로 열려 있음). 현재 `raffles` 시드가 비어 있어
+   먼저 CMS/시드 쪽에 데이터가 필요하다.
+4. **이벤트 상세/참여**: `event_screen.dart`는 목록만 있다. `events` 시드가 비어 있어 실제 화면 확인은
+   데이터가 채워진 뒤에 가능하다.
+5. **알림(notifications), 활동내역, 초대(invites), 출석체크(daily_visits), 응모용 룰렛** 등
+   `docs/schema-mapping.md`의 나머지 화면은 아직 이식하지 않았다.
+6. `user_points.balance`를 실제로 증감시키는 로직(예: 브론즈 티켓 포인트 환전)은 아직 없다 — 현재는
+   가입 시 0으로 초기화만 되고 화면에는 표시만 한다.
 
-1. **경유구매 실동작**: `purchase_screen.dart`의 "구매 시뮬"은 다이얼로그만 띄운다.
-   실제로는 `click_logs` 생성 → `postbacks` 매칭 → `click_postback_matches` → 구매 확정 시
-   Greedy 로직으로 `user_tickets`(pending) 생성까지 이어져야 한다.
-2. **티켓 등급 확정**: `ticket_screen.dart`의 "확정" 버튼은 스텁이다. pending 티켓 묶음을
-   Greedy 규칙으로 실제 등급 티켓(`user_tickets` status: active)으로 전환하고
-   `ticket_transactions`(불변 원장)에 `earn` 기록을 남기는 로직이 필요하다.
-3. **기프티콘 교환 실동작**: `gifticon_screen.dart`의 교환은 스텁이다. 실제로는 보유 등급 티켓 차감
-   (`user_tickets` 상태 변경 또는 소모 처리) + `gifticon_stock.remaining` 차감 +
-   `gifticon_exchanges` 문서 생성이 하나의 트랜잭션으로 묶여야 한다 (동시성 주의).
-4. **카카오 로그인 실연동**: 위 "Firebase 연동" 절 참고. 안드로이드 실기기 + SHA-1 + 카카오 앱 키 필요.
-5. **웹/안드로이드 배포 파이프라인**: 웹은 `pricepick-demo.vercel.app/flutter`로 정적 배포(저장소 루트
-   README 참고). 안드로이드는 Play 등록용 서명·appbundle 빌드가 아직 없다.
-6. 나머지 전체 화면(응모/이벤트, 공지, 문의, 초대 등 `docs/schema-mapping.md`의 F·G 그룹)은
-   코어 스파인에 포함하지 않았다 — 다음 세션에서 순차 이식 예정.
-
-이 앱을 이어받는 개발자는 위 1~3번(핵심 코어 로직)부터 `pricepick_repository.dart`에
-쓰기 메서드를 추가하는 방식으로 진행하면 된다. 화면 쪽은 이미 읽기 연동이 되어 있어
-쓰기가 끝나면 `_load()`만 다시 타면 화면에 반영된다.
+이 앱을 이어받는 개발자는 `pricepick_repository.dart`의 기존 트랜잭션 메서드(`simulatePurchase`,
+`confirmBundle`, `exchangeGifticon`)를 참고 패턴 삼아 나머지 쓰기 로직을 추가하면 된다.

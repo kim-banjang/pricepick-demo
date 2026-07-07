@@ -143,6 +143,13 @@ class _HomeScreenState extends State<HomeScreen> {
                   .pushNamed('/gifticon')
                   .then((_) => _load()),
             ),
+            const SizedBox(height: 12),
+            _HubTile(
+              icon: Icons.person_outline,
+              title: '마이',
+              subtitle: '공지사항 · 문의 · 이벤트 · 응모',
+              onTap: () => Navigator.of(context).pushNamed('/my'),
+            ),
           ],
         ),
       ),

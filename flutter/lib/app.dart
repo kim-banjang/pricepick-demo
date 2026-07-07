@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
 
+import 'screens/event_screen.dart';
 import 'screens/gifticon_screen.dart';
 import 'screens/home_screen.dart';
+import 'screens/inquiry_screen.dart';
+import 'screens/my_screen.dart';
+import 'screens/notice_screen.dart';
 import 'screens/purchase_screen.dart';
+import 'screens/raffle_screen.dart';
 import 'screens/signup_screen.dart';
 import 'screens/splash_screen.dart';
 import 'screens/ticket_screen.dart';
@@ -29,6 +34,11 @@ class PricePickApp extends StatelessWidget {
         '/purchase': (_) => PurchaseScreen(repository: repository),
         '/ticket': (_) => TicketScreen(repository: repository),
         '/gifticon': (_) => GifticonScreen(repository: repository),
+        '/my': (_) => MyScreen(repository: repository),
+        '/notice': (_) => NoticeScreen(repository: repository),
+        '/inquiry': (_) => InquiryScreen(repository: repository),
+        '/event': (_) => EventScreen(repository: repository),
+        '/raffle': (_) => RaffleScreen(repository: repository),
       },
     );
   }
