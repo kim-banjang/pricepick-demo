@@ -1160,7 +1160,7 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
       <div class="info-box"><strong>티켓 원장은 절대 삭제 금지</strong> — 회계/세무/부정거래 추적의 근거. 회수 시에도 음수 레코드로 추가, 원본 보존. (append-only)</div>
       <div class="toolbar">
         <input class="search-box" placeholder="회원명, UID 검색">
-        <select class="filter-sel"><option>전체 발행유형</option><option>구매 적립</option><option>출석 체크</option><option>광고 시청</option><option>친구 초대</option><option>주간 미션</option><option>관리자 지급</option></select>
+        <select class="filter-sel"><option>전체 발행유형</option><option>구매 적립</option><option>출석 체크</option><option>광고 시청</option><option>친구 초대</option><option>주간 미션</option><option>이벤트 발급</option><option>관리자 지급</option></select>
         <select class="filter-sel"><option>전체 상태</option><option>보유 중</option><option>사용 완료</option></select>
         <div style="margin-left:auto;display:flex;gap:8px;" id="ticket-hdr-actions"><button class="btn btn-ghost btn-sm" onclick="tmOpenModal()">수동 지급 / 회수</button></div>
       </div>
@@ -2721,7 +2721,7 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
       <div class="form-group" id="m-ticket-section">
         <label class="form-label">티켓 수동 지급</label>
         <div style="display:flex;gap:8px">
-          <select class="form-select" style="width:120px;" id="m-ticket-grade"><option value="bronze">브론즈</option><option value="silver">실버</option><option value="gold">골드</option></select>
+          <select class="form-select" style="width:120px;" id="m-ticket-grade"><option value="bronze">브론즈</option><option value="silver">실버</option><option value="gold">골드</option><option value="event">이벤트</option></select>
           <input class="form-input" placeholder="수량" type="number" min="1" style="width:100px" id="m-ticket-qty">
           <button class="btn btn-success" id="m-ticket-btn" onclick="dmMemberDetailGrant()">지급</button>
         </div>
@@ -2811,7 +2811,7 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
         </div>
         <div class="form-group">
           <label class="form-label">티켓 등급</label>
-          <select class="form-select" id="tm-grade"><option value="bronze">브론즈</option><option value="silver">실버</option><option value="gold">골드</option></select>
+          <select class="form-select" id="tm-grade"><option value="bronze">브론즈</option><option value="silver">실버</option><option value="gold">골드</option><option value="event">이벤트</option></select>
         </div>
       </div>
       <div class="form-row">
@@ -5812,7 +5812,7 @@ function loadMembers() {
           + '<td style="text-align:center"><span id="mem-rand-' + doc.id + '">…</span></td>'
           + '<td style="text-align:center"><span id="mem-upcoming-' + doc.id + '" style="font-size:11px;color:var(--text-3)">…</span></td>'
           + '<td style="text-align:center"><span id="mem-grade-' + doc.id + '">…</span></td>'
-          + '<td style="text-align:center">0</td>'
+          + '<td style="text-align:center"><span id="mem-event-' + doc.id + '">…</span></td>'
           + '<td style="text-align:center">-</td>'
           + '<td style="text-align:center"><span style="background:var(--success-soft);color:var(--success);padding:2px 8px;border-radius:99px;font-size:11px;font-weight:600;">' + statusKo + '</span></td>'
           + '<td style="text-align:center"><button class="btn btn-ghost btn-sm" onclick="openMemberDetail(\'' + doc.id + '\')">상세</button></td>'
@@ -5843,15 +5843,18 @@ function loadMembers() {
 // 아니므로 전부 제외 — 데이터관리 생성이든 시나리오 채우기든 수동 지급/회수든 전부 같은
 // user_tickets 컬렉션·status 규칙을 보므로 출처와 무관하게 동일하게 집계된다.
 // 회원 목록(다건)과 회원 상세 팝업(단건)이 이 두 헬퍼를 그대로 같이 써서 집계 기준이 어긋나지 않는다.
+// 이벤트 티켓(grade:'event')은 등급 티켓(브/실/골)과 별개 종류 — Greedy·가지급(pending)·
+// 확정전환 로직과 전혀 섞이지 않고 active.event로만 별도 집계된다.
 function dmNewTicketCounter() {
-  return { pendingBundles: {}, pending: { bronze:0, silver:0, gold:0 }, active: { bronze:0, silver:0, gold:0 } };
+  return { pendingBundles: {}, pending: { bronze:0, silver:0, gold:0 }, active: { bronze:0, silver:0, gold:0, event:0 } };
 }
 function dmClassifyTicketInto(c, d) {
   if (d.status === 'pending') {
     if (d.postback_id) c.pendingBundles[d.postback_id] = true;
     if (d.grade === 'bronze' || d.grade === 'silver' || d.grade === 'gold') c.pending[d.grade]++;
-  } else if (d.status === 'active' && (d.grade === 'bronze' || d.grade === 'silver' || d.grade === 'gold')) {
-    c.active[d.grade]++;
+  } else if (d.status === 'active') {
+    if (d.grade === 'bronze' || d.grade === 'silver' || d.grade === 'gold') c.active[d.grade]++;
+    else if (d.grade === 'event') c.active.event++;
   }
 }
 
@@ -5877,6 +5880,8 @@ function loadMemberTicketCounts(userIds) {
       if (upcomingEl) upcomingEl.textContent = '브+' + c.pending.bronze + '·실+' + c.pending.silver + '·골+' + c.pending.gold;
       var gradeEl = document.getElementById('mem-grade-' + uid);
       if (gradeEl) gradeEl.textContent = '브' + c.active.bronze + '·실' + c.active.silver + '·골' + c.active.gold;
+      var eventEl = document.getElementById('mem-event-' + uid);
+      if (eventEl) eventEl.textContent = c.active.event;
     });
   });
 }
@@ -5957,7 +5962,7 @@ function loadTickets() {
     .then(function(snap) {
       if (snap.empty) { tbody.innerHTML = ppEmpty(5,'티켓 이력이 없습니다.'); return; }
       var TYPE_LABELS = { earn:'<span style="color:var(--success)">구매확정 적립</span>', use:'<span style="color:var(--danger)">기프티콘 교환</span>', clawback:'<span style="color:var(--danger)">환수(취소/반품)</span>', expire:'<span style="color:var(--text-3)">만료 소멸</span>', pending:'<span style="color:var(--text-2)">구매 대기</span>' };
-      var GRADE_CHIPS = { gold:'<span class="tk-chip gold bare">골드</span>', silver:'<span class="tk-chip silver bare">실버</span>', bronze:'<span class="tk-chip bronze bare">브론즈</span>' };
+      var GRADE_CHIPS = { gold:'<span class="tk-chip gold bare">골드</span>', silver:'<span class="tk-chip silver bare">실버</span>', bronze:'<span class="tk-chip bronze bare">브론즈</span>', event:'<span class="tk-chip event bare">이벤트</span>' };
       var STATUS_MAP = {
         earn: '<span style="display:inline-block;font-size:11px;font-weight:700;color:#1f9d57;background:#e6f7ec;border:1px solid #b6e6c8;border-radius:20px;padding:3px 10px">보유 중</span>',
         use:  '<span style="display:inline-block;font-size:11px;font-weight:700;color:#6b7280;background:#f3f4f6;border:1px solid #e5e7eb;border-radius:20px;padding:3px 10px">사용 완료</span>',
@@ -7089,7 +7094,14 @@ function dmRevokePostbackTickets(postbackId, reason) {
 // ════════════════════════════════════════════════
 // 티켓 내역 화면 — 수동 지급 / 회수 (m-ticket-manual)
 // ════════════════════════════════════════════════
-var TM_GRADE_KO = { bronze: '브론즈', silver: '실버', gold: '골드' };
+var TM_GRADE_KO = { bronze: '브론즈', silver: '실버', gold: '골드', event: '이벤트' };
+// 이벤트 티켓 만료 정책값: 발급일로부터 100일 (등급 티켓 1년과 별개)
+var EVENT_TICKET_VALID_DAYS = 100;
+function dmFutureTimestamp(days) {
+  var d = new Date();
+  d.setDate(d.getDate() + days);
+  return FS.Timestamp.fromDate(d);
+}
 
 window.tmOpenModal = function() {
   var qtyEl = document.getElementById('tm-qty'); if (qtyEl) qtyEl.value = '1';
@@ -7126,13 +7138,16 @@ window.tmSubmit = function() {
   });
 };
 
-// 지급 — dmAccruePostbackTickets와 동일한 문서 구조(user_tickets: status active/expires_at null,
-// ticket_transactions: type earn)를 postback_id 없이 그대로 재사용
+// 지급 — dmAccruePostbackTickets와 동일한 문서 구조(user_tickets: status active,
+// ticket_transactions: type earn)를 postback_id 없이 그대로 재사용. grade:'event'(이벤트
+// 티켓)는 등급 티켓(브/실/골)과 완전히 별개 종류로 저장되며 만료만 발급일+100일로 계산해서
+// 넣어준다(등급 티켓은 기존과 동일하게 expires_at:null 유지, Greedy·가지급 로직과 무관).
 function tmGrantTickets(userId, grade, qty, reason) {
   var now = FS.Timestamp.now();
+  var expiresAt = grade === 'event' ? dmFutureTimestamp(EVENT_TICKET_VALID_DAYS) : null;
   var b = db.batch();
   for (var i = 0; i < qty; i++) {
-    b.set(db.collection('user_tickets').doc(), { user_id: userId, grade: grade, status: 'active', postback_id: null, earned_at: now, expires_at: null, manual: true, reason: reason });
+    b.set(db.collection('user_tickets').doc(), { user_id: userId, grade: grade, status: 'active', postback_id: null, earned_at: now, expires_at: expiresAt, manual: true, reason: reason });
     b.set(db.collection('ticket_transactions').doc(), { user_id: userId, ticket_grade: grade, type: 'earn', postback_id: null, created_at: now, manual: true, reason: reason });
   }
   return b.commit().then(function() {
@@ -7208,7 +7223,7 @@ function dmRenderMemberDetailTickets(c) {
   document.getElementById('m-bronze-count').textContent = c.active.bronze;
   document.getElementById('m-silver-count').textContent = c.active.silver;
   document.getElementById('m-gold-count').textContent = c.active.gold;
-  document.getElementById('m-event-count').textContent = 0;
+  document.getElementById('m-event-count').textContent = c.active.event;
   var convEl = document.getElementById('m-conv-preview');
   if (bundleCount > 0) {
     convEl.style.display = 'flex';
