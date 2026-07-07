@@ -1162,7 +1162,7 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
         <input class="search-box" placeholder="회원명, UID 검색">
         <select class="filter-sel"><option>전체 발행유형</option><option>구매 적립</option><option>출석 체크</option><option>광고 시청</option><option>친구 초대</option><option>주간 미션</option><option>관리자 지급</option></select>
         <select class="filter-sel"><option>전체 상태</option><option>보유 중</option><option>사용 완료</option></select>
-        <div style="margin-left:auto;display:flex;gap:8px;" id="ticket-hdr-actions"><button class="btn btn-ghost btn-sm" onclick="openModal('m-ticket-manual')">수동 지급 / 회수</button></div>
+        <div style="margin-left:auto;display:flex;gap:8px;" id="ticket-hdr-actions"><button class="btn btn-ghost btn-sm" onclick="tmOpenModal()">수동 지급 / 회수</button></div>
       </div>
       <div class="card">
           <div class="card-header"><div class="card-title">최근 티켓 이력</div></div>
@@ -2806,25 +2806,25 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
     </div>
     <div class="modal-body">
       <div class="warn-box"><strong>주의:</strong> 수동 처리는 로그에 기록되며 되돌릴 수 없습니다.</div>
-      <div class="form-group"><label class="form-label">닉네임</label><input class="form-input" placeholder="대상 회원 닉네임 또는 UID"></div>
+      <div class="form-group"><label class="form-label">대상 회원</label><select class="form-select" id="tm-user"><option value="">불러오는 중…</option></select></div>
       <div class="form-row">
         <div class="form-group">
           <label class="form-label">처리 유형</label>
-          <select class="form-select"><option>지급</option><option>회수</option></select>
+          <select class="form-select" id="tm-action"><option value="grant">지급</option><option value="revoke">회수</option></select>
         </div>
         <div class="form-group">
           <label class="form-label">티켓 등급</label>
-          <select class="form-select"><option>브론즈</option><option>실버</option><option>골드</option><option>이벤트</option></select>
+          <select class="form-select" id="tm-grade"><option value="bronze">브론즈</option><option value="silver">실버</option><option value="gold">골드</option></select>
         </div>
       </div>
       <div class="form-row">
-        <div class="form-group"><label class="form-label">수량</label><input class="form-input" type="number" placeholder="0" min="1"></div>
-        <div class="form-group"><label class="form-label">사유</label><input class="form-input" placeholder="처리 사유 (필수)"></div>
+        <div class="form-group"><label class="form-label">수량</label><input class="form-input" type="number" id="tm-qty" placeholder="0" min="1" value="1"></div>
+        <div class="form-group"><label class="form-label">사유</label><input class="form-input" id="tm-reason" placeholder="처리 사유 (필수)"></div>
       </div>
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModal('m-ticket-manual')">취소</button>
-      <button class="btn btn-primary" onclick="toast('처리되었습니다.');closeModal('m-ticket-manual')">처리하기</button>
+      <button class="btn btn-primary" onclick="tmSubmit()">처리하기</button>
     </div>
   </div>
 </div>
@@ -3661,9 +3661,9 @@ function applyRole(role) {
   const mTicketSec = document.getElementById('m-ticket-section');
   if (mTicketSec) mTicketSec.style.display = canWrite ? 'block' : 'none';
 
-  // 티켓 수동 처리
+  // 티켓 수동 지급/회수 — canWrite(슈퍼어드민/운영자)만 노출, CS는 조회 전용이라 숨김
   const tkHdr = document.getElementById('ticket-hdr-actions');
-  tkHdr.innerHTML = canWrite ? `<button class="btn btn-primary btn-sm" onclick="toast('수동 발행 완료')">+ 수동 발행</button>` : '';
+  tkHdr.innerHTML = canWrite ? `<button class="btn btn-ghost btn-sm" onclick="tmOpenModal()">수동 지급 / 회수</button>` : '';
   const tmBtn = document.getElementById('ticket-manual-btn');
   if (tmBtn) tmBtn.classList.toggle('btn-disabled', !canWrite);
 
@@ -6607,7 +6607,7 @@ var DM_FIELDS = {
   user_tickets: [
     { id:'user_id',  label:'유저ID', type:'text', def:'user-frank-001' },
     { id:'grade',    label:'등급',   type:'select', opts:['bronze','silver','gold'], def:'bronze' },
-    { id:'status',   label:'상태',   type:'select', opts:['active','pending','expired','used'], def:'active' },
+    { id:'status',   label:'상태',   type:'select', opts:['active','pending','expired','used','revoked'], def:'active' },
     { id:'postback_id', label:'포스트백ID', type:'text', def:'' },
   ],
   postbacks: [
@@ -6898,6 +6898,95 @@ function dmAccruePostbackTickets(postbackId, userId, amount) {
     b.set(db.collection('ticket_transactions').doc(), { user_id: userId, ticket_grade: g, type: 'earn', postback_id: postbackId, created_at: now });
   });
   return b.commit().then(function() { return tk; });
+}
+
+// ════════════════════════════════════════════════
+// 티켓 내역 화면 — 수동 지급 / 회수 (m-ticket-manual)
+// ════════════════════════════════════════════════
+var TM_GRADE_KO = { bronze: '브론즈', silver: '실버', gold: '골드' };
+
+window.tmOpenModal = function() {
+  var qtyEl = document.getElementById('tm-qty'); if (qtyEl) qtyEl.value = '1';
+  var reasonEl = document.getElementById('tm-reason'); if (reasonEl) reasonEl.value = '';
+  var actionEl = document.getElementById('tm-action'); if (actionEl) actionEl.value = 'grant';
+  var gradeEl = document.getElementById('tm-grade'); if (gradeEl) gradeEl.value = 'bronze';
+  dmPopulateUserSelect('tm-user');
+  openModal('m-ticket-manual');
+};
+
+window.tmSubmit = function() {
+  var userId = document.getElementById('tm-user').value;
+  if (!userId) { dmShowToast('대상 회원을 선택하세요.', true); return; }
+  var action = document.getElementById('tm-action').value; // grant | revoke
+  var grade = document.getElementById('tm-grade').value;   // bronze | silver | gold
+  var qty = parseInt(document.getElementById('tm-qty').value, 10) || 0;
+  if (qty < 1) { dmShowToast('수량을 입력하세요.', true); return; }
+  var reason = document.getElementById('tm-reason').value.trim();
+  if (!reason) { dmShowToast('사유를 입력하세요.', true); return; }
+
+  var task = action === 'revoke'
+    ? tmRevokeTickets(userId, grade, qty, reason)
+    : tmGrantTickets(userId, grade, qty, reason);
+
+  task.then(function(result) {
+    dmShowToast(result.message);
+    logAdmin((action === 'revoke' ? '수동 티켓 회수: ' : '수동 티켓 지급: ') + userId + ' · ' + (TM_GRADE_KO[grade] || grade) + ' · ' + result.count + '장 · 사유: ' + reason);
+    closeModal('m-ticket-manual');
+    if (typeof loadDashboardStats === 'function') loadDashboardStats();
+    if (typeof loadTickets === 'function') loadTickets();
+    if (typeof dmLoadStats === 'function') dmLoadStats();
+    if (typeof DM !== 'undefined' && DM.col && (DM.col === 'user_tickets' || DM.col === 'ticket_transactions') && typeof dmLoadList === 'function') dmLoadList(DM.col);
+  }).catch(function(e) {
+    dmShowToast('처리 실패: ' + (e.message || e), true);
+  });
+};
+
+// 지급 — dmAccruePostbackTickets와 동일한 문서 구조(user_tickets: status active/expires_at null,
+// ticket_transactions: type earn)를 postback_id 없이 그대로 재사용
+function tmGrantTickets(userId, grade, qty, reason) {
+  var now = FS.Timestamp.now();
+  var b = db.batch();
+  for (var i = 0; i < qty; i++) {
+    b.set(db.collection('user_tickets').doc(), { user_id: userId, grade: grade, status: 'active', postback_id: null, earned_at: now, expires_at: null, manual: true, reason: reason });
+    b.set(db.collection('ticket_transactions').doc(), { user_id: userId, ticket_grade: grade, type: 'earn', postback_id: null, created_at: now, manual: true, reason: reason });
+  }
+  return b.commit().then(function() {
+    return { message: (TM_GRADE_KO[grade] || grade) + ' ' + qty + '장 지급 완료', count: qty };
+  });
+}
+
+// 회수 — 해당 회원의 해당 등급 active 티켓을 오래된 것(earned_at 오름차순)부터 요청 수량만큼 회수.
+// user_tickets.status를 'revoked'로 바꾸고 ticket_transactions에 type:'clawback' 기록을 남긴다.
+// 원장(ticket_transactions)은 불변이라 삭제하지 않고 새 문서만 추가 — user_tickets만 실제 갱신.
+// 보유 수량이 요청보다 적으면 있는 만큼만 처리하고(에러 아님) 결과 메시지로 알린다.
+function tmRevokeTickets(userId, grade, qty, reason) {
+  return db.collection('user_tickets')
+    .where('user_id', '==', userId)
+    .where('grade', '==', grade)
+    .where('status', '==', 'active')
+    .get()
+    .then(function(snap) {
+      var docs = snap.docs.slice().sort(function(a, b) {
+        var am = (a.data().earned_at && a.data().earned_at.toMillis) ? a.data().earned_at.toMillis() : 0;
+        var bm = (b.data().earned_at && b.data().earned_at.toMillis) ? b.data().earned_at.toMillis() : 0;
+        return am - bm;
+      });
+      var toRevoke = docs.slice(0, qty);
+      if (!toRevoke.length) {
+        return { message: '회수 가능한 보유 티켓이 없습니다 (' + (TM_GRADE_KO[grade] || grade) + ').', count: 0 };
+      }
+      var now = FS.Timestamp.now();
+      var b = db.batch();
+      toRevoke.forEach(function(doc) {
+        b.update(doc.ref, { status: 'revoked', revoked_at: now, revoke_reason: reason });
+        b.set(db.collection('ticket_transactions').doc(), { user_id: userId, ticket_grade: grade, type: 'clawback', postback_id: doc.data().postback_id || null, created_at: now, manual: true, reason: reason });
+      });
+      return b.commit().then(function() {
+        var msg = (TM_GRADE_KO[grade] || grade) + ' ' + toRevoke.length + '장 회수 완료';
+        if (toRevoke.length < qty) msg += ' (요청 ' + qty + '장 중 보유 부족으로 ' + toRevoke.length + '장만 처리됨)';
+        return { message: msg, count: toRevoke.length };
+      });
+    });
 }
 
 // ──────────────────────────────────────────
