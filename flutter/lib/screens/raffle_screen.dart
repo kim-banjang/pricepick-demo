@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import '../services/pricepick_repository.dart';
 import '../theme/app_theme.dart';
+import '../widgets/empty_state.dart';
 
 /// 응모. raffles 컬렉션을 그대로 읽어 목록으로 보여준다.
 /// 응모 참여(raffle_entries 기록) 실쓰기는 다음 단계에서 채운다.
@@ -56,7 +57,10 @@ class _RaffleScreenState extends State<RaffleScreen> {
           : _error != null
               ? Center(child: Text('불러오기 실패: $_error'))
               : _raffles.isEmpty
-                  ? const Center(child: Text('진행 중인 응모가 없습니다.'))
+                  ? const EmptyState(
+                      icon: Icons.card_giftcard,
+                      message: '진행 중인 응모가 없습니다.\nCMS에서 응모 이벤트를 등록하면 여기에 표시돼요.',
+                    )
                   : ListView.separated(
                       padding: const EdgeInsets.all(20),
                       itemCount: _raffles.length,

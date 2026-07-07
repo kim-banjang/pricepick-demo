@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../services/pricepick_repository.dart';
 import '../theme/app_theme.dart';
 
-/// 마이. 프로필 요약 + 공지/문의/이벤트/응모 진입 메뉴.
+/// 마이. 프로필 요약 + 나머지 기능(혜택/내 정보/안내/설정) 진입 메뉴 허브.
 class MyScreen extends StatefulWidget {
   const MyScreen({super.key, required this.repository});
 
@@ -90,17 +90,7 @@ class _MyScreenState extends State<MyScreen> {
                     },
                   ),
                 ],
-                const SizedBox(height: 24),
-                _MenuTile(
-                  icon: Icons.campaign_outlined,
-                  title: '공지사항',
-                  onTap: () => Navigator.of(context).pushNamed('/notice'),
-                ),
-                _MenuTile(
-                  icon: Icons.headset_mic_outlined,
-                  title: '문의하기',
-                  onTap: () => Navigator.of(context).pushNamed('/inquiry'),
-                ),
+                const _SectionLabel('혜택'),
                 _MenuTile(
                   icon: Icons.celebration_outlined,
                   title: '이벤트',
@@ -112,14 +102,72 @@ class _MyScreenState extends State<MyScreen> {
                   onTap: () => Navigator.of(context).pushNamed('/raffle'),
                 ),
                 _MenuTile(
+                  icon: Icons.group_add_outlined,
+                  title: '친구초대',
+                  onTap: () => Navigator.of(context).pushNamed('/invite'),
+                ),
+                _MenuTile(
+                  icon: Icons.event_available_outlined,
+                  title: '출석체크',
+                  onTap: () => Navigator.of(context).pushNamed('/checkin'),
+                ),
+                _MenuTile(
+                  icon: Icons.casino_outlined,
+                  title: '행운룰렛',
+                  onTap: () => Navigator.of(context).pushNamed('/roulette'),
+                ),
+                const _SectionLabel('내 정보'),
+                _MenuTile(
+                  icon: Icons.notifications_none,
+                  title: '알림',
+                  onTap: () => Navigator.of(context).pushNamed('/notification'),
+                ),
+                _MenuTile(
+                  icon: Icons.history,
+                  title: '활동내역',
+                  onTap: () => Navigator.of(context).pushNamed('/activity'),
+                ),
+                const _SectionLabel('안내'),
+                _MenuTile(
+                  icon: Icons.campaign_outlined,
+                  title: '공지사항',
+                  onTap: () => Navigator.of(context).pushNamed('/notice'),
+                ),
+                _MenuTile(
+                  icon: Icons.info_outline,
+                  title: '적립 조건 안내',
+                  onTap: () => Navigator.of(context).pushNamed('/terms'),
+                ),
+                _MenuTile(
+                  icon: Icons.headset_mic_outlined,
+                  title: '문의하기',
+                  onTap: () => Navigator.of(context).pushNamed('/inquiry'),
+                ),
+                const _SectionLabel('설정'),
+                _MenuTile(
                   icon: Icons.settings_outlined,
                   title: '설정',
-                  onTap: () => ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('설정 화면은 다음 단계에서 이어집니다.')),
-                  ),
+                  onTap: () => Navigator.of(context).pushNamed('/settings'),
                 ),
               ],
             ),
+    );
+  }
+}
+
+class _SectionLabel extends StatelessWidget {
+  const _SectionLabel(this.text);
+
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 20, bottom: 8, left: 4),
+      child: Text(
+        text,
+        style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13, color: AppTheme.textSecondary),
+      ),
     );
   }
 }
@@ -134,7 +182,7 @@ class _MenuTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      margin: const EdgeInsets.only(bottom: 12),
+      margin: const EdgeInsets.only(bottom: 10),
       child: ListTile(
         onTap: onTap,
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),

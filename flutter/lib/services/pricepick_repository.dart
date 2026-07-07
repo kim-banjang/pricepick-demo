@@ -287,4 +287,69 @@ class PricePickRepository {
     final snap = await _db.collection('raffles').get();
     return snap.docs;
   }
+
+  Future<List<QueryDocumentSnapshot<Map<String, dynamic>>>> fetchNotifications(
+    String uid,
+  ) async {
+    final snap =
+        await _db.collection('notifications').where('user_id', isEqualTo: uid).get();
+    final docs = snap.docs.toList();
+    docs.sort((a, b) {
+      final atA = a.data()['created_at'] as Timestamp?;
+      final atB = b.data()['created_at'] as Timestamp?;
+      if (atA == null || atB == null) return 0;
+      return atB.compareTo(atA);
+    });
+    return docs;
+  }
+
+  /// ticket_transactions + point_transactions를 합쳐 최신순으로 노출하는 활동내역.
+  /// 순수 읽기 — 원장에 아무것도 쓰지 않는다.
+  Future<List<Map<String, dynamic>>> fetchActivity(String uid) async {
+    final ticketSnap =
+        await _db.collection('ticket_transactions').where('user_id', isEqualTo: uid).get();
+    final pointSnap =
+        await _db.collection('point_transactions').where('user_id', isEqualTo: uid).get();
+
+    final entries = <Map<String, dynamic>>[
+      for (final d in ticketSnap.docs) {'kind': 'ticket', ...d.data()},
+      for (final d in pointSnap.docs) {'kind': 'point', ...d.data()},
+    ];
+    entries.sort((a, b) {
+      final atA = a['created_at'] as Timestamp?;
+      final atB = b['created_at'] as Timestamp?;
+      if (atA == null || atB == null) return 0;
+      return atB.compareTo(atA);
+    });
+    return entries;
+  }
+
+  Future<List<QueryDocumentSnapshot<Map<String, dynamic>>>> fetchInvites(
+    String uid,
+  ) async {
+    final snap = await _db.collection('invites').where('inviter_id', isEqualTo: uid).get();
+    return snap.docs;
+  }
+
+  /// 가장 최근 출석 기록 (없으면 null). "오늘 이미 출석했는지"는 화면에서 날짜만 비교한다.
+  Future<Timestamp?> fetchLatestCheckin(String uid) async {
+    final snap = await _db.collection('daily_visits').where('user_id', isEqualTo: uid).get();
+    Timestamp? latest;
+    for (final doc in snap.docs) {
+      final at = doc.data()['visited_at'] as Timestamp?;
+      if (at == null) continue;
+      if (latest == null || at.compareTo(latest) > 0) latest = at;
+    }
+    return latest;
+  }
+
+  /// 출석 액션 기록. 보상 포인트 계산은 하지 않는다.
+  /// TODO(백엔드): 이 daily_visits 문서를 트리거로 points_earned를 채우고 user_points에 반영해야 한다.
+  Future<void> recordCheckin(String uid) {
+    return _db.collection('daily_visits').add({
+      'user_id': uid,
+      'visited_at': FieldValue.serverTimestamp(),
+      'points_earned': null,
+    });
+  }
 }

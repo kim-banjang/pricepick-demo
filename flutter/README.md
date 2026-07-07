@@ -45,11 +45,21 @@ flutter/
       purchase_screen.dart  # 경유구매 — 제휴몰 목록 + 구매 이벤트 기록(금액 입력)
       ticket_screen.dart    # 확정 대기(pending) 묶음 노출 — 순수 읽기, 액션 버튼 없음
       gifticon_screen.dart  # 기프티콘 목록 + 재고 노출 + 교환 "요청" 기록
-      my_screen.dart        # 마이 — 프로필 + 공지/문의/이벤트/응모 진입 메뉴
+      my_screen.dart        # 마이 — 혜택/내 정보/안내/설정 섹션으로 묶은 메뉴 허브
       notice_screen.dart    # 공지사항 (notices 읽기)
       inquiry_screen.dart   # 문의 (inquiries 읽기 + 작성)
-      event_screen.dart     # 이벤트 (events 읽기, 현재 시드 비어 있어 빈 상태)
-      raffle_screen.dart    # 응모 (raffles 읽기, 참여는 스텁)
+      event_screen.dart     # 이벤트 (events 읽기, 시드 비면 EmptyState)
+      raffle_screen.dart    # 응모 (raffles 읽기, 참여는 스텁, 시드 비면 EmptyState)
+      notification_screen.dart  # 알림 (notifications 읽기, 순수 노출)
+      activity_screen.dart      # 활동내역 (ticket_transactions + point_transactions 병합 읽기)
+      invite_screen.dart        # 친구초대 (초대코드는 uid 앞 8자리 표시, invites 읽기)
+      checkin_screen.dart       # 출석체크 (daily_visits 최신 기록 읽기 + 액션 기록)
+      roulette_screen.dart      # 행운룰렛 — 순수 UI 스텁, Firestore 쓰기 없음(보상은 백엔드 몫)
+      earning_terms_screen.dart # 적립 조건 안내 — 완전 정적 콘텐츠, Firestore 접근 없음
+      settings_screen.dart      # 설정 — 알림 토글은 로컬 상태만(영속화 안 함), 계정탈퇴 진입
+      withdraw_screen.dart      # 계정 탈퇴 — UI 전체 구현, 실제 삭제는 스텁(요청 접수만 기록)
+    widgets/
+      empty_state.dart      # 목록 빈 상태 공통 위젯 (아이콘 + 안내 문구)
   android/, ios/, web/      # flutter create 표준 플랫폼 폴더
   firebase.json, lib/firebase_options.dart  # flutterfire configure 산출물 (커밋 대상)
 ```
@@ -113,13 +123,16 @@ flutter build web --release --base-href /flutter/
   시뮬 로그인 때문에 실제 Firebase Auth uid와 화면이 보여주는 `activeUserId`가 달라질 수 있는
   지점만 최소한으로 완화했다:
   - **read 완화** (`isSignedIn()`만 요구, 다른 회원 데이터를 시뮬 로그인으로 조회하기 위함):
-    `users`, `user_points`, `user_tickets`, `postbacks`, `gifticon_exchanges`, `inquiries`.
+    `users`, `user_points`, `user_tickets`, `postbacks`, `gifticon_exchanges`, `inquiries`,
+    `ticket_transactions`(활동내역), `point_transactions`(활동내역/포인트), `invites`(친구초대 —
+    원래 admin 전용이라 본인도 못 읽던 규칙이었다), `daily_visits`(출석체크), `notifications`(알림).
   - **create 완화** (persona 명의로 이벤트를 기록하기 위함): `postbacks`(구매 기록),
-    `gifticon_exchanges`(교환 요청), `click_logs`/`click_postback_matches`/`inquiries`는
-    원래부터 uid 검사가 없었다.
-  - **그 외에는 전부 원래 규칙 그대로다**: `user_tickets`/`postbacks`의 update, `ticket_transactions`
-    read/create, `gifticon_stock` write는 여전히 owner-uid 검증 또는 admin 전용이다 — 앱이 이
-    컬렉션들에 계산 결과를 쓰지 않기 때문에 완화할 이유가 없다.
+    `gifticon_exchanges`(교환 요청), `daily_visits`(출석 액션 기록), `click_logs`/
+    `click_postback_matches`/`inquiries`는 원래부터 uid 검사가 없었다.
+  - **그 외에는 전부 원래 규칙 그대로다**: `user_tickets`/`postbacks`의 update, `ticket_transactions`/
+    `point_transactions`/`invites`/`notifications`의 create·write, `gifticon_stock` write는 여전히
+    owner-uid 검증 또는 admin 전용이다 — 앱이 이 컬렉션들에 계산 결과나 발신 데이터를 쓰지 않기
+    때문에 완화할 이유가 없다.
   - ⚠️ 그래도 read 완화·`postbacks`/`gifticon_exchanges` create 완화는 데모 한정 조치다. 실서비스
     이관 시 시뮬 로그인을 진짜 Kakao SDK + Firebase Custom Token/OIDC로 교체하고 이 완화도 되돌릴 것.
 - **컬렉션 스키마 정본**: `../docs/schema-mapping.md` — 필드명이 헷갈리면 이 문서와 `pricepick_repository.dart`를 대조할 것.
@@ -145,6 +158,15 @@ flutter build web --release --base-href /flutter/
   차감하는 건 백엔드가 이 요청을 트리거로 처리해야 한다 — TODO.
 - **불변 원장**: `ticket_transactions`, `point_transactions`는 update/delete 불가(Firestore 규칙으로
   강제). 앱은 이 컬렉션에 아예 쓰지 않는다 — earn/use 기록은 백엔드가 계산과 함께 남겨야 한다.
+- **출석체크**: 앱은 `PricePickRepository.recordCheckin`으로 `daily_visits` 문서만 남긴다
+  (`points_earned: null`). 이 방문 기록을 트리거로 포인트를 채우고 `user_points`에 반영하는 건
+  백엔드 몫 — TODO. "오늘 이미 출석했는지" 판단은 서버 계산이 아니라 단순 날짜 비교라 앱에서 처리했다.
+- **행운룰렛**: 화면만 있고 Firestore 쓰기가 전혀 없다. 랜덤 보상 산정은 조작 위험이 있는 전형적인
+  서버 로직이라, 앱에서 흉내내지 않고 버튼을 누르면 스낵바만 뜨는 순수 스텁으로 남겨뒀다.
+- **계정 탈퇴**: `withdraw_screen.dart`는 2단계 확인 UI까지 전부 구현했지만, 실제 계정·데이터 삭제는
+  하지 않는다 — "요청 접수" 안내만 띄우고 시뮬 로그인을 종료한다. 실제 삭제(티켓/포인트/활동내역/
+  프로필 파기)는 백엔드가 탈퇴 요청을 받아 처리해야 할 몫 — 클라이언트에서 직접 삭제하면 시뮬 로그인
+  중 실수로 CMS 시드 데이터를 지울 위험이 있어 일부러 손대지 않았다.
 
 ## 이 저장소 범위 밖 (의도적으로 안 함)
 
@@ -158,12 +180,15 @@ flutter build web --release --base-href /flutter/
    생성을 트리거로 Greedy 등급 계산·티켓 생성·재고 차감을 수행하는 서버 로직이 필요하다. 이 앱은
    그 결과가 Firestore에 반영되면 자동으로 화면에 나타나도록 이미 읽기 연동이 되어 있다.
 2. **응모 참여**: `raffle_screen.dart`의 "응모하기"는 스낵바만 띄운다. 참여 자체는 단순 기록(요청)이라
-   앱에서 처리해도 되지만, 현재 `raffles` 시드가 비어 있어 먼저 CMS/시드 쪽에 데이터가 필요하다.
+   앱에서 처리해도 되지만, 현재 `raffles` 시드가 비어 있어 먼저 CMS/시드 쪽에 데이터가 필요하다
+   (시드가 빌 때는 `widgets/empty_state.dart`로 "정상적으로 비어있음"을 안내한다).
 3. **이벤트 상세**: `event_screen.dart`는 목록만 있다. `events` 시드가 비어 있어 실제 화면 확인은
-   데이터가 채워진 뒤에 가능하다.
-4. **알림(notifications), 활동내역, 초대(invites), 출석체크(daily_visits), 응모용 룰렛** 등
-   `docs/schema-mapping.md`의 나머지 화면은 아직 이식하지 않았다.
-5. 시뮬 로그인 대상(`linked_kakao == true`)이 CMS 시드에 아직 1명뿐이면 피커가 단조로울 수 있다 —
+   데이터가 채워진 뒤에 가능하다 (마찬가지로 EmptyState 처리).
+4. **행운룰렛 실제 보상 지급**: 지금은 순수 UI 스텁이다. 실제로 룰렛을 돌려 티켓/포인트를 지급하려면
+   서버에서 랜덤 산정 후 결과만 앱에 내려주는 구조가 필요하다.
+5. **계정 탈퇴 실제 처리**: `withdraw_screen.dart`는 요청 접수 UI까지만 있고 실제 삭제 로직은 없다 —
+   백엔드에서 탈퇴 요청 큐를 만들어 처리해야 한다.
+6. 시뮬 로그인 대상(`linked_kakao == true`)이 CMS 시드에 아직 1명뿐이면 피커가 단조로울 수 있다 —
    여러 연동 회원 시드를 늘려두면 데모가 더 풍성해진다.
 
 이 앱을 이어받는 개발자는 `pricepick_repository.dart`의 `TODO(백엔드)` 주석이 달린 지점부터

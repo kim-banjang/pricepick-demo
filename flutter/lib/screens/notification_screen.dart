@@ -5,19 +5,18 @@ import '../services/pricepick_repository.dart';
 import '../theme/app_theme.dart';
 import '../widgets/empty_state.dart';
 
-/// 이벤트. events 컬렉션을 그대로 읽어 목록으로 보여준다.
-/// 상세 진입/참여 로직은 컬렉션이 비어 있는 현재 시드 상태 기준 다음 단계에서 채운다.
-class EventScreen extends StatefulWidget {
-  const EventScreen({super.key, required this.repository});
+/// 알림. notifications 컬렉션을 그대로 읽어 목록으로 보여준다 (순수 노출).
+class NotificationScreen extends StatefulWidget {
+  const NotificationScreen({super.key, required this.repository});
 
   final PricePickRepository repository;
 
   @override
-  State<EventScreen> createState() => _EventScreenState();
+  State<NotificationScreen> createState() => _NotificationScreenState();
 }
 
-class _EventScreenState extends State<EventScreen> {
-  List<QueryDocumentSnapshot<Map<String, dynamic>>> _events = [];
+class _NotificationScreenState extends State<NotificationScreen> {
+  List<QueryDocumentSnapshot<Map<String, dynamic>>> _notifications = [];
   bool _loading = true;
   String? _error;
 
@@ -28,10 +27,12 @@ class _EventScreenState extends State<EventScreen> {
   }
 
   Future<void> _load() async {
+    final uid = widget.repository.activeUserId;
+    if (uid == null) return;
     try {
-      final events = await widget.repository.fetchEvents();
+      final notifications = await widget.repository.fetchNotifications(uid);
       setState(() {
-        _events = events;
+        _notifications = notifications;
         _loading = false;
       });
     } catch (e) {
@@ -45,36 +46,36 @@ class _EventScreenState extends State<EventScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('이벤트')),
+      appBar: AppBar(title: const Text('알림')),
       body: _loading
           ? const Center(child: CircularProgressIndicator())
           : _error != null
               ? Center(child: Text('불러오기 실패: $_error'))
-              : _events.isEmpty
+              : _notifications.isEmpty
                   ? const EmptyState(
-                      icon: Icons.celebration_outlined,
-                      message: '진행 중인 이벤트가 없습니다.\nCMS에서 이벤트를 등록하면 여기에 표시돼요.',
+                      icon: Icons.notifications_none,
+                      message: '알림이 없습니다.\n새 소식이 있으면 여기에 표시돼요.',
                     )
                   : ListView.separated(
                       padding: const EdgeInsets.all(20),
-                      itemCount: _events.length,
+                      itemCount: _notifications.length,
                       separatorBuilder: (_, _) => const SizedBox(height: 12),
                       itemBuilder: (context, i) {
-                        final data = _events[i].data();
+                        final data = _notifications[i].data();
+                        final isRead = data['read'] as bool? ?? false;
                         return Card(
                           child: ListTile(
                             contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                            leading: const CircleAvatar(
-                              backgroundColor: AppTheme.primarySoft,
-                              foregroundColor: AppTheme.primary,
-                              child: Icon(Icons.celebration_outlined),
+                            leading: Icon(
+                              isRead ? Icons.notifications_none : Icons.notifications_active,
+                              color: isRead ? AppTheme.textSecondary : AppTheme.primary,
                             ),
                             title: Text(
-                              data['title'] as String? ?? '이벤트',
+                              data['title'] as String? ?? '',
                               style: const TextStyle(fontWeight: FontWeight.w700),
                             ),
                             subtitle: Text(
-                              data['description'] as String? ?? '',
+                              data['body'] as String? ?? data['content'] as String? ?? '',
                               style: const TextStyle(color: AppTheme.textSecondary, fontSize: 12),
                             ),
                           ),

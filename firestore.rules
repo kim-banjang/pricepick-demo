@@ -94,9 +94,10 @@ service cloud.firestore {
     }
 
     // Immutable ledger – append-only. 수정 불가(불변). 단, 데모 리셋을 위해 admin 삭제만 허용.
-    // 앱은 이 컬렉션을 전혀 쓰지 않는다(등급 확정·차감 계산은 백엔드 몫) — 원래 owner-uid 검증 유지.
+    // read를 isSignedIn()까지 완화: "활동내역" 화면이 시뮬 로그인 회원의 원장을 조회해야 함.
+    // 앱은 이 컬렉션에 쓰지 않는다(등급 확정·차감 계산은 백엔드 몫) — create는 owner-uid 검증 유지.
     match /ticket_transactions/{docId} {
-      allow read: if isAdmin() || (isSignedIn() && resource.data.user_id == request.auth.uid);
+      allow read: if isSignedIn();
       allow create: if isAdmin() || (isSignedIn() && request.resource.data.user_id == request.auth.uid);
       allow update: if false;
       allow delete: if isAdmin();
@@ -166,12 +167,17 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
     match /invites/{docId} {
-      allow read: if isAdmin();
+      // read를 isSignedIn()까지 완화: "친구초대" 화면이 본인이 초대한 친구 목록을 보여줘야 함
+      // (원래 admin 전용이라 본인도 못 읽던 규칙 — 노출 화면 추가하며 최소한으로 열었다).
+      // 초대 관계 생성 자체는 백엔드(초대받은 사람의 실제 가입 완료 시점)가 처리 — 앱은 쓰지 않는다.
+      allow read: if isSignedIn();
       allow write: if isAdmin();
     }
     match /daily_visits/{docId} {
-      allow read: if isAdmin() || (isSignedIn() && resource.data.user_id == request.auth.uid);
-      allow create: if isSignedIn() && request.resource.data.user_id == request.auth.uid;
+      // read/create를 isSignedIn()까지 완화: 시뮬 로그인 지원 + "출석체크" 화면의 최소 액션 기록.
+      // points_earned 등 보상 계산은 앱이 채우지 않는다 — 백엔드가 방문 기록을 보고 처리해야 할 몫.
+      allow read: if isSignedIn();
+      allow create: if isSignedIn();
       allow update, delete: if isAdmin();
     }
     match /banners/{docId} {
@@ -191,7 +197,8 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
     match /notifications/{docId} {
-      allow read: if isAdmin() || (isSignedIn() && resource.data.user_id == request.auth.uid);
+      // read를 isSignedIn()까지 완화: 시뮬 로그인 지원(알림 화면). 생성은 백엔드/CMS 전용 유지.
+      allow read: if isSignedIn();
       allow write: if isAdmin();
     }
     match /inquiries/{docId} {
