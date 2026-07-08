@@ -13659,11 +13659,12 @@ function showScreen(screenId, pushHistory = true) {
     if (scroll) scroll.scrollTop = 0;
   }
 
-  // 행운룰렛: 진입 시 하루 1회 제한 상태 갱신
+  // 행운룰렛: 진입 시 CMS 설정 재조회 + 하루 1회 제한 상태 갱신
   if (screenId === 'pw-15' && typeof rlApplyDailyLock === 'function') {
     if (!_rlSpinning) {
       var rlRes = document.getElementById('rl-result');
       if (rlRes) rlRes.classList.remove('show');
+      if (typeof rlRefreshWheel === 'function') rlRefreshWheel();
     }
     rlApplyDailyLock();
   }
@@ -13822,14 +13823,43 @@ function bindAttendanceScreen() {
 }
 
 // ===== 행운룰렛 (pw-15) =====
-var RL_REWARDS = [
-  { label:'이벤트 티켓', sub:'1장', win:true,  color:'#9B78FF' },
-  { label:'꽝',          sub:'',    win:false, color:'#C6AFFF' },
-  { label:'이벤트 티켓', sub:'2장', win:true,  color:'#6C4AB6' },
-  { label:'이벤트 티켓', sub:'1장', win:true,  color:'#845EEE' },
-  { label:'꽝',          sub:'',    win:false, color:'#C6AFFF' },
-  { label:'이벤트 티켓', sub:'1장', win:true,  color:'#7C5BE0' }
+// CMS(settings/roulette 문서)가 6칸 구성(type/value)을 편집·저장하면 앱은 그대로 읽어 렌더링·지급에 쓴다.
+// CMS 미설정 시(문서 없음) 기본 시드값으로 대체.
+var RL_DEFAULT_WHEEL = [
+  { type:'event_ticket', value:1 },
+  { type:'miss' },
+  { type:'point', value:100 },
+  { type:'event_ticket', value:2 },
+  { type:'miss' },
+  { type:'point', value:200 }
 ];
+var RL_COLORS = ['#9B78FF', '#C6AFFF', '#6C4AB6', '#845EEE', '#C6AFFF', '#7C5BE0'];
+var RL_ACTIVE_WHEEL = RL_DEFAULT_WHEEL;
+var RL_EVENT_TICKET_DAILY_CAP = 5;
+var RL_EVENT_TICKET_MONTHLY_CAP = 30;
+function rlNormalizeWheel(wheel) {
+  var valid = Array.isArray(wheel) && wheel.length === 6 && wheel.every(function(s) {
+    return s && ['miss', 'event_ticket', 'point'].indexOf(s.type) !== -1;
+  });
+  return valid ? wheel : RL_DEFAULT_WHEEL;
+}
+function rlLoadWheelConfig() {
+  if (!window.ppLoadRouletteConfig) { RL_ACTIVE_WHEEL = RL_DEFAULT_WHEEL; return Promise.resolve(); }
+  return window.ppLoadRouletteConfig().then(function(wheel) {
+    RL_ACTIVE_WHEEL = rlNormalizeWheel(wheel);
+  }).catch(function(e) {
+    console.error('roulette config', e);
+    RL_ACTIVE_WHEEL = RL_DEFAULT_WHEEL;
+  });
+}
+function rlRefreshWheel() {
+  return rlLoadWheelConfig().then(function() { rlBuildWheel(); });
+}
+function rlSegDisplay(seg) {
+  if (seg.type === 'point') return { label:'포인트', sub:(seg.value || 0) + 'P', win:true };
+  if (seg.type === 'event_ticket') return { label:'이벤트 티켓', sub:(seg.value || 1) + '장', win:true };
+  return { label:'꽝', sub:'', win:false };
+}
 var RL_LS_KEY = 'pp_roulette_last_date';
 function rlTodayStr() {
   var d = new Date();
@@ -13853,18 +13883,18 @@ function rlPolar(cx, cy, r, deg) {
 function rlBuildWheel() {
   var svg = document.getElementById('rl-wheel');
   if (!svg) return;
-  var cx = 132, cy = 132, R = 132, n = RL_REWARDS.length, seg = 360 / n;
+  var cx = 132, cy = 132, R = 132, n = RL_ACTIVE_WHEEL.length, seg = 360 / n;
   var parts = '';
   for (var i = 0; i < n; i++) {
     var a0 = i * seg, a1 = (i + 1) * seg;
     var p0 = rlPolar(cx, cy, R, a0), p1 = rlPolar(cx, cy, R, a1);
     parts += '<path d="M' + cx + ' ' + cy + ' L' + p0[0].toFixed(2) + ' ' + p0[1].toFixed(2) +
       ' A' + R + ' ' + R + ' 0 0 1 ' + p1[0].toFixed(2) + ' ' + p1[1].toFixed(2) + ' Z" fill="' +
-      RL_REWARDS[i].color + '" stroke="rgba(255,255,255,0.55)" stroke-width="1.5"/>';
+      RL_COLORS[i % RL_COLORS.length] + '" stroke="rgba(255,255,255,0.55)" stroke-width="1.5"/>';
     // 라벨 (반경 중간, 슬라이스 중심각)
     var mid = a0 + seg / 2;
     var lp = rlPolar(cx, cy, 86, mid);
-    var rw = RL_REWARDS[i];
+    var rw = rlSegDisplay(RL_ACTIVE_WHEEL[i]);
     var txtFill = rw.win ? '#ffffff' : '#6C4AB6';
     if (rw.win) {
       parts += '<text x="' + lp[0].toFixed(1) + '" y="' + (lp[1] - 4).toFixed(1) + '" fill="' + txtFill +
@@ -13881,18 +13911,44 @@ function rlBuildWheel() {
   }
   svg.innerHTML = parts;
 }
-function rlShowResult(idx) {
+function rlEventTicketAllowance() {
+  if (!window.ppEventTicketAllowance) return Promise.resolve({ daily: RL_EVENT_TICKET_DAILY_CAP, monthly: RL_EVENT_TICKET_MONTHLY_CAP });
+  return window.ppEventTicketAllowance(RL_EVENT_TICKET_DAILY_CAP, RL_EVENT_TICKET_MONTHLY_CAP);
+}
+// 당첨 보상 지급 — 실제 지급 수량을 반환(0이면 미지급: 꽝 또는 한도 초과)
+function rlGrantReward(seg) {
+  if (seg.type === 'point') {
+    var amt = seg.value || 0;
+    if (!amt || !window.ppGrantPoints) return Promise.resolve(0);
+    return window.ppGrantPoints(amt, '행운 룰렛 당첨').then(function() { return amt; });
+  }
+  if (seg.type === 'event_ticket') {
+    var qty = seg.value || 1;
+    return rlEventTicketAllowance().then(function(remain) {
+      if (qty > remain.daily || qty > remain.monthly || !window.ppGrantEventTicket) return 0;
+      return window.ppGrantEventTicket(qty, '행운 룰렛 당첨').then(function() { return qty; });
+    });
+  }
+  return Promise.resolve(0);
+}
+function rlShowResult(idx, grantedQty) {
   var wrap = document.getElementById('rl-result');
   var card = document.getElementById('rl-result-card');
   var ico = document.getElementById('rl-result-ico');
   var label = document.getElementById('rl-result-label');
   var title = document.getElementById('rl-result-title');
-  var rw = RL_REWARDS[idx];
-  if (rw.win) {
+  var seg = RL_ACTIVE_WHEEL[idx];
+  var disp = rlSegDisplay(seg);
+  if (disp.win && grantedQty > 0) {
     card.classList.remove('miss');
     ico.innerHTML = RL_TICKET_SVG;
-    label.textContent = '축하해요! 티켓이 지급됐어요';
-    title.textContent = rw.label + ' ' + rw.sub + ' 당첨';
+    label.textContent = '축하해요! 보상이 지급됐어요';
+    title.textContent = (seg.type === 'point' ? (grantedQty + 'P') : (disp.label + ' ' + disp.sub)) + ' 당첨';
+  } else if (disp.win && grantedQty === 0 && seg.type === 'event_ticket') {
+    card.classList.add('miss');
+    ico.innerHTML = RL_MISS_SVG;
+    label.textContent = '아쉽지만 오늘은 지급 한도를 넘었어요';
+    title.textContent = '이벤트 티켓 지급 한도 초과 (일 ' + RL_EVENT_TICKET_DAILY_CAP + '장 · 월 ' + RL_EVENT_TICKET_MONTHLY_CAP + '장)';
   } else {
     card.classList.add('miss');
     ico.innerHTML = RL_MISS_SVG;
@@ -13924,10 +13980,10 @@ function bindFortuneRoulette() {
   if (!btn) return;
   rlBuildWheel();
   rlApplyDailyLock();
+  rlRefreshWheel();
   if (btn.dataset.ipBound) return;
   btn.dataset.ipBound = '1';
   var wheel = document.getElementById('rl-wheel');
-  var badge = document.querySelector('#pw-15 .rl-hero-badge');
   btn.style.cursor = 'pointer';
   btn.addEventListener('click', function(e) {
     e.stopPropagation();
@@ -13938,7 +13994,7 @@ function bindFortuneRoulette() {
     btn.textContent = '돌리는 중...';
     document.getElementById('rl-result').classList.remove('show');
 
-    var n = RL_REWARDS.length, seg = 360 / n;
+    var n = RL_ACTIVE_WHEEL.length, seg = 360 / n;
     var idx = Math.floor(Math.random() * n);
     // idx 슬라이스 중심이 상단 포인터(0도)에 오도록 회전
     var targetMod = ((360 - (idx * seg + seg / 2)) % 360 + 360) % 360;
@@ -13948,15 +14004,13 @@ function bindFortuneRoulette() {
     wheel.style.transform = 'rotate(' + _rlTotalRot + 'deg)';
 
     setTimeout(function() {
-      rlShowResult(idx);
       rlMarkPlayed();
-      var rw = RL_REWARDS[idx];
-      if (rw.win && window.ppGrantEventTicket) {
-        var qty = parseInt(rw.sub) || 1;
-        window.ppGrantEventTicket(qty, '행운 룰렛 당첨');
-      }
-      _rlSpinning = false;
-      rlApplyDailyLock();
+      var pickedSeg = RL_ACTIVE_WHEEL[idx];
+      rlGrantReward(pickedSeg).then(function(grantedQty) {
+        rlShowResult(idx, grantedQty);
+        _rlSpinning = false;
+        rlApplyDailyLock();
+      });
     }, 4350);
   });
 }
@@ -15645,6 +15699,39 @@ function ppGrantEventTicket(qty, reason) {
 }
 window.ppGrantPoints = ppGrantPoints;
 window.ppGrantEventTicket = ppGrantEventTicket;
+
+/* ── 행운룰렛: CMS 설정(settings/roulette) 조회 + 이벤트 티켓 일/월 한도 조회 ──
+   행운룰렛 화면(인터랙티브 프로토타입 스크립트, 이 IIFE 밖)이 db/PP/ppQuery/ppDate에
+   직접 접근할 수 없어 window 경유로 노출한다(ppGrantPoints 등과 동일한 패턴). */
+window.ppLoadRouletteConfig = function() {
+  return db.collection('settings').doc('roulette').get().then(function(doc) {
+    var data = doc.exists ? doc.data() : null;
+    return (data && Array.isArray(data.wheel) && data.wheel.length === 6) ? data.wheel : null;
+  }).catch(function(e) { console.error('ppLoadRouletteConfig', e); return null; });
+};
+window.ppEventTicketAllowance = function(dailyCap, monthlyCap) {
+  if (!PP.uid) return Promise.resolve({ daily: 0, monthly: 0 });
+  return ppQuery('ticket_transactions', 'user_id', PP.uid).then(function(list) {
+    var now = new Date();
+    var dayCount = 0, monthCount = 0;
+    list.forEach(function(t) {
+      if (t.ticket_grade !== 'event' || t.type !== 'earn') return;
+      var d = ppDate(t.created_at);
+      if (!d) return;
+      if (d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth()) {
+        monthCount++;
+        if (d.getDate() === now.getDate()) dayCount++;
+      }
+    });
+    return {
+      daily: Math.max(0, dailyCap - dayCount),
+      monthly: Math.max(0, monthlyCap - monthCount)
+    };
+  }).catch(function(e) {
+    console.error('ppEventTicketAllowance', e);
+    return { daily: dailyCap, monthly: monthlyCap };
+  });
+};
 
 /* ── showScreen hook ── */
 function hookShowScreen() {
