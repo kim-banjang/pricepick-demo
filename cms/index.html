@@ -1141,7 +1141,7 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
       </div>
       <div class="card">
         <table>
-          <thead><tr><th>닉네임 / 카카오톡 ID</th><th>연동 상태</th><th>가입일</th><th>랜덤 티켓</th><th>전환예정</th><th>등급 티켓 (브론즈/실버/골드)</th><th>이벤트 티켓</th><th>마케팅 수신</th><th>상태</th><th>관리</th></tr></thead>
+          <thead><tr><th>닉네임 / 식별자</th><th>연동 상태</th><th>가입일</th><th>랜덤 티켓</th><th>전환예정</th><th>등급 티켓 (브론즈/실버/골드)</th><th>이벤트 티켓</th><th>마케팅 수신</th><th>상태</th><th>관리</th></tr></thead>
           <tbody>
           </tbody>
         </table>
@@ -5874,16 +5874,40 @@ function loadMemberTicketCounts(userIds) {
   })).then(function() {
     Object.keys(counts).forEach(function(uid) {
       var c = counts[uid];
+      var randCount = Object.keys(c.pendingBundles).length;
       var randEl = document.getElementById('mem-rand-' + uid);
-      if (randEl) randEl.textContent = Object.keys(c.pendingBundles).length + '개';
+      if (randEl) {
+        randEl.innerHTML = randCount > 0
+          ? '<div class="rnd-chip-wrap">' + dmMemberTkChip('random', randCount, false) + '<span class="conv-arrow">→</span></div>'
+          : dmMemberTkChip('random', 0, true);
+      }
       var upcomingEl = document.getElementById('mem-upcoming-' + uid);
-      if (upcomingEl) upcomingEl.innerHTML = '<div>브+' + c.pending.bronze + '</div><div>실+' + c.pending.silver + '</div><div>골+' + c.pending.gold + '</div>';
+      if (upcomingEl) {
+        var pendingChips = [];
+        if (c.pending.bronze > 0) pendingChips.push(dmMemberTkChip('bronze', '+' + c.pending.bronze, false));
+        if (c.pending.silver > 0) pendingChips.push(dmMemberTkChip('silver', '+' + c.pending.silver, false));
+        if (c.pending.gold > 0) pendingChips.push(dmMemberTkChip('gold', '+' + c.pending.gold, false));
+        upcomingEl.innerHTML = pendingChips.length ? '<div class="conv-preview">' + pendingChips.join('') + '</div>' : '';
+      }
       var gradeEl = document.getElementById('mem-grade-' + uid);
-      if (gradeEl) gradeEl.innerHTML = '<div>브' + c.active.bronze + '</div><div>실' + c.active.silver + '</div><div>골' + c.active.gold + '</div>';
+      if (gradeEl) {
+        gradeEl.innerHTML = '<div style="display:flex;gap:5px;align-items:center;justify-content:center;">'
+          + dmMemberTkChip('bronze', c.active.bronze, c.active.bronze === 0)
+          + dmMemberTkChip('silver', c.active.silver, c.active.silver === 0)
+          + dmMemberTkChip('gold', c.active.gold, c.active.gold === 0)
+          + '</div>';
+      }
       var eventEl = document.getElementById('mem-event-' + uid);
-      if (eventEl) eventEl.textContent = c.active.event;
+      if (eventEl) eventEl.innerHTML = dmMemberTkChip('event', c.active.event, c.active.event === 0);
     });
   });
+}
+
+// 회원 목록 티켓 컬럼 전용 SVG 칩 빌더 — 페이지 전역 applyTicketIcons()의 uid 카운터(0부터 시작)와
+// 겹치면 SVG gradient id가 충돌해 색이 뒤바뀔 수 있어, 절대 겹치지 않는 별도 카운터 공간을 쓴다.
+var _dmMemberTkUid = 900000;
+function dmMemberTkChip(grade, num, dim) {
+  return '<span class="tk-chip ' + grade + (dim ? ' dim' : '') + '">' + tkSVG(grade, 'small', _dmMemberTkUid++) + '<span>' + num + '</span></span>';
 }
 
 // 회원 상세 팝업용 단건 집계 — 위 두 헬퍼(dmNewTicketCounter/dmClassifyTicketInto)를 그대로 재사용.
@@ -5934,11 +5958,13 @@ function renderMemberIdentity(u, docId) {
     + '<div style="font-size:11px;color:var(--text-3);">' + memberKakaoLabel(u) + '</div>'
     + '<div style="font-size:11px;color:var(--text-3);font-family:monospace;">' + memberIdShort(docId) + '</div>';
 }
-// 회원 목록 리스트 전용 — 세로 2행(닉네임 / 카카오톡ID). 식별 아이디는 상세에서만 노출.
+// 회원 목록 리스트 전용 — 세로 2행(닉네임 / 짧은 식별자). 긴 식별 아이디(내부 문서ID) 전체는 상세에서만 노출.
+// 카카오 연동 회원은 카카오 로그인 ID, 미연동(게스트) 회원은 내부 문서ID 앞 8자리를 "app_uid:" 접두로 표기.
 function renderMemberIdentityListOnly(u, docId) {
   u = u || {};
+  var idLine = (u.linked_kakao && u.kakao_login_id) ? u.kakao_login_id : ('app_uid: ' + (docId || '').slice(0, 8));
   return '<div style="font-weight:500;">' + (u.nickname || '닉네임없음') + '</div>'
-    + '<div style="font-size:11px;color:var(--text-3);">' + memberKakaoLabel(u) + '</div>';
+    + '<div style="font-size:11px;color:var(--text-2);font-family:monospace;">' + idLine + '</div>';
 }
 // 드롭다운 등 세로 공간이 없는 곳용 — 한 줄 "닉네임 · 카카오톡ID(또는 게스트) · 식별 아이디"
 function renderMemberIdentityInline(u, docId) {
