@@ -11898,11 +11898,11 @@ body.interactive-mode #ip-nav { display: block; }
               <svg width="20" height="20" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill="#FEE500" d="M12 2C6.477 2 2 5.58 2 10c0 2.8 1.516 5.273 3.875 6.875L5 22l5.25-2.75c.562.163 1.15.25 1.75.25 5.523 0 10-3.58 10-8S17.523 2 12 2z"/><circle cx="8" cy="10" r="1.2" fill="#3C1E1E"/><circle cx="12" cy="10" r="1.2" fill="#3C1E1E"/><circle cx="16" cy="10" r="1.2" fill="#3C1E1E"/></svg>
               <div>
                 <div style="font-size:13px;font-weight:700;color:var(--text1);">카카오 닉네임 가져오기</div>
-                <div style="font-size:11px;color:var(--text3);margin-top:1px;">마크김</div>
+                <div id="kakao-nick-preview" style="font-size:11px;color:var(--text3);margin-top:1px;">마크김</div>
               </div>
             </div>
             <button data-ip-bound="1" style="padding:6px 12px;background:#FEE500;border:none;border-radius:8px;font-size:12px;font-weight:700;color:#3C1E1E;cursor:pointer;"
-              onclick="(function(){var inp=document.getElementById('nick-input');if(!inp)return;inp.value='마크김';var cnt=document.getElementById('nick-cnt');if(cnt)cnt.textContent='3/10';var err=document.getElementById('nick-err');if(err)err.style.display='none';var btn=document.getElementById('nick-save');if(btn){btn.disabled=false;btn.style.background='var(--main)';btn.style.cursor='pointer';}})()">가져오기</button>
+              onclick="(function(){var inp=document.getElementById('nick-input');if(!inp)return;var kn=(window.ppGetKakaoNickname&&window.ppGetKakaoNickname())||'마크김';inp.value=kn;var cnt=document.getElementById('nick-cnt');if(cnt)cnt.textContent=kn.length+'/10';var err=document.getElementById('nick-err');if(err)err.style.display='none';var btn=document.getElementById('nick-save');if(btn){btn.disabled=false;btn.style.background='var(--main)';btn.style.cursor='pointer';}})()">가져오기</button>
           </div>
           <button id="nick-save" data-orig="" data-ip-bound="1" disabled
             style="width:100%;padding:15px;background:var(--text4);border:none;border-radius:14px;font-size:16px;font-weight:800;color:#fff;cursor:not-allowed;margin-top:8px;">저장</button>
@@ -15663,6 +15663,8 @@ function onScreenShown(id) {
     var ns = document.getElementById('nick-save'); if (ns) { ns.dataset.orig = nick; ns.disabled = true; ns.style.background = 'var(--text4)'; ns.style.cursor = 'not-allowed'; }
     var cnt = document.getElementById('nick-cnt'); if (cnt) cnt.textContent = nick.length + '/10';
     hideNickErr('nick-err');
+    var kp = document.getElementById('kakao-nick-preview');
+    if (kp) kp.textContent = (window.ppGetKakaoNickname && window.ppGetKakaoNickname()) || '마크김';
   }
   if (!PP.uid) return;
   if (id === 'pw-10') refreshHomeData();
@@ -16275,7 +16277,27 @@ function bindExchangeBtn() {
   }, true);
 }
 
-/* ── Kakao mock complete ── */
+/* ── Kakao mock complete ──
+   실제 Kakao SDK 연동이 없으므로 kakao_login_id·kakao_nickname도 그럴듯한 값으로
+   자동 생성해 저장한다 (CMS 회원목록/상세가 이 필드를 카카오ID·닉네임으로 그대로 표기함).
+   재연동 등으로 이미 값이 있으면 덮어쓰지 않고 유지한다. */
+var KAKAO_ID_CHARS = 'abcdefghijklmnopqrstuvwxyz0123456789';
+function randomKakaoLoginId() {
+  var local = '';
+  for (var i = 0; i < 9; i++) local += KAKAO_ID_CHARS[Math.floor(Math.random() * KAKAO_ID_CHARS.length)];
+  return local + '@kakao.com';
+}
+var KAKAO_SURNAMES = ['김', '이', '박', '최', '정', '강', '조', '윤', '장', '임'];
+var KAKAO_GIVEN = ['민준', '서연', '도윤', '하윤', '시우', '지우', '예준', '서윤', '주원', '수아', '건우', '다은', '현우', '지호', '유나', '지안', '서준', '하은'];
+function randomKakaoNickname() {
+  var s = KAKAO_SURNAMES[Math.floor(Math.random() * KAKAO_SURNAMES.length)];
+  var g = KAKAO_GIVEN[Math.floor(Math.random() * KAKAO_GIVEN.length)];
+  return s + g;
+}
+window.ppGetKakaoNickname = function() {
+  return (PP.user && PP.user.linked_kakao && PP.user.kakao_nickname) ? PP.user.kakao_nickname : null;
+};
+
 function bindKakaoComplete() {
   /* 두 화면 다 CTA 버튼에 .btn-primary 클래스가 없어(마크업 누락) 기존 셀렉터가
      항상 매치 실패 → 카카오 연동 플래그조차 저장되지 않던 상태였다. 화면당 버튼이
@@ -16288,8 +16310,19 @@ function bindKakaoComplete() {
     if (!btn) return;
     btn.addEventListener('click', function() {
       if (!PP.uid) return;
-      db.collection('users').doc(PP.uid).update({ linked_kakao: true }).then(function() {
-        if (PP.user) PP.user.linked_kakao = true;
+      var uid = PP.uid;
+      db.collection('users').doc(uid).get().then(function(doc) {
+        var existing = doc.exists ? doc.data() : {};
+        var payload = { linked_kakao: true };
+        payload.kakao_login_id = existing.kakao_login_id || randomKakaoLoginId();
+        payload.kakao_nickname = existing.kakao_nickname || randomKakaoNickname();
+        return db.collection('users').doc(uid).update(payload).then(function() {
+          if (PP.user) {
+            PP.user.linked_kakao = true;
+            PP.user.kakao_login_id = payload.kakao_login_id;
+            PP.user.kakao_nickname = payload.kakao_nickname;
+          }
+        });
       }).catch(function(e){ console.error('kakaoLink', e); });
       /* pw-02-K-new(신규 연동) 화면이 "이벤트 티켓 1장 + 가입 축하 200P 즉시 지급"을
          명시적으로 약속하므로 실제로 지급. pw-02-K-existing(기존 계정 재로그인 데모)은
