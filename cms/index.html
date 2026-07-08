@@ -5877,9 +5877,9 @@ function loadMemberTicketCounts(userIds) {
       var randEl = document.getElementById('mem-rand-' + uid);
       if (randEl) randEl.textContent = Object.keys(c.pendingBundles).length + '개';
       var upcomingEl = document.getElementById('mem-upcoming-' + uid);
-      if (upcomingEl) upcomingEl.textContent = '브+' + c.pending.bronze + '·실+' + c.pending.silver + '·골+' + c.pending.gold;
+      if (upcomingEl) upcomingEl.innerHTML = '<div>브+' + c.pending.bronze + '</div><div>실+' + c.pending.silver + '</div><div>골+' + c.pending.gold + '</div>';
       var gradeEl = document.getElementById('mem-grade-' + uid);
-      if (gradeEl) gradeEl.textContent = '브' + c.active.bronze + '·실' + c.active.silver + '·골' + c.active.gold;
+      if (gradeEl) gradeEl.innerHTML = '<div>브' + c.active.bronze + '</div><div>실' + c.active.silver + '</div><div>골' + c.active.gold + '</div>';
       var eventEl = document.getElementById('mem-event-' + uid);
       if (eventEl) eventEl.textContent = c.active.event;
     });
