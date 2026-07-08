@@ -5891,7 +5891,7 @@ function loadMemberTicketCounts(userIds) {
       }
       var gradeEl = document.getElementById('mem-grade-' + uid);
       if (gradeEl) {
-        gradeEl.innerHTML = '<div style="display:flex;gap:5px;align-items:center;justify-content:center;">'
+        gradeEl.innerHTML = '<div style="display:flex;flex-direction:column;gap:4px;align-items:center;justify-content:center;">'
           + dmMemberTkChip('bronze', c.active.bronze, c.active.bronze === 0)
           + dmMemberTkChip('silver', c.active.silver, c.active.silver === 0)
           + dmMemberTkChip('gold', c.active.gold, c.active.gold === 0)
