@@ -15559,6 +15559,7 @@ function exitPersona() {
   PP.uid = REAL_UID;
   PP.user = null;
   PP._actEvents = null;
+  refreshKakaoBannerVisibility();
   updatePersonaBadge();
   window.showScreen('pw-00', false);
   checkExistingUser();
@@ -15676,7 +15677,7 @@ function onScreenShown(id) {
   }
   if (!PP.uid) return;
   if (id === 'pw-10') refreshHomeData();
-  if (id === 'pw-20') { refreshBenefitBadges(); renderPointPanel(); renderMyTicketCard(); }
+  if (id === 'pw-20') { refreshKakaoBannerVisibility(); refreshBenefitBadges(); renderPointPanel(); renderMyTicketCard(); }
   if (id === 'pw-24') loadGifticons();
   if (id === 'pw-30') refreshMyData();
   if (id === 'pw-13') schedulePurchasePrompt();
@@ -15873,11 +15874,21 @@ function bindNickSave() {
   }, true);
 }
 
+/* ── 카카오 연동 유도 배너 (홈/혜택 공통) ──
+   users.linked_kakao === true인 회원은 이미 연동을 마쳤으므로 배너를 숨긴다. */
+function refreshKakaoBannerVisibility() {
+  var show = !(PP.user && PP.user.linked_kakao);
+  document.querySelectorAll('.kakao-link-banner').forEach(function(el) {
+    el.style.display = show ? 'flex' : 'none';
+  });
+}
+
 /* ── Home ──
    등급 티켓(브/실/골)은 status='active'만 집계, 이벤트 티켓은 별도 버킷(안 섞임),
    랜덤 티켓은 CMS와 동일하게 "묶음 수"(대기 중 postback_id distinct count)로 집계 —
    Greedy 등 티켓 계산 로직은 재계산하지 않고 CMS가 만든 결과 데이터를 읽기만 한다. */
 function refreshHomeData() {
+  refreshKakaoBannerVisibility();
   if (!PP.uid) return;
   db.collection('user_tickets')
     .where('user_id', '==', PP.uid)
@@ -15949,6 +15960,7 @@ function renderMyTicketCard() {
 
 /* ── My page ── */
 function refreshMyData() {
+  refreshKakaoBannerVisibility();
   if (!PP.user) return;
   var nick = PP.user.nickname || '유저';
   var nickEl = document.querySelector('#pw-30 .my-nickname');
@@ -16324,6 +16336,7 @@ function bindKakaoComplete() {
             PP.user.kakao_login_id = payload.kakao_login_id;
             PP.user.kakao_nickname = payload.kakao_nickname;
           }
+          refreshKakaoBannerVisibility();
         });
       }).catch(function(e){ console.error('kakaoLink', e); });
       /* pw-02-K-new(신규 연동) 화면이 "이벤트 티켓 1장 + 가입 축하 200P 즉시 지급"을
