@@ -67,6 +67,16 @@ flutter/
 화면 ↔ 서비스 계층을 분리했다: 화면(`screens/`)은 UI만 다루고, Firestore 쿼리·필드명은
 전부 `services/pricepick_repository.dart`에 모아둔다. 스키마가 바뀌면 이 파일만 고치면 된다.
 
+## 릴리스 빌드 (TestFlight / Play 내부테스트용)
+
+- **Android**: `android/key.properties` + `android/keystore/pricepick-demo-release.keystore`로
+  release 서명이 연결돼 있다. **둘 다 `.gitignore` 대상이라 저장소에 없다** — 이 keystore를 잃어버리면
+  같은 앱(`applicationId`)으로 다시는 업데이트를 못 올리니 별도 백업 필수(형님에게 별도 보고한 값 참고).
+  `flutter build appbundle --release` → `build/app/outputs/bundle/release/app-release.aab`.
+- **iOS**: 인증서·프로비저닝·팀 선택은 Xcode GUI + Apple 계정 로그인이 필요해 이 저장소/커맨드라인
+  범위 밖이다. `flutter build ios --release --no-codesign`으로 서명 없이 빌드 가능 여부만 검증해 둔 상태.
+  실제 아카이브는 `ios/Runner.xcworkspace`를 Xcode로 열어 진행한다.
+
 ## 실행법 (네이티브 우선)
 
 ```bash
