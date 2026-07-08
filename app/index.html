@@ -8073,6 +8073,15 @@ body.interactive-mode #ip-nav { display: block; }
   .iv-reward-rs { font-size:11px; color:rgba(255,255,255,0.72); margin-top:2px; }
   .iv-reward-rval { margin-left:auto; font-size:13px; font-weight:800; color:#fff; white-space:nowrap; }
   .iv-reward-note { margin-top:12px; font-size:11px; color:rgba(255,255,255,0.7); text-align:center; line-height:1.5; }
+  .iv-code-card { margin:12px 16px 0; background:#fff; border-radius:14px; padding:15px 16px; border:1px solid var(--border); }
+  .iv-code-label { font-size:12px; font-weight:600; color:var(--text1); margin-bottom:8px; }
+  .iv-code-row { display:flex; align-items:center; gap:8px; }
+  .iv-code-value { flex:1; font-size:20px; font-weight:800; letter-spacing:2px; color:var(--main); background:var(--sub-4); border-radius:10px; padding:12px 14px; text-align:center; font-family:inherit; }
+  .iv-code-copy { flex-shrink:0; height:44px; padding:0 18px; background:var(--main); color:#fff; border:none; border-radius:10px; font-size:13px; font-weight:700; cursor:pointer; font-family:inherit; }
+  .iv-code-copy:active { background:var(--main-dark); }
+  .iv-hist-actions { margin-top:9px; }
+  .iv-hist-complete-btn { width:100%; height:34px; background:var(--main); color:#fff; border:none; border-radius:9px; font-size:11.5px; font-weight:700; cursor:pointer; font-family:inherit; }
+  .iv-hist-complete-btn:active { background:var(--main-dark); }
   .iv-status-card { margin:12px 16px 0; background:#fff; border-radius:14px; padding:15px 16px; border:1px solid var(--border); }
   .iv-status-head { display:flex; justify-content:space-between; align-items:baseline; margin-bottom:9px; }
   .iv-status-label { font-size:12px; font-weight:600; color:var(--text1); }
@@ -8087,7 +8096,8 @@ body.interactive-mode #ip-nav { display: block; }
   .iv-hist { margin:16px 16px 28px; }
   .iv-hist-title { font-size:13px; font-weight:700; color:var(--text1); margin-bottom:10px; }
   .iv-hist-list { display:flex; flex-direction:column; gap:8px; }
-  .iv-hist-item { display:flex; align-items:center; gap:11px; background:#fff; border:1px solid var(--border); border-radius:12px; padding:11px 13px; }
+  .iv-hist-item { display:flex; flex-direction:column; background:#fff; border:1px solid var(--border); border-radius:12px; padding:11px 13px; }
+  .iv-hist-top { display:flex; align-items:center; gap:11px; }
   .iv-hist-ava { width:36px; height:36px; border-radius:50%; background:var(--sub-4); display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:13px; font-weight:800; color:var(--main); }
   .iv-hist-body { flex:1; min-width:0; }
   .iv-hist-name { font-size:13px; font-weight:700; color:var(--text1); }
@@ -10095,7 +10105,7 @@ body.interactive-mode #ip-nav { display: block; }
                 <div class="event-ico">👥</div>
                 <div class="event-body">
                   <div class="event-name">친구 초대하면 둘 다 받기</div>
-                  <div class="event-desc">초대 성공(친구 첫 픽구매) 시 양쪽 각 500P 지급</div>
+                  <div class="event-desc">초대 성공(친구 첫 구매) 시 양쪽 각 500P 지급</div>
                 </div>
                 <div class="event-arrow">›</div>
               </div>
@@ -10731,6 +10741,15 @@ body.interactive-mode #ip-nav { display: block; }
                 <div class="my-row-desc" id="kakao-row-desc" data-ip-bound="1">연동하면 티켓·포인트·내역을 안전하게 보관해요</div>
               </div>
               <button class="kakao-pull-btn" data-ip-bound="1" style="cursor:pointer !important;background:#FEE500;color:#3C1E1E;" onclick="showScreen('pw-02-K')">연동하기</button>
+            </div>
+            <div class="my-row" data-jump="pw-30-invite">
+              <div class="my-row-ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12V8a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v4a2 2 0 0 1 0 4v4a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4a2 2 0 0 1 0-4Z"/><path d="M10 6v14" stroke-dasharray="2 2"/></svg></div>
+              <div class="my-row-body">
+                <div class="my-row-name">초대코드 입력</div>
+                <div class="my-row-desc">친구의 초대코드를 입력하고 500P 받기</div>
+              </div>
+              <div class="my-row-right value" id="my-invcode-value">미입력</div>
+              <div class="my-row-right">›</div>
             </div>
           </div>
 
@@ -11499,7 +11518,7 @@ body.interactive-mode #ip-nav { display: block; }
           <!-- 보상 안내 카드 -->
           <div class="iv-reward-card">
             <div class="iv-reward-title">친구 초대하고 포인트 받기</div>
-            <div class="iv-reward-sub">초대한 친구가 첫 픽구매를 완료하면<br>두 사람 모두 500P를 받아요</div>
+            <div class="iv-reward-sub">초대한 친구가 첫 구매를 완료하면<br>두 사람 모두 500P를 받아요</div>
             <div class="iv-reward-rows">
               <div class="iv-reward-row">
                 <div class="iv-reward-ico">
@@ -11507,7 +11526,7 @@ body.interactive-mode #ip-nav { display: block; }
                 </div>
                 <div>
                   <div class="iv-reward-rt">나 (초대자)</div>
-                  <div class="iv-reward-rs">친구 첫 픽구매 완료 시 지급</div>
+                  <div class="iv-reward-rs">친구 첫 구매 완료 시 지급</div>
                 </div>
                 <div class="iv-reward-rval">500P</div>
               </div>
@@ -11517,27 +11536,36 @@ body.interactive-mode #ip-nav { display: block; }
                 </div>
                 <div>
                   <div class="iv-reward-rt">친구 (피초대자)</div>
-                  <div class="iv-reward-rs">첫 픽구매 완료 시 지급</div>
+                  <div class="iv-reward-rs">첫 구매 완료 시 지급</div>
                 </div>
                 <div class="iv-reward-rval">500P</div>
               </div>
             </div>
-            <div class="iv-reward-note">초대 보상은 친구의 <b>최초 픽구매 완료(성사)</b> 시 지급 · 월 최대 20명까지 인정</div>
+            <div class="iv-reward-note">초대 보상은 친구의 <b>최초 구매 완료(성사)</b> 시 지급 · 월 최대 50명까지 인정</div>
+          </div>
+
+          <!-- 내 초대코드 -->
+          <div class="iv-code-card">
+            <div class="iv-code-label">내 초대코드</div>
+            <div class="iv-code-row">
+              <div class="iv-code-value" id="iv-code-value">――――――</div>
+              <button class="iv-code-copy" id="iv-code-copy-btn" data-ip-bound="1">복사</button>
+            </div>
           </div>
 
           <!-- 이번 달 현황 -->
           <div class="iv-status-card">
             <div class="iv-status-head">
-              <span class="iv-status-label">이번 달 초대 현황</span>
-              <span class="iv-status-count"><b id="iv-month-count">0</b>/20명</span>
+              <span class="iv-status-label">이번 달 초대 현황 (첫 구매 성사 기준)</span>
+              <span class="iv-status-count"><b id="iv-month-count">0</b>/50명</span>
             </div>
             <div class="iv-status-bar"><div class="iv-status-fill" id="iv-status-fill" style="width:0%;"></div></div>
-            <div class="iv-status-sub" id="iv-status-sub">매월 1일 0시에 초기화 · 이번 달 20명 더 초대할 수 있어요</div>
+            <div class="iv-status-sub" id="iv-status-sub">매월 1일 0시에 초기화 · 이번 달 50명 더 인정받을 수 있어요</div>
           </div>
 
           <!-- 공유 버튼 -->
           <div class="iv-share-wrap">
-            <button class="iv-share-btn" id="iv-share-btn" onclick="ipToast('초대 링크가 복사되었습니다')">
+            <button class="iv-share-btn" id="iv-share-btn" data-ip-bound="1">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M18 8C19.66 8 21 6.66 21 5C21 3.34 19.66 2 18 2C16.34 2 15 3.34 15 5C15 6.66 16.34 8 18 8Z" stroke="#fff" stroke-width="1.6"/><path d="M6 15C7.66 15 9 13.66 9 12C9 10.34 7.66 9 6 9C4.34 9 3 10.34 3 12C3 13.66 4.34 15 6 15Z" stroke="#fff" stroke-width="1.6"/><path d="M18 22C19.66 22 21 20.66 21 19C21 17.34 19.66 16 18 16C16.34 16 15 17.34 15 19C15 20.66 16.34 22 18 22Z" stroke="#fff" stroke-width="1.6"/><path d="M8.59 13.51L15.42 17.49M15.41 6.51L8.59 10.49" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/></svg>
               친구에게 공유하기
             </button>
@@ -11910,6 +11938,34 @@ body.interactive-mode #ip-nav { display: block; }
           </div>
           <button id="nick-save" data-orig="" data-ip-bound="1" disabled
             style="width:100%;padding:15px;background:var(--text4);border:none;border-radius:14px;font-size:16px;font-weight:800;color:#fff;cursor:not-allowed;margin-top:8px;">저장</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="phone-wrap" id="pw-30-invite" data-screen="30-invite">
+    <div class="phone">
+      <div class="my-screen">
+        <div class="statusbar"><span>9:41</span><div class="statusbar-icons"><svg width="17" height="12" viewBox="0 0 17 12" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><rect x="0" y="4" width="3" height="8" rx="1"/><rect x="4.5" y="2.5" width="3" height="9.5" rx="1"/><rect x="9" y="1" width="3" height="11" rx="1"/><rect x="13.5" y="0" width="3" height="12" rx="1"/></svg><svg width="16" height="12" viewBox="0 0 16 12" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M8 2.5C10.2 2.5 12.2 3.4 13.6 4.9L15 3.4C13.2 1.5 10.7 0.3 8 0.3C5.3 0.3 2.8 1.5 1 3.4L2.4 4.9C3.8 3.4 5.8 2.5 8 2.5Z"/><path d="M8 5.5C9.4 5.5 10.7 6.1 11.6 7L13 5.5C11.7 4.2 10 3.3 8 3.3C6 3.3 4.3 4.2 3 5.5L4.4 7C5.3 6.1 6.6 5.5 8 5.5Z"/><circle cx="8" cy="10" r="1.8"/></svg><svg width="25" height="12" viewBox="0 0 25 12" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="currentColor" stroke-opacity="0.35"/><rect x="2" y="2" width="17" height="8" rx="2" fill="currentColor"/><path d="M23 4V8C23.8 7.6 24.5 6.9 24.5 6C24.5 5.1 23.8 4.4 23 4Z" fill="currentColor" fill-opacity="0.4"/></svg></div></div>
+        <div style="display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid var(--border);background:#fff;">
+          <button class="back-btn" data-jump="30"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M11.25 15.5L5.96 10.45C5.17 9.65 5.17 8.35 5.96 7.55L11.25 2.66" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+          <div style="font-size:16px;font-weight:800;color:var(--text1);">초대코드 입력</div>
+        </div>
+        <div style="padding:28px 20px;display:flex;flex-direction:column;gap:20px;">
+          <div style="text-align:center;">
+            <div style="font-size:13px;color:var(--text3);margin-bottom:6px;">친구의 초대코드를 입력하면</div>
+            <div style="font-size:15px;font-weight:700;color:var(--text1);">나와 친구 모두 500P를 받을 수 있어요</div>
+          </div>
+          <div>
+            <div style="font-size:12px;font-weight:600;color:var(--text2);margin-bottom:8px;">초대코드</div>
+            <input id="invcode-input" type="text" maxlength="8" placeholder="예: AB23CD" data-ip-bound="1"
+              style="width:100%;padding:13px 14px;border:1.5px solid var(--main);border-radius:12px;font-size:18px;font-weight:800;letter-spacing:2px;text-align:center;color:var(--text1);background:#fff;box-sizing:border-box;font-family:inherit;outline:none;text-transform:uppercase;"
+              oninput="this.value=this.value.toUpperCase();var err=document.getElementById('invcode-err');if(err)err.style.display='none';">
+            <div id="invcode-err" style="display:none;font-size:11.5px;font-weight:600;color:#E5533D;margin-top:6px;"></div>
+          </div>
+          <button id="invcode-submit" data-ip-bound="1"
+            style="width:100%;padding:15px;background:var(--main);border:none;border-radius:14px;font-size:16px;font-weight:800;color:#fff;cursor:pointer;margin-top:4px;">등록하기</button>
+          <div id="invcode-done" style="display:none;text-align:center;padding:14px;background:var(--sub-4);border-radius:12px;font-size:13px;font-weight:700;color:var(--main);">이미 초대코드를 입력했어요</div>
         </div>
       </div>
     </div>
@@ -15758,14 +15814,15 @@ function onScreenShown(id) {
     if (kp) kp.textContent = (window.ppGetKakaoNickname && window.ppGetKakaoNickname()) || '마크김';
   }
   if (!PP.uid) return;
-  if (id === 'pw-10') refreshHomeData();
+  if (id === 'pw-10') { refreshHomeData(); ppClaimInviteeRewards(); }
   if (id === 'pw-20') { refreshKakaoBannerVisibility(); refreshBenefitBadges(); renderPointPanel(); renderMyTicketCard(); }
   if (id === 'pw-24') loadGifticons();
-  if (id === 'pw-30') refreshMyData();
+  if (id === 'pw-30') { refreshMyData(); ppClaimInviteeRewards(); }
   if (id === 'pw-13') schedulePurchasePrompt();
   if (id === 'pw-32' || id === 'phone-11e') renderActivity();
   if (id === 'pw-S1') renderNotifications();
-  if (id === 'pw-16') renderInvites();
+  if (id === 'pw-16') { renderInvites(); bindInviteScreen(); }
+  if (id === 'pw-30-invite') { bindInviteCodeEntryScreen(); renderInviteCodeEntryScreen(); }
   if (id === 'pw-34') renderPurchaseHistory();
   if (id === 'pw-21' || id === 'phone19') renderTicketDetail();
   if (id === 'pw-24') renderGifticonHistory();
@@ -16085,6 +16142,8 @@ function refreshMyData() {
       kakaoBtn.onclick = function() { showScreen('pw-02-K'); };
     }
   }
+  var invEl = document.getElementById('my-invcode-value');
+  if (invEl) invEl.textContent = PP.user.invited_by ? '입력 완료' : '미입력';
 }
 
 /* ── Mall click logging ── */
@@ -16674,29 +16733,273 @@ function renderNotifications() {
 }
 
 /* ── 친구 초대 (pw-16) ── */
+/* ── 친구초대: 초대코드 발급 ──
+   계정당 고정 고유값. users/{uid}.invite_code에 최초 1회 생성해 영구 보존.
+   보상은 point_transactions/user_points 규칙상 "본인 소유 문서만 쓰기 가능"이라
+   초대자·피초대자 각자 자기 세션에서 자기 몫만 셀프 지급한다(양쪽 다 다른 사람 잔액을
+   직접 건드릴 수 없음 — 임의로 다른 계정 잔액을 조작 못 하게 하는 기존 규칙을 그대로 따름).
+   그래서 초대자가 "첫 구매 완료 처리"를 누르면 그 자리에서 자기 500P만 즉시 지급되고,
+   피초대자 몫 500P는 그 피초대자가 다음에 앱을 열 때 ppClaimInviteeRewards()가 자동 지급한다. */
+var INVITE_CODE_CHARS = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ';
+function ppGenerateInviteCode() {
+  var s = '';
+  for (var i = 0; i < 6; i++) s += INVITE_CODE_CHARS[Math.floor(Math.random() * INVITE_CODE_CHARS.length)];
+  return s;
+}
+function ppIsInviteCodeTaken(code) {
+  return db.collection('users').where('invite_code', '==', code).limit(1).get().then(function (snap) { return !snap.empty; });
+}
+function ppEnsureInviteCode(attempt) {
+  attempt = attempt || 0;
+  if (!PP.uid) return Promise.resolve(null);
+  if (PP.user && PP.user.invite_code) return Promise.resolve(PP.user.invite_code);
+  var code = ppGenerateInviteCode();
+  return ppIsInviteCodeTaken(code).then(function (taken) {
+    if (taken && attempt < 8) return ppEnsureInviteCode(attempt + 1);
+    if (taken) code += Date.now().toString().slice(-2);
+    return db.collection('users').doc(PP.uid).set({ invite_code: code }, { merge: true }).then(function () {
+      PP.user = PP.user || {};
+      PP.user.invite_code = code;
+      return code;
+    });
+  }).catch(function (e) { console.error('ppEnsureInviteCode', e); return null; });
+}
+
+/* ── 클립보드 복사 (Clipboard API + execCommand 폴백) ── */
+function ppCopyTextFallback(text) {
+  return new Promise(function (resolve, reject) {
+    try {
+      var ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.left = '-9999px';
+      document.body.appendChild(ta);
+      ta.focus(); ta.select();
+      var ok = document.execCommand('copy');
+      document.body.removeChild(ta);
+      ok ? resolve() : reject(new Error('copy failed'));
+    } catch (e) { reject(e); }
+  });
+}
+function ppCopyText(text) {
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    return navigator.clipboard.writeText(text).catch(function () { return ppCopyTextFallback(text); });
+  }
+  return ppCopyTextFallback(text);
+}
+function ppInviteLink(code) {
+  return window.location.origin + window.location.pathname + '?invite=' + code;
+}
+
+/* ── 초대코드 등록(피초대자) ──
+   계정당 1회만 허용(users.invited_by 1회 설정 후 불변) · 자기초대 차단 · 존재하는 코드인지 검증.
+   invites 문서 생성은 firestore.rules상 invitee_id === 본인 uid일 때만 허용된다. */
+function ppRedeemInviteCode(codeRaw) {
+  if (!PP.uid) return Promise.reject(new Error('no_uid'));
+  var code = (codeRaw || '').trim().toUpperCase();
+  if (!code) return Promise.reject(new Error('empty'));
+  if (PP.user && PP.user.invited_by) return Promise.reject(new Error('already_redeemed'));
+  if (PP.user && PP.user.invite_code === code) return Promise.reject(new Error('self'));
+  return db.collection('users').where('invite_code', '==', code).limit(1).get().then(function (snap) {
+    if (snap.empty) return Promise.reject(new Error('not_found'));
+    var inviterDoc = snap.docs[0];
+    if (inviterDoc.id === PP.uid) return Promise.reject(new Error('self'));
+    var now = FS.FieldValue.serverTimestamp();
+    var batch = db.batch();
+    var inviteRef = db.collection('invites').doc();
+    batch.set(inviteRef, {
+      inviter_id: inviterDoc.id, invitee_id: PP.uid, code: code,
+      status: 'pending', created_at: now, completed_at: null,
+      inviter_rewarded: false, invitee_rewarded: false,
+    });
+    batch.set(db.collection('users').doc(PP.uid), { invited_by: inviterDoc.id }, { merge: true });
+    return batch.commit().then(function () {
+      PP.user = PP.user || {};
+      PP.user.invited_by = inviterDoc.id;
+    });
+  });
+}
+window.ppRedeemInviteCode = ppRedeemInviteCode;
+
+/* ── 이번 달(completed_at 기준) 첫 구매 성사 건수 — 월 50건 한도 판정에 사용 ── */
+function ppMonthlyInviteCompletions(inviterId) {
+  return ppQuery('invites', 'inviter_id', inviterId).then(function (list) {
+    var now = new Date(), mc = 0;
+    list.forEach(function (x) {
+      if (x.status !== 'completed' && x.status !== 'rewarded') return;
+      var cd = ppDate(x.completed_at) || ppDate(x.created_at);
+      if (cd && cd.getFullYear() === now.getFullYear() && cd.getMonth() === now.getMonth()) mc++;
+    });
+    return mc;
+  });
+}
+var INVITE_MONTHLY_CAP = 50;
+
+/* ── "첫 구매 완료 처리" (데모용 성사 트리거, 초대자 화면) ──
+   월 50건 초과 시 미지급. 성사 처리 시 초대자 본인 몫 500P는 즉시 셀프 지급. */
+function ppCompleteInvite(inviteId) {
+  if (!PP.uid) return;
+  db.collection('invites').doc(inviteId).get().then(function (doc) {
+    if (!doc.exists) { showToast('초대 정보를 찾을 수 없어요'); return; }
+    var inv = doc.data();
+    if (inv.inviter_id !== PP.uid) { showToast('처리 권한이 없어요'); return; }
+    if (inv.status === 'completed' || inv.status === 'rewarded') { showToast('이미 처리된 초대예요'); return; }
+    return ppMonthlyInviteCompletions(PP.uid).then(function (mc) {
+      if (mc >= INVITE_MONTHLY_CAP) { showToast('이번 달 한도 도달(' + INVITE_MONTHLY_CAP + '명) — 다음 달에 다시 시도해 주세요'); return; }
+      var ts = FS.FieldValue.serverTimestamp();
+      return db.collection('invites').doc(inviteId).update({
+        status: 'completed', completed_at: ts, inviter_rewarded: true,
+      }).then(function () {
+        return ppGrantPoints(500, '친구초대 보상 (초대자)');
+      }).then(function () {
+        showToast('첫 구매 성사 처리 완료 · 내 500P 지급 (친구 몫은 친구가 다음 접속 시 자동 지급)');
+        renderInvites();
+      });
+    });
+  }).catch(function (e) { console.error('ppCompleteInvite', e); showToast('처리에 실패했어요'); });
+}
+window.ppCompleteInvite = ppCompleteInvite; // iv-hist-list innerHTML의 inline onclick에서 호출(IIFE 밖 전역 스코프 필요)
+
+/* ── 피초대자 보상 셀프 클레임 ── status가 completed인데 아직 못 받은 몫이 있으면 앱 진입 시 자동 지급 */
+function ppClaimInviteeRewards() {
+  if (!PP.uid) return Promise.resolve();
+  return ppQuery('invites', 'invitee_id', PP.uid).then(function (list) {
+    // status는 'completed'로 유지(CMS 친구초대 관리 대시보드의 "성공 초대" 집계가 status==='completed'
+    // 기준이라, 여기서 'rewarded'로 바꿔버리면 피초대자가 보상을 받는 순간 CMS 통계에서 빠져버린다).
+    // 피초대자의 수령 여부는 invitee_rewarded 플래그로만 추적.
+    var pending = list.filter(function (x) { return (x.status === 'completed' || x.status === 'rewarded') && !x.invitee_rewarded; });
+    if (!pending.length) return;
+    var chain = Promise.resolve();
+    pending.forEach(function (x) {
+      chain = chain.then(function () {
+        return ppGrantPoints(500, '친구초대 보상 (피초대자)').then(function () {
+          return db.collection('invites').doc(x._id).update({ invitee_rewarded: true });
+        });
+      });
+    });
+    return chain.then(function () { showToast('친구초대 보상 500P가 지급됐어요!'); });
+  }).catch(function (e) { console.error('ppClaimInviteeRewards', e); });
+}
+
+function renderInviteCode() {
+  var el = document.getElementById('iv-code-value');
+  if (!el) return;
+  ppEnsureInviteCode().then(function (code) {
+    el.textContent = code || '――――――';
+  });
+}
+
 function renderInvites() {
   if (!PP.uid) return;
+  renderInviteCode();
   var list = document.getElementById('iv-hist-list');
   if (!list) return;
   ppQuery('invites', 'inviter_id', PP.uid).then(function (inv) {
     inv = inv.filter(function (x) { return ppDate(x.created_at); }).sort(function (a, b) { return ppDate(b.created_at) - ppDate(a.created_at); });
     var now = new Date(), mc = 0;
-    inv.forEach(function (x) { var d = ppDate(x.created_at); if (d && d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth()) mc++; });
+    inv.forEach(function (x) {
+      if (x.status !== 'completed' && x.status !== 'rewarded') return;
+      var cd = ppDate(x.completed_at) || ppDate(x.created_at);
+      if (cd && cd.getFullYear() === now.getFullYear() && cd.getMonth() === now.getMonth()) mc++;
+    });
     var mcEl = document.getElementById('iv-month-count'); if (mcEl) mcEl.textContent = mc;
-    var fill = document.getElementById('iv-status-fill'); if (fill) fill.style.width = Math.min(100, mc / 20 * 100) + '%';
-    var sub = document.getElementById('iv-status-sub'); if (sub) sub.textContent = '매월 1일 0시에 초기화 · 이번 달 ' + Math.max(0, 20 - mc) + '명 더 초대할 수 있어요';
+    var fill = document.getElementById('iv-status-fill'); if (fill) fill.style.width = Math.min(100, mc / INVITE_MONTHLY_CAP * 100) + '%';
+    var sub = document.getElementById('iv-status-sub');
+    if (sub) sub.textContent = mc >= INVITE_MONTHLY_CAP
+      ? '이번 달 한도(' + INVITE_MONTHLY_CAP + '명)에 도달했어요 · 다음 달 1일 초기화'
+      : '매월 1일 0시에 초기화 · 이번 달 ' + (INVITE_MONTHLY_CAP - mc) + '명 더 인정받을 수 있어요';
     if (!inv.length) {
-      list.innerHTML = ppEmpty('👥', '아직 초대한 친구가 없어요', '친구를 초대하고 첫 픽구매가 성사되면<br>두 사람 모두 500P를 받아요');
+      list.innerHTML = ppEmpty('👥', '아직 초대한 친구가 없어요', '친구를 초대하고 첫 구매가 성사되면<br>두 사람 모두 500P를 받아요');
       return;
     }
     list.innerHTML = inv.map(function (x) {
       var done = (x.status === 'completed' || x.status === 'rewarded');
       var nm = '친구'; var ava = (x.invitee_id || '친').slice(-1).toUpperCase();
-      return '<div class="iv-hist-item"><div class="iv-hist-ava">' + ppEsc(ava) + '</div>'
+      var top = '<div class="iv-hist-top"><div class="iv-hist-ava">' + ppEsc(ava) + '</div>'
         + '<div class="iv-hist-body"><div class="iv-hist-name">' + nm + '</div><div class="iv-hist-date">' + ppFmt(ppDate(x.created_at)) + '</div></div>'
-        + '<div class="iv-hist-chip ' + (done ? 'done' : 'wait') + '">' + (done ? '보상 지급 완료' : '첫 구매 대기') + '</div></div>';
+        + '<div class="iv-hist-chip ' + (done ? 'done' : 'wait') + '">' + (done ? '첫 구매 완료' : '첫 구매 대기') + '</div></div>';
+      var actions = done ? '' : '<div class="iv-hist-actions"><button class="iv-hist-complete-btn" onclick="ppCompleteInvite(\'' + x._id + '\')">첫 구매 완료 처리 (데모)</button></div>';
+      return '<div class="iv-hist-item">' + top + actions + '</div>';
     }).join('');
   });
+}
+
+/* ── pw-16 화면 바인딩: 코드 복사, 공유(Web Share API + 클립보드 폴백) ──
+   dataset.ipBound은 bindCatchAll()이 전역에서 예약해 쓰는 플래그라 여기서 재사용하면 안 됨
+   (미리 세팅해두면 이 함수가 자기 리스너를 안 붙이고, 안 세팅해두면 catchAll이 먼저 가짜
+   "프로토타입" 핸들러를 붙여버려 실제 로직이 실행되지 않는다) — 별도 키(ppBound) 사용. */
+function bindInviteScreen() {
+  var copyBtn = document.getElementById('iv-code-copy-btn');
+  if (copyBtn && !copyBtn.dataset.ppBound) {
+    copyBtn.dataset.ppBound = '1';
+    copyBtn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      var code = (PP.user && PP.user.invite_code) || document.getElementById('iv-code-value').textContent;
+      if (!code || code === '――――――') return;
+      ppCopyText(code).then(function () { showToast('복사됐어요'); }).catch(function () { showToast('복사에 실패했어요'); });
+    });
+  }
+  var shareBtn = document.getElementById('iv-share-btn');
+  if (shareBtn && !shareBtn.dataset.ppBound) {
+    shareBtn.dataset.ppBound = '1';
+    shareBtn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      ppEnsureInviteCode().then(function (code) {
+        if (!code) { showToast('초대코드를 불러오지 못했어요'); return; }
+        var link = ppInviteLink(code);
+        var text = '프라이스픽 초대코드 ' + code + ' 입력하고 같이 포인트 받아요!';
+        if (navigator.share) {
+          navigator.share({ title: '프라이스픽 친구초대', text: text, url: link }).catch(function () {});
+        } else {
+          ppCopyText(link).then(function () { showToast('초대 링크가 복사됐어요'); }).catch(function () { showToast('복사에 실패했어요'); });
+        }
+      });
+    });
+  }
+}
+
+/* ── pw-30-invite 화면 바인딩: 초대코드 등록 ── */
+function bindInviteCodeEntryScreen() {
+  var submit = document.getElementById('invcode-submit');
+  var input = document.getElementById('invcode-input');
+  if (!submit || !input || submit.dataset.ppBound) return;
+  submit.dataset.ppBound = '1';
+  submit.addEventListener('click', function (e) {
+    e.stopPropagation();
+    var err = document.getElementById('invcode-err');
+    if (err) err.style.display = 'none';
+    var code = input.value.trim();
+    if (!code) { if (err) { err.textContent = '초대코드를 입력해 주세요.'; err.style.display = 'block'; } return; }
+    submit.disabled = true;
+    submit.textContent = '확인 중...';
+    ppRedeemInviteCode(code).then(function () {
+      submit.textContent = '등록하기';
+      showToast('초대코드가 등록됐어요! 첫 구매가 성사되면 500P가 지급돼요');
+      renderInviteCodeEntryScreen();
+    }).catch(function (e2) {
+      submit.disabled = false;
+      submit.textContent = '등록하기';
+      var msg = { empty: '초대코드를 입력해 주세요.', already_redeemed: '이미 초대코드를 입력했어요.',
+        self: '본인 코드는 사용할 수 없어요.', not_found: '존재하지 않는 코드예요.' }[e2.message] || '처리에 실패했어요.';
+      if (err) { err.textContent = msg; err.style.display = 'block'; }
+      if (e2.message === 'already_redeemed') renderInviteCodeEntryScreen();
+    });
+  });
+}
+function renderInviteCodeEntryScreen() {
+  var input = document.getElementById('invcode-input');
+  var submit = document.getElementById('invcode-submit');
+  var done = document.getElementById('invcode-done');
+  if (!input || !submit || !done) return;
+  if (PP.user && PP.user.invited_by) {
+    input.disabled = true;
+    submit.style.display = 'none';
+    done.style.display = 'block';
+  } else {
+    input.disabled = false;
+    submit.style.display = 'block';
+    done.style.display = 'none';
+  }
 }
 
 /* ── 구매 내역 (pw-34) ── */

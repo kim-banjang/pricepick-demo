@@ -174,9 +174,15 @@ service cloud.firestore {
     match /invites/{docId} {
       // read를 isSignedIn()까지 완화: "친구초대" 화면이 본인이 초대한 친구 목록을 보여줘야 함
       // (원래 admin 전용이라 본인도 못 읽던 규칙 — 노출 화면 추가하며 최소한으로 열었다).
-      // 초대 관계 생성 자체는 백엔드(초대받은 사람의 실제 가입 완료 시점)가 처리 — 앱은 쓰지 않는다.
+      // create: 피초대자가 초대코드를 등록하는 시점에 본인을 invitee_id로 하는 관계 문서를
+      // 직접 생성(자기 uid만 invitee_id로 쓸 수 있어 타인 명의 도용 불가).
+      // update: 초대자(첫 구매 완료 처리 데모 트리거)·피초대자(보상 셀프 클레임) 둘 다 본인이
+      // 당사자인 문서의 상태만 갱신 가능 — 포인트 잔액 자체는 이 컬렉션이 아니라
+      // user_points/point_transactions 쪽 "본인 전용 쓰기" 규칙이 그대로 지켜준다.
       allow read: if isSignedIn();
-      allow write: if isAdmin();
+      allow create: if isAdmin() || (isSignedIn() && request.resource.data.invitee_id == request.auth.uid);
+      allow update: if isAdmin() || (isSignedIn() && (resource.data.inviter_id == request.auth.uid || resource.data.invitee_id == request.auth.uid));
+      allow delete: if isAdmin();
     }
     match /daily_visits/{docId} {
       // read/create를 isSignedIn()까지 완화: 시뮬 로그인 지원 + "출석체크" 화면의 최소 액션 기록.
