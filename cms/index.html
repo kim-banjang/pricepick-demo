@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PricePick v8.2 — CMS</title>
+<title>PricePick DEMO — CMS</title>
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
 <style>
@@ -1141,7 +1141,7 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
       </div>
       <div class="card">
         <table>
-          <thead><tr><th>닉네임 / 카카오톡 ID / 식별 아이디</th><th>연동 상태</th><th>가입일</th><th>랜덤 티켓</th><th>전환예정</th><th>등급 티켓 (브론즈/실버/골드)</th><th>이벤트 티켓</th><th>마케팅 수신</th><th>상태</th><th>관리</th></tr></thead>
+          <thead><tr><th>닉네임 / 카카오톡 ID</th><th>연동 상태</th><th>가입일</th><th>랜덤 티켓</th><th>전환예정</th><th>등급 티켓 (브론즈/실버/골드)</th><th>이벤트 티켓</th><th>마케팅 수신</th><th>상태</th><th>관리</th></tr></thead>
           <tbody>
           </tbody>
         </table>
@@ -5806,7 +5806,7 @@ function loadMembers() {
           : '<span style="background:var(--warning-soft);color:var(--warning);padding:2px 8px;border-radius:99px;font-size:11px;font-weight:600;">게스트</span>';
         var statusKo = MEMBER_STATUS_KO[u.status] || '정상';
         rows.push('<tr>'
-          + '<td>' + renderMemberIdentity(u, doc.id) + '</td>'
+          + '<td>' + renderMemberIdentityListOnly(u, doc.id) + '</td>'
           + '<td>' + kakaoType + '</td>'
           + '<td style="text-align:center;white-space:nowrap"><div style="font-weight:700;">' + ppDt(u.created_at) + '</div><div style="color:var(--text-3);font-size:11px">' + ppTm(u.created_at) + '</div></td>'
           + '<td style="text-align:center"><span id="mem-rand-' + doc.id + '">…</span></td>'
@@ -5933,6 +5933,12 @@ function renderMemberIdentity(u, docId) {
   return '<div style="font-weight:500;">' + (u.nickname || '닉네임없음') + '</div>'
     + '<div style="font-size:11px;color:var(--text-3);">' + memberKakaoLabel(u) + '</div>'
     + '<div style="font-size:11px;color:var(--text-3);font-family:monospace;">' + memberIdShort(docId) + '</div>';
+}
+// 회원 목록 리스트 전용 — 세로 2행(닉네임 / 카카오톡ID). 식별 아이디는 상세에서만 노출.
+function renderMemberIdentityListOnly(u, docId) {
+  u = u || {};
+  return '<div style="font-weight:500;">' + (u.nickname || '닉네임없음') + '</div>'
+    + '<div style="font-size:11px;color:var(--text-3);">' + memberKakaoLabel(u) + '</div>';
 }
 // 드롭다운 등 세로 공간이 없는 곳용 — 한 줄 "닉네임 · 카카오톡ID(또는 게스트) · 식별 아이디"
 function renderMemberIdentityInline(u, docId) {
