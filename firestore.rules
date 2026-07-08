@@ -68,6 +68,11 @@ service cloud.firestore {
       allow read: if true;
       allow write: if isAdmin();
     }
+    // 운영 설정 싱글턴 문서 (예: settings/roulette = 행운룰렛 6칸 구성). 앱은 읽기만, 편집은 CMS(admin) 전용.
+    match /settings/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
 
     // ──────────────────────────────────────────
     // C. Purchase Attribution

@@ -824,7 +824,11 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
           <button class="sb-item" id="nav-attendance" data-label="주간 이벤트 추첨" onclick="go('attendance',this)">
             <span class="sb-item-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M8 2v4"/><path d="M16 2v4"/><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M3 10h18"/><path d="m9 16 2 2 4-4"/></svg></span>
             <span class="sb-item-lbl" id="nav-label-attendance">주간 이벤트 추첨</span>
-            
+
+          </button>
+          <button class="sb-item" id="nav-roulette-settings" data-label="행운룰렛 설정" onclick="go('roulette-settings',this)">
+            <span class="sb-item-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 3v9l6 3"/></svg></span>
+            <span class="sb-item-lbl" id="nav-label-roulette-settings">행운룰렛 설정</span>
           </button>
           <button class="sb-item" id="nav-clawback" data-label="환수 이력" onclick="go('clawback',this)">
             <span class="sb-item-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg></span>
@@ -1318,6 +1322,21 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
             <tbody id="attendance-tbody">
             </tbody>
           </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 행운룰렛 설정 (신규) ── -->
+    <div class="section" id="sec-roulette-settings">
+      <div class="info-box"><strong>행운룰렛 = 포인트·이벤트티켓을 확률로 지급</strong> — 확률·배분은 정책상 미결이라 운영자가 직접 정합니다. 룰렛은 6칸이며 각 칸을 균등 확률(1/6)로 추첨합니다. 여기서 저장한 설정을 앱이 그대로 읽어 룰렛을 렌더링하고 당첨 보상을 지급합니다.</div>
+      <div class="card">
+        <div class="card-header"><div class="card-title">룰렛 6칸 설정</div><button class="btn btn-primary btn-sm" id="rlt-save-btn" onclick="rltSave()">저장</button></div>
+        <div style="padding:16px">
+          <div style="display:grid;grid-template-columns:56px 1fr 160px;gap:8px;font-size:12px;color:var(--text-3);margin-bottom:6px;padding:0 2px;">
+            <div>칸</div><div>유형</div><div>값</div>
+          </div>
+          <div id="rlt-rows"></div>
+          <div style="font-size:12px;color:var(--text-3);margin-top:10px" id="rlt-status">불러오는 중…</div>
         </div>
       </div>
     </div>
@@ -3528,6 +3547,7 @@ const I18N = {
     'page.demo-mgmt.title': '데이터 관리(데모)', 'page.demo-mgmt.bc': '개발 · 데모',
     'nav.op-policy': '운영 정책', 'page.op-policy.title': '운영 정책', 'page.op-policy.bc': '운영',
     'page.clawback.title': '환수 이력', 'page.clawback.bc': '티켓 · 보상',
+    'nav.roulette-settings': '행운룰렛 설정', 'page.roulette-settings.title': '행운룰렛 설정', 'page.roulette-settings.bc': '티켓 · 보상',
     'nav.group.points': '포인트 관리',
     'nav.points': '포인트 내역', 'page.points.title': '포인트 내역', 'page.points.bc': '포인트 관리',
     'nav.point-attendance': '출석체크 설정', 'page.point-attendance.title': '출석체크 설정', 'page.point-attendance.bc': '포인트 관리',
@@ -3787,6 +3807,7 @@ const PAGE_META = {
   draws:         { title:'추첨 관리',           bc:'티켓 · 보상' },
   prizes:        { title:'경품/응모 관리',        bc:'티켓 · 보상' },
   attendance:    { title:'주간 이벤트 추첨',       bc:'티켓 · 보상' },
+  'roulette-settings': { title:'행운룰렛 설정',    bc:'티켓 · 보상' },
   gifticons:     { title:'구매/사용 내역',        bc:'티켓 · 보상' },
   banners:       { title:'배너 관리',           bc:'콘텐츠' },
   events:        { title:'이벤트 관리',         bc:'콘텐츠' },
@@ -3824,6 +3845,7 @@ function go(id, navEl) {
   // 섹션 진입 시 초기화 훅
   if (id === 'scenario-mgmt' && window.scenInit) window.scenInit();
   if (id === 'demo-mgmt' && window.dmLoadStats) window.dmLoadStats();
+  if (id === 'roulette-settings' && window.rltLoad) window.rltLoad();
   // 모바일: 메뉴 항목 선택 시 드로어 닫기
   if (window.innerWidth <= 768) closeMobileSidebar();
   // 새로고침/뒤로가기 복원을 위해 현재 섹션을 URL 해시에 반영
@@ -8271,6 +8293,97 @@ window.dmFillFromScenarios = function() {
       })();
     });
   }).catch(function(e){ if(btn){btn.textContent='시나리오 채우기';btn.disabled=false;} dmShowToast('채우기 실패: '+(e.message||e), true); });
+};
+
+/* ── 행운룰렛 설정 (settings/roulette) ──
+   type: 'miss' | 'event_ticket' | 'point'. 앱(app/index.html)이 같은 문서를 읽어
+   룰렛을 렌더링하고 당첨 지급에 그대로 사용한다. */
+var RLT_DEFAULT_WHEEL = [
+  { type: 'event_ticket', value: 1 },
+  { type: 'miss' },
+  { type: 'point', value: 100 },
+  { type: 'event_ticket', value: 2 },
+  { type: 'miss' },
+  { type: 'point', value: 200 },
+];
+function rltRenderRows(wheel) {
+  var wrap = document.getElementById('rlt-rows');
+  if (!wrap) return;
+  wrap.innerHTML = wheel.map(function(seg, i) {
+    var type = seg && seg.type ? seg.type : 'miss';
+    var value = (seg && seg.value != null) ? seg.value : '';
+    var disabled = type === 'miss' ? 'disabled' : '';
+    var placeholder = type === 'event_ticket' ? '장수' : (type === 'point' ? 'P 액수' : '-');
+    return '<div style="display:grid;grid-template-columns:56px 1fr 160px;gap:8px;align-items:center;margin-bottom:8px;">'
+      + '<div style="font-size:13px;font-weight:700;color:var(--text-2);">' + (i + 1) + '칸</div>'
+      + '<select class="form-select" data-rlt-type="' + i + '" onchange="rltOnTypeChange(' + i + ')">'
+      + '<option value="miss"' + (type === 'miss' ? ' selected' : '') + '>꽝</option>'
+      + '<option value="event_ticket"' + (type === 'event_ticket' ? ' selected' : '') + '>이벤트티켓</option>'
+      + '<option value="point"' + (type === 'point' ? ' selected' : '') + '>포인트</option>'
+      + '</select>'
+      + '<input class="form-input" type="number" min="1" step="1" data-rlt-value="' + i + '" value="' + value + '" placeholder="' + placeholder + '"' + (disabled ? ' disabled' : '') + '>'
+      + '</div>';
+  }).join('');
+}
+window.rltOnTypeChange = function(i) {
+  var sel = document.querySelector('[data-rlt-type="' + i + '"]');
+  var input = document.querySelector('[data-rlt-value="' + i + '"]');
+  if (!sel || !input) return;
+  if (sel.value === 'miss') {
+    input.value = '';
+    input.disabled = true;
+    input.placeholder = '-';
+  } else {
+    input.disabled = false;
+    input.placeholder = sel.value === 'event_ticket' ? '장수' : 'P 액수';
+    if (!input.value) input.value = sel.value === 'event_ticket' ? 1 : 100;
+  }
+};
+function rltReadRows() {
+  var wheel = [];
+  for (var i = 0; i < 6; i++) {
+    var sel = document.querySelector('[data-rlt-type="' + i + '"]');
+    var input = document.querySelector('[data-rlt-value="' + i + '"]');
+    var type = sel ? sel.value : 'miss';
+    if (type === 'miss') { wheel.push({ type: 'miss' }); continue; }
+    var value = input ? parseInt(input.value, 10) : 0;
+    wheel.push({ type: type, value: (value > 0 ? value : 1) });
+  }
+  return wheel;
+}
+window.rltLoad = function() {
+  var status = document.getElementById('rlt-status');
+  rltRenderRows(RLT_DEFAULT_WHEEL);
+  if (status) status.textContent = '불러오는 중…';
+  db.collection('settings').doc('roulette').get().then(function(doc) {
+    var data = doc.exists ? doc.data() : null;
+    var wheel = (data && Array.isArray(data.wheel) && data.wheel.length === 6) ? data.wheel : RLT_DEFAULT_WHEEL;
+    rltRenderRows(wheel);
+    if (status) status.textContent = doc.exists ? '저장된 설정을 불러왔습니다.' : '기본값(시드) 표시 중 · 저장하면 이 설정이 앱에 적용됩니다.';
+  }).catch(function(e) {
+    console.error('rltLoad', e);
+    rltRenderRows(RLT_DEFAULT_WHEEL);
+    if (status) status.textContent = '불러오기 실패 — 기본값 표시 중';
+  });
+};
+window.rltSave = function() {
+  var wheel = rltReadRows();
+  var btn = document.getElementById('rlt-save-btn');
+  var status = document.getElementById('rlt-status');
+  if (btn) { btn.disabled = true; btn.textContent = '저장 중…'; }
+  db.collection('settings').doc('roulette').set({
+    wheel: wheel,
+    updated_at: FS.FieldValue.serverTimestamp(),
+  }, { merge: true }).then(function() {
+    if (btn) { btn.disabled = false; btn.textContent = '저장'; }
+    if (status) status.textContent = '저장 완료 · 앱에서 다음 진입 시 반영됩니다.';
+    toast('행운룰렛 설정이 저장되었습니다.');
+  }).catch(function(e) {
+    console.error('rltSave', e);
+    if (btn) { btn.disabled = false; btn.textContent = '저장'; }
+    if (status) status.textContent = '저장 실패: ' + (e.message || e);
+    toast('저장에 실패했습니다.');
+  });
 };
 
 })();
