@@ -14623,8 +14623,24 @@ function bindWithdrawConfirmScreen() {
     btn.querySelectorAll('*').forEach(function(c) { c.dataset.ipBound = '1'; });
     btn.addEventListener('click', function(e) {
       e.stopPropagation();
-      if (txt.includes('탈퇴')) showScreen('pw-02-withdraw-done');
-      else ipGoBack();
+      if (txt.includes('탈퇴')) {
+        if (btn.disabled) return;
+        if (!window.ppPerformWithdraw) { showScreen('pw-02-withdraw-done'); return; }
+        btn.disabled = true;
+        var prevText = btn.textContent;
+        btn.textContent = '처리 중...';
+        window.ppPerformWithdraw().then(function() {
+          showScreen('pw-02-withdraw-done');
+        }).catch(function(err) {
+          console.error('withdraw', err);
+          showScreen('pw-02-withdraw-done');
+        }).then(function() {
+          btn.disabled = false;
+          btn.textContent = prevText;
+        });
+      } else {
+        ipGoBack();
+      }
     });
   });
 }
@@ -15540,6 +15556,37 @@ function exitPersona() {
   checkExistingUser();
 }
 window.ppExitPersona = exitPersona;
+
+/* ── 계정 탈퇴 ──
+   1) users/{uid}.status='withdrawn'로 소프트 삭제 (하드 delete는 firestore.rules상
+      isAdmin()만 허용 — 30일 보존 정책과도 일치).
+   2) 클라이언트 로그인 세션을 끊어서 재실행 시 예전 계정으로 자동 복원되지 않게 한다:
+      익명 인증이면 계정 자체를 삭제(다음 실행 때 signInAnonymously가 새 uid 발급),
+      아니면 signOut만. 시뮬 로그인(페르소나) 중엔 실제 인증 세션은 건드리지 않는다. */
+function performWithdraw() {
+  var uid = PP.uid;
+  if (!uid) return Promise.resolve();
+  var isPersona = !!PP.personaUserId;
+  var now = FS.FieldValue.serverTimestamp();
+  return db.collection('users').doc(uid).set({
+    status: 'withdrawn', withdrawn_at: now,
+  }, { merge: true }).catch(function(e) { console.error('withdrawMark', e); }).then(function() {
+    PP.user = null;
+    PP.points = 0;
+    PP.tickets = { bronze: 0, silver: 0, gold: 0, event: 0, total: 0 };
+    if (isPersona) { PP.personaUserId = null; PP.uid = REAL_UID; return; }
+    PP.uid = null;
+    var cu = auth.currentUser;
+    if (cu && cu.isAnonymous) {
+      return cu.delete().catch(function(e) {
+        console.error('withdrawDeleteAnon', e);
+        return auth.signOut().catch(function(e2) { console.error('withdrawSignOut', e2); });
+      });
+    }
+    return auth.signOut().catch(function(e) { console.error('withdrawSignOut', e); });
+  });
+}
+window.ppPerformWithdraw = performWithdraw;
 
 function greedyTickets(amount) {
   var units = Math.floor(amount / 5000);
