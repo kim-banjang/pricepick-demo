@@ -15903,25 +15903,6 @@ function renderHomeTickets() {
   var tot = document.querySelector('#pw-10 .htc-tickets-grp b');
   if (tot) tot.textContent = PP.tickets.total;
 
-  /* 빈 상태 처리 — 대기 중인 랜덤 티켓이 있으면 "적립 없음"이 아니라 "확정 대기" 안내 */
-  var homeCard = document.querySelector('#pw-10 .home-ticket-card');
-  var homeEmpty = document.getElementById('pp-home-empty');
-  if (PP.tickets.total === 0) {
-    if (!homeEmpty && homeCard) {
-      var emp = document.createElement('div');
-      emp.id = 'pp-home-empty';
-      emp.style.cssText = 'margin:12px 0 0;background:#F8F7FF;border:1px dashed #C6AFFF;border-radius:14px;padding:18px 16px;text-align:center;font-size:13px;color:#6B5E8A;';
-      homeCard.parentNode.insertBefore(emp, homeCard.nextSibling);
-    }
-    if (homeEmpty || document.getElementById('pp-home-empty')) {
-      var e2 = document.getElementById('pp-home-empty');
-      e2.innerHTML = '<div style="font-size:28px;margin-bottom:8px;">🎟</div>'
-        + '<div style="font-weight:700;color:var(--text1);margin-bottom:4px;">아직 티켓이 없어요</div>'
-        + '<div>쇼핑몰 구매 후 티켓을 적립해 보세요</div>';
-    }
-  } else if (homeEmpty) {
-    homeEmpty.remove();
-  }
   if (typeof renderExGifticonSummary === 'function') renderExGifticonSummary();
 }
 
