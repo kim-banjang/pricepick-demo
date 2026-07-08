@@ -10737,8 +10737,8 @@ body.interactive-mode #ip-nav { display: block; }
             <div class="my-row kakao-row" data-ip-bound="1" style="cursor:default !important">
               <div class="my-row-ico" data-ip-bound="1"><svg width="16" height="16" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill="#FEE500" d="M12 2C6.477 2 2 5.58 2 10c0 2.8 1.516 5.273 3.875 6.875L5 22l5.25-2.75c.562.163 1.15.25 1.75.25 5.523 0 10-3.58 10-8S17.523 2 12 2z"/><circle cx="8" cy="10" r="1.2" fill="#3C1E1E"/><circle cx="12" cy="10" r="1.2" fill="#3C1E1E"/><circle cx="16" cy="10" r="1.2" fill="#3C1E1E"/></svg></div>
               <div class="my-row-body" data-ip-bound="1">
-                <div class="my-row-name" data-ip-bound="1">카카오 미연동</div>
-                <div class="my-row-desc" data-ip-bound="1">연동하면 티켓·포인트·내역을 안전하게 보관해요</div>
+                <div class="my-row-name" id="kakao-row-name" data-ip-bound="1">카카오 미연동</div>
+                <div class="my-row-desc" id="kakao-row-desc" data-ip-bound="1">연동하면 티켓·포인트·내역을 안전하게 보관해요</div>
               </div>
               <button class="kakao-pull-btn" data-ip-bound="1" style="cursor:pointer !important;background:#FEE500;color:#3C1E1E;" onclick="showScreen('pw-02-K')">연동하기</button>
             </div>
@@ -15971,12 +15971,31 @@ function refreshMyData() {
     metaEl.textContent = '가입 ' + days + '일째';
   }
   var kakaoBtn = document.querySelector('#pw-30 .kakao-pull-btn');
-  if (kakaoBtn && PP.user.linked_kakao) {
-    kakaoBtn.textContent = '연동됨';
-    kakaoBtn.style.background = '#eee';
-    kakaoBtn.style.color = '#888';
-    kakaoBtn.style.cursor = 'default';
-    kakaoBtn.onclick = null;
+  var kakaoNameEl = document.getElementById('kakao-row-name');
+  var kakaoDescEl = document.getElementById('kakao-row-desc');
+  if (PP.user.linked_kakao) {
+    if (kakaoNameEl) kakaoNameEl.textContent = '카카오 연동';
+    if (kakaoDescEl) {
+      var kInfo = [PP.user.kakao_nickname, PP.user.kakao_login_id].filter(Boolean).join(' · ');
+      kakaoDescEl.textContent = kInfo || '카카오 계정과 안전하게 연결되어 있어요';
+    }
+    if (kakaoBtn) {
+      kakaoBtn.textContent = '연동됨';
+      kakaoBtn.style.background = '#eee';
+      kakaoBtn.style.color = '#888';
+      kakaoBtn.style.cursor = 'default';
+      kakaoBtn.onclick = null;
+    }
+  } else {
+    if (kakaoNameEl) kakaoNameEl.textContent = '카카오 미연동';
+    if (kakaoDescEl) kakaoDescEl.textContent = '연동하면 티켓·포인트·내역을 안전하게 보관해요';
+    if (kakaoBtn) {
+      kakaoBtn.textContent = '연동하기';
+      kakaoBtn.style.background = '#FEE500';
+      kakaoBtn.style.color = '#3C1E1E';
+      kakaoBtn.style.cursor = 'pointer';
+      kakaoBtn.onclick = function() { showScreen('pw-02-K'); };
+    }
   }
 }
 
