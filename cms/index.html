@@ -400,6 +400,15 @@ tr:hover td{background:var(--surface-2);}
   padding:10px 13px;color:var(--text);font-size:13px;outline:none;font-family:var(--font);height:40px;}
 .form-hint{font-size:11px;color:var(--text-3);margin-top:4px;}
 textarea.form-input{resize:vertical;min-height:80px;height:auto;}
+/* ── 등급별 수량 스테퍼(수동 티켓 지급/회수) ── */
+.tm-grade-row{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;}
+.tm-grade-label{font-size:13px;font-weight:600;color:var(--text);flex-shrink:0;min-width:44px;}
+.tm-stepper{display:flex;align-items:center;gap:6px;flex-shrink:0;}
+.tm-stepper-btn{width:40px;height:40px;flex-shrink:0;border-radius:var(--r-md);border:1px solid var(--border);
+  background:var(--surface-2);color:var(--text-2);font-size:18px;font-weight:700;cursor:pointer;
+  display:inline-flex;align-items:center;justify-content:center;line-height:1;font-family:var(--font);transition:all .15s;}
+.tm-stepper-btn:hover{background:var(--surface);border-color:var(--text-2);color:var(--text);}
+.tm-stepper-btn:active{transform:scale(.94);}
 
 /* ── 페이지네이션 ── */
 .pagination{display:flex;gap:5px;justify-content:center;padding:16px;}
@@ -2804,20 +2813,45 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
     <div class="modal-body">
       <div class="warn-box"><strong>주의:</strong> 수동 처리는 로그에 기록되며 되돌릴 수 없습니다.</div>
       <div class="form-group"><label class="form-label">대상 회원</label><select class="form-select" id="tm-user"><option value="">불러오는 중…</option></select></div>
-      <div class="form-row">
-        <div class="form-group">
-          <label class="form-label">처리 유형</label>
-          <select class="form-select" id="tm-action"><option value="grant">지급</option><option value="revoke">회수</option></select>
-        </div>
-        <div class="form-group">
-          <label class="form-label">티켓 등급</label>
-          <select class="form-select" id="tm-grade"><option value="bronze">브론즈</option><option value="silver">실버</option><option value="gold">골드</option><option value="event">이벤트</option></select>
+      <div class="form-group"><label class="form-label">처리 유형</label><select class="form-select" id="tm-action"><option value="grant">지급</option><option value="revoke">회수</option></select></div>
+      <div class="form-group">
+        <label class="form-label">티켓 수량 (등급별, 0보다 큰 것만 처리)</label>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <div class="tm-grade-row">
+            <span class="tm-grade-label">브론즈</span>
+            <div class="tm-stepper">
+              <button type="button" class="tm-stepper-btn" onclick="tmStepQty('tm-qty-bronze',-1)">−</button>
+              <input class="form-input" type="number" id="tm-qty-bronze" min="0" value="0" style="width:64px;text-align:center;flex:none;" oninput="tmClampQty(this)">
+              <button type="button" class="tm-stepper-btn" onclick="tmStepQty('tm-qty-bronze',1)">+</button>
+            </div>
+          </div>
+          <div class="tm-grade-row">
+            <span class="tm-grade-label">실버</span>
+            <div class="tm-stepper">
+              <button type="button" class="tm-stepper-btn" onclick="tmStepQty('tm-qty-silver',-1)">−</button>
+              <input class="form-input" type="number" id="tm-qty-silver" min="0" value="0" style="width:64px;text-align:center;flex:none;" oninput="tmClampQty(this)">
+              <button type="button" class="tm-stepper-btn" onclick="tmStepQty('tm-qty-silver',1)">+</button>
+            </div>
+          </div>
+          <div class="tm-grade-row">
+            <span class="tm-grade-label">골드</span>
+            <div class="tm-stepper">
+              <button type="button" class="tm-stepper-btn" onclick="tmStepQty('tm-qty-gold',-1)">−</button>
+              <input class="form-input" type="number" id="tm-qty-gold" min="0" value="0" style="width:64px;text-align:center;flex:none;" oninput="tmClampQty(this)">
+              <button type="button" class="tm-stepper-btn" onclick="tmStepQty('tm-qty-gold',1)">+</button>
+            </div>
+          </div>
+          <div class="tm-grade-row">
+            <span class="tm-grade-label">이벤트</span>
+            <div class="tm-stepper">
+              <button type="button" class="tm-stepper-btn" onclick="tmStepQty('tm-qty-event',-1)">−</button>
+              <input class="form-input" type="number" id="tm-qty-event" min="0" value="0" style="width:64px;text-align:center;flex:none;" oninput="tmClampQty(this)">
+              <button type="button" class="tm-stepper-btn" onclick="tmStepQty('tm-qty-event',1)">+</button>
+            </div>
+          </div>
         </div>
       </div>
-      <div class="form-row">
-        <div class="form-group"><label class="form-label">수량</label><input class="form-input" type="number" id="tm-qty" placeholder="0" min="1" value="1"></div>
-        <div class="form-group"><label class="form-label">사유</label><input class="form-input" id="tm-reason" placeholder="처리 사유 (필수)"></div>
-      </div>
+      <div class="form-group"><label class="form-label">사유</label><input class="form-input" id="tm-reason" placeholder="처리 사유 (필수)"></div>
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModal('m-ticket-manual')">취소</button>
@@ -7135,32 +7169,64 @@ function dmFutureTimestamp(days) {
   return FS.Timestamp.fromDate(d);
 }
 
+var TM_GRADES = ['bronze', 'silver', 'gold', 'event'];
+
 window.tmOpenModal = function() {
-  var qtyEl = document.getElementById('tm-qty'); if (qtyEl) qtyEl.value = '1';
+  TM_GRADES.forEach(function(g) {
+    var el = document.getElementById('tm-qty-' + g); if (el) el.value = '0';
+  });
   var reasonEl = document.getElementById('tm-reason'); if (reasonEl) reasonEl.value = '';
   var actionEl = document.getElementById('tm-action'); if (actionEl) actionEl.value = 'grant';
-  var gradeEl = document.getElementById('tm-grade'); if (gradeEl) gradeEl.value = 'bronze';
   dmPopulateUserSelect('tm-user');
   openModal('m-ticket-manual');
 };
 
+// 등급별 수량 스테퍼 — 0 미만으로는 내려가지 않는다.
+window.tmStepQty = function(id, delta) {
+  var el = document.getElementById(id);
+  if (!el) return;
+  var v = Math.max(0, (parseInt(el.value, 10) || 0) + delta);
+  el.value = v;
+};
+window.tmClampQty = function(el) {
+  var v = parseInt(el.value, 10);
+  el.value = (isNaN(v) || v < 0) ? 0 : v;
+};
+
+// 처리 유형(지급/회수) 하나를 선택하고, 수량이 0보다 큰 등급들만 골라 동일 유형으로 순차 일괄 처리.
+// 등급별로 기존 tmGrantTickets/tmRevokeTickets를 그대로 호출해 로직·기록(user_tickets,
+// ticket_transactions, 관리자 로그)을 등급마다 따로 남긴다 — 배치를 등급별로 분리해 순차 실행하는
+// 이유는 회수 시 등급마다 보유량 조회→회수 대상 산정이 독립적이라 병렬 처리 시 결과 산정이 꼬일 수 있어서다.
 window.tmSubmit = function() {
   var userId = document.getElementById('tm-user').value;
   if (!userId) { dmShowToast('대상 회원을 선택하세요.', true); return; }
   var action = document.getElementById('tm-action').value; // grant | revoke
-  var grade = document.getElementById('tm-grade').value;   // bronze | silver | gold
-  var qty = parseInt(document.getElementById('tm-qty').value, 10) || 0;
-  if (qty < 1) { dmShowToast('수량을 입력하세요.', true); return; }
   var reason = document.getElementById('tm-reason').value.trim();
+
+  var qtyByGrade = {};
+  TM_GRADES.forEach(function(g) {
+    qtyByGrade[g] = parseInt(document.getElementById('tm-qty-' + g).value, 10) || 0;
+  });
+  var targets = TM_GRADES.filter(function(g) { return qtyByGrade[g] > 0; });
+  if (!targets.length) { dmShowToast('하나 이상의 등급에 수량을 입력하세요.', true); return; }
   if (!reason) { dmShowToast('사유를 입력하세요.', true); return; }
 
-  var task = action === 'revoke'
-    ? tmRevokeTickets(userId, grade, qty, reason)
-    : tmGrantTickets(userId, grade, qty, reason);
+  var results = [];
+  var chain = Promise.resolve();
+  targets.forEach(function(grade) {
+    chain = chain.then(function() {
+      var task = action === 'revoke'
+        ? tmRevokeTickets(userId, grade, qtyByGrade[grade], reason)
+        : tmGrantTickets(userId, grade, qtyByGrade[grade], reason);
+      return task.then(function(result) {
+        results.push(result);
+        logAdmin((action === 'revoke' ? '수동 티켓 회수: ' : '수동 티켓 지급: ') + userId + ' · ' + (TM_GRADE_KO[grade] || grade) + ' · ' + result.count + '장 · 사유: ' + reason);
+      });
+    });
+  });
 
-  task.then(function(result) {
-    dmShowToast(result.message);
-    logAdmin((action === 'revoke' ? '수동 티켓 회수: ' : '수동 티켓 지급: ') + userId + ' · ' + (TM_GRADE_KO[grade] || grade) + ' · ' + result.count + '장 · 사유: ' + reason);
+  chain.then(function() {
+    dmShowToast(results.map(function(r) { return r.message; }).join(' / '));
     closeModal('m-ticket-manual');
     if (typeof loadDashboardStats === 'function') loadDashboardStats();
     if (typeof loadTickets === 'function') loadTickets();
