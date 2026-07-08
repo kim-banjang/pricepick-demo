@@ -8611,14 +8611,15 @@ body.interactive-mode #ip-nav { display: block; }
           <div style="margin-bottom:14px;">
             <div style="font-size:12px;font-weight:600;color:var(--text2);margin-bottom:8px;">닉네임</div>
             <div style="position:relative;">
-              <input id="nick2-input" type="text" value="알뜰한판다" maxlength="10"
+              <input id="nick2-input" type="text" value="" maxlength="10"
                 style="width:100%;padding:14px 52px 14px 14px;border:1.5px solid var(--main);border-radius:12px;font-size:16px;font-weight:700;color:var(--text1);background:#fff;box-sizing:border-box;font-family:inherit;outline:none;"
-                oninput="(function(el){var c=document.getElementById('nick2-cnt');if(c)c.textContent=el.value.length+'/10';var b=document.getElementById('nick2-start');if(b){var ok=el.value.trim().length>=2;b.disabled=!ok;b.style.opacity=ok?'1':'0.5';b.style.cursor=ok?'pointer':'not-allowed';}})(this)">
-              <span id="nick2-cnt" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);font-size:12px;color:var(--text3);">5/10</span>
+                oninput="(function(el){var c=document.getElementById('nick2-cnt');if(c)c.textContent=el.value.length+'/10';var b=document.getElementById('nick2-start');if(b){var ok=el.value.trim().length>=2;b.disabled=!ok;b.style.opacity=ok?'1':'0.5';b.style.cursor=ok?'pointer':'not-allowed';}var err=document.getElementById('nick2-err');if(err)err.style.display='none';})(this)">
+              <span id="nick2-cnt" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);font-size:12px;color:var(--text3);">0/10</span>
             </div>
+            <div id="nick2-err" style="display:none;font-size:11.5px;font-weight:600;color:#E5533D;margin-top:6px;">이미 사용중인 닉네임입니다.</div>
             <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px;">
               <div style="font-size:11px;color:var(--text3);">한글·영문·숫자 조합, 2~10자</div>
-              <button type="button" data-ip-bound="1" onclick="(function(){var n=['알뜰한판다','현명한너구리','부지런한다람쥐','똑똑한고슴도치','센스있는코알라','꼼꼼한햄스터'];window._nk2=((window._nk2||0)+1)%n.length;var el=document.getElementById('nick2-input');el.value=n[window._nk2];var c=document.getElementById('nick2-cnt');if(c)c.textContent=el.value.length+'/10';var b=document.getElementById('nick2-start');if(b){b.disabled=false;b.style.opacity='1';b.style.cursor='pointer';}})()"
+              <button type="button" id="nick2-suggest-btn" data-ip-bound="1" onclick="window.ppRefreshNickSuggestion(true)"
                 style="display:flex;align-items:center;gap:4px;background:none;border:none;font-size:12px;font-weight:700;color:var(--main);cursor:pointer;padding:2px 4px;">
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
                 추천 닉네임 다시 받기
@@ -8637,8 +8638,8 @@ body.interactive-mode #ip-nav { display: block; }
             <div style="font-size:11.5px;color:#9C4435;line-height:1.55;">지금은 <b>이 기기에만</b> 정보가 저장돼요. 카카오 미연동 상태에서 <b>앱 삭제·기기 변경 시 티켓·포인트·활동 내역이 모두 초기화</b>됩니다. 카카오를 연동하면 안전하게 보관돼요 (앱 안에서 언제든 가능).</div>
           </div>
           <div style="padding-top:18px;">
-            <button id="nick2-start" class="nick-start-btn"
-              style="width:100%;height:54px;background:var(--main);border:none;border-radius:14px;font-size:16px;font-weight:800;color:#fff;cursor:pointer;">시작하기</button>
+            <button id="nick2-start" class="nick-start-btn" data-ip-bound="1" disabled
+              style="width:100%;height:54px;background:var(--main);border:none;border-radius:14px;font-size:16px;font-weight:800;color:#fff;cursor:not-allowed;opacity:0.5;">시작하기</button>
             <div class="login-terms" style="margin-top:12px;">계속 진행하면 <b>이용약관</b> 및 <b>개인정보처리방침</b>에<br>동의하는 것으로 간주됩니다.</div>
           </div>
         </div>
@@ -11884,12 +11885,13 @@ body.interactive-mode #ip-nav { display: block; }
           <div>
             <div style="font-size:12px;font-weight:600;color:var(--text2);margin-bottom:8px;">새 닉네임</div>
             <div style="position:relative;">
-              <input id="nick-input" type="text" value="" id="nick-input-pp" maxlength="10" data-ip-bound="1"
+              <input id="nick-input" type="text" value="" maxlength="10" data-ip-bound="1"
                 style="width:100%;padding:13px 48px 13px 14px;border:1.5px solid var(--main);border-radius:12px;font-size:15px;font-weight:600;color:var(--text1);background:#fff;box-sizing:border-box;font-family:inherit;outline:none;"
-                oninput="(function(el){var cnt=document.getElementById('nick-cnt');if(cnt)cnt.textContent=el.value.length+'/10';var btn=document.getElementById('nick-save');if(!btn)return;var changed=el.value.trim().length>=2&&el.value!==btn.dataset.orig;btn.disabled=!changed;btn.style.background=changed?'var(--main)':'var(--text4)';btn.style.cursor=changed?'pointer':'not-allowed';})(this)">
+                oninput="(function(el){var cnt=document.getElementById('nick-cnt');if(cnt)cnt.textContent=el.value.length+'/10';var err=document.getElementById('nick-err');if(err)err.style.display='none';var btn=document.getElementById('nick-save');if(!btn)return;var changed=el.value.trim().length>=2&&el.value!==btn.dataset.orig;btn.disabled=!changed;btn.style.background=changed?'var(--main)':'var(--text4)';btn.style.cursor=changed?'pointer':'not-allowed';})(this)">
               <span id="nick-cnt" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);font-size:12px;color:var(--text3);">5/10</span>
             </div>
             <div style="font-size:11px;color:var(--text3);margin-top:6px;">한글·영문·숫자 조합, 2~10자</div>
+            <div id="nick-err" style="display:none;font-size:11.5px;font-weight:600;color:#E5533D;margin-top:6px;">이미 사용중인 닉네임입니다.</div>
           </div>
           <div style="background:var(--bg);border-radius:12px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;">
             <div style="display:flex;align-items:center;gap:10px;">
@@ -11900,9 +11902,9 @@ body.interactive-mode #ip-nav { display: block; }
               </div>
             </div>
             <button data-ip-bound="1" style="padding:6px 12px;background:#FEE500;border:none;border-radius:8px;font-size:12px;font-weight:700;color:#3C1E1E;cursor:pointer;"
-              onclick="(function(){var inp=document.getElementById('nick-input');if(!inp)return;inp.value='마크김';var cnt=document.getElementById('nick-cnt');if(cnt)cnt.textContent='3/10';var btn=document.getElementById('nick-save');if(btn){btn.disabled=false;btn.style.background='var(--main)';btn.style.cursor='pointer';}})()">가져오기</button>
+              onclick="(function(){var inp=document.getElementById('nick-input');if(!inp)return;inp.value='마크김';var cnt=document.getElementById('nick-cnt');if(cnt)cnt.textContent='3/10';var err=document.getElementById('nick-err');if(err)err.style.display='none';var btn=document.getElementById('nick-save');if(btn){btn.disabled=false;btn.style.background='var(--main)';btn.style.cursor='pointer';}})()">가져오기</button>
           </div>
-          <button id="nick-save" data-orig="" data-jump="30" disabled
+          <button id="nick-save" data-orig="" data-ip-bound="1" disabled
             style="width:100%;padding:15px;background:var(--text4);border:none;border-radius:14px;font-size:16px;font-weight:800;color:#fff;cursor:not-allowed;margin-top:8px;">저장</button>
         </div>
       </div>
@@ -15606,6 +15608,15 @@ function hookShowScreen() {
 }
 
 function onScreenShown(id) {
+  if (id === 'pw-02-nick') refreshNickSuggestion(false);
+  if (id === 'pw-30-nick') {
+    var nick = (PP.user && PP.user.nickname) || '유저';
+    var nb = document.getElementById('nick-big'); if (nb) nb.textContent = nick;
+    var ni = document.getElementById('nick-input'); if (ni) ni.value = nick;
+    var ns = document.getElementById('nick-save'); if (ns) { ns.dataset.orig = nick; ns.disabled = true; ns.style.background = 'var(--text4)'; ns.style.cursor = 'not-allowed'; }
+    var cnt = document.getElementById('nick-cnt'); if (cnt) cnt.textContent = nick.length + '/10';
+    hideNickErr('nick-err');
+  }
   if (!PP.uid) return;
   if (id === 'pw-10') refreshHomeData();
   if (id === 'pw-20') { refreshBenefitBadges(); renderPointPanel(); renderMyTicketCard(); }
@@ -15661,25 +15672,147 @@ function hookSplashTimer() {
   };
 }
 
-/* ── Nickname ── */
+/* ── Nickname ──
+   users.nickname 필드 기준 유니크 정책. 추천 닉네임은 DB 조회로 미사용 값만 제시하고,
+   직접 입력/변경 시에도 저장 전 동일 방식으로 중복 체크한다 (kakao_nickname과 별개 필드). */
+var NICK_ADJ = ['알뜰한', '똑똑한', '현명한', '부지런한', '센스있는', '꼼꼼한', '씩씩한', '느긋한', '상큼한', '유쾌한', '차분한', '활기찬', '다정한', '재빠른', '당당한'];
+var NICK_NOUN = ['판다', '너구리', '다람쥐', '고슴도치', '코알라', '햄스터', '수달', '펭귄', '여우', '고양이', '토끼', '부엉이', '물개', '비버'];
+function randomNickname(withNumber) {
+  var a = NICK_ADJ[Math.floor(Math.random() * NICK_ADJ.length)];
+  var n = NICK_NOUN[Math.floor(Math.random() * NICK_NOUN.length)];
+  var base = a + n;
+  if (withNumber) base += (1 + Math.floor(Math.random() * 98));
+  return base;
+}
+function isNicknameTaken(nickname) {
+  return db.collection('users').where('nickname', '==', nickname).limit(1).get()
+    .then(function(snap) { return !snap.empty; });
+}
+function suggestUniqueNickname(attempt) {
+  attempt = attempt || 0;
+  var candidate = randomNickname(attempt >= 3);
+  return isNicknameTaken(candidate).then(function(taken) {
+    if (!taken) return candidate;
+    if (attempt >= 12) return candidate + Date.now().toString().slice(-4);
+    return suggestUniqueNickname(attempt + 1);
+  }).catch(function(e) {
+    console.error('suggestUniqueNickname', e);
+    return randomNickname(true) + Date.now().toString().slice(-4);
+  });
+}
+function showNickErr(elId, msg) {
+  var el = document.getElementById(elId);
+  if (!el) return;
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+function hideNickErr(elId) {
+  var el = document.getElementById(elId);
+  if (el) el.style.display = 'none';
+}
+
+function refreshNickSuggestion(force) {
+  var input = document.getElementById('nick2-input');
+  if (!input) return;
+  if (!PP.uid) { setTimeout(function() { refreshNickSuggestion(force); }, 300); return; }
+  if (input.value && !force) return;
+  hideNickErr('nick2-err');
+  var suggestBtn = document.getElementById('nick2-suggest-btn');
+  if (suggestBtn) suggestBtn.disabled = true;
+  suggestUniqueNickname().then(function(nick) {
+    input.value = nick;
+    var c = document.getElementById('nick2-cnt'); if (c) c.textContent = nick.length + '/10';
+    var startBtn = document.getElementById('nick2-start');
+    if (startBtn) { startBtn.disabled = false; startBtn.style.opacity = '1'; startBtn.style.cursor = 'pointer'; }
+    if (suggestBtn) suggestBtn.disabled = false;
+  });
+}
+window.ppRefreshNickSuggestion = refreshNickSuggestion;
+
 function bindNickname() {
   var screen = document.getElementById('pw-02-nick');
   if (!screen || screen.dataset.ppNick) return;
   screen.dataset.ppNick = '1';
   var btn = screen.querySelector('.nick-start-btn') || document.getElementById('nick2-start');
   if (!btn) return;
-  btn.addEventListener('click', function() {
+  btn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    e.preventDefault();
+    if (btn.disabled) return;
     var input = document.getElementById('nick2-input');
-    var nickname = (input && input.value && input.value.trim()) || '새로운유저';
-    if (!PP.uid) return;
-    var now = FS.FieldValue.serverTimestamp();
-    db.collection('users').doc(PP.uid).set({
-      uid: PP.uid, nickname: nickname, linked_kakao: false, created_at: now, status: 'active',
-    }, { merge: true }).catch(function(e){ console.error('saveUser', e); });
-    db.collection('user_points').doc(PP.uid).set({
-      user_id: PP.uid, balance: 0, updated_at: now,
-    }, { merge: true }).catch(function(e){ console.error('savePoints', e); });
-    PP.user = { nickname: nickname, linked_kakao: false, created_at: new Date() };
+    var nickname = (input && input.value && input.value.trim()) || '';
+    if (nickname.length < 2 || !PP.uid) return;
+    hideNickErr('nick2-err');
+    var prevText = btn.textContent;
+    btn.disabled = true;
+    btn.style.opacity = '0.6';
+    btn.textContent = '확인 중...';
+    isNicknameTaken(nickname).then(function(taken) {
+      if (taken) {
+        showNickErr('nick2-err', '이미 사용중인 닉네임입니다.');
+        btn.disabled = false;
+        btn.style.opacity = '1';
+        btn.textContent = prevText;
+        return;
+      }
+      var now = FS.FieldValue.serverTimestamp();
+      var batch = db.batch();
+      batch.set(db.collection('users').doc(PP.uid), {
+        uid: PP.uid, nickname: nickname, linked_kakao: false, created_at: now, status: 'active',
+      }, { merge: true });
+      batch.set(db.collection('user_points').doc(PP.uid), {
+        user_id: PP.uid, balance: 0, updated_at: now,
+      }, { merge: true });
+      return batch.commit().then(function() {
+        PP.user = { nickname: nickname, linked_kakao: false, created_at: new Date() };
+        btn.textContent = prevText;
+        window.showScreen('pw-10');
+      });
+    }).catch(function(err) {
+      console.error('saveUser', err);
+      btn.disabled = false;
+      btn.style.opacity = '1';
+      btn.textContent = prevText;
+    });
+  }, true);
+}
+
+function bindNickSave() {
+  var btn = document.getElementById('nick-save');
+  if (!btn || btn.dataset.ppBound) return;
+  btn.dataset.ppBound = '1';
+  btn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    e.preventDefault();
+    if (btn.disabled) return;
+    var input = document.getElementById('nick-input');
+    var nickname = (input && input.value && input.value.trim()) || '';
+    if (nickname.length < 2 || !PP.uid) return;
+    hideNickErr('nick-err');
+    var prevText = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = '확인 중...';
+    isNicknameTaken(nickname).then(function(taken) {
+      if (taken && nickname !== btn.dataset.orig) {
+        showNickErr('nick-err', '이미 사용중인 닉네임입니다.');
+        btn.disabled = false;
+        btn.textContent = prevText;
+        return;
+      }
+      var now = FS.FieldValue.serverTimestamp();
+      return db.collection('users').doc(PP.uid).set({
+        nickname: nickname, updated_at: now,
+      }, { merge: true }).then(function() {
+        PP.user = PP.user || {};
+        PP.user.nickname = nickname;
+        btn.textContent = prevText;
+        window.showScreen('pw-30');
+      });
+    }).catch(function(err) {
+      console.error('nickSave', err);
+      btn.disabled = false;
+      btn.textContent = prevText;
+    });
   }, true);
 }
 
@@ -15790,7 +15923,6 @@ function refreshMyData() {
   if (nickEl) nickEl.textContent = nick;
   var nv = document.getElementById('my-nick-value'); if (nv) nv.textContent = nick;
   var nb = document.getElementById('nick-big'); if (nb) nb.textContent = nick;
-  var ni = document.getElementById('nick-input-pp'); if (ni && !ni.value) ni.value = nick;
   var metaEl = document.querySelector('#pw-30 .my-meta');
   if (metaEl && PP.user.created_at) {
     var created;
@@ -16617,6 +16749,7 @@ document.addEventListener('DOMContentLoaded', function() {
   hookSplashTimer();
   hookSelectMall();
   bindNickname();
+  bindNickSave();
   bindExchangeBtn();
   bindKakaoComplete();
   bindPersonaEntryPoints();
