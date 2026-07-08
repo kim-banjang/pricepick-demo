@@ -67,15 +67,33 @@ flutter/
 화면 ↔ 서비스 계층을 분리했다: 화면(`screens/`)은 UI만 다루고, Firestore 쿼리·필드명은
 전부 `services/pricepick_repository.dart`에 모아둔다. 스키마가 바뀌면 이 파일만 고치면 된다.
 
-## 릴리스 빌드 (TestFlight / Play 내부테스트용)
+## 릴리스 빌드 (Firebase App Distribution / TestFlight용)
 
 - **Android**: `android/key.properties` + `android/keystore/pricepick-demo-release.keystore`로
   release 서명이 연결돼 있다. **둘 다 `.gitignore` 대상이라 저장소에 없다** — 이 keystore를 잃어버리면
   같은 앱(`applicationId`)으로 다시는 업데이트를 못 올리니 별도 백업 필수(형님에게 별도 보고한 값 참고).
-  `flutter build appbundle --release` → `build/app/outputs/bundle/release/app-release.aab`.
+  Firebase App Distribution 배포는 AAB가 아니라 **APK**를 쓴다: `flutter build apk --release` →
+  `build/app/outputs/flutter-apk/app-release.apk`.
 - **iOS**: 인증서·프로비저닝·팀 선택은 Xcode GUI + Apple 계정 로그인이 필요해 이 저장소/커맨드라인
   범위 밖이다. `flutter build ios --release --no-codesign`으로 서명 없이 빌드 가능 여부만 검증해 둔 상태.
   실제 아카이브는 `ios/Runner.xcworkspace`를 Xcode로 열어 진행한다.
+
+## 자동 배포 파이프라인 (main push마다)
+
+`../.github/workflows/distribute-android.yml`(Firebase App Distribution) +
+`../.github/workflows/distribute-ios.yml`(TestFlight)이 `main`에 push될 때마다
+(이 워크플로 파일 자체 또는 `flutter/**` 변경 시) 자동으로 돈다. `closeusvoice-flutter`의
+같은 이름 워크플로와 동일한 패턴(self-hosted 맥미니 러너 + firebase CLI/altool 직접 호출)을
+따르되, 이 저장소는 Flutter 프로젝트가 `flutter/` 서브폴더에 있어 모든 스텝에
+`working-directory: flutter`를 지정한 점만 다르다.
+
+- 전용 self-hosted 러너 `pricepick-macmini-runner`를 이 저장소에 별도 등록해 뒀다
+  (`closeusvoice-flutter`가 쓰는 `macmini-runner`와는 별개 launchd 서비스·별개 GitHub 저장소
+  등록이라 잡·시크릿이 절대 겹치지 않는다. 같은 맥미니에서 두 러너가 나란히 상주한다).
+- 필요한 GitHub Secrets는 각 워크플로 파일 상단 주석에 상세히 적어 뒀다(발급 절차 포함).
+- Android는 keystore를 `.gitignore`로 빼둔 대신 CI에서 `KEYSTORE_BASE64`/`KEY_PROPERTIES`
+  시크릿으로 매번 복원한다. iOS는 Apple Distribution 인증서 + App Store 프로비저닝 프로파일을
+  시크릿으로 가져와 임시 키체인에 넣고 `xcrun altool`로 업로드한다.
 
 ## 실행법 (네이티브 우선)
 

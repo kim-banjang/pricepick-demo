@@ -1,0 +1,100 @@
+# main 브랜치에 push 되면 flutter/ 안의 Flutter 앱을 release APK로 빌드해
+# Firebase App Distribution(pricepick-demo 프로젝트)으로 자동 배포한다.
+#
+# closeusvoice-flutter의 distribute.yml과 동일한 패턴(self-hosted 맥미니 러너 +
+# firebase CLI 직접 호출)을 참조했다. 이 저장소는 Flutter 프로젝트가 repo 루트가
+# 아니라 flutter/ 서브폴더에 있어 모든 flutter/gradle 명령에 working-directory를
+# 지정한 점만 다르다.
+#
+# 이 워크플로 전용 self-hosted 러너: pricepick-macmini-runner
+# (closeusvoice-flutter가 쓰는 macmini-runner와는 별개 인스턴스·별개 GitHub 저장소
+# 등록이라 잡 이름·시크릿이 서로 겹치지 않는다. 같은 물리 맥미니에서 launchd 서비스
+# 두 개로 나란히 돈다 — 하나가 잡을 실행 중이어도 다른 하나는 별도로 동시에 받을 수 있다.)
+#
+# ── 필요한 GitHub Secrets (Settings → Secrets and variables → Actions → New repository secret) ──
+#
+# KEYSTORE_BASE64
+#   release 서명용 keystore 파일을 base64 인코딩한 값.
+#   base64 -i flutter/android/keystore/pricepick-demo-release.keystore | pbcopy
+#
+# KEY_PROPERTIES
+#   flutter/android/key.properties 파일의 내용 전체 그대로.
+#   (storePassword/keyPassword/keyAlias/storeFile 4줄 — 형님에게 별도 보고된 값)
+#
+# FIREBASE_APP_ID
+#   Firebase Android 앱 ID. flutter/android/app/google-services.json 의
+#   client[].client_info.mobilesdk_app_id 값.
+#   현재 값: 1:505137396208:android:7e2a3c28bf9da5bce14535
+#
+# GOOGLE_APPLICATION_CREDENTIALS
+#   Firebase(GCP) 서비스 계정 키 JSON 파일의 "내용 전체".
+#   발급 방법(closeusvoice와 동일한 절차):
+#     1. Firebase 콘솔(pricepick-demo 프로젝트) → 프로젝트 설정 → 서비스 계정 탭
+#        → "새 비공개 키 생성" → JSON 다운로드
+#     2. 그 서비스 계정에 "Firebase App Distribution Admin" 역할 부여
+#        (GCP 콘솔 → IAM 및 관리자 → IAM → 해당 서비스 계정 → 역할 편집)
+#     3. 다운로드한 .json 내용 전체를 이 Secret 값으로 붙여넣기
+#   주의: Firebase 콘솔에서 pricepick-demo 프로젝트의 App Distribution 제품을
+#   먼저 "시작하기"로 최소 1회 활성화해야 한다(안 하면 위 API 호출이 전부 404).
+#   테스터(sgkim.mixit@gmail.com)도 App Distribution 콘솔에서 그룹으로 미리 등록.
+
+name: Distribute PricePick Android to Firebase
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "flutter/**"
+      - ".github/workflows/distribute-android.yml"
+  workflow_dispatch:
+
+jobs:
+  distribute-android:
+    name: Build & Distribute PricePick APK
+    runs-on: [self-hosted, pricepick]
+
+    defaults:
+      run:
+        working-directory: flutter
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      # release 서명용 keystore / key.properties 복원 (매 실행마다 secrets 기준으로
+      # 다시 써서 러너 재설치/이전 시에도 그대로 재현 가능하게 한다).
+      - name: Decode keystore
+        run: |
+          mkdir -p android/keystore
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > android/keystore/pricepick-demo-release.keystore
+          echo "${{ secrets.KEY_PROPERTIES }}" > android/key.properties
+
+      # Android versionCode는 pubspec.yaml 공용 빌드 번호에 기대지 않고 이 워크플로의
+      # 실행 회차(github.run_number)로 매번 자동 증가시킨다(closeusvoice와 동일 정책).
+      - name: Build release APK
+        run: flutter build apk --release --build-number="${{ github.run_number }}"
+
+      - name: Upload to Firebase App Distribution
+        run: |
+          SA_PATH="$RUNNER_TEMP/firebase-sa-pricepick.json"
+          echo '${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}' > "$SA_PATH"
+          export GOOGLE_APPLICATION_CREDENTIALS="$SA_PATH"
+          /Users/markkim/.npm-global/bin/firebase appdistribution:distribute \
+            build/app/outputs/flutter-apk/app-release.apk \
+            --app "${{ secrets.FIREBASE_APP_ID }}" \
+            --testers "sgkim.mixit@gmail.com"
