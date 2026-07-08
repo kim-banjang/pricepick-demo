@@ -16672,26 +16672,29 @@ function renderTicketDetail() {
     });
     if (!rows) rows = '<div style="font-size:11.5px;color:var(--text3);padding:10px 2px;">보유한 등급 티켓이 없어요. 쇼핑몰 구매로 티켓을 적립해 보세요.</div>';
     document.querySelectorAll('#gd-holdings, #gd-holdings-19').forEach(function (el) { el.innerHTML = rows; });
-    /* 대기/활성 목록 — CMS와 동일하게 postback_id 단위로 "랜덤 티켓 묶음" 1개로 표시 */
+    /* 대기/활성 목록 — CMS와 동일하게 postback_id 단위로 "랜덤 티켓 묶음" 1개로 표시.
+       정책: 전환될 등급은 사전 미공개 — D-day(대기 기간)만 노출, 등급 구성은 표시 안 함. */
     var bundles = {};
     pend.forEach(function (t) {
       var key = t.postback_id || t._id;
-      if (!bundles[key]) bundles[key] = { bronze: 0, silver: 0, gold: 0, total: 0 };
-      var g = (t.grade || '').toLowerCase();
-      if (bundles[key].hasOwnProperty(g)) bundles[key][g]++;
+      if (!bundles[key]) bundles[key] = { total: 0, earnedAt: null };
       bundles[key].total++;
+      var d = ppDate(t.earned_at);
+      if (d && (!bundles[key].earnedAt || d < bundles[key].earnedAt)) bundles[key].earnedAt = d;
     });
     var bundleKeys = Object.keys(bundles);
+    var waitDays = (PP.user && PP.user.linked_kakao) ? 7 : 30;
     var pm = '';
     if (bundleKeys.length) {
       pm = bundleKeys.map(function (key) {
         var b = bundles[key];
-        var parts = [];
-        if (b.gold) parts.push('골드' + b.gold);
-        if (b.silver) parts.push('실버' + b.silver);
-        if (b.bronze) parts.push('브론즈' + b.bronze);
+        var ddayLabel = '전환 예정';
+        if (b.earnedAt) {
+          var daysLeft = Math.ceil((b.earnedAt.getTime() + waitDays * 86400000 - Date.now()) / 86400000);
+          if (daysLeft > 0) ddayLabel = daysLeft + '일 후 전환 예정';
+        }
         return '<div class="gd-pending-item"><div class="gd-pending-head">'
-          + '<div class="gd-pending-info" style="flex:1;">랜덤 티켓 ' + b.total + '장<span class="dim"> · ' + parts.join('·') + ' 전환 예정</span></div>'
+          + '<div class="gd-pending-info" style="flex:1;">랜덤 티켓 ' + b.total + '장<span class="dim"> · ' + ddayLabel + '</span></div>'
           + '<div style="font-size:10px;font-weight:600;color:#FF6B55;background:#FFF4F2;padding:2px 7px;border-radius:20px;flex-shrink:0;">대기중</div></div></div>';
       }).join('');
     } else {
