@@ -7938,22 +7938,27 @@ body.interactive-mode #ip-nav { display: block; }
   }
 .htc-cta-arrow { color: var(--main); flex-shrink: 0; }
 .home-mission-row {
-    margin: 18px 16px 0;
-    display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px;
+    margin: 16px 16px 4px;
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 9px;
   }
 .home-mission-card {
-    background: var(--card); border: 1px solid var(--border);
-    border-radius: 14px; padding: 14px 8px;
-    display: flex; flex-direction: column; align-items: center; gap: 6px;
+    border: 1px solid rgba(255,255,255,.9);
+    border-radius: 22px; padding: 14px 4px 12px;
+    display: flex; flex-direction: column; align-items: center; gap: 7px;
     text-align: center; cursor: pointer;
+    transition: transform .15s;
   }
-.home-mission-card:active { background: var(--sub-4); }
+.home-mission-card:active { transform: scale(.96); }
+.home-mission-card.hmc-attend { background: linear-gradient(170deg,#FFF6DC,#FFE9B8); box-shadow: 0 8px 18px rgba(230,170,40,.16); }
+.home-mission-card.hmc-roulette { background: linear-gradient(170deg,#FFEBF5,#FFD4EA); box-shadow: 0 8px 18px rgba(240,100,170,.16); }
+.home-mission-card.hmc-invite { background: linear-gradient(170deg,#EDF6FF,#D6EBFF); box-shadow: 0 8px 18px rgba(80,150,230,.16); }
+.home-mission-card.hmc-streak { background: linear-gradient(170deg,#F1EBFF,#E3D8FF); box-shadow: 0 8px 18px rgba(130,90,240,.16); }
 .hmc-ico {
-    width: 36px; height: 36px; border-radius: 10px;
+    width: 50px; height: 50px; border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
-    font-size: 20px;
+    font-size: 26px;
   }
-.hmc-ico.attend { background: linear-gradient(135deg,#FFE9A8,#FFC34A); }
+.hmc-ico.attend { background: linear-gradient(140deg,#FFE89A,#FFC54D); box-shadow: 0 5px 12px rgba(240,170,30,.4), inset 0 2px 3px rgba(255,255,255,.7); }
   /* ============== 14. 쿠팡 구경하기 ============== */
   .ac-screen { height:100%; display:flex; flex-direction:column; background:var(--bg); }
   .ac-header { display:flex; align-items:center; justify-content:space-between; padding:8px 16px 12px; background:white; border-bottom:1px solid var(--border); }
@@ -8095,9 +8100,9 @@ body.interactive-mode #ip-nav { display: block; }
   .iv-hist-chip.done { background:var(--sub-4); color:var(--main); }
   .iv-hist-chip.wait { background:#F0EEF5; color:var(--text3); }
 
-.hmc-ico.roulette { background: linear-gradient(135deg,#FFD7E5,#FF6FA8); }
-.hmc-ico.invite { background: linear-gradient(135deg,#D3E8FF,#5A9BFF); }
-.hmc-ico.streak { background: linear-gradient(135deg,#FFD9B8,#FF8A3D); }
+.hmc-ico.roulette { background: linear-gradient(140deg,#FFD4EA,#FF8EC6); box-shadow: 0 5px 12px rgba(240,100,170,.4), inset 0 2px 3px rgba(255,255,255,.7); }
+.hmc-ico.invite { background: linear-gradient(140deg,#DCEEFF,#76B7FF); box-shadow: 0 5px 12px rgba(80,150,230,.4), inset 0 2px 3px rgba(255,255,255,.7); }
+.hmc-ico.streak { background: linear-gradient(140deg,#E7DEFF,#9C7EFF); box-shadow: 0 5px 12px rgba(130,90,240,.4), inset 0 2px 3px rgba(255,255,255,.7); }
   /* ===== 17. 연속구매 미션 ===== */
   .sm-steps { margin:12px 16px 0; display:flex; flex-direction:column; gap:8px; }
   .sm-step { background:white; border:1px solid var(--border); border-radius:14px; padding:13px 14px; display:flex; align-items:center; gap:12px; }
@@ -8108,8 +8113,17 @@ body.interactive-mode #ip-nav { display: block; }
   .sm-step-title { font-size:13px; font-weight:700; color:var(--text1); letter-spacing:-0.2px; }
   .sm-step-reward { font-size:13px; font-weight:800; color:var(--main); flex-shrink:0; }
   .sm-note { margin:12px 16px 0; background:var(--sub-4); border-radius:12px; padding:12px 14px; font-size:11px; color:var(--text2); line-height:1.5; }
-.hmc-title { font-size: 12px; font-weight: 700; color: var(--text1); letter-spacing: -0.2px; }
-.hmc-reward { font-size: 10.5px; color: var(--main); font-weight: 600; }
+.hmc-title { font-size: 13px; font-weight: 800; letter-spacing: -0.2px; }
+.home-mission-card.hmc-attend .hmc-title { color: #5A4410; }
+.home-mission-card.hmc-roulette .hmc-title { color: #6E2247; }
+.home-mission-card.hmc-invite .hmc-title { color: #1D3F66; }
+.home-mission-card.hmc-streak .hmc-title { color: #3B2570; }
+.hmc-reward { font-size: 10.5px; font-weight: 700; background: rgba(255,255,255,.85); border-radius: 999px; padding: 3px 9px; }
+.hmc-reward b { font-weight: 900; }
+.home-mission-card.hmc-attend .hmc-reward { color: #C77F00; }
+.home-mission-card.hmc-roulette .hmc-reward { color: #E0509B; }
+.home-mission-card.hmc-invite .hmc-reward { color: #2E86E8; }
+.home-mission-card.hmc-streak .hmc-reward { color: #7B2FF2; }
 .home-mall-section { margin-top: 26px; }
 .home-mall-head {
     padding: 0 16px; display: flex; justify-content: space-between;
@@ -9147,22 +9161,22 @@ body.interactive-mode #ip-nav { display: block; }
             <div class="home-mission-card hmc-attend">
               <div class="hmc-ico attend">🛍️</div>
               <div class="hmc-title">쿠팡 구경</div>
-              <div class="hmc-reward">매일 100P</div>
+              <div class="hmc-reward">매일 <b>100P</b></div>
             </div>
             <div class="home-mission-card hmc-roulette">
-              <div class="hmc-ico roulette">🎰</div>
+              <div class="hmc-ico roulette">🎡</div>
               <div class="hmc-title">행운 룰렛</div>
-              <div class="hmc-reward">하루 1회</div>
+              <div class="hmc-reward">하루 <b>1회</b></div>
             </div>
             <div class="home-mission-card hmc-invite">
               <div class="hmc-ico invite">👥</div>
               <div class="hmc-title">친구 초대</div>
-              <div class="hmc-reward">각 500P</div>
+              <div class="hmc-reward">각 <b>500P</b></div>
             </div>
             <div class="home-mission-card hmc-streak">
-              <div class="hmc-ico streak">🔥</div>
+              <div class="hmc-ico streak">🎯</div>
               <div class="hmc-title">연속구매</div>
-              <div class="hmc-reward">최대 5장</div>
+              <div class="hmc-reward">최대 <b>5장</b></div>
             </div>
           </div>
 
