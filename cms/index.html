@@ -4116,7 +4116,7 @@ function saveTicketEdit() {
     <div class="modal-body">
       <input type="hidden" id="dmue-id">
       <div class="form-group"><label class="form-label">닉네임</label><input class="form-input" id="dmue-nickname" placeholder="닉네임"></div>
-      <div class="form-group"><label class="form-label">카카오연동</label><select class="form-select" id="dmue-linked" onchange="dmToggleKakaoFields('dmue')"><option value="true">연동</option><option value="false">미연동</option></select></div>
+      <div class="form-group"><label class="form-label">카카오연동</label><select class="form-select" id="dmue-linked" onchange="dmToggleKakaoFields('dmue')"><option value="false">미연동</option><option value="true">연동</option></select></div>
       <div class="form-group" id="dmuew-kakao_nickname"><label class="form-label">카카오 닉네임</label><input class="form-input" id="dmue-kakao_nickname" placeholder="카카오 닉네임"></div>
       <div class="form-group" id="dmuew-kakao_login_id"><label class="form-label">카카오 로그인 ID</label><input class="form-input" id="dmue-kakao_login_id" placeholder="카카오 로그인 아이디"></div>
       <div class="form-group"><label class="form-label">가입일</label><input class="form-input" type="datetime-local" id="dmue-created"></div>
@@ -6813,7 +6813,7 @@ var DEMO_COLS = [
 var DM_FIELDS = {
   users: [
     { id:'nickname',        label:'닉네임',         type:'text',   def:'테스트유저' },
-    { id:'linked',          label:'카카오연동',     type:'select', opts:['true','false'], def:'true', labels:{ 'true':'연동', 'false':'미연동' } },
+    { id:'linked',          label:'카카오연동',     type:'select', opts:['false','true'], def:'false', labels:{ 'true':'연동', 'false':'미연동' } },
     { id:'kakao_nickname',  label:'카카오 닉네임',  type:'text',   def:'' },
     { id:'kakao_login_id',  label:'카카오 로그인 ID', type:'text', def:'' },
     { id:'created_at',      label:'가입일',         type:'datetime-local', def:'' },
@@ -6941,20 +6941,44 @@ function dmRenderForm(col) {
   if (col === 'users') dmToggleKakaoFields('dmf');
 }
 
-// 카카오연동이 '연동'일 때만 카카오 닉네임/로그인ID 입력칸 노출 (미연동 전환 시 값 비움)
-// prefix: 'dmf'(문서추가 폼) 또는 'dmue'(회원 수정 모달) — 각각 dmw-/dmuew- 래퍼를 토글한다.
+// 가상 카카오 계정 생성 — app/index.html의 bindKakaoComplete() 자동생성 로직과 형식을
+// 맞춘다(kakao_login_id: 영문+숫자 9자리 로컬파트+"@kakao.com", kakao_nickname: 성+이름).
+var DM_KAKAO_ID_CHARS = 'abcdefghijklmnopqrstuvwxyz0123456789';
+function dmRandomKakaoLoginId() {
+  var local = '';
+  for (var i = 0; i < 9; i++) local += DM_KAKAO_ID_CHARS[Math.floor(Math.random() * DM_KAKAO_ID_CHARS.length)];
+  return local + '@kakao.com';
+}
+var DM_KAKAO_SURNAMES = ['김', '이', '박', '최', '정', '강', '조', '윤', '장', '임'];
+var DM_KAKAO_GIVEN = ['민준', '서연', '도윤', '하윤', '시우', '지우', '예준', '서윤', '주원', '수아', '건우', '다은', '현우', '지호', '유나', '지안', '서준', '하은'];
+function dmRandomKakaoNickname() {
+  var s = DM_KAKAO_SURNAMES[Math.floor(Math.random() * DM_KAKAO_SURNAMES.length)];
+  var g = DM_KAKAO_GIVEN[Math.floor(Math.random() * DM_KAKAO_GIVEN.length)];
+  return s + g;
+}
+
+// 카카오연동 select 값에 따라 카카오 닉네임/로그인ID 입력칸을 채우거나 비활성화한다.
+// 미연동: 값 비우고 disabled(카카오 정보 없음). 연동: 비어 있으면 그럴듯한 값을 자동 생성해
+// 채우고(운영자가 그 값을 그대로 수정할 수 있게) enabled로 전환 — 기존 값이 있으면 유지.
+// prefix: 'dmf'(문서추가 폼) 또는 'dmue'(회원 수정 모달).
 window.dmToggleKakaoFields = function(prefix) {
   var linkedEl = document.getElementById(prefix + '-linked');
   if (!linkedEl) return;
-  var show = linkedEl.value === 'true';
-  var wrapPrefix = (prefix === 'dmf') ? 'dmw-' : 'dmuew-';
-  var nickWrap = document.getElementById(wrapPrefix + 'kakao_nickname');
-  var loginWrap = document.getElementById(wrapPrefix + 'kakao_login_id');
-  if (nickWrap) nickWrap.style.display = show ? '' : 'none';
-  if (loginWrap) loginWrap.style.display = show ? '' : 'none';
-  if (!show) {
-    var ne = document.getElementById(prefix + '-kakao_nickname'); if (ne) ne.value = '';
-    var le = document.getElementById(prefix + '-kakao_login_id'); if (le) le.value = '';
+  var linked = linkedEl.value === 'true';
+  var nickEl = document.getElementById(prefix + '-kakao_nickname');
+  var loginEl = document.getElementById(prefix + '-kakao_login_id');
+  if (!linked) {
+    if (nickEl) { nickEl.value = ''; nickEl.disabled = true; }
+    if (loginEl) { loginEl.value = ''; loginEl.disabled = true; }
+    return;
+  }
+  if (nickEl) {
+    nickEl.disabled = false;
+    if (!nickEl.value.trim()) nickEl.value = dmRandomKakaoNickname();
+  }
+  if (loginEl) {
+    loginEl.disabled = false;
+    if (!loginEl.value.trim()) loginEl.value = dmRandomKakaoLoginId();
   }
 };
 
@@ -7061,6 +7085,11 @@ window.dmAdd = function(col) {
 
   if (col === 'postbacks' && !data.user_id) {
     dmShowToast('회원을 선택하세요.', true);
+    return;
+  }
+
+  if (col === 'users' && data.linked_kakao && (!data.kakao_nickname || !data.kakao_login_id)) {
+    dmShowToast('카카오 연동 회원은 카카오 닉네임·카카오 로그인 ID를 입력해야 합니다.', true);
     return;
   }
 
@@ -7561,11 +7590,17 @@ window.dmEditUserSave = function() {
   var nickname = document.getElementById('dmue-nickname').value.trim();
   if (!nickname) { dmShowToast('닉네임을 입력하세요.', true); return; }
   var linked = document.getElementById('dmue-linked').value === 'true';
+  var kakaoNickname = document.getElementById('dmue-kakao_nickname').value.trim();
+  var kakaoLoginId = document.getElementById('dmue-kakao_login_id').value.trim();
+  if (linked && (!kakaoNickname || !kakaoLoginId)) {
+    dmShowToast('카카오 연동 회원은 카카오 닉네임·카카오 로그인 ID를 입력해야 합니다.', true);
+    return;
+  }
   var data = {
     nickname: nickname,
     linked_kakao: linked,
-    kakao_nickname: linked ? (document.getElementById('dmue-kakao_nickname').value.trim() || null) : null,
-    kakao_login_id: linked ? (document.getElementById('dmue-kakao_login_id').value.trim() || null) : null,
+    kakao_nickname: linked ? kakaoNickname : null,
+    kakao_login_id: linked ? kakaoLoginId : null,
     updated_at: FS.Timestamp.now(),
   };
   var dateStr = document.getElementById('dmue-created').value;
