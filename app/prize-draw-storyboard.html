@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PricePick — 경품 응모 프로세스 스토리보드</title>
+<style>
+  :root{
+    --bg:#f5f6fa; --card:#ffffff; --ink:#1f2433; --sub:#5b6478;
+    --line:#e6e8f0; --accent:#3b5bdb; --accent-soft:#eef1fd;
+    --green:#1f9d57; --green-bg:#e7f6ee; --amber:#b9770a; --amber-bg:#fdf3e3;
+    --red:#c0392b; --red-bg:#fbeceb; --gray:#5b6478; --gray-bg:#eef0f4;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+    line-height:1.6;-webkit-font-smoothing:antialiased;}
+  .wrap{max-width:1080px;margin:0 auto;padding:40px 24px 100px;}
+  header.doc{border-bottom:2px solid var(--accent);padding-bottom:20px;margin-bottom:8px;}
+  header.doc h1{margin:0 0 8px;font-size:26px;letter-spacing:-.01em;}
+  .lead{color:var(--sub);font-size:15px;margin:0 0 4px;}
+  .meta{color:var(--sub);font-size:13px;margin:2px 0 0;}
+  .note-top{background:var(--accent-soft);border:1px solid #d7ddf8;border-radius:10px;
+    padding:14px 18px;margin:20px 0 36px;font-size:13.5px;color:#33406b;display:flex;gap:10px;align-items:flex-start;}
+  .note-top svg{flex:0 0 auto;margin-top:1px;}
+
+  .policy-bar{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:44px;}
+  .policy-card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;
+    box-shadow:0 1px 2px rgba(20,30,60,.04);}
+  .policy-card .num{font-size:18px;font-weight:700;color:var(--accent);}
+  .policy-card .lbl{font-size:12px;color:var(--sub);margin-top:2px;}
+  @media(max-width:760px){.policy-bar{grid-template-columns:repeat(2,1fr);}}
+
+  .part-title{margin:48px 0 18px;font-size:15px;font-weight:800;color:var(--accent);
+    display:flex;align-items:center;gap:10px;}
+  .part-title::after{content:"";flex:1;height:1px;background:var(--line);}
+
+  .flow{position:relative;padding-left:40px;}
+  .flow::before{content:"";position:absolute;left:15px;top:8px;bottom:8px;width:2px;background:var(--line);}
+
+  .step{position:relative;margin-bottom:14px;}
+  .step-badge{position:absolute;left:-40px;top:2px;width:32px;height:32px;border-radius:50%;
+    background:var(--accent);color:#fff;font-size:14px;font-weight:700;
+    display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(59,91,219,.35);z-index:2;}
+  .step-card{background:var(--card);border:1px solid var(--line);border-radius:14px;
+    padding:22px 24px;box-shadow:0 1px 3px rgba(20,30,60,.05);}
+  .step-card h2{margin:0 0 4px;font-size:17px;}
+  .step-card .role{display:inline-block;font-size:11px;font-weight:700;padding:2px 9px;border-radius:999px;
+    margin-bottom:8px;letter-spacing:.02em;margin-right:6px;}
+  .role-user{background:#eef1fd;color:var(--accent);}
+  .role-admin{background:var(--amber-bg);color:var(--amber);}
+  .role-system{background:var(--gray-bg);color:var(--gray);}
+  .flag{display:inline-block;font-size:11px;font-weight:700;padding:2px 9px;border-radius:999px;margin-bottom:8px;}
+  .flag-mock{background:var(--red-bg);color:var(--red);}
+  .flag-conflict{background:var(--amber-bg);color:var(--amber);}
+  .step-card p.desc{margin:8px 0 16px;color:var(--sub);font-size:13.5px;}
+  .shots{display:flex;gap:20px;flex-wrap:wrap;align-items:flex-start;}
+  .shot{flex:0 0 auto;}
+  .shot img{display:block;width:220px;height:auto;border-radius:14px;border:1px solid var(--line);
+    box-shadow:0 4px 14px rgba(20,30,60,.10);}
+  .shot .cap{margin-top:8px;font-size:12px;color:var(--sub);text-align:center;max-width:220px;}
+  .shot.cms img{width:640px;max-width:100%;}
+  .shot.cms .cap{max-width:640px;}
+
+  .arrow-down{display:flex;justify-content:center;margin:2px 0 18px 0;color:#b7bdd1;}
+
+  .badge-note{display:flex;align-items:flex-start;gap:6px;font-size:12px;color:var(--sub);
+    background:var(--gray-bg);border-radius:8px;padding:8px 10px;margin-top:14px;line-height:1.5;}
+  .badge-note.warn{background:var(--amber-bg);color:#7a5307;}
+  .badge-note svg{flex:0 0 auto;margin-top:2px;}
+
+  /* 정책 요약 */
+  .rules{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px 24px;
+    box-shadow:0 1px 3px rgba(20,30,60,.05);margin-bottom:14px;}
+  .rules h3{margin:0 0 14px;font-size:15px;}
+  .rule-row{display:flex;gap:12px;padding:9px 0;border-top:1px solid var(--line);font-size:13.5px;}
+  .rule-row:first-of-type{border-top:none;}
+  .rule-row .k{flex:0 0 130px;font-weight:700;color:var(--accent);font-size:12.5px;padding-top:1px;}
+  .rule-row .v{flex:1;color:var(--ink);}
+  .rule-row .v small{color:var(--sub);}
+
+  /* 미결·불일치 */
+  .pending-box{background:#fffdf5;border:2px solid #f3d9ad;border-radius:14px;padding:22px 24px;margin-bottom:14px;}
+  .pending-box h3{margin:0 0 6px;font-size:15px;color:var(--amber);}
+  .pending-box p.sub{margin:0 0 14px;font-size:12.5px;color:var(--sub);}
+  table.cmp{width:100%;border-collapse:collapse;font-size:12.5px;}
+  table.cmp th{background:var(--gray-bg);text-align:left;padding:8px 10px;font-size:11.5px;color:var(--sub);
+    border:1px solid var(--line);white-space:nowrap;}
+  table.cmp td{border:1px solid var(--line);padding:8px 10px;vertical-align:top;background:#fff;}
+  table.cmp td.item{font-weight:700;white-space:nowrap;}
+  table.cmp td .sot{color:var(--green);font-weight:700;}
+  table.cmp td .bad{color:var(--red);}
+  .scroll-x{overflow-x:auto;}
+
+  footer.notes{margin-top:44px;background:var(--card);border:1px solid var(--line);border-radius:12px;
+    padding:20px 24px;font-size:13px;color:var(--sub);}
+  footer.notes h4{margin:0 0 10px;color:var(--ink);font-size:14px;}
+  footer.notes ul{margin:0;padding-left:18px;}
+  footer.notes li{margin:5px 0;}
+  code{background:var(--gray-bg);border-radius:5px;padding:1px 6px;font-size:12px;
+    font-family:ui-monospace,Menlo,monospace;color:#3a3f52;}
+
+  .last-update{position:fixed;bottom:24px;left:24px;background:rgba(255,255,255,.92);
+    border:1px solid var(--line);border-radius:10px;padding:8px 14px;font-size:11.5px;color:var(--sub);
+    box-shadow:0 2px 10px rgba(0,0,0,.05);z-index:50;}
+  .last-update b{font-weight:700;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="doc">
+    <h1>경품 응모 프로세스 스토리보드</h1>
+    <p class="lead">이벤트 티켓 획득부터 응모, CMS 추첨 운영까지 — 실제 배포본 화면 캡처 기반</p>
+    <p class="meta">pricepick-demo.vercel.app <code>/app</code>(게스트) · <code>/cms</code>(운영자) 공개 배포본에서 직접 캡처 (2026.07.09) · 목업/와이어프레임 없음</p>
+  </header>
+
+  <div class="note-top">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3b5bdb" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v5"/><circle cx="12" cy="16" r=".5" fill="#3b5bdb"/></svg>
+    <div>이 문서의 모든 화면 썸네일은 공개 배포본(pricepick-demo.vercel.app)에 헤드리스 브라우저로 직접 접속해 — 앱은 게스트 온보딩(닉네임 가입)을 실제로 완료한 세션에서, CMS는 운영자 계정으로 실제 로그인한 세션에서 — 캡처한 스크린샷입니다. 그림이나 와이어프레임으로 대체한 화면은 없습니다.</div>
+  </div>
+
+  <div class="policy-bar">
+    <div class="policy-card"><div class="num">이벤트 티켓 1장</div><div class="lbl">응모 수단 (경품 응모 전용 티켓)</div></div>
+    <div class="policy-card"><div class="num">최대 10장</div><div class="lbl">1회 추첨 누적 응모 한도</div></div>
+    <div class="policy-card"><div class="num">취소 불가</div><div class="lbl">응모 즉시 티켓 소모 (1단계 기준)</div></div>
+    <div class="policy-card"><div class="num">100일 소멸</div><div class="lbl">이벤트 티켓 유효기간 (발급일 기준·이월 없음)</div></div>
+  </div>
+
+  <div class="part-title">PART 1 — 앱 유저 흐름</div>
+
+  <div class="flow">
+
+    <div class="step">
+      <div class="step-badge">1</div>
+      <div class="step-card">
+        <span class="role role-user">유저</span>
+        <h2>이벤트 티켓 획득 — 출석 5일 연속 달성 보상</h2>
+        <p class="desc">이벤트 티켓은 경품 응모 전용 티켓으로, 구매 적립 티켓(랜덤/등급)과 완전히 분리된다. 획득 경로는 출석 5일 연속·행운룰렛·온보딩 가입(1회성) 등이며, 전 경로 합산 일 5장 / 월 30장 한도가 적용된다. 화면은 5일 연속 출석 달성 시 이벤트 티켓 1장이 지급되는 보상 화면 — 티켓 카드에 "경품 응모 전용" 배지가 붙고, 하단 "경품 응모 바로가기" 버튼으로 응모 화면과 직접 연결된다.</p>
+        <div class="shots">
+          <div class="shot">
+            <img src="prize-draw-storyboard-assets/05-app-attendance-event-ticket.png" alt="출석 5일 연속 달성 - 이벤트 티켓 1장 지급 보상 화면">
+            <div class="cap">출석 5일 달성 보상 · 이벤트 티켓 +1장 지급 · "경품 응모 바로가기" 연결</div>
+          </div>
+        </div>
+        <div class="badge-note warn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#b9770a" stroke-width="2"><path d="M12 3L2 21h20L12 3z"/><path d="M12 10v5"/><circle cx="12" cy="18" r=".5" fill="#b9770a"/></svg>
+          <span>불일치 — 이 화면의 티켓 문구가 "유효기간 30일"(2곳)로 표시됨. 정책 최종안(마스터 정책서)은 발급일+100일 고정 소멸. 하단 미결·불일치 (2)번 참조.</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="arrow-down">
+      <svg width="20" height="28" viewBox="0 0 20 28" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 2v22M3 17l7 7 7-7"/></svg>
+    </div>
+
+    <div class="step">
+      <div class="step-badge">2</div>
+      <div class="step-card">
+        <span class="role role-user">유저</span>
+        <h2>혜택 탭 — 경품 응모 진입 카드</h2>
+        <p class="desc">혜택 탭 중단의 "이번 주 행운의 추첨" 카드가 경품 응모 화면의 진입점이다. 카드에 보유 이벤트 티켓 수와 이번 회차 경품 요약이 노출된다. 그 아래 "진행중 이벤트" 리스트에도 주간 추첨 이벤트 행이 있다.</p>
+        <div class="shots">
+          <div class="shot">
+            <img src="prize-draw-storyboard-assets/02-app-benefit-tab-entry.png" alt="혜택 탭 - 이번 주 행운의 추첨 진입 카드">
+            <div class="cap">혜택 탭 · "이번 주 행운의 추첨" 카드 + 진행중 이벤트 리스트</div>
+          </div>
+        </div>
+        <div class="badge-note warn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#b9770a" stroke-width="2"><path d="M12 3L2 21h20L12 3z"/><path d="M12 10v5"/><circle cx="12" cy="18" r=".5" fill="#b9770a"/></svg>
+          <span>불일치 — 진행중 이벤트의 "주간 추첨 이벤트" 행 설명이 "전주 접속 유저 자동 응모"로 표시됨. 응모 화면(다음 단계)과 정책 최종안은 티켓을 직접 소모하는 수동 응모. 하단 미결·불일치 (3)번 참조.</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="arrow-down">
+      <svg width="20" height="28" viewBox="0 0 20 28" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 2v22M3 17l7 7 7-7"/></svg>
+    </div>
+
+    <div class="step">
+      <div class="step-badge">3</div>
+      <div class="step-card">
+        <span class="role role-user">유저</span>
+        <span class="flag flag-mock">정적 목업 · 실연동 미완</span>
+        <h2>경품 응모 메인 — 회차 정보 확인 · 응모</h2>
+        <p class="desc">상단 히어로 카드에 이번 회차 경품 구성(등수별 경품·당첨자 수)과 마감 D-day가 노출되고, "이벤트 티켓 1장으로 응모하기" 버튼으로 응모한다. 그 아래 "내 응모 현황"에서 이번 주 응모 횟수·남은 티켓·누적 응모를 확인한다. 응모하면 티켓이 즉시 소모되며 취소할 수 없다(1단계 기준). 1회 추첨에 누적 최대 10장까지 응모 가능하고, 응모 티켓 수에 비례해 당첨 확률이 올라간다.</p>
+        <div class="shots">
+          <div class="shot">
+            <img src="prize-draw-storyboard-assets/03-app-raffle-main-top.png" alt="경품 응모 메인 상단 - 회차 히어로 카드와 응모 버튼, 내 응모 현황">
+            <div class="cap">경품 응모 메인 상단 · 회차 경품 구성 + 마감 D-day + 응모 버튼 + 내 응모 현황</div>
+          </div>
+        </div>
+        <div class="badge-note">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#5b6478" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-5M12 8h.01"/></svg>
+          <span>구현 상태 — 이 화면은 현재 데모에서 정적 목업이다. 표시값(D-3, 보유 3장, 응모 3회, 누적 17회, 경품 구성)이 전부 하드코딩이고, 응모 버튼을 눌러도 실제 응모 없이 혜택 탭으로 돌아간다. CMS 추첨 데이터와도 연결되어 있지 않다.</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="arrow-down">
+      <svg width="20" height="28" viewBox="0 0 20 28" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 2v22M3 17l7 7 7-7"/></svg>
+    </div>
+
+    <div class="step">
+      <div class="step-badge">4</div>
+      <div class="step-card">
+        <span class="role role-user">유저</span>
+        <h2>티켓 더 모으기 · 지난 회차 당첨 결과</h2>
+        <p class="desc">응모 화면 하단에서 이벤트 티켓 획득 경로 3종(출석 5일·행운룰렛·온보딩 가입)의 오늘 상태를 확인하고 각 미션으로 이동할 수 있다. 맨 아래 "지난 회차 당첨 결과"는 직전 회차의 등수별 경품과 당첨자(마스킹 닉네임·인원)를 보여준다.</p>
+        <div class="shots">
+          <div class="shot">
+            <img src="prize-draw-storyboard-assets/04-app-raffle-main-bottom.png" alt="경품 응모 메인 하단 - 이벤트 티켓 더 모으기, 지난 회차 당첨 결과">
+            <div class="cap">경품 응모 메인 하단 · 티켓 획득 경로 3종 + 지난 회차 당첨 결과</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="part-title">PART 2 — CMS 운영자 흐름</div>
+
+  <div class="flow">
+
+    <div class="step">
+      <div class="step-badge">5</div>
+      <div class="step-card">
+        <span class="role role-admin">운영자</span>
+        <h2>추첨 관리 — 회차 목록 · 당첨 처리 대기</h2>
+        <p class="desc">CMS "추첨 관리"에서 추첨 회차를 등록·운영한다. 회차별로 경품 구성·추첨 기간·마감일·참여 티켓·당첨자·상태를 관리하고, 마감됐지만 당첨 처리(추첨 실행)를 안 한 회차 수가 좌측 메뉴 배지로 표시된다. 정책 최종안 기준 1단계 추첨 실행은 관리자 수동 — 당첨자에게 카톡/이메일로 배송지 입력을 안내하고 경품을 수동 발송한다.</p>
+        <div class="shots">
+          <div class="shot cms">
+            <img src="prize-draw-storyboard-assets/06-cms-draws.png" alt="CMS 추첨 관리 - 회차 목록">
+            <div class="cap">CMS &gt; 추첨 관리 · 회차 목록 (현재 등록된 회차 없음 — 빈 상태)</div>
+          </div>
+        </div>
+        <div class="badge-note">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#5b6478" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-5M12 8h.01"/></svg>
+          <span>구현 상태 — 회차 목록은 빈 상태인데 좌측 메뉴 배지는 "1"로 표시됨(배지 값 하드코딩). 화면 부제 "추첨 방식: 매주 월요일 자동 발표(자동/수동 전환 가능)"는 정책 최종안(관리자 수동·주기 미결)과 불일치. 하단 미결·불일치 (1)(5)번 참조.</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="arrow-down">
+      <svg width="20" height="28" viewBox="0 0 20 28" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 2v22M3 17l7 7 7-7"/></svg>
+    </div>
+
+    <div class="step">
+      <div class="step-badge">6</div>
+      <div class="step-card">
+        <span class="role role-admin">운영자</span>
+        <h2>새 추첨 회차 등록</h2>
+        <p class="desc">회차명·시작일·마감일을 입력하고 등수별 경품 구성을 편성한다(등수당 1행·중복 등수 금지, 한 등수에 경품 여러 개 가능, 등수별 당첨자 수 지정). 총 참여 티켓 소모는 자동 계산 항목이다.</p>
+        <div class="shots">
+          <div class="shot cms">
+            <img src="prize-draw-storyboard-assets/07-cms-draw-create-modal.png" alt="CMS 새 추첨 회차 등록 모달">
+            <div class="cap">CMS &gt; 추첨 관리 &gt; 새 추첨 회차 등록 · 기간 + 등수별 경품·당첨자 수 편성</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="arrow-down">
+      <svg width="20" height="28" viewBox="0 0 20 28" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 2v22M3 17l7 7 7-7"/></svg>
+    </div>
+
+    <div class="step">
+      <div class="step-badge">7</div>
+      <div class="step-card">
+        <span class="role role-admin">운영자</span>
+        <span class="flag flag-conflict">모델 불일치</span>
+        <h2>경품/응모 관리 — 응모 집계 · 경품 설정 · 발송 관리</h2>
+        <p class="desc">오늘 응모 수·오늘 당첨자·소모 이벤트 티켓·미발송 경품 KPI를 집계하고, 현재 경품 설정을 편집한다. 당첨됐지만 아직 발송 안 한 경품은 "미발송 경품" 목록에서 처리하고, "경품 변경 이력"으로 경품 구성 변경을 버전·공표 여부와 함께 추적한다(누가·언제·전후·공표).</p>
+        <div class="shots">
+          <div class="shot cms">
+            <img src="prize-draw-storyboard-assets/08-cms-prizes.png" alt="CMS 경품/응모 관리 - KPI, 현재 경품 설정, 미발송 경품, 변경 이력">
+            <div class="cap">CMS &gt; 경품/응모 관리 · KPI 4종 + 현재 경품 설정 + 미발송 경품 + 변경 이력</div>
+          </div>
+        </div>
+        <div class="badge-note warn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#b9770a" stroke-width="2"><path d="M12 3L2 21h20L12 3z"/><path d="M12 10v5"/><circle cx="12" cy="18" r=".5" fill="#b9770a"/></svg>
+          <span>불일치 — 이 화면의 "현재 경품 설정"은 등수별 당첨 확률 %(1등 5%·2등 15%·3등 꽝 80%) 구조, 즉 즉석 확률형 모델이다. 정책 최종안(회차 모집 후 응모 티켓 수 비례 비복원 추첨)·앱 응모 화면(회차형)·추첨 관리의 회차 등록 구조와 모델 자체가 다르다. 하단 미결·불일치 (4)(6)번 참조.</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="arrow-down">
+      <svg width="20" height="28" viewBox="0 0 20 28" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 2v22M3 17l7 7 7-7"/></svg>
+    </div>
+
+    <div class="step">
+      <div class="step-badge">8</div>
+      <div class="step-card">
+        <span class="role role-admin">운영자</span>
+        <span class="flag flag-conflict">모델 불일치</span>
+        <h2>주간 이벤트 추첨 — 자동 응모 방식 설정 화면</h2>
+        <p class="desc">이벤트 티켓 보유 회원을 매 회차 자동 응모시키고 매주 월요일 00:00 자동 추첨하는 방식의 설정 화면. 응모 대상·추첨 일정·당첨 확률(50%, 조정 가능)·당첨 보상(경품 지급, 티켓 신규 발급 없음)·이벤트 티켓 만료(발급일+100일)를 정의하고, 이번주 자동 응모자·소진 티켓을 집계한다.</p>
+        <div class="shots">
+          <div class="shot cms">
+            <img src="prize-draw-storyboard-assets/09-cms-weekly-draw.png" alt="CMS 주간 이벤트 추첨 - 자동 응모 설정과 이번주 현황">
+            <div class="cap">CMS &gt; 주간 이벤트 추첨 · 추첨 설정 5항목 + 이번주 추첨 현황</div>
+          </div>
+        </div>
+        <div class="badge-note warn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#b9770a" stroke-width="2"><path d="M12 3L2 21h20L12 3z"/><path d="M12 10v5"/><circle cx="12" cy="18" r=".5" fill="#b9770a"/></svg>
+          <span>불일치 — 이 화면은 "보유 티켓 자동 응모 + 당첨 확률 50% + 매주 자동 추첨" 모델로, 정책 최종안(직접 응모·티켓 수 비례 확률·관리자 수동 추첨)과 응모 방식·확률·실행 방식이 모두 다르다. 같은 CMS 안의 "경품/응모 관리"(직접 응모 전제)와도 충돌. 티켓 만료 100일만 정책과 일치. 하단 미결·불일치 (3)(4)(5)번 참조.</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="part-title">PART 3 — 정책 · 규칙 (마스터 정책서 확정 기준)</div>
+
+  <div class="rules">
+    <h3>확정 정책 — 출처: 마스터 정책서(policyspec.html) "추첨·경품" 및 "이벤트 티켓" 항목</h3>
+    <div class="rule-row"><div class="k">응모 수단</div><div class="v">이벤트 티켓 전용. 경품 응모에만 사용 가능하고 기프티콘 교환에는 쓸 수 없다. 구매 적립 티켓(랜덤/등급)과 완전 분리.</div></div>
+    <div class="rule-row"><div class="k">응모 규칙</div><div class="v">응모 즉시 티켓 소모, 취소 불가(1단계 기준). 1회 추첨 누적 최대 10장 응모.</div></div>
+    <div class="rule-row"><div class="k">당첨 확률</div><div class="v">응모한 티켓 수에 비례해 상승. 당첨자 수만큼 비복원 추첨(한 번 뽑힌 응모는 다시 안 뽑힘).</div></div>
+    <div class="rule-row"><div class="k">추첨 운영</div><div class="v">1단계는 관리자가 직접 추첨 실행. 당첨자에게 카톡/이메일로 배송지 입력 안내 후 수동 발송.</div></div>
+    <div class="rule-row"><div class="k">경품 예산</div><div class="v">매출의 일정 비율로 고정 — 티켓 발행량과 무관하게 손실 상한 보장. <small>(비율 %는 미결)</small></div></div>
+    <div class="rule-row"><div class="k">티켓 획득</div><div class="v">추첨은 이벤트 티켓을 소비만 하고 새로 발급하지 않는다. 획득 경로는 출석 5일 연속·행운룰렛·온보딩 가입 등 별도 경로. 전 경로 합산 일 5장 / 월 30장 한도(초과 시 0장).</div></div>
+    <div class="rule-row"><div class="k">티켓 만료</div><div class="v">받은 날부터 100일 뒤 소멸(고정)·이월 없음. 미응모해도 다음 회차로 넘어가지 않고 만료.</div></div>
+    <div class="rule-row"><div class="k">알림 연계</div><div class="v">경품 응모·당첨 알림은 "이벤트·티켓 알림" 그룹에 포함(티켓 만료 임박 D-30/D-7 알림 포함).</div></div>
+  </div>
+
+  <div class="pending-box">
+    <h3>미결 정책 — 형님(운영) 확정 대기</h3>
+    <p class="sub">마스터 정책서에 미결로 명시된 항목. 이 문서는 임의로 확정하지 않고 그대로 표시한다.</p>
+    <div class="rule-row"><div class="k">추첨 주기</div><div class="v">월 1회 vs 격주 미확정. <small>정책서 추천: 월 1회(예산 예측·운영 부담 최소). 현재 앱·CMS 화면 샘플은 "매주"로 표기되어 있어 확정 시 전면 정합 필요.</small></div></div>
+    <div class="rule-row"><div class="k">경품 예산 비율</div><div class="v">매출 대비 % 미확정. <small>정책서 추천: 매출의 1~2%(손실 상한 보장).</small></div></div>
+  </div>
+
+  <div class="pending-box">
+    <h3>화면 간 불일치 — 형님 보고용 (구현 정리 필요)</h3>
+    <p class="sub">2026.07.09 배포본 실화면 기준으로 확인된 정책·화면 불일치. 번호는 위 각 단계의 경고 배지와 연결된다.</p>
+    <div class="scroll-x">
+    <table class="cmp">
+      <tr><th style="width:30px;">#</th><th style="width:130px;">항목</th><th>정책 최종안 (SoT)</th><th>앱 화면</th><th>CMS 화면</th></tr>
+      <tr>
+        <td>1</td><td class="item">추첨 주기</td>
+        <td><span class="sot">미결 (월 1회 vs 격주)</span></td>
+        <td><span class="bad">"매주 월요일 당첨자 발표"</span> (응모 메인·혜택 탭)</td>
+        <td><span class="bad">"매주 월요일 자동 발표"</span> (추첨 관리) · 주간 이벤트 추첨은 "매주 월요일 00:00" + 부연 "월1/격주 미정"</td>
+      </tr>
+      <tr>
+        <td>2</td><td class="item">이벤트 티켓 유효기간</td>
+        <td><span class="sot">발급일 + 100일 고정 소멸</span></td>
+        <td><span class="bad">"유효기간 30일"</span> (출석 5일 보상 화면 2곳)</td>
+        <td>발급일+100일 (일치)</td>
+      </tr>
+      <tr>
+        <td>3</td><td class="item">응모 방식</td>
+        <td><span class="sot">티켓 직접 응모 (즉시 소모·취소 불가)</span></td>
+        <td>응모 메인 = 직접 응모 · <span class="bad">혜택 탭 이벤트 행 = "전주 접속 유저 자동 응모"</span></td>
+        <td>경품/응모 관리 = 직접 응모(1장 소모·최대 10장) · <span class="bad">주간 이벤트 추첨 = "보유 티켓 자동 응모"</span></td>
+      </tr>
+      <tr>
+        <td>4</td><td class="item">당첨 확률 모델</td>
+        <td><span class="sot">응모 티켓 수 비례 · 비복원 추첨</span></td>
+        <td>표기 없음</td>
+        <td><span class="bad">주간 이벤트 추첨 = "50% (조정 가능)"</span> · <span class="bad">경품/응모 관리 = 등수별 %(5/15/80) 즉석 확률형</span></td>
+      </tr>
+      <tr>
+        <td>5</td><td class="item">추첨 실행</td>
+        <td><span class="sot">1단계 관리자 수동 실행</span></td>
+        <td>—</td>
+        <td><span class="bad">"자동 발표(자동/수동 전환 가능)" · "00:00 자동 추첨"</span></td>
+      </tr>
+      <tr>
+        <td>6</td><td class="item">경품 구성 샘플</td>
+        <td>회차별 등수 구성 (구성 자체는 운영 재량)</td>
+        <td>신세계 상품권 5만원 1명 · 스타벅스 3명 · 티켓 추가 지급 다수</td>
+        <td><span class="bad">경품/응모 관리 = 스타벅스 · 아이스크림 · 꽝(80%)</span> — 앱 샘플과 상이, "꽝"은 추첨형 모델에 없는 개념</td>
+      </tr>
+    </table>
+    </div>
+    <div class="rule-row" style="border-top:1px solid var(--line);margin-top:14px;">
+      <div class="k">구현 상태</div>
+      <div class="v">앱 경품 응모 화면 = 정적 목업(전 수치 하드코딩, 응모 버튼은 혜택 탭 복귀만). CMS 추첨 3개 메뉴(추첨 관리·경품/응모 관리·주간 이벤트 추첨) = KPI 전부 "운영 데이터 없음"·회차 목록 빈 상태로 실연동 미완, 추첨 관리 메뉴 배지 "1"은 하드코딩. 데모에서 경품 응모 기능만 유일하게 실연동이 안 된 상태(기존 LIVE 기록과 일치).</div>
+    </div>
+  </div>
+
+  <footer class="notes">
+    <h4>참고 사항</h4>
+    <ul>
+      <li>앱 캡처는 공개 배포본 <code>/app</code>에 게스트로 접속해 실제 온보딩(알림 권한 → 닉네임 자동 추천 가입)을 완료한 세션에서, CMS 캡처는 <code>/cms</code>에 운영자 계정으로 실제 로그인한 세션에서 헤드리스 브라우저(Playwright·390×844 / 1440×960)로 촬영했다.</li>
+      <li>앱 경품 응모 화면의 수치(D-3·보유 3장·응모 3회 등)는 데모 하드코딩 값이며 실제 게스트 계정 상태가 아니다 — 화면 자체가 정적 목업이기 때문(위 구현 상태 참조).</li>
+      <li>정책 기준은 전부 마스터 정책서(policyspec.html — PricePick 정책 SoT)의 "추첨·경품"·"이벤트 티켓" 항목이며, 미결 항목은 임의 확정 없이 미결로 표시했다.</li>
+      <li>이벤트 티켓 획득 경로의 상세(출석·행운룰렛 규칙)는 각 기능 스토리보드(출석체크·행운 룰렛)에서 다룬다. 이 문서는 "경품 응모 전용 소비처" 관점만 담는다.</li>
+    </ul>
+  </footer>
+
+</div>
+
+<div class="last-update">Last Update <b>2026.07.09 18:28</b></div>
+
+</body>
+</html>
