@@ -155,6 +155,16 @@ html,body{font-family:var(--font);background:var(--bg);color:var(--text);-webkit
   border-radius:10px;padding:1px 7px;min-width:18px;text-align:center;flex-shrink:0;}
 .sb-item.active .sb-item-badge{background:rgba(255,255,255,.25);}
 
+/* 메뉴 상태 태그 (확정/확인중) — 운영자가 클릭해서 전환 */
+.sb-status-tag{margin-left:auto;flex-shrink:0;font-size:10px;font-weight:700;
+  border-radius:10px;padding:2px 8px;cursor:pointer;white-space:nowrap;
+  transition:filter .12s;}
+.sb-status-tag:hover{filter:brightness(0.96);}
+.sb-status-tag.confirmed{background:#DCFCE7;color:#15803D;}
+.sb-status-tag.checking{background:#FEF3C7;color:#92400E;}
+.sb-item.active .sb-status-tag{box-shadow:0 0 0 1px rgba(255,255,255,.5) inset;}
+.sidebar.sb-mini .sb-status-tag{display:none;}
+
 /* mini 모드 항목 */
 .sidebar.sb-mini .sb-item{padding:10px;justify-content:center;}
 .sidebar.sb-mini .sb-item-lbl{display:none;}
@@ -5622,6 +5632,8 @@ auth.onAuthStateChanged(function(user) {
 
 /* ── Load all data ── */
 function loadAllData() {
+  if (window.mtInjectStatusTags) window.mtInjectStatusTags();
+  if (window.mtLoadStatuses) window.mtLoadStatuses();
   loadDashboardStats();
   setTimeout(function() {
     loadGifticonProducts();
@@ -8385,6 +8397,65 @@ window.rltSave = function() {
     toast('저장에 실패했습니다.');
   });
 };
+
+/* ── 좌측 네비 메뉴 상태 태그 (확정/확인중) ──
+   settings/menu_status 문서(statuses: {navId: 'confirmed'|'checking'})에 저장.
+   기본값은 '확인중'. 운영자가 태그를 클릭하면 그 자리에서 토글 + 저장. */
+var MT_STATUS = {};
+function mtNavId(el) {
+  return (el.id || '').replace(/^nav-/, '');
+}
+function mtApplyStatuses() {
+  document.querySelectorAll('.sb-status-tag').forEach(function(tag) {
+    var st = MT_STATUS[tag.dataset.navId] === 'confirmed' ? 'confirmed' : 'checking';
+    tag.classList.toggle('confirmed', st === 'confirmed');
+    tag.classList.toggle('checking', st === 'checking');
+    tag.textContent = st === 'confirmed' ? '확정' : '확인중';
+  });
+}
+function mtToggleStatus(navId) {
+  var cur = MT_STATUS[navId] === 'confirmed' ? 'confirmed' : 'checking';
+  var next = cur === 'confirmed' ? 'checking' : 'confirmed';
+  MT_STATUS[navId] = next;
+  mtApplyStatuses();
+  db.collection('settings').doc('menu_status').set({
+    statuses: MT_STATUS,
+    updated_at: FS.FieldValue.serverTimestamp(),
+  }, { merge: true }).catch(function(e) {
+    console.error('mtToggleStatus', e);
+    toast('상태 저장에 실패했습니다.');
+  });
+}
+function mtInjectStatusTags() {
+  document.querySelectorAll('.sb-item').forEach(function(el) {
+    if (el.dataset.mtTagged) return;
+    var navId = mtNavId(el);
+    if (!navId) return;
+    el.dataset.mtTagged = '1';
+    var tag = document.createElement('span');
+    tag.className = 'sb-status-tag checking';
+    tag.dataset.navId = navId;
+    tag.textContent = '확인중';
+    tag.title = '클릭해서 확정/확인중 전환';
+    tag.addEventListener('click', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      mtToggleStatus(navId);
+    });
+    var existingBadge = el.querySelector('.sb-item-badge');
+    if (existingBadge) el.insertBefore(tag, existingBadge);
+    else el.appendChild(tag);
+  });
+  mtApplyStatuses();
+}
+function mtLoadStatuses() {
+  return db.collection('settings').doc('menu_status').get().then(function(doc) {
+    MT_STATUS = (doc.exists && doc.data().statuses) ? doc.data().statuses : {};
+    mtApplyStatuses();
+  }).catch(function(e) { console.error('mtLoadStatuses', e); });
+}
+window.mtInjectStatusTags = mtInjectStatusTags;
+window.mtLoadStatuses = mtLoadStatuses;
 
 })();
 
