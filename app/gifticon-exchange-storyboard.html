@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PricePick — 기프티콘 교환 프로세스 스토리보드</title>
+<style>
+  :root{
+    --bg:#f5f6fa; --card:#ffffff; --ink:#1f2433; --sub:#5b6478;
+    --line:#e6e8f0; --accent:#3b5bdb; --accent-soft:#eef1fd;
+    --green:#1f9d57; --green-bg:#e7f6ee; --amber:#b9770a; --amber-bg:#fdf3e3;
+    --red:#c0392b; --red-bg:#fbeceb; --gray:#5b6478; --gray-bg:#eef0f4;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+    line-height:1.6;-webkit-font-smoothing:antialiased;}
+  .wrap{max-width:1080px;margin:0 auto;padding:40px 24px 100px;}
+  header.doc{border-bottom:2px solid var(--accent);padding-bottom:20px;margin-bottom:8px;}
+  header.doc h1{margin:0 0 8px;font-size:26px;letter-spacing:-.01em;}
+  .lead{color:var(--sub);font-size:15px;margin:0 0 4px;}
+  .meta{color:var(--sub);font-size:13px;margin:2px 0 0;}
+  .note-top{background:var(--accent-soft);border:1px solid #d7ddf8;border-radius:10px;
+    padding:14px 18px;margin:20px 0 36px;font-size:13.5px;color:#33406b;display:flex;gap:10px;align-items:flex-start;}
+  .note-top svg{flex:0 0 auto;margin-top:1px;}
+
+  .policy-bar{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:44px;}
+  .policy-card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;
+    box-shadow:0 1px 2px rgba(20,30,60,.04);}
+  .policy-card .num{font-size:18px;font-weight:700;color:var(--accent);}
+  .policy-card .lbl{font-size:12px;color:var(--sub);margin-top:2px;}
+  @media(max-width:760px){.policy-bar{grid-template-columns:repeat(2,1fr);}}
+
+  .flow{position:relative;padding-left:40px;}
+  .flow::before{content:"";position:absolute;left:15px;top:8px;bottom:8px;width:2px;background:var(--line);}
+
+  .step{position:relative;margin-bottom:14px;}
+  .step-badge{position:absolute;left:-40px;top:2px;width:32px;height:32px;border-radius:50%;
+    background:var(--accent);color:#fff;font-size:14px;font-weight:700;
+    display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(59,91,219,.35);z-index:2;}
+  .step-card{background:var(--card);border:1px solid var(--line);border-radius:14px;
+    padding:22px 24px;box-shadow:0 1px 3px rgba(20,30,60,.05);}
+  .step-card h2{margin:0 0 4px;font-size:17px;}
+  .step-card .role{display:inline-block;font-size:11px;font-weight:700;padding:2px 9px;border-radius:999px;
+    margin-bottom:8px;letter-spacing:.02em;}
+  .role-user{background:#eef1fd;color:var(--accent);}
+  .role-admin{background:var(--green-bg);color:var(--green);}
+  .role-system{background:var(--gray-bg);color:var(--gray);}
+  .step-card p.desc{margin:8px 0 16px;color:var(--sub);font-size:13.5px;}
+  .shots{display:flex;gap:20px;flex-wrap:wrap;align-items:flex-start;}
+  .shot{flex:0 0 auto;}
+  .shot img{display:block;width:200px;height:auto;border-radius:14px;border:1px solid var(--line);
+    box-shadow:0 4px 14px rgba(20,30,60,.10);}
+  .shot .cap{margin-top:8px;font-size:12px;color:var(--sub);text-align:center;max-width:200px;}
+  .shot.wide img{width:280px;}
+  .shot.wide .cap{max-width:280px;}
+  .shot.cms img{width:520px;}
+  .shot.cms .cap{max-width:520px;}
+
+  .arrow-down{display:flex;justify-content:center;margin:2px 0 18px 0;color:#b7bdd1;}
+
+  .branch-wrap{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+  @media(max-width:700px){.branch-wrap{grid-template-columns:1fr;}}
+  .branch{border-radius:14px;padding:20px;border:2px solid var(--line);background:var(--card);}
+  .branch.ok{border-color:#bfe3cd;}
+  .branch.short{border-color:#f3d9ad;}
+  .branch .tag{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:700;
+    padding:3px 10px;border-radius:999px;margin-bottom:10px;}
+  .branch.ok .tag{background:var(--green-bg);color:var(--green);}
+  .branch.short .tag{background:var(--amber-bg);color:var(--amber);}
+  .branch h3{margin:0 0 6px;font-size:14.5px;}
+  .branch p{margin:0 0 14px;font-size:13px;color:var(--sub);}
+  .branch .shots{gap:12px;}
+  .branch .shot img{width:170px;}
+  .branch .shot .cap{max-width:170px;}
+
+  .badge-note{display:inline-flex;align-items:flex-start;gap:6px;font-size:12px;color:var(--sub);
+    background:var(--gray-bg);border-radius:8px;padding:6px 10px;margin-top:14px;}
+
+  /* 정책 섹션 */
+  .sec-title{margin:48px 0 14px;font-size:19px;letter-spacing:-.01em;}
+  .rule-card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:6px 24px 10px;
+    box-shadow:0 1px 3px rgba(20,30,60,.05);}
+  .rule{display:flex;gap:14px;padding:13px 0;border-bottom:1px solid #f0f1f6;font-size:13.5px;}
+  .rule:last-child{border-bottom:none;}
+  .rule .k{flex:0 0 150px;font-weight:700;color:var(--ink);}
+  .rule .v{flex:1;color:var(--sub);}
+  .rule .v b{color:var(--ink);}
+  .src{font-size:11.5px;color:#9aa1b5;}
+
+  /* 미결·불일치 */
+  .pending-card{background:#fffdf6;border:1.5px solid #f0dcae;border-radius:14px;padding:6px 24px 10px;margin-bottom:12px;}
+  .pending{display:flex;gap:12px;padding:14px 0;border-bottom:1px solid #f3ecd8;font-size:13.5px;align-items:flex-start;}
+  .pending:last-child{border-bottom:none;}
+  .pl{flex:0 0 auto;font-size:11px;font-weight:800;color:#fff;background:var(--amber);border-radius:6px;padding:2px 8px;margin-top:2px;}
+  .pl.limit{background:var(--gray);}
+  .pending .pv{flex:1;color:#6b5b2e;}
+  .pending .pv b{color:#4d3f16;}
+  .pending .pv .rec{display:block;margin-top:4px;font-size:12.5px;color:#8a7434;}
+
+  footer.notes{margin-top:44px;background:var(--card);border:1px solid var(--line);border-radius:12px;
+    padding:20px 24px;font-size:13px;color:var(--sub);}
+  footer.notes h4{margin:0 0 10px;color:var(--ink);font-size:14px;}
+  footer.notes ul{margin:0;padding-left:18px;}
+  footer.notes li{margin:5px 0;}
+  code{background:var(--gray-bg);border-radius:5px;padding:1px 6px;font-size:12px;
+    font-family:ui-monospace,Menlo,monospace;color:#3a3f52;}
+
+  .last-update{position:fixed;bottom:24px;left:24px;background:rgba(255,255,255,.92);
+    border:1px solid var(--line);border-radius:10px;padding:8px 14px;font-size:11.5px;color:#9aa1b5;
+    box-shadow:0 2px 10px rgba(0,0,0,.05);z-index:50;}
+  .last-update b{color:var(--sub);font-weight:700;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="doc">
+    <h1>기프티콘 교환 프로세스 스토리보드</h1>
+    <p class="lead">교환소 진입부터 티켓 차감·코드 발급·CMS 집계까지 — 실제 배포본 화면 캡처 기반</p>
+    <p class="meta">pricepick-demo.vercel.app /app(게스트) · /cms 배포본에서 직접 캡처 (2026.07.09) · 목업/와이어프레임 없음 · 정책 기준 = 마스터 정책서(policyspec, SoT)</p>
+  </header>
+
+  <div class="note-top">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3b5bdb" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v5"/><circle cx="12" cy="16" r=".5" fill="#3b5bdb"/></svg>
+    <div>이 문서의 모든 화면 썸네일은 배포본에서 게스트 계정 생성 → CMS 수동 티켓 지급 → 실제 교환 2건(브론즈·실버) 실행 → CMS 집계 확인까지 실제로 수행한 뒤 캡처한 스크린샷입니다. 그림으로 대체한 화면은 없습니다.</div>
+  </div>
+
+  <div class="policy-bar">
+    <div class="policy-card"><div class="num">단일 등급 결제</div><div class="lbl">한 상품 = 한 등급 티켓으로만 (혼합 결제 없음)</div></div>
+    <div class="policy-card"><div class="num">100 / 1,000 / 2,000원</div><div class="lbl">티켓 1장 가치 (브론즈 / 실버 / 골드)</div></div>
+    <div class="policy-card"><div class="num">취소 불가</div><div class="lbl">교환 완료 후 취소·재발급 없음</div></div>
+    <div class="policy-card"><div class="num">이벤트 티켓 제외</div><div class="lbl">경품 응모 전용 — 기프티콘 교환 불가</div></div>
+  </div>
+
+  <div class="flow">
+
+    <div class="step">
+      <div class="step-badge">1</div>
+      <div class="step-card">
+        <span class="role role-user">유저</span>
+        <h2>진입점 — 홈 티켓 카드 배너 &amp; 혜택 탭 CTA</h2>
+        <p class="desc">교환소 진입 경로는 두 곳. 홈 '내 보유 티켓' 카드 하단의 "기프티콘 교환 — 티켓으로 커피·상품권 교환" 배너, 그리고 혜택 탭 하단 고정 "기프티콘 교환" 버튼. 두 경로 모두 같은 티켓 교환소로 이동한다.</p>
+        <div class="shots">
+          <div class="shot wide">
+            <img src="gifticon-exchange-storyboard-assets/01-entry-home.png" alt="홈 — 내 보유 티켓 카드와 기프티콘 교환 배너">
+            <div class="cap">홈 · 티켓 카드 안 "기프티콘 교환" 배너 (가입 직후 0장 상태)</div>
+          </div>
+          <div class="shot wide">
+            <img src="gifticon-exchange-storyboard-assets/02-entry-benefit.png" alt="혜택 탭 — 하단 기프티콘 교환 CTA">
+            <div class="cap">혜택 탭 · 하단 고정 "기프티콘 교환" CTA</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="arrow-down">
+      <svg width="20" height="28" viewBox="0 0 20 28" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 2v22M3 17l7 7 7-7"/></svg>
+    </div>
+
+    <div class="step">
+      <div class="step-badge">2</div>
+      <div class="step-card">
+        <span class="role role-user">유저</span>
+        <h2>티켓 교환소 — 카탈로그</h2>
+        <p class="desc">상단에 내 보유 티켓 요약(브론즈/실버/골드)이 고정되고, 그 아래 검색·정렬·"교환 내역" 버튼, 카테고리 필터, "지금 교환 가능한 상품만" 토글, 상품 그리드가 이어진다. 상품 카드는 브랜드 + 상품명 + 필요 티켓(등급 × 장수)을 표시하며, 카탈로그는 CMS "상품 목록"에 등록된 판매중 상품(<code>gifticons</code> 컬렉션)을 실시간 로드한다.</p>
+        <div class="shots">
+          <div class="shot wide">
+            <img src="gifticon-exchange-storyboard-assets/03-catalog-zero.png" alt="티켓 교환소 카탈로그 — 티켓 0장 상태">
+            <div class="cap">교환소 카탈로그 · 티켓 0장 상태 (전 상품 교환 불가 — '구매가능' 배지 없음)</div>
+          </div>
+        </div>
+        <div class="badge-note">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#5b6478" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-5M12 8h.01"/></svg>
+          <span>데모 한계: 검색·정렬·카테고리 필터·"교환 가능만" 토글은 현재 데모에서 UI만 존재하고 동작하지 않는다 (실서비스 구현 항목).</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="arrow-down">
+      <svg width="20" height="28" viewBox="0 0 20 28" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 2v22M3 17l7 7 7-7"/></svg>
+    </div>
+
+    <div class="step">
+      <div class="step-badge">3</div>
+      <div class="step-card">
+        <span class="role role-system">분기</span>
+        <h2>티켓 부족 vs 보유 충분</h2>
+        <p class="desc">필요 등급의 보유 수량에 따라 카드 배지와 교환 가능 여부가 갈린다. 부족해도 상세 진입은 가능하지만 최종 실행이 차단된다.</p>
+        <div class="branch-wrap">
+          <div class="branch short">
+            <span class="tag">티켓 부족 · 교환 차단</span>
+            <h3>보유 &lt; 필요 수량</h3>
+            <p>카드에 '구매가능' 배지가 붙지 않는다. 상세에서 "교환하기"를 눌러도 <b>"티켓이 부족합니다"</b> 토스트와 함께 처리되지 않는다.</p>
+            <div class="shots">
+              <div class="shot">
+                <img src="gifticon-exchange-storyboard-assets/04-detail-short-toast.png" alt="티켓 부족 상태에서 교환하기 시 차단 토스트">
+                <div class="cap">보유 0장 · "티켓이 부족합니다" 토스트 차단</div>
+              </div>
+            </div>
+          </div>
+          <div class="branch ok">
+            <span class="tag">보유 충분 · 교환 가능</span>
+            <h3>보유 ≥ 필요 수량</h3>
+            <p>해당 상품 카드 좌상단에 <b>'구매가능'</b> 배지가 표시된다. 보유 요약(브 40 / 실 12 / 골 2) 기준으로 상품별로 개별 판정된다.</p>
+            <div class="shots">
+              <div class="shot">
+                <img src="gifticon-exchange-storyboard-assets/07-catalog-available.png" alt="티켓 보유 후 구매가능 배지가 표시된 카탈로그">
+                <div class="cap">티켓 보유 후 · 전 상품 '구매가능' 배지</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="arrow-down">
+      <svg width="20" height="28" viewBox="0 0 20 28" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 2v22M3 17l7 7 7-7"/></svg>
+    </div>
+
+    <div class="step">
+      <div class="step-badge">4</div>
+      <div class="step-card">
+        <span class="role role-admin">운영자</span>
+        <h2>CMS 수동 티켓 지급 (이 시연의 티켓 확보 경로)</h2>
+        <p class="desc">실서비스에서 티켓은 경유 구매 적립으로 쌓이지만, 이 시연에서는 CMS "티켓 내역 &gt; 수동 지급/회수"로 검증 계정에 브론즈 40 · 실버 12 · 골드 2장을 지급했다. 대상 회원 선택 + 등급별 수량 스테퍼 + 사유 필수 입력이며, 처리 내역은 관리자 로그와 티켓 원장(<code>user_tickets</code>·<code>ticket_transactions</code>)에 기록된다. 지급 즉시 앱 홈 보유 티켓에 반영된다(54장).</p>
+        <div class="shots">
+          <div class="shot cms">
+            <img src="gifticon-exchange-storyboard-assets/05-cms-manual-grant.png" alt="CMS 수동 티켓 지급/회수 모달">
+            <div class="cap">CMS &gt; 티켓 내역 &gt; 수동 지급/회수 — 대상 회원·등급별 수량·사유 입력</div>
+          </div>
+          <div class="shot wide">
+            <img src="gifticon-exchange-storyboard-assets/06-home-granted.png" alt="지급 후 앱 홈 — 54장 반영">
+            <div class="cap">지급 직후 앱 홈 · 브 40 / 실 12 / 골 2 = 54장 반영</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="arrow-down">
+      <svg width="20" height="28" viewBox="0 0 20 28" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 2v22M3 17l7 7 7-7"/></svg>
+    </div>
+
+    <div class="step">
+      <div class="step-badge">5</div>
+      <div class="step-card">
+        <span class="role role-user">유저</span>
+        <h2>기프티콘 상세 — 차감 미리보기 → 교환 실행</h2>
+        <p class="desc">상세 화면은 상품 카드(이미지·브랜드·상품명), 필요 티켓 vs 현재 보유 비교, 유효기간, 교환 정책 3줄(취소 불가 / 기간 경과 시 사용 불가 / 발송 안내)을 표시한다. 하단에 <b>차감 미리보기</b>("브론즈 티켓 2장 차감 → 잔여 38장")와 "교환하기" CTA. 실행 시 만료 임박 티켓부터(FIFO) 소진 처리되고, 티켓 원장에 사용 기록 + 교환 이력(<code>gifticon_exchanges</code>)이 남는다.</p>
+        <div class="shots">
+          <div class="shot wide">
+            <img src="gifticon-exchange-storyboard-assets/08-detail-ready.png" alt="기프티콘 상세 — 차감 미리보기와 교환하기 버튼">
+            <div class="cap">상세 · 필요 2장 / 보유 40장 · 차감 미리보기 "2장 차감 → 잔여 38장"</div>
+          </div>
+        </div>
+        <div class="badge-note">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#5b6478" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-5M12 8h.01"/></svg>
+          <span>현재 데모는 "교환하기" 원탭으로 즉시 처리된다. 화면 스펙의 확인 모달 단계는 미구현 — 하단 미결 P5 참조.</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="arrow-down">
+      <svg width="20" height="28" viewBox="0 0 20 28" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 2v22M3 17l7 7 7-7"/></svg>
+    </div>
+
+    <div class="step">
+      <div class="step-badge">6</div>
+      <div class="step-card">
+        <span class="role role-system">발급</span>
+        <h2>교환 완료 — 교환 코드 즉시 발급</h2>
+        <p class="desc">처리 완료 시 교환 완료 화면으로 전환되고 상품 카드 안에 <b>교환 코드(PP-XXXX-XXXX-XXXX 형식) + 바코드</b>가 발급된다. "발급일로부터 90일 유효" 안내가 붙는다. "확인"은 혜택 탭으로, "홈으로 가기"는 홈으로 이동. 코드는 교환 내역에서 언제든 다시 볼 수 있다.</p>
+        <div class="shots">
+          <div class="shot wide">
+            <img src="gifticon-exchange-storyboard-assets/09-exchange-done.png" alt="교환 완료 화면 — 교환 코드와 바코드">
+            <div class="cap">교환 완료 · 실제 발급 코드 <code>PP-73IY-2IQS-AN08</code> + 바코드</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="arrow-down">
+      <svg width="20" height="28" viewBox="0 0 20 28" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 2v22M3 17l7 7 7-7"/></svg>
+    </div>
+
+    <div class="step">
+      <div class="step-badge">7</div>
+      <div class="step-card">
+        <span class="role role-user">유저</span>
+        <h2>사후 반영 — 잔여 차감 · 교환 내역 · 활동 내역</h2>
+        <p class="desc">교환 2건(이디야 아메리카노 브론즈 2장, 배민 상품권 실버 11장) 후 보유 티켓이 브 38 / 실 1 / 골 2로 차감 반영된다. 교환소의 "교환 내역" 패널에서 건별 상태(발급완료)와 사용 티켓·교환일을 확인하고 '코드 보기'로 완료 화면을 재호출한다. 마이 &gt; 활동 내역에는 티켓 원장 기준으로 사용 기록이 장 단위(-1장)로 남는다.</p>
+        <div class="shots">
+          <div class="shot wide">
+            <img src="gifticon-exchange-storyboard-assets/10-benefit-after.png" alt="교환 후 혜택 탭 — 차감 반영">
+            <div class="cap">교환 후 혜택 탭 · 브 38 / 실 1 / 골 2</div>
+          </div>
+          <div class="shot wide">
+            <img src="gifticon-exchange-storyboard-assets/11-history-panel.png" alt="교환소 교환 내역 패널">
+            <div class="cap">교환소 "교환 내역" · 발급완료 2건 + 코드 보기</div>
+          </div>
+          <div class="shot wide">
+            <img src="gifticon-exchange-storyboard-assets/12-activity.png" alt="활동 내역 — 티켓 사용 기록">
+            <div class="cap">마이 &gt; 활동 내역 · "기프티콘 교환 사용 -1장" 기록</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="arrow-down">
+      <svg width="20" height="28" viewBox="0 0 20 28" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 2v22M3 17l7 7 7-7"/></svg>
+    </div>
+
+    <div class="step">
+      <div class="step-badge">8</div>
+      <div class="step-card">
+        <span class="role role-admin">운영자 · CMS</span>
+        <h2>CMS 기프티콘 관리 — 내역 · 라인업 · 집계</h2>
+        <p class="desc">CMS "기프티콘 관리" 그룹은 4개 메뉴. <b>구매/사용 내역</b>에 앱 교환 건이 자동 기록되고(회원·상품·소모 티켓), <b>상품 목록</b>에서 라인업(카테고리·브랜드·상품명·유효기간·교환 티켓·판매 상태)을 관리하며 "+상품 추가"로 등록한다. <b>취소 내역</b>은 관리자·시스템 취소 건 기록용(유저 취소는 정책상 불가). 대시보드에는 <b>기프티콘 판매 수익(교환 마진)</b> KPI가 집계되고, 회원 상세에서 교환 후 티켓 보유 현황을 실시간 확인한다.</p>
+        <div class="shots">
+          <div class="shot cms">
+            <img src="gifticon-exchange-storyboard-assets/13-cms-exchanges.png" alt="CMS 구매/사용 내역">
+            <div class="cap">CMS &gt; 구매/사용 내역 — 이번 시연 교환 건 자동 기록 (실버 11장 · 브론즈 2장)</div>
+          </div>
+          <div class="shot cms">
+            <img src="gifticon-exchange-storyboard-assets/14-cms-products.png" alt="CMS 상품 목록">
+            <div class="cap">CMS &gt; 상품 목록 — 라인업 7개 · 교환 티켓 칩 · 판매중 상태</div>
+          </div>
+          <div class="shot cms">
+            <img src="gifticon-exchange-storyboard-assets/15-cms-dashboard.png" alt="CMS 대시보드 — 기프티콘 판매 수익">
+            <div class="cap">CMS &gt; 대시보드 — "기프티콘 판매 수익(교환 마진)" KPI, 교환 반영 후 6,000원</div>
+          </div>
+          <div class="shot cms">
+            <img src="gifticon-exchange-storyboard-assets/16-cms-member-detail.png" alt="CMS 회원 상세 — 티켓 보유 현황">
+            <div class="cap">CMS &gt; 회원 상세 — 교환 후 보유 (브 38 / 실 1 / 골 2) 실시간 반영 + 개별 수동 지급</div>
+          </div>
+          <div class="shot cms">
+            <img src="gifticon-exchange-storyboard-assets/17-cms-cancel.png" alt="CMS 취소 내역 — 빈 상태">
+            <div class="cap">CMS &gt; 취소 내역 — 관리자·시스템 취소 기록용 (현재 0건)</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <h2 class="sec-title">정책 · 규칙 (SoT: 마스터 정책서 policyspec)</h2>
+  <div class="rule-card">
+    <div class="rule"><span class="k">단일 등급 교환</span><span class="v">한 상품은 <b>한 가지 등급 티켓으로만</b> 교환(브론즈끼리·실버끼리·골드끼리). <b>여러 등급을 섞는 혼합 결제 없음.</b> <span class="src">— 정책서 6. 교환·등급</span></span></div>
+    <div class="rule"><span class="k">티켓 가치 · 라인업</span><span class="v">티켓 1장 가치 = 브론즈 <b>100원</b> · 실버 <b>1,000원</b> · 골드 <b>2,000원</b>. 라인업은 <b>티켓 단위에 딱 떨어지는 액면가 상품만</b> 등록 가능 — 액면가가 교환 가치와 안 맞으면 등록 자체 불가(적자 교환 방지). <span class="src">— 정책서 6</span></span></div>
+    <div class="rule"><span class="k">이벤트 티켓 제외</span><span class="v">이벤트 티켓은 <b>경품 응모 전용</b>. 기프티콘 교환에는 쓸 수 없다. <span class="src">— 정책서 3. 유효기간·만료</span></span></div>
+    <div class="rule"><span class="k">취소 불가</span><span class="v">교환 완료 후 <b>취소 불가</b>(유저). CMS "취소 내역"은 관리자·시스템 취소 건 기록용. <span class="src">— 정책서 6</span></span></div>
+    <div class="rule"><span class="k">본인인증 게이트</span><span class="v">가입·적립 단계에는 인증 없음. <b>기프티콘으로 처음 교환(환금)하려는 순간 1회 휴대폰 본인인증</b>, 이후 인증 상태 유지. <b>1개 번호 = 1개 계정만 환금 가능</b> — 계정농장 차단의 핵심 게이트. <span class="src">— 정책서 11. 본인인증·정산</span></span></div>
+    <div class="rule"><span class="k">사용 자격</span><span class="v"><b>모든 티켓·포인트 사용(교환 포함)은 카카오 연동 후에만 가능.</b> 미연동(게스트)은 적립만 누적 — 닉네임 반복가입 파밍 차단. <span class="src">— 정책서 7. 계정 생애주기</span></span></div>
+    <div class="rule"><span class="k">부족 등급 보완</span><span class="v">낮은 등급을 모아 높은 등급으로 등가 상향(브론즈 10장 → 실버 1장, 실버 2장 → 골드 1장, 하향 불가) — 별도 기능 <b>⑦ 티켓 등급 교환</b>에서 처리. <span class="src">— 정책서 6</span></span></div>
+    <div class="rule"><span class="k">탈퇴 시 처리</span><span class="v">탈퇴하면 보유 티켓·<b>미사용 기프티콘 즉시 소멸</b>, 복구 불가(약관). <span class="src">— 정책서 7</span></span></div>
+    <div class="rule"><span class="k">수익 모델</span><span class="v">순수익 = 제휴 수수료 + <b>기프티콘 판매 마진</b>(티켓 → 기프티콘 교환 시 발생) − 적립 비용. CMS 대시보드 "기프티콘 판매 수익" KPI가 이 항목. <span class="src">— 정책서 12. 수익</span></span></div>
+    <div class="rule"><span class="k">운영값 연동 수정</span><span class="v">등급 가치·적립 단위·보상률·교환비·<b>기프티콘 라인업</b>은 한 세트로만 수정(단독 변경 금지). <span class="src">— 정책서 운영값 원칙</span></span></div>
+  </div>
+
+  <h2 class="sec-title">미결 · 정책 불일치 (형님 확정 필요)</h2>
+  <div class="pending-card">
+    <div class="pending"><span class="pl">P1</span><span class="pv"><b>기프티콘 유효기간 충돌</b> — 마스터 정책서(SoT)에 기프티콘 자체 유효기간 규정 <b>없음</b>. CMS 약관은 "발급 30일 이내 사용", CMS 상품 데이터도 전 상품 30일로 등록돼 있는데, 앱 상세·완료 화면 문구와 실제 발급 만료는 <b>90일 고정</b>(상품별 유효기간 값을 앱이 반영하지 않음).<span class="rec">→ 기준 유효기간(30일 vs 90일 vs 상품별)을 SoT에 명문화하고 앱·CMS·약관 3곳 일치 필요.</span></span></div>
+    <div class="pending"><span class="pl">P2</span><span class="pv"><b>환금 게이트 미구현</b> — 정책상 첫 교환 시 휴대폰 본인인증 1회 + "카카오 연동 후에만 사용 가능"인데, 현재 데모는 <b>게스트(미연동)도 인증 없이 즉시 교환</b>된다(이번 시연 자체가 게스트 교환). 데모 편의로는 무방하나 실서비스 필수 구현 항목.<span class="rec">→ 개발 이관 시 '연동 체크 + 첫 환금 본인인증' 게이트를 교환하기 직전 단계로 명시.</span></span></div>
+    <div class="pending"><span class="pl">P3</span><span class="pv"><b>라인업 액면가 규칙 위반 시드</b> — 정책은 "액면가가 티켓 단위와 안 맞으면 등록 불가"인데 현재 등록 상품이 규칙과 어긋남: 배민 10,000원권 = 실버 11장(11,000원), CU 3,000원권 = 브론즈 33장(3,300원), 스타벅스 4,500원 = 브론즈 50장(5,000원), GS25 3,000원권 = 브론즈 3장(300원). 이디야 아메리카노는 중복 2건. CMS 등록 폼에 액면가 검증이 없다.<span class="rec">→ 시드 정리 + CMS 상품 등록 시 액면가=교환가치 검증 로직 필요.</span></span></div>
+    <div class="pending"><span class="pl">P4</span><span class="pv"><b>발송 방식 미확정</b> — 앱 상세 문구는 "카카오톡 선물함으로 발송됩니다"인데 실동작은 <b>앱 내 교환 코드·바코드 즉시 발급</b>. 실서비스의 발행 방식(자체 코드 vs 기프티콘 벤더사 연동 발송)은 미확정 — 카카오 선물함 발송은 외부 벤더 연동이 필요한 <b>미확인</b> 항목(개인정보처리방침에 '발송 벤더사' 언급만 존재).<span class="rec">→ 벤더 연동 여부 결정 후 상세 문구·완료 화면 통일.</span></span></div>
+    <div class="pending"><span class="pl">P5</span><span class="pv"><b>교환 확인 모달 부재</b> — 화면 스펙(25 기프티콘 교환 상세)은 "교환하기 → 확인 모달 → 완료"인데 데모는 <b>원탭 즉시 교환</b>. 취소 불가 정책과 결합하면 오탭 리스크가 크다.<span class="rec">→ 확인 모달(또는 길게 누르기 등 2단계 확인) 추가 권고.</span></span></div>
+    <div class="pending"><span class="pl limit">참고</span><span class="pv"><b>데모 구현 한계</b> (정책 미결 아님 — 개발 이관 시 정리 목록): ① 상세의 사용처·유효기간 문구가 정적이라 어떤 상품이든 "스타벅스 전 매장 / 발급 후 90일"로 표시 ② 카탈로그 검색·정렬·카테고리·"교환 가능만" 토글 미동작 ③ CMS 구매/사용 내역의 교환 코드가 마스킹 고정(PP-XXXX-XXXX)·유효기간 90일 고정·상태 '사용완료' 고정(실제 저장 상태는 발급완료)이고 일부 행 상품명에 상품코드가 노출 ④ 대시보드 판매 수익이 등급 무관 장당 2,000원 × 마진 20% 일괄 가정으로 계산.</span></span></div>
+  </div>
+
+  <footer class="notes">
+    <h4>검증 시나리오 기록</h4>
+    <ul>
+      <li>검증 계정: <code>기프티콘검증13</code> (게스트/비연동, 식별 아이디 <code>uDZfd0KgAZbF5r8nXVewB5AJkzx1</code>) — 배포본에서 닉네임 온보딩으로 신규 생성.</li>
+      <li>티켓 확보: CMS(<code>firstadmin</code>) 수동 지급 — 브론즈 40 · 실버 12 · 골드 2장, 사유 "기프티콘 교환 스토리보드 시연용 지급".</li>
+      <li>교환 실행 2건: ① 이디야커피 아메리카노(브론즈 2장) → 코드 <code>PP-73IY-2IQS-AN08</code> 발급 ② 배민 10,000원 상품권(실버 11장). 잔여 브 38 / 실 1 / 골 2 확인.</li>
+      <li>전 화면은 배포본(pricepick-demo.vercel.app)의 <code>/app</code>(모바일 390×844)·<code>/cms</code>(데스크톱 1440×900)를 헤드리스 브라우저로 직접 조작해 캡처. 6번 완료 화면 1장만 캡처 편의상 화면 위치 보정을 적용했고 내용은 실발급 결과 그대로다.</li>
+      <li>티켓 차감은 만료 임박(적립일 오래된) 티켓부터 FIFO 소진 — 화면 안내와 실제 동작 일치(친구초대 세션에서 수정 반영된 로직).</li>
+    </ul>
+  </footer>
+
+</div>
+<div class="last-update">Last Update <b>2026.07.09 19:05</b></div>
+</body>
+</html>
