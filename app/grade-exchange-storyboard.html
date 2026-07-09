@@ -109,7 +109,7 @@
   <div class="policy-bar">
     <div class="policy-card"><div class="num">브론즈 10장 → 실버 1장</div><div class="lbl">교환 비율 (등가 전환)</div></div>
     <div class="policy-card"><div class="num">실버 2장 → 골드 1장</div><div class="lbl">교환 비율 (등가 전환)</div></div>
-    <div class="policy-card"><div class="num">상향만</div><div class="lbl">정책서 기준 — 하향(골드→실버 등) 불가 ※화면과 불일치</div></div>
+    <div class="policy-card"><div class="num">상향만</div><div class="lbl">SoT 확정 — 하향(골드→실버 등) 불가. 배포 화면·CMS "양방향" 표기는 오류(정정 대상)</div></div>
     <div class="policy-card"><div class="num">취소 불가</div><div class="lbl">교환 완료 후 되돌리기 없음</div></div>
   </div>
 
@@ -167,7 +167,7 @@
         </div>
         <div class="badge-conflict">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#c0392b" stroke-width="2"><path d="M12 3l10 18H2L12 3z"/><path d="M12 10v4"/></svg>
-          <span>정책 불일치 — 배포 화면은 <b>양방향 4버튼</b>(실버→브론즈, 골드→실버 하향 포함)에 "어느 방향으로 바꿔도 보유 가치는 같아요"라고 안내하지만, 마스터 정책서(SoT)는 <b>상향만 허용·하향 불가</b>로 확정돼 있다. 방향 정책 확정 필요(아래 미결 목록 1번).</span>
+          <span>정책 불일치(정정 대상) — 배포 화면은 <b>양방향 4버튼</b>(실버→브론즈, 골드→실버 하향 포함)에 "어느 방향으로 바꿔도 보유 가치는 같아요"라고 안내하지만, 마스터 정책서(SoT)는 <b>상향만 허용·하향 불가</b>로 확정돼 있다. 방향은 SoT 기준으로 이미 확정됐고, 앱 4버튼 UI·안내 문구가 이 기준에 맞게 정정돼야 한다(교환 실행 로직 자체가 미구현이라 화면 수정은 구현 시 함께 처리 — 아래 "구현 필요 항목" 참고).</span>
         </div>
       </div>
     </div>
@@ -235,7 +235,7 @@
         <div class="shots">
           <div class="shot wide" style="flex-basis:100%;">
             <img src="grade-exchange-storyboard-assets/06-cms-policy-swap.png" alt="CMS 운영 정책 — 티켓 등급 간 교환 정책 패널" style="width:520px;">
-            <div class="cap" style="max-width:520px;">CMS &gt; 운영 정책 · 등급 간 교환 정책 패널 — "양방향" 서술로 정책서(상향만)와 불일치 상태</div>
+            <div class="cap" style="max-width:520px;">CMS &gt; 운영 정책 · 등급 간 교환 정책 패널 — SoT 확정은 상향만, 패널의 "양방향" 서술은 정정 필요(정책 변경 아님·표기 오류)</div>
           </div>
           <div class="shot wide" style="flex-basis:100%;">
             <img src="grade-exchange-storyboard-assets/07-cms-ticket-ledger.png" alt="CMS 티켓 내역 — append-only 원장" style="width:520px;">
@@ -256,7 +256,7 @@
     <table class="rule-tbl">
       <tr><th>항목</th><th>확정 정책</th></tr>
       <tr><td>교환 비율</td><td><b>브론즈 10장 → 실버 1장 · 실버 2장 → 골드 1장</b> (환산가치 1:1 등가 전환. 브론즈 100원/실버 1,000원/골드 2,000원)</td></tr>
-      <tr><td>교환 방향</td><td>정책서 기준 <b>상향만 허용, 하향 불가</b> — 단 배포 화면·CMS 패널은 양방향으로 표기돼 있어 확정 필요 (미결 1)</td></tr>
+      <tr><td>교환 방향</td><td>SoT 확정 — <b>상향만 허용, 하향 불가</b>. 배포 화면 4버튼·CMS 패널의 "양방향" 서술은 오표기로, SoT 기준 정정 대상(실행 로직 미구현이라 화면 수정은 구현 시 함께 처리)</td></tr>
       <tr><td>취소</td><td><b>교환 완료 후 취소 불가</b></td></tr>
       <tr><td>사용 티켓 선택</td><td>만료 임박분(적립일이 오래된 티켓)부터 <b>FIFO 자동 사용</b> — 유저가 개별 티켓을 고르지 않음</td></tr>
       <tr><td>만료일 처리</td><td>새로 생기는 상위 티켓은 <b>원본 중 가장 이른 적립일을 승계</b>, 만료일 연장 없음 (등급 티켓 만료 = 적립일 + 1년, D-30/D-7 알림)</td></tr>
@@ -265,13 +265,24 @@
     </table>
   </div>
 
+  <div class="badge-note" style="display:block;background:var(--green-bg);margin:20px 0 0;padding:14px 18px;border-radius:12px;">
+    <b style="color:var(--green);">SoT 정정 반영</b> — 이번 대조로 확정된 항목. 스토리보드는 아래를 정본으로 서술한다.
+    <ul style="margin:8px 0 0;padding-left:18px;">
+      <li><b>교환 방향</b> — SoT 기준 <b>상향만 허용, 하향 불가</b>로 이미 확정. 배포 앱 화면(방향 4버튼 + "어느 방향으로 바꿔도" 문구), CMS 운영 정책 패널("양방향 교환"), 구 스토리보드 인덱스 문구("전 방향 허용")는 전부 SoT와 어긋나는 오표기이며, 정책 재확인 대상이 아니라 화면·문구 정정 대상이다.</li>
+      <li><b>사용 조건(연동 게이팅)</b> — SoT 기준 티켓·포인트 사용(교환 포함)은 <b>카카오 연동 후에만 가능</b>(게스트는 적립만). 정책은 확정, 앱 구현만 미완 상태.</li>
+    </ul>
+  </div>
+
   <div class="pending">
     <h3>미결 · 불일치 — 형님 확정 필요</h3>
     <ol>
-      <li><b>교환 방향</b> — 정책서(SoT)는 "상향만, 하향 불가"인데 배포 앱 화면(방향 4버튼 + "어느 방향으로 바꿔도" 문구 + 하향 분해 규칙 설명)과 CMS 운영 정책 패널("단일 등급 결제 + 양방향 교환"), 스토리보드 인덱스 카드 07 문구("전 방향 허용")까지 모두 양방향으로 표기돼 있다. 양방향이 맞다면 정책서를, 상향만이 맞다면 앱·CMS·인덱스 문구와 UI를 함께 고쳐야 한다.</li>
-      <li><b>포인트 ↔ 티켓 교환</b> — 앱 등급 교환 화면 하단에 존재하지만 정책서에 근거 없음. 기능 존치/폐기 확정 필요.</li>
-      <li><b>실행 로직 미구현</b> — 등급 교환은 앱·CMS 모두 실행이 구현되지 않은 UI 목업 상태. 구현 우선순위 결정 필요.</li>
+      <li><b>포인트 ↔ 티켓 교환</b> — 앱 등급 교환 화면 하단에 존재하지만 정책서(SoT)에 근거 없음. 기능 존치/폐기 확정 필요.</li>
+    </ol>
+    <h3 style="margin-top:18px;">구현 필요 항목 (정책 확정, 미구현 — 형님 결정 불필요)</h3>
+    <ol>
+      <li><b>실행 로직 미구현</b> — 등급 교환은 앱·CMS 모두 실행이 구현되지 않은 UI 목업 상태. 구현 우선순위만 남음.</li>
       <li><b>연동 게이팅 미구현</b> — "사용은 카카오 연동 후" 정책이 앱 교환 흐름(등급 교환·기프티콘 교환)에 적용되지 않아 게스트도 사용 가능한 상태.</li>
+      <li><b>방향 제한 UI 미반영</b> — 앱 4버튼(양방향)·CMS 패널 서술을 SoT 기준 상향만으로 고치는 작업. 실행 로직 구현과 함께 처리.</li>
     </ol>
   </div>
 
@@ -285,6 +296,6 @@
   </footer>
 
 </div>
-<div style="position:fixed;bottom:24px;left:24px;background:rgba(255,255,255,.92);border:1px solid var(--line);border-radius:10px;padding:8px 14px;font-size:11.5px;color:var(--sub);box-shadow:0 2px 10px rgba(0,0,0,.05);z-index:50;">Last Update <b style="color:var(--ink);">2026.07.09 19:03</b></div>
+<div style="position:fixed;bottom:24px;left:24px;background:rgba(255,255,255,.92);border:1px solid var(--line);border-radius:10px;padding:8px 14px;font-size:11.5px;color:var(--sub);box-shadow:0 2px 10px rgba(0,0,0,.05);z-index:50;">Last Update <b style="color:var(--ink);">2026.07.09 22:13</b></div>
 </body>
 </html>

@@ -360,10 +360,14 @@
   <h2 class="sec-title">미결 · 정책 불일치 (형님 확정 필요)</h2>
   <div class="pending-card">
     <div class="pending"><span class="pl">P1</span><span class="pv"><b>기프티콘 유효기간 충돌</b> — 마스터 정책서(SoT)에 기프티콘 자체 유효기간 규정 <b>없음</b>. CMS 약관은 "발급 30일 이내 사용", CMS 상품 데이터도 전 상품 30일로 등록돼 있는데, 앱 상세·완료 화면 문구와 실제 발급 만료는 <b>90일 고정</b>(상품별 유효기간 값을 앱이 반영하지 않음).<span class="rec">→ 기준 유효기간(30일 vs 90일 vs 상품별)을 SoT에 명문화하고 앱·CMS·약관 3곳 일치 필요.</span></span></div>
-    <div class="pending"><span class="pl">P2</span><span class="pv"><b>환금 게이트 미구현</b> — 정책상 첫 교환 시 휴대폰 본인인증 1회 + "카카오 연동 후에만 사용 가능"인데, 현재 데모는 <b>게스트(미연동)도 인증 없이 즉시 교환</b>된다(이번 시연 자체가 게스트 교환). 데모 편의로는 무방하나 실서비스 필수 구현 항목.<span class="rec">→ 개발 이관 시 '연동 체크 + 첫 환금 본인인증' 게이트를 교환하기 직전 단계로 명시.</span></span></div>
-    <div class="pending"><span class="pl">P3</span><span class="pv"><b>라인업 액면가 규칙 위반 시드</b> — 정책은 "액면가가 티켓 단위와 안 맞으면 등록 불가"인데 현재 등록 상품이 규칙과 어긋남: 배민 10,000원권 = 실버 11장(11,000원), CU 3,000원권 = 브론즈 33장(3,300원), 스타벅스 4,500원 = 브론즈 50장(5,000원), GS25 3,000원권 = 브론즈 3장(300원). 이디야 아메리카노는 중복 2건. CMS 등록 폼에 액면가 검증이 없다.<span class="rec">→ 시드 정리 + CMS 상품 등록 시 액면가=교환가치 검증 로직 필요.</span></span></div>
     <div class="pending"><span class="pl">P4</span><span class="pv"><b>발송 방식 미확정</b> — 앱 상세 문구는 "카카오톡 선물함으로 발송됩니다"인데 실동작은 <b>앱 내 교환 코드·바코드 즉시 발급</b>. 실서비스의 발행 방식(자체 코드 vs 기프티콘 벤더사 연동 발송)은 미확정 — 카카오 선물함 발송은 외부 벤더 연동이 필요한 <b>미확인</b> 항목(개인정보처리방침에 '발송 벤더사' 언급만 존재).<span class="rec">→ 벤더 연동 여부 결정 후 상세 문구·완료 화면 통일.</span></span></div>
-    <div class="pending"><span class="pl">P5</span><span class="pv"><b>교환 확인 모달 부재</b> — 화면 스펙(25 기프티콘 교환 상세)은 "교환하기 → 확인 모달 → 완료"인데 데모는 <b>원탭 즉시 교환</b>. 취소 불가 정책과 결합하면 오탭 리스크가 크다.<span class="rec">→ 확인 모달(또는 길게 누르기 등 2단계 확인) 추가 권고.</span></span></div>
+  </div>
+
+  <h2 class="sec-title">구현·정리 필요 (정책은 SoT로 확정 — 형님 결정 불필요)</h2>
+  <div class="pending-card">
+    <div class="pending"><span class="pl limit">P2</span><span class="pv"><b>환금 게이트 미구현</b> — 정책(SoT)상 첫 교환 시 휴대폰 본인인증 1회 + "카카오 연동 후에만 사용 가능"으로 이미 확정. 현재 데모는 <b>게스트(미연동)도 인증 없이 즉시 교환</b>된다(이번 시연 자체가 게스트 교환). 데모 편의로는 무방하나 실서비스 필수 구현 항목.<span class="rec">→ 개발 이관 시 '연동 체크 + 첫 환금 본인인증' 게이트를 교환하기 직전 단계로 명시.</span></span></div>
+    <div class="pending"><span class="pl limit">P3</span><span class="pv"><b>라인업 액면가 규칙 위반 시드</b> — 정책(SoT)은 "액면가가 티켓 단위와 안 맞으면 등록 불가"로 확정돼 있는데 현재 등록 상품이 규칙과 어긋남: 배민 10,000원권 = 실버 11장(11,000원), CU 3,000원권 = 브론즈 33장(3,300원), 스타벅스 4,500원 = 브론즈 50장(5,000원), GS25 3,000원권 = 브론즈 3장(300원). 이디야 아메리카노는 중복 2건. CMS 등록 폼에 액면가 검증이 없다.<span class="rec">→ 시드 정리 + CMS 상품 등록 시 액면가=교환가치 검증 로직 필요.</span></span></div>
+    <div class="pending"><span class="pl limit">P5</span><span class="pv"><b>교환 확인 모달 부재</b> — 화면 스펙(25 기프티콘 교환 상세)은 "교환하기 → 확인 모달 → 완료"인데 데모는 <b>원탭 즉시 교환</b>. 취소 불가 정책과 결합하면 오탭 리스크가 크다.<span class="rec">→ 확인 모달(또는 길게 누르기 등 2단계 확인) 추가 권고.</span></span></div>
     <div class="pending"><span class="pl limit">참고</span><span class="pv"><b>데모 구현 한계</b> (정책 미결 아님 — 개발 이관 시 정리 목록): ① 상세의 사용처·유효기간 문구가 정적이라 어떤 상품이든 "스타벅스 전 매장 / 발급 후 90일"로 표시 ② 카탈로그 검색·정렬·카테고리·"교환 가능만" 토글 미동작 ③ CMS 구매/사용 내역의 교환 코드가 마스킹 고정(PP-XXXX-XXXX)·유효기간 90일 고정·상태 '사용완료' 고정(실제 저장 상태는 발급완료)이고 일부 행 상품명에 상품코드가 노출 ④ 대시보드 판매 수익이 등급 무관 장당 2,000원 × 마진 20% 일괄 가정으로 계산.</span></span></div>
   </div>
 
@@ -379,6 +383,6 @@
   </footer>
 
 </div>
-<div class="last-update">Last Update <b>2026.07.09 19:05</b></div>
+<div class="last-update">Last Update <b>2026.07.09 22:13</b></div>
 </body>
 </html>
