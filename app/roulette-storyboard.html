@@ -30,14 +30,7 @@
     box-shadow:0 1px 2px rgba(20,30,60,.04);}
   .policy-card .num{font-size:20px;font-weight:700;color:var(--accent);}
   .policy-card .lbl{font-size:12px;color:var(--sub);margin-top:2px;}
-  .policy-card.pending{border-color:#f3d9ad;background:#fffdf7;}
-  .policy-card.pending .num{color:var(--amber);font-size:17px;}
   @media(max-width:760px){.policy-bar{grid-template-columns:repeat(2,1fr);}}
-
-  .pending-banner{background:var(--amber-bg);border:1px solid #f3d9ad;border-radius:10px;
-    padding:12px 18px;margin:0 0 44px;font-size:13px;color:#7a5306;display:flex;gap:10px;align-items:flex-start;}
-  .pending-banner b{color:#5f4004;}
-  .pending-banner svg{flex:0 0 auto;margin-top:1px;}
 
   .flow{position:relative;padding-left:40px;}
   .flow::before{content:"";position:absolute;left:15px;top:8px;bottom:8px;width:2px;background:var(--line);}
@@ -97,7 +90,7 @@
   .rule-list{margin:0;padding-left:18px;font-size:13.5px;color:var(--ink);}
   .rule-list li{margin:7px 0;}
   .rule-list .k{font-weight:700;}
-  .pill-pending{display:inline-block;font-size:11px;font-weight:700;background:var(--amber-bg);color:var(--amber);
+  .pill-info{display:inline-block;font-size:11px;font-weight:700;background:var(--purple-bg);color:var(--purple);
     border-radius:999px;padding:1px 8px;margin-left:4px;vertical-align:1px;}
 
   footer.notes{margin-top:44px;background:var(--card);border:1px solid var(--line);border-radius:12px;
@@ -127,12 +120,7 @@
     <div class="policy-card"><div class="num">하루 1회</div><div class="lbl">참여 한도 · 매일 자정 초기화</div></div>
     <div class="policy-card"><div class="num">6칸 · 1/6</div><div class="lbl">균등 확률 추첨 (가중치 없음)</div></div>
     <div class="policy-card"><div class="num">일 5 · 월 30장</div><div class="lbl">이벤트 티켓 지급 한도 (초과 시 미지급)</div></div>
-    <div class="policy-card pending"><div class="num">배분값 확정 대기</div><div class="lbl">6칸 구성은 시드값 운영 중 · 형님 확정 필요</div></div>
-  </div>
-
-  <div class="pending-banner">
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#b9770a" stroke-width="2"><path d="M12 9v4"/><path d="M10.3 3.6 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.6a2 2 0 0 0-3.4 0z"/><circle cx="12" cy="17" r=".5" fill="#b9770a"/></svg>
-    <div><b>룰렛 6칸 기본 배분값은 형님 확정 대기.</b> 현재 배포본은 시드값(포인트 100P·200P / 이벤트 티켓 1장·2장 / 꽝 2칸)이 CMS <code>settings/roulette</code>에 저장돼 그대로 운영 중이며, 이 문서의 모든 캡처도 해당 시드 기준입니다. 확정값이 정해지면 CMS에서 저장만 하면 앱에 즉시 반영됩니다.</div>
+    <div class="policy-card"><div class="num">CMS 설정</div><div class="lbl">6칸 배분은 운영자가 CMS에서 직접 설정(가변)</div></div>
   </div>
 
   <div class="flow">
@@ -161,10 +149,10 @@
       <div class="step-card">
         <span class="role role-user">유저</span>
         <h2>룰렛 메인 — CMS 설정 6칸을 그대로 렌더링</h2>
-        <p class="desc">진입할 때마다 CMS가 저장한 <code>settings/roulette</code> 문서를 다시 읽어 6칸(유형·값)을 그대로 그린다. 하드코딩이 아니라 운영자가 바꾸면 앱이 바뀐다. 문서가 없으면 기본 시드값으로 대체. 상단 배지에 오늘 남은 기회(1회)가 표시된다.</p>
+        <p class="desc">진입할 때마다 CMS가 저장한 <code>settings/roulette</code> 문서를 다시 읽어 6칸(유형·값)을 그대로 그린다. 하드코딩이 아니라 운영자가 바꾸면 앱이 바뀐다. 문서가 없으면 기본값 예시로 대체. 상단 배지에 오늘 남은 기회(1회)가 표시된다.</p>
         <table class="wheel-tbl">
           <tr><th>칸</th><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td></tr>
-          <tr><th>구성 (시드)</th><td class="win">이벤트 티켓 1장</td><td class="miss">꽝</td><td class="win">포인트 100P</td><td class="win">이벤트 티켓 2장</td><td class="miss">꽝</td><td class="win">포인트 200P</td></tr>
+          <tr><th>구성 (기본값 예시)</th><td class="win">이벤트 티켓 1장</td><td class="miss">꽝</td><td class="win">포인트 100P</td><td class="win">이벤트 티켓 2장</td><td class="miss">꽝</td><td class="win">포인트 200P</td></tr>
         </table>
         <div class="shots">
           <div class="shot wide">
@@ -174,7 +162,7 @@
         </div>
         <div class="badge-note">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#5b6478" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-5M12 8h.01"/></svg>
-          <span>위 표는 CMS <code>settings/roulette</code>에 저장된 현재 시드값이며, 8번 CMS 설정 화면의 저장값과 동일하다. 확정값이 아니라 형님 확정 대기 상태의 임시 운영값이다.</span>
+          <span>위 표는 CMS <code>settings/roulette</code>에 저장된 현재 값이며, 8번 CMS 설정 화면의 저장값과 동일하다. 6칸 배분은 고정값이 아니라 운영자가 CMS에서 직접 설정하는 가변값이고, 여기 표시된 구성은 그 기본값 예시다.</span>
         </div>
       </div>
     </div>
@@ -312,7 +300,7 @@
       <div class="step-card">
         <span class="role role-cms">운영자 · CMS</span>
         <h2>CMS "행운룰렛 설정" — 6칸 유형·값 편집 (실연동)</h2>
-        <p class="desc">CMS &gt; 티켓 · 보상 &gt; 행운룰렛 설정에서 6칸 각각의 유형(꽝 / 이벤트티켓 / 포인트)과 값(장수 / P 액수)을 편집해 저장하면 <code>settings/roulette</code>에 기록되고, 앱은 다음 진입 시 그대로 반영한다. 꽝 선택 시 값 입력은 자동 비활성화된다. 캡처 시점 저장값은 시드와 동일한 6칸(이벤트티켓 1장 / 꽝 / 포인트 100 / 이벤트티켓 2장 / 꽝 / 포인트 200) — 형님 확정 전 임시 운영값이다.</p>
+        <p class="desc">CMS &gt; 티켓 · 보상 &gt; 행운룰렛 설정에서 6칸 각각의 유형(꽝 / 이벤트티켓 / 포인트)과 값(장수 / P 액수)을 편집해 저장하면 <code>settings/roulette</code>에 기록되고, 앱은 다음 진입 시 그대로 반영한다. 꽝 선택 시 값 입력은 자동 비활성화된다. 캡처 시점 저장값은 기본값 예시와 동일한 6칸(이벤트티켓 1장 / 꽝 / 포인트 100 / 이벤트티켓 2장 / 꽝 / 포인트 200)이며, 운영자가 CMS에서 언제든 편집·저장해 값을 바꿀 수 있다.</p>
         <div class="shots">
           <div class="shot" style="flex-basis:100%;">
             <img src="roulette-storyboard-assets/11-cms-roulette-settings.png" alt="CMS 행운룰렛 설정 화면 — 6칸 유형·값 편집" style="width:640px;max-width:100%;">
@@ -334,8 +322,8 @@
         <ul class="rule-list">
           <li><span class="k">성격</span> — 출석(쿠팡 구경)과 무관한 독립 상시 이벤트. 구매 없이 참여 가능.</li>
           <li><span class="k">참여</span> — 하루 1회, 매일 자정 초기화.</li>
-          <li><span class="k">보상</span> — 포인트 또는 이벤트 티켓을 확률 지급. 확률·배분은 정책상 미결이라 운영자가 CMS에서 직접 정한다(6칸 균등 1/6 추첨).</li>
-          <li><span class="k">6칸 배분값</span> <span class="pill-pending">형님 확정 대기</span> — 현재 시드: 포인트 100P·200P / 이벤트 티켓 1장·2장 / 꽝 2칸. CMS에 저장돼 배포본이 이 값으로 운영 중이나 확정값 아님.</li>
+          <li><span class="k">보상</span> — 포인트 또는 이벤트 티켓을 확률 지급. 확률·배분은 고정 정책값이 아니라 운영자가 CMS에서 직접 설정하는 가변값이다(6칸 균등 1/6 추첨).</li>
+          <li><span class="k">6칸 배분값</span> <span class="pill-info">운영자 설정(가변)</span> — 기본값 예시: 포인트 100P·200P / 이벤트 티켓 1장·2장 / 꽝 2칸. CMS <code>settings/roulette</code>에 저장되며 운영자가 언제든 값을 바꿀 수 있다.</li>
           <li><span class="k">이벤트 티켓 성격</span> — 경품 응모(추첨) 전용, 등급(적립) 티켓과 완전 분리. 발급일 +100일 만료.</li>
           <li><span class="k">지급 한도</span> — 이벤트 티켓 어뷰징 한도 일 5장 / 월 30장이 룰렛 지급에도 적용(전 경로 합산). 한도 초과 당첨 건은 미지급 처리(결과 카드에 안내).</li>
           <li><span class="k">포인트 지급</span> — 즉시 지급·즉시 반영, 활동 내역 "행운 룰렛 당첨"으로 기록. 구매와 무관한 무상 보상이라 환불·환수와 무관.</li>
@@ -352,7 +340,7 @@
     <ul>
       <li>모든 화면은 배포본 <code>pricepick-demo.vercel.app/app</code>(게스트 신규 계정) · <code>/cms</code>(firstadmin) 에 헤드리스 브라우저(390×844·dsf 2 / CMS 1440×900)로 접속해 실제 참여·지급·기록 확인까지 수행한 뒤 캡처했다.</li>
       <li>결과 4종(포인트 / 이벤트 티켓 / 꽝 / 한도 초과)은 하루 1회 제한 때문에 계정을 나눠 재현했으며, 각 결과의 지급·미지급·원장 기록은 앱의 실제 로직이 그대로 수행된 것이다. 한도 초과분은 계정에 당일 5장을 실제 적립해 한도를 소진시킨 상태에서 이벤트 티켓 칸에 멈추게 해 재현했다(미지급 판정은 실제 코드가 수행).</li>
-      <li>룰렛 6칸 구성의 단일 원본은 CMS <code>settings/roulette</code> 문서다. 앱 화면·이 문서의 캡처 모두 해당 저장값(시드) 기준이며, 배분값은 형님 확정 대기 상태다.</li>
+      <li>룰렛 6칸 구성의 단일 원본은 CMS <code>settings/roulette</code> 문서다. 앱 화면·이 문서의 캡처 모두 해당 저장값(현재는 기본값 예시) 기준이며, 배분값은 형님 확정 대상이 아니라 운영자가 CMS에서 상시 편집하는 가변값이다.</li>
       <li>정책 근거는 마스터 정책서(policyspec.html) "참여 — 행운룰렛(독립 정책)" 및 정책 임계값 표(행운룰렛 / 이벤트 티켓 적립 한도) 조항이다.</li>
     </ul>
   </footer>
