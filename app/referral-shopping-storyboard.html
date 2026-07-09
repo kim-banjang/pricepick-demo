@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PricePick — 경유 구매 적립 프로세스 스토리보드</title>
+<style>
+  :root{
+    --bg:#f5f6fa; --card:#ffffff; --ink:#1f2433; --sub:#5b6478;
+    --line:#e6e8f0; --accent:#3b5bdb; --accent-soft:#eef1fd;
+    --green:#1f9d57; --green-bg:#e7f6ee; --amber:#b9770a; --amber-bg:#fdf3e3;
+    --red:#c0392b; --red-bg:#fbeceb; --gray:#5b6478; --gray-bg:#eef0f4;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+    line-height:1.6;-webkit-font-smoothing:antialiased;}
+  .wrap{max-width:1080px;margin:0 auto;padding:40px 24px 100px;}
+  header.doc{border-bottom:2px solid var(--accent);padding-bottom:20px;margin-bottom:8px;}
+  header.doc h1{margin:0 0 8px;font-size:26px;letter-spacing:-.01em;}
+  .lead{color:var(--sub);font-size:15px;margin:0 0 4px;}
+  .meta{color:var(--sub);font-size:13px;margin:2px 0 0;}
+  .note-top{background:var(--accent-soft);border:1px solid #d7ddf8;border-radius:10px;
+    padding:14px 18px;margin:20px 0 36px;font-size:13.5px;color:#33406b;display:flex;gap:10px;align-items:flex-start;}
+  .note-top svg{flex:0 0 auto;margin-top:1px;}
+
+  .policy-bar{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:44px;}
+  .policy-card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;
+    box-shadow:0 1px 2px rgba(20,30,60,.04);}
+  .policy-card .num{font-size:18px;font-weight:700;color:var(--accent);}
+  .policy-card .lbl{font-size:12px;color:var(--sub);margin-top:2px;}
+  @media(max-width:760px){.policy-bar{grid-template-columns:repeat(2,1fr);}}
+
+  .flow{position:relative;padding-left:40px;}
+  .flow::before{content:"";position:absolute;left:15px;top:8px;bottom:8px;width:2px;background:var(--line);}
+
+  .step{position:relative;margin-bottom:14px;}
+  .step-badge{position:absolute;left:-40px;top:2px;width:32px;height:32px;border-radius:50%;
+    background:var(--accent);color:#fff;font-size:14px;font-weight:700;
+    display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(59,91,219,.35);z-index:2;}
+  .step-card{background:var(--card);border:1px solid var(--line);border-radius:14px;
+    padding:22px 24px;box-shadow:0 1px 3px rgba(20,30,60,.05);}
+  .step-card h2{margin:0 0 4px;font-size:17px;}
+  .step-card .role{display:inline-block;font-size:11px;font-weight:700;padding:2px 9px;border-radius:999px;
+    margin-bottom:8px;letter-spacing:.02em;}
+  .role-user{background:#eef1fd;color:var(--accent);}
+  .role-system{background:var(--gray-bg);color:var(--gray);}
+  .role-cms{background:var(--green-bg);color:var(--green);}
+  .role-demo{background:var(--amber-bg);color:var(--amber);}
+  .step-card p.desc{margin:8px 0 16px;color:var(--sub);font-size:13.5px;}
+  .shots{display:flex;gap:20px;flex-wrap:wrap;align-items:flex-start;}
+  .shot{flex:0 0 auto;}
+  .shot img{display:block;width:200px;height:auto;border-radius:14px;border:1px solid var(--line);
+    box-shadow:0 4px 14px rgba(20,30,60,.10);}
+  .shot .cap{margin-top:8px;font-size:12px;color:var(--sub);text-align:center;max-width:200px;}
+  .shot.wide img{width:280px;}
+  .shot.wide .cap{max-width:280px;}
+  .shot.cms img{width:520px;}
+  .shot.cms .cap{max-width:520px;}
+  @media(max-width:640px){.shot.cms img{width:100%;}}
+
+  .arrow-down{display:flex;justify-content:center;margin:2px 0 18px 0;color:#b7bdd1;}
+
+  .badge-note{display:inline-flex;align-items:flex-start;gap:6px;font-size:12px;color:var(--sub);
+    background:var(--gray-bg);border-radius:8px;padding:6px 10px;margin-top:14px;line-height:1.6;}
+  .warn-box{display:flex;gap:8px;align-items:flex-start;font-size:12.5px;color:#7a3f10;
+    background:var(--amber-bg);border:1px solid #f0dcae;border-radius:8px;padding:10px 12px;margin-top:14px;line-height:1.6;}
+  .warn-box b{color:#8a4a12;}
+
+  .sec-divider{margin:46px 0 24px;display:flex;align-items:center;gap:12px;}
+  .sec-divider h2{margin:0;font-size:19px;letter-spacing:-.01em;}
+  .sec-divider .line{flex:1;height:1px;background:var(--line);}
+
+  footer.notes{margin-top:44px;background:var(--card);border:1px solid var(--line);border-radius:12px;
+    padding:20px 24px;font-size:13px;color:var(--sub);}
+  footer.notes h4{margin:0 0 10px;color:var(--ink);font-size:14px;}
+  footer.notes ul{margin:0;padding-left:18px;}
+  footer.notes li{margin:5px 0;}
+  code{background:var(--gray-bg);border-radius:5px;padding:1px 6px;font-size:12px;
+    font-family:ui-monospace,Menlo,monospace;color:#3a3f52;}
+
+  table.policy{width:100%;border-collapse:collapse;font-size:13px;margin-top:6px;}
+  table.policy th{background:var(--gray-bg);color:var(--ink);text-align:left;font-size:12px;padding:8px 12px;border:1px solid var(--line);}
+  table.policy td{padding:8px 12px;border:1px solid var(--line);vertical-align:top;}
+  table.policy td.k{width:190px;font-weight:700;color:var(--ink);white-space:nowrap;}
+  .tag-ok{display:inline-block;font-size:10.5px;font-weight:700;padding:1px 8px;border-radius:999px;background:var(--green-bg);color:var(--green);margin-left:6px;}
+  .tag-warn{display:inline-block;font-size:10.5px;font-weight:700;padding:1px 8px;border-radius:999px;background:var(--amber-bg);color:var(--amber);margin-left:6px;}
+  .warn-box svg{flex:0 0 auto;margin-top:2px;}
+
+  section.block{margin-top:52px;}
+  section.block > h2{font-size:20px;margin:0 0 6px;padding-left:2px;letter-spacing:-.01em;}
+  section.block > p.blead{margin:0 0 18px;color:var(--sub);font-size:13.5px;padding-left:2px;}
+  .issue{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--red);
+    border-radius:10px;padding:14px 18px;margin-bottom:12px;font-size:13.5px;}
+  .issue.minor{border-left-color:var(--amber);}
+  .issue.ref{border-left-color:#9aa3bd;}
+  .issue h3{margin:0 0 4px;font-size:14px;}
+  .issue p{margin:0;color:var(--sub);font-size:13px;}
+  .issue .tag{display:inline-block;font-size:10.5px;font-weight:700;border-radius:999px;padding:1px 8px;margin-left:6px;vertical-align:1px;}
+  .tag-conflict{background:var(--red-bg);color:var(--red);}
+  .tag-missing{background:var(--amber-bg);color:var(--amber);}
+  .tag-demo{background:var(--gray-bg);color:var(--gray);}
+
+  .last-update{position:fixed;bottom:24px;left:24px;background:rgba(255,255,255,.92);
+    border:1px solid var(--line);border-radius:10px;padding:8px 14px;font-size:11.5px;color:var(--sub);
+    box-shadow:0 2px 10px rgba(0,0,0,.05);z-index:50;}
+  .last-update b{color:var(--ink);font-weight:700;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="doc">
+    <h1>경유 구매 적립 프로세스 스토리보드</h1>
+    <p class="lead">홈 쇼핑몰 섹션 → 적립 안내 → 이동 브릿지 → 구매 → 랜덤 티켓 적립 → CMS 확정·집계 — 실제 배포본 화면 캡처 기반</p>
+    <p class="meta">pricepick-demo.vercel.app /app(게스트) · /cms(firstadmin) 배포본에서 직접 조작 후 캡처 (2026.07.09) · 목업/와이어프레임 없음</p>
+  </header>
+
+  <div class="note-top">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3b5bdb" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v5"/><circle cx="12" cy="16" r=".5" fill="#3b5bdb"/></svg>
+    <div>이 문서의 모든 화면 썸네일은 실제 배포본에서 게스트 계정(닉네임 "다정한물개") 생성 → 쿠팡 경유 → 구매 53,000원 시뮬 → 랜덤 티켓 적립 → CMS 포스트백 확정까지 실제로 수행한 뒤 캡처한 스크린샷입니다. 그림이나 와이어프레임으로 대체한 화면은 없습니다.</div>
+  </div>
+
+  <div class="policy-bar">
+    <div class="policy-card"><div class="num">랜덤 티켓 1장</div><div class="lbl">구매 1건당 가지급 (등급은 확정 전 비공개)</div></div>
+    <div class="policy-card"><div class="num">연동 D+7 · 미연동 D+30</div><div class="lbl">구매 확정 대기 (확정 시 등급 티켓 전환)</div></div>
+    <div class="policy-card"><div class="num">24시간 유효</div><div class="lbl">브릿지 경유 후 24시간 내 구매분만 적립</div></div>
+    <div class="policy-card"><div class="num">일 5건 · 월 50건</div><div class="lbl">구매 적립 한도 (어뷰징 한도)</div></div>
+  </div>
+
+  <div class="flow">
+
+    <div class="step">
+      <div class="step-badge">1</div>
+      <div class="step-card">
+        <span class="role role-user">앱 · 홈</span>
+        <h2>홈 "쇼핑하고 티켓 받기" 섹션</h2>
+        <p class="desc">홈 탭 중단의 쇼핑몰 섹션. "바로가기로 들어가 구매하면 티켓이 쌓여요" 카피와 함께 쿠팡(BEST)·알리익스프레스·테무 카드가 노출된다. 카드의 "바로가기 ›"는 이동 브릿지로 직행하고, "전체 ›"는 적립 가능 쇼핑몰 목록으로 진입한다.</p>
+        <div class="shots">
+          <div class="shot wide">
+            <img src="referral-shopping-storyboard-assets/01-home-shopping-section.png" alt="홈 쇼핑하고 티켓 받기 섹션">
+            <div class="cap">홈 · "쇼핑하고 티켓 받기" 섹션 (게스트 초기 상태 0장·0P)</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="arrow-down">
+      <svg width="20" height="28" viewBox="0 0 20 28" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 2v22M3 17l7 7 7-7"/></svg>
+    </div>
+
+    <div class="step">
+      <div class="step-badge">2</div>
+      <div class="step-card">
+        <span class="role role-user">앱 · 쇼핑몰 목록</span>
+        <h2>적립 가능 쇼핑몰</h2>
+        <p class="desc">"전체 ›"로 진입하는 제휴몰 전체 목록. 종합 쇼핑몰 4개(쿠팡·11번가·G마켓·옥션) + 해외직구 3개(알리익스프레스·테무·아이허브). 쇼핑몰명을 누르면 적립 안내로, "바로가기 ›"를 누르면 안내를 건너뛰고 바로 이동 브릿지로 간다.</p>
+        <div class="shots">
+          <div class="shot wide">
+            <img src="referral-shopping-storyboard-assets/02-mall-list.png" alt="적립 가능 쇼핑몰 목록">
+            <div class="cap">적립 가능 쇼핑몰 · 종합 4 + 해외직구 3</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="arrow-down">
+      <svg width="20" height="28" viewBox="0 0 20 28" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 2v22M3 17l7 7 7-7"/></svg>
+    </div>
+
+    <div class="step">
+      <div class="step-badge">3</div>
+      <div class="step-card">
+        <span class="role role-user">앱 · 적립 안내</span>
+        <h2>쿠팡 적립 안내 — "구매 시 랜덤 티켓 1장" + 3단계</h2>
+        <p class="desc">쇼핑몰별 적립 안내 화면. 로고 카드에 "구매 시 랜덤 티켓 1장", CTA "쿠팡 바로가기" 아래에 3단계 안내(① 바로가기로 쿠팡 접속 ② 24시간 이내 구매 ③ 티켓 확정)가 배치된다. 홈 화면 바로 가기 추가 버튼(빨간색)도 이 화면의 표준 위치.</p>
+        <div class="shots">
+          <div class="shot wide">
+            <img src="referral-shopping-storyboard-assets/03-coupang-earn-guide.png" alt="쿠팡 적립 안내 화면">
+            <div class="cap">쿠팡 적립 안내 · 3단계 안내 포함</div>
+          </div>
+        </div>
+        <div class="warn-box">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#b9770a" stroke-width="2"><path d="M12 3l10 18H2L12 3z"/><path d="M12 10v4"/><circle cx="12" cy="17.2" r=".5" fill="#b9770a"/></svg>
+          <div><b>정책 불일치 — 형님 결정 필요:</b> 3단계 중 "티켓 확정" 문구가 <b>"구매 확정 후 7일 사용 가능"</b>으로만 표기돼 있다. 마스터 정책서(policyspec, SoT)와 CMS·적립 완료 화면은 모두 <b>연동 D+7 / 미연동 D+30</b>으로 표기한다. 이 화면만 미연동 D+30이 누락 — 문구 수정 필요 여부 결정 대기.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="arrow-down">
+      <svg width="20" height="28" viewBox="0 0 20 28" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 2v22M3 17l7 7 7-7"/></svg>
+    </div>
+
+    <div class="step">
+      <div class="step-badge">4</div>
+      <div class="step-card">
+        <span class="role role-system">시스템 · 브릿지</span>
+        <h2>이동 브릿지 — 적립 추적 시작</h2>
+        <p class="desc">"쿠팡 바로가기"를 누르면 이동 브릿지가 뜬다. "쿠팡으로 이동 중" + 체크리스트(적립 추적 시작 · 24시간 유효)로 경유 추적이 시작됐음을 알리고, 실서비스에서는 이 시점에 쿠팡 앱/웹으로 전환된다. 클릭 로그(<code>click_logs</code>)가 이 시점에 기록된다.</p>
+        <div class="shots">
+          <div class="shot wide">
+            <img src="referral-shopping-storyboard-assets/04-bridge.png" alt="쿠팡 이동 브릿지 화면">
+            <div class="cap">이동 브릿지 · "쿠팡으로 이동 중" + 24시간 유효</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="arrow-down">
+      <svg width="20" height="28" viewBox="0 0 20 28" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 2v22M3 17l7 7 7-7"/></svg>
+    </div>
+
+    <div class="step">
+      <div class="step-badge">5</div>
+      <div class="step-card">
+        <span class="role role-demo">데모 시뮬</span>
+        <h2>구매 완료 — 금액 입력 시뮬 (데모 전용 장치)</h2>
+        <p class="desc">실서비스에서는 외부 쇼핑몰에서 구매하면 제휴몰 포스트백(구매 확인 콜백)이 서버로 수신된다. 데모에서는 이 포스트백을 대신하는 시뮬 바텀시트가 브릿지 3.5초 후 자동으로 떠서, 구매 금액을 입력하면(예: 53,000원) "티켓 받기"로 포스트백 수신·가지급 적립까지 실데이터로 처리된다(Firestore <code>postbacks</code> + <code>user_tickets</code> 기록).</p>
+        <div class="shots">
+          <div class="shot wide">
+            <img src="referral-shopping-storyboard-assets/05-purchase-sheet-53000.png" alt="구매 금액 입력 시뮬 바텀시트">
+            <div class="cap">데모 시뮬 바텀시트 · 53,000원 입력 → "티켓 받기"</div>
+          </div>
+        </div>
+        <div class="warn-box">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#b9770a" stroke-width="2"><path d="M12 3l10 18H2L12 3z"/><path d="M12 10v4"/><circle cx="12" cy="17.2" r=".5" fill="#b9770a"/></svg>
+          <div><b>정책 불일치(데모 장치) — 형님 결정 필요:</b> 시트의 미리보기가 "적립 예정: 실버 1장"으로 <b>등급을 사전 노출</b>한다. 정책은 확정 전까지 등급 비공개(랜덤 표기). 데모 전용 장치라 실서비스와 무관하지만, 데모를 개발자·이해관계자에게 공유하는 용도라면 "랜덤 티켓 1장"으로 고칠지 결정 대기.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="arrow-down">
+      <svg width="20" height="28" viewBox="0 0 20 28" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 2v22M3 17l7 7 7-7"/></svg>
+    </div>
+
+    <div class="step">
+      <div class="step-badge">6</div>
+      <div class="step-card">
+        <span class="role role-user">앱 · 적립 완료</span>
+        <h2>티켓 적립 완료 — 랜덤 티켓 1장 · 대기중</h2>
+        <p class="desc">적립 완료 화면. 구매 정보(쿠팡 53,000원)와 "1장 적립됨" 배지, 그리고 "랜덤 티켓 1장 · 대기중" 안내가 노출된다. 확정 전에는 실제 등급(브론즈·실버·골드)을 공개하지 않는 정책이 화면에 그대로 반영돼 있고, 확정 대기 기간도 <b>연동 D+7 / 미연동 D+30</b>으로 정확히 표기된다. "홈으로 가기"로 복귀.</p>
+        <div class="shots">
+          <div class="shot wide">
+            <img src="referral-shopping-storyboard-assets/06-earn-done.png" alt="티켓 적립 완료 화면">
+            <div class="cap">적립 완료 · 랜덤 티켓 1장 대기중 + D+7/D+30 안내</div>
+          </div>
+        </div>
+        <div class="badge-note">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#5b6478" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-5M12 8h.01"/></svg>
+          <span>관찰: 데스크톱 폰 프레임(캡처 기준)에서는 정상 렌더되나, 좁은 모바일 뷰포트(390px)에서는 이 화면 하단(홈으로 가기 CTA)이 잘리는 앱 렌더링 이슈가 있다. 위 썸네일은 정상 렌더 상태의 실제 화면이며 합성·수정본이 아니다. 실기기 확인 필요 — 미결 보고 참조.</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="arrow-down">
+      <svg width="20" height="28" viewBox="0 0 20 28" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 2v22M3 17l7 7 7-7"/></svg>
+    </div>
+
+    <div class="step">
+      <div class="step-badge">7</div>
+      <div class="step-card">
+        <span class="role role-user">앱 · 혜택 탭</span>
+        <h2>혜택 탭 — 대기 현황</h2>
+        <p class="desc">혜택 탭 상단 "내 티켓" 카드에 <b>랜덤 티켓 1장 · 대기중</b>이 표시된다. "대기 기간 후 실제 티켓으로 전환" 안내만 있고 전환될 등급 구성은 노출하지 않는다(등급 사전 비공개 정책). 사용 가능 티켓(브론즈·실버·골드)은 아직 0장.</p>
+        <div class="shots">
+          <div class="shot wide">
+            <img src="referral-shopping-storyboard-assets/07-benefit-pending.png" alt="혜택 탭 대기 현황">
+            <div class="cap">혜택 탭 · 랜덤 티켓 1장 대기중 (사용 가능 0장)</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="sec-divider">
+    <h2>CMS (운영자) — 포스트백 확정 · 매출/티켓 집계</h2>
+    <div class="line"></div>
+  </div>
+
+  <div class="flow">
+
+    <div class="step">
+      <div class="step-badge">8</div>
+      <div class="step-card">
+        <span class="role role-cms">CMS · 포스트백</span>
+        <h2>포스트백 로그 — 가지급(대기) 수신 확인</h2>
+        <p class="desc">CMS &gt; 시스템 &gt; 포스트백 로그. 방금 발생한 구매가 <b>다정한물개 · 쿠팡 · 53,000원 · 대기</b>로 수신됐고, 제휴 수수료(매출)가 수수료율 3% 기준 <b>+1,590원</b>으로 자동 집계된다. 화면 상단에 확정 정책(연동 D+7 / 미연동 D+30)과 예외 처리 규칙(환불 회수·24h 미수신 영수증 수동 지급·주문번호 UNIQUE 중복 차단)이 명시돼 있다.</p>
+        <div class="shots">
+          <div class="shot cms">
+            <img src="referral-shopping-storyboard-assets/cms-01-postback-pending.png" alt="CMS 포스트백 로그 대기 상태">
+            <div class="cap">포스트백 로그 · 다정한물개 53,000원 "대기" + 수수료 +1,590원</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="arrow-down">
+      <svg width="20" height="28" viewBox="0 0 20 28" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 2v22M3 17l7 7 7-7"/></svg>
+    </div>
+
+    <div class="step">
+      <div class="step-badge">9</div>
+      <div class="step-card">
+        <span class="role role-cms">CMS · 확정 처리</span>
+        <h2>구매 확정 처리 — 가지급 티켓 → 등급 티켓 전환</h2>
+        <p class="desc">실서비스에서는 확정 대기 기간(연동 D+7 / 미연동 D+30) 경과 시 자동 확정되고, 데모에서는 CMS "데이터 관리(데모)"의 포스트백 수정에서 상태를 <b>대기 → 확정</b>으로 바꿔 그 시점을 재현한다. 확정 시 가지급 랜덤 티켓이 구매 금액 기준(Greedy 환산)의 등급 티켓으로 전환된다 — 53,000원은 실버 1장(브0·실1·골0).</p>
+        <div class="shots">
+          <div class="shot cms">
+            <img src="referral-shopping-storyboard-assets/cms-02-postback-confirm-modal.png" alt="CMS 포스트백 확정 처리 모달">
+            <div class="cap">포스트백 수정 모달 · 상태 "확정" 선택 → 저장 시 "가지급 티켓 1장 → 등급 티켓 전환"</div>
+          </div>
+          <div class="shot cms">
+            <img src="referral-shopping-storyboard-assets/cms-03-postback-confirmed.png" alt="CMS 포스트백 로그 확정 후">
+            <div class="cap">확정 후 포스트백 로그 · 같은 건이 "정상"으로 전환</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="arrow-down">
+      <svg width="20" height="28" viewBox="0 0 20 28" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 2v22M3 17l7 7 7-7"/></svg>
+    </div>
+
+    <div class="step">
+      <div class="step-badge">10</div>
+      <div class="step-card">
+        <span class="role role-cms">CMS · 집계</span>
+        <h2>매출 내역 — 수수료 매출 · 적립 금액(티켓) 집계</h2>
+        <p class="desc">CMS &gt; 매출·수익 &gt; 매출 내역. 확정된 구매 건이 제휴 수수료 매출에 반영된다 — 이번 건은 <b>수수료 매출 +1,590원(3%) / 적립 금액(티켓) 1,000원</b>(실버 1장의 원환산). 상단 KPI 카드에서 제휴 수수료 매출·기프티콘 판매 매출·총 매출이 합산 집계된다.</p>
+        <div class="shots">
+          <div class="shot cms">
+            <img src="referral-shopping-storyboard-assets/cms-04-revenue.png" alt="CMS 매출 내역 집계">
+            <div class="cap">매출 내역 · 다정한물개 53,000원 → 수수료 +1,590원 · 적립 금액(티켓) 1,000원</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="sec-divider">
+    <h2>정책 · 규칙 (SoT: policyspec 기준 대조)</h2>
+    <div class="line"></div>
+  </div>
+
+  <table class="policy">
+    <tr><th>항목</th><th>확정 정책 (마스터 정책서 policyspec = SoT)</th><th>화면 반영 상태</th></tr>
+    <tr>
+      <td class="k">가지급 티켓</td>
+      <td>구매 1건 = 랜덤 티켓 1장(가지급). 등급은 내부 확정하되 확정 전까지 유저에게 비공개.</td>
+      <td>적립 완료·혜택 탭 정상 반영 <span class="tag-ok">일치</span><br>데모 시뮬 시트만 등급 사전 노출 <span class="tag-warn">불일치 ②</span></td>
+    </tr>
+    <tr>
+      <td class="k">구매 확정 대기</td>
+      <td>카카오 연동 D+7 / 미연동 D+30 (2026-06-08 정책 변경 확정). 기간 내 취소 없으면 자동 확정.</td>
+      <td>적립 완료 화면·CMS 정상 표기 <span class="tag-ok">일치</span><br>앱 적립 안내 3단계는 "확정 후 7일"만 표기 <span class="tag-warn">불일치 ①</span></td>
+    </tr>
+    <tr>
+      <td class="k">등급 전환 기준</td>
+      <td>확정 시 Greedy 환산 — 골드 100,000 / 실버 50,000 / 브론즈 5,000원당 1장, 큰 단위부터.</td>
+      <td>53,000원 → 실버 1장 실측 확인 <span class="tag-ok">일치</span></td>
+    </tr>
+    <tr>
+      <td class="k">경유 유효시간</td>
+      <td>브릿지 경유 후 24시간 이내 구매분만 적립 대상.</td>
+      <td>적립 안내·브릿지 정상 표기 <span class="tag-ok">일치</span></td>
+    </tr>
+    <tr>
+      <td class="k">구매 적립 한도</td>
+      <td>일 5건 / 월 50건 (어뷰징 한도).</td>
+      <td>앱 화면에는 한도 표기 없음 — 적립 조건·제외 안내(별도 스토리보드 ⑥ 범위)에서 다룰지 확인 필요</td>
+    </tr>
+    <tr>
+      <td class="k">포스트백 예외</td>
+      <td>확정 후 환불 = 미사용분만 회수 / 24h 미수신 = 영수증 인증 수동 지급 / 중복 = 주문번호 UNIQUE 차단.</td>
+      <td>CMS 포스트백 로그 상단에 명시 <span class="tag-ok">일치</span></td>
+    </tr>
+  </table>
+
+  <section class="block">
+    <h2>미결 · 불일치 보고 (형님 확정 필요)</h2>
+    <p class="blead">이번 실측·정책서 대조에서 발견한 어긋남. 임의로 정하지 않고 그대로 보고한다. 붉은 테두리 = 정책 충돌, 노란 테두리 = 표기·앱 이슈, 회색 = 데모 한정 참고.</p>
+
+    <div class="issue">
+      <h3>① 쿠팡 적립 안내 3단계가 "확정 후 7일"만 표기 <span class="tag tag-conflict">화면-정책 충돌</span></h3>
+      <p>적립 안내(스텝 3)의 "티켓 확정" 문구가 "구매 확정 후 7일 사용 가능"으로만 서술돼 미연동 D+30이 누락됐다. 이 캡처 계정은 미연동 게스트다. 같은 앱의 적립 완료 화면·혜택 탭·CMS는 모두 연동 D+7 / 미연동 D+30으로 정확히 표기해 이 화면만 어긋난다. 문구 보강 여부 확인 필요. (적립 조건·제외 안내 ⑥ 보고 ③과 동일 건)</p>
+    </div>
+    <div class="issue ref">
+      <h3>② 데모 구매 시뮬 시트가 등급 구성을 사전 노출 <span class="tag tag-demo">데모 한정</span></h3>
+      <p>구매 금액 입력 시트(스텝 5)의 "적립 예정: 실버 1장" 미리보기가 등급을 확정 전에 노출한다. 정책은 확정 전까지 등급 비공개("랜덤 티켓"으로만 표시)다. 포스트백을 대신하는 데모 전용 장치라 실서비스와 무관하지만, 개발자·이해관계자 공유 시 오해 소지가 있어 "랜덤 티켓 1장"으로 고칠지 확인 필요. (⑤·⑥ 보고와 동일 건)</p>
+    </div>
+    <div class="issue minor">
+      <h3>③ 적립 완료 화면이 좁은 모바일 뷰포트에서 하단 잘림 <span class="tag tag-missing">앱 렌더링</span></h3>
+      <p>적립 완료 화면(pw-earn-done)이 데스크톱 폰 프레임에서는 정상이나 390px 모바일 뷰포트에서는 하단(홈으로 가기 CTA)이 잘린다. 위 썸네일은 정상 렌더 상태의 실화면이며 합성·수정본이 아니다. 실기기(iPhone) 재현 여부 확인 후 수정 대상.</p>
+    </div>
+    <div class="issue minor">
+      <h3>④ 구매 적립 한도(일 5건·월 50건)가 앱 화면에 미노출 <span class="tag tag-missing">안내 누락</span></h3>
+      <p>정책서에 확정값으로 존재하나 이 플로우의 앱 화면 어디에도 한도가 표기되지 않는다. 노출 위치는 "적립 조건·제외 안내" 스토리보드(⑥) 범위 — 거기서도 동일하게 보고했다.</p>
+    </div>
+  </section>
+
+  <footer class="notes">
+    <h4>참고 사항</h4>
+    <ul>
+      <li>캡처 환경: 배포본 <code>pricepick-demo.vercel.app/app</code>을 데스크톱 폰 프레임(390×844)에서 신규 게스트("다정한물개")로 실제 조작. CMS는 <code>/cms</code> firstadmin 계정. 캡처 일시 2026-07-09.</li>
+      <li>등급 전환 기준(Greedy 환산): 골드 100,000 / 실버 50,000 / 브론즈 5,000원당 1장, 큰 단위부터. 티켓 1장 원환산 = 골드 2,000 / 실버 1,000 / 브론즈 100원(전체 보상률 2%). 53,000원 = 실버 1장(원환산 1,000원) 실측 확인.</li>
+      <li>이 문서 캡처 과정에서 생성된 테스트 게스트 1명(다정한물개)과 확정 포스트백 1건은 데모 DB에 실데이터로 남아 있다(캡처 반복분 5건은 정리 완료).</li>
+      <li>정책 근거는 마스터 정책서(policyspec.html — 2026-07-09 SoT 확정). 화면·다른 문서와 충돌하면 정책서가 우선한다.</li>
+    </ul>
+  </footer>
+
+</div>
+<div class="last-update">Last Update <b>2026.07.09 20:33</b></div>
+</body>
+</html>
