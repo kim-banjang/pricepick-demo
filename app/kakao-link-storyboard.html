@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PricePick — 카카오 연동 프로세스 스토리보드</title>
+<style>
+  :root{
+    --bg:#f5f6fa; --card:#ffffff; --ink:#1f2433; --sub:#5b6478;
+    --line:#e6e8f0; --accent:#3b5bdb; --accent-soft:#eef1fd;
+    --green:#1f9d57; --green-bg:#e7f6ee; --amber:#b9770a; --amber-bg:#fdf3e3;
+    --red:#c0392b; --red-bg:#fbeceb; --gray:#5b6478; --gray-bg:#eef0f4;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+    line-height:1.6;-webkit-font-smoothing:antialiased;}
+  .wrap{max-width:1080px;margin:0 auto;padding:40px 24px 100px;}
+  header.doc{border-bottom:2px solid var(--accent);padding-bottom:20px;margin-bottom:8px;}
+  header.doc h1{margin:0 0 8px;font-size:26px;letter-spacing:-.01em;}
+  .lead{color:var(--sub);font-size:15px;margin:0 0 4px;}
+  .meta{color:var(--sub);font-size:13px;margin:2px 0 0;}
+  .note-top{background:var(--accent-soft);border:1px solid #d7ddf8;border-radius:10px;
+    padding:14px 18px;margin:20px 0 36px;font-size:13.5px;color:#33406b;display:flex;gap:10px;align-items:flex-start;}
+  .note-top svg{flex:0 0 auto;margin-top:1px;}
+
+  .policy-bar{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:44px;}
+  .policy-card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;
+    box-shadow:0 1px 2px rgba(20,30,60,.04);}
+  .policy-card .num{font-size:18px;font-weight:700;color:var(--accent);}
+  .policy-card .lbl{font-size:12px;color:var(--sub);margin-top:2px;}
+  @media(max-width:760px){.policy-bar{grid-template-columns:repeat(2,1fr);}}
+
+  .flow{position:relative;padding-left:40px;}
+  .flow::before{content:"";position:absolute;left:15px;top:8px;bottom:8px;width:2px;background:var(--line);}
+
+  .step{position:relative;margin-bottom:14px;}
+  .step-badge{position:absolute;left:-40px;top:2px;width:32px;height:32px;border-radius:50%;
+    background:var(--accent);color:#fff;font-size:14px;font-weight:700;
+    display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(59,91,219,.35);z-index:2;}
+  .step-card{background:var(--card);border:1px solid var(--line);border-radius:14px;
+    padding:22px 24px;box-shadow:0 1px 3px rgba(20,30,60,.05);}
+  .step-card h2{margin:0 0 4px;font-size:17px;}
+  .step-card .role{display:inline-block;font-size:11px;font-weight:700;padding:2px 9px;border-radius:999px;
+    margin-bottom:8px;letter-spacing:.02em;}
+  .role-user{background:#eef1fd;color:var(--accent);}
+  .role-guest{background:var(--amber-bg);color:var(--amber);}
+  .role-system{background:var(--gray-bg);color:var(--gray);}
+  .role-cms{background:var(--green-bg);color:var(--green);}
+  .step-card p.desc{margin:8px 0 16px;color:var(--sub);font-size:13.5px;}
+  .shots{display:flex;gap:20px;flex-wrap:wrap;align-items:flex-start;}
+  .shot{flex:0 0 auto;}
+  .shot img{display:block;width:200px;height:auto;border-radius:14px;border:1px solid var(--line);
+    box-shadow:0 4px 14px rgba(20,30,60,.10);}
+  .shot .cap{margin-top:8px;font-size:12px;color:var(--sub);text-align:center;max-width:200px;}
+  .shot.wide img{width:280px;}
+  .shot.wide .cap{max-width:280px;}
+
+  .arrow-down{display:flex;justify-content:center;margin:2px 0 18px 0;color:#b7bdd1;}
+
+  .branch-wrap{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+  @media(max-width:700px){.branch-wrap{grid-template-columns:1fr;}}
+  .branch{border-radius:14px;padding:20px;border:2px solid var(--line);background:var(--card);}
+  .branch.auto{border-color:#bfe3cd;}
+  .branch.manual{border-color:#f3d9ad;}
+  .branch .tag{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:700;
+    padding:3px 10px;border-radius:999px;margin-bottom:10px;}
+  .branch.auto .tag{background:var(--green-bg);color:var(--green);}
+  .branch.manual .tag{background:var(--amber-bg);color:var(--amber);}
+  .branch h3{margin:0 0 6px;font-size:14.5px;}
+  .branch p{margin:0 0 14px;font-size:13px;color:var(--sub);}
+  .branch .shots{gap:12px;}
+  .branch .shot img{width:190px;}
+  .branch .shot .cap{max-width:190px;}
+
+  .badge-note{display:inline-flex;align-items:flex-start;gap:6px;font-size:12px;color:var(--sub);
+    background:var(--gray-bg);border-radius:8px;padding:6px 10px;margin-top:14px;}
+
+  table.rules{width:100%;border-collapse:collapse;font-size:13px;margin-top:6px;}
+  table.rules th,table.rules td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top;}
+  table.rules th{background:var(--gray-bg);font-size:12.5px;color:var(--ink);white-space:nowrap;}
+  table.rules td b{color:var(--ink);}
+
+  section.block{margin-top:44px;background:var(--card);border:1px solid var(--line);border-radius:12px;
+    padding:22px 24px;}
+  section.block h4{margin:0 0 12px;color:var(--ink);font-size:15px;}
+  section.block.issues{border-color:#f3d9ad;background:#fffdf7;}
+  .issue{border-left:3px solid var(--amber);padding:2px 0 2px 12px;margin:12px 0;font-size:13px;color:var(--sub);}
+  .issue b{color:var(--ink);}
+  .issue .kind{display:inline-block;font-size:11px;font-weight:700;padding:1px 8px;border-radius:999px;margin-right:6px;}
+  .kind.bug{background:var(--red-bg);color:var(--red);}
+  .kind.gap{background:var(--amber-bg);color:var(--amber);}
+  .kind.open{background:var(--gray-bg);color:var(--gray);}
+
+  footer.notes{margin-top:24px;background:var(--card);border:1px solid var(--line);border-radius:12px;
+    padding:20px 24px;font-size:13px;color:var(--sub);}
+  footer.notes h4{margin:0 0 10px;color:var(--ink);font-size:14px;}
+  footer.notes ul{margin:0;padding-left:18px;}
+  footer.notes li{margin:5px 0;}
+  code{background:var(--gray-bg);border-radius:5px;padding:1px 6px;font-size:12px;
+    font-family:ui-monospace,Menlo,monospace;color:#3a3f52;}
+
+  .last-update{position:fixed;bottom:24px;left:24px;background:rgba(255,255,255,.92);
+    border:1px solid var(--line);border-radius:10px;padding:8px 14px;font-size:11.5px;color:var(--sub);
+    box-shadow:0 2px 10px rgba(0,0,0,.05);z-index:50;}
+  .last-update b{font-weight:700;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="doc">
+    <h1>카카오 연동 프로세스 스토리보드</h1>
+    <p class="lead">닉네임 게스트 가입부터 카카오 연동·보상 지급·CMS 집계까지 — 실제 배포본 화면 캡처 기반</p>
+    <p class="meta">pricepick-demo.vercel.app /app(게스트 실계정) · /cms(운영자) 배포본에서 직접 캡처 (2026.07.09) · 목업/와이어프레임 없음</p>
+  </header>
+
+  <div class="note-top">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3b5bdb" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v5"/><circle cx="12" cy="16" r=".5" fill="#3b5bdb"/></svg>
+    <div>이 문서의 모든 화면 썸네일은 배포본(pricepick-demo.vercel.app)에서 게스트 계정 생성 → 카카오 연동 → 보상 지급 → CMS 확인까지 실제로 수행한 뒤 캡처한 스크린샷입니다. 연동 판정은 <code>users.linked_kakao</code> 단일 기준이며, 데모 특성상 실제 Kakao OAuth 없이 연동 완료 시 <code>kakao_login_id</code>·<code>kakao_nickname</code>이 자동 생성·저장됩니다.</div>
+  </div>
+
+  <div class="policy-bar">
+    <div class="policy-card"><div class="num">선택 연동</div><div class="lbl">가입은 닉네임만 (진입 단계 소셜 로그인 없음)</div></div>
+    <div class="policy-card"><div class="num">티켓 1장 + 200P</div><div class="lbl">연동 시 이벤트 티켓·축하 포인트 즉시 지급</div></div>
+    <div class="policy-card"><div class="num">D+7 / D+30</div><div class="lbl">구매확정 대기 (연동 / 미연동)</div></div>
+    <div class="policy-card"><div class="num">사용은 연동 후</div><div class="lbl">미연동은 적립만 누적 · 사용/교환/응모 불가</div></div>
+  </div>
+
+  <div class="flow">
+
+    <div class="step">
+      <div class="step-badge">1</div>
+      <div class="step-card">
+        <span class="role role-guest">게스트</span>
+        <h2>닉네임만으로 가입 — 미연동(게스트) 시작</h2>
+        <p class="desc">로그인 없이 자동 추천 닉네임만 정하면 바로 시작한다. 가입 화면에 "이 기기에만 저장 · 앱 삭제/기기 변경 시 초기화" 경고가 노출되고, 카카오 연동으로 안전하게 보관할 수 있음을 안내한다.</p>
+        <div class="shots">
+          <div class="shot wide">
+            <img src="kakao-link-storyboard-assets/01-onboarding-nickname-guest-warning.png" alt="닉네임 가입 화면 — 재설치·기기 변경 주의 경고">
+            <div class="cap">가입 화면 · 닉네임 자동 추천 + 재설치·기기 변경 경고</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="arrow-down">
+      <svg width="20" height="28" viewBox="0 0 20 28" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 2v22M3 17l7 7 7-7"/></svg>
+    </div>
+
+    <div class="step">
+      <div class="step-badge">2</div>
+      <div class="step-card">
+        <span class="role role-guest">게스트</span>
+        <h2>연동 진입점 — 홈 배너 · 마이 회원정보 · 적립 조건 안내</h2>
+        <p class="desc">미연동 상태에서는 앱 곳곳에서 연동을 유도한다. ① 홈 상단 "카카오 연동하고 혜택 받기" 배너(연동 계정에는 미노출), ② 마이 회원정보의 "카카오 미연동 · 연동하기" 행, ③ 적립 조건 안내의 "카카오 연동하러 가기" 링크. 어디서 눌러도 동일한 연동 플로우로 진입한다.</p>
+        <div class="shots">
+          <div class="shot">
+            <img src="kakao-link-storyboard-assets/02-home-guest-kakao-banner.png" alt="홈 상단 카카오 연동 유도 배너">
+            <div class="cap">① 홈 배너 (미연동에만 노출)</div>
+          </div>
+          <div class="shot">
+            <img src="kakao-link-storyboard-assets/04-mypage-guest-kakao-row.png" alt="마이페이지 회원정보 — 카카오 미연동 + 연동하기 버튼">
+            <div class="cap">② 마이 회원정보 · "카카오 미연동" + 연동하기</div>
+          </div>
+          <div class="shot">
+            <img src="kakao-link-storyboard-assets/03-tickets-d30-guest-notice.png" alt="적립 조건 안내 — 카카오 연동 유도 링크">
+            <div class="cap">③ 적립 조건 안내 · 연동 유도 링크 (표기 이슈는 하단 미결 참조)</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="arrow-down">
+      <svg width="20" height="28" viewBox="0 0 20 28" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 2v22M3 17l7 7 7-7"/></svg>
+    </div>
+
+    <div class="step">
+      <div class="step-badge">3</div>
+      <div class="step-card">
+        <span class="role role-system">시스템</span>
+        <h2>카카오 인증 — 카카오톡 앱 전환</h2>
+        <p class="desc">연동하기를 누르면 카카오톡 앱 전환 안내와 함께 iOS 권한 팝업("카카오톡에서 프라이스픽 열기 허용")이 뜬다. 데모에서는 실제 OAuth 없이 이 화면에서 다음 단계로 진행한다. (화면 ID <code>03b-C</code>)</p>
+        <div class="shots">
+          <div class="shot wide">
+            <img src="kakao-link-storyboard-assets/05-kakao-auth-transition.png" alt="카카오톡으로 이동 중 화면과 iOS 권한 팝업">
+            <div class="cap">카카오톡 이동 안내 + iOS 앱 전환 권한 팝업</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="arrow-down">
+      <svg width="20" height="28" viewBox="0 0 20 28" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 2v22M3 17l7 7 7-7"/></svg>
+    </div>
+
+    <div class="step">
+      <div class="step-badge">4</div>
+      <div class="step-card">
+        <span class="role role-system">분기</span>
+        <h2>인증 결과 분기 — 신규 연결 vs 기존 계정 발견</h2>
+        <p class="desc">해당 카카오 계정의 기존 데이터 유무에 따라 갈라진다. 신규 연결이면 보상 안내와 함께 연동이 완료되고, 기존 프라이스픽 데이터가 있는 카카오면 그 계정(티켓 잔량 포함)을 불러와 이어서 쓴다. 두 경로 모두 CTA를 누르는 순간 <code>linked_kakao=true</code>가 저장되고 홈으로 이동한다.</p>
+
+        <div class="branch-wrap">
+          <div class="branch auto">
+            <span class="tag">신규 연결 · 보상 지급</span>
+            <h3>처음 연결하는 카카오 계정 (03b-B)</h3>
+            <p>"카카오 연동 완료!" 화면에서 지금 지급되는 보상(이벤트 티켓 1장 + 가입 축하 200P + 영구 보관)과 이어서 받을 보상을 안내한다. CTA를 누르면 실제로 지급된다.</p>
+            <div class="shots">
+              <div class="shot">
+                <img src="kakao-link-storyboard-assets/07-kakao-new-link-complete.png" alt="카카오 신규 연동 완료 화면 — 보상 안내">
+                <div class="cap">신규 연동 완료 · 보상 명세 + 시작하기</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="branch manual">
+            <span class="tag">기존 계정 발견 · 데이터 복원</span>
+            <h3>이미 사용하던 카카오 계정 (03b-A)</h3>
+            <p>"이미 사용하신 계정이 있어요" — 기존 계정의 가입일·티켓 내역을 보여주고 그 계정으로 시작한다. 기기 변경·재설치 후 복원이 이 경로다. (썸네일 수치는 데모 정적 표시)</p>
+            <div class="shots">
+              <div class="shot">
+                <img src="kakao-link-storyboard-assets/06-kakao-existing-account.png" alt="기존 계정 발견 화면 — 티켓 내역 표시">
+                <div class="cap">기존 계정 발견 · 티켓 잔량 확인 후 시작</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="badge-note">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#5b6478" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-5M12 8h.01"/></svg>
+          <span>구 "카카오 계정 충돌 선택" 화면(03-conflict)은 폐지. 양쪽 모두 적립을 보유한 경우 선택 화면 없이 자동 병합된다(6단계).</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="arrow-down">
+      <svg width="20" height="28" viewBox="0 0 20 28" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 2v22M3 17l7 7 7-7"/></svg>
+    </div>
+
+    <div class="step">
+      <div class="step-badge">5</div>
+      <div class="step-card">
+        <span class="role role-system">연동 완료</span>
+        <h2>보상 지급 + 상태 전환 — 배너 숨김 · 활동내역 기록</h2>
+        <p class="desc">연동 완료 시 <code>users</code>에 <code>linked_kakao=true</code>·<code>kakao_login_id</code>·<code>kakao_nickname</code>이 저장되고, 이벤트 티켓 1장(<code>ticket_transactions</code>, 유효 100일)과 200P(<code>point_transactions</code> + <code>user_points</code> 잔액)가 실제 지급된다. 홈의 연동 유도 배너는 즉시 사라지고, 활동내역에 지급 기록이 남는다.</p>
+        <div class="shots">
+          <div class="shot wide">
+            <img src="kakao-link-storyboard-assets/08-home-linked-no-banner.png" alt="연동 후 홈 — 배너 숨김, 200P 반영">
+            <div class="cap">연동 후 홈 · 배너 사라짐 + 200P 반영</div>
+          </div>
+          <div class="shot wide">
+            <img src="kakao-link-storyboard-assets/09-ledger-link-rewards.png" alt="활동내역 — 카카오 연동 가입 축하 200P, 이벤트 티켓 1장">
+            <div class="cap">활동내역 · "카카오 연동 가입 축하 +200P" + "이벤트 티켓 적립 +1장"</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="arrow-down">
+      <svg width="20" height="28" viewBox="0 0 20 28" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 2v22M3 17l7 7 7-7"/></svg>
+    </div>
+
+    <div class="step">
+      <div class="step-badge">6</div>
+      <div class="step-card">
+        <span class="role role-system">자동 병합</span>
+        <h2>계정 통합 — 양쪽 모두 적립 보유 시 (03b-merge)</h2>
+        <p class="desc">닉네임 계정에 적립이 있는 상태에서, 이미 적립 데이터가 있는 카카오로 연동하면 선택 화면 없이 자동 합산한다. 정상 적립 포인트·티켓은 합산 반영하고, 이벤트성 무상 지급분(출석·룰렛·온보딩 등)은 중복 방지를 위해 합산에서 제외한다.</p>
+        <div class="shots">
+          <div class="shot wide">
+            <img src="kakao-link-storyboard-assets/13-kakao-merge-complete.png" alt="계정을 합쳤어요 — 적립 합산 요약">
+            <div class="cap">계정 통합 완료 · 합산 요약 + 무상지급분 제외 안내</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="arrow-down">
+      <svg width="20" height="28" viewBox="0 0 20 28" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 2v22M3 17l7 7 7-7"/></svg>
+    </div>
+
+    <div class="step">
+      <div class="step-badge">7</div>
+      <div class="step-card">
+        <span class="role role-user">연동 회원</span>
+        <h2>마이페이지 연동 상태 · 카카오 닉네임 동기화</h2>
+        <p class="desc">연동 후 마이 회원정보 행이 "카카오 연동 · {카카오 닉네임} · {카카오 ID}" + "연동됨" 배지로 바뀐다. 닉네임 변경 화면에서는 "카카오 닉네임 가져오기"로 카카오 프로필 닉네임을 한 번에 입력할 수 있다(<code>kakao_nickname</code>은 앱 닉네임과 별개 필드, 중복 검사는 동일 적용).</p>
+        <div class="shots">
+          <div class="shot">
+            <img src="kakao-link-storyboard-assets/10-mypage-linked-kakao-row.png" alt="마이페이지 — 카카오 연동 상태 표시">
+            <div class="cap">마이 회원정보 · "장주원 · wfxpx65z4@kakao.com" + 연동됨</div>
+          </div>
+          <div class="shot">
+            <img src="kakao-link-storyboard-assets/11-nick-change-kakao-pull.png" alt="닉네임 변경 — 카카오 닉네임 가져오기 행">
+            <div class="cap">닉네임 변경 · 카카오 닉네임 가져오기(장주원) 노출</div>
+          </div>
+          <div class="shot">
+            <img src="kakao-link-storyboard-assets/12-nick-change-kakao-filled.png" alt="가져오기 클릭 후 입력란에 카카오 닉네임 채워짐">
+            <div class="cap">가져오기 클릭 → 입력란에 "장주원" 채워짐 + 저장 활성</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="arrow-down">
+      <svg width="20" height="28" viewBox="0 0 20 28" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 2v22M3 17l7 7 7-7"/></svg>
+    </div>
+
+    <div class="step">
+      <div class="step-badge">8</div>
+      <div class="step-card">
+        <span class="role role-cms">CMS</span>
+        <h2>운영자: 회원 목록 · 회원 상세의 연동 집계</h2>
+        <p class="desc">CMS 회원 목록은 "카카오 연동 N명(%) / 게스트(미연동) N명(%)"을 실시간 집계하고, 첫 컬럼에 닉네임(카카오ID)·연동 상태 배지를 표기한다. 회원 상세에서는 연동 계정(카카오 ID), 가입 유형 "카카오 연동", 티켓 보유 현황을 확인·관리한다. 이 캡처의 회원(느긋한코알라)은 이 문서 제작 중 실제로 가입·연동한 테스트 계정이다.</p>
+        <div class="shots">
+          <div class="shot wide" style="flex-basis:100%;">
+            <img src="kakao-link-storyboard-assets/14-cms-members-list.png" alt="CMS 회원 목록 — 연동/게스트 집계와 연동 상태 컬럼" style="width:640px;">
+            <div class="cap" style="max-width:640px;">CMS &gt; 회원 목록 — 연동 17명(23.6%) / 게스트 55명(76.4%) 실집계 + 연동 상태 컬럼</div>
+          </div>
+          <div class="shot wide" style="flex-basis:100%;">
+            <img src="kakao-link-storyboard-assets/15-cms-member-detail-kakao.png" alt="CMS 회원 상세 — 연동 계정과 가입 유형" style="width:640px;">
+            <div class="cap" style="max-width:640px;">CMS &gt; 회원 상세 — 연동 계정(카카오 ID) · 가입 유형 "카카오 연동" · 이벤트 티켓 1장(연동 보상)</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <section class="block">
+    <h4>정책 요약 — 미연동(게스트) vs 카카오 연동 <span style="font-weight:400;color:var(--sub);font-size:12px;">(SoT: 마스터 정책서 policyspec.html)</span></h4>
+    <table class="rules">
+      <tr><th></th><th>미연동 (게스트)</th><th>카카오 연동</th></tr>
+      <tr><td><b>데이터 보존</b></td><td>기기에만 저장 — 앱 삭제·기기 변경 시 초기화(복구 불가)</td><td>서버 보존 — 재설치·기기 변경에도 유지, 기존 계정 복원</td></tr>
+      <tr><td><b>구매확정 대기</b></td><td>D+30</td><td>D+7</td></tr>
+      <tr><td><b>티켓·포인트 사용</b></td><td>적립만 누적 — 사용·교환·응모·차감 불가</td><td>모든 기능 사용 가능</td></tr>
+      <tr><td><b>보상</b></td><td>핵심 보상(이벤트 티켓 등)은 보류</td><td>연동 시 이벤트 티켓 1장 + 200P 지급 (재설치 반복 파밍 차단)</td></tr>
+      <tr><td><b>계정 병합</b></td><td>—</td><td>양쪽 적립 보유 시 자동 병합 · 이벤트성 무상지급분 합산 제외 · 선택 화면 없음</td></tr>
+      <tr><td><b>연동 해제</b></td><td>—</td><td>앱 내 해제 메뉴 없음 (해제 = 탈퇴 플로우, 별도 스토리보드 03)</td></tr>
+    </table>
+    <div class="badge-note" style="margin-top:12px;">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#5b6478" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-5M12 8h.01"/></svg>
+      <span>데이터 기준: 연동 판정 = <code>users.linked_kakao</code>(boolean) · 카카오 식별 = <code>kakao_login_id</code> · 프로필 = <code>kakao_nickname</code>(앱 닉네임과 별개). CMS 회원 목록·상세가 이 필드를 그대로 표기한다.</span>
+    </div>
+  </section>
+
+  <section class="block issues">
+    <h4>미결 · 불일치 — 형님 확인 필요 (이 문서 제작 중 실측으로 확인)</h4>
+    <div class="issue"><span class="kind gap">정책 불일치</span><b>적립 조건 안내 화면의 대기기간 고정 표기</b> — 미연동(게스트) 상태에서도 "구매 확정 후 <b>D+7 후 사용</b>"으로 고정 표기된다(2단계 ③ 캡처). 정책은 미연동 D+30. 연동 상태에 따라 D+7/D+30 동적 표기 필요.</div>
+    <div class="issue"><span class="kind gap">출처 충돌</span><b>가입 축하 200P 지급 시점</b> — 마스터 정책서(계정 생애주기)는 "가입 즉시 200P + 이벤트 티켓(연동 후)"로 읽히는 반면, CMS 정책 텍스트·앱 실동작은 <b>200P도 카카오 연동 시점에 지급</b>(가입 시 0P 실측 확인). 어느 쪽이 확정인지 정리 필요.</div>
+    <div class="issue"><span class="kind bug">버그</span><b>CMS 회원 목록 검색·연동상태 필터 미동작</b> — 검색어 입력, "카카오 연동" 필터 선택 모두 목록에 반영되지 않음(실측). 목록은 최신 30명 고정 표시라 연동 회원 조회가 사실상 불가.</div>
+    <div class="issue"><span class="kind bug">버그</span><b>연동 직후 홈 포인트 이중 표시</b> — 연동 완료 직후 세션에서 홈 포인트가 400P로 표시(원장·서버 잔액은 200P 정상, 새로고침 시 정상 복귀). 로컬 증가분과 서버 재조회가 겹치는 표시 전용 버그.</div>
+    <div class="issue"><span class="kind open">기존 미결</span><b>탈퇴 후 재가입 쿨타임</b> — CMS 약관 "동일 카카오 30일 제한" vs 앱 화면 "즉시 재가입 가능". 마스터 정책서 자체에 미결로 표기되어 있음(탈퇴 스토리보드 03과 공통 이슈).</div>
+    <div class="issue"><span class="kind open">데모 한계</span><b>기존 계정 발견 화면의 수치는 정적 표시</b> — 실제 Kakao SDK가 없어 "기존 데이터 인식"은 데모에서 시뮬 불가. 4단계 기존 계정 카드(유저·12/5/1장)는 고정 데이터다.</div>
+  </section>
+
+  <footer class="notes">
+    <h4>참고 사항</h4>
+    <ul>
+      <li>모든 앱 화면은 배포본(pricepick-demo.vercel.app/app)에서 헤드리스 브라우저로 게스트 계정을 실제 생성하고, 연동 진입 → 인증 → 완료 CTA까지 실클릭으로 진행한 뒤 캡처했다. CMS 화면은 운영자 계정으로 로그인해 캡처했다.</li>
+      <li>연동 보상(이벤트 티켓 1장 + 200P)은 캡처 과정에서 실제로 Firestore에 기록됐고, 활동내역·CMS 회원 상세 캡처의 수치는 그 실데이터다.</li>
+      <li>카카오 연동은 데모 시뮬이다: 실제 OAuth 없이 연동 완료 시 <code>linked_kakao=true</code>와 가상 <code>kakao_login_id</code>·<code>kakao_nickname</code>이 저장된다. 재연동 시 기존 값은 유지된다.</li>
+      <li>버전 번호는 쓰지 않는다 — 기준은 항상 pricepick-demo 최신 배포본.</li>
+    </ul>
+  </footer>
+
+</div>
+<div class="last-update">Last Update <b>2026.07.09 18:41</b></div>
+</body>
+</html>
