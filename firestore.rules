@@ -236,5 +236,36 @@ service cloud.firestore {
     match /demo_scenarios/{docId} {
       allow read, write: if isAdmin();
     }
+
+    // 경품 당첨자 (추첨 관리 · 경품/응모 관리 — 당첨/발송 처리)
+    match /prize_winners/{docId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+
+    // 약관 본문 (약관 관리 CMS 탭 — 앱은 게시된 약관을 읽어야 하므로 공개 read)
+    match /terms/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // 앱 최소/강제 버전 게이트 (앱 진입 시 읽음)
+    match /app_versions/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // 배치 스케줄러 상태·설정 (실제 cron 실행은 데모 범위 밖 — 상태·설정만 저장)
+    match /scheduler_jobs/{docId} {
+      allow read, write: if isAdmin();
+    }
+
+    // 행운룰렛 하루 1회 제한 — {uid}_{날짜} 문서를 스핀 시점에 생성. create만 허용해
+    // 같은 문서에 대한 두 번째 쓰기는 update로 분류돼 자동 거부(클라이언트 우회 방지).
+    match /roulette_spins/{docId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() && request.resource.data.user_id == request.auth.uid;
+      allow update, delete: if isAdmin();
+    }
   }
 }

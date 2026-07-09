@@ -8753,8 +8753,8 @@ body.interactive-mode #ip-nav { display: block; }
               <div style="font-size:12px;color:#666;line-height:1.4;">카카오 계정으로 로그인하기 위해<br>앱 전환이 필요합니다</div>
             </div>
             <div style="display:grid;grid-template-columns:1fr 1fr;">
-              <button style="padding:12px;background:none;border:none;border-right:0.5px solid rgba(0,0,0,0.15);font-size:17px;color:#007AFF;cursor:pointer;font-family:inherit;">취소</button>
-              <button style="padding:12px;background:none;border:none;font-size:17px;color:#007AFF;font-weight:600;cursor:pointer;font-family:inherit;">허용</button>
+              <button class="kakao-app-cancel" style="padding:12px;background:none;border:none;border-right:0.5px solid rgba(0,0,0,0.15);font-size:17px;color:#007AFF;cursor:pointer;font-family:inherit;">취소</button>
+              <button class="kakao-app-allow" style="padding:12px;background:none;border:none;font-size:17px;color:#007AFF;font-weight:600;cursor:pointer;font-family:inherit;">허용</button>
             </div>
           </div>
 
@@ -8808,6 +8808,10 @@ body.interactive-mode #ip-nav { display: block; }
             <button class="login-btn" style="background:var(--main);color:white;font-size:15px;height:54px;">
               프라이스픽 시작하기
             </button>
+          </div>
+          <div style="text-align:center;margin-top:14px;font-size:12px;color:var(--text3);line-height:1.6;">
+            이 카카오 계정은 다른 프로필과 이미 연결되어 있어요.<br>
+            <span style="text-decoration:underline;color:var(--text2);font-weight:600;">새 계정으로 시작할게요</span>
           </div>
           <div class="login-terms" style="margin-top:16px;">
             계속 진행하면 <b>이용약관</b> 및 <b>개인정보처리방침</b>에<br>동의하는 것으로 간주됩니다.
@@ -10967,7 +10971,7 @@ body.interactive-mode #ip-nav { display: block; }
               <span class="bridge-arrow">›</span>
               <span class="bridge-arrow">›</span>
             </div>
-            <div class="bridge-logo-cp"><img src="images/img_027.png" alt="Coupang"></div>
+            <div class="bridge-logo-cp"><img src="https://www.google.com/s2/favicons?domain=coupang.com&sz=64" alt="Coupang" onerror="this.remove()"></div>
           </div>
 
           <!-- 메시지 -->
@@ -11606,17 +11610,17 @@ body.interactive-mode #ip-nav { display: block; }
         </div>
         <div style="flex:1;overflow-y:auto;padding-bottom:4px;">
           <div class="ac-streak-card">
-            <div class="ac-streak-row"><div class="ac-streak-num">2 / 3</div><div class="ac-streak-unit">회</div></div>
-            <div class="ac-streak-label">연속구매 진행 중</div>
-            <div class="ac-streak-badge">경유구매를 이어가면 이벤트티켓을 드려요</div>
+            <div class="ac-streak-row"><div class="ac-streak-num" id="sm-streak-num">0 / 3</div><div class="ac-streak-unit">회</div></div>
+            <div class="ac-streak-label" id="sm-streak-label">연속구매 진행 중</div>
+            <div class="ac-streak-badge" id="sm-streak-badge">경유구매를 이어가면 이벤트티켓을 드려요</div>
           </div>
           <div class="ac-progress-section">
             <div class="ac-progress-header">
               <span class="ac-progress-label">3회 연속 달성까지</span>
-              <span class="ac-progress-count">현재 2 / 3회</span>
+              <span class="ac-progress-count" id="sm-progress-count">현재 0 / 3회</span>
             </div>
-            <div class="ac-progress-bar"><div class="ac-progress-fill" style="width:66%"></div></div>
-            <div class="ac-progress-sub">1회만 더 경유구매하면 이벤트티켓 1장!</div>
+            <div class="ac-progress-bar"><div class="ac-progress-fill" id="sm-progress-fill" style="width:0%"></div></div>
+            <div class="ac-progress-sub" id="sm-progress-sub">3회 연속으로 경유구매하면 이벤트티켓 1장!</div>
           </div>
           <div class="sm-steps">
             <div class="sm-step">
@@ -11841,7 +11845,7 @@ body.interactive-mode #ip-nav { display: block; }
           <!-- 접수 버튼 -->
           <button id="cs-submit" data-ip-bound="1" disabled
             style="width:100%;padding:15px;background:var(--text4);border:none;border-radius:14px;font-size:16px;font-weight:800;color:#fff;cursor:not-allowed;font-family:inherit;"
-            onclick="this.disabled=true;this.style.background='var(--text4)';ipToast('문의가 접수되었습니다. 평일 1–2일 내 답변드릴게요.');">
+            onclick="csSubmitInquiry(this)">
             접수하기
           </button>
         </div>
@@ -11856,18 +11860,15 @@ body.interactive-mode #ip-nav { display: block; }
       <div class="app-screen">
         <div class="statusbar"><span>9:41</span><div class="statusbar-icons"><svg width="17" height="12" viewBox="0 0 17 12" fill="currentColor"><rect x="0" y="4" width="3" height="8" rx="1"/><rect x="4.5" y="2.5" width="3" height="9.5" rx="1"/><rect x="9" y="1" width="3" height="11" rx="1"/><rect x="13.5" y="0" width="3" height="12" rx="1"/></svg></div></div>
         <div class="C-bridge" style="background:linear-gradient(180deg,#FEF9C3 0%,#fff 60%);">
-          <div class="C-spin">
-            <div class="C-spin-logo" style="background:#FEE500;border-radius:50%;inset:14px;">
-              <svg width="36" height="32" viewBox="0 0 40 36" fill="none"><path d="M20 3C10.6 3 3 9.3 3 17c0 4.8 2.8 9.1 7.2 11.8L8 33l6.5-3.5C15.6 29.8 17.8 30 20 30c9.4 0 17-6.3 17-14S29.4 3 20 3z" fill="#3C1E1E"/><path d="M20 4.5C11.2 4.5 4 10.5 4 17.5c0 4.4 2.6 8.3 6.6 10.7L8.5 32l5.5-3.1c1.9.5 3.9.8 6 .8 8.8 0 16-6 16-13S28.8 4.5 20 4.5z" fill="#FEE500"/><circle cx="14" cy="18" r="2.5" fill="#3C1E1E"/><circle cx="20" cy="18" r="2.5" fill="#3C1E1E"/><circle cx="26" cy="18" r="2.5" fill="#3C1E1E"/></svg>
-            </div>
+          <div class="C-spin-logo" style="width:64px;height:64px;background:#FEE500;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 18px;">
+            <svg width="36" height="32" viewBox="0 0 40 36" fill="none"><path d="M20 3C10.6 3 3 9.3 3 17c0 4.8 2.8 9.1 7.2 11.8L8 33l6.5-3.5C15.6 29.8 17.8 30 20 30c9.4 0 17-6.3 17-14S29.4 3 20 3z" fill="#3C1E1E"/><path d="M20 4.5C11.2 4.5 4 10.5 4 17.5c0 4.4 2.6 8.3 6.6 10.7L8.5 32l5.5-3.1c1.9.5 3.9.8 6 .8 8.8 0 16-6 16-13S28.8 4.5 20 4.5z" fill="#FEE500"/><circle cx="14" cy="18" r="2.5" fill="#3C1E1E"/><circle cx="20" cy="18" r="2.5" fill="#3C1E1E"/><circle cx="26" cy="18" r="2.5" fill="#3C1E1E"/></svg>
           </div>
-          <div class="C-t">카카오채널 연결 중</div>
-          <div class="C-s">PricePick 카카오채널에서<br>실시간으로 상담해 드려요</div>
-          <div class="C-check-list">
-            <div class="row"><span class="ico">✓</span>연결 준비 완료</div>
-            <div class="row"><span class="ico">✓</span>채팅 시작 준비</div>
-            <div class="row muted">잠시 후 카카오채널이 열려요…</div>
-          </div>
+          <div class="C-t">카카오채널 상담 (데모)</div>
+          <div class="C-s">이 데모에는 실제 카카오채널이 연결되어 있지 않아요.<br>지금은 아래 1:1 문의로 접수해 주시면<br>운영팀이 확인 후 답변드려요.</div>
+          <button data-jump="pw-30-cs-write"
+            style="margin-top:18px;padding:13px 28px;background:var(--main);border:none;border-radius:20px;font-size:14px;font-weight:700;color:#fff;cursor:pointer;font-family:inherit;">
+            1:1 문의 작성하기
+          </button>
           <button data-jump="pw-30-cs"
             style="margin-top:8px;padding:10px 24px;background:none;border:1.5px solid var(--border);border-radius:20px;font-size:13px;font-weight:600;color:var(--text3);cursor:pointer;font-family:inherit;">
             돌아가기
@@ -12006,7 +12007,7 @@ body.interactive-mode #ip-nav { display: block; }
               <div class="my-row-name">구매 알림</div>
               <div class="my-row-desc">구매 추적 · 적립/가지급 · 구매확정 · 환수 (거래성)</div>
             </div>
-            <div class="my-toggle on"></div>
+            <div class="my-toggle on" id="toggle-notif-purchase" data-notif-key="notif_purchase"></div>
           </div>
           <div class="my-row">
             <div class="my-row-ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg></div>
@@ -12014,7 +12015,7 @@ body.interactive-mode #ip-nav { display: block; }
               <div class="my-row-name">이벤트 · 티켓 알림</div>
               <div class="my-row-desc">룰렛 · 경품 응모 · 당첨 · 티켓 만료 임박(D-30/D-7)</div>
             </div>
-            <div class="my-toggle on"></div>
+            <div class="my-toggle on" id="toggle-notif-event" data-notif-key="notif_event"></div>
           </div>
           <div class="my-row">
             <div class="my-row-ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l19-9v18L3 13"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/></svg></div>
@@ -12022,7 +12023,7 @@ body.interactive-mode #ip-nav { display: block; }
               <div class="my-row-name">마케팅 정보 수신</div>
               <div class="my-row-desc">프로모션 · 광고성 정보 (기본 꺼짐)</div>
             </div>
-            <div class="my-toggle"></div>
+            <div class="my-toggle" id="toggle-notif-marketing" data-notif-key="notif_marketing"></div>
           </div>
         </div>
         <!-- 쿠팡 홈 바로가기 (설정 표준 위치) -->
@@ -12251,7 +12252,7 @@ body.interactive-mode #ip-nav { display: block; }
           </div>
           <div style="display:flex;align-items:center;gap:6px;background:var(--bg);border-radius:20px;padding:5px 10px 5px 8px;">
             <svg width="28" height="28" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="evt_05b_header" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#C9AAFF"/><stop offset="100%" stop-color="#845EEE"/></linearGradient></defs><path d="M306.6,106.8l-49.5,49.5,2.4,2.4c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-2.4-2.4-138.6,138.6c-3.7,3.7-3.7,9.6,0,13.3l75.5,75.5c3.7,3.7,9.6,3.7,13.3,0l138.6-138.6-2.3-2.3c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l2.3,2.3,49.5-49.5c3.7-3.7,3.7-9.6,0-13.3l-75.5-75.5c-3.7-3.7-9.6-3.7-13.3,0ZM335.6,234.8c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM322.9,222.1c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM310.2,209.4c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM297.6,196.7c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM284.9,184.1c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM272.2,171.4c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7Z" fill="url(#evt_05b_header)"/><path d="M316.2,155.8l12.1,6.2c.8.4,1.8.3,2.4-.4l9.6-9.6c1.4-1.4,3.8-.2,3.5,1.8l-2.1,13.5c-.1.9.3,1.8,1.1,2.2l12.1,6.2c1.8.9,1.4,3.6-.6,3.9l-13.5,2.1c-.9.1-1.6.8-1.7,1.7l-2.1,13.5c-.3,2-3,2.4-3.9.6l-6.2-12.1c-.4-.8-1.3-1.3-2.2-1.1l-13.5,2.1c-2,.3-3.2-2.1-1.8-3.5l9.6-9.6c.6-.6.8-1.6.4-2.4l-6.2-12.1c-.9-1.8,1-3.7,2.8-2.8Z" fill="rgba(255,255,255,0.95)"/><path d="M180.7,298.9l-5.2,5.2,27.4,27.4-4.7,4.7-27.4-27.4-5.2,5.2-4.2-4.2,15.1-15.1,4.2,4.2ZM215.3,319.1l-4.7,4.7-31.6-31.6,4.7-4.7,31.6,31.6ZM231.9,296.8c1.9,1.9,1.9,3.9,0,5.8l-9.9,9.9c-1.9,1.9-3.8,1.8-5.7,0l-25.8-25.8c-1.9-1.9-2-3.8-.1-5.7l9.9-9.9c1.9-1.9,3.9-1.9,5.8,0l7.4,7.4-4.7,4.7-6.2-6.2-6.1,6.1,23.5,23.5,6.1-6.1-6.6-6.6,4.7-4.7,7.8,7.8ZM254.4,280l-5.2,5.2-20.1-8.1,14.1,14.1-4.7,4.7-31.6-31.6,4.7-4.7,13.4,13.4-8.1-18.6,5.2-5.2.2.2,8.6,21.4,23.6,9.2ZM269.5,265l-13.1,13.1-31.6-31.6,13-13,4.2,4.2-8.3,8.3,9.2,9.2,7.1-7.1,4.1,4.1-7.1,7.1,9.9,9.9,8.4-8.4,4.2,4.2ZM259,220.6l-5.2,5.2,27.4,27.4-4.7,4.7-27.4-27.4-5.2,5.2-4.2-4.2,15.1-15.1,4.2,4.2Z" fill="rgba(255,255,255,0.95)"/></svg>
-            <span style="font-size:12px;font-weight:800;color:var(--text1);">3</span>
+            <span id="raffle-my-tickets" style="font-size:12px;font-weight:800;color:var(--text1);">0</span>
             <span style="font-size:10px;font-weight:600;color:var(--text2);">장 보유</span>
           </div>
         </div>
@@ -12295,7 +12296,7 @@ body.interactive-mode #ip-nav { display: block; }
                 <span style="font-size:10px;font-weight:600;color:rgba(255,255,255,0.8);">다수</span>
               </div>
             </div>
-            <button style="width:100%;background:white;border:none;border-radius:10px;padding:12px;font-size:13px;font-weight:800;color:#FF5D8F;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:6px;"><svg width="28" height="28" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="evt_05b_btn" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#FF7EB3"/><stop offset="100%" stop-color="#FF5D8F"/></linearGradient></defs><path d="M306.6,106.8l-49.5,49.5,2.4,2.4c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-2.4-2.4-138.6,138.6c-3.7,3.7-3.7,9.6,0,13.3l75.5,75.5c3.7,3.7,9.6,3.7,13.3,0l138.6-138.6-2.3-2.3c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l2.3,2.3,49.5-49.5c3.7-3.7,3.7-9.6,0-13.3l-75.5-75.5c-3.7-3.7-9.6-3.7-13.3,0ZM335.6,234.8c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM322.9,222.1c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM310.2,209.4c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM297.6,196.7c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM284.9,184.1c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM272.2,171.4c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7Z" fill="url(#evt_05b_btn)"/><path d="M316.2,155.8l12.1,6.2c.8.4,1.8.3,2.4-.4l9.6-9.6c1.4-1.4,3.8-.2,3.5,1.8l-2.1,13.5c-.1.9.3,1.8,1.1,2.2l12.1,6.2c1.8.9,1.4,3.6-.6,3.9l-13.5,2.1c-.9.1-1.6.8-1.7,1.7l-2.1,13.5c-.3,2-3,2.4-3.9.6l-6.2-12.1c-.4-.8-1.3-1.3-2.2-1.1l-13.5,2.1c-2,.3-3.2-2.1-1.8-3.5l9.6-9.6c.6-.6.8-1.6.4-2.4l-6.2-12.1c-.9-1.8,1-3.7,2.8-2.8Z" fill="rgba(255,255,255,0.95)"/><path d="M180.7,298.9l-5.2,5.2,27.4,27.4-4.7,4.7-27.4-27.4-5.2,5.2-4.2-4.2,15.1-15.1,4.2,4.2ZM215.3,319.1l-4.7,4.7-31.6-31.6,4.7-4.7,31.6,31.6ZM231.9,296.8c1.9,1.9,1.9,3.9,0,5.8l-9.9,9.9c-1.9,1.9-3.8,1.8-5.7,0l-25.8-25.8c-1.9-1.9-2-3.8-.1-5.7l9.9-9.9c1.9-1.9,3.9-1.9,5.8,0l7.4,7.4-4.7,4.7-6.2-6.2-6.1,6.1,23.5,23.5,6.1-6.1-6.6-6.6,4.7-4.7,7.8,7.8ZM254.4,280l-5.2,5.2-20.1-8.1,14.1,14.1-4.7,4.7-31.6-31.6,4.7-4.7,13.4,13.4-8.1-18.6,5.2-5.2.2.2,8.6,21.4,23.6,9.2ZM269.5,265l-13.1,13.1-31.6-31.6,13-13,4.2,4.2-8.3,8.3,9.2,9.2,7.1-7.1,4.1,4.1-7.1,7.1,9.9,9.9,8.4-8.4,4.2,4.2ZM259,220.6l-5.2,5.2,27.4,27.4-4.7,4.7-27.4-27.4-5.2,5.2-4.2-4.2,15.1-15.1,4.2,4.2Z" fill="rgba(255,255,255,0.95)"/></svg> 이벤트 티켓 1장으로 응모하기</button>
+            <button id="raffle-enter-btn" style="width:100%;background:white;border:none;border-radius:10px;padding:12px;font-size:13px;font-weight:800;color:#FF5D8F;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:6px;"><svg width="28" height="28" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="evt_05b_btn" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#FF7EB3"/><stop offset="100%" stop-color="#FF5D8F"/></linearGradient></defs><path d="M306.6,106.8l-49.5,49.5,2.4,2.4c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-2.4-2.4-138.6,138.6c-3.7,3.7-3.7,9.6,0,13.3l75.5,75.5c3.7,3.7,9.6,3.7,13.3,0l138.6-138.6-2.3-2.3c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l2.3,2.3,49.5-49.5c3.7-3.7,3.7-9.6,0-13.3l-75.5-75.5c-3.7-3.7-9.6-3.7-13.3,0ZM335.6,234.8c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM322.9,222.1c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM310.2,209.4c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM297.6,196.7c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM284.9,184.1c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM272.2,171.4c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7Z" fill="url(#evt_05b_btn)"/><path d="M316.2,155.8l12.1,6.2c.8.4,1.8.3,2.4-.4l9.6-9.6c1.4-1.4,3.8-.2,3.5,1.8l-2.1,13.5c-.1.9.3,1.8,1.1,2.2l12.1,6.2c1.8.9,1.4,3.6-.6,3.9l-13.5,2.1c-.9.1-1.6.8-1.7,1.7l-2.1,13.5c-.3,2-3,2.4-3.9.6l-6.2-12.1c-.4-.8-1.3-1.3-2.2-1.1l-13.5,2.1c-2,.3-3.2-2.1-1.8-3.5l9.6-9.6c.6-.6.8-1.6.4-2.4l-6.2-12.1c-.9-1.8,1-3.7,2.8-2.8Z" fill="rgba(255,255,255,0.95)"/><path d="M180.7,298.9l-5.2,5.2,27.4,27.4-4.7,4.7-27.4-27.4-5.2,5.2-4.2-4.2,15.1-15.1,4.2,4.2ZM215.3,319.1l-4.7,4.7-31.6-31.6,4.7-4.7,31.6,31.6ZM231.9,296.8c1.9,1.9,1.9,3.9,0,5.8l-9.9,9.9c-1.9,1.9-3.8,1.8-5.7,0l-25.8-25.8c-1.9-1.9-2-3.8-.1-5.7l9.9-9.9c1.9-1.9,3.9-1.9,5.8,0l7.4,7.4-4.7,4.7-6.2-6.2-6.1,6.1,23.5,23.5,6.1-6.1-6.6-6.6,4.7-4.7,7.8,7.8ZM254.4,280l-5.2,5.2-20.1-8.1,14.1,14.1-4.7,4.7-31.6-31.6,4.7-4.7,13.4,13.4-8.1-18.6,5.2-5.2.2.2,8.6,21.4,23.6,9.2ZM269.5,265l-13.1,13.1-31.6-31.6,13-13,4.2,4.2-8.3,8.3,9.2,9.2,7.1-7.1,4.1,4.1-7.1,7.1,9.9,9.9,8.4-8.4,4.2,4.2ZM259,220.6l-5.2,5.2,27.4,27.4-4.7,4.7-27.4-27.4-5.2,5.2-4.2-4.2,15.1-15.1,4.2,4.2Z" fill="rgba(255,255,255,0.95)"/></svg> 이벤트 티켓 1장으로 응모하기</button>
           </div>
 
           <!-- 내 응모 현황 -->
@@ -12304,17 +12305,17 @@ body.interactive-mode #ip-nav { display: block; }
             <div style="display:flex;gap:8px;">
               <div style="flex:1;background:var(--bg);border-radius:10px;padding:10px;text-align:center;">
                 <div style="font-size:9.5px;font-weight:600;color:var(--text3);margin-bottom:3px;">이번 주 응모</div>
-                <div style="font-size:20px;font-weight:800;color:var(--main);letter-spacing:-1px;">3</div>
+                <div id="raffle-week-count" style="font-size:20px;font-weight:800;color:var(--main);letter-spacing:-1px;">0</div>
                 <div style="font-size:9px;color:var(--text3);">회</div>
               </div>
               <div style="flex:1;background:var(--bg);border-radius:10px;padding:10px;text-align:center;">
                 <div style="font-size:9.5px;font-weight:600;color:var(--text3);margin-bottom:3px;">남은 티켓</div>
-                <div style="font-size:20px;font-weight:800;color:var(--text1);letter-spacing:-1px;">0</div>
+                <div id="raffle-remain-tickets" style="font-size:20px;font-weight:800;color:var(--text1);letter-spacing:-1px;">0</div>
                 <div style="font-size:9px;color:var(--text3);">장</div>
               </div>
               <div style="flex:1;background:var(--bg);border-radius:10px;padding:10px;text-align:center;">
                 <div style="font-size:9.5px;font-weight:600;color:var(--text3);margin-bottom:3px;">누적 응모</div>
-                <div style="font-size:20px;font-weight:800;color:var(--text1);letter-spacing:-1px;">17</div>
+                <div id="raffle-total-count" style="font-size:20px;font-weight:800;color:var(--text1);letter-spacing:-1px;">0</div>
                 <div style="font-size:9px;color:var(--text3);">회</div>
               </div>
             </div>
@@ -12336,7 +12337,7 @@ body.interactive-mode #ip-nav { display: block; }
                 </div>
                 <div style="background:#F0EBF9;border-radius:6px;padding:3px 8px;font-size:10px;font-weight:700;color:var(--main);">오늘 완료</div>
               </div>
-              <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 16px;border-bottom:1px solid var(--border);">
+              <div id="raffle-roulette-row" style="display:flex;align-items:center;justify-content:space-between;padding:11px 16px;border-bottom:1px solid var(--border);cursor:pointer;">
                 <div style="display:flex;align-items:center;gap:10px;">
                   <div style="width:32px;height:32px;background:#E8F5E9;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;">📺</div>
                   <div>
@@ -12484,17 +12485,17 @@ body.interactive-mode #ip-nav { display: block; }
               <div class="swap-hold-card bronze">
                 <div class="swap-hold-medal"><svg width="60" height="60" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="g05d_4001" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#C68250"/><stop offset="100%" stop-color="#8B5A2B"/></linearGradient></defs><path d="M306.6,106.8l-49.5,49.5,2.4,2.4c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-2.4-2.4-138.6,138.6c-3.7,3.7-3.7,9.6,0,13.3l75.5,75.5c3.7,3.7,9.6,3.7,13.3,0l138.6-138.6-2.3-2.3c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l2.3,2.3,49.5-49.5c3.7-3.7,3.7-9.6,0-13.3l-75.5-75.5c-3.7-3.7-9.6-3.7-13.3,0ZM335.6,234.8c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM322.9,222.1c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM310.2,209.4c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM297.6,196.7c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM284.9,184.1c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM272.2,171.4c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7Z" fill="url(#g05d_4001)"/><path d="M316.2,155.8l12.1,6.2c.8.4,1.8.3,2.4-.4l9.6-9.6c1.4-1.4,3.8-.2,3.5,1.8l-2.1,13.5c-.1.9.3,1.8,1.1,2.2l12.1,6.2c1.8.9,1.4,3.6-.6,3.9l-13.5,2.1c-.9.1-1.6.8-1.7,1.7l-2.1,13.5c-.3,2-3,2.4-3.9.6l-6.2-12.1c-.4-.8-1.3-1.3-2.2-1.1l-13.5,2.1c-2,.3-3.2-2.1-1.8-3.5l9.6-9.6c.6-.6.8-1.6.4-2.4l-6.2-12.1c-.9-1.8,1-3.7,2.8-2.8Z" fill="rgba(255,255,255,0.95)"/><path d="M180.7,298.9l-5.2,5.2,27.4,27.4-4.7,4.7-27.4-27.4-5.2,5.2-4.2-4.2,15.1-15.1,4.2,4.2ZM215.3,319.1l-4.7,4.7-31.6-31.6,4.7-4.7,31.6,31.6ZM231.9,296.8c1.9,1.9,1.9,3.9,0,5.8l-9.9,9.9c-1.9,1.9-3.8,1.8-5.7,0l-25.8-25.8c-1.9-1.9-2-3.8-.1-5.7l9.9-9.9c1.9-1.9,3.9-1.9,5.8,0l7.4,7.4-4.7,4.7-6.2-6.2-6.1,6.1,23.5,23.5,6.1-6.1-6.6-6.6,4.7-4.7,7.8,7.8ZM254.4,280l-5.2,5.2-20.1-8.1,14.1,14.1-4.7,4.7-31.6-31.6,4.7-4.7,13.4,13.4-8.1-18.6,5.2-5.2.2.2,8.6,21.4,23.6,9.2ZM269.5,265l-13.1,13.1-31.6-31.6,13-13,4.2,4.2-8.3,8.3,9.2,9.2,7.1-7.1,4.1,4.1-7.1,7.1,9.9,9.9,8.4-8.4,4.2,4.2ZM259,220.6l-5.2,5.2,27.4,27.4-4.7,4.7-27.4-27.4-5.2,5.2-4.2-4.2,15.1-15.1,4.2,4.2Z" fill="rgba(255,255,255,0.95)"/></svg></div>
                 <div class="swap-hold-name">브론즈</div>
-                <div class="swap-hold-count" data-bronze="12">12<span class="unit">장</span></div>
+                <div class="swap-hold-count" id="swap-hold-bronze" data-bronze="12">12<span class="unit">장</span></div>
               </div>
               <div class="swap-hold-card silver">
                 <div class="swap-hold-medal"><svg width="60" height="60" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="g05d_4002" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#D8D8D8"/><stop offset="100%" stop-color="#999999"/></linearGradient></defs><path d="M306.6,106.8l-49.5,49.5,2.4,2.4c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-2.4-2.4-138.6,138.6c-3.7,3.7-3.7,9.6,0,13.3l75.5,75.5c3.7,3.7,9.6,3.7,13.3,0l138.6-138.6-2.3-2.3c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l2.3,2.3,49.5-49.5c3.7-3.7,3.7-9.6,0-13.3l-75.5-75.5c-3.7-3.7-9.6-3.7-13.3,0ZM335.6,234.8c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM322.9,222.1c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM310.2,209.4c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM297.6,196.7c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM284.9,184.1c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM272.2,171.4c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7Z" fill="url(#g05d_4002)"/><path d="M316.2,155.8l12.1,6.2c.8.4,1.8.3,2.4-.4l9.6-9.6c1.4-1.4,3.8-.2,3.5,1.8l-2.1,13.5c-.1.9.3,1.8,1.1,2.2l12.1,6.2c1.8.9,1.4,3.6-.6,3.9l-13.5,2.1c-.9.1-1.6.8-1.7,1.7l-2.1,13.5c-.3,2-3,2.4-3.9.6l-6.2-12.1c-.4-.8-1.3-1.3-2.2-1.1l-13.5,2.1c-2,.3-3.2-2.1-1.8-3.5l9.6-9.6c.6-.6.8-1.6.4-2.4l-6.2-12.1c-.9-1.8,1-3.7,2.8-2.8Z" fill="rgba(50,50,50,0.75)"/><path d="M180.7,298.9l-5.2,5.2,27.4,27.4-4.7,4.7-27.4-27.4-5.2,5.2-4.2-4.2,15.1-15.1,4.2,4.2ZM215.3,319.1l-4.7,4.7-31.6-31.6,4.7-4.7,31.6,31.6ZM231.9,296.8c1.9,1.9,1.9,3.9,0,5.8l-9.9,9.9c-1.9,1.9-3.8,1.8-5.7,0l-25.8-25.8c-1.9-1.9-2-3.8-.1-5.7l9.9-9.9c1.9-1.9,3.9-1.9,5.8,0l7.4,7.4-4.7,4.7-6.2-6.2-6.1,6.1,23.5,23.5,6.1-6.1-6.6-6.6,4.7-4.7,7.8,7.8ZM254.4,280l-5.2,5.2-20.1-8.1,14.1,14.1-4.7,4.7-31.6-31.6,4.7-4.7,13.4,13.4-8.1-18.6,5.2-5.2.2.2,8.6,21.4,23.6,9.2ZM269.5,265l-13.1,13.1-31.6-31.6,13-13,4.2,4.2-8.3,8.3,9.2,9.2,7.1-7.1,4.1,4.1-7.1,7.1,9.9,9.9,8.4-8.4,4.2,4.2ZM259,220.6l-5.2,5.2,27.4,27.4-4.7,4.7-27.4-27.4-5.2,5.2-4.2-4.2,15.1-15.1,4.2,4.2Z" fill="rgba(50,50,50,0.75)"/></svg></div>
                 <div class="swap-hold-name">실버</div>
-                <div class="swap-hold-count" data-silver="4">4<span class="unit">장</span></div>
+                <div class="swap-hold-count" id="swap-hold-silver" data-silver="4">4<span class="unit">장</span></div>
               </div>
               <div class="swap-hold-card gold">
                 <div class="swap-hold-medal"><svg width="60" height="60" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="g05d_4003" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#FFD93B"/><stop offset="100%" stop-color="#E6A800"/></linearGradient></defs><path d="M306.6,106.8l-49.5,49.5,2.4,2.4c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-2.4-2.4-138.6,138.6c-3.7,3.7-3.7,9.6,0,13.3l75.5,75.5c3.7,3.7,9.6,3.7,13.3,0l138.6-138.6-2.3-2.3c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l2.3,2.3,49.5-49.5c3.7-3.7,3.7-9.6,0-13.3l-75.5-75.5c-3.7-3.7-9.6-3.7-13.3,0ZM335.6,234.8c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM322.9,222.1c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM310.2,209.4c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM297.6,196.7c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM284.9,184.1c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM272.2,171.4c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7Z" fill="url(#g05d_4003)"/><path d="M316.2,155.8l12.1,6.2c.8.4,1.8.3,2.4-.4l9.6-9.6c1.4-1.4,3.8-.2,3.5,1.8l-2.1,13.5c-.1.9.3,1.8,1.1,2.2l12.1,6.2c1.8.9,1.4,3.6-.6,3.9l-13.5,2.1c-.9.1-1.6.8-1.7,1.7l-2.1,13.5c-.3,2-3,2.4-3.9.6l-6.2-12.1c-.4-.8-1.3-1.3-2.2-1.1l-13.5,2.1c-2,.3-3.2-2.1-1.8-3.5l9.6-9.6c.6-.6.8-1.6.4-2.4l-6.2-12.1c-.9-1.8,1-3.7,2.8-2.8Z" fill="rgba(255,255,255,0.95)"/><path d="M180.7,298.9l-5.2,5.2,27.4,27.4-4.7,4.7-27.4-27.4-5.2,5.2-4.2-4.2,15.1-15.1,4.2,4.2ZM215.3,319.1l-4.7,4.7-31.6-31.6,4.7-4.7,31.6,31.6ZM231.9,296.8c1.9,1.9,1.9,3.9,0,5.8l-9.9,9.9c-1.9,1.9-3.8,1.8-5.7,0l-25.8-25.8c-1.9-1.9-2-3.8-.1-5.7l9.9-9.9c1.9-1.9,3.9-1.9,5.8,0l7.4,7.4-4.7,4.7-6.2-6.2-6.1,6.1,23.5,23.5,6.1-6.1-6.6-6.6,4.7-4.7,7.8,7.8ZM254.4,280l-5.2,5.2-20.1-8.1,14.1,14.1-4.7,4.7-31.6-31.6,4.7-4.7,13.4,13.4-8.1-18.6,5.2-5.2.2.2,8.6,21.4,23.6,9.2ZM269.5,265l-13.1,13.1-31.6-31.6,13-13,4.2,4.2-8.3,8.3,9.2,9.2,7.1-7.1,4.1,4.1-7.1,7.1,9.9,9.9,8.4-8.4,4.2,4.2ZM259,220.6l-5.2,5.2,27.4,27.4-4.7,4.7-27.4-27.4-5.2,5.2-4.2-4.2,15.1-15.1,4.2,4.2Z" fill="rgba(255,255,255,0.95)"/></svg></div>
                 <div class="swap-hold-name">골드</div>
-                <div class="swap-hold-count" data-gold="2">2<span class="unit">장</span></div>
+                <div class="swap-hold-count" id="swap-hold-gold" data-gold="2">2<span class="unit">장</span></div>
               </div>
             </div>
           </div>
@@ -12516,7 +12517,7 @@ body.interactive-mode #ip-nav { display: block; }
           <div class="gd-section">
             <div class="gd-section-t">교환 방향 선택</div>
             <div class="swap-dir-grid">
-              <button class="swap-dir-btn active" data-from="bronze" data-to="silver" data-ratio-from="10" data-ratio-to="1">
+              <button class="swap-dir-btn active" id="swap-dir-b2s" data-from="bronze" data-to="silver" data-ratio-from="10" data-ratio-to="1">
                 <div class="swap-dir-flow">
                   <span class="swap-dir-medal"><svg width="32" height="32" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="g05d_4004" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#C68250"/><stop offset="100%" stop-color="#8B5A2B"/></linearGradient></defs><path d="M306.6,106.8l-49.5,49.5,2.4,2.4c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-2.4-2.4-138.6,138.6c-3.7,3.7-3.7,9.6,0,13.3l75.5,75.5c3.7,3.7,9.6,3.7,13.3,0l138.6-138.6-2.3-2.3c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l2.3,2.3,49.5-49.5c3.7-3.7,3.7-9.6,0-13.3l-75.5-75.5c-3.7-3.7-9.6-3.7-13.3,0ZM335.6,234.8c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM322.9,222.1c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM310.2,209.4c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM297.6,196.7c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM284.9,184.1c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM272.2,171.4c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7Z" fill="url(#g05d_4004)"/><path d="M316.2,155.8l12.1,6.2c.8.4,1.8.3,2.4-.4l9.6-9.6c1.4-1.4,3.8-.2,3.5,1.8l-2.1,13.5c-.1.9.3,1.8,1.1,2.2l12.1,6.2c1.8.9,1.4,3.6-.6,3.9l-13.5,2.1c-.9.1-1.6.8-1.7,1.7l-2.1,13.5c-.3,2-3,2.4-3.9.6l-6.2-12.1c-.4-.8-1.3-1.3-2.2-1.1l-13.5,2.1c-2,.3-3.2-2.1-1.8-3.5l9.6-9.6c.6-.6.8-1.6.4-2.4l-6.2-12.1c-.9-1.8,1-3.7,2.8-2.8Z" fill="rgba(255,255,255,0.95)"/><path d="M180.7,298.9l-5.2,5.2,27.4,27.4-4.7,4.7-27.4-27.4-5.2,5.2-4.2-4.2,15.1-15.1,4.2,4.2ZM215.3,319.1l-4.7,4.7-31.6-31.6,4.7-4.7,31.6,31.6ZM231.9,296.8c1.9,1.9,1.9,3.9,0,5.8l-9.9,9.9c-1.9,1.9-3.8,1.8-5.7,0l-25.8-25.8c-1.9-1.9-2-3.8-.1-5.7l9.9-9.9c1.9-1.9,3.9-1.9,5.8,0l7.4,7.4-4.7,4.7-6.2-6.2-6.1,6.1,23.5,23.5,6.1-6.1-6.6-6.6,4.7-4.7,7.8,7.8ZM254.4,280l-5.2,5.2-20.1-8.1,14.1,14.1-4.7,4.7-31.6-31.6,4.7-4.7,13.4,13.4-8.1-18.6,5.2-5.2.2.2,8.6,21.4,23.6,9.2ZM269.5,265l-13.1,13.1-31.6-31.6,13-13,4.2,4.2-8.3,8.3,9.2,9.2,7.1-7.1,4.1,4.1-7.1,7.1,9.9,9.9,8.4-8.4,4.2,4.2ZM259,220.6l-5.2,5.2,27.4,27.4-4.7,4.7-27.4-27.4-5.2,5.2-4.2-4.2,15.1-15.1,4.2,4.2Z" fill="rgba(255,255,255,0.95)"/></svg></span>
                   <span class="swap-dir-arrow">→</span>
@@ -12524,7 +12525,7 @@ body.interactive-mode #ip-nav { display: block; }
                 </div>
                 <div class="swap-dir-label">브론즈 → 실버</div>
               </button>
-              <button class="swap-dir-btn" data-from="silver" data-to="bronze" data-ratio-from="1" data-ratio-to="10">
+              <button class="swap-dir-btn" id="swap-dir-s2b" data-downgrade="1" data-from="silver" data-to="bronze" data-ratio-from="1" data-ratio-to="10">
                 <div class="swap-dir-flow">
                   <span class="swap-dir-medal"><svg width="32" height="32" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="g05d_4006" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#D8D8D8"/><stop offset="100%" stop-color="#999999"/></linearGradient></defs><path d="M306.6,106.8l-49.5,49.5,2.4,2.4c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-2.4-2.4-138.6,138.6c-3.7,3.7-3.7,9.6,0,13.3l75.5,75.5c3.7,3.7,9.6,3.7,13.3,0l138.6-138.6-2.3-2.3c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l2.3,2.3,49.5-49.5c3.7-3.7,3.7-9.6,0-13.3l-75.5-75.5c-3.7-3.7-9.6-3.7-13.3,0ZM335.6,234.8c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM322.9,222.1c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM310.2,209.4c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM297.6,196.7c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM284.9,184.1c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM272.2,171.4c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7Z" fill="url(#g05d_4006)"/><path d="M316.2,155.8l12.1,6.2c.8.4,1.8.3,2.4-.4l9.6-9.6c1.4-1.4,3.8-.2,3.5,1.8l-2.1,13.5c-.1.9.3,1.8,1.1,2.2l12.1,6.2c1.8.9,1.4,3.6-.6,3.9l-13.5,2.1c-.9.1-1.6.8-1.7,1.7l-2.1,13.5c-.3,2-3,2.4-3.9.6l-6.2-12.1c-.4-.8-1.3-1.3-2.2-1.1l-13.5,2.1c-2,.3-3.2-2.1-1.8-3.5l9.6-9.6c.6-.6.8-1.6.4-2.4l-6.2-12.1c-.9-1.8,1-3.7,2.8-2.8Z" fill="rgba(50,50,50,0.75)"/><path d="M180.7,298.9l-5.2,5.2,27.4,27.4-4.7,4.7-27.4-27.4-5.2,5.2-4.2-4.2,15.1-15.1,4.2,4.2ZM215.3,319.1l-4.7,4.7-31.6-31.6,4.7-4.7,31.6,31.6ZM231.9,296.8c1.9,1.9,1.9,3.9,0,5.8l-9.9,9.9c-1.9,1.9-3.8,1.8-5.7,0l-25.8-25.8c-1.9-1.9-2-3.8-.1-5.7l9.9-9.9c1.9-1.9,3.9-1.9,5.8,0l7.4,7.4-4.7,4.7-6.2-6.2-6.1,6.1,23.5,23.5,6.1-6.1-6.6-6.6,4.7-4.7,7.8,7.8ZM254.4,280l-5.2,5.2-20.1-8.1,14.1,14.1-4.7,4.7-31.6-31.6,4.7-4.7,13.4,13.4-8.1-18.6,5.2-5.2.2.2,8.6,21.4,23.6,9.2ZM269.5,265l-13.1,13.1-31.6-31.6,13-13,4.2,4.2-8.3,8.3,9.2,9.2,7.1-7.1,4.1,4.1-7.1,7.1,9.9,9.9,8.4-8.4,4.2,4.2ZM259,220.6l-5.2,5.2,27.4,27.4-4.7,4.7-27.4-27.4-5.2,5.2-4.2-4.2,15.1-15.1,4.2,4.2Z" fill="rgba(50,50,50,0.75)"/></svg></span>
                   <span class="swap-dir-arrow">→</span>
@@ -12532,7 +12533,7 @@ body.interactive-mode #ip-nav { display: block; }
                 </div>
                 <div class="swap-dir-label">실버 → 브론즈</div>
               </button>
-              <button class="swap-dir-btn" data-from="silver" data-to="gold" data-ratio-from="2" data-ratio-to="1">
+              <button class="swap-dir-btn" id="swap-dir-s2g" data-from="silver" data-to="gold" data-ratio-from="2" data-ratio-to="1">
                 <div class="swap-dir-flow">
                   <span class="swap-dir-medal"><svg width="32" height="32" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="g05d_4008" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#D8D8D8"/><stop offset="100%" stop-color="#999999"/></linearGradient></defs><path d="M306.6,106.8l-49.5,49.5,2.4,2.4c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-2.4-2.4-138.6,138.6c-3.7,3.7-3.7,9.6,0,13.3l75.5,75.5c3.7,3.7,9.6,3.7,13.3,0l138.6-138.6-2.3-2.3c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l2.3,2.3,49.5-49.5c3.7-3.7,3.7-9.6,0-13.3l-75.5-75.5c-3.7-3.7-9.6-3.7-13.3,0ZM335.6,234.8c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM322.9,222.1c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM310.2,209.4c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM297.6,196.7c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM284.9,184.1c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM272.2,171.4c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7Z" fill="url(#g05d_4008)"/><path d="M316.2,155.8l12.1,6.2c.8.4,1.8.3,2.4-.4l9.6-9.6c1.4-1.4,3.8-.2,3.5,1.8l-2.1,13.5c-.1.9.3,1.8,1.1,2.2l12.1,6.2c1.8.9,1.4,3.6-.6,3.9l-13.5,2.1c-.9.1-1.6.8-1.7,1.7l-2.1,13.5c-.3,2-3,2.4-3.9.6l-6.2-12.1c-.4-.8-1.3-1.3-2.2-1.1l-13.5,2.1c-2,.3-3.2-2.1-1.8-3.5l9.6-9.6c.6-.6.8-1.6.4-2.4l-6.2-12.1c-.9-1.8,1-3.7,2.8-2.8Z" fill="rgba(50,50,50,0.75)"/><path d="M180.7,298.9l-5.2,5.2,27.4,27.4-4.7,4.7-27.4-27.4-5.2,5.2-4.2-4.2,15.1-15.1,4.2,4.2ZM215.3,319.1l-4.7,4.7-31.6-31.6,4.7-4.7,31.6,31.6ZM231.9,296.8c1.9,1.9,1.9,3.9,0,5.8l-9.9,9.9c-1.9,1.9-3.8,1.8-5.7,0l-25.8-25.8c-1.9-1.9-2-3.8-.1-5.7l9.9-9.9c1.9-1.9,3.9-1.9,5.8,0l7.4,7.4-4.7,4.7-6.2-6.2-6.1,6.1,23.5,23.5,6.1-6.1-6.6-6.6,4.7-4.7,7.8,7.8ZM254.4,280l-5.2,5.2-20.1-8.1,14.1,14.1-4.7,4.7-31.6-31.6,4.7-4.7,13.4,13.4-8.1-18.6,5.2-5.2.2.2,8.6,21.4,23.6,9.2ZM269.5,265l-13.1,13.1-31.6-31.6,13-13,4.2,4.2-8.3,8.3,9.2,9.2,7.1-7.1,4.1,4.1-7.1,7.1,9.9,9.9,8.4-8.4,4.2,4.2ZM259,220.6l-5.2,5.2,27.4,27.4-4.7,4.7-27.4-27.4-5.2,5.2-4.2-4.2,15.1-15.1,4.2,4.2Z" fill="rgba(50,50,50,0.75)"/></svg></span>
                   <span class="swap-dir-arrow">→</span>
@@ -12540,7 +12541,7 @@ body.interactive-mode #ip-nav { display: block; }
                 </div>
                 <div class="swap-dir-label">실버 → 골드</div>
               </button>
-              <button class="swap-dir-btn" data-from="gold" data-to="silver" data-ratio-from="1" data-ratio-to="2">
+              <button class="swap-dir-btn" id="swap-dir-g2s" data-downgrade="1" data-from="gold" data-to="silver" data-ratio-from="1" data-ratio-to="2">
                 <div class="swap-dir-flow">
                   <span class="swap-dir-medal"><svg width="32" height="32" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="g05d_4010" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#FFD93B"/><stop offset="100%" stop-color="#E6A800"/></linearGradient></defs><path d="M306.6,106.8l-49.5,49.5,2.4,2.4c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-2.4-2.4-138.6,138.6c-3.7,3.7-3.7,9.6,0,13.3l75.5,75.5c3.7,3.7,9.6,3.7,13.3,0l138.6-138.6-2.3-2.3c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l2.3,2.3,49.5-49.5c3.7-3.7,3.7-9.6,0-13.3l-75.5-75.5c-3.7-3.7-9.6-3.7-13.3,0ZM335.6,234.8c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM322.9,222.1c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM310.2,209.4c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM297.6,196.7c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM284.9,184.1c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM272.2,171.4c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7Z" fill="url(#g05d_4010)"/><path d="M316.2,155.8l12.1,6.2c.8.4,1.8.3,2.4-.4l9.6-9.6c1.4-1.4,3.8-.2,3.5,1.8l-2.1,13.5c-.1.9.3,1.8,1.1,2.2l12.1,6.2c1.8.9,1.4,3.6-.6,3.9l-13.5,2.1c-.9.1-1.6.8-1.7,1.7l-2.1,13.5c-.3,2-3,2.4-3.9.6l-6.2-12.1c-.4-.8-1.3-1.3-2.2-1.1l-13.5,2.1c-2,.3-3.2-2.1-1.8-3.5l9.6-9.6c.6-.6.8-1.6.4-2.4l-6.2-12.1c-.9-1.8,1-3.7,2.8-2.8Z" fill="rgba(255,255,255,0.95)"/><path d="M180.7,298.9l-5.2,5.2,27.4,27.4-4.7,4.7-27.4-27.4-5.2,5.2-4.2-4.2,15.1-15.1,4.2,4.2ZM215.3,319.1l-4.7,4.7-31.6-31.6,4.7-4.7,31.6,31.6ZM231.9,296.8c1.9,1.9,1.9,3.9,0,5.8l-9.9,9.9c-1.9,1.9-3.8,1.8-5.7,0l-25.8-25.8c-1.9-1.9-2-3.8-.1-5.7l9.9-9.9c1.9-1.9,3.9-1.9,5.8,0l7.4,7.4-4.7,4.7-6.2-6.2-6.1,6.1,23.5,23.5,6.1-6.1-6.6-6.6,4.7-4.7,7.8,7.8ZM254.4,280l-5.2,5.2-20.1-8.1,14.1,14.1-4.7,4.7-31.6-31.6,4.7-4.7,13.4,13.4-8.1-18.6,5.2-5.2.2.2,8.6,21.4,23.6,9.2ZM269.5,265l-13.1,13.1-31.6-31.6,13-13,4.2,4.2-8.3,8.3,9.2,9.2,7.1-7.1,4.1,4.1-7.1,7.1,9.9,9.9,8.4-8.4,4.2,4.2ZM259,220.6l-5.2,5.2,27.4,27.4-4.7,4.7-27.4-27.4-5.2,5.2-4.2-4.2,15.1-15.1,4.2,4.2Z" fill="rgba(255,255,255,0.95)"/></svg></span>
                   <span class="swap-dir-arrow">→</span>
@@ -12643,46 +12644,46 @@ body.interactive-mode #ip-nav { display: block; }
             <!-- 포인트 → 티켓 -->
             <div class="pt-sub-t">포인트로 티켓 받기</div>
             <div class="pt-row-list">
-              <div class="pt-ex-row">
+              <div class="pt-ex-row" id="pt-row-buy-bronze">
                 <div class="pt-ex-side pt-ex-from"><span class="pt-pchip">P</span>1,000P</div>
                 <span class="pt-ex-arrow">→</span>
                 <div class="pt-ex-side pt-ex-to"><svg width="18" height="18" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0;"><defs><linearGradient id="g05d_pt1" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#C68250"/><stop offset="100%" stop-color="#8B5A2B"/></linearGradient></defs><path d="M306.6,106.8l-49.5,49.5,2.4,2.4c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-2.4-2.4-138.6,138.6c-3.7,3.7-3.7,9.6,0,13.3l75.5,75.5c3.7,3.7,9.6,3.7,13.3,0l138.6-138.6-2.3-2.3c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l2.3,2.3,49.5-49.5c3.7-3.7,3.7-9.6,0-13.3l-75.5-75.5c-3.7-3.7-9.6-3.7-13.3,0ZM335.6,234.8c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM322.9,222.1c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM310.2,209.4c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM297.6,196.7c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM284.9,184.1c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM272.2,171.4c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7Z" fill="url(#g05d_pt1)"/><path d="M316.2,155.8l12.1,6.2c.8.4,1.8.3,2.4-.4l9.6-9.6c1.4-1.4,3.8-.2,3.5,1.8l-2.1,13.5c-.1.9.3,1.8,1.1,2.2l12.1,6.2c1.8.9,1.4,3.6-.6,3.9l-13.5,2.1c-.9.1-1.6.8-1.7,1.7l-2.1,13.5c-.3,2-3,2.4-3.9.6l-6.2-12.1c-.4-.8-1.3-1.3-2.2-1.1l-13.5,2.1c-2,.3-3.2-2.1-1.8-3.5l9.6-9.6c.6-.6.8-1.6.4-2.4l-6.2-12.1c-.9-1.8,1-3.7,2.8-2.8Z" fill="rgba(255,255,255,0.95)"/><path d="M180.7,298.9l-5.2,5.2,27.4,27.4-4.7,4.7-27.4-27.4-5.2,5.2-4.2-4.2,15.1-15.1,4.2,4.2ZM215.3,319.1l-4.7,4.7-31.6-31.6,4.7-4.7,31.6,31.6ZM231.9,296.8c1.9,1.9,1.9,3.9,0,5.8l-9.9,9.9c-1.9,1.9-3.8,1.8-5.7,0l-25.8-25.8c-1.9-1.9-2-3.8-.1-5.7l9.9-9.9c1.9-1.9,3.9-1.9,5.8,0l7.4,7.4-4.7,4.7-6.2-6.2-6.1,6.1,23.5,23.5,6.1-6.1-6.6-6.6,4.7-4.7,7.8,7.8ZM254.4,280l-5.2,5.2-20.1-8.1,14.1,14.1-4.7,4.7-31.6-31.6,4.7-4.7,13.4,13.4-8.1-18.6,5.2-5.2.2.2,8.6,21.4,23.6,9.2ZM269.5,265l-13.1,13.1-31.6-31.6,13-13,4.2,4.2-8.3,8.3,9.2,9.2,7.1-7.1,4.1,4.1-7.1,7.1,9.9,9.9,8.4-8.4,4.2,4.2ZM259,220.6l-5.2,5.2,27.4,27.4-4.7,4.7-27.4-27.4-5.2,5.2-4.2-4.2,15.1-15.1,4.2,4.2Z" fill="rgba(255,255,255,0.95)"/></svg>브론즈 1장</div>
-                <button class="pt-ex-btn" onclick="ipToast('교환되었어요 (프로토타입)')">교환</button>
+                <button class="pt-ex-btn" id="pt-btn-buy-bronze">교환</button>
               </div>
-              <div class="pt-ex-row disabled">
+              <div class="pt-ex-row disabled" id="pt-row-buy-silver">
                 <div class="pt-ex-side pt-ex-from"><span class="pt-pchip">P</span>10,000P</div>
                 <span class="pt-ex-arrow">→</span>
                 <div class="pt-ex-side pt-ex-to"><svg width="18" height="18" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0;"><defs><linearGradient id="g05d_pt2" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#D8D8D8"/><stop offset="100%" stop-color="#999999"/></linearGradient></defs><path d="M306.6,106.8l-49.5,49.5,2.4,2.4c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-2.4-2.4-138.6,138.6c-3.7,3.7-3.7,9.6,0,13.3l75.5,75.5c3.7,3.7,9.6,3.7,13.3,0l138.6-138.6-2.3-2.3c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l2.3,2.3,49.5-49.5c3.7-3.7,3.7-9.6,0-13.3l-75.5-75.5c-3.7-3.7-9.6-3.7-13.3,0ZM335.6,234.8c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM322.9,222.1c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM310.2,209.4c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM297.6,196.7c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM284.9,184.1c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM272.2,171.4c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7Z" fill="url(#g05d_pt2)"/><path d="M316.2,155.8l12.1,6.2c.8.4,1.8.3,2.4-.4l9.6-9.6c1.4-1.4,3.8-.2,3.5,1.8l-2.1,13.5c-.1.9.3,1.8,1.1,2.2l12.1,6.2c1.8.9,1.4,3.6-.6,3.9l-13.5,2.1c-.9.1-1.6.8-1.7,1.7l-2.1,13.5c-.3,2-3,2.4-3.9.6l-6.2-12.1c-.4-.8-1.3-1.3-2.2-1.1l-13.5,2.1c-2,.3-3.2-2.1-1.8-3.5l9.6-9.6c.6-.6.8-1.6.4-2.4l-6.2-12.1c-.9-1.8,1-3.7,2.8-2.8Z" fill="rgba(50,50,50,0.75)"/><path d="M180.7,298.9l-5.2,5.2,27.4,27.4-4.7,4.7-27.4-27.4-5.2,5.2-4.2-4.2,15.1-15.1,4.2,4.2ZM215.3,319.1l-4.7,4.7-31.6-31.6,4.7-4.7,31.6,31.6ZM231.9,296.8c1.9,1.9,1.9,3.9,0,5.8l-9.9,9.9c-1.9,1.9-3.8,1.8-5.7,0l-25.8-25.8c-1.9-1.9-2-3.8-.1-5.7l9.9-9.9c1.9-1.9,3.9-1.9,5.8,0l7.4,7.4-4.7,4.7-6.2-6.2-6.1,6.1,23.5,23.5,6.1-6.1-6.6-6.6,4.7-4.7,7.8,7.8ZM254.4,280l-5.2,5.2-20.1-8.1,14.1,14.1-4.7,4.7-31.6-31.6,4.7-4.7,13.4,13.4-8.1-18.6,5.2-5.2.2.2,8.6,21.4,23.6,9.2ZM269.5,265l-13.1,13.1-31.6-31.6,13-13,4.2,4.2-8.3,8.3,9.2,9.2,7.1-7.1,4.1,4.1-7.1,7.1,9.9,9.9,8.4-8.4,4.2,4.2ZM259,220.6l-5.2,5.2,27.4,27.4-4.7,4.7-27.4-27.4-5.2,5.2-4.2-4.2,15.1-15.1,4.2,4.2Z" fill="rgba(50,50,50,0.75)"/></svg>실버 1장</div>
-                <button class="pt-ex-btn" disabled>교환</button>
+                <button class="pt-ex-btn" id="pt-btn-buy-silver" disabled>교환</button>
               </div>
-              <div class="pt-ex-row disabled">
+              <div class="pt-ex-row disabled" id="pt-row-buy-gold">
                 <div class="pt-ex-side pt-ex-from"><span class="pt-pchip">P</span>20,000P</div>
                 <span class="pt-ex-arrow">→</span>
                 <div class="pt-ex-side pt-ex-to"><svg width="18" height="18" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0;"><defs><linearGradient id="g05d_pt3" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#FFD93B"/><stop offset="100%" stop-color="#E6A800"/></linearGradient></defs><path d="M306.6,106.8l-49.5,49.5,2.4,2.4c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-2.4-2.4-138.6,138.6c-3.7,3.7-3.7,9.6,0,13.3l75.5,75.5c3.7,3.7,9.6,3.7,13.3,0l138.6-138.6-2.3-2.3c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l2.3,2.3,49.5-49.5c3.7-3.7,3.7-9.6,0-13.3l-75.5-75.5c-3.7-3.7-9.6-3.7-13.3,0ZM335.6,234.8c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM322.9,222.1c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM310.2,209.4c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM297.6,196.7c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM284.9,184.1c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM272.2,171.4c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7Z" fill="url(#g05d_pt3)"/><path d="M316.2,155.8l12.1,6.2c.8.4,1.8.3,2.4-.4l9.6-9.6c1.4-1.4,3.8-.2,3.5,1.8l-2.1,13.5c-.1.9.3,1.8,1.1,2.2l12.1,6.2c1.8.9,1.4,3.6-.6,3.9l-13.5,2.1c-.9.1-1.6.8-1.7,1.7l-2.1,13.5c-.3,2-3,2.4-3.9.6l-6.2-12.1c-.4-.8-1.3-1.3-2.2-1.1l-13.5,2.1c-2,.3-3.2-2.1-1.8-3.5l9.6-9.6c.6-.6.8-1.6.4-2.4l-6.2-12.1c-.9-1.8,1-3.7,2.8-2.8Z" fill="rgba(255,255,255,0.95)"/><path d="M180.7,298.9l-5.2,5.2,27.4,27.4-4.7,4.7-27.4-27.4-5.2,5.2-4.2-4.2,15.1-15.1,4.2,4.2ZM215.3,319.1l-4.7,4.7-31.6-31.6,4.7-4.7,31.6,31.6ZM231.9,296.8c1.9,1.9,1.9,3.9,0,5.8l-9.9,9.9c-1.9,1.9-3.8,1.8-5.7,0l-25.8-25.8c-1.9-1.9-2-3.8-.1-5.7l9.9-9.9c1.9-1.9,3.9-1.9,5.8,0l7.4,7.4-4.7,4.7-6.2-6.2-6.1,6.1,23.5,23.5,6.1-6.1-6.6-6.6,4.7-4.7,7.8,7.8ZM254.4,280l-5.2,5.2-20.1-8.1,14.1,14.1-4.7,4.7-31.6-31.6,4.7-4.7,13.4,13.4-8.1-18.6,5.2-5.2.2.2,8.6,21.4,23.6,9.2ZM269.5,265l-13.1,13.1-31.6-31.6,13-13,4.2,4.2-8.3,8.3,9.2,9.2,7.1-7.1,4.1,4.1-7.1,7.1,9.9,9.9,8.4-8.4,4.2,4.2ZM259,220.6l-5.2,5.2,27.4,27.4-4.7,4.7-27.4-27.4-5.2,5.2-4.2-4.2,15.1-15.1,4.2,4.2Z" fill="rgba(255,255,255,0.95)"/></svg>골드 1장</div>
-                <button class="pt-ex-btn" disabled>교환</button>
+                <button class="pt-ex-btn" id="pt-btn-buy-gold" disabled>교환</button>
               </div>
             </div>
 
             <!-- 티켓 → 포인트 -->
             <div class="pt-sub-t">티켓을 포인트로 바꾸기</div>
             <div class="pt-row-list">
-              <div class="pt-ex-row">
+              <div class="pt-ex-row" id="pt-row-sell-bronze">
                 <div class="pt-ex-side pt-ex-from"><svg width="18" height="18" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0;"><defs><linearGradient id="g05d_pt4" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#C68250"/><stop offset="100%" stop-color="#8B5A2B"/></linearGradient></defs><path d="M306.6,106.8l-49.5,49.5,2.4,2.4c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-2.4-2.4-138.6,138.6c-3.7,3.7-3.7,9.6,0,13.3l75.5,75.5c3.7,3.7,9.6,3.7,13.3,0l138.6-138.6-2.3-2.3c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l2.3,2.3,49.5-49.5c3.7-3.7,3.7-9.6,0-13.3l-75.5-75.5c-3.7-3.7-9.6-3.7-13.3,0ZM335.6,234.8c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM322.9,222.1c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM310.2,209.4c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM297.6,196.7c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM284.9,184.1c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM272.2,171.4c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7Z" fill="url(#g05d_pt4)"/><path d="M316.2,155.8l12.1,6.2c.8.4,1.8.3,2.4-.4l9.6-9.6c1.4-1.4,3.8-.2,3.5,1.8l-2.1,13.5c-.1.9.3,1.8,1.1,2.2l12.1,6.2c1.8.9,1.4,3.6-.6,3.9l-13.5,2.1c-.9.1-1.6.8-1.7,1.7l-2.1,13.5c-.3,2-3,2.4-3.9.6l-6.2-12.1c-.4-.8-1.3-1.3-2.2-1.1l-13.5,2.1c-2,.3-3.2-2.1-1.8-3.5l9.6-9.6c.6-.6.8-1.6.4-2.4l-6.2-12.1c-.9-1.8,1-3.7,2.8-2.8Z" fill="rgba(255,255,255,0.95)"/><path d="M180.7,298.9l-5.2,5.2,27.4,27.4-4.7,4.7-27.4-27.4-5.2,5.2-4.2-4.2,15.1-15.1,4.2,4.2ZM215.3,319.1l-4.7,4.7-31.6-31.6,4.7-4.7,31.6,31.6ZM231.9,296.8c1.9,1.9,1.9,3.9,0,5.8l-9.9,9.9c-1.9,1.9-3.8,1.8-5.7,0l-25.8-25.8c-1.9-1.9-2-3.8-.1-5.7l9.9-9.9c1.9-1.9,3.9-1.9,5.8,0l7.4,7.4-4.7,4.7-6.2-6.2-6.1,6.1,23.5,23.5,6.1-6.1-6.6-6.6,4.7-4.7,7.8,7.8ZM254.4,280l-5.2,5.2-20.1-8.1,14.1,14.1-4.7,4.7-31.6-31.6,4.7-4.7,13.4,13.4-8.1-18.6,5.2-5.2.2.2,8.6,21.4,23.6,9.2ZM269.5,265l-13.1,13.1-31.6-31.6,13-13,4.2,4.2-8.3,8.3,9.2,9.2,7.1-7.1,4.1,4.1-7.1,7.1,9.9,9.9,8.4-8.4,4.2,4.2ZM259,220.6l-5.2,5.2,27.4,27.4-4.7,4.7-27.4-27.4-5.2,5.2-4.2-4.2,15.1-15.1,4.2,4.2Z" fill="rgba(255,255,255,0.95)"/></svg>브론즈 1장</div>
                 <span class="pt-ex-arrow">→</span>
                 <div class="pt-ex-side pt-ex-to"><span class="pt-pchip">P</span>1,000P</div>
-                <button class="pt-ex-btn" onclick="ipToast('교환되었어요 (프로토타입)')">교환</button>
+                <button class="pt-ex-btn" id="pt-btn-sell-bronze">교환</button>
               </div>
-              <div class="pt-ex-row">
+              <div class="pt-ex-row" id="pt-row-sell-silver">
                 <div class="pt-ex-side pt-ex-from"><svg width="18" height="18" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0;"><defs><linearGradient id="g05d_pt5" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#D8D8D8"/><stop offset="100%" stop-color="#999999"/></linearGradient></defs><path d="M306.6,106.8l-49.5,49.5,2.4,2.4c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-2.4-2.4-138.6,138.6c-3.7,3.7-3.7,9.6,0,13.3l75.5,75.5c3.7,3.7,9.6,3.7,13.3,0l138.6-138.6-2.3-2.3c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l2.3,2.3,49.5-49.5c3.7-3.7,3.7-9.6,0-13.3l-75.5-75.5c-3.7-3.7-9.6-3.7-13.3,0ZM335.6,234.8c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM322.9,222.1c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM310.2,209.4c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM297.6,196.7c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM284.9,184.1c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM272.2,171.4c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7Z" fill="url(#g05d_pt5)"/><path d="M316.2,155.8l12.1,6.2c.8.4,1.8.3,2.4-.4l9.6-9.6c1.4-1.4,3.8-.2,3.5,1.8l-2.1,13.5c-.1.9.3,1.8,1.1,2.2l12.1,6.2c1.8.9,1.4,3.6-.6,3.9l-13.5,2.1c-.9.1-1.6.8-1.7,1.7l-2.1,13.5c-.3,2-3,2.4-3.9.6l-6.2-12.1c-.4-.8-1.3-1.3-2.2-1.1l-13.5,2.1c-2,.3-3.2-2.1-1.8-3.5l9.6-9.6c.6-.6.8-1.6.4-2.4l-6.2-12.1c-.9-1.8,1-3.7,2.8-2.8Z" fill="rgba(50,50,50,0.75)"/><path d="M180.7,298.9l-5.2,5.2,27.4,27.4-4.7,4.7-27.4-27.4-5.2,5.2-4.2-4.2,15.1-15.1,4.2,4.2ZM215.3,319.1l-4.7,4.7-31.6-31.6,4.7-4.7,31.6,31.6ZM231.9,296.8c1.9,1.9,1.9,3.9,0,5.8l-9.9,9.9c-1.9,1.9-3.8,1.8-5.7,0l-25.8-25.8c-1.9-1.9-2-3.8-.1-5.7l9.9-9.9c1.9-1.9,3.9-1.9,5.8,0l7.4,7.4-4.7,4.7-6.2-6.2-6.1,6.1,23.5,23.5,6.1-6.1-6.6-6.6,4.7-4.7,7.8,7.8ZM254.4,280l-5.2,5.2-20.1-8.1,14.1,14.1-4.7,4.7-31.6-31.6,4.7-4.7,13.4,13.4-8.1-18.6,5.2-5.2.2.2,8.6,21.4,23.6,9.2ZM269.5,265l-13.1,13.1-31.6-31.6,13-13,4.2,4.2-8.3,8.3,9.2,9.2,7.1-7.1,4.1,4.1-7.1,7.1,9.9,9.9,8.4-8.4,4.2,4.2ZM259,220.6l-5.2,5.2,27.4,27.4-4.7,4.7-27.4-27.4-5.2,5.2-4.2-4.2,15.1-15.1,4.2,4.2Z" fill="rgba(50,50,50,0.75)"/></svg>실버 1장</div>
                 <span class="pt-ex-arrow">→</span>
                 <div class="pt-ex-side pt-ex-to"><span class="pt-pchip">P</span>10,000P</div>
-                <button class="pt-ex-btn" onclick="ipToast('교환되었어요 (프로토타입)')">교환</button>
+                <button class="pt-ex-btn" id="pt-btn-sell-silver">교환</button>
               </div>
-              <div class="pt-ex-row">
+              <div class="pt-ex-row" id="pt-row-sell-gold">
                 <div class="pt-ex-side pt-ex-from"><svg width="18" height="18" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0;"><defs><linearGradient id="g05d_pt6" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#FFD93B"/><stop offset="100%" stop-color="#E6A800"/></linearGradient></defs><path d="M306.6,106.8l-49.5,49.5,2.4,2.4c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-2.4-2.4-138.6,138.6c-3.7,3.7-3.7,9.6,0,13.3l75.5,75.5c3.7,3.7,9.6,3.7,13.3,0l138.6-138.6-2.3-2.3c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l2.3,2.3,49.5-49.5c3.7-3.7,3.7-9.6,0-13.3l-75.5-75.5c-3.7-3.7-9.6-3.7-13.3,0ZM335.6,234.8c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM322.9,222.1c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM310.2,209.4c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM297.6,196.7c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM284.9,184.1c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM272.2,171.4c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7Z" fill="url(#g05d_pt6)"/><path d="M316.2,155.8l12.1,6.2c.8.4,1.8.3,2.4-.4l9.6-9.6c1.4-1.4,3.8-.2,3.5,1.8l-2.1,13.5c-.1.9.3,1.8,1.1,2.2l12.1,6.2c1.8.9,1.4,3.6-.6,3.9l-13.5,2.1c-.9.1-1.6.8-1.7,1.7l-2.1,13.5c-.3,2-3,2.4-3.9.6l-6.2-12.1c-.4-.8-1.3-1.3-2.2-1.1l-13.5,2.1c-2,.3-3.2-2.1-1.8-3.5l9.6-9.6c.6-.6.8-1.6.4-2.4l-6.2-12.1c-.9-1.8,1-3.7,2.8-2.8Z" fill="rgba(255,255,255,0.95)"/><path d="M180.7,298.9l-5.2,5.2,27.4,27.4-4.7,4.7-27.4-27.4-5.2,5.2-4.2-4.2,15.1-15.1,4.2,4.2ZM215.3,319.1l-4.7,4.7-31.6-31.6,4.7-4.7,31.6,31.6ZM231.9,296.8c1.9,1.9,1.9,3.9,0,5.8l-9.9,9.9c-1.9,1.9-3.8,1.8-5.7,0l-25.8-25.8c-1.9-1.9-2-3.8-.1-5.7l9.9-9.9c1.9-1.9,3.9-1.9,5.8,0l7.4,7.4-4.7,4.7-6.2-6.2-6.1,6.1,23.5,23.5,6.1-6.1-6.6-6.6,4.7-4.7,7.8,7.8ZM254.4,280l-5.2,5.2-20.1-8.1,14.1,14.1-4.7,4.7-31.6-31.6,4.7-4.7,13.4,13.4-8.1-18.6,5.2-5.2.2.2,8.6,21.4,23.6,9.2ZM269.5,265l-13.1,13.1-31.6-31.6,13-13,4.2,4.2-8.3,8.3,9.2,9.2,7.1-7.1,4.1,4.1-7.1,7.1,9.9,9.9,8.4-8.4,4.2,4.2ZM259,220.6l-5.2,5.2,27.4,27.4-4.7,4.7-27.4-27.4-5.2,5.2-4.2-4.2,15.1-15.1,4.2,4.2Z" fill="rgba(255,255,255,0.95)"/></svg>골드 1장</div>
                 <span class="pt-ex-arrow">→</span>
                 <div class="pt-ex-side pt-ex-to"><span class="pt-pchip">P</span>20,000P</div>
-                <button class="pt-ex-btn" onclick="ipToast('교환되었어요 (프로토타입)')">교환</button>
+                <button class="pt-ex-btn" id="pt-btn-sell-gold">교환</button>
               </div>
             </div>
 
@@ -12913,11 +12914,13 @@ const FLOW_MAP = [
   ['pw-01b', '.ios-modal-btn', 'pw-02-nick', 'ATT 허용/거부 → 닉네임 설정'],
   ['pw-02-nick', '.nick-start-btn', 'pw-10', '시작하기 → 홈'],
   // 02 소셜 로그인 (3-button) — bindSocialLogin()에서 처리
-  ['pw-02-K', 'button', 'pw-02-K-existing', '→ 기존 계정 발견 (기본)'],
+  ['pw-02-K', '.kakao-app-allow', 'pw-02-K-existing', '허용 → 기존 계정 발견 (기본)'],
+  // 취소: 'pw-02'(소셜 로그인 진입) 화면은 v5.5에서 제거돼 실제 마크업이 없음 — 진입 지점(홈/마이)으로 되돌아가야 하므로 null(ipGoBack)
+  ['pw-02-K', '.kakao-app-cancel', null, '취소 → 이전 화면으로'],
   ['pw-02-K-existing', 'button, .btn-primary, [style*="cursor"]', 'pw-10', '시작하기 → 홈'],
   ['pw-02-K-new', 'button, .btn-primary', 'pw-10', '시작하기 → 홈'],
   ['pw-02-K-merge', 'button, .btn-primary', 'pw-10', '홈으로 가기 → 홈'],
-  ['pw-02-withdraw',      'button, .btn-primary', 'pw-02-withdraw-done', '탈퇴 확정 → 완료'],
+  // pw-02-withdraw: 탈퇴/취소 버튼 실핸들러 = bindWithdrawConfirmScreen() (FLOW_MAP 범용 라우팅 제외 — 실지급/세션종료 로직 우회 방지)
   ['pw-02-withdraw-done', 'button, .btn-primary', 'pw-02-nick', '닉네임 설정으로'],
   ['pw-02-err-network',   'button, .btn-primary', null,                  '재시도'],
   ['pw-02-err-blocked',   'button, .btn-primary', null,                  '고객센터 (외부)'],
@@ -12949,7 +12952,7 @@ const FLOW_MAP = [
   ['pw-21', '.gd-swap-cta, [class*="swap"]',         'pw-22', '등급교환 → 22'],
   ['pw-21', '.btn-primary, [class*="to-exchange"]',  'pw-24', '교환소 → 24'],
   ['pw-22', '.back-btn',                   'pw-21', '뒤로 → 21'],
-  ['pw-22', '.gd-cta, .swap-cta',          'pw-21', '교환 → 21 복귀'],
+  // pw-22 swap-cta-btn: 실핸들러 = bindGradeSwapScreen() (FLOW_MAP 범용 라우팅 제외 — 실차감/지급 우회 방지)
   ['pw-23', '.back-btn, .close-btn', 'pw-20', '닫기 → 혜택'],
   ['pw-24', '.ex-item',                    'pw-25', '기프티콘 → 25'],
   ['pw-24', '.back-btn, .reward-top-btn',  'pw-20', '뒤로 → 혜택'],
@@ -14023,22 +14026,31 @@ function rlShowResult(idx, grantedQty) {
   }
   wrap.classList.add('show');
 }
-// 오늘 이미 참여한 경우 잠금 UI 반영
+// 오늘 이미 참여한 경우 잠금 UI 반영 (localStorage는 즉시 반영용 캐시일 뿐 — 실제 판정은 서버 기록)
 function rlApplyDailyLock() {
   var btn = document.getElementById('rl-spin-btn');
   var badge = document.querySelector('#pw-15 .rl-hero-badge');
   var info = document.querySelector('#pw-15 .rl-spin-info');
   if (!btn) return;
-  if (rlPlayedToday()) {
+  function setLocked() {
     btn.disabled = true;
     btn.textContent = '오늘 이미 참여했어요';
     if (badge) badge.textContent = '오늘 참여 완료 · 내일 다시 오세요';
     if (info) info.textContent = '오늘 이미 참여했어요 · 내일 다시 오세요';
-  } else {
+  }
+  function setUnlocked() {
     btn.disabled = false;
     btn.textContent = '돌리기';
     if (badge) badge.textContent = '오늘 남은 기회 1회';
     if (info) info.textContent = '룰렛은 매일 자정 초기화 · 당첨 티켓은 자동 지급';
+  }
+  // localStorage는 즉시 반영용 낙관적 힌트일 뿐(uid 무관 · 기기 공유라 계정 전환 시 부정확할 수 있음) —
+  // 최종 판정은 항상 서버(roulette_spins)가 내리고, 아래 비동기 확인 결과로 덮어쓴다.
+  if (rlPlayedToday()) setLocked(); else setUnlocked();
+  if (window.ppHasSpunToday) {
+    window.ppHasSpunToday().then(function(spun) {
+      if (spun) { rlMarkPlayed(); setLocked(); } else { setUnlocked(); }
+    });
   }
 }
 function bindFortuneRoulette() {
@@ -14054,30 +14066,44 @@ function bindFortuneRoulette() {
   btn.addEventListener('click', function(e) {
     e.stopPropagation();
     if (_rlSpinning) return;
-    if (rlPlayedToday()) { rlApplyDailyLock(); return; }
+    if (btn.disabled) return;
     _rlSpinning = true;
     btn.disabled = true;
-    btn.textContent = '돌리는 중...';
-    document.getElementById('rl-result').classList.remove('show');
+    btn.textContent = '확인 중...';
 
-    var n = RL_ACTIVE_WHEEL.length, seg = 360 / n;
-    var idx = Math.floor(Math.random() * n);
-    // idx 슬라이스 중심이 상단 포인터(0도)에 오도록 회전
-    var targetMod = ((360 - (idx * seg + seg / 2)) % 360 + 360) % 360;
-    var current = ((_rlTotalRot % 360) + 360) % 360;
-    var delta = (targetMod - current + 360) % 360;
-    _rlTotalRot += 360 * 5 + delta;
-    wheel.style.transform = 'rotate(' + _rlTotalRot + 'deg)';
-
-    setTimeout(function() {
-      rlMarkPlayed();
-      var pickedSeg = RL_ACTIVE_WHEEL[idx];
-      rlGrantReward(pickedSeg).then(function(grantedQty) {
-        rlShowResult(idx, grantedQty);
+    // 실제 하루 1회 판정 = 서버(roulette_spins 문서 생성, firestore.rules상 create 1회만 허용).
+    // 이게 성공해야만 회전·보상 지급으로 진행 — localStorage 삭제로는 이 단계를 우회할 수 없다.
+    var claim = window.ppClaimRouletteSpin ? window.ppClaimRouletteSpin() : Promise.resolve(true);
+    claim.then(function(ok) {
+      if (!ok) {
+        rlMarkPlayed();
         _rlSpinning = false;
         rlApplyDailyLock();
-      });
-    }, 4350);
+        ipToast('오늘은 이미 참여했어요');
+        return;
+      }
+      btn.textContent = '돌리는 중...';
+      document.getElementById('rl-result').classList.remove('show');
+
+      var n = RL_ACTIVE_WHEEL.length, seg = 360 / n;
+      var idx = Math.floor(Math.random() * n);
+      // idx 슬라이스 중심이 상단 포인터(0도)에 오도록 회전
+      var targetMod = ((360 - (idx * seg + seg / 2)) % 360 + 360) % 360;
+      var current = ((_rlTotalRot % 360) + 360) % 360;
+      var delta = (targetMod - current + 360) % 360;
+      _rlTotalRot += 360 * 5 + delta;
+      wheel.style.transform = 'rotate(' + _rlTotalRot + 'deg)';
+
+      setTimeout(function() {
+        rlMarkPlayed();
+        var pickedSeg = RL_ACTIVE_WHEEL[idx];
+        rlGrantReward(pickedSeg).then(function(grantedQty) {
+          rlShowResult(idx, grantedQty);
+          _rlSpinning = false;
+          rlApplyDailyLock();
+        });
+      }, 4350);
+    });
   });
 }
 
@@ -14711,13 +14737,23 @@ function bindAttScreen() {
   const dim = screen.querySelector('.att-system-dim');
 
   // "계속하기" 버튼 → ATT 시스템 팝업 표시
-  const contBtn = screen.querySelector('.att-pre-btns .btn-primary, .att-pre-btns button');
+  const contBtn = screen.querySelector('.att-pre-allow');
   if (contBtn && !contBtn.dataset.ipBound) {
     contBtn.dataset.ipBound = '1';
     contBtn.style.cursor = 'pointer';
     contBtn.addEventListener('click', function(e) {
       e.stopPropagation();
       if (dim) dim.classList.add('visible');
+    });
+  }
+  // "나중에 결정할게요" 버튼 → ATT 허용/거부 무관하게 진행(스펙) → 바로 닉네임 설정으로
+  const denyBtn = screen.querySelector('.att-pre-deny');
+  if (denyBtn && !denyBtn.dataset.ipBound) {
+    denyBtn.dataset.ipBound = '1';
+    denyBtn.style.cursor = 'pointer';
+    denyBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      showScreen('pw-02-nick');
     });
   }
   // ATT 허용/거부 → 홈(04)
@@ -14768,23 +14804,32 @@ function bindWithdrawConfirmScreen() {
   });
 }
 
-// pw-26 경품 응모 버튼 바인딩 (인라인 스타일 버튼) → pw-20 복귀
+// pw-26 경품 응모 버튼 바인딩 (인라인 스타일 버튼) — 실제 응모(이벤트 티켓 차감+기록)는
+// window.ppEnterRaffle()(Firebase IIFE 쪽, PP/db 접근 가능)에 위임 후 성공 시에만 pw-20 복귀.
 function bindRaffleScreen() {
   var screen = document.getElementById('pw-26');
   if (!screen) return;
-  screen.querySelectorAll('button').forEach(function(btn) {
-    if (btn.dataset.ipBound) return;
-    var txt = (btn.textContent || '').trim();
-    if (txt.includes('응모') || txt.includes('이벤트')) {
-      btn.dataset.ipBound = '1';
-      btn.style.cursor = 'pointer';
-      btn.querySelectorAll('*').forEach(function(c) { c.dataset.ipBound = '1'; });
-      btn.addEventListener('click', function(e) {
-        e.stopPropagation();
-        showScreen('pw-20');
-      }, true);
-    }
-  });
+  var btn = document.getElementById('raffle-enter-btn');
+  if (btn && !btn.dataset.ipBound) {
+    btn.dataset.ipBound = '1';
+    btn.style.cursor = 'pointer';
+    btn.querySelectorAll('*').forEach(function(c) { c.dataset.ipBound = '1'; });
+    btn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      if (btn.disabled) return;
+      if (!window.ppEnterRaffle) { showScreen('pw-20'); return; }
+      btn.disabled = true;
+      window.ppEnterRaffle().then(function(ok) {
+        btn.disabled = false;
+        if (ok) showScreen('pw-20');
+      });
+    }, true);
+  }
+  var rlRow = document.getElementById('raffle-roulette-row');
+  if (rlRow && !rlRow.dataset.ipBound) {
+    rlRow.dataset.ipBound = '1';
+    rlRow.addEventListener('click', function(e) { e.stopPropagation(); showScreen('pw-15'); });
+  }
 }
 
 
@@ -14842,12 +14887,16 @@ function bindNotifItems() {
     var item = e.target.closest('.notif-item');
     if (!item) return;
     e.stopPropagation();
-    item.classList.remove('unread');
+    if (item.classList.contains('unread')) {
+      item.classList.remove('unread');
+      if (window.ppMarkNotifRead) window.ppMarkNotifRead(item.dataset.notifKey);
+    }
   }, true); // 캡처 단계 — catchAll보다 먼저 실행
 }
 
 function markAllRead(btn) {
   var scroll = document.querySelector('#pw-S1 .notif-scroll');
+  if (window.ppMarkAllNotifRead) window.ppMarkAllNotifRead();
   if (scroll) scroll.querySelectorAll('.notif-item.unread').forEach(function(el){ el.classList.remove('unread'); });
   btn.style.opacity = '0.4';
   btn.style.pointerEvents = 'none';
@@ -15004,6 +15053,8 @@ window.addEventListener('DOMContentLoaded', function() {
   bindDetailRuleLink();
   bindHScrolls();
   bindAttendanceScreen();   // 가로스크롤 화살표 (catch-all 보다 먼저)
+  if (window.ppBindPw22) window.ppBindPw22();   // pw-22 실핸들러 선점 (catch-all의 가짜 토글/토스트 우회 방지)
+  if (window.ppBindNotifSettings) window.ppBindNotifSettings();   // pw-31 알림 토글 실핸들러 선점
   bindCatchAll();   // 마지막: 미바인딩 인터랙티브 요소 전부 토스트 처리
   hideV5Remnants();
   showScreen('pw-00', false);
@@ -15030,6 +15081,32 @@ function csCheck() {
     btn.style.background = ok ? 'var(--main)' : 'var(--text4)';
     btn.style.cursor = ok ? 'pointer' : 'not-allowed';
   }
+}
+
+// 문의 접수 — 실제 inquiries 컬렉션에 문서 생성 (window.ppSubmitInquiry: Firebase IIFE 경유)
+function csSubmitInquiry(btn) {
+  if (btn.disabled) return;
+  var typeLbl = (document.getElementById('cs-type-lbl') || {}).textContent || '기타';
+  var CAT_KEY = { '티켓 적립':'postback', '기프티콘 교환':'gifticon', '티켓 교환·환수':'postback', '계정·로그인':'account', '기타':'general' };
+  var category = CAT_KEY[typeLbl] || 'general';
+  var title = (document.getElementById('cs-title') || {}).value || '';
+  var body = (document.getElementById('cs-body') || {}).value || '';
+  if (!window.ppSubmitInquiry) { ipToast('문의 접수에 실패했어요'); return; }
+  btn.disabled = true;
+  btn.style.background = 'var(--text4)';
+  var prevText = btn.textContent;
+  btn.textContent = '접수 중...';
+  window.ppSubmitInquiry(category, title.trim(), body.trim()).then(function(ok) {
+    if (ok) {
+      ipToast('문의가 접수되었습니다. 평일 1–2일 내 답변드릴게요.');
+      showScreen('pw-30-cs');
+    } else {
+      ipToast('문의 접수에 실패했어요');
+      btn.disabled = false;
+      btn.textContent = prevText;
+      btn.style.background = 'var(--main)';
+    }
+  });
 }
 
 
@@ -15425,7 +15502,7 @@ function csCheck() {
   <div id="pp-install-sheet" role="dialog" aria-modal="true" style="background:#fff;border-radius:20px 20px 0 0;max-width:430px;width:100%;box-shadow:0 -10px 40px rgba(0,0,0,.28);font-family:'Pretendard Variable',-apple-system,'Apple SD Gothic Neo',sans-serif;padding:0 0 max(22px,env(safe-area-inset-bottom));">
     <div style="display:flex;justify-content:center;padding:10px 0 2px;"><span style="width:38px;height:4px;border-radius:999px;background:#E0D9ED;"></span></div>
     <div style="padding:8px 22px 0;text-align:center;">
-      <img src="/icons/icon-192.png" alt="PricePick" width="64" height="64" style="border-radius:16px;box-shadow:0 6px 18px rgba(132,94,238,.32);"/>
+      <img src="/apple-touch-icon.png" alt="PricePick" width="64" height="64" style="border-radius:16px;box-shadow:0 6px 18px rgba(132,94,238,.32);"/>
       <div id="pp-install-title" style="font-size:17px;font-weight:800;color:#1A1130;margin:12px 0 5px;"></div>
       <div id="pp-install-sub" style="font-size:12.5px;color:#5A5370;line-height:1.6;"></div>
     </div>
@@ -15806,6 +15883,29 @@ window.ppLoadRouletteConfig = function() {
     return (data && Array.isArray(data.wheel) && data.wheel.length === 6) ? data.wheel : null;
   }).catch(function(e) { console.error('ppLoadRouletteConfig', e); return null; });
 };
+/* ── 행운룰렛 하루 1회 제한 (서버측) ──
+   roulette_spins/{uid}_{날짜} 문서를 스핀 확정 시점에 "생성"해 하루 1회를 강제한다.
+   문서 ID가 유저+날짜로 결정적이라 동시 요청이 같은 경로에 몰려도 Firestore가 직렬화 처리 —
+   먼저 도착한 쓰기만 create로 성공하고, 이미 문서가 있으면 이후 쓰기는 firestore.rules상
+   update로 분류돼(create만 허용) 거부된다. localStorage만 지우고 새로고침하는 우회를 막는다. */
+function ppRouletteDateKey() {
+  var d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+}
+window.ppHasSpunToday = function() {
+  if (!PP.uid) return Promise.resolve(false);
+  return db.collection('roulette_spins').doc(PP.uid + '_' + ppRouletteDateKey()).get()
+    .then(function(doc) { return doc.exists; }).catch(function(e) { console.error('ppHasSpunToday', e); return false; });
+};
+window.ppClaimRouletteSpin = function() {
+  if (!PP.uid) return Promise.resolve(false);
+  return db.collection('roulette_spins').doc(PP.uid + '_' + ppRouletteDateKey()).set({
+    user_id: PP.uid, date: ppRouletteDateKey(), created_at: FS.FieldValue.serverTimestamp(),
+  }).then(function() { return true; }).catch(function(e) {
+    if (e.code !== 'permission-denied') console.error('ppClaimRouletteSpin', e);
+    return false;
+  });
+};
 window.ppEventTicketAllowance = function(dailyCap, monthlyCap) {
   if (!PP.uid) return Promise.resolve({ daily: 0, monthly: 0 });
   return ppQuery('ticket_transactions', 'user_id', PP.uid).then(function(list) {
@@ -15868,7 +15968,10 @@ function onScreenShown(id) {
   if (id === 'pw-21' || id === 'phone19') renderTicketDetail();
   if (id === 'pw-24') renderGifticonHistory();
   if (id === 'pw-30-cs') renderInquiries();
-  if (id === 'pw-22') renderExchangePoint();
+  if (id === 'pw-22') { refreshHomeData(); renderExchangePoint(); renderGradeSwapScreen(); renderPointTicketExchange(); }
+  if (id === 'pw-17') renderStreakMission();
+  if (id === 'pw-31') renderNotifSettings();
+  if (id === 'pw-26') { refreshHomeData(); renderRaffleScreen(); }
   if (id === 'pw-30-nt') renderAppNotices();
 }
 
@@ -16086,10 +16189,14 @@ function refreshHomeData() {
       PP.randomBundleCount = Object.keys(pendingBundles).length;
       renderHomeTickets();
       renderMyTicketCard();
+      if (typeof renderGradeSwapScreen === 'function') renderGradeSwapScreen();
+      if (typeof renderPointTicketExchange === 'function') renderPointTicketExchange();
     }).catch(function(e){ console.error('tickets', e); });
   db.collection('user_points').doc(PP.uid).get().then(function(doc) {
     PP.points = doc.exists ? (doc.data().balance || 0) : 0;
     renderHomePoints();
+    if (typeof renderExchangePoint === 'function') renderExchangePoint();
+    if (typeof renderPointTicketExchange === 'function') renderPointTicketExchange();
   }).catch(function(e){ console.error('points', e); });
 }
 
@@ -16474,6 +16581,67 @@ function bindExchangeBtn() {
   }, true);
 }
 
+/* ── pw-26 경품 응모: 이벤트 티켓 1장 차감 + raffle_entries 기록 ──
+   기프티콘 교환(bindExchangeBtn)과 동일한 패턴 — 실제 user_tickets 문서를 소진 처리해야
+   새로고침 후에도 잔여 수량이 맞는다. 만료 임박(적립일이 오래된) 티켓부터 소진(FIFO). */
+function ppEnterRaffle() {
+  if (!PP.uid) return Promise.resolve(false);
+  if ((PP.tickets.event || 0) < 1) { showToast('이벤트 티켓이 부족해요'); return Promise.resolve(false); }
+  return db.collection('user_tickets')
+    .where('user_id', '==', PP.uid)
+    .where('grade', '==', 'event')
+    .where('status', '==', 'active')
+    .get()
+    .then(function(snap) {
+      var docs = snap.docs.slice().sort(function(a, b) {
+        var ea = a.data().earned_at, eb = b.data().earned_at;
+        var ta = (ea && ea.toMillis) ? ea.toMillis() : 0;
+        var tb = (eb && eb.toMillis) ? eb.toMillis() : 0;
+        return ta - tb;
+      });
+      if (!docs.length) { showToast('이벤트 티켓이 부족해요'); return false; }
+      var now = FS.FieldValue.serverTimestamp();
+      var batch = db.batch();
+      batch.update(docs[0].ref, { status: 'used', used_at: now });
+      batch.set(db.collection('ticket_transactions').doc(), {
+        user_id: PP.uid, ticket_grade: 'event', type: 'use', postback_id: null, created_at: now,
+      });
+      batch.set(db.collection('raffle_entries').doc(), {
+        user_id: PP.uid, tickets_used: 1, created_at: now,
+      });
+      return batch.commit().then(function() {
+        PP.tickets.event -= 1;
+        renderMyTicketCard();
+        renderRaffleScreen();
+        showToast('응모가 완료됐어요');
+        return true;
+      });
+    }).catch(function(e) { console.error('ppEnterRaffle', e); showToast('응모 중 오류가 발생했어요'); return false; });
+}
+window.ppEnterRaffle = ppEnterRaffle;
+
+/* ── pw-26 헤더 티켓수 · 응모 현황 실데이터 렌더 (하드코딩 제거) ── */
+function renderRaffleScreen() {
+  var badge = document.getElementById('raffle-my-tickets');
+  if (badge) badge.textContent = PP.tickets.event || 0;
+  var remain = document.getElementById('raffle-remain-tickets');
+  if (remain) remain.textContent = PP.tickets.event || 0;
+  if (!PP.uid) return;
+  ppQuery('raffle_entries', 'user_id', PP.uid).then(function(list) {
+    var now = new Date();
+    var weekAgo = new Date(now.getTime() - 7 * 86400000);
+    var weekCount = 0;
+    list.forEach(function(x) {
+      var d = ppDate(x.created_at);
+      if (d && d >= weekAgo) weekCount++;
+    });
+    var weekEl = document.getElementById('raffle-week-count');
+    if (weekEl) weekEl.textContent = weekCount;
+    var totalEl = document.getElementById('raffle-total-count');
+    if (totalEl) totalEl.textContent = list.length;
+  });
+}
+
 /* ── Kakao mock complete ──
    실제 Kakao SDK 연동이 없으므로 kakao_login_id·kakao_nickname도 그럴듯한 값으로
    자동 생성해 저장한다 (CMS 회원목록/상세가 이 필드를 카카오ID·닉네임으로 그대로 표기함).
@@ -16719,6 +16887,66 @@ function renderActivity(filter) {
 }
 window.ppRenderActivity = renderActivity;
 
+/* ── pw-31 알림 설정 스위치 3종 (실저장) ── users/{uid}에 notif_purchase·notif_event·notif_marketing 저장 */
+var NOTIF_TOGGLE_DEFAULTS = { notif_purchase: true, notif_event: true, notif_marketing: false };
+function renderNotifSettings() {
+  Object.keys(NOTIF_TOGGLE_DEFAULTS).forEach(function(key) {
+    var el = document.querySelector('.my-toggle[data-notif-key="' + key + '"]');
+    if (!el) return;
+    var val = (PP.user && PP.user[key] !== undefined) ? PP.user[key] : NOTIF_TOGGLE_DEFAULTS[key];
+    el.classList.toggle('on', !!val);
+  });
+}
+function bindNotifSettings() {
+  document.querySelectorAll('.my-toggle[data-notif-key]').forEach(function(el) {
+    if (el.dataset.ipBound) return;
+    el.dataset.ipBound = '1';
+    el.style.cursor = 'pointer';
+    el.addEventListener('click', function(e) {
+      e.stopPropagation();
+      var key = el.dataset.notifKey;
+      var next = !el.classList.contains('on');
+      el.classList.toggle('on', next);
+      if (PP.uid) {
+        var patch = {}; patch[key] = next;
+        db.collection('users').doc(PP.uid).set(patch, { merge: true }).then(function() {
+          PP.user = PP.user || {}; PP.user[key] = next;
+        }).catch(function(e) { console.error('saveNotifSetting', e); });
+      }
+      showToast('설정이 변경되었어요');
+    });
+  });
+}
+window.ppBindNotifSettings = bindNotifSettings;
+
+/* ── 알림 읽음 처리 (pw-S1) ──
+   알림 항목은 postbacks/gifticon_exchanges/invites/point_transactions에서 매번 계산해 만드는
+   가상 목록이라 항목 자체엔 read 필드가 없다. 대신 users/{uid}.read_notif_ids(읽은 항목 key 배열)에
+   반영해 새로고침 후에도 읽음 상태가 유지되게 한다. */
+window.ppMarkNotifRead = function(key) {
+  if (!PP.uid || !key) return Promise.resolve();
+  return db.collection('users').doc(PP.uid).set({
+    read_notif_ids: FS.FieldValue.arrayUnion(key),
+  }, { merge: true }).then(function() {
+    PP.user = PP.user || {};
+    PP.user.read_notif_ids = (PP.user.read_notif_ids || []).concat(key);
+  }).catch(function(e) { console.error('ppMarkNotifRead', e); });
+};
+window.ppMarkAllNotifRead = function() {
+  if (!PP.uid) return Promise.resolve();
+  var keys = Array.prototype.map.call(
+    document.querySelectorAll('#pw-S1 .notif-item.unread[data-notif-key]'),
+    function(el) { return el.dataset.notifKey; }
+  );
+  if (!keys.length) return Promise.resolve();
+  return db.collection('users').doc(PP.uid).set({
+    read_notif_ids: FS.FieldValue.arrayUnion.apply(null, keys),
+  }, { merge: true }).then(function() {
+    PP.user = PP.user || {};
+    PP.user.read_notif_ids = (PP.user.read_notif_ids || []).concat(keys);
+  }).catch(function(e) { console.error('ppMarkAllNotifRead', e); });
+};
+
 /* ── 알림 (pw-S1) — 실제 이벤트 기반 ── */
 function renderNotifications() {
   if (!PP.uid) return;
@@ -16732,19 +16960,21 @@ function renderNotifications() {
   ]).then(function (res) {
     var pbs = res[0], gex = res[1], inv = res[2], ptx = res[3], items = [];
     pbs.forEach(function (p) {
-      items.push({ type: 'pick', d: ppDate(p.created_at), tag: '구매', head: (p.mall_name || '쇼핑몰') + ' 구매로 티켓 적립', desc: (p.purchase_amount ? p.purchase_amount.toLocaleString('ko-KR') + '원 · ' : '') + (p.status === 'confirmed' ? '적립 완료' : '구매 확정 대기') });
+      items.push({ key: 'pb:' + p._id, type: 'pick', d: ppDate(p.created_at), tag: '구매', head: (p.mall_name || '쇼핑몰') + ' 구매로 티켓 적립', desc: (p.purchase_amount ? p.purchase_amount.toLocaleString('ko-KR') + '원 · ' : '') + (p.status === 'confirmed' ? '적립 완료' : '구매 확정 대기') });
     });
     gex.forEach(function (x) {
-      items.push({ type: 'ticket', d: ppDate(x.exchanged_at), tag: '티켓', head: '기프티콘 교환 완료', desc: (GRADE_KO[x.grade_used] || '') + ' 티켓 ' + (x.count_used || 1) + '장 사용' });
+      items.push({ key: 'gx:' + x._id, type: 'ticket', d: ppDate(x.exchanged_at), tag: '티켓', head: '기프티콘 교환 완료', desc: (GRADE_KO[x.grade_used] || '') + ' 티켓 ' + (x.count_used || 1) + '장 사용' });
     });
     inv.forEach(function (x) {
-      items.push({ type: 'event', d: ppDate(x.created_at), tag: '이벤트', head: '친구 초대 완료', desc: '초대 보상 지급' });
+      items.push({ key: 'iv:' + x._id, type: 'event', d: ppDate(x.created_at), tag: '이벤트', head: '친구 초대 완료', desc: '초대 보상 지급' });
     });
     ptx.forEach(function (p) {
       var amt = p.amount != null ? p.amount : (p.qty || 0);
-      if (amt > 0) items.push({ type: 'event', d: ppDate(p.created_at), tag: '이벤트', head: (p.reason || '포인트 적립'), desc: '+' + amt + 'P 적립' });
+      if (amt > 0) items.push({ key: 'pt:' + p._id, type: 'event', d: ppDate(p.created_at), tag: '이벤트', head: (p.reason || '포인트 적립'), desc: '+' + amt + 'P 적립' });
     });
     items = items.filter(function (i) { return i.d; }).sort(function (a, b) { return b.d - a.d; });
+    var readSet = {};
+    (PP.user && PP.user.read_notif_ids || []).forEach(function (k) { readSet[k] = true; });
     /* 필터 뱃지 */
     var cnt = { all: items.length, pick: 0, ticket: 0, event: 0 };
     items.forEach(function (i) { cnt[i.type]++; });
@@ -16765,7 +16995,7 @@ function renderNotifications() {
     items.forEach(function (i) {
       var bk = bucket(i.d);
       if (bk !== cur) { cur = bk; parts.push('<div class="notif-date">' + bk + '</div>'); }
-      parts.push('<div data-type="' + i.type + '" class="notif-item">'
+      parts.push('<div data-type="' + i.type + '" data-notif-key="' + ppEsc(i.key) + '" class="notif-item' + (readSet[i.key] ? '' : ' unread') + '">'
         + '<div class="notif-ico ' + i.type + '"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/></svg></div>'
         + '<div class="notif-body"><div class="notif-line1"><span class="notif-tag ' + i.type + '">' + i.tag + '</span><span class="notif-time">' + ppFmt(i.d) + '</span></div>'
         + '<div class="notif-headline">' + ppEsc(i.head) + '</div><div class="notif-desc">' + ppEsc(i.desc) + '</div></div></div>');
@@ -16902,25 +17132,63 @@ function ppCompleteInvite(inviteId) {
 }
 window.ppCompleteInvite = ppCompleteInvite; // iv-hist-list innerHTML의 inline onclick에서 호출(IIFE 밖 전역 스코프 필요)
 
-/* ── 피초대자 보상 셀프 클레임 ── status가 completed인데 아직 못 받은 몫이 있으면 앱 진입 시 자동 지급 */
+/* ── 피초대자 보상 단건 지급 (Firestore 트랜잭션) ──
+   invites 문서의 invitee_rewarded 플래그 확인 + 지급 기록(point_transactions)·잔액 증가(user_points)를
+   하나의 트랜잭션으로 묶어 원자적으로 처리한다. 같은 invite에 대해 동시에 여러 트랜잭션이 붙어도
+   Firestore가 직렬화하므로, 먼저 커밋된 쪽만 invitee_rewarded=true로 바뀌고 나머지는 재시도 시
+   이미 true인 걸 읽어 지급을 건너뛴다 — 홈↔마이 빠른 전환으로 동시에 여러 번 트리거돼도 중복 지급 불가. */
+function ppClaimInviteeRewardOne(inviteId) {
+  var uid = PP.uid;
+  var inviteRef = db.collection('invites').doc(inviteId);
+  var pointsRef = db.collection('point_transactions').doc();
+  var balanceRef = db.collection('user_points').doc(uid);
+  return db.runTransaction(function (tx) {
+    return tx.get(inviteRef).then(function (doc) {
+      if (!doc.exists) return false;
+      var inv = doc.data();
+      if (inv.invitee_id !== uid) return false;
+      if (inv.invitee_rewarded) return false; // 멱등: 이미 지급된 건 재지급 금지
+      if (inv.status !== 'completed' && inv.status !== 'rewarded') return false;
+      var now = FS.FieldValue.serverTimestamp();
+      tx.update(inviteRef, { invitee_rewarded: true });
+      tx.set(pointsRef, {
+        user_id: uid, amount: 500, type: 'earn', reason: '친구초대 보상 (피초대자)', manual: false, created_at: now,
+      });
+      tx.set(balanceRef, { user_id: uid, balance: FS.FieldValue.increment(500), updated_at: now }, { merge: true });
+      return true;
+    });
+  }).then(function (granted) {
+    if (granted) { PP.points = (PP.points || 0) + 500; renderHomePoints(); }
+    return granted;
+  }).catch(function (e) { console.error('ppClaimInviteeRewardOne', e); return false; });
+}
+
+/* ── 피초대자 보상 셀프 클레임 ── status가 completed인데 아직 못 받은 몫이 있으면 앱 진입 시 자동 지급.
+   in-flight 락으로 같은 세션 내 중복 호출(홈·마이 화면 전환마다 호출됨)이 겹쳐도 한 번만 돈다. */
 function ppClaimInviteeRewards() {
   if (!PP.uid) return Promise.resolve();
-  return ppQuery('invites', 'invitee_id', PP.uid).then(function (list) {
+  if (ppClaimInviteeRewards._inFlight) return ppClaimInviteeRewards._inFlight;
+  var run = ppQuery('invites', 'invitee_id', PP.uid).then(function (list) {
     // status는 'completed'로 유지(CMS 친구초대 관리 대시보드의 "성공 초대" 집계가 status==='completed'
     // 기준이라, 여기서 'rewarded'로 바꿔버리면 피초대자가 보상을 받는 순간 CMS 통계에서 빠져버린다).
     // 피초대자의 수령 여부는 invitee_rewarded 플래그로만 추적.
     var pending = list.filter(function (x) { return (x.status === 'completed' || x.status === 'rewarded') && !x.invitee_rewarded; });
     if (!pending.length) return;
     var chain = Promise.resolve();
+    var grantedCount = 0;
     pending.forEach(function (x) {
       chain = chain.then(function () {
-        return ppGrantPoints(500, '친구초대 보상 (피초대자)').then(function () {
-          return db.collection('invites').doc(x._id).update({ invitee_rewarded: true });
-        });
+        return ppClaimInviteeRewardOne(x._id).then(function (granted) { if (granted) grantedCount++; });
       });
     });
-    return chain.then(function () { showToast('친구초대 보상 500P가 지급됐어요!'); });
-  }).catch(function (e) { console.error('ppClaimInviteeRewards', e); });
+    return chain.then(function () {
+      if (grantedCount) showToast('친구초대 보상 500P가 지급됐어요!');
+    });
+  }).catch(function (e) { console.error('ppClaimInviteeRewards', e); }).then(function () {
+    ppClaimInviteeRewards._inFlight = null;
+  });
+  ppClaimInviteeRewards._inFlight = run;
+  return run;
 }
 
 function renderInviteCode() {
@@ -17080,6 +17348,42 @@ function renderPurchaseHistory() {
   });
 }
 
+/* ── pw-17 연속구매 미션 진행률 (실데이터) ──
+   "연속구매" = 확정(status:'confirmed') 구매 postback을 최신순 정렬해, 가장 최근 건부터 거슬러
+   올라가며 연속된 두 구매 사이 간격이 7일 이내인 동안 streak을 센다(7일 넘게 비면 거기서 끊김).
+   1차 목표(3회/7일) 진행바만 실데이터로 노출 — 5·10회 단계는 정적 안내(보상 자동지급은 데모 범위 밖). */
+function computePurchaseStreak(postbacks) {
+  var confirmed = postbacks
+    .filter(function(p) { return p.status === 'confirmed'; })
+    .map(function(p) { return ppDate(p.confirmed_at) || ppDate(p.created_at); })
+    .filter(Boolean)
+    .sort(function(a, b) { return b - a; }); // 최신순
+  if (!confirmed.length) return 0;
+  var streak = 1;
+  for (var i = 0; i < confirmed.length - 1; i++) {
+    var gapDays = (confirmed[i] - confirmed[i + 1]) / 86400000;
+    if (gapDays <= 7) streak++; else break;
+  }
+  return streak;
+}
+function renderStreakMission() {
+  if (!PP.uid) return;
+  ppQuery('postbacks', 'user_id', PP.uid).then(function(list) {
+    var streak = computePurchaseStreak(list);
+    var target = 3;
+    var shown = Math.min(streak, target);
+    var pct = Math.round((shown / target) * 100);
+    var numEl = document.getElementById('sm-streak-num'); if (numEl) numEl.textContent = shown + ' / ' + target;
+    var countEl = document.getElementById('sm-progress-count'); if (countEl) countEl.textContent = '현재 ' + shown + ' / ' + target + '회';
+    var fillEl = document.getElementById('sm-progress-fill'); if (fillEl) fillEl.style.width = pct + '%';
+    var remain = Math.max(0, target - streak);
+    var subEl = document.getElementById('sm-progress-sub');
+    if (subEl) subEl.textContent = remain > 0 ? (remain + '회만 더 경유구매하면 이벤트티켓 1장!') : '3회 연속 달성! 이벤트티켓 1장이 지급돼요';
+    var badgeEl = document.getElementById('sm-streak-badge');
+    if (badgeEl) badgeEl.textContent = streak > 0 ? '경유구매를 이어가면 이벤트티켓을 드려요' : '첫 경유구매로 연속구매 미션을 시작해보세요';
+  }).catch(function(e) { console.error('renderStreakMission', e); });
+}
+
 /* ── 내 적립 티켓 (pw-21 / phone19) ── */
 function renderTicketDetail() {
   if (!PP.uid) return;
@@ -17193,6 +17497,17 @@ function renderGifticonHistory() {
   });
 }
 
+/* ── 문의 접수 (pw-30-cs-write) ── inquiries 컬렉션에 실제 문서 생성 */
+window.ppSubmitInquiry = function(category, title, content) {
+  if (!PP.uid) return Promise.resolve(false);
+  if (!title || !content) return Promise.resolve(false);
+  return db.collection('inquiries').add({
+    user_id: PP.uid, category: category || 'general', title: title, content: content,
+    status: 'pending', answer: null, answered_at: null, created_at: FS.FieldValue.serverTimestamp(),
+  }).then(function() { renderInquiries(); return true; })
+    .catch(function(e) { console.error('ppSubmitInquiry', e); return false; });
+};
+
 /* ── 내 문의 내역 (pw-30-cs) ── */
 function renderInquiries() {
   if (!PP.uid) return;
@@ -17268,6 +17583,249 @@ function renderExchangePoint() {
   if (el) el.textContent = (PP.points || 0).toLocaleString('ko-KR') + 'P';
 }
 
+/* ── pw-22 등급 티켓 교환 (실로직) ──
+   정책: 상향만 허용, 하향 불가(실버→브론즈·골드→실버 버튼은 클릭해도 토스트만 뜨고 선택 안 됨).
+   합칠 때 만료 임박분(적립일이 오래된 티켓)부터 소진(FIFO) — 기프티콘 교환(bindExchangeBtn)과 동일 패턴.
+   실제 user_tickets 문서를 소진(status:'used') + 신규 생성해야 새로고침 후에도 잔여 수량이 맞는다. */
+var GRADE_NAME = { bronze: '브론즈', silver: '실버', gold: '골드' };
+var _swapState = { from: 'bronze', to: 'silver', ratioFrom: 10, ratioTo: 1 };
+
+function renderGradeSwapScreen() {
+  var screen = document.getElementById('pw-22');
+  if (!screen) return;
+  ['bronze', 'silver', 'gold'].forEach(function(g) {
+    var el = document.getElementById('swap-hold-' + g);
+    if (el) el.innerHTML = (PP.tickets[g] || 0) + '<span class="unit">장</span>';
+  });
+
+  var input = document.getElementById('swap-input');
+  var qty = input ? (parseInt(input.value, 10) || 0) : 0;
+  var from = _swapState.from, to = _swapState.to, rf = _swapState.ratioFrom, rt = _swapState.ratioTo;
+  var units = Math.floor(qty / rf);
+  var consume = units * rf;
+  var receive = units * rt;
+
+  var fromGradeEl = document.getElementById('swap-from-grade'); if (fromGradeEl) fromGradeEl.textContent = GRADE_NAME[from];
+  var toGradeEl = document.getElementById('swap-to-grade'); if (toGradeEl) toGradeEl.textContent = GRADE_NAME[to];
+  var fromHaveEl = document.getElementById('swap-from-have'); if (fromHaveEl) fromHaveEl.textContent = PP.tickets[from] || 0;
+  var toHaveEl = document.getElementById('swap-to-have'); if (toHaveEl) toHaveEl.textContent = PP.tickets[to] || 0;
+  var toAfterEl = document.getElementById('swap-to-after'); if (toAfterEl) toAfterEl.textContent = (PP.tickets[to] || 0) + receive;
+  var outputEl = document.getElementById('swap-output'); if (outputEl) outputEl.textContent = receive;
+
+  var have = PP.tickets[from] || 0;
+  var warnEl = document.getElementById('swap-warn'); if (warnEl) warnEl.style.display = (consume > have) ? '' : 'none';
+
+  ['bronze', 'silver', 'gold'].forEach(function(grade) {
+    var simEl = document.getElementById('sim-' + grade);
+    if (!simEl) return;
+    var val = PP.tickets[grade] || 0;
+    if (grade === from) val -= consume;
+    if (grade === to) val += receive;
+    simEl.textContent = Math.max(0, val) + '장';
+  });
+
+  var cta = document.getElementById('swap-cta-btn');
+  if (cta) cta.disabled = (units < 1 || consume > have);
+}
+
+function bindGradeSwapScreen() {
+  var screen = document.getElementById('pw-22');
+  if (!screen || screen.dataset.ppSwapBound) return;
+  screen.dataset.ppSwapBound = '1';
+
+  screen.querySelectorAll('.swap-dir-btn').forEach(function(btn) {
+    btn.dataset.ipBound = '1'; // catch-all(bindCatchAll)의 가짜 토글 선점 방지
+    btn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      if (btn.dataset.downgrade === '1') { showToast('등급 하향 교환은 지원하지 않아요'); return; }
+      screen.querySelectorAll('.swap-dir-btn').forEach(function(b) { b.classList.remove('active'); });
+      btn.classList.add('active');
+      _swapState = {
+        from: btn.dataset.from, to: btn.dataset.to,
+        ratioFrom: parseInt(btn.dataset.ratioFrom, 10) || 1, ratioTo: parseInt(btn.dataset.ratioTo, 10) || 1,
+      };
+      renderGradeSwapScreen();
+    });
+  });
+
+  var input = document.getElementById('swap-input');
+  if (input) input.addEventListener('input', function() { renderGradeSwapScreen(); });
+
+  screen.querySelectorAll('.swap-quick-btn').forEach(function(btn) {
+    btn.dataset.ipBound = '1';
+    btn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      if (!input) return;
+      if (btn.dataset.add) input.value = (parseInt(input.value, 10) || 0) + parseInt(btn.dataset.add, 10);
+      else if (btn.dataset.set === 'max') input.value = PP.tickets[_swapState.from] || 0;
+      else if (btn.dataset.set === '0') input.value = 0;
+      renderGradeSwapScreen();
+    });
+  });
+
+  var cta = document.getElementById('swap-cta-btn');
+  if (cta) { cta.dataset.ipBound = '1'; cta.addEventListener('click', function(e) {
+    e.stopPropagation();
+    if (cta.disabled || !PP.uid) return;
+    var qtyInput = document.getElementById('swap-input');
+    var qty = qtyInput ? (parseInt(qtyInput.value, 10) || 0) : 0;
+    var from = _swapState.from, to = _swapState.to, rf = _swapState.ratioFrom, rt = _swapState.ratioTo;
+    var units = Math.floor(qty / rf);
+    var consume = units * rf, receive = units * rt;
+    if (units < 1 || consume > (PP.tickets[from] || 0)) { showToast('교환 수량을 확인해주세요'); return; }
+    cta.disabled = true;
+    db.collection('user_tickets').where('user_id', '==', PP.uid).where('grade', '==', from).where('status', '==', 'active').get()
+      .then(function(snap) {
+        var docs = snap.docs.slice().sort(function(a, b) {
+          var ea = a.data().earned_at, eb = b.data().earned_at;
+          var ta = (ea && ea.toMillis) ? ea.toMillis() : 0;
+          var tb = (eb && eb.toMillis) ? eb.toMillis() : 0;
+          return ta - tb;
+        });
+        if (docs.length < consume) { showToast('티켓이 부족합니다'); return null; }
+        var now = FS.FieldValue.serverTimestamp();
+        var batch = db.batch();
+        docs.slice(0, consume).forEach(function(doc) {
+          batch.update(doc.ref, { status: 'used', used_at: now });
+          batch.set(db.collection('ticket_transactions').doc(), {
+            user_id: PP.uid, ticket_grade: from, type: 'use', postback_id: null, created_at: now,
+          });
+        });
+        for (var i = 0; i < receive; i++) {
+          batch.set(db.collection('user_tickets').doc(), {
+            user_id: PP.uid, grade: to, status: 'active', postback_id: null,
+            earned_at: now, confirmed_at: now, expires_at: null,
+          });
+          batch.set(db.collection('ticket_transactions').doc(), {
+            user_id: PP.uid, ticket_grade: to, type: 'earn', postback_id: null, created_at: now,
+          });
+        }
+        return batch.commit().then(function() { return true; });
+      })
+      .then(function(ok) {
+        cta.disabled = false;
+        if (!ok) return;
+        PP.tickets[from] -= consume;
+        PP.tickets[to] += receive;
+        PP.tickets.total = PP.tickets.bronze + PP.tickets.silver + PP.tickets.gold;
+        renderHomeTickets();
+        renderMyTicketCard();
+        renderGradeSwapScreen();
+        showToast(GRADE_NAME[from] + ' ' + consume + '장 → ' + GRADE_NAME[to] + ' ' + receive + '장 교환 완료');
+        showScreen('pw-21');
+      }).catch(function(e) { console.error('gradeSwap', e); showToast('교환 중 오류가 발생했어요'); cta.disabled = false; });
+  }); }
+}
+
+/* ── pw-22 포인트 ↔ 티켓 교환 (실로직) ── 정책: 쌍방 허용, 10P=1원, 브1,000P·실10,000P·골20,000P */
+var PT_TICKET_RATE = { bronze: 1000, silver: 10000, gold: 20000 };
+
+function renderPointTicketExchange() {
+  var pairs = [
+    { row: 'pt-row-buy-bronze', btn: 'pt-btn-buy-bronze', ok: (PP.points || 0) >= PT_TICKET_RATE.bronze },
+    { row: 'pt-row-buy-silver', btn: 'pt-btn-buy-silver', ok: (PP.points || 0) >= PT_TICKET_RATE.silver },
+    { row: 'pt-row-buy-gold', btn: 'pt-btn-buy-gold', ok: (PP.points || 0) >= PT_TICKET_RATE.gold },
+    { row: 'pt-row-sell-bronze', btn: 'pt-btn-sell-bronze', ok: (PP.tickets.bronze || 0) >= 1 },
+    { row: 'pt-row-sell-silver', btn: 'pt-btn-sell-silver', ok: (PP.tickets.silver || 0) >= 1 },
+    { row: 'pt-row-sell-gold', btn: 'pt-btn-sell-gold', ok: (PP.tickets.gold || 0) >= 1 },
+  ];
+  pairs.forEach(function(p) {
+    var rowEl = document.getElementById(p.row);
+    var btnEl = document.getElementById(p.btn);
+    if (rowEl) rowEl.classList.toggle('disabled', !p.ok);
+    if (btnEl) btnEl.disabled = !p.ok;
+  });
+}
+
+function ppBuyTicketWithPoints(grade) {
+  if (!PP.uid) return Promise.resolve();
+  var cost = PT_TICKET_RATE[grade];
+  if ((PP.points || 0) < cost) { showToast('포인트가 부족해요'); return Promise.resolve(); }
+  var now = FS.FieldValue.serverTimestamp();
+  var batch = db.batch();
+  batch.set(db.collection('point_transactions').doc(), {
+    user_id: PP.uid, amount: -cost, type: 'use', reason: '포인트→티켓 교환(' + GRADE_NAME[grade] + ')', manual: false, created_at: now,
+  });
+  batch.set(db.collection('user_points').doc(PP.uid), {
+    user_id: PP.uid, balance: FS.FieldValue.increment(-cost), updated_at: now,
+  }, { merge: true });
+  batch.set(db.collection('user_tickets').doc(), {
+    user_id: PP.uid, grade: grade, status: 'active', postback_id: null,
+    earned_at: now, confirmed_at: now, expires_at: null,
+  });
+  batch.set(db.collection('ticket_transactions').doc(), {
+    user_id: PP.uid, ticket_grade: grade, type: 'earn', postback_id: null, created_at: now,
+  });
+  return batch.commit().then(function() {
+    PP.points -= cost;
+    PP.tickets[grade] = (PP.tickets[grade] || 0) + 1;
+    PP.tickets.total = PP.tickets.bronze + PP.tickets.silver + PP.tickets.gold;
+    renderHomePoints(); renderHomeTickets(); renderMyTicketCard(); renderExchangePoint(); renderGradeSwapScreen();
+    showToast(cost.toLocaleString('ko-KR') + 'P → ' + GRADE_NAME[grade] + ' 1장 교환 완료');
+  }).catch(function(e) { console.error('ppBuyTicketWithPoints', e); showToast('교환 중 오류가 발생했어요'); });
+}
+
+function ppSellTicketForPoints(grade) {
+  if (!PP.uid) return Promise.resolve();
+  if ((PP.tickets[grade] || 0) < 1) { showToast('보유한 티켓이 없어요'); return Promise.resolve(); }
+  var reward = PT_TICKET_RATE[grade];
+  return db.collection('user_tickets').where('user_id', '==', PP.uid).where('grade', '==', grade).where('status', '==', 'active').get()
+    .then(function(snap) {
+      if (snap.empty) { showToast('보유한 티켓이 없어요'); return null; }
+      var docs = snap.docs.slice().sort(function(a, b) {
+        var ea = a.data().earned_at, eb = b.data().earned_at;
+        var ta = (ea && ea.toMillis) ? ea.toMillis() : 0;
+        var tb = (eb && eb.toMillis) ? eb.toMillis() : 0;
+        return ta - tb;
+      });
+      var doc = docs[0];
+      var now = FS.FieldValue.serverTimestamp();
+      var batch = db.batch();
+      batch.update(doc.ref, { status: 'used', used_at: now });
+      batch.set(db.collection('ticket_transactions').doc(), {
+        user_id: PP.uid, ticket_grade: grade, type: 'use', postback_id: null, created_at: now,
+      });
+      batch.set(db.collection('point_transactions').doc(), {
+        user_id: PP.uid, amount: reward, type: 'earn', reason: '티켓→포인트 교환(' + GRADE_NAME[grade] + ')', manual: false, created_at: now,
+      });
+      batch.set(db.collection('user_points').doc(PP.uid), {
+        user_id: PP.uid, balance: FS.FieldValue.increment(reward), updated_at: now,
+      }, { merge: true });
+      return batch.commit().then(function() { return true; });
+    })
+    .then(function(ok) {
+      if (!ok) return;
+      PP.tickets[grade] -= 1;
+      PP.tickets.total = PP.tickets.bronze + PP.tickets.silver + PP.tickets.gold;
+      PP.points += reward;
+      renderHomePoints(); renderHomeTickets(); renderMyTicketCard(); renderExchangePoint(); renderGradeSwapScreen();
+      showToast(GRADE_NAME[grade] + ' 1장 → ' + reward.toLocaleString('ko-KR') + 'P 교환 완료');
+    }).catch(function(e) { console.error('ppSellTicketForPoints', e); showToast('교환 중 오류가 발생했어요'); });
+}
+
+function bindPointTicketExchange() {
+  var screen = document.getElementById('pw-22');
+  if (!screen || screen.dataset.ppPtBound) return;
+  screen.dataset.ppPtBound = '1';
+  [['pt-btn-buy-bronze', 'bronze', ppBuyTicketWithPoints], ['pt-btn-buy-silver', 'silver', ppBuyTicketWithPoints], ['pt-btn-buy-gold', 'gold', ppBuyTicketWithPoints],
+   ['pt-btn-sell-bronze', 'bronze', ppSellTicketForPoints], ['pt-btn-sell-silver', 'silver', ppSellTicketForPoints], ['pt-btn-sell-gold', 'gold', ppSellTicketForPoints]]
+    .forEach(function(t) {
+      var btn = document.getElementById(t[0]);
+      if (!btn) return;
+      btn.dataset.ipBound = '1';
+      btn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        if (btn.disabled) return;
+        btn.disabled = true;
+        t[2](t[1]).then(function() { renderPointTicketExchange(); });
+      });
+    });
+}
+
+/* pw-22 실핸들러를 outer script의 bindCatchAll()보다 먼저 선점시키기 위한 브릿지
+   (bindWithdrawConfirmScreen 등과 동일 이유 — window 경유로 outer script에서 먼저 호출) */
+window.ppBindPw22 = function() { bindGradeSwapScreen(); bindPointTicketExchange(); };
+
 /* ── Init ── */
 document.addEventListener('DOMContentLoaded', function() {
   hookShowScreen();
@@ -17276,6 +17834,9 @@ document.addEventListener('DOMContentLoaded', function() {
   bindNickname();
   bindNickSave();
   bindExchangeBtn();
+  bindGradeSwapScreen();
+  bindPointTicketExchange();
+  bindNotifSettings();
   bindKakaoComplete();
   bindPersonaEntryPoints();
 });
