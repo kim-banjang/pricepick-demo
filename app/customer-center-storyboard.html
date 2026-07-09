@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PricePick — 고객센터 · 1:1 문의 스토리보드</title>
+<style>
+  :root{
+    --bg:#f5f6fa; --card:#ffffff; --ink:#1f2433; --sub:#5b6478;
+    --line:#e6e8f0; --accent:#3b5bdb; --accent-soft:#eef1fd;
+    --green:#1f9d57; --green-bg:#e7f6ee; --amber:#b9770a; --amber-bg:#fdf3e3;
+    --red:#c0392b; --red-bg:#fbeceb; --gray:#5b6478; --gray-bg:#eef0f4;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+    line-height:1.6;-webkit-font-smoothing:antialiased;}
+  .wrap{max-width:1080px;margin:0 auto;padding:40px 24px 100px;}
+  header.doc{border-bottom:2px solid var(--accent);padding-bottom:20px;margin-bottom:8px;}
+  header.doc h1{margin:0 0 8px;font-size:26px;letter-spacing:-.01em;}
+  .lead{color:var(--sub);font-size:15px;margin:0 0 4px;}
+  .meta{color:var(--sub);font-size:13px;margin:2px 0 0;}
+  .note-top{background:var(--accent-soft);border:1px solid #d7ddf8;border-radius:10px;
+    padding:14px 18px;margin:20px 0 36px;font-size:13.5px;color:#33406b;display:flex;gap:10px;align-items:flex-start;}
+  .note-top svg{flex:0 0 auto;margin-top:1px;}
+
+  .policy-bar{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:44px;}
+  .policy-card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;
+    box-shadow:0 1px 2px rgba(20,30,60,.04);}
+  .policy-card .num{font-size:19px;font-weight:700;color:var(--accent);}
+  .policy-card .lbl{font-size:12px;color:var(--sub);margin-top:2px;}
+  @media(max-width:760px){.policy-bar{grid-template-columns:repeat(2,1fr);}}
+
+  .flow{position:relative;padding-left:40px;}
+  .flow::before{content:"";position:absolute;left:15px;top:8px;bottom:8px;width:2px;background:var(--line);}
+
+  .step{position:relative;margin-bottom:14px;}
+  .step-badge{position:absolute;left:-40px;top:2px;width:32px;height:32px;border-radius:50%;
+    background:var(--accent);color:#fff;font-size:14px;font-weight:700;
+    display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(59,91,219,.35);z-index:2;}
+  .step-card{background:var(--card);border:1px solid var(--line);border-radius:14px;
+    padding:22px 24px;box-shadow:0 1px 3px rgba(20,30,60,.05);}
+  .step-card h2{margin:0 0 4px;font-size:17px;}
+  .step-card .role{display:inline-block;font-size:11px;font-weight:700;padding:2px 9px;border-radius:999px;
+    margin-bottom:8px;letter-spacing:.02em;}
+  .role-user{background:#eef1fd;color:var(--accent);}
+  .role-admin{background:var(--green-bg);color:var(--green);}
+  .role-system{background:var(--gray-bg);color:var(--gray);}
+  .step-card p.desc{margin:8px 0 16px;color:var(--sub);font-size:13.5px;}
+  .shots{display:flex;gap:20px;flex-wrap:wrap;align-items:flex-start;}
+  .shot{flex:0 0 auto;}
+  .shot img{display:block;width:200px;height:auto;border-radius:14px;border:1px solid var(--line);
+    box-shadow:0 4px 14px rgba(20,30,60,.10);}
+  .shot .cap{margin-top:8px;font-size:12px;color:var(--sub);text-align:center;max-width:200px;}
+  .shot.wide img{width:280px;}
+  .shot.wide .cap{max-width:280px;}
+  .shot.cms img{width:520px;}
+  .shot.cms .cap{max-width:520px;}
+
+  .arrow-down{display:flex;justify-content:center;margin:2px 0 18px 0;color:#b7bdd1;}
+
+  .badge-note{display:inline-flex;align-items:flex-start;gap:6px;font-size:12px;color:var(--sub);
+    background:var(--gray-bg);border-radius:8px;padding:6px 10px;margin-top:14px;line-height:1.5;}
+  .badge-warn{display:inline-flex;align-items:flex-start;gap:6px;font-size:12px;color:#8a5a06;
+    background:var(--amber-bg);border-radius:8px;padding:6px 10px;margin-top:14px;line-height:1.5;}
+
+  .rules{margin-top:44px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:24px 28px;}
+  .rules h3{margin:0 0 14px;font-size:16px;}
+  .rules table{width:100%;border-collapse:collapse;font-size:13px;}
+  .rules th{background:var(--gray-bg);text-align:left;padding:8px 12px;font-size:12px;color:var(--sub);
+    border-bottom:1px solid var(--line);white-space:nowrap;}
+  .rules td{padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top;}
+  .rules tr:last-child td{border-bottom:none;}
+  .rules td:first-child{white-space:nowrap;font-weight:700;color:var(--ink);}
+  .src{font-size:11px;color:#9aa1b5;}
+
+  .issues{margin-top:24px;background:#fffaf2;border:2px solid #f3d9ad;border-radius:14px;padding:24px 28px;}
+  .issues h3{margin:0 0 6px;font-size:16px;color:#8a5a06;}
+  .issues .sub{margin:0 0 14px;font-size:13px;color:var(--sub);}
+  .issues ol{margin:0;padding-left:20px;}
+  .issues li{margin:10px 0;font-size:13.5px;}
+  .issues li b{color:#8a5a06;}
+
+  footer.notes{margin-top:24px;background:var(--card);border:1px solid var(--line);border-radius:12px;
+    padding:20px 24px;font-size:13px;color:var(--sub);}
+  footer.notes h4{margin:0 0 10px;color:var(--ink);font-size:14px;}
+  footer.notes ul{margin:0;padding-left:18px;}
+  footer.notes li{margin:5px 0;}
+  code{background:var(--gray-bg);border-radius:5px;padding:1px 6px;font-size:12px;
+    font-family:ui-monospace,Menlo,monospace;color:#3a3f52;}
+  .last-update{position:fixed;bottom:24px;left:24px;background:rgba(255,255,255,.92);
+    border:1px solid var(--line);border-radius:10px;padding:8px 14px;font-size:11.5px;color:#9aa1b5;
+    box-shadow:0 2px 10px rgba(0,0,0,.05);z-index:50;}
+  .last-update b{color:var(--sub);font-weight:700;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="doc">
+    <h1>고객센터 · 1:1 문의 스토리보드</h1>
+    <p class="lead">문의 접수부터 운영자 답변·CMS 집계까지 — 실제 배포본 화면 캡처 기반</p>
+    <p class="meta">app/index.html · cms/index.html 배포본(pricepick-demo.vercel.app)에서 직접 캡처 (2026.07.09) · 목업/와이어프레임 없음</p>
+  </header>
+
+  <div class="note-top">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3b5bdb" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v5"/><circle cx="12" cy="16" r=".5" fill="#3b5bdb"/></svg>
+    <div>이 문서의 모든 화면은 배포본 공개 URL(<code>/app</code> 게스트 · <code>/cms</code> firstadmin)에 헤드리스 브라우저로 직접 접속해 실행·캡처한 스크린샷입니다. 단, 현재 배포본은 앱 접수 버튼이 서버 저장을 하지 않는 미구현 상태라(하단 미결 1번), "처리 중 → 답변 완료" 상태 화면 검증에 필요한 문의 데이터 2건은 콘솔에서 실제 Firestore에 생성하고 관리자 권한으로 답변을 저장한 뒤, 앱·CMS의 실제 렌더링 로직이 그려낸 화면을 캡처했습니다. 그림으로 그려낸 화면은 없습니다.</div>
+  </div>
+
+  <div class="policy-bar">
+    <div class="policy-card"><div class="num">평일 10–18시</div><div class="lbl">운영 시간 (주말·공휴일 휴무)</div></div>
+    <div class="policy-card"><div class="num">1–2 영업일</div><div class="lbl">1:1 문의 답변 기준</div></div>
+    <div class="policy-card"><div class="num">탈퇴 전까지</div><div class="lbl">문의 내역 영구 보존</div></div>
+    <div class="policy-card"><div class="num">미처리→처리 중→완료</div><div class="lbl">처리 상태 (완료 후 재오픈 가능)</div></div>
+  </div>
+
+  <div class="flow">
+
+    <div class="step">
+      <div class="step-badge">1</div>
+      <div class="step-card">
+        <span class="role role-user">유저</span>
+        <h2>진입 — 마이 &gt; 도움말 &gt; 고객센터 · 1:1 문의</h2>
+        <p class="desc">고객센터는 마이 탭의 "도움말" 그룹에서 진입한다. 같은 그룹에 공지사항, 이용약관·개인정보처리방침이 함께 배치되어 있다. 이 밖에 계정 차단 안내(error-blocked)·닉네임 충돌 등 오류 화면의 "고객센터 문의" CTA로도 연결된다.</p>
+        <div class="shots">
+          <div class="shot wide">
+            <img src="customer-center-storyboard-assets/01-my-cs-row.png" alt="마이 탭 도움말 그룹 — 고객센터 1:1 문의 행">
+            <div class="cap">마이 탭 · 도움말 그룹 (고객센터·공지사항·약관)</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="arrow-down">
+      <svg width="20" height="28" viewBox="0 0 20 28" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 2v22M3 17l7 7 7-7"/></svg>
+    </div>
+
+    <div class="step">
+      <div class="step-badge">2</div>
+      <div class="step-card">
+        <span class="role role-user">유저</span>
+        <h2>고객센터 홈 — 상담 채널 2개 + 내 문의 내역</h2>
+        <p class="desc">상단 배너에 운영 정보 3종(운영 시간 평일 10–18시 / 평균 답변 1–2 영업일 / 주말·공휴일 휴무)을 고정 노출한다. 상담 채널은 <b>카카오채널 상담</b>(실시간 채팅)과 <b>1:1 문의</b>(비동기 접수) 두 가지. 하단에 내 문의 내역이 붙고, "문의 내역은 탈퇴 전까지 영구 보존됩니다" 문구를 노출한다.</p>
+        <div class="shots">
+          <div class="shot wide">
+            <img src="customer-center-storyboard-assets/02-cs-home-empty.png" alt="고객센터 홈 — 빈 문의 내역 상태">
+            <div class="cap">고객센터 홈 · 첫 진입(문의 없음) 빈 상태</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="arrow-down">
+      <svg width="20" height="28" viewBox="0 0 20 28" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 2v22M3 17l7 7 7-7"/></svg>
+    </div>
+
+    <div class="step">
+      <div class="step-badge">3</div>
+      <div class="step-card">
+        <span class="role role-user">유저</span>
+        <h2>채널 A — 카카오채널 상담 (실시간)</h2>
+        <p class="desc">"카카오채널 상담"을 누르면 브릿지 화면을 거쳐 외부 카카오톡 채널로 연결된다. <b>앱은 채널 URL 딥링크를 여는 역할만 하고, 실제 상담 응대는 카카오채널에서 이뤄진다</b> — 앱이 별도로 처리할 로직 없음 (DevQA #8 ① 확정 답변, 2026-07-06).</p>
+        <div class="shots">
+          <div class="shot wide">
+            <img src="customer-center-storyboard-assets/07-cs-kakao-bridge.png" alt="카카오채널 연결 브릿지 화면">
+            <div class="cap">카카오채널 연결 브릿지 (데모: 시뮬레이션, 실채널 URL 미연동)</div>
+          </div>
+        </div>
+        <div class="badge-note">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#5b6478" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-5M12 8h.01"/></svg>
+          전제: PricePick 공식 카카오채널을 운영. 실서비스에서는 채널 URL만 연동하면 된다. 데모는 브릿지 연출 후 "돌아가기"만 제공.
+        </div>
+      </div>
+    </div>
+
+    <div class="arrow-down">
+      <svg width="20" height="28" viewBox="0 0 20 28" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 2v22M3 17l7 7 7-7"/></svg>
+    </div>
+
+    <div class="step">
+      <div class="step-badge">4</div>
+      <div class="step-card">
+        <span class="role role-user">유저</span>
+        <h2>채널 B — 1:1 문의 작성</h2>
+        <p class="desc">문의 유형(5종 중 택1) + 제목(최대 50자) + 내용(최대 500자)을 입력한다. 세 항목이 모두 채워져야 "접수하기"가 활성화된다. 폼 하단에 답변 운영 시간 안내를 고정 노출.</p>
+        <div class="shots">
+          <div class="shot">
+            <img src="customer-center-storyboard-assets/03-cs-write-empty.png" alt="문의 작성 초기 화면 — 접수 버튼 비활성">
+            <div class="cap">초기 상태 · 접수하기 비활성</div>
+          </div>
+          <div class="shot">
+            <img src="customer-center-storyboard-assets/04-cs-write-typedd.png" alt="문의 유형 드롭다운 — 5종">
+            <div class="cap">유형 5종: 티켓 적립 / 기프티콘 교환 / 티켓 교환·환수 / 계정·로그인 / 기타</div>
+          </div>
+          <div class="shot">
+            <img src="customer-center-storyboard-assets/05-cs-write-filled.png" alt="작성 완료 상태 — 접수 버튼 활성">
+            <div class="cap">작성 완료 · 접수하기 활성 (글자수 카운터 72/500)</div>
+          </div>
+        </div>
+        <div class="badge-warn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#b9770a" stroke-width="2"><path d="M12 9v4M12 17h.01M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg>
+          내용 입력란 플레이스홀더는 "최소 10자 이상"이지만 실제 활성화 조건은 1자 이상 — 검증 로직 불일치 (미결 4번).
+        </div>
+      </div>
+    </div>
+
+    <div class="arrow-down">
+      <svg width="20" height="28" viewBox="0 0 20 28" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 2v22M3 17l7 7 7-7"/></svg>
+    </div>
+
+    <div class="step">
+      <div class="step-badge">5</div>
+      <div class="step-card">
+        <span class="role role-system">시스템</span>
+        <h2>접수 완료 — 토스트 안내 + 중복 접수 방지</h2>
+        <p class="desc">접수하기를 누르면 버튼이 즉시 비활성화(중복 접수 방지)되고 "문의가 접수되었습니다. 평일 1–2일 내 답변드릴게요." 토스트가 노출된다. 접수된 문의는 <code>inquiries</code> 컬렉션에 상태 <code>pending</code>(미처리)으로 쌓이고 CMS 집계에 잡힌다.</p>
+        <div class="shots">
+          <div class="shot wide">
+            <img src="customer-center-storyboard-assets/06-cs-submit-toast.png" alt="접수 완료 토스트와 비활성화된 버튼">
+            <div class="cap">접수 토스트 · 버튼 비활성 전환</div>
+          </div>
+        </div>
+        <div class="badge-warn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#b9770a" stroke-width="2"><path d="M12 9v4M12 17h.01M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg>
+          현재 배포본은 이 버튼이 토스트만 띄우고 <b>Firestore 저장을 하지 않는다</b> (미결 1번). 아래 6단계부터의 데이터 흐름은 문서 캡처를 위해 동일 스키마로 직접 생성한 실데이터 기준.
+        </div>
+      </div>
+    </div>
+
+    <div class="arrow-down">
+      <svg width="20" height="28" viewBox="0 0 20 28" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 2v22M3 17l7 7 7-7"/></svg>
+    </div>
+
+    <div class="step">
+      <div class="step-badge">6</div>
+      <div class="step-card">
+        <span class="role role-user">유저</span>
+        <h2>내 문의 내역 — "처리 중" 상태</h2>
+        <p class="desc">접수된 문의는 고객센터 홈의 "내 문의 내역"에 최신순으로 쌓인다. 카드마다 유형 뱃지 + 상태 뱃지(처리 중 / 답변 완료) + 제목 + 접수일을 표시. 답변 전에는 주황 "처리 중"으로 노출된다.</p>
+        <div class="shots">
+          <div class="shot wide">
+            <img src="customer-center-storyboard-assets/08-cs-list-pending.png" alt="내 문의 내역 — 처리 중 2건">
+            <div class="cap">내 문의 내역 · 2건 모두 "처리 중" (티켓 적립 / 계정)</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="arrow-down">
+      <svg width="20" height="28" viewBox="0 0 20 28" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 2v22M3 17l7 7 7-7"/></svg>
+    </div>
+
+    <div class="step">
+      <div class="step-badge">7</div>
+      <div class="step-card">
+        <span class="role role-admin">운영자 · CMS</span>
+        <h2>CMS 집계 — 대시보드 KPI + 1:1 문의 관리</h2>
+        <p class="desc">대시보드에 "미처리 문의" KPI(pending 상태 실집계)가 뜨고, 좌측 네비 "1:1 문의" 메뉴에 미처리 건수 배지가 붙는다. 문의 관리 화면은 통계 4카드(미처리 / 처리 중 / 완료 / 평균 응답 시간) + 검색·상태·유형 필터 + 문의 목록(제목·상태·회원 3행 식별·접수일·유형)으로 구성. 상단 안내: 완료 건도 재오픈 가능하며 재오픈 시 변경 사유·이력(누가·언제)을 기록한다.</p>
+        <div class="shots">
+          <div class="shot cms">
+            <img src="customer-center-storyboard-assets/09-cms-dashboard.png" alt="CMS 대시보드 — 미처리 문의 KPI 2건">
+            <div class="cap">CMS 대시보드 · "미처리 문의 2 (pending 상태)" 실집계</div>
+          </div>
+          <div class="shot cms">
+            <img src="customer-center-storyboard-assets/10-cms-inquiries-list.png" alt="CMS 1:1 문의 목록 — 미처리 2건">
+            <div class="cap">CMS &gt; 운영 &gt; 1:1 문의 · 통계 카드 + 목록 (좌측 네비에 배지 2) — 유저가 접수한 문의가 닉네임·연동 상태·식별자와 함께 집계됨</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="arrow-down">
+      <svg width="20" height="28" viewBox="0 0 20 28" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 2v22M3 17l7 7 7-7"/></svg>
+    </div>
+
+    <div class="step">
+      <div class="step-badge">8</div>
+      <div class="step-card">
+        <span class="role role-admin">운영자 · CMS</span>
+        <h2>문의 상세 / 답변 작성</h2>
+        <p class="desc">목록에서 문의를 클릭하면 상세 모달이 열린다. 문의 원문 확인 → 답변 작성 → 처리 상태 지정(완료 등) → "답변 발송". 권한 정책상 CS 역할은 조회 + 1:1 문의 답변만 가능하고 다른 데이터 수정은 불가.</p>
+        <div class="shots">
+          <div class="shot cms">
+            <img src="customer-center-storyboard-assets/11-cms-inquiry-modal.png" alt="CMS 문의 상세/답변 모달">
+            <div class="cap">문의 상세 / 답변 모달 · 답변 작성 + 처리 상태 선택 + 답변 발송</div>
+          </div>
+        </div>
+        <div class="badge-warn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#b9770a" stroke-width="2"><path d="M12 9v4M12 17h.01M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg>
+          현재 배포본의 이 모달은 정적 목업이다 — 클릭한 문의와 무관한 고정 예시 내용이 뜨고(캡처의 메타 "— · — · —"), "답변 발송"도 토스트만 띄운다 (미결 2번).
+        </div>
+      </div>
+    </div>
+
+    <div class="arrow-down">
+      <svg width="20" height="28" viewBox="0 0 20 28" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 2v22M3 17l7 7 7-7"/></svg>
+    </div>
+
+    <div class="step">
+      <div class="step-badge">9</div>
+      <div class="step-card">
+        <span class="role role-system">답변 완료</span>
+        <h2>답변 저장 → CMS "완료" 집계 · 앱 "답변 완료" 반영</h2>
+        <p class="desc">답변이 저장되면(상태 <code>answered</code> + 답변 본문 + 답변 시각) CMS 통계가 미처리 1 / 완료 1로 갱신되고 평균 응답 시간이 계산된다. 유저 앱에서는 해당 문의가 초록 "답변 완료" 뱃지로 바뀌고, 카드 안에 <b>관리자 답변이 인라인으로 표시</b>된다. 별도 알림(푸시) 없이 문의 내역 재진입 시 확인하는 구조.</p>
+        <div class="shots">
+          <div class="shot cms">
+            <img src="customer-center-storyboard-assets/12-cms-inquiries-answered.png" alt="CMS 문의 목록 — 완료 1건 반영">
+            <div class="cap">CMS · 답변 저장 후 통계 갱신 (미처리 1 / 완료 1 · 평균 응답 시간 산출)</div>
+          </div>
+          <div class="shot wide">
+            <img src="customer-center-storyboard-assets/13-cs-list-answered.png" alt="앱 내 문의 내역 — 답변 완료와 관리자 답변 인라인 표시">
+            <div class="cap">앱 · "답변 완료" 뱃지 + 관리자 답변 인라인 노출</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="arrow-down">
+      <svg width="20" height="28" viewBox="0 0 20 28" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 2v22M3 17l7 7 7-7"/></svg>
+    </div>
+
+    <div class="step">
+      <div class="step-badge">10</div>
+      <div class="step-card">
+        <span class="role role-user">유저</span>
+        <h2>인접 진입점 — 공지사항 · 약관</h2>
+        <p class="desc">고객센터와 같은 "도움말" 그룹의 공지사항은 <code>notices</code> 컬렉션 실데이터를 고정(공지 뱃지) 우선 + 최신순으로 노출한다. CMS "공지사항 관리"에서 등록한 글이 이 화면에 뜬다. 이용약관·개인정보처리방침은 정적 문서 화면.</p>
+        <div class="shots">
+          <div class="shot wide">
+            <img src="customer-center-storyboard-assets/14-app-notices.png" alt="공지사항 목록 화면">
+            <div class="cap">공지사항 · 고정 공지 + 최신순 (CMS 공지사항 관리와 연동)</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="rules">
+    <h3>정책 · 규칙 정리</h3>
+    <table>
+      <tr><th>항목</th><th>내용</th><th>근거</th></tr>
+      <tr><td>상담 채널</td><td>카카오채널 상담(실시간 채팅) + 1:1 문의(비동기 접수) 2원화. 카카오채널은 앱이 채널 URL 딥링크만 열고 응대는 채널에서 — 앱 추가 로직 없음.</td><td class="src">앱 화면 / DevQA #8 ① 확정</td></tr>
+      <tr><td>운영 시간</td><td>평일 10:00–18:00, 주말·공휴일 휴무. 1:1 문의 답변은 접수 후 1–2 영업일.</td><td class="src">앱 고객센터 홈·작성 화면</td></tr>
+      <tr><td>문의 유형</td><td>티켓 적립 / 기프티콘 교환 / 티켓 교환·환수 / 계정·로그인 / 기타 (5종 택1 필수)</td><td class="src">앱 작성 화면 — 단 저장·집계 체계와 불일치(미결 3)</td></tr>
+      <tr><td>입력 제한</td><td>제목 최대 50자 · 내용 최대 500자(안내상 최소 10자) · 유형+제목+내용 모두 입력 시 접수 가능 · 접수 즉시 버튼 비활성(중복 방지)</td><td class="src">앱 작성 화면</td></tr>
+      <tr><td>처리 상태</td><td>미처리(pending) → 처리 중(processing) → 완료(answered/completed). 앱에는 "처리 중 / 답변 완료" 2단계로 단순화 표시.</td><td class="src">CMS 상태 뱃지 / 앱 렌더 규칙</td></tr>
+      <tr><td>재오픈</td><td>완료 건도 처리 상태 변경(재오픈) 가능. 재오픈 시 변경 사유·이력(누가·언제) 기록.</td><td class="src">CMS 1:1 문의 안내문</td></tr>
+      <tr><td>보존</td><td>문의 내역은 탈퇴 전까지 영구 보존. 앱 목록 라벨은 "최근 3개월".</td><td class="src">앱 문구 — 라벨 정합은 미결 5</td></tr>
+      <tr><td>답변 확인</td><td>답변은 앱 문의 카드에 인라인 표시. 답변 완료 푸시 알림은 현재 화면·정책에 없음.</td><td class="src">앱 렌더 (알림 정책 미정의)</td></tr>
+      <tr><td>CMS 권한</td><td>CS 역할 = 조회 전용 + 1:1 문의 답변, 데이터 수정 불가. 대시보드 KPI·네비 배지로 미처리 노출.</td><td class="src">CMS 권한 정책 화면</td></tr>
+      <tr><td>CS 보완 처리</td><td>포스트백 24시간 미수신 시 영수증 인증 기반 수동 지급 등 운영 보완은 CS가 수동 처리(이벤트 티켓 경로 5 포함). 1:1 문의의 대표 처리 시나리오.</td><td class="src">마스터 정책서(policyspec) SoT</td></tr>
+      <tr><td>차단 계정</td><td>운영자 차단 계정은 로그인 시 차단 안내 화면 → "고객센터 연결" CTA로 유도(앱 외부 채널·메일).</td><td class="src">앱 error-blocked 화면</td></tr>
+    </table>
+  </div>
+
+  <div class="issues">
+    <h3>미결 · 불일치 — 형님 확인 필요</h3>
+    <p class="sub">임의로 확정하지 않고 표시만 해둔 항목. 1·2번은 데모 실연동 작업, 3~7번은 정책·문구 결정 사안.</p>
+    <ol>
+      <li><b>앱 "접수하기" 미구현(깡통)</b> — 토스트만 띄우고 <code>inquiries</code>에 저장하지 않는다. 유저가 문의를 보내도 CMS에 안 잡힘. 실연동 필요 (보안규칙은 이미 로그인 유저 create 허용으로 준비돼 있음).</li>
+      <li><b>CMS 답변 모달 미구현(정적 목업)</b> — 어떤 문의를 클릭해도 고정 예시가 뜨고 "답변 발송"은 토스트만. 클릭 문의 바인딩 + 답변 저장(<code>answer</code>·<code>status</code>·<code>answered_at</code>) 실연동 필요. 재오픈 이력 기록도 미구현.</li>
+      <li><b>문의 유형 체계 3곳 불일치</b> — 앱 작성(티켓 적립/기프티콘 교환/티켓 교환·환수/계정·로그인/기타) vs 앱 내역 렌더(ticket/gifticon/postback/account/point) vs CMS 라벨·필터(postback/account/gifticon/general · 티켓/적립/계정/기타). 실제로 CMS 목록에 미등록 유형이 <code>ticket</code> 원문 그대로 노출됨(7단계 캡처에서 실증). 유형 코드 단일화 필요.</li>
+      <li><b>내용 최소 길이 검증 불일치</b> — 플레이스홀더 "최소 10자 이상" vs 실제 활성 조건 1자 이상.</li>
+      <li><b>"최근 3개월" 라벨 vs 실동작</b> — 앱 목록은 기간 필터 없이 전체 조회. "영구 보존" 문구와 함께 기간 정책(표시 범위) 확정 필요.</li>
+      <li><b>고객센터 정책이 마스터 정책서(SoT) 미수록</b> — policyspec에는 CS 수동 지급·영수증 인증만 있고 운영 시간·답변 SLA·유형·보존·재오픈 등 고객센터 규정 자체가 없다. 현재는 화면 문구가 사실상의 정책. 이 스토리보드 확정 시 SoT 반영 권장.</li>
+      <li><b>카카오채널 실채널 URL 미연동</b> — 브릿지는 연출만. 실서비스 전 공식 채널 개설 + URL 연동 필요.</li>
+    </ol>
+  </div>
+
+  <footer class="notes">
+    <h4>참고 사항</h4>
+    <ul>
+      <li>모든 화면은 배포본 공개 URL에서 캡처: <code>/app</code>은 신규 게스트 계정으로 온보딩부터 실행, <code>/cms</code>는 firstadmin 계정으로 로그인해 실집계 화면을 확인했다.</li>
+      <li>앱 접수 버튼이 미구현(미결 1)이라, 상태 흐름 검증용 문의 2건은 동일 스키마(<code>user_id·category·title·content·status·created_at</code>)로 Firestore에 직접 생성했고, 답변은 관리자 권한으로 <code>answer·answered_at·status:answered</code>를 저장했다. 화면에 보이는 목록·뱃지·집계·인라인 답변은 전부 배포본의 실제 렌더링 로직이 그린 결과다.</li>
+      <li>캡처에서 앱 좌측의 KO/VI 언어 전환 플로팅 버튼은 화면 가림 방지를 위해 숨김 처리했다 (앱 기능과 무관한 데모용 오버레이).</li>
+      <li>문서 캡처용으로 생성한 문의 2건은 <code>inquiries</code> 컬렉션에 남아 있다 (데이터 관리(데모) 초기화 시 함께 삭제됨).</li>
+    </ul>
+  </footer>
+
+</div>
+<div class="last-update">Last Update <b>2026.07.09 18:36</b></div>
+</body>
+</html>
