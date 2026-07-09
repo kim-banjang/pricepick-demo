@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PricePick — 기능별 스토리보드 인덱스</title>
+<style>
+  :root{
+    --purple:#845EEE;
+    --purple-soft:#F3EFFF;
+    --purple-line:#E4DAFA;
+    --blue-soft:#EEF4FF;
+    --ink:#2A2A33;
+    --ink-sub:#6B6B78;
+    --ink-mute:#9A9AA6;
+    --bg:#F7F8FC;
+    --card:#FFFFFF;
+    --line:#ECEDF3;
+    --green:#12B76A;
+    --green-soft:#E7F7EF;
+    --amber:#F79009;
+    --amber-soft:#FEF3E2;
+    --gray-badge:#EEF0F5;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Pretendard","Malgun Gothic",sans-serif;
+    background:var(--bg);
+    color:var(--ink);
+    line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+    padding-bottom:80px;
+  }
+  .wrap{max-width:1080px;margin:0 auto;padding:0 24px}
+
+  /* Header */
+  header.hero{
+    background:linear-gradient(135deg,#8B6BF0 0%,#A88BF5 100%);
+    color:#fff;
+    padding:56px 0 48px;
+    margin-bottom:40px;
+    border-radius:0 0 28px 28px;
+  }
+  .hero .wrap{position:relative}
+  .hero .kicker{
+    display:inline-block;font-size:13px;font-weight:600;letter-spacing:.04em;
+    background:rgba(255,255,255,.18);padding:6px 14px;border-radius:100px;margin-bottom:16px;
+  }
+  .hero h1{font-size:34px;font-weight:800;letter-spacing:-.02em;margin-bottom:12px}
+  .hero p{font-size:16px;color:rgba(255,255,255,.92);max-width:660px}
+  .hero .meta{margin-top:22px;display:flex;gap:26px;flex-wrap:wrap;font-size:13px;color:rgba(255,255,255,.85)}
+  .hero .meta b{color:#fff;font-weight:700}
+
+  /* Legend */
+  .legend{
+    display:flex;gap:18px;flex-wrap:wrap;align-items:center;
+    background:var(--card);border:1px solid var(--line);border-radius:14px;
+    padding:14px 20px;margin-bottom:36px;font-size:13px;color:var(--ink-sub);
+  }
+  .legend .item{display:flex;align-items:center;gap:8px}
+  .badge{display:inline-flex;align-items:center;font-size:12px;font-weight:700;padding:3px 11px;border-radius:100px;letter-spacing:.01em}
+  .badge.done{background:var(--green-soft);color:var(--green)}
+  .badge.wip{background:var(--amber-soft);color:var(--amber)}
+  .badge.todo{background:var(--gray-badge);color:var(--ink-mute)}
+  .legend .note{margin-left:auto;color:var(--ink-mute);font-size:12.5px}
+
+  /* Category */
+  .cat{margin-bottom:40px}
+  .cat-head{display:flex;align-items:baseline;gap:12px;margin-bottom:18px;padding-left:2px}
+  .cat-head .num{font-size:13px;font-weight:800;color:var(--purple);background:var(--purple-soft);
+    border:1px solid var(--purple-line);border-radius:8px;padding:3px 10px}
+  .cat-head h2{font-size:19px;font-weight:800;letter-spacing:-.01em}
+  .cat-head .sub{font-size:13px;color:var(--ink-mute)}
+
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  @media(max-width:860px){.grid{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:560px){.grid{grid-template-columns:1fr}}
+
+  .card{
+    background:var(--card);border:1px solid var(--line);border-radius:16px;
+    padding:20px 18px 18px;position:relative;transition:.18s;
+    display:flex;flex-direction:column;min-height:150px;
+    text-decoration:none;color:inherit;
+  }
+  .card.live{cursor:pointer}
+  .card.live:hover{border-color:var(--purple);box-shadow:0 8px 24px rgba(132,94,238,.12);transform:translateY(-2px)}
+  .card.soon{opacity:.72}
+  .card .top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;gap:10px}
+  .card .idx{font-size:12px;font-weight:800;color:var(--ink-mute);letter-spacing:.03em}
+  .card h3{font-size:16px;font-weight:800;letter-spacing:-.01em;margin-bottom:7px}
+  .card p{font-size:13px;color:var(--ink-sub);line-height:1.5;flex:1}
+  .card .foot{margin-top:14px;display:flex;align-items:center;gap:8px;font-size:12px;color:var(--ink-mute)}
+  .card .tag{font-size:11px;font-weight:600;color:var(--purple);background:var(--purple-soft);
+    border-radius:6px;padding:2px 8px}
+  .card .arrow{margin-left:auto;color:var(--purple);font-weight:700;opacity:0}
+  .card.live:hover .arrow{opacity:1}
+
+  footer{margin-top:20px;text-align:center;font-size:12.5px;color:var(--ink-mute)}
+  footer .wrap{padding-top:26px;border-top:1px solid var(--line)}
+
+  /* Last update fixed label */
+  .last-update{
+    position:fixed;bottom:24px;left:24px;
+    background:rgba(255,255,255,.92);backdrop-filter:blur(6px);
+    border:1px solid var(--line);border-radius:10px;
+    padding:8px 14px;font-size:11.5px;color:var(--ink-mute);
+    box-shadow:0 2px 10px rgba(0,0,0,.05);z-index:50;
+  }
+  .last-update b{color:var(--ink-sub);font-weight:700}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <span class="kicker">PricePick · Storyboard Index</span>
+    <h1>기능별 스토리보드</h1>
+    <p>현재 데모(pricepick-demo)의 전체 통합 스토리보드를 메뉴 단위로 쪼갠 디테일 스토리보드 모음입니다. 각 스토리보드는 <b style="color:#fff">그 하나만 보면 해당 기능이 완결</b>되게 — 앱 유저 흐름 + CMS(운영자) 집계 + 정책·규칙까지 담습니다.</p>
+    <div class="meta">
+      <span>총 <b>15개</b> 기능</span>
+      <span>완성 <b>15</b> · 예정 <b>0</b></span>
+      <span>기준 <b>현재 데모 (pricepick-demo)</b></span>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <div class="legend">
+    <div class="item"><span class="badge done">완성</span> 링크 활성 · 검수 가능</div>
+    <div class="item"><span class="badge wip">작성중</span> 제작 진행 중</div>
+    <div class="item"><span class="badge todo">예정</span> 미착수</div>
+    <span class="note">각 카드 = 하나의 완결형 스토리보드 (앱 + CMS + 정책) · 15개 전부 완성</span>
+  </div>
+
+  <!-- 1. 온보딩·계정 -->
+  <section class="cat">
+    <div class="cat-head">
+      <span class="num">A</span>
+      <h2>온보딩 · 계정</h2>
+      <span class="sub">진입 / 로그인</span>
+    </div>
+    <div class="grid">
+      <a class="card live" href="https://pricepick-demo.vercel.app/app/signup-login-storyboard.html" target="_blank" rel="noopener">
+        <div class="top"><span class="idx">01</span><span class="badge done">완성</span></div>
+        <h3>가입 · 로그인</h3>
+        <p>스플래시 → 알림·ATT 권한 → 닉네임 가입(소셜 진입 로그인 없음) → 홈 직행 · 재실행 자동 복원 → CMS 회원목록 확인.</p>
+        <div class="foot"><span class="tag">진입 · 로그인</span><span class="arrow">열기 →</span></div>
+      </a>
+      <a class="card live" href="https://pricepick-demo.vercel.app/app/kakao-link-storyboard.html" target="_blank" rel="noopener">
+        <div class="top"><span class="idx">02</span><span class="badge done">완성</span></div>
+        <h3>카카오 연동</h3>
+        <p>선택적 카카오 연동, 닉네임 동기화, 기기 간 데이터 복원. 미연동 시 닉네임만으로 시작.</p>
+        <div class="foot"><span class="tag">로그인 · 마이</span><span class="arrow">열기 →</span></div>
+      </a>
+      <a class="card live" href="https://pricepick-demo.vercel.app/app/account-withdraw-storyboard.html" target="_blank" rel="noopener">
+        <div class="top"><span class="idx">03</span><span class="badge done">완성</span></div>
+        <h3>계정 탈퇴 · 재가입</h3>
+        <p>탈퇴 최종 확인 → 데이터 30일 보존 → 완전 삭제. 재가입 즉시 허용, 어뷰징 의심만 30일 제한.</p>
+        <div class="foot"><span class="tag">설정 · 탈퇴</span><span class="arrow">열기 →</span></div>
+      </a>
+    </div>
+  </section>
+
+  <!-- 2. 쇼핑·적립 -->
+  <section class="cat">
+    <div class="cat-head">
+      <span class="num">B</span>
+      <h2>쇼핑 · 적립</h2>
+      <span class="sub">홈 탭 핵심 여정</span>
+    </div>
+    <div class="grid">
+      <a class="card live" href="https://pricepick-demo.vercel.app/app/referral-shopping-storyboard.html" target="_blank" rel="noopener">
+        <div class="top"><span class="idx">04</span><span class="badge done">완성</span></div>
+        <h3>경유 구매 적립</h3>
+        <p>홈 쇼핑몰 섹션 → 적립 가능 쇼핑몰 → 적립 안내 → 이동 브릿지 → 구매 시뮬 → 랜덤 티켓 적립 → CMS 확정·매출 집계.</p>
+        <div class="foot"><span class="tag">홈 · 쇼핑몰 / CMS 집계</span><span class="arrow">열기 →</span></div>
+      </a>
+      <a class="card live" href="https://pricepick-demo.vercel.app/app/grade-conversion-storyboard.html" target="_blank" rel="noopener">
+        <div class="top"><span class="idx">05</span><span class="badge done">완성</span></div>
+        <h3>랜덤티켓 → 등급 전환</h3>
+        <p>구매 확정(연동 D+7 / 미연동 D+30) 후 랜덤 티켓이 등급 티켓으로 전환. 확정 전 환불 환수·CMS 회원 집계까지.</p>
+        <div class="foot"><span class="tag">혜택 · 적립 티켓</span><span class="arrow">열기 →</span></div>
+      </a>
+      <a class="card live" href="https://pricepick-demo.vercel.app/app/earn-conditions-storyboard.html" target="_blank" rel="noopener">
+        <div class="top"><span class="idx">06</span><span class="badge done">완성</span></div>
+        <h3>적립 조건 · 제외 안내</h3>
+        <p>적립 규칙, 구매확정 대기, 유효기간, 적립 한도, 제외 상품(상품권·게임머니 등) 안내 + CMS 운영 정책.</p>
+        <div class="foot"><span class="tag">혜택 · 적립 조건</span><span class="arrow">열기 →</span></div>
+      </a>
+    </div>
+  </section>
+
+  <!-- 3. 티켓 사용 -->
+  <section class="cat">
+    <div class="cat-head">
+      <span class="num">C</span>
+      <h2>티켓 사용</h2>
+      <span class="sub">혜택 탭</span>
+    </div>
+    <div class="grid">
+      <a class="card live" href="https://pricepick-demo.vercel.app/app/grade-exchange-storyboard.html" target="_blank" rel="noopener">
+        <div class="top"><span class="idx">07</span><span class="badge done">완성</span></div>
+        <h3>티켓 등급 교환</h3>
+        <p>브론즈·실버·골드 등급 간 교환(등가 1:1). 전 방향 허용, 수량 입력·자동 계산·확인 모달.</p>
+        <div class="foot"><span class="tag">혜택 · 등급 교환</span><span class="arrow">열기 →</span></div>
+      </a>
+      <a class="card live" href="https://pricepick-demo.vercel.app/app/gifticon-exchange-storyboard.html" target="_blank" rel="noopener">
+        <div class="top"><span class="idx">08</span><span class="badge done">완성</span></div>
+        <h3>기프티콘 교환</h3>
+        <p>교환소 카탈로그 → 상세 → 티켓 차감 → 카카오톡 선물함 발송. 등급별 필터·차감 미리보기.</p>
+        <div class="foot"><span class="tag">혜택 · 교환소</span><span class="arrow">열기 →</span></div>
+      </a>
+      <a class="card live" href="https://pricepick-demo.vercel.app/app/prize-draw-storyboard.html" target="_blank" rel="noopener">
+        <div class="top"><span class="idx">09</span><span class="badge done">완성</span></div>
+        <h3>경품 응모</h3>
+        <p>이벤트 티켓으로 격주(월 2회) 추첨 응모. 경품 리스트·응모 현황·지난 회차 결과.</p>
+        <div class="foot"><span class="tag">혜택 · 경품 응모</span><span class="arrow">열기 →</span></div>
+      </a>
+    </div>
+  </section>
+
+  <!-- 4. 미션·리워드 -->
+  <section class="cat">
+    <div class="cat-head">
+      <span class="num">D</span>
+      <h2>미션 · 리워드</h2>
+      <span class="sub">홈 미션 카드 · 참여형 적립</span>
+    </div>
+    <div class="grid">
+      <a class="card live" href="https://pricepick-demo.vercel.app/app/attendance-storyboard.html" target="_blank" rel="noopener">
+        <div class="top"><span class="idx">10</span><span class="badge done">완성</span></div>
+        <h3>출석체크</h3>
+        <p>일일 출석 클릭 즉시 100P 지급. 연속 출석·보상 흐름.</p>
+        <div class="foot"><span class="tag">홈 미션</span><span class="arrow">열기 →</span></div>
+      </a>
+      <a class="card live" href="https://pricepick-demo.vercel.app/app/roulette-storyboard.html" target="_blank" rel="noopener">
+        <div class="top"><span class="idx">11</span><span class="badge done">완성</span></div>
+        <h3>행운 룰렛</h3>
+        <p>하루 1회 룰렛. 6칸 구성(포인트·이벤트 티켓·꽝), 일/월 한도. CMS에서 칸별 배분 편집.</p>
+        <div class="foot"><span class="tag">홈 미션 / CMS 룰렛</span><span class="arrow">열기 →</span></div>
+      </a>
+      <a class="card live" href="https://pricepick-demo.vercel.app/app/friend-invite-storyboard.html" target="_blank" rel="noopener">
+        <div class="top"><span class="idx">12</span><span class="badge done">완성</span></div>
+        <h3>친구 초대</h3>
+        <p>초대코드 공유 → 링크 진입 → 자동등록·수동입력 분기 → 첫 구매 성사 시 양쪽 500P → 성사 현황(X/50) → CMS 집계.</p>
+        <div class="foot"><span class="tag">홈 미션 / CMS 집계</span><span class="arrow">열기 →</span></div>
+      </a>
+    </div>
+  </section>
+
+  <!-- 5. 마이·시스템 -->
+  <section class="cat">
+    <div class="cat-head">
+      <span class="num">E</span>
+      <h2>마이 · 시스템</h2>
+      <span class="sub">마이 탭 · 시스템</span>
+    </div>
+    <div class="grid">
+      <a class="card live" href="https://pricepick-demo.vercel.app/app/my-activity-storyboard.html" target="_blank" rel="noopener">
+        <div class="top"><span class="idx">13</span><span class="badge done">완성</span></div>
+        <h3>마이 · 활동내역</h3>
+        <p>프로필·회원정보, 티켓 거래·환수 영구 조회(적립/사용/교환/환수 필터·월별 그룹).</p>
+        <div class="foot"><span class="tag">마이 · 활동내역</span><span class="arrow">열기 →</span></div>
+      </a>
+      <a class="card live" href="https://pricepick-demo.vercel.app/app/settings-notification-storyboard.html" target="_blank" rel="noopener">
+        <div class="top"><span class="idx">14</span><span class="badge done">완성</span></div>
+        <h3>설정 · 알림</h3>
+        <p>알림 토글(픽구매·이벤트·마케팅), 표시 옵션, 캐시 관리, 전역 알림함.</p>
+        <div class="foot"><span class="tag">설정 · 알림함</span><span class="arrow">열기 →</span></div>
+      </a>
+      <a class="card live" href="https://pricepick-demo.vercel.app/app/customer-center-storyboard.html" target="_blank" rel="noopener">
+        <div class="top"><span class="idx">15</span><span class="badge done">완성</span></div>
+        <h3>고객센터 · 1:1 문의</h3>
+        <p>문의 접수 → 운영자 처리 → 답변. 공지사항·약관 진입. CMS 문의 관리 집계.</p>
+        <div class="foot"><span class="tag">마이 도움말 / CMS 문의</span><span class="arrow">열기 →</span></div>
+      </a>
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  <div class="wrap">
+    PricePick 기능별 스토리보드 인덱스 · 현재 데모(pricepick-demo) 기준<br>
+    각 스토리보드는 앱 유저 흐름 · CMS 운영자 집계 · 정책(SoT: policyspec.html)을 함께 담습니다.
+  </div>
+</footer>
+
+<div class="last-update">Last Update <b>2026.07.09 20:57</b></div>
+
+</body>
+</html>
