@@ -1013,18 +1013,10 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
           <span class="sb-chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></span>
         </div>
         <div class="sb-grp-items">
-          <button class="sb-item" id="nav-scenario-mgmt" data-label="시나리오 관리" onclick="go('scenario-mgmt',this)">
-            <span class="sb-item-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6M22 11h-6"/></svg></span>
-            <span class="sb-item-lbl">시나리오 관리(데모)</span>
-          </button>
           <button class="sb-item" id="nav-demo-mgmt" data-label="데이터 관리" onclick="go('demo-mgmt',this)">
             <span class="sb-item-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg></span>
             <span class="sb-item-lbl">데이터 관리(데모)</span>
           </button>
-          <a class="sb-item" id="nav-scenario" data-label="시나리오 문서" href="/scenario" target="_blank" rel="noopener" style="text-decoration:none;">
-            <span class="sb-item-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="13" y2="17"/></svg></span>
-            <span class="sb-item-lbl">시나리오 문서(참고)</span>
-          </a>
         </div>
       </div>
 
@@ -2602,44 +2594,6 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
       </div>
     </div>
 
-    <!-- ════ 시나리오 관리(데모) ════ -->
-    <div class="section" id="sec-scenario-mgmt">
-      <div class="card" style="margin-bottom:16px;">
-        <div class="card-header" style="display:flex;align-items:center;gap:8px;">
-          <svg viewBox="0 0 24 24" fill="none" stroke="#F59E0B" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6M22 11h-6"/></svg>
-          <span>시나리오 관리 (데모 전용)</span>
-          <span style="margin-left:auto;background:#FEF3C7;color:#92400E;font-size:11px;font-weight:700;padding:2px 8px;border-radius:99px;">DEMO ONLY</span>
-        </div>
-        <div style="padding:0 20px 16px;color:var(--text-2);font-size:13px;line-height:1.7;">
-          가상 손님(시나리오)을 등록해 두면 <strong>데이터 관리 → [시나리오 채우기]</strong>로 한 번에 가상 데이터(회원·포스트백·티켓·포인트)를 만들 수 있습니다.
-          입력값은 <strong>이름 · 등급 · 구매금액 · 연동여부</strong>만. 티켓 적립(Greedy 등급 환산)·수수료(3%)·적립 금액·포인트는 신 스키마 규칙대로 자동 계산됩니다.
-          시나리오 정의는 <code>demo_scenarios</code> 컬렉션에 보존되어 [전체 비우기] 후에도 남습니다.
-        </div>
-        <!-- 입력 폼 -->
-        <div style="padding:0 20px 16px;">
-          <div class="dm-form-row">
-            <div class="dm-field"><label>이름</label><input type="text" id="scn-name" placeholder="가상 손님 이름"></div>
-            <div class="dm-field"><label>대표 등급</label><select id="scn-grade"><option value="bronze">bronze</option><option value="silver" selected>silver</option><option value="gold">gold</option></select></div>
-            <div class="dm-field"><label>구매금액(원)</label><input type="number" id="scn-amount" value="67000" oninput="scenPreview()"></div>
-            <div class="dm-field"><label>연동여부</label><select id="scn-linked" onchange="scenPreview()"><option value="linked" selected>linked(연동)</option><option value="guest">guest(미연동)</option></select></div>
-            <div class="dm-field"><label>&nbsp;</label><button class="btn btn-primary btn-sm" id="scn-save-btn" onclick="scenSave()">+ 시나리오 추가</button></div>
-            <div class="dm-field" id="scn-cancel-wrap" style="display:none;"><label>&nbsp;</label><button class="btn btn-ghost btn-sm" onclick="scenResetForm()">취소</button></div>
-          </div>
-          <div id="scn-preview" style="margin-top:10px;font-size:12px;color:var(--text-2);background:var(--bg-soft,#F9FAFB);border:1px solid var(--border);border-radius:8px;padding:10px 12px;"></div>
-        </div>
-        <!-- 액션 -->
-        <div style="display:flex;gap:10px;flex-wrap:wrap;padding:0 20px 18px;border-top:1px solid var(--border);padding-top:14px;">
-          <button class="btn btn-ghost" onclick="scenLoadDefaults()" id="scn-default-btn">기본 시나리오 14명 불러오기</button>
-          <button class="btn btn-ghost" onclick="scenLoadList()">새로고침</button>
-          <button class="btn btn-primary" onclick="go('demo-mgmt', document.getElementById('nav-demo-mgmt'))" style="margin-left:auto;">데이터 관리로 이동 →</button>
-        </div>
-      </div>
-      <div class="card">
-        <div class="card-header"><span>등록된 시나리오</span><span id="scn-count" style="margin-left:auto;font-size:12px;color:var(--text-3);"></span></div>
-        <div id="scn-list-area" style="padding:12px 20px;overflow-x:auto;"></div>
-      </div>
-    </div>
-
     <!-- ════ 데이터 관리(데모) ════ -->
     <div class="section" id="sec-demo-mgmt">
       <div class="card" style="margin-bottom:16px;">
@@ -2658,10 +2612,6 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14" stroke-linecap="round"><path d="M12 5v14M5 12l7-7 7 7"/></svg>
             시나리오 채우기
           </button>
-          <button class="btn btn-ghost" onclick="go('scenario-mgmt', document.getElementById('nav-scenario-mgmt'))">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
-            시나리오 관리
-          </button>
           <button class="btn btn-ghost" onclick="dmLoadStats()" id="dm-refresh-btn">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14" stroke-linecap="round"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
             새로고침
@@ -2674,7 +2624,7 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
 
         <!-- 보호 컬렉션 안내 -->
         <div style="padding:10px 20px;background:var(--warning-soft);color:#92400E;font-size:12px;border-bottom:1px solid var(--border);">
-          [시나리오 채우기]는 <strong>시나리오 관리</strong>에 등록된 가상 손님대로 데이터를 생성합니다. [전체 비우기]는 가상 데이터만 삭제하고
+          [시나리오 채우기]는 <strong>demo_scenarios</strong>(scripts/seed-demo.js로 등록)에 등록된 가상 손님대로 데이터를 생성합니다. [전체 비우기]는 가상 데이터만 삭제하고
           운영 뼈대(관리자 계정 firstadmin · 마스터 데이터 · 기프티콘 상품 · 배너 · 공지 · 시나리오 정의)는 보존합니다.
         </div>
       </div>
@@ -3553,7 +3503,6 @@ const I18N = {
     'page.apikeys.title': '제휴몰 API 관리', 'page.apikeys.bc': '시스템',
     'page.scheduler.title': '스케줄러', 'page.scheduler.bc': '시스템',
     'page.accounts.title': '관리자 계정', 'page.accounts.bc': '계정 관리',
-    'page.scenario-mgmt.title': '시나리오 관리(데모)', 'page.scenario-mgmt.bc': '개발 · 데모',
     'page.demo-mgmt.title': '데이터 관리(데모)', 'page.demo-mgmt.bc': '개발 · 데모',
     'nav.op-policy': '운영 정책', 'page.op-policy.title': '운영 정책', 'page.op-policy.bc': '운영',
     'page.clawback.title': '환수 이력', 'page.clawback.bc': '티켓 · 보상',
@@ -3853,7 +3802,6 @@ function go(id, navEl) {
   document.getElementById('page-bc').textContent = t('page.' + id + '.bc') || '';
   window.scrollTo({top:0, behavior:'instant'});
   // 섹션 진입 시 초기화 훅
-  if (id === 'scenario-mgmt' && window.scenInit) window.scenInit();
   if (id === 'demo-mgmt' && window.dmLoadStats) window.dmLoadStats();
   if (id === 'roulette-settings' && window.rltLoad) window.rltLoad();
   // 모바일: 메뉴 항목 선택 시 드로어 닫기
@@ -8032,211 +7980,27 @@ function dmShowToast(msg, isErr) {
 // 입력값(이름·등급·구매금액·연동)만 받고, 티켓(Greedy)·수수료·적립액·포인트는 자동 계산.
 // 생성 데이터는 seed-demo.js와 동일한 단일 신 스키마.
 // ════════════════════════════════════════════════
-var SCEN_EDIT_ID = null;
 var SCEN_MALL = { name:'쿠팡', domain:'coupang.com', rate:0.03 };
 
 // Greedy 등급환산 정책 확정값: 골드=100,000원당 1장 · 실버=50,000원당 1장 · 브론즈=5,000원당 1장.
 // 큰 단위부터 차감, 남는 금액은 버림(반올림 아님). 예: 67,000원 → 실버1(50,000)+브론즈3(15,000), 2,000원 버림.
 // (과거엔 Math.ceil로 단가 이하 금액을 올림 처리해 브론즈가 1장 더 나오는 버그가 있었음 — floor로 수정)
+// scenGreedy는 [데이터 관리 → 시나리오 채우기](dmFillFromScenarios)가 그대로 쓰는 공용 함수라 유지.
 function scenGreedy(amount) {
   var u = Math.floor((amount||0)/5000);
   var g = Math.floor(u/20), r = u%20, s = Math.floor(r/10), b = r%10;
   return { gold:g, silver:s, bronze:b, total:g+s+b };
 }
-function scenEarnWon(tk) { return tk.bronze*100 + tk.silver*1000 + tk.gold*2000; }
 
-window.scenPreview = function() {
-  var el = document.getElementById('scn-preview'); if (!el) return;
-  var amount = parseFloat((document.getElementById('scn-amount')||{}).value) || 0;
-  var linked = ((document.getElementById('scn-linked')||{}).value) === 'linked';
-  var tk = scenGreedy(amount), comm = Math.round(amount*SCEN_MALL.rate), earn = scenEarnWon(tk);
-  el.innerHTML = '<b>자동 계산 미리보기</b> · 포스트백 ' + (linked?'confirmed(연동 D+7 확정)':'pending(미연동 D+30 대기)')
-    + ' · 티켓 ' + tk.total + '장(골' + tk.gold + '·실' + tk.silver + '·동' + tk.bronze + ')'
-    + ' · 적립 금액 ' + earn.toLocaleString('ko-KR') + '원'
-    + ' · 수수료 매출 ' + comm.toLocaleString('ko-KR') + '원(' + (SCEN_MALL.rate*100) + '%)'
-    + ' · 포인트 ' + (linked ? '500P(가입보너스)' : '0P');
-};
-
-window.scenInit = function() { scenResetForm(); scenLoadList(); };
-
-window.scenResetForm = function() {
-  SCEN_EDIT_ID = null;
-  var f = { 'scn-name':'', 'scn-amount':'67000' };
-  Object.keys(f).forEach(function(id){ var e=document.getElementById(id); if(e) e.value=f[id]; });
-  var g=document.getElementById('scn-grade'); if(g) g.value='silver';
-  var l=document.getElementById('scn-linked'); if(l) l.value='linked';
-  var b=document.getElementById('scn-save-btn'); if(b) b.textContent='+ 시나리오 추가';
-  var cw=document.getElementById('scn-cancel-wrap'); if(cw) cw.style.display='none';
-  scenPreview();
-};
-
-window.scenSave = function() {
-  var name = (document.getElementById('scn-name').value||'').trim();
-  if (!name) { dmShowToast('이름을 입력하세요.', true); return; }
-  var data = {
-    name: name,
-    grade: document.getElementById('scn-grade').value,
-    purchase_amount: parseFloat(document.getElementById('scn-amount').value)||0,
-    linked: document.getElementById('scn-linked').value === 'linked',
-    updated_at: FS.Timestamp.now(),
-  };
-  var p;
-  if (SCEN_EDIT_ID) { p = db.collection('demo_scenarios').doc(SCEN_EDIT_ID).set(data, {merge:true}); }
-  else { data.created_at = FS.Timestamp.now(); p = db.collection('demo_scenarios').add(data); }
-  p.then(function(){ dmShowToast(SCEN_EDIT_ID?'시나리오 저장됨':'시나리오 추가됨'); scenResetForm(); scenLoadList(); })
-   .catch(function(e){ dmShowToast('저장 실패: '+(e.message||e), true); });
-};
-
-window.scenEdit = function(id) {
-  db.collection('demo_scenarios').doc(id).get().then(function(doc){
-    if (!doc.exists) return;
-    var d = doc.data();
-    SCEN_EDIT_ID = id;
-    document.getElementById('scn-name').value = d.name||'';
-    document.getElementById('scn-grade').value = d.grade||'silver';
-    document.getElementById('scn-amount').value = d.purchase_amount||0;
-    document.getElementById('scn-linked').value = d.linked ? 'linked':'guest';
-    document.getElementById('scn-save-btn').textContent = '저장';
-    document.getElementById('scn-cancel-wrap').style.display = '';
-    scenPreview();
-    try { document.getElementById('scn-name').scrollIntoView({block:'center',behavior:'smooth'}); } catch(e){}
-  });
-};
-
-window.scenDelete = function(id) {
-  if (!confirm('이 시나리오를 삭제할까요?')) return;
-  db.collection('demo_scenarios').doc(id).delete()
-    .then(function(){ dmShowToast('시나리오 삭제됨'); scenLoadList(); })
-    .catch(function(e){ dmShowToast('삭제 실패: '+(e.message||e), true); });
-};
-
-window.scenLoadList = function() {
-  var area = document.getElementById('scn-list-area'); if (!area) return;
-  area.innerHTML = '<div style="color:var(--text-3);font-size:12px;padding:8px 0;">불러오는 중…</div>';
-  db.collection('demo_scenarios').get().then(function(snap){
-    var cnt=document.getElementById('scn-count'); if(cnt) cnt.textContent = snap.size + '명';
-    if (snap.empty) { area.innerHTML = '<div style="color:var(--text-3);font-size:13px;padding:14px 0;">등록된 시나리오가 없습니다. 위에서 추가하거나 [기본 시나리오 14명 불러오기]를 누르세요.</div>'; return; }
-    var docs = snap.docs.slice().sort(function(a,b){
-      var am=(a.data().created_at&&a.data().created_at.toMillis)?a.data().created_at.toMillis():0;
-      var bm=(b.data().created_at&&b.data().created_at.toMillis)?b.data().created_at.toMillis():0;
-      return am-bm;
-    });
-    area.innerHTML = docs.map(function(doc){
-      var d = doc.data(), tk = scenGreedy(d.purchase_amount), earn = scenEarnWon(tk), comm = Math.round((d.purchase_amount||0)*SCEN_MALL.rate);
-      return '<div class="dm-row">'
-        + '<span class="dm-row-id">' + (d.name||'(이름없음)') + '</span>'
-        + '<span class="dm-row-info">' + (d.linked?'연동':'게스트') + ' · ' + (d.grade||'-')
-        + ' · 구매 ' + ((d.purchase_amount||0).toLocaleString('ko-KR')) + '원'
-        + ' · 티켓 골' + tk.gold + '·실' + tk.silver + '·동' + tk.bronze
-        + ' · 적립 ' + earn.toLocaleString('ko-KR') + '원 · 수수료 ' + comm.toLocaleString('ko-KR') + '원</span>'
-        + '<button class="dm-del-btn" style="border-color:var(--success);color:var(--success);" onclick="scenFillOne(\'' + doc.id + '\')">채우기</button>'
-        + '<button class="dm-del-btn" style="border-color:var(--main);color:var(--main);" onclick="scenEdit(\'' + doc.id + '\')">편집</button>'
-        + '<button class="dm-del-btn" onclick="scenDelete(\'' + doc.id + '\')">삭제</button>'
-        + '</div>';
-    }).join('');
-  }).catch(function(e){ area.innerHTML = '<div style="color:var(--danger);font-size:12px;">오류: '+(e.message||e)+'</div>'; });
-};
-
-window.scenLoadDefaults = function() {
-  var DEF = [
-    ['프랭크','gold',150000,true],['그레이스','silver',67000,true],['헨리','silver',67000,true],
-    ['아이리스','gold',100000,true],['제이크','silver',67000,true],['케이트','silver',50000,true],
-    ['레오','gold',200000,true],['미아','bronze',25000,true],['노아','bronze',10000,true],
-    ['올리비아','gold',200000,true],['피터','silver',50000,false],['데이브','bronze',15000,false],
-    ['앨리스','silver',67000,true],['밥','gold',120000,true],
-  ];
-  if (!confirm('기본 시나리오 ' + DEF.length + '명을 demo_scenarios에 추가합니다. 계속할까요?')) return;
-  var btn=document.getElementById('scn-default-btn'); if(btn){ btn.disabled=true; btn.textContent='불러오는 중…'; }
-  var b = db.batch();
-  DEF.forEach(function(r, i){
-    b.set(db.collection('demo_scenarios').doc('scn-default-' + String(i+1).padStart(2,'0')),
-      { name:r[0], grade:r[1], purchase_amount:r[2], linked:r[3], created_at:FS.Timestamp.now(), updated_at:FS.Timestamp.now() });
-  });
-  b.commit().then(function(){ if(btn){btn.disabled=false;btn.textContent='기본 시나리오 14명 불러오기';} dmShowToast('기본 시나리오 ' + DEF.length + '명 추가됨'); scenLoadList(); })
-   .catch(function(e){ if(btn){btn.disabled=false;btn.textContent='기본 시나리오 14명 불러오기';} dmShowToast('실패: '+(e.message||e), true); });
-};
-
-// ── 단건 빌더 (전체/개별 채우기 공용 — 시나리오 1건 → 신 스키마 문서 묶음) ──
-function scenMakeDocs(sid, s, created, confirmedAt, seq) {
-  var TS = FS.Timestamp;
-  function future(n){ var d=new Date(); d.setDate(d.getDate()+n); return TS.fromDate(d); }
-  function ymd(tsv){ var d=tsv.toDate(); return ''+d.getFullYear()+String(d.getMonth()+1).padStart(2,'0')+String(d.getDate()).padStart(2,'0'); }
-  var linked = !!s.linked, amount = s.purchase_amount||0;
-  var uid='user-scn-'+sid, pbId='pb-scn-'+sid, clId='cl-scn-'+sid;
-  var orderId='CPN-ORDER-'+ymd(created)+'-'+String(seq).padStart(3,'0');
-  var out = { USERS:{}, UP:{}, PB:{}, CL:{}, CPM:{}, TK:{}, TTX:{}, PTX:{}, uid:uid, pbId:pbId };
-  out.USERS[uid] = { nickname:s.name||'손님', linked_kakao:linked, status:'active', rep_grade:s.grade||null, scenario_id:sid, created_at:created, updated_at:TS.now() };
-  out.PB[pbId] = { user_id:uid, mall_name:SCEN_MALL.name, mall_domain:SCEN_MALL.domain, purchase_amount:amount, order_id:orderId, status:(linked?'confirmed':'pending'), created_at:created, confirmed_at:confirmedAt };
-  out.CL[clId] = { user_id:uid, mall_name:SCEN_MALL.name, mall_domain:SCEN_MALL.domain, clicked_at:created };
-  out.CPM['cpm-scn-'+sid] = { user_id:uid, click_id:clId, postback_id:pbId, created_at:created };
-  var tk = scenGreedy(amount), tkStatus = linked ? 'active' : 'pending', grades = [];
-  for (var gi=0; gi<tk.gold; gi++) grades.push('gold');
-  for (var si=0; si<tk.silver; si++) grades.push('silver');
-  for (var bi=0; bi<tk.bronze; bi++) grades.push('bronze');
-  grades.forEach(function(g, n){
-    out.TK['tk-scn-'+sid+'-'+(n+1)] = { user_id:uid, grade:g, status:tkStatus, postback_id:pbId, earned_at:created, confirmed_at:confirmedAt, expires_at:future(365) };
-    out.TTX['ttx-scn-'+sid+'-'+(n+1)] = { user_id:uid, ticket_grade:g, type:'earn', postback_id:pbId, created_at:(confirmedAt||created) };
-  });
-  var pts = linked ? 500 : 0;
-  out.UP[uid] = { user_id:uid, balance:pts, updated_at:TS.now(), created_at:created };
-  if (pts > 0) out.PTX['ptx-scn-'+sid] = { user_id:uid, amount:pts, type:'onboarding', reason:'가입 축하 보상', created_at:created };
-  return out;
-}
-
-// ── 개별 채우기 (시나리오 1건만 주입; 같은 시나리오 재클릭 시 멱등 재생성 = 1건만 유지) ──
-window.scenFillOne = function(id) {
-  db.collection('demo_scenarios').doc(id).get().then(function(doc){
-    if (!doc.exists) { dmShowToast('시나리오를 찾을 수 없습니다.', true); return; }
-    var s = doc.data(), sid = id, TS = FS.Timestamp;
-    function ago(n){ var d=new Date(); d.setDate(d.getDate()-n); return TS.fromDate(d); }
-    var linked = !!s.linked, created = ago(2), confirmedAt = linked ? ago(1) : null;
-    var seq = Math.floor(Math.random()*900) + 100;
-    var uid = 'user-scn-'+sid, pbId = 'pb-scn-'+sid;
-    dmShowToast('"' + (s.name||'시나리오') + '" 채우는 중…');
-    // 1) 동일 시나리오의 기존 생성물 정리 (멱등 — 1건만 유지)
-    function delWhere(col, field, val){
-      return db.collection(col).where(field,'==',val).get().then(function(snap){
-        if (snap.empty) return null;
-        var b = db.batch(); snap.forEach(function(d){ b.delete(d.ref); }); return b.commit();
-      }).catch(function(){});
-    }
-    Promise.all([
-      db.collection('users').doc(uid).delete().catch(function(){}),
-      db.collection('user_points').doc(uid).delete().catch(function(){}),
-      db.collection('postbacks').doc(pbId).delete().catch(function(){}),
-      db.collection('click_logs').doc('cl-scn-'+sid).delete().catch(function(){}),
-      db.collection('click_postback_matches').doc('cpm-scn-'+sid).delete().catch(function(){}),
-      delWhere('user_tickets','postback_id',pbId),
-      delWhere('ticket_transactions','postback_id',pbId),
-      delWhere('point_transactions','user_id',uid),
-    ]).then(function(){
-      // 2) 생성
-      var m = scenMakeDocs(sid, s, created, confirmedAt, seq);
-      function setAll(col, map){
-        if (!Object.keys(map).length) return Promise.resolve();
-        var b = db.batch();
-        Object.entries(map).forEach(function(e){ b.set(db.collection(col).doc(e[0]), e[1]); });
-        return b.commit();
-      }
-      return Promise.all([
-        setAll('users', m.USERS), setAll('user_points', m.UP), setAll('postbacks', m.PB),
-        setAll('click_logs', m.CL), setAll('click_postback_matches', m.CPM),
-        setAll('user_tickets', m.TK), setAll('ticket_transactions', m.TTX), setAll('point_transactions', m.PTX),
-      ]);
-    }).then(function(){
-      dmShowToast('"' + (s.name||'시나리오') + '" 채우기 완료 (단건)');
-      if (window.dmLoadStats) dmLoadStats();
-    }).catch(function(e){ dmShowToast('단건 채우기 실패: '+(e.message||e), true); });
-  }).catch(function(e){ dmShowToast('단건 채우기 실패: '+(e.message||e), true); });
-};
+// (시나리오 관리 CMS UI는 제거됨 — demo_scenarios 문서는 scripts/seed-demo.js로만 등록.
+// 아래 dmFillFromScenarios는 그 컬렉션을 읽기만 하므로 그대로 동작한다.)
 
 // ── 시나리오 기반 채우기 (회원·포스트백·티켓·포인트 자동 생성) ──
 window.dmFillFromScenarios = function() {
   var btn = document.getElementById('dm-seed-btn');
   db.collection('demo_scenarios').get().then(function(snap){
     if (snap.empty) {
-      dmShowToast('등록된 시나리오가 없습니다. [시나리오 관리]에서 먼저 추가하세요.', true);
-      go('scenario-mgmt', document.getElementById('nav-scenario-mgmt'));
+      dmShowToast('등록된 시나리오가 없습니다. scripts/seed-demo.js로 demo_scenarios를 먼저 채워주세요.', true);
       return;
     }
     return db.collection('users').get().then(function(uSnap){
