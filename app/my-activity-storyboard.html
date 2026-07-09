@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PricePick — 마이 · 활동내역 스토리보드</title>
+<style>
+  :root{
+    --bg:#f5f6fa; --card:#ffffff; --ink:#1f2433; --sub:#5b6478;
+    --line:#e6e8f0; --accent:#3b5bdb; --accent-soft:#eef1fd;
+    --green:#1f9d57; --green-bg:#e7f6ee; --amber:#b9770a; --amber-bg:#fdf3e3;
+    --red:#c0392b; --red-bg:#fbeceb; --gray:#5b6478; --gray-bg:#eef0f4;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+    line-height:1.6;-webkit-font-smoothing:antialiased;}
+  .wrap{max-width:1080px;margin:0 auto;padding:40px 24px 100px;}
+  header.doc{border-bottom:2px solid var(--accent);padding-bottom:20px;margin-bottom:8px;}
+  header.doc h1{margin:0 0 8px;font-size:26px;letter-spacing:-.01em;}
+  .lead{color:var(--sub);font-size:15px;margin:0 0 4px;}
+  .meta{color:var(--sub);font-size:13px;margin:2px 0 0;}
+  .note-top{background:var(--accent-soft);border:1px solid #d7ddf8;border-radius:10px;
+    padding:14px 18px;margin:20px 0 24px;font-size:13.5px;color:#33406b;display:flex;gap:10px;align-items:flex-start;}
+  .note-top svg{flex:0 0 auto;margin-top:1px;}
+
+  .policy-bar{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:44px;}
+  .policy-card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;
+    box-shadow:0 1px 2px rgba(20,30,60,.04);}
+  .policy-card .num{font-size:19px;font-weight:700;color:var(--accent);}
+  .policy-card .lbl{font-size:12px;color:var(--sub);margin-top:2px;}
+  @media(max-width:760px){.policy-bar{grid-template-columns:repeat(2,1fr);}}
+
+  .flow{position:relative;padding-left:40px;}
+  .flow::before{content:"";position:absolute;left:15px;top:8px;bottom:8px;width:2px;background:var(--line);}
+
+  .step{position:relative;margin-bottom:14px;}
+  .step-badge{position:absolute;left:-40px;top:2px;width:32px;height:32px;border-radius:50%;
+    background:var(--accent);color:#fff;font-size:14px;font-weight:700;
+    display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(59,91,219,.35);z-index:2;}
+  .step-card{background:var(--card);border:1px solid var(--line);border-radius:14px;
+    padding:22px 24px;box-shadow:0 1px 3px rgba(20,30,60,.05);}
+  .step-card h2{margin:0 0 4px;font-size:17px;}
+  .step-card .role{display:inline-block;font-size:11px;font-weight:700;padding:2px 9px;border-radius:999px;
+    margin-bottom:8px;letter-spacing:.02em;}
+  .role-user{background:#eef1fd;color:var(--accent);}
+  .role-system{background:var(--gray-bg);color:var(--gray);}
+  .role-cms{background:var(--amber-bg);color:var(--amber);}
+  .step-card p.desc{margin:8px 0 16px;color:var(--sub);font-size:13.5px;}
+  .shots{display:flex;gap:20px;flex-wrap:wrap;align-items:flex-start;}
+  .shot{flex:0 0 auto;}
+  .shot img{display:block;width:200px;height:auto;border-radius:14px;border:1px solid var(--line);
+    box-shadow:0 4px 14px rgba(20,30,60,.10);}
+  .shot .cap{margin-top:8px;font-size:12px;color:var(--sub);text-align:center;max-width:200px;}
+  .shot.wide img{width:280px;}
+  .shot.wide .cap{max-width:280px;}
+  .shot.cms img{width:520px;}
+  .shot.cms .cap{max-width:520px;}
+  @media(max-width:600px){.shot.cms img{width:100%;}}
+
+  .arrow-down{display:flex;justify-content:center;margin:2px 0 18px 0;color:#b7bdd1;}
+
+  .branch-wrap{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+  @media(max-width:700px){.branch-wrap{grid-template-columns:1fr;}}
+  .branch{border-radius:14px;padding:20px;border:2px solid var(--line);background:var(--card);}
+  .branch.good{border-color:#bfe3cd;}
+  .branch.warn{border-color:#f3d9ad;}
+  .branch .tag{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:700;
+    padding:3px 10px;border-radius:999px;margin-bottom:10px;}
+  .branch.good .tag{background:var(--green-bg);color:var(--green);}
+  .branch.warn .tag{background:var(--amber-bg);color:var(--amber);}
+  .branch h3{margin:0 0 6px;font-size:14.5px;}
+  .branch p{margin:0 0 14px;font-size:13px;color:var(--sub);}
+
+  .badge-note{display:inline-flex;align-items:flex-start;gap:6px;font-size:12px;color:var(--sub);
+    background:var(--gray-bg);border-radius:8px;padding:6px 10px;margin-top:14px;line-height:1.55;}
+  .badge-note svg{flex:0 0 auto;margin-top:2px;}
+
+  table.rules{width:100%;border-collapse:collapse;font-size:13px;margin:10px 0 4px;}
+  table.rules th{background:var(--gray-bg);text-align:left;padding:8px 12px;font-size:12px;color:var(--sub);border:1px solid var(--line);}
+  table.rules td{padding:8px 12px;border:1px solid var(--line);vertical-align:top;}
+  table.rules td b{color:var(--ink);}
+
+  .rule-sec{margin-top:44px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px 24px;}
+  .rule-sec h2{margin:0 0 4px;font-size:17px;}
+  .rule-sec p.desc{margin:6px 0 14px;color:var(--sub);font-size:13.5px;}
+  .rule-sec ul{margin:8px 0 0;padding-left:18px;font-size:13px;color:var(--sub);}
+  .rule-sec li{margin:6px 0;}
+  .rule-sec li b{color:var(--ink);}
+
+  .issue-sec{margin-top:24px;background:#fffaf0;border:1px solid #f3d9ad;border-radius:14px;padding:22px 24px;}
+  .issue-sec h2{margin:0 0 4px;font-size:17px;color:var(--amber);}
+  .issue-sec p.desc{margin:6px 0 14px;color:var(--sub);font-size:13.5px;}
+  .issue-sec ol{margin:8px 0 0;padding-left:20px;font-size:13px;color:#5b5340;}
+  .issue-sec li{margin:8px 0;}
+  .issue-sec li b{color:#3d3729;}
+
+  footer.notes{margin-top:24px;background:var(--card);border:1px solid var(--line);border-radius:12px;
+    padding:20px 24px;font-size:13px;color:var(--sub);}
+  footer.notes h4{margin:0 0 10px;color:var(--ink);font-size:14px;}
+  footer.notes ul{margin:0;padding-left:18px;}
+  footer.notes li{margin:5px 0;}
+  code{background:var(--gray-bg);border-radius:5px;padding:1px 6px;font-size:12px;
+    font-family:ui-monospace,Menlo,monospace;color:#3a3f52;}
+
+  .last-update{position:fixed;bottom:24px;left:24px;background:rgba(255,255,255,.92);
+    border:1px solid var(--line);border-radius:10px;padding:8px 14px;font-size:11.5px;color:var(--sub);
+    box-shadow:0 2px 10px rgba(0,0,0,.05);z-index:50;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="doc">
+    <h1>마이 · 활동내역 스토리보드</h1>
+    <p class="lead">프로필·회원정보부터 티켓 원장(적립 / 사용 / 교환 / 환수)의 영구 조회, CMS 운영 화면까지 — 실제 배포본 화면 캡처 기반</p>
+    <p class="meta">app/index.html · cms/index.html 배포본(pricepick-demo.vercel.app)에서 직접 조작 후 캡처 (2026.07.09) · 목업/와이어프레임 없음</p>
+  </header>
+
+  <div class="note-top">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3b5bdb" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v5"/><circle cx="12" cy="16" r=".5" fill="#3b5bdb"/></svg>
+    <div>이 문서의 모든 화면은 배포본에서 게스트 계정(닉네임 <b>마이스토리</b>)을 실제로 생성하고, 경유 구매 2건(쿠팡 67,000원 · 11번가 12,000원) → CMS 구매확정 → 기프티콘 교환 2건 → CMS 환불 처리 → CMS 수동 지급까지 전부 실행한 뒤 캡처한 스크린샷입니다. 그림으로 대체한 화면은 없습니다.</div>
+  </div>
+
+  <div class="policy-bar">
+    <div class="policy-card"><div class="num">적립일 + 365일</div><div class="lbl">등급 티켓 유효기간 (만료 D-30 · D-7 알림)</div></div>
+    <div class="policy-card"><div class="num">미사용분만 회수</div><div class="lbl">확정 후 환불 시 — 이미 쓴 티켓은 회수하지 않음</div></div>
+    <div class="policy-card"><div class="num">원장 불변</div><div class="lbl">거래 기록은 삭제 없이 추가만 (환수도 새 기록)</div></div>
+    <div class="policy-card"><div class="num">연동 = 서버 영구 보존</div><div class="lbl">미연동 게스트는 기기 보존 (재설치 시 초기화)</div></div>
+  </div>
+
+  <div class="flow">
+
+    <div class="step">
+      <div class="step-badge">1</div>
+      <div class="step-card">
+        <span class="role role-user">유저</span>
+        <h2>마이페이지 — 프로필 · 회원정보 · 메뉴</h2>
+        <p class="desc">하단 탭 '마이'로 진입. 상단 프로필(닉네임 + 가입 N일째), 회원정보(닉네임 / 카카오 연동 / 초대코드 입력), 활동(내 티켓·기프티콘 / 활동 내역 / 구매 내역), 도움말, 시스템(계정 탈퇴) 순으로 구성된다. 미연동 게스트에게는 카카오 연동하기 버튼이 노출된다.</p>
+        <div class="shots">
+          <div class="shot wide">
+            <img src="my-activity-storyboard-assets/01-my-main.png" alt="마이페이지 상단 — 프로필, 회원정보, 활동 메뉴">
+            <div class="cap">마이페이지 상단 · 프로필 + 회원정보 + 활동 메뉴</div>
+          </div>
+          <div class="shot wide">
+            <img src="my-activity-storyboard-assets/02-my-main-bottom.png" alt="마이페이지 하단 — 도움말, 시스템 섹션">
+            <div class="cap">마이페이지 하단 · 도움말 + 시스템(계정 탈퇴)</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="arrow-down">
+      <svg width="20" height="28" viewBox="0 0 20 28" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 2v22M3 17l7 7 7-7"/></svg>
+    </div>
+
+    <div class="step">
+      <div class="step-badge">2</div>
+      <div class="step-card">
+        <span class="role role-user">유저</span>
+        <h2>닉네임 변경 — 중복 검사 실동작</h2>
+        <p class="desc">회원정보의 '닉네임' 행에서 진입. 저장 시 <code>users.nickname</code> 중복 검사가 실제로 동작하며, 이미 사용 중인 닉네임이면 인라인 에러로 저장이 차단된다. 입력 규칙은 2~10자.</p>
+        <div class="shots">
+          <div class="shot wide">
+            <img src="my-activity-storyboard-assets/03-my-nickname-edit.png" alt="닉네임 변경 화면">
+            <div class="cap">닉네임 변경 · 현재 닉네임 채워진 상태</div>
+          </div>
+        </div>
+        <div class="badge-note">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#5b6478" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-5M12 8h.01"/></svg>
+          닉네임 2~10자 규칙은 화면 문구로만 존재하고 마스터 정책서 본문에는 없다 — 하단 '미결·확인 필요' 6번 참조.
+        </div>
+      </div>
+    </div>
+
+    <div class="arrow-down">
+      <svg width="20" height="28" viewBox="0 0 20 28" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 2v22M3 17l7 7 7-7"/></svg>
+    </div>
+
+    <div class="step">
+      <div class="step-badge">3</div>
+      <div class="step-card">
+        <span class="role role-user">유저</span>
+        <h2>활동 내역 — 구조 (필터 7종 · 월별 그룹 · 영구 조회)</h2>
+        <p class="desc">마이 &gt; 활동 &gt; '활동 내역'으로 진입. 상단 필터 7종(전체 / 적립 / 사용 / 교환 / 환수 / 응모 / 만료), 리스트는 <code>YYYY년 M월</code> 월별 그룹 헤더로 묶여 최신순으로 표시된다. 하단에 "영구 조회 · 탈퇴 전까지 모든 이력 보존" 고정 문구. 가입 직후에는 빈 상태 안내가 노출된다.</p>
+        <div class="shots">
+          <div class="shot wide">
+            <img src="my-activity-storyboard-assets/04-activity-empty.png" alt="활동 내역 빈 상태">
+            <div class="cap">가입 직후 빈 상태 · 필터 7종 + 정렬 토글 + 영구 조회 문구</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="arrow-down">
+      <svg width="20" height="28" viewBox="0 0 20 28" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 2v22M3 17l7 7 7-7"/></svg>
+    </div>
+
+    <div class="step">
+      <div class="step-badge">4</div>
+      <div class="step-card">
+        <span class="role role-system">적립 발생</span>
+        <h2>경유 구매 → 랜덤 티켓 가지급 = '적립' 기록</h2>
+        <p class="desc">쇼핑몰 경유 구매가 발생하면 구매 즉시 랜덤 티켓(가지급)이 지급되고, 이 시점에 원장(<code>ticket_transactions</code>)에 <code>earn</code> 기록이 등급별 장수만큼 남는다. 확정 전까지 실제 등급(브론즈/실버/골드)은 비공개.</p>
+        <div class="shots">
+          <div class="shot wide">
+            <img src="my-activity-storyboard-assets/05-earn-done-67000.png" alt="구매 적립 완료 — 랜덤 티켓 4장 대기중">
+            <div class="cap">쿠팡 67,000원 구매 직후 · 랜덤 티켓 4장 대기중 (등급 비공개)</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="arrow-down">
+      <svg width="20" height="28" viewBox="0 0 20 28" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 2v22M3 17l7 7 7-7"/></svg>
+    </div>
+
+    <div class="step">
+      <div class="step-badge">5</div>
+      <div class="step-card">
+        <span class="role role-cms">CMS 운영자</span>
+        <h2>구매확정 처리 — 가지급 → 등급 티켓 전환</h2>
+        <p class="desc">확정(연동 D+7 / 미연동 D+30)은 앱이 스스로 하지 않고 CMS에서 포스트백 상태를 '대기 → 확정'으로 바꿔야 처리된다. 확정은 기존 티켓 문서의 상태만 바꾸며(수량 증가 없음), 원장에 새 기록을 만들지 않는다.</p>
+        <div class="shots">
+          <div class="shot cms">
+            <img src="my-activity-storyboard-assets/06-cms-dm-postback-pending.png" alt="CMS 포스트백 목록 — 가지급 상태 2건">
+            <div class="cap">CMS &gt; 포스트백 목록 · 마이스토리 2건 "가지급(랜덤티켓)" 상태</div>
+          </div>
+          <div class="shot cms">
+            <img src="my-activity-storyboard-assets/07-cms-postback-edit-confirm.png" alt="CMS 포스트백 수정 모달 — 상태 확정 선택">
+            <div class="cap">포스트백 수정 모달 · 상태 '확정' 선택 (전환·회수 규칙 안내 문구 포함)</div>
+          </div>
+          <div class="shot cms">
+            <img src="my-activity-storyboard-assets/08-cms-dm-postback-confirmed.png" alt="CMS 포스트백 목록 — 확정 반영">
+            <div class="cap">저장 후 · "확정(등급티켓) 브3·실1·골0 / 브2·실0·골0" 반영</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="arrow-down">
+      <svg width="20" height="28" viewBox="0 0 20 28" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 2v22M3 17l7 7 7-7"/></svg>
+    </div>
+
+    <div class="step">
+      <div class="step-badge">6</div>
+      <div class="step-card">
+        <span class="role role-user">유저</span>
+        <h2>기프티콘 교환 = '사용' 기록</h2>
+        <p class="desc">혜택 &gt; 티켓 교환소에서 상품 교환 시 필요 등급 티켓이 차감되고, 원장에 사용(<code>use</code>) 기록과 교환 이력(<code>gifticon_exchanges</code>)이 남는다. 차감 미리보기("2장 차감 → 잔여 N장")가 상세 화면에 표시된다.</p>
+        <div class="shots">
+          <div class="shot wide">
+            <img src="my-activity-storyboard-assets/09-exchange-catalog.png" alt="티켓 교환소 카탈로그">
+            <div class="cap">티켓 교환소 · 보유 티켓 기준 "구매가능" 표시</div>
+          </div>
+          <div class="shot wide">
+            <img src="my-activity-storyboard-assets/10-gifticon-detail.png" alt="기프티콘 상세 — 차감 미리보기">
+            <div class="cap">상세 · "브론즈 티켓 2장 차감 → 잔여 1장" + 교환 정책</div>
+          </div>
+          <div class="shot wide">
+            <img src="my-activity-storyboard-assets/11-exchange-done.png" alt="교환 완료 화면">
+            <div class="cap">교환 완료 · 카카오톡 선물함 발송 안내</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="arrow-down">
+      <svg width="20" height="28" viewBox="0 0 20 28" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 2v22M3 17l7 7 7-7"/></svg>
+    </div>
+
+    <div class="step">
+      <div class="step-badge">7</div>
+      <div class="step-card">
+        <span class="role role-cms">CMS 운영자</span>
+        <h2>환불 처리 = '환수' 기록 — 미사용분만 회수</h2>
+        <p class="desc">CMS에서 포스트백 상태를 '환불'로 바꾸면 그 구매건에 걸린 티켓이 회수(<code>status: revoked</code>)되고 원장에 환수(<code>clawback</code>) 기록이 추가된다. 이번 검증에서 11번가 건(브론즈 2장 적립)은 1장이 이미 기프티콘 교환에 사용된 상태였고, 환불 처리 결과 <b>미사용 1장만 환수</b>됐다("티켓 1장 환수" 토스트) — 정책서 t8 "이미 쓴 티켓은 회수하지 않음(잔액 마이너스 방지)"과 일치.</p>
+        <div class="shots">
+          <div class="shot cms">
+            <img src="my-activity-storyboard-assets/12-cms-postback-refund-modal.png" alt="CMS 포스트백 환불 처리 모달">
+            <div class="cap">포스트백 수정 모달 · 상태 '환불' 선택 → 저장 시 해당 건 티켓 회수</div>
+          </div>
+        </div>
+        <div class="badge-note">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#5b6478" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-5M12 8h.01"/></svg>
+          정책서 기준 확정 전 환불은 "자동 취소(기록만)"인데, 데모 구현은 가지급/확정 구분 없이 동일하게 환수(clawback) 기록을 남긴다(코드 주석에 "간단화" 명시). 문서화 시 구분 필요 — '미결·확인 필요' 참조.
+        </div>
+      </div>
+    </div>
+
+    <div class="arrow-down">
+      <svg width="20" height="28" viewBox="0 0 20 28" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 2v22M3 17l7 7 7-7"/></svg>
+    </div>
+
+    <div class="step">
+      <div class="step-badge">8</div>
+      <div class="step-card">
+        <span class="role role-cms">CMS 운영자</span>
+        <h2>수동 지급 / 회수 — CS 보완 · 운영 조정</h2>
+        <p class="desc">CMS &gt; 티켓 내역의 '수동 지급 / 회수'로 특정 회원에게 등급별 티켓을 지급(<code>earn</code>)하거나 회수(<code>clawback</code>)할 수 있다. 사유 입력이 필수이며 처리 내역은 관리자 로그(<code>admin_logs</code>)에 남는다. 회수는 보유 활성 티켓에서 오래된 순(FIFO)으로 차감. 포스트백 미수신 시 CS가 영수증 인증 확인 후 수동 보완 지급하는 정책(t8)의 실행 창구다.</p>
+        <div class="shots">
+          <div class="shot cms">
+            <img src="my-activity-storyboard-assets/13-cms-ticket-list.png" alt="CMS 티켓 내역 화면">
+            <div class="cap">CMS &gt; 티켓 내역 · 우상단 '수동 지급 / 회수' 버튼</div>
+          </div>
+          <div class="shot cms">
+            <img src="my-activity-storyboard-assets/14-cms-manual-grant-modal.png" alt="CMS 수동 지급/회수 모달">
+            <div class="cap">수동 지급 모달 · 대상 회원 + 처리유형 + 등급별 수량 + 사유(필수) — 실제 브론즈 1장 지급 실행</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="arrow-down">
+      <svg width="20" height="28" viewBox="0 0 20 28" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 2v22M3 17l7 7 7-7"/></svg>
+    </div>
+
+    <div class="step">
+      <div class="step-badge">9</div>
+      <div class="step-card">
+        <span class="role role-user">유저</span>
+        <h2>활동 내역 — 전체 원장이 쌓인 모습</h2>
+        <p class="desc">위 1~8 실행 후의 활동 내역. 적립(+1장, 초록) / 사용(-1장, 보라) / 환수(-1장, 빨강) / 포인트(+100P)가 월별 그룹 아래 최신순으로 쌓인다. 원장 3개(<code>ticket_transactions</code> + <code>gifticon_exchanges</code> + <code>point_transactions</code>)를 병합해 렌더링한다.</p>
+        <div class="shots">
+          <div class="shot wide">
+            <img src="my-activity-storyboard-assets/19-activity-all.png" alt="활동 내역 전체 — 적립·사용·환수 혼합">
+            <div class="cap">전체 필터 · 2026년 7월 그룹 아래 적립/사용/환수/포인트 16행</div>
+          </div>
+        </div>
+        <div class="badge-note">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#b9770a" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-5M12 8h.01"/></svg>
+          캡처에서 확인된 버그: 기프티콘 교환 1건(브론즈 2장)이 "브론즈 티켓 사용 -1장" 2행 + "기프티콘 교환 -2장" 1행 = 3행으로 중복 표기된다. 실제 차감은 2장인데 화면상 -4장처럼 보임 — '미결·확인 필요' 1번.
+        </div>
+      </div>
+    </div>
+
+    <div class="arrow-down">
+      <svg width="20" height="28" viewBox="0 0 20 28" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 2v22M3 17l7 7 7-7"/></svg>
+    </div>
+
+    <div class="step">
+      <div class="step-badge">10</div>
+      <div class="step-card">
+        <span class="role role-user">유저</span>
+        <h2>필터별 조회 — 적립 / 사용 / 환수 / 응모 / 교환</h2>
+        <p class="desc">필터 pill을 누르면 해당 유형만 남는다. 아래는 같은 계정에서 필터만 바꿔 캡처한 결과.</p>
+        <div class="shots">
+          <div class="shot">
+            <img src="my-activity-storyboard-assets/20-activity-earn.png" alt="적립 필터">
+            <div class="cap">적립 · 구매 6장 + 온보딩 이벤트 1장 + 수동 지급 1장</div>
+          </div>
+          <div class="shot">
+            <img src="my-activity-storyboard-assets/21-activity-use.png" alt="사용 필터">
+            <div class="cap">사용 · 기프티콘 교환 차감 기록</div>
+          </div>
+          <div class="shot">
+            <img src="my-activity-storyboard-assets/22-activity-claw.png" alt="환수 필터">
+            <div class="cap">환수 · "구매 취소·환불 -1장"</div>
+          </div>
+          <div class="shot">
+            <img src="my-activity-storyboard-assets/23-activity-event.png" alt="응모 필터">
+            <div class="cap">응모 · 포인트 기록(+100P)이 이 필터로 분류됨</div>
+          </div>
+          <div class="shot">
+            <img src="my-activity-storyboard-assets/24-activity-swap-empty.png" alt="교환 필터 — 빈 상태">
+            <div class="cap">교환 · 항상 빈 상태 ("해당 내역이 없어요")</div>
+          </div>
+        </div>
+        <div class="badge-note">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#b9770a" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-5M12 8h.01"/></svg>
+          '교환' 필터를 채우는 기록 생성 흐름이 현재 앱·CMS 어디에도 없고(등급 교환 화면은 UI만, 확정 전환은 원장 기록 없음), 포인트가 '응모' 필터로 분류되는 것도 라벨과 어긋난다 — '미결·확인 필요' 2·3번.
+        </div>
+      </div>
+    </div>
+
+    <div class="arrow-down">
+      <svg width="20" height="28" viewBox="0 0 20 28" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 2v22M3 17l7 7 7-7"/></svg>
+    </div>
+
+    <div class="step">
+      <div class="step-badge">11</div>
+      <div class="step-card">
+        <span class="role role-user">유저</span>
+        <h2>활동 섹션의 나머지 진입점 — 내 티켓 · 구매 내역</h2>
+        <p class="desc">활동 내역과 나란히 배치된 두 화면. '내 티켓·기프티콘'은 보유 현황(잔액) 중심, '구매 내역'은 포스트백(주문) 단위 상태 중심이라 원장(활동 내역)과 관점이 다르다. 구매 내역에는 환불 완료 / 구매확정 상태가 그대로 반영된다.</p>
+        <div class="shots">
+          <div class="shot wide">
+            <img src="my-activity-storyboard-assets/25-my-tickets.png" alt="내 티켓·기프티콘 화면">
+            <div class="cap">내 티켓·기프티콘 · 보유 잔액 + 대기/완료 목록</div>
+          </div>
+          <div class="shot wide">
+            <img src="my-activity-storyboard-assets/26-purchase-history.png" alt="구매 내역 화면">
+            <div class="cap">구매 내역 · 11번가 "환불 완료" / 쿠팡 "구매확정"</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="arrow-down">
+      <svg width="20" height="28" viewBox="0 0 20 28" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 2v22M3 17l7 7 7-7"/></svg>
+    </div>
+
+    <div class="step">
+      <div class="step-badge">12</div>
+      <div class="step-card">
+        <span class="role role-cms">CMS 운영자</span>
+        <h2>운영 조회 화면 — 환수 이력 · 포인트 내역 · 회원 상세</h2>
+        <p class="desc">유저 활동내역의 운영자 측 대응 화면. 환수 이력은 원장의 <code>clawback</code>·<code>expire</code> 기록을 등급·사유·기간으로 필터해 집계하고, 회원 상세는 티켓 보유현황(등급별 합산)을 실집계로 보여준다.</p>
+        <div class="shots">
+          <div class="shot cms">
+            <img src="my-activity-storyboard-assets/15-cms-clawback-history.png" alt="CMS 환수 이력">
+            <div class="cap">CMS &gt; 환수 이력 · 마이스토리 "브론즈 1장 · 반품/취소" 최상단 기록</div>
+          </div>
+          <div class="shot cms">
+            <img src="my-activity-storyboard-assets/16-cms-point-list.png" alt="CMS 포인트 내역">
+            <div class="cap">CMS &gt; 포인트 내역</div>
+          </div>
+          <div class="shot cms">
+            <img src="my-activity-storyboard-assets/17-cms-member-list.png" alt="CMS 회원 목록 — 닉네임 검색">
+            <div class="cap">CMS &gt; 회원 목록 · 닉네임 검색 "마이스토리"</div>
+          </div>
+          <div class="shot cms">
+            <img src="my-activity-storyboard-assets/18-cms-member-detail.png" alt="CMS 회원 상세 — 티켓 보유현황">
+            <div class="cap">회원 상세 · 티켓 보유현황 실집계 (개별 이력 리스트는 없음 — 미결 8번)</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="rule-sec">
+    <h2>정책 · 규칙 (마스터 정책서 policyspec.html 기준)</h2>
+    <p class="desc">활동내역이 다루는 원장의 정책 근거. SoT는 마스터 정책서이며, 아래 표의 "화면 문구만" 표시는 정책서 본문에 정식 서술이 없다는 뜻이다.</p>
+
+    <table class="rules">
+      <tr><th style="width:130px;">필터</th><th>원장 기록 원천</th><th>발생 경로</th></tr>
+      <tr><td><b>적립</b></td><td><code>ticket_transactions</code> type <code>earn</code> (+1장/건)</td><td>경유 구매 가지급 시점 · 미션(이벤트 티켓) · CMS 수동 지급</td></tr>
+      <tr><td><b>사용</b></td><td>type <code>use</code> + <code>gifticon_exchanges</code></td><td>기프티콘 교환 차감</td></tr>
+      <tr><td><b>교환</b></td><td>type이 earn/use/expire/clawback 외인 기록 → "티켓 전환"</td><td>현재 생성 경로 없음 (미결 2번)</td></tr>
+      <tr><td><b>환수</b></td><td>type <code>clawback</code></td><td>CMS 환불 처리 · CMS 수동 회수 (FIFO)</td></tr>
+      <tr><td><b>응모</b></td><td><code>point_transactions</code> 전체 (+/-P)</td><td>미션 포인트 등 — 라벨과 불일치 (미결 3번)</td></tr>
+      <tr><td><b>만료</b></td><td>type <code>expire</code></td><td>유효기간 경과 자동 소멸</td></tr>
+    </table>
+
+    <ul>
+      <li><b>유효기간</b> — 등급 티켓: 적립일 + 365일(확정일 아님) · 이벤트 티켓: 발급일 + 100일 · 포인트: 적립일 + 1년(10P = 1원, FIFO 소멸). 만료 D-30 · D-7 알림.</li>
+      <li><b>확정 대기</b> — 카카오 연동 D+7 / 미연동 D+30. 확정 전 상태는 "가지급(랜덤 티켓)", 등급 비공개.</li>
+      <li><b>환불 규칙(t8)</b> — 확정 전 환불: 적립 예정 보상 자동 취소(잔액 영향 없음) · 확정 후 환불: 미사용 티켓만 회수(이미 쓴 티켓 회수 안 함) · 이벤트 티켓: 환불에도 회수 안 함 · 30일 내 환불 5건 초과 시 어뷰징 플래그(운영자 검토).</li>
+      <li><b>원장 불변</b> — 거래 기록은 삭제·수정하지 않고 새 기록만 추가(환수도 <code>clawback</code> 신규 기록 + 티켓 상태 변경). CMS 데이터 관리에서도 원장 2종은 "불변" 표기.</li>
+      <li><b>데이터 보존(t11)</b> — 연동 계정만 서버 영구 보존, 미연동 게스트는 기기 보존(재설치 시 초기화). 금전 정산 데이터는 5년 마스킹 보관. 앱의 "영구 조회 · 탈퇴 전까지 모든 이력 보존" 문구는 화면 문구만 (미결 5번).</li>
+      <li><b>수동 지급/회수</b> — 사유 필수, <code>admin_logs</code> 기록, 회수는 활성 티켓 FIFO. CS 수동 보완 지급(포스트백 미수신 + 영수증 인증)의 실행 창구.</li>
+    </ul>
+  </div>
+
+  <div class="issue-sec">
+    <h2>미결 · 확인 필요 (형님 결정 대상 — 임의 확정하지 않음)</h2>
+    <p class="desc">이번 검증에서 확인된 정책 공백·구현 불일치. 전부 실화면/코드로 확인된 사실이며, 방향 결정만 남은 항목이다.</p>
+    <ol>
+      <li><b>사용 기록 중복 표기 (버그)</b> — 기프티콘 교환 1건(2장)이 활동내역에 3행(-1장, -1장, -2장)으로 표시돼 차감이 2배로 보인다. 티켓 단위 기록과 교환 단위 기록 중 하나만 노출하도록 정리 필요.</li>
+      <li><b>'교환' 필터가 항상 빈 상태</b> — 티켓 등급 교환 화면(혜택 탭)은 UI만 있고 원장 기록을 만들지 않으며, 가지급→확정 전환도 기록을 남기지 않는다. 등급 교환 실구현 시 원장 type(예: swap) 정의 필요.</li>
+      <li><b>포인트 기록이 '응모' 필터로 분류</b> — 미션 포인트(+100P)가 '응모' 탭에 나온다. 필터명을 '포인트'로 바꾸거나 분류를 나눠야 함.</li>
+      <li><b>정렬 토글 미동작</b> — 최신순/오래된순 버튼은 색만 바뀌고 실제 재정렬하지 않는다(항상 최신순).</li>
+      <li><b>"영구 조회" 정책 근거 부재</b> — 앱 문구(영구 조회·탈퇴 전까지 보존)에 해당하는 정식 정책이 정책서 본문에 없고, 미연동 게스트는 재설치 시 초기화되므로 문구와 실보존이 어긋난다. 정책 명문화 필요.</li>
+      <li><b>닉네임 2~10자 규칙 정책 부재</b> — 화면 문구로만 존재. 프로필·회원정보 영역 전반이 정책서에 정식 섹션 없음.</li>
+      <li><b>수동 회수도 "구매 취소·환불"로 표기</b> — 활동내역이 clawback 사유를 구분하지 않아 운영자 수동 회수까지 구매 환불로 보인다. 사유 필드 노출 여부 결정 필요.</li>
+      <li><b>CMS 회원 상세에 활동 이력 없음</b> — 등급별 티켓 합산만 있고 회원 단위 활동내역/포인트 이력 조회가 없다. 운영 필요 시 추가 대상.</li>
+      <li><b>확정 전 환불의 데모 단순화</b> — 정책서는 "확정 전 = 자동 취소(기록만)"인데 데모는 가지급/확정 구분 없이 동일하게 환수 처리한다(코드 주석 명시). 개발 이관 시 구분 구현 필요.</li>
+    </ol>
+  </div>
+
+  <footer class="notes">
+    <h4>참고 사항</h4>
+    <ul>
+      <li>모든 화면은 배포본(pricepick-demo.vercel.app)에서 헤드리스 브라우저로 실제 계정 생성 → 구매 시뮬 2건 → CMS 확정 → 기프티콘 교환 2건 → CMS 환불·수동 지급까지 실행한 뒤 캡처했다. CMS는 firstadmin 계정으로 실제 로그인·조작했다.</li>
+      <li>검증 계정: 닉네임 <code>마이스토리</code> (게스트 · 비연동), 식별자 <code>MfeNULU3l5cU5D0iq4JrStDTlG53</code>. CMS에서 동일 계정으로 추적 가능하다.</li>
+      <li>활동내역 원장은 <code>ticket_transactions</code> + <code>gifticon_exchanges</code> + <code>point_transactions</code> 3개 컬렉션 병합이며, 캡처의 모든 수치는 이번 실행에서 실제 발생한 데이터다.</li>
+      <li>월별 그룹은 당월(2026년 7월) 데이터만 존재해 그룹 헤더 1개로 표시됐다. 복수 월 데이터 시 월 단위로 나뉜다.</li>
+    </ul>
+  </footer>
+
+</div>
+
+<div class="last-update">Last Update <b>2026.07.09 19:02</b></div>
+
+</body>
+</html>
