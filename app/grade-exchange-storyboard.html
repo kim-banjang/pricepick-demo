@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PricePick — 티켓 등급 교환 스토리보드</title>
+<style>
+  :root{
+    --bg:#f5f6fa; --card:#ffffff; --ink:#1f2433; --sub:#5b6478;
+    --line:#e6e8f0; --accent:#3b5bdb; --accent-soft:#eef1fd;
+    --green:#1f9d57; --green-bg:#e7f6ee; --amber:#b9770a; --amber-bg:#fdf3e3;
+    --red:#c0392b; --red-bg:#fbeceb; --gray:#5b6478; --gray-bg:#eef0f4;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+    line-height:1.6;-webkit-font-smoothing:antialiased;}
+  .wrap{max-width:1080px;margin:0 auto;padding:40px 24px 100px;}
+  header.doc{border-bottom:2px solid var(--accent);padding-bottom:20px;margin-bottom:8px;}
+  header.doc h1{margin:0 0 8px;font-size:26px;letter-spacing:-.01em;}
+  .lead{color:var(--sub);font-size:15px;margin:0 0 4px;}
+  .meta{color:var(--sub);font-size:13px;margin:2px 0 0;}
+  .note-top{background:var(--accent-soft);border:1px solid #d7ddf8;border-radius:10px;
+    padding:14px 18px;margin:20px 0 14px;font-size:13.5px;color:#33406b;display:flex;gap:10px;align-items:flex-start;}
+  .note-top svg{flex:0 0 auto;margin-top:1px;}
+  .note-warn{background:var(--amber-bg);border:1px solid #f0dcb2;border-radius:10px;
+    padding:14px 18px;margin:0 0 36px;font-size:13.5px;color:#6b5320;display:flex;gap:10px;align-items:flex-start;}
+  .note-warn svg{flex:0 0 auto;margin-top:1px;}
+
+  .policy-bar{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:44px;}
+  .policy-card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;
+    box-shadow:0 1px 2px rgba(20,30,60,.04);}
+  .policy-card .num{font-size:20px;font-weight:700;color:var(--accent);}
+  .policy-card .lbl{font-size:12px;color:var(--sub);margin-top:2px;}
+  @media(max-width:760px){.policy-bar{grid-template-columns:repeat(2,1fr);}}
+
+  .flow{position:relative;padding-left:40px;}
+  .flow::before{content:"";position:absolute;left:15px;top:8px;bottom:8px;width:2px;background:var(--line);}
+  .step{position:relative;margin-bottom:14px;}
+  .step-badge{position:absolute;left:-40px;top:2px;width:32px;height:32px;border-radius:50%;
+    background:var(--accent);color:#fff;font-size:14px;font-weight:700;
+    display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(59,91,219,.35);z-index:2;}
+  .step-card{background:var(--card);border:1px solid var(--line);border-radius:14px;
+    padding:22px 24px;box-shadow:0 1px 3px rgba(20,30,60,.05);}
+  .step-card h2{margin:0 0 4px;font-size:17px;}
+  .step-card .role{display:inline-block;font-size:11px;font-weight:700;padding:2px 9px;border-radius:999px;
+    margin-bottom:8px;letter-spacing:.02em;}
+  .role-user{background:#eef1fd;color:var(--accent);}
+  .role-system{background:var(--gray-bg);color:var(--gray);}
+  .role-admin{background:var(--green-bg);color:var(--green);}
+  .step-card p.desc{margin:8px 0 16px;color:var(--sub);font-size:13.5px;}
+  .shots{display:flex;gap:20px;flex-wrap:wrap;align-items:flex-start;}
+  .shot{flex:0 0 auto;}
+  .shot img{display:block;width:200px;height:auto;border-radius:14px;border:1px solid var(--line);
+    box-shadow:0 4px 14px rgba(20,30,60,.10);}
+  .shot .cap{margin-top:8px;font-size:12px;color:var(--sub);text-align:center;max-width:200px;}
+  .shot.wide img{width:280px;}
+  .shot.wide .cap{max-width:280px;}
+
+  .arrow-down{display:flex;justify-content:center;margin:2px 0 18px 0;color:#b7bdd1;}
+
+  .badge-note{display:inline-flex;align-items:flex-start;gap:6px;font-size:12px;color:var(--sub);
+    background:var(--gray-bg);border-radius:8px;padding:6px 10px;margin-top:14px;}
+  .badge-conflict{display:inline-flex;align-items:flex-start;gap:6px;font-size:12px;color:var(--red);
+    background:var(--red-bg);border-radius:8px;padding:6px 10px;margin-top:14px;}
+
+  .rules{margin-top:44px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px 24px;}
+  .rules h3{margin:0 0 12px;font-size:16px;}
+  table.rule-tbl{width:100%;border-collapse:collapse;font-size:13px;}
+  table.rule-tbl th{background:var(--gray-bg);color:var(--ink);text-align:left;padding:8px 12px;
+    font-size:12px;border:1px solid var(--line);white-space:nowrap;}
+  table.rule-tbl td{padding:8px 12px;border:1px solid var(--line);color:var(--sub);}
+  table.rule-tbl td b{color:var(--ink);}
+
+  .pending{margin-top:20px;background:var(--red-bg);border:1px solid #f0c8c2;border-radius:12px;padding:18px 22px;}
+  .pending h3{margin:0 0 10px;font-size:15px;color:var(--red);}
+  .pending ol{margin:0;padding-left:20px;font-size:13px;color:#6b3a33;}
+  .pending li{margin:7px 0;}
+  .pending li b{color:var(--red);}
+
+  footer.notes{margin-top:28px;background:var(--card);border:1px solid var(--line);border-radius:12px;
+    padding:20px 24px;font-size:13px;color:var(--sub);}
+  footer.notes h4{margin:0 0 10px;color:var(--ink);font-size:14px;}
+  footer.notes ul{margin:0;padding-left:18px;}
+  footer.notes li{margin:5px 0;}
+  code{background:var(--gray-bg);border-radius:5px;padding:1px 6px;font-size:12px;
+    font-family:ui-monospace,Menlo,monospace;color:#3a3f52;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="doc">
+    <h1>티켓 등급 교환 스토리보드</h1>
+    <p class="lead">혜택 탭 진입부터 등급 교환·기록·CMS 정책 관리까지 — 실제 배포본 화면 캡처 기반</p>
+    <p class="meta">pricepick-demo.vercel.app /app(게스트) · /cms 배포본에서 직접 캡처 (2026.07.09) · 목업/와이어프레임 없음</p>
+  </header>
+
+  <div class="note-top">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3b5bdb" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v5"/><circle cx="12" cy="16" r=".5" fill="#3b5bdb"/></svg>
+    <div>이 문서의 모든 화면 썸네일은 실제 배포본(pricepick-demo.vercel.app)에서 테스트 계정(SB검증C)을 만들고 CMS 수동 지급으로 티켓(브론즈 12·실버 4·골드 2)을 실제 세팅한 뒤 조작·캡처한 스크린샷입니다. 정책 기준은 마스터 정책서(policyspec.html, SoT)입니다.</div>
+  </div>
+
+  <div class="note-warn">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#b9770a" stroke-width="2"><path d="M12 3l10 18H2L12 3z"/><path d="M12 10v4"/><circle cx="12" cy="17" r=".5" fill="#b9770a"/></svg>
+    <div><b>구현 상태 주의</b> — 등급 교환 화면(UI)은 배포본에 존재하지만 <b>교환 실행 로직은 아직 미구현</b>입니다(하단 CTA는 실행 없이 이전 화면 복귀만, Firestore 기록 없음). 아래 5단계의 "실행·기록"은 정책서·데이터 구조 기준으로 정의된 동작이며 현재 앱에서 동작하지 않습니다.</div>
+  </div>
+
+  <div class="policy-bar">
+    <div class="policy-card"><div class="num">브론즈 10장 → 실버 1장</div><div class="lbl">교환 비율 (등가 전환)</div></div>
+    <div class="policy-card"><div class="num">실버 2장 → 골드 1장</div><div class="lbl">교환 비율 (등가 전환)</div></div>
+    <div class="policy-card"><div class="num">상향만</div><div class="lbl">정책서 기준 — 하향(골드→실버 등) 불가 ※화면과 불일치</div></div>
+    <div class="policy-card"><div class="num">취소 불가</div><div class="lbl">교환 완료 후 되돌리기 없음</div></div>
+  </div>
+
+  <div class="flow">
+
+    <div class="step">
+      <div class="step-badge">1</div>
+      <div class="step-card">
+        <span class="role role-user">유저</span>
+        <h2>혜택 탭 — 내 티켓 카드에서 진입</h2>
+        <p class="desc">혜택 탭 상단 '내 티켓' 카드에 등급별 보유 수량(브론즈/실버/골드)이 표시된다. '내 적립 티켓 자세히 보기 ›'를 누르면 적립 티켓 상세로 이동한다.</p>
+        <div class="shots">
+          <div class="shot wide">
+            <img src="grade-exchange-storyboard-assets/01-benefit-ticket-card.png" alt="혜택 탭 내 티켓 카드 — 등급별 보유 수량">
+            <div class="cap">혜택 탭 · 내 티켓 카드 (브론즈 12 · 실버 4 · 골드 2 — CMS 수동 지급으로 세팅한 실데이터)</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="arrow-down">
+      <svg width="20" height="28" viewBox="0 0 20 28" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 2v22M3 17l7 7 7-7"/></svg>
+    </div>
+
+    <div class="step">
+      <div class="step-badge">2</div>
+      <div class="step-card">
+        <span class="role role-user">유저</span>
+        <h2>내 적립 티켓 — 규칙 안내 + '티켓 바꾸러 가기'</h2>
+        <p class="desc">'내 적립 티켓' 화면은 랜덤 티켓 활성화 목록과 등급 티켓 보유 현황을 보여주고, 하단 '티켓 등급 바꾸기' 섹션에서 교환 규칙(단일 등급 사용, 만료 임박분부터 자동 사용, 적립일 승계)과 비율을 안내한 뒤 '티켓 바꾸러 가기 ›'로 교환 화면에 진입시킨다.</p>
+        <div class="shots">
+          <div class="shot wide">
+            <img src="grade-exchange-storyboard-assets/02-my-tickets-swap-entry.png" alt="내 적립 티켓 화면 — 티켓 등급 바꾸기 진입 섹션">
+            <div class="cap">내 적립 티켓 · 보유 현황 + 등급 바꾸기 안내/진입</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="arrow-down">
+      <svg width="20" height="28" viewBox="0 0 20 28" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 2v22M3 17l7 7 7-7"/></svg>
+    </div>
+
+    <div class="step">
+      <div class="step-badge">3</div>
+      <div class="step-card">
+        <span class="role role-user">유저</span>
+        <h2>티켓 등급 교환 — 보유 현황 · 비율 · 방향 선택</h2>
+        <p class="desc">교환 화면 상단에 등급별 보유 현황, 교환 비율(브론즈 10장 ⇄ 실버 1장 / 실버 2장 ⇄ 골드 1장), 사용 기한 처리 규칙(FIFO 자동 사용 · 적립일 승계 · 만료일 연장 없음)이 표시되고, 교환 방향을 버튼으로 선택한다.</p>
+        <div class="shots">
+          <div class="shot wide">
+            <img src="grade-exchange-storyboard-assets/03-swap-main.png" alt="티켓 등급 교환 화면 — 보유 현황, 교환 비율, 방향 선택">
+            <div class="cap">등급 교환 화면 · 보유/비율/방향 선택 (실배포 화면)</div>
+          </div>
+        </div>
+        <div class="badge-conflict">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#c0392b" stroke-width="2"><path d="M12 3l10 18H2L12 3z"/><path d="M12 10v4"/></svg>
+          <span>정책 불일치 — 배포 화면은 <b>양방향 4버튼</b>(실버→브론즈, 골드→실버 하향 포함)에 "어느 방향으로 바꿔도 보유 가치는 같아요"라고 안내하지만, 마스터 정책서(SoT)는 <b>상향만 허용·하향 불가</b>로 확정돼 있다. 방향 정책 확정 필요(아래 미결 목록 1번).</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="arrow-down">
+      <svg width="20" height="28" viewBox="0 0 20 28" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 2v22M3 17l7 7 7-7"/></svg>
+    </div>
+
+    <div class="step">
+      <div class="step-badge">4</div>
+      <div class="step-card">
+        <span class="role role-user">유저</span>
+        <h2>수량 입력 → 교환 후 보유 시뮬레이션</h2>
+        <p class="desc">보낼 티켓 수량을 직접 입력하거나 퀵버튼(+10/+50/+100/최대/초기화)으로 조정하면, 받을 티켓 수와 '교환 후 보유 현황'(등급별 before → after)이 화면에서 미리 확인된다. 보유 초과 입력 시 '보유 부족' 경고를 띄우는 구조.</p>
+        <div class="shots">
+          <div class="shot wide">
+            <img src="grade-exchange-storyboard-assets/04-swap-stepper.png" alt="교환 수량 스테퍼와 받을 티켓 표시">
+            <div class="cap">교환 수량 · 브론즈 10장 → 실버 1장 (현재 4장 → 교환 후 5장)</div>
+          </div>
+          <div class="shot wide">
+            <img src="grade-exchange-storyboard-assets/05-swap-simulation-point.png" alt="교환 후 보유 현황 시뮬레이션과 포인트-티켓 교환 섹션">
+            <div class="cap">교환 후 보유 현황(12→2 / 4→5 / 2→2) + 하단 포인트 ↔ 티켓 교환 섹션</div>
+          </div>
+        </div>
+        <div class="badge-conflict">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#c0392b" stroke-width="2"><path d="M12 3l10 18H2L12 3z"/><path d="M12 10v4"/></svg>
+          <span>정책 근거 없음 — 화면 하단의 <b>'포인트 ↔ 티켓 교환'</b>(1,000P→브론즈 1장, 10,000P→실버 1장, 20,000P→골드 1장, 역방향 포함) 섹션은 마스터 정책서에 존재하지 않는 기능이다. 존치 여부 확정 필요(미결 목록 2번).</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="arrow-down">
+      <svg width="20" height="28" viewBox="0 0 20 28" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 2v22M3 17l7 7 7-7"/></svg>
+    </div>
+
+    <div class="step">
+      <div class="step-badge">5</div>
+      <div class="step-card">
+        <span class="role role-system">시스템 (미구현)</span>
+        <h2>교환 실행 · 기록 — 정의된 동작 (현재 앱 미구현)</h2>
+        <p class="desc">정책·데이터 구조 기준으로 교환 실행 시 일어나야 하는 처리는 다음과 같다. ① 보낼 등급의 활성 티켓을 만료 임박분(적립일 오래된 것)부터 FIFO로 <code>used</code> 처리, ② 받을 등급 티켓을 신규 생성하되 <b>원본 중 가장 이른 적립일을 승계</b>(만료일 연장 없음 — 등급 티켓 만료는 적립일+1년), ③ 티켓 원장(<code>ticket_transactions</code>)에 교환 기록 추가, ④ 활동내역에 '등급 전환'으로 노출, ⑤ 완료 후 취소 불가. 활동내역에는 '교환' 필터가 이미 준비돼 있어(아래 캡처) 실행이 구현되면 여기에 기록이 쌓인다.</p>
+        <div class="shots">
+          <div class="shot wide">
+            <img src="grade-exchange-storyboard-assets/08-activity-swap-filter.png" alt="활동 내역 — 교환 필터 선택 상태(빈 내역)">
+            <div class="cap">마이 &gt; 활동 내역 · '교환' 필터 — 등급 전환 기록이 남을 자리 (실행 미구현이라 현재 빈 상태) · "영구 조회 · 탈퇴 전까지 모든 이력 보존"</div>
+          </div>
+        </div>
+        <div class="badge-note">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#5b6478" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-5M12 8h.01"/></svg>
+          <span>현재 배포본: 화면 하단 '티켓 교환하기' CTA는 실행 없이 이전 화면으로 복귀만 하며, 수량 스테퍼·시뮬레이션 숫자도 계산 로직 없이 고정값이다. 등급 교환용 Firestore 쓰기 함수 자체가 없다. 또한 정책상 "티켓 사용은 카카오 연동 후에만 가능(게스트는 적립만)"인데, 이 게이팅도 아직 앱에 없다.</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="arrow-down">
+      <svg width="20" height="28" viewBox="0 0 20 28" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 2v22M3 17l7 7 7-7"/></svg>
+    </div>
+
+    <div class="step">
+      <div class="step-badge">6</div>
+      <div class="step-card">
+        <span class="role role-admin">운영자 · CMS</span>
+        <h2>CMS — 교환 정책 패널(조회 전용) + 티켓 원장</h2>
+        <p class="desc">등급 교환 전용 CMS 관리 화면은 없다(별도 운영 개입이 없는 자동 등가 전환이기 때문). CMS에서는 ① '운영 정책' 페이지의 '티켓 등급 간 교환 정책' 패널에서 비율·환산가치(브론즈 100원/실버 1,000원/골드 2,000원) 기준을 조회하고, ② '티켓 내역'(append-only 원장)에서 회원별 티켓 발행·사용·회수 기록을 확인하며, ③ 오류·CS 보정이 필요하면 '수동 지급 / 회수' 모달로 등급별 수량을 직접 지급·회수한다(사유 필수, 로그 기록, 되돌리기 불가). 교환 실행이 구현되면 이 원장에 교환 기록이 쌓이는 구조다.</p>
+        <div class="shots">
+          <div class="shot wide" style="flex-basis:100%;">
+            <img src="grade-exchange-storyboard-assets/06-cms-policy-swap.png" alt="CMS 운영 정책 — 티켓 등급 간 교환 정책 패널" style="width:520px;">
+            <div class="cap" style="max-width:520px;">CMS &gt; 운영 정책 · 등급 간 교환 정책 패널 — "양방향" 서술로 정책서(상향만)와 불일치 상태</div>
+          </div>
+          <div class="shot wide" style="flex-basis:100%;">
+            <img src="grade-exchange-storyboard-assets/07-cms-ticket-ledger.png" alt="CMS 티켓 내역 — append-only 원장" style="width:520px;">
+            <div class="cap" style="max-width:520px;">CMS &gt; 티켓 내역 — 실 Firestore 원장(발행/사용/회수, 수동 지급/회수 포함) · 테스트 지급·교환 기록이 실제 반영된 화면</div>
+          </div>
+          <div class="shot wide" style="flex-basis:100%;">
+            <img src="grade-exchange-storyboard-assets/09-cms-manual-grant-modal.png" alt="CMS 수동 티켓 지급/회수 모달" style="width:520px;">
+            <div class="cap" style="max-width:520px;">CMS &gt; 티켓 내역 &gt; 수동 티켓 지급 / 회수 — 대상 회원·처리 유형·등급별 스테퍼·사유(필수) · 실동작 (캡처는 처리 전 상태)</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="rules">
+    <h3>정책·규칙 정리 (SoT: policyspec.html)</h3>
+    <table class="rule-tbl">
+      <tr><th>항목</th><th>확정 정책</th></tr>
+      <tr><td>교환 비율</td><td><b>브론즈 10장 → 실버 1장 · 실버 2장 → 골드 1장</b> (환산가치 1:1 등가 전환. 브론즈 100원/실버 1,000원/골드 2,000원)</td></tr>
+      <tr><td>교환 방향</td><td>정책서 기준 <b>상향만 허용, 하향 불가</b> — 단 배포 화면·CMS 패널은 양방향으로 표기돼 있어 확정 필요 (미결 1)</td></tr>
+      <tr><td>취소</td><td><b>교환 완료 후 취소 불가</b></td></tr>
+      <tr><td>사용 티켓 선택</td><td>만료 임박분(적립일이 오래된 티켓)부터 <b>FIFO 자동 사용</b> — 유저가 개별 티켓을 고르지 않음</td></tr>
+      <tr><td>만료일 처리</td><td>새로 생기는 상위 티켓은 <b>원본 중 가장 이른 적립일을 승계</b>, 만료일 연장 없음 (등급 티켓 만료 = 적립일 + 1년, D-30/D-7 알림)</td></tr>
+      <tr><td>사용 가능 조건</td><td>티켓·포인트 사용(교환 포함)은 <b>카카오 연동 후에만 가능</b> — 게스트(미연동)는 적립만 누적</td></tr>
+      <tr><td>대상 티켓</td><td>등급 티켓(브론즈/실버/골드)만. <b>이벤트 티켓은 경품 응모 전용</b>이라 등급 교환·기프티콘 교환에 쓸 수 없음</td></tr>
+    </table>
+  </div>
+
+  <div class="pending">
+    <h3>미결 · 불일치 — 형님 확정 필요</h3>
+    <ol>
+      <li><b>교환 방향</b> — 정책서(SoT)는 "상향만, 하향 불가"인데 배포 앱 화면(방향 4버튼 + "어느 방향으로 바꿔도" 문구 + 하향 분해 규칙 설명)과 CMS 운영 정책 패널("단일 등급 결제 + 양방향 교환"), 스토리보드 인덱스 카드 07 문구("전 방향 허용")까지 모두 양방향으로 표기돼 있다. 양방향이 맞다면 정책서를, 상향만이 맞다면 앱·CMS·인덱스 문구와 UI를 함께 고쳐야 한다.</li>
+      <li><b>포인트 ↔ 티켓 교환</b> — 앱 등급 교환 화면 하단에 존재하지만 정책서에 근거 없음. 기능 존치/폐기 확정 필요.</li>
+      <li><b>실행 로직 미구현</b> — 등급 교환은 앱·CMS 모두 실행이 구현되지 않은 UI 목업 상태. 구현 우선순위 결정 필요.</li>
+      <li><b>연동 게이팅 미구현</b> — "사용은 카카오 연동 후" 정책이 앱 교환 흐름(등급 교환·기프티콘 교환)에 적용되지 않아 게스트도 사용 가능한 상태.</li>
+    </ol>
+  </div>
+
+  <footer class="notes">
+    <h4>참고 사항</h4>
+    <ul>
+      <li>캡처는 전부 배포본(pricepick-demo.vercel.app)에서 수행 — 게스트 온보딩으로 테스트 계정(SB검증C)을 생성하고, CMS 수동 지급 로직과 동일한 구조로 티켓(브론즈 12·실버 4·골드 2·이벤트 3)을 지급해 실데이터 상태에서 조작·캡처했다.</li>
+      <li>화면 경로: 혜택 탭 → 내 적립 티켓 → 티켓 등급 교환. 등급 교환 화면의 잔액·시뮬레이션 수치는 현재 정적 표기이나, 캡처 계정 보유량과 일치하도록 세팅해 실제 동작 시의 화면과 동일한 상태를 재현했다.</li>
+      <li>이 문서의 정책 서술 기준은 마스터 정책서 <code>policyspec.html</code>(2026-07-09 형님 명문화 SoT)이며, 화면·CMS와 어긋나는 지점은 본문에 불일치로 표기했다.</li>
+    </ul>
+  </footer>
+
+</div>
+<div style="position:fixed;bottom:24px;left:24px;background:rgba(255,255,255,.92);border:1px solid var(--line);border-radius:10px;padding:8px 14px;font-size:11.5px;color:var(--sub);box-shadow:0 2px 10px rgba(0,0,0,.05);z-index:50;">Last Update <b style="color:var(--ink);">2026.07.09 19:03</b></div>
+</body>
+</html>
