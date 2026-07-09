@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" font-family="Apple SD Gothic Neo, Noto Sans CJK KR, Pretendard, sans-serif">
+<defs>
+<linearGradient id="gA" x1="0" y1="0" x2="1" y2="1">
+<stop offset="0" stop-color="#EEE9FC"/><stop offset="1" stop-color="#F8F6FD"/></linearGradient>
+</defs>
+<rect width="1200" height="630" fill="url(#gA)"/>
+<text x="80" y="100" font-size="36" font-weight="700" fill="#6B21A8">PRICE<tspan fill="#2E1065">PICK</tspan></text>
+<text x="80" y="270" font-size="82" font-weight="700" fill="#2E1065">친구 초대하고</text>
+<text x="80" y="370" font-size="82" font-weight="700" fill="#2E1065">같이 <tspan fill="#6B3AE0">500P</tspan> 받기</text>
+<text x="80" y="452" font-size="33" fill="#6B5B8A">초대코드 입력하면 친구도 나도 포인트 지급</text>
+<rect x="80" y="505" width="380" height="70" rx="35" fill="#6B3AE0"/>
+<text x="270" y="551" font-size="32" font-weight="700" fill="#ffffff" text-anchor="middle">지금 초대받기</text>
+<g transform="translate(860,150)">
+<rect x="30" y="70" width="250" height="160" rx="22" fill="#ffffff" stroke="#C9B8F2" stroke-width="3"/>
+<rect x="62" y="118" width="78" height="50" rx="12" fill="#C79A2E"/>
+<circle cx="245" cy="46" r="60" fill="#FFD24A" stroke="#E8B62E" stroke-width="5"/>
+<text x="245" y="63" font-size="46" font-weight="700" fill="#8A6A12" text-anchor="middle">P</text>
+<circle cx="135" cy="320" r="50" fill="#FFD24A" stroke="#E8B62E" stroke-width="5"/>
+<text x="135" y="336" font-size="38" font-weight="700" fill="#8A6A12" text-anchor="middle">P</text>
+</g>
+</svg>
