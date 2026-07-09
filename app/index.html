@@ -15645,6 +15645,37 @@ var PP = {
 };
 var REAL_UID = null;
 
+/* ── 초대 링크 딥링크 (?invite=CODE) ──
+   가입 전에 링크로 들어올 수 있으므로 URL의 코드를 즉시 localStorage에 보관해뒀다가
+   닉네임 가입이 완료되는 시점(bindNickname)에 소비해서 초대관계를 자동 등록한다. */
+var PENDING_INVITE_KEY = 'pp_pending_invite_code';
+(function () {
+  try {
+    var params = new URLSearchParams(window.location.search);
+    var urlCode = params.get('invite');
+    if (urlCode) localStorage.setItem(PENDING_INVITE_KEY, urlCode.trim().toUpperCase());
+  } catch (e) { /* URLSearchParams/localStorage 미지원 환경은 그냥 무시 */ }
+})();
+function ppConsumePendingInviteCode() {
+  try {
+    var code = localStorage.getItem(PENDING_INVITE_KEY);
+    localStorage.removeItem(PENDING_INVITE_KEY);
+    return code || null;
+  } catch (e) { return null; }
+}
+/* 가입 완료 시 대기 중인 초대코드가 있으면 자동 등록. 기존 검증(자기 코드·무효 코드·1회
+   제한)을 그대로 태우고, 실패하면 조용히 무시(코드 없이 가입한 것과 동일하게 취급 —
+   마이페이지 입력란은 계속 활성 상태로 남는다). */
+function ppTryAutoRedeemPendingInvite() {
+  var code = ppConsumePendingInviteCode();
+  if (!code) return;
+  ppRedeemInviteCode(code).then(function () {
+    showToast('친구 초대로 시작했어요');
+  }).catch(function (e) {
+    console.warn('ppTryAutoRedeemPendingInvite', e && e.message);
+  });
+}
+
 /* ── 시뮬 로그인 (CMS에서 세팅한 카카오 연동 회원으로 체험) ──
    flutter 앱의 enterAsPersona/exitPersona와 동일한 개념: PP.uid를
    실제 익명 인증 uid(REAL_UID) 대신 CMS 회원 문서 ID로 덮어써서 그 회원의
@@ -15975,6 +16006,7 @@ function bindNickname() {
         PP.user = { nickname: nickname, linked_kakao: false, created_at: new Date() };
         btn.textContent = prevText;
         window.showScreen('pw-10');
+        ppTryAutoRedeemPendingInvite();
       });
     }).catch(function(err) {
       console.error('saveUser', err);
