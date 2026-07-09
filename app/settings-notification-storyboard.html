@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PricePick — 설정·알림 프로세스 스토리보드</title>
+<style>
+  :root{
+    --bg:#f5f6fa; --card:#ffffff; --ink:#1f2433; --sub:#5b6478;
+    --line:#e6e8f0; --accent:#3b5bdb; --accent-soft:#eef1fd;
+    --green:#1f9d57; --green-bg:#e7f6ee; --amber:#b9770a; --amber-bg:#fdf3e3;
+    --red:#c0392b; --red-bg:#fbeceb; --gray:#5b6478; --gray-bg:#eef0f4;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+    line-height:1.6;-webkit-font-smoothing:antialiased;}
+  .wrap{max-width:1080px;margin:0 auto;padding:40px 24px 100px;}
+  header.doc{border-bottom:2px solid var(--accent);padding-bottom:20px;margin-bottom:8px;}
+  header.doc h1{margin:0 0 8px;font-size:26px;letter-spacing:-.01em;}
+  .lead{color:var(--sub);font-size:15px;margin:0 0 4px;}
+  .meta{color:var(--sub);font-size:13px;margin:2px 0 0;}
+  .note-top{background:var(--accent-soft);border:1px solid #d7ddf8;border-radius:10px;
+    padding:14px 18px;margin:20px 0 36px;font-size:13.5px;color:#33406b;display:flex;gap:10px;align-items:flex-start;}
+  .note-top svg{flex:0 0 auto;margin-top:1px;}
+
+  .policy-bar{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:44px;}
+  .policy-card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;
+    box-shadow:0 1px 2px rgba(20,30,60,.04);}
+  .policy-card .num{font-size:20px;font-weight:700;color:var(--accent);}
+  .policy-card .lbl{font-size:12px;color:var(--sub);margin-top:2px;}
+  @media(max-width:760px){.policy-bar{grid-template-columns:repeat(2,1fr);}}
+
+  .flow{position:relative;padding-left:40px;}
+  .flow::before{content:"";position:absolute;left:15px;top:8px;bottom:8px;width:2px;background:var(--line);}
+
+  .step{position:relative;margin-bottom:14px;}
+  .step-badge{position:absolute;left:-40px;top:2px;width:32px;height:32px;border-radius:50%;
+    background:var(--accent);color:#fff;font-size:14px;font-weight:700;
+    display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(59,91,219,.35);z-index:2;}
+  .step-card{background:var(--card);border:1px solid var(--line);border-radius:14px;
+    padding:22px 24px;box-shadow:0 1px 3px rgba(20,30,60,.05);}
+  .step-card h2{margin:0 0 4px;font-size:17px;}
+  .step-card .role{display:inline-block;font-size:11px;font-weight:700;padding:2px 9px;border-radius:999px;
+    margin-bottom:8px;letter-spacing:.02em;}
+  .role-user{background:#eef1fd;color:var(--accent);}
+  .role-system{background:var(--gray-bg);color:var(--gray);}
+  .role-cms{background:var(--green-bg);color:var(--green);}
+  .step-card p.desc{margin:8px 0 16px;color:var(--sub);font-size:13.5px;}
+  .shots{display:flex;gap:20px;flex-wrap:wrap;align-items:flex-start;}
+  .shot{flex:0 0 auto;}
+  .shot img{display:block;width:200px;height:auto;border-radius:14px;border:1px solid var(--line);
+    box-shadow:0 4px 14px rgba(20,30,60,.10);}
+  .shot .cap{margin-top:8px;font-size:12px;color:var(--sub);text-align:center;max-width:200px;}
+  .shot.wide img{width:280px;}
+  .shot.wide .cap{max-width:280px;}
+
+  .arrow-down{display:flex;justify-content:center;margin:2px 0 18px 0;color:#b7bdd1;}
+
+  .branch-wrap{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+  @media(max-width:700px){.branch-wrap{grid-template-columns:1fr;}}
+  .branch{border-radius:14px;padding:20px;border:2px solid var(--line);background:var(--card);}
+  .branch.auto{border-color:#bfe3cd;}
+  .branch.manual{border-color:#f3d9ad;}
+  .branch .tag{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:700;
+    padding:3px 10px;border-radius:999px;margin-bottom:10px;}
+  .branch.auto .tag{background:var(--green-bg);color:var(--green);}
+  .branch.manual .tag{background:var(--amber-bg);color:var(--amber);}
+  .branch h3{margin:0 0 6px;font-size:14.5px;}
+  .branch p{margin:0 0 14px;font-size:13px;color:var(--sub);}
+  .branch .shots{gap:12px;}
+  .branch .shot img{width:170px;}
+  .branch .shot .cap{max-width:170px;}
+
+  .badge-note{display:inline-flex;align-items:flex-start;gap:6px;font-size:12px;color:var(--sub);
+    background:var(--gray-bg);border-radius:8px;padding:6px 10px;margin-top:14px;}
+  .badge-note svg{flex:0 0 auto;margin-top:2px;}
+
+  /* 정책 요약 표 */
+  .policy-section{margin-top:52px;}
+  .policy-section h2{font-size:19px;margin:0 0 6px;}
+  .policy-section .sub{color:var(--sub);font-size:13.5px;margin:0 0 18px;}
+  .rule-card{background:var(--card);border:1px solid var(--line);border-radius:14px;
+    padding:20px 24px;margin-bottom:14px;box-shadow:0 1px 3px rgba(20,30,60,.05);}
+  .rule-card h3{margin:0 0 10px;font-size:15px;}
+  .rule-card table{width:100%;border-collapse:collapse;font-size:13px;}
+  .rule-card th{background:var(--gray-bg);color:var(--sub);font-weight:600;padding:8px 12px;text-align:left;
+    border-bottom:1px solid var(--line);white-space:nowrap;}
+  .rule-card td{padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top;}
+  .rule-card tr:last-child td{border-bottom:none;}
+  .rule-card .src{display:block;margin-top:10px;font-size:11.5px;color:#9aa0b4;}
+  .pill{display:inline-block;font-size:11px;font-weight:700;border-radius:999px;padding:1px 9px;}
+  .pill.on{background:var(--green-bg);color:var(--green);}
+  .pill.off{background:var(--gray-bg);color:var(--gray);}
+
+  /* 미결 섹션 */
+  .open-issues{margin-top:52px;}
+  .open-issues h2{font-size:19px;margin:0 0 6px;}
+  .open-issues .sub{color:var(--sub);font-size:13.5px;margin:0 0 18px;}
+  .issue{background:var(--amber-bg);border:1px solid #f0dcb2;border-radius:12px;
+    padding:14px 18px;margin-bottom:10px;font-size:13.5px;color:#5d4a1a;}
+  .issue b{color:#4a3a10;}
+  .issue .itag{display:inline-block;font-size:11px;font-weight:700;background:#fff;color:var(--amber);
+    border:1px solid #eed9a9;border-radius:999px;padding:1px 9px;margin-right:8px;}
+  .issue.red{background:var(--red-bg);border-color:#efc4bf;color:#6e2a22;}
+  .issue.red .itag{color:var(--red);border-color:#ecc7c2;}
+
+  footer.notes{margin-top:44px;background:var(--card);border:1px solid var(--line);border-radius:12px;
+    padding:20px 24px;font-size:13px;color:var(--sub);}
+  footer.notes h4{margin:0 0 10px;color:var(--ink);font-size:14px;}
+  footer.notes ul{margin:0;padding-left:18px;}
+  footer.notes li{margin:5px 0;}
+  code{background:var(--gray-bg);border-radius:5px;padding:1px 6px;font-size:12px;
+    font-family:ui-monospace,Menlo,monospace;color:#3a3f52;}
+
+  .last-update{position:fixed;bottom:24px;left:24px;background:rgba(255,255,255,.92);
+    border:1px solid var(--line);border-radius:10px;padding:8px 14px;font-size:11.5px;color:#9aa0b4;
+    box-shadow:0 2px 10px rgba(0,0,0,.05);z-index:50;}
+  .last-update b{color:var(--sub);font-weight:700;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="doc">
+    <h1>설정·알림 프로세스 스토리보드</h1>
+    <p class="lead">알림 권한 온보딩부터 앱 설정 3종 스위치, 전역 알림함, CMS 알림 운영까지 — 실제 배포본 화면 캡처 기반</p>
+    <p class="meta">app/index.html · cms/index.html 배포본(pricepick-demo.vercel.app)에서 직접 캡처 (2026.07.09) · 목업/와이어프레임 없음</p>
+  </header>
+
+  <div class="note-top">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3b5bdb" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v5"/><circle cx="12" cy="16" r=".5" fill="#3b5bdb"/></svg>
+    <div>이 문서의 모든 화면 썸네일은 실제 배포본에서 게스트 가입 → 구매 시뮬 → 출석·룰렛 참여 → 알림함 확인 → 설정 토글 조작, CMS는 firstadmin 로그인 후 해당 메뉴 진입까지 실제로 수행한 뒤 캡처한 스크린샷입니다. 그림이나 와이어프레임으로 대체한 화면은 없습니다.</div>
+  </div>
+
+  <div class="policy-bar">
+    <div class="policy-card"><div class="num">3종 스위치</div><div class="lbl">구매 / 이벤트·티켓 / 마케팅 — 푸시·인앱 공통 1토글</div></div>
+    <div class="policy-card"><div class="num">기본 꺼짐</div><div class="lbl">마케팅 정보 수신 초기값 (구매·이벤트는 기본 켜짐)</div></div>
+    <div class="policy-card"><div class="num">일 2건</div><div class="lbl">기타 알림 발송 상한 (거래 알림은 상한 없음)</div></div>
+    <div class="policy-card"><div class="num">22~08시</div><div class="lbl">야간 미발송 (거래 알림만 야간에도 즉시)</div></div>
+  </div>
+
+  <div class="flow">
+
+    <div class="step">
+      <div class="step-badge">1</div>
+      <div class="step-card">
+        <span class="role role-system">온보딩</span>
+        <h2>알림 권한 프리퍼미션 → iOS 시스템 팝업</h2>
+        <p class="desc">스플래시 직후 앱 자체 프리퍼미션 화면이 먼저 뜬다. 혜택(적립·등급 전환·만료 임박 D-30/D-7·이벤트 소식)을 설명한 뒤 '다음'을 누르면 그때 iOS 시스템 권한 팝업을 노출한다. '나중에 설정하기'로 건너뛸 수 있으며, 허용/거부와 무관하게 닉네임 설정으로 진행된다.</p>
+        <div class="shots">
+          <div class="shot wide">
+            <img src="settings-notification-storyboard-assets/01-onboarding-notif-perm.png" alt="알림 권한 프리퍼미션 화면">
+            <div class="cap">프리퍼미션 — "혜택을 놓치고 싶지 않다면 허용하세요"</div>
+          </div>
+          <div class="shot wide">
+            <img src="settings-notification-storyboard-assets/02-onboarding-ios-popup.png" alt="iOS 알림 권한 시스템 팝업">
+            <div class="cap">'다음' → iOS 시스템 팝업 (허용 / 허용 안 함)</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="arrow-down">
+      <svg width="20" height="28" viewBox="0 0 20 28" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 2v22M3 17l7 7 7-7"/></svg>
+    </div>
+
+    <div class="step">
+      <div class="step-badge">2</div>
+      <div class="step-card">
+        <span class="role role-user">진입점</span>
+        <h2>알림함·설정 진입 — 홈 헤더 &amp; 마이 상단</h2>
+        <p class="desc">알림함(벨)과 설정(톱니)은 홈 헤더와 마이 탭 상단 두 곳에 상시 노출된다. 리워드(교환소) 화면 상단에도 설정 톱니가 있다. 홈 벨 아이콘의 빨간 점은 현재 데모에서 정적 표시다(미읽음 수와 무관 — 하단 미결 참조).</p>
+        <div class="shots">
+          <div class="shot wide">
+            <img src="settings-notification-storyboard-assets/03-home-entry.png" alt="홈 헤더의 알림 벨과 설정 톱니">
+            <div class="cap">홈 헤더 — 벨(알림함) + 톱니(설정)</div>
+          </div>
+          <div class="shot wide">
+            <img src="settings-notification-storyboard-assets/04-mypage-entry.png" alt="마이 탭 상단의 알림 벨과 설정 톱니">
+            <div class="cap">마이 탭 상단 — 벨 + 톱니 동일 진입</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="arrow-down">
+      <svg width="20" height="28" viewBox="0 0 20 28" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 2v22M3 17l7 7 7-7"/></svg>
+    </div>
+
+    <div class="step">
+      <div class="step-badge">3</div>
+      <div class="step-card">
+        <span class="role role-user">알림함</span>
+        <h2>전역 알림함 — 사용자 이벤트 기반 실데이터</h2>
+        <p class="desc">알림함은 별도 알림 컬렉션 없이 사용자의 실제 이벤트 로그 4종(구매 포스트백 · 기프티콘 교환 · 친구초대 · 포인트 적립)을 통합해 시간순으로 렌더한다. 날짜 버킷(오늘/어제/이번 주/이전)으로 묶이며, 우측 상단에 '모두 읽음' 버튼이 있다. 아래 두 상태 모두 실제 계정으로 만든 화면이다.</p>
+        <div class="branch-wrap">
+          <div class="branch manual">
+            <span class="tag">신규 가입 직후</span>
+            <h3>활동 없음 — 빈 상태</h3>
+            <p>가입 직후 활동이 없으면 빈 상태 안내가 노출된다. 필터 탭 뱃지는 전부 0.</p>
+            <div class="shots">
+              <div class="shot">
+                <img src="settings-notification-storyboard-assets/05-notif-empty.png" alt="알림함 빈 상태">
+                <div class="cap">"알림이 없어요" 빈 상태</div>
+              </div>
+            </div>
+          </div>
+          <div class="branch auto">
+            <span class="tag">활동 발생 후</span>
+            <h3>구매·출석·룰렛 후 자동 누적</h3>
+            <p>구매 시뮬(67,000원) + 출석체크(+100P) + 룰렛 당첨(+200P)을 실제 수행한 직후의 알림함.</p>
+            <div class="shots">
+              <div class="shot">
+                <img src="settings-notification-storyboard-assets/06-notif-list.png" alt="알림함 실데이터 3건">
+                <div class="cap">전체 3건 — 이벤트 2 + 구매 1</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="badge-note">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#5b6478" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-5M12 8h.01"/></svg>
+          알림함 보관 기간·읽음 처리·뱃지 규칙은 마스터 정책서에 정의가 없다(FunctionalSpec 소관). 현재 데모는 이벤트 로그 파생형이라 별도 보관 정책 없이 원본 로그를 그대로 따른다.
+        </div>
+      </div>
+    </div>
+
+    <div class="arrow-down">
+      <svg width="20" height="28" viewBox="0 0 20 28" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 2v22M3 17l7 7 7-7"/></svg>
+    </div>
+
+    <div class="step">
+      <div class="step-badge">4</div>
+      <div class="step-card">
+        <span class="role role-user">알림함</span>
+        <h2>필터 탭 — 전체 / 구매 / 티켓 / 이벤트</h2>
+        <p class="desc">상단 필터 탭 4개가 실제 건수 뱃지와 함께 노출되고, 탭 전환 시 해당 유형만 필터링된다. 구매=포스트백, 티켓=기프티콘 교환, 이벤트=친구초대·포인트 적립(출석·룰렛 등) 유형이 매핑된다.</p>
+        <div class="shots">
+          <div class="shot wide">
+            <img src="settings-notification-storyboard-assets/07-notif-filter-pick.png" alt="구매 필터 적용 알림함">
+            <div class="cap">'구매' 탭 — 포스트백 알림만 필터</div>
+          </div>
+          <div class="shot wide">
+            <img src="settings-notification-storyboard-assets/08-notif-filter-event.png" alt="이벤트 필터 적용 알림함">
+            <div class="cap">'이벤트' 탭 — 출석·룰렛 적립 알림만 필터</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="arrow-down">
+      <svg width="20" height="28" viewBox="0 0 20 28" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 2v22M3 17l7 7 7-7"/></svg>
+    </div>
+
+    <div class="step">
+      <div class="step-badge">5</div>
+      <div class="step-card">
+        <span class="role role-user">설정</span>
+        <h2>설정 화면 — 알림 3종 스위치 + 5개 그룹</h2>
+        <p class="desc">설정은 알림 / 홈 화면 / 표시 / 데이터 / 정보 5개 그룹이다. 최상단 알림 그룹에 정책 확정안대로 3종 스위치가 배치된다: 구매 알림(거래성, 기본 켜짐) · 이벤트-티켓 알림(룰렛·응모·당첨·만료 임박 D-30/D-7, 기본 켜짐) · 마케팅 정보 수신(기본 꺼짐). 각 스위치는 푸시·인앱에 공통 적용되는 1토글이다(1단계 단순화 — 채널 분리 없음).</p>
+        <div class="shots">
+          <div class="shot wide">
+            <img src="settings-notification-storyboard-assets/09-settings-top.png" alt="설정 화면 상단 - 알림 3종 스위치">
+            <div class="cap">알림 3종 스위치 (마케팅만 기본 OFF) + 홈 화면·표시 그룹</div>
+          </div>
+          <div class="shot wide">
+            <img src="settings-notification-storyboard-assets/10-settings-bottom.png" alt="설정 화면 하단 - 표시, 데이터, 정보">
+            <div class="cap">하단 — 다크모드(2차 예정) · 기본 정렬 · 캐시 삭제 · 약관 · 앱 버전</div>
+          </div>
+        </div>
+        <div class="badge-note">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#5b6478" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-5M12 8h.01"/></svg>
+          <div>'홈 화면에 쿠팡 바로 가기 추가'는 실동작(<code>cpkOpen()</code> — 제휴 적립 유지 바로가기 안내). 다크모드는 화면에 '2차 업데이트 예정'으로 명시. 기본 정렬·캐시 삭제는 현재 데모에서 표시만 있는 상태(하단 미결 참조).</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="arrow-down">
+      <svg width="20" height="28" viewBox="0 0 20 28" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 2v22M3 17l7 7 7-7"/></svg>
+    </div>
+
+    <div class="step">
+      <div class="step-badge">6</div>
+      <div class="step-card">
+        <span class="role role-user">설정</span>
+        <h2>스위치 변경 — 확정 정책 vs 현재 데모 동작</h2>
+        <p class="desc">확정 정책: 스위치 상태는 서버에 저장되고 계정 기준으로 기기 간 동기화되며, 미연동 게스트는 로컬 저장 후 카카오 연동 시 승계된다. 현재 데모는 토글 UI와 변경 토스트까지만 구현되어 있고 서버 저장은 없다 — 화면 토스트에도 '(프로토타입)'으로 명시되어 있다.</p>
+        <div class="shots">
+          <div class="shot wide">
+            <img src="settings-notification-storyboard-assets/11-settings-toggle-toast.png" alt="마케팅 수신 토글 ON 후 토스트">
+            <div class="cap">마케팅 수신 토글 ON → "설정이 변경되었어요 (프로토타입)" 토스트</div>
+          </div>
+        </div>
+        <div class="badge-note">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#5b6478" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-5M12 8h.01"/></svg>
+          마케팅 동의는 변경분을 새로 기록해 이력을 보존한다(과거 동의 내역 보존 — DataModel 정책). 동의/철회 시점 기록이 법적 근거가 되므로 실구현 시 서버 저장과 함께 필수.
+        </div>
+      </div>
+    </div>
+
+    <div class="arrow-down">
+      <svg width="20" height="28" viewBox="0 0 20 28" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 2v22M3 17l7 7 7-7"/></svg>
+    </div>
+
+    <div class="step">
+      <div class="step-badge">7</div>
+      <div class="step-card">
+        <span class="role role-cms">CMS</span>
+        <h2>운영자: 알림 관리 — 상한 정책 · 작성 발송 · 발송 내역</h2>
+        <p class="desc">CMS '알림 관리' 메뉴 한 곳에서 FCM 발송 상한 정책(거래 상한 없음 / 기타 일 2건 / 야간 22~08시 미발송)을 상시 확인하고, 채널(앱 푸시 / 카카오 알림톡 / 동시)·대상(전체·등급별·미접속·세그먼트)·발송 시점(즉시/예약)을 지정해 알림을 작성·발송한다. 발송 완료 건은 불변 로그로 남고 '예약' 상태만 취소·수정할 수 있다. 폼 하단에 "마케팅성 알림은 수신 동의 회원에게만 발송, 서비스 필수 알림은 동의 여부와 무관하게 발송" 원칙이 명시돼 있다.</p>
+        <div class="shots">
+          <div class="shot wide" style="flex-basis:100%;">
+            <img src="settings-notification-storyboard-assets/12-cms-notifications.png" alt="CMS 알림 관리 화면" style="width:640px;">
+            <div class="cap" style="max-width:640px;">CMS &gt; 콘텐츠 &gt; 알림 관리 — 발송 통계 · FCM 상한 정책 · 작성 폼 · 발송 내역</div>
+          </div>
+        </div>
+        <div class="badge-note">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#5b6478" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-5M12 8h.01"/></svg>
+          현재 데모의 알림 관리는 화면 구성까지만이고 발송 버튼은 토스트 처리(실발송·저장 없음)다. 인접 메뉴(문의·기프티콘 등)는 실연동인 것과 대비됨 — 하단 미결 참조.
+        </div>
+      </div>
+    </div>
+
+    <div class="arrow-down">
+      <svg width="20" height="28" viewBox="0 0 20 28" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 2v22M3 17l7 7 7-7"/></svg>
+    </div>
+
+    <div class="step">
+      <div class="step-badge">8</div>
+      <div class="step-card">
+        <span class="role role-cms">CMS</span>
+        <h2>운영자: 마케팅 수신 동의 — 회원 집계 · 약관 원문</h2>
+        <p class="desc">회원 목록 상단에서 마케팅 수신 동의 집계(동의 수·비율)를 확인하고, 리스트에 '마케팅 수신' 컬럼과 '전체 마케팅' 필터가 있다. 약관 관리의 '마케팅 수신 동의' 탭에서 동의 항목(앱 푸시 / 카카오 알림톡)·발송 내용·수신 거부 방법 원문을 운영한다.</p>
+        <div class="shots">
+          <div class="shot wide" style="flex-basis:100%;">
+            <img src="settings-notification-storyboard-assets/13-cms-members-consent.png" alt="CMS 회원 목록의 마케팅 수신 동의 집계" style="width:640px;">
+            <div class="cap" style="max-width:640px;">CMS &gt; 회원 목록 — 마케팅 수신 동의 집계 + '마케팅 수신' 컬럼 · 필터</div>
+          </div>
+          <div class="shot wide" style="flex-basis:100%;">
+            <img src="settings-notification-storyboard-assets/14-cms-terms-marketing.png" alt="CMS 약관 관리 마케팅 수신 동의 탭" style="width:640px;">
+            <div class="cap" style="max-width:640px;">CMS &gt; 약관 관리 &gt; 마케팅 수신 동의 — 선택 동의 · 항목 · 거부 방법 원문</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <section class="policy-section">
+    <h2>정책·규칙 (마스터 정책서 SoT 기준)</h2>
+    <p class="sub">모든 수치·규칙의 원본은 마스터 정책서(policyspec.html)다. 아래는 설정·알림 관련 발췌.</p>
+
+    <div class="rule-card">
+      <h3>알림 3종 스위치</h3>
+      <table>
+        <tr><th>스위치</th><th>커버 범위</th><th>기본값</th></tr>
+        <tr><td><b>구매 알림</b></td><td>거래성 — 구매 추적 · 적립/가지급 · 구매확정 · 환수</td><td><span class="pill on">켜짐</span></td></tr>
+        <tr><td><b>이벤트 · 티켓 알림</b></td><td>룰렛 · 경품 응모 · 당첨 · 티켓 만료 임박(D-30/D-7)</td><td><span class="pill on">켜짐</span></td></tr>
+        <tr><td><b>마케팅 정보 수신</b></td><td>프로모션 · 광고성 정보</td><td><span class="pill off">꺼짐</span></td></tr>
+      </table>
+      <span class="src">공통 규칙: 각 스위치는 푸시·인앱 공통 1토글(채널 분리 없음, 1단계 단순화) · 상태는 서버 저장, 계정 기준 기기 간 동기화 · 미연동 게스트는 로컬 저장 후 연동 시 승계 — 출처: DEVQA 존 #5(c) 반영분 (2026-06-18)</span>
+    </div>
+
+    <div class="rule-card">
+      <h3>푸시 발송 상한 (FCM)</h3>
+      <table>
+        <tr><th>구분</th><th>규칙</th></tr>
+        <tr><td><b>거래 알림</b> (구매·확정·환불)</td><td>상한 없음 — 서비스 필수, 즉시 발송 (야간에도 즉시)</td></tr>
+        <tr><td><b>기타 알림</b> (미션·만료·추첨)</td><td>1인 하루 2건까지</td></tr>
+        <tr><td><b>야간</b></td><td>22:00~08:00 미발송 — 모았다가 아침에 묶음 발송</td></tr>
+        <tr><td><b>우선순위·중복 억제</b></td><td>거래 &gt; 만료 임박 &gt; 미션 &gt; 추첨 순 · 같은 사유는 묶어 중복 발송 억제</td></tr>
+      </table>
+      <span class="src">출처: PolicySpec 12 / FunctionalSpec(알림함) / CMS FCM 발송 상한 — CMS 알림 관리 화면에 '정책 확정' 라벨로 상시 노출</span>
+    </div>
+
+    <div class="rule-card">
+      <h3>만료 임박 알림</h3>
+      <table>
+        <tr><th>대상</th><th>만료 기준</th><th>알림</th></tr>
+        <tr><td><b>등급 티켓</b> (브론즈/실버/골드)</td><td>적립일(확정일 아님) + 1년(365일) 자동 소멸</td><td>D-30 · D-7</td></tr>
+        <tr><td><b>포인트</b></td><td>적립일 + 1년 만료</td><td>D-30 · D-7</td></tr>
+        <tr><td><b>이벤트 티켓</b></td><td>발급일 + 100일 고정 (이월 폐기)</td><td>만료 알림 명시 없음 — 확인 필요</td></tr>
+      </table>
+      <span class="src">출처: PolicySpec 5 / 정책 변경 로그 2026-06-08 (등급 티켓 적립일 기산 확정)</span>
+    </div>
+
+    <div class="rule-card">
+      <h3>마케팅 수신 동의 (법적 처리)</h3>
+      <table>
+        <tr><th>항목</th><th>규칙</th></tr>
+        <tr><td><b>성격</b></td><td>선택 동의 — 미동의여도 기본 서비스 이용 제한 없음</td></tr>
+        <tr><td><b>동의 채널</b></td><td>앱 푸시 + 카카오 알림톡(연동 회원)</td></tr>
+        <tr><td><b>이력 보존</b></td><td>약관·개인정보·마케팅 동의는 변경분을 새로 기록해 과거 동의 내역 보존</td></tr>
+        <tr><td><b>철회 후에도</b></td><td>서비스 필수 알림(티켓 지급·기프티콘 발송·경품 당첨)은 계속 발송</td></tr>
+      </table>
+      <span class="src">출처: DataModel(보존기간 정책) / CMS 약관 관리 '마케팅 수신 동의' 원문</span>
+    </div>
+  </section>
+
+  <section class="open-issues">
+    <h2>미결 · 확인 필요 (형님 확정 대기)</h2>
+    <p class="sub">임의로 정하지 않고 표시만 한 항목. 확정되면 이 문서와 데모에 반영한다.</p>
+
+    <div class="issue red"><span class="itag">정책 지위</span><b>알림 3종 스위치 정책의 SoT 정식 편입 여부.</b> 마스터 정책서에서 해당 블록(DEVQA 2026-06-18 반영 패널)은 "검토용 반영 — 본 섹션 편입 여부는 형님 확정" 상태다. 이 스토리보드는 그 확정안을 기준으로 작성했으니, 편입 확정이 나야 정책 지위가 완결된다.</div>
+
+    <div class="issue red"><span class="itag">구현 갭</span><b>설정 3종 스위치가 데모에서 저장되지 않는다.</b> 정책은 서버 저장 + 기기 간 동기화 + 게스트 로컬 저장 후 승계인데, 현재 데모 토글은 UI 토글 + "(프로토타입)" 토스트뿐이고 Firestore 쓰기가 없다. 실구현 시 users 필드 설계(예: notif_pick / notif_event / marketing_consent)와 동의 이력 기록이 함께 필요하다.</div>
+
+    <div class="issue"><span class="itag">구현 갭</span><b>CMS 알림 관리가 목업 상태.</b> 발송 버튼은 토스트만 출력(발송 큐 저장 없음), 발송 내역은 항상 빈 상태로 세팅된다. 데모 단계에서 실연동(발송 로그 저장·열람율 집계)까지 만들지 여부 확정 필요.</div>
+
+    <div class="issue"><span class="itag">구현 갭</span><b>설정의 '기본 정렬'·'캐시 삭제'가 무동작.</b> 기본 정렬은 선택 UI 없음, 캐시 삭제는 12.4MB 하드코딩 표시에 핸들러 없음. 유지할 기능인지(웹 데모 특성상 캐시 삭제 개념이 모호) 정리 필요. 다크모드는 '2차 업데이트 예정'으로 화면에 명시되어 있어 미결 아님.</div>
+
+    <div class="issue"><span class="itag">정책 공백</span><b>알림함 운영 규칙 미정의.</b> 보관 기간·읽음 처리·미읽음 뱃지 규칙이 마스터 정책서에 없다(FunctionalSpec 소관으로만 참조). 현재 데모는 미읽음 표시가 사실상 무동작이고, 홈 벨의 빨간 점도 정적 CSS라 실제 미읽음 수와 무관하다. 이벤트 로그 파생형 구조를 유지할지, 별도 알림 컬렉션으로 갈지도 개발 전 결정 필요.</div>
+
+    <div class="issue"><span class="itag">문구 불일치</span><b>약관 원문 "마이 &gt; 알림 설정" vs 실제 화면 "설정".</b> 마케팅 수신 동의 약관의 수신 거부 경로 문구가 실제 화면명과 다르고, "개별 항목별 수신 거부"라는 표현도 실제 구현(3종 통합 스위치)과 정합 확인이 필요하다.</div>
+
+    <div class="issue"><span class="itag">UX 미정</span><b>마케팅 동의/철회 시 안내 UX 미확정.</b> 동의 이력 기록 정책은 있으나, 동의/철회 순간의 안내 문구(일시 고지 토스트 등, 정보통신망법 고지 관행)는 정해진 게 없다.</div>
+  </section>
+
+  <footer class="notes">
+    <h4>참고 사항</h4>
+    <ul>
+      <li>모든 앱 화면은 배포본(pricepick-demo.vercel.app/app)에서 신규 게스트 가입 → 구매 시뮬레이션(67,000원) → 출석체크(+100P) → 행운 룰렛(+200P 당첨)을 실제로 수행한 뒤 캡처했다. CMS 화면은 firstadmin 계정으로 로그인해 캡처했다.</li>
+      <li>알림함은 별도 컬렉션이 아니라 <code>postbacks</code> · <code>gifticon_exchanges</code> · <code>invites</code> · <code>point_transactions</code> 4개 이벤트 로그를 통합 렌더하는 파생형 구조다.</li>
+      <li>알림 권한 프리퍼미션(1단계)은 온보딩 화면이지만 알림 기능의 시작점이라 본 스토리보드에 포함했다. 가입·로그인 전체 흐름은 별도 '가입·로그인' 스토리보드 소관.</li>
+      <li>정책 수치의 단일 원본은 마스터 정책서(policyspec.html)이며, 본 문서는 그 발췌·시각화다. 충돌 시 정책서가 우선한다.</li>
+    </ul>
+  </footer>
+
+</div>
+<div class="last-update">Last Update <b>2026.07.09 18:42</b></div>
+</body>
+</html>
