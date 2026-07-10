@@ -1458,7 +1458,7 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
         <div id="event-list" style="padding:16px">
           <div class="event-card">
             <div class="event-header"><div><div class="event-title">5월 출석 체크</div><div class="event-period">05/01 ~ 05/31 &nbsp;·&nbsp; 전체 회원</div></div><span class="badge badge-green">진행 중</span></div>
-            <div class="event-desc">5일 연속 출석 달성 시 500P + 이벤트 티켓 1장 지급.</div>
+            <div class="event-desc">5일 연속 출석 달성 시 이벤트 티켓 1장 지급.</div>
             <div class="event-actions" id="event-action-1"><button class="btn btn-ghost btn-sm" onclick="openModal('m-event')">수정</button><button class="btn btn-ghost btn-sm" style="color:var(--danger)" onclick="if(confirm('이 이벤트를 삭제할까요?'))toast('이벤트가 삭제되었습니다.')">삭제</button></div>
           </div>
           <div class="event-card">
@@ -1983,7 +1983,7 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
             <table>
               <thead><tr><th>경로</th><th>지급</th><th>조건</th></tr></thead>
               <tbody>
-                <tr><td>출석 체크</td><td>500P + 이벤트티켓 1장</td><td>5일 연속 출석 달성 시</td></tr>
+                <tr><td>출석 체크</td><td>이벤트티켓 1장</td><td>5일 연속 출석 달성 시</td></tr>
                 <tr><td>행운룰렛</td><td>포인트·이벤트티켓(확률 미정)</td><td>하루 1회 / 확률 지급</td></tr>
                 <tr><td>온보딩 가입</td><td>+1장</td><td>신규 가입 시 (카카오 연동 후 지급)</td></tr>
               </tbody>
@@ -2467,7 +2467,7 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
 
     <!-- ── 출석체크 설정 ── -->
     <div class="section" id="sec-point-attendance">
-      <div class="info-box"><strong>출석체크 = 제휴몰 방문 후 복귀 시 적립</strong> — 회원이 연결 제휴몰을 방문하고 앱으로 복귀하면 일일 포인트가 지급됩니다. (폴센트형 UX) · 5일 연속 달성 시 500P + 이벤트 티켓 1장 추가 지급.</div>
+      <div class="info-box"><strong>출석체크 = 제휴몰 방문 후 복귀 시 적립</strong> — 회원이 연결 제휴몰을 방문하고 앱으로 복귀하면 일일 포인트가 지급됩니다. (폴센트형 UX) · 5일 연속 달성 시 이벤트 티켓 1장 추가 지급.</div>
       <div class="stats-grid" style="grid-template-columns:repeat(4,1fr)">
         <div class="stat-card purple"><div class="stat-label">오늘 출석 회원</div><div class="stat-value" id="pa-kpi-visits">—</div><div class="stat-change neutral">오늘 기준</div></div>
         <div class="stat-card green"><div class="stat-label">오늘 지급 포인트</div><div class="stat-value" id="pa-kpi-points">—</div><div class="stat-change neutral">오늘 기준</div></div>
@@ -2486,7 +2486,7 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
               <div style="font-size:12px;color:var(--text-3);margin-top:4px">현재 쿠팡 전용. 회원은 쿠팡 방문 후 복귀해야 출석이 인정됩니다.</div>
             </div>
             <div class="form-group"><label class="form-label">5일 연속 보너스</label>
-              <div style="display:flex;align-items:center;gap:8px"><select class="form-select" id="pa-streak-bonus" style="max-width:200px"><option value="500P + 이벤트 티켓 1장" selected>500P + 이벤트 티켓 1장</option><option value="이벤트 티켓 2장">이벤트 티켓 2장</option><option value="보너스 포인트">보너스 포인트</option></select></div>
+              <div style="display:flex;align-items:center;gap:8px"><select class="form-select" id="pa-streak-bonus" style="max-width:200px"><option value="이벤트 티켓 1장" selected>이벤트 티켓 1장</option><option value="이벤트 티켓 2장">이벤트 티켓 2장</option><option value="보너스 포인트">보너스 포인트</option></select></div>
             </div>
             <div class="form-group"><label class="form-label">출석 인정 조건</label>
               <select class="form-select" id="pa-condition"><option value="제휴몰 방문 후 앱 복귀" selected>제휴몰 방문 후 앱 복귀</option><option value="앱 진입만으로 인정">앱 진입만으로 인정</option></select>
@@ -2501,7 +2501,7 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
           <div>
             <div class="policy-item"><div class="policy-label">일일 지급</div><div class="policy-value" id="pa-disp-points">100P (10원 상당)</div><div class="policy-desc">1일 1회, 제휴몰 방문 후 복귀 시 지급</div></div>
             <div class="policy-item"><div class="policy-label">연결 제휴몰</div><div class="policy-value" id="pa-disp-mall">쿠팡 단독</div><div class="policy-desc">브릿지 경유 방문 추적</div></div>
-            <div class="policy-item"><div class="policy-label">연속 보너스</div><div class="policy-value" id="pa-disp-streak">5일 연속 → 500P + 이벤트 티켓 1장</div></div>
+            <div class="policy-item"><div class="policy-label">연속 보너스</div><div class="policy-value" id="pa-disp-streak">5일 연속 → 이벤트 티켓 1장</div></div>
             <div class="policy-item"><div class="policy-label">초기화</div><div class="policy-value" id="pa-disp-reset">매일 00:00 자동 초기화</div></div>
           </div>
         </div>
@@ -4145,7 +4145,7 @@ function giSaveTicketEdit() {
     "노출 중":"Đang hiển thị","비노출":"Ẩn",
     /* Events section */
     "5월 출석 체크":"Điểm danh tháng 5","전체 회원":"Toàn bộ thành viên",
-    "5일 연속 출석 달성 시 500P + 이벤트 티켓 1장 지급.":"Tặng 500P + 1 vé sự kiện khi điểm danh 5 ngày liên tiếp.",
+    "5일 연속 출석 달성 시 이벤트 티켓 1장 지급.":"Tặng 1 vé sự kiện khi điểm danh 5 ngày liên tiếp.",
     "신규 가입 웰컴 보너스":"Thưởng chào mừng thành viên mới","신규 가입자":"Người mới đăng ký",
     "가입 즉시 이벤트 티켓 1장 + 200P 지급. (어뷰징 방지: 카카오 연동 후 지급)":"Tặng 1 vé sự kiện + 200P ngay khi đăng ký. (Chống lạm dụng: cấp sau khi liên kết Kakao)",
     "첫 경유 구매 보너스":"Thưởng mua hàng qua liên kết lần đầu",
@@ -4862,7 +4862,7 @@ function giSaveTicketEdit() {
   "UI 개선, 알림 버그 수정":"Cải tiến UI, sửa lỗi thông báo",
   "🥈 투썸 케이크 교환권 ×5":"🥈 Voucher bánh Two Some ×5",
   "→ 발급 자동화 안정화 시급":"→ Cần khẩn cấp ổn định phát hành tự động",
-  "5일 연속 → 500P + 이벤트 티켓 1장":"5 ngày liên tiếp → 500P + 1 vé sự kiện",
+  "5일 연속 → 이벤트 티켓 1장":"5 ngày liên tiếp → 1 vé sự kiện",
   "D+30 자동 삭제 (스케줄러)":"Tự động xóa D+30 (lịch trình)",
   "(상품 교환 불가)이며, 만료는":"(Không thể đổi sản phẩm), hết hạn là",
   "1등17 · 2등51 · 3등59":"Nhất 17 · Nhì 51 · Ba 59",
@@ -4944,7 +4944,7 @@ function giSaveTicketEdit() {
   "— 회원이 PricePick 경유 링크로 제휴몰에서 구매하면 해당 제휴몰이 우리 서버에 콜백을 보냅니다. 이 데이터로 가지급(적립예정) 처리와":"— Khi thành viên mua tại cửa hàng LK qua liên kết PricePick, cửa hàng LK đó gửi callback đến máy chủ. Dữ liệu này để xử lý tạm cấp (dự kiến tích lũy) và",
   "— 매주 월요일, 보유 이벤트 티켓으로 자동 응모된 회원 중 추첨하여 당첨자에게 경품(기프티콘·실물 등)을 지급합니다. 이벤트 티켓은 이 추첨의":"— Mỗi thứ Hai, rút thăm trong số thành viên đã tự động tham dự bằng vé sự kiện đang giữ và cấp giải thưởng (Gifticon·hiện vật v.v.) cho người trúng. Vé sự kiện là",
   "— ① 확정 후 환불은 미사용분만 회수 ② 포스트백 미수신 24h 후 영수증 인증으로 수동 지급 ③ 중복 포스트백은 주문번호 UNIQUE로 차단.":"— ① Hoàn tiền sau xác nhận chỉ thu hồi phần chưa dùng ② Cấp thủ công bằng xác thực hóa đơn sau 24h không nhận postback ③ Postback trùng bị chặn bằng UNIQUE mã đơn hàng.",
-  "— 회원이 연결 제휴몰을 방문하고 앱으로 복귀하면 일일 포인트가 지급됩니다. (폴센트형 UX) · 5일 연속 달성 시 500P + 이벤트 티켓 1장 추가 지급.":"— Khi thành viên thăm cửa hàng LK kết nối và quay lại ứng dụng, điểm hàng ngày được cấp. (UX kiểu Folscent) · Cấp thêm 500P + 1 vé sự kiện khi đạt 5 ngày liên tiếp.",
+  "— 회원이 연결 제휴몰을 방문하고 앱으로 복귀하면 일일 포인트가 지급됩니다. (폴센트형 UX) · 5일 연속 달성 시 이벤트 티켓 1장 추가 지급.":"— Khi thành viên thăm cửa hàng LK kết nối và quay lại ứng dụng, điểm hàng ngày được cấp. (UX kiểu Folscent) · Cấp thêm 1 vé sự kiện khi đạt 5 ngày liên tiếp.",
   "방식입니다 — 이월은 없으며 미응모해도 다음 회차로 넘어가지 않고 만료됩니다. 추첨 응모 마감 후 획득분은 다음 회차가 당회.":"là phương thức — không có rollover, dù chưa dự thưởng cũng không chuyển sang vòng sau mà hết hạn. Phần nhận sau khi đóng dự thưởng thì vòng sau là vòng hiện tại.",
   "은 구매 취소·반품에 의한 회수 및 등급 티켓 유효기간 만료 소멸 내역입니다. TicketTransaction 테이블의 type='CLAWBACK'·'EXPIRE' 레코드를 조회합니다.":"là chi tiết thu hồi do hủy·trả hàng và hủy hết hiệu lực vé hạng. Truy vấn bản ghi type='CLAWBACK'·'EXPIRE' của bảng TicketTransaction.",
   "— 앱·서비스 운영의 핵심 정책 기준을 한곳에서 확인하는 페이지입니다. 정책 수치·기준 변경은 별도 승인 절차를 거쳐 반영되며, 이 화면에서 직접 수정하지 않습니다. (이용약관·개인정보처리방침 등 앱 노출용 약관은":"— Đây là trang xác nhận các tiêu chuẩn chính sách cốt lõi vận hành ứng dụng·dịch vụ tại một nơi. Thay đổi số liệu·tiêu chuẩn chính sách được phản ánh qua quy trình phê duyệt riêng, không chỉnh sửa trực tiếp trên màn hình này. (Điều khoản sử dụng·chính sách bảo mật v.v. dùng để hiển thị trên ứng dụng thì",
