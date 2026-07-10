@@ -2062,65 +2062,51 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
 
     <!-- ── 계정 탈퇴 처리 (신규) ── -->
     <div class="section" id="sec-withdrawal">
-      <div class="warn-box"><strong>법적 필수 화면</strong> — 회원이 앱 "마이 → 계정탈퇴" 누르면 여기로 들어옵니다. <strong>30일 유예 기간</strong> 동안 철회 가능, 이후 PII 영구 삭제. 처리 누락 시 개인정보보호법 위반 + Apple 심사 거절 사유.</div>
+      <div class="warn-box"><strong>법적 필수 화면</strong> — 회원이 앱 "마이 → 계정탈퇴" 누르면 <strong>그 자리에서 즉시 처리</strong>됩니다(유예·철회 기간 없음). 개인정보(PII)는 즉시 스크럽되고 회원 문서(레코드)는 유지됩니다. 처리 누락 시 개인정보보호법 위반 소지.</div>
       <div class="stats-grid">
-        <div class="stat-card amber"><div class="stat-label">유예 기간 중 (철회 가능)</div><div class="stat-value">0명</div><div class="stat-change neutral">D+1 ~ D+29</div></div>
-        <div class="stat-card red"><div class="stat-label">오늘 영구 삭제 예정</div><div class="stat-value">0명</div><div class="stat-change down">D+30 도달</div></div>
         <div class="stat-card purple"><div class="stat-label">이번달 탈퇴</div><div class="stat-value">0명</div><div class="stat-change neutral">누적</div></div>
-        <div class="stat-card green"><div class="stat-label">철회 (재가입 의사)</div><div class="stat-value">0명</div><div class="stat-change neutral">누적</div></div>
+        <div class="stat-card green"><div class="stat-label">누적 탈퇴 회원</div><div class="stat-value">0명</div><div class="stat-change neutral">전체</div></div>
       </div>
       <div class="card" style="margin-bottom:16px">
         <div class="card-header"><div class="card-title">탈퇴 처리 흐름</div></div>
         <div style="display:flex;align-items:stretch;gap:0;padding:18px;flex-wrap:wrap;">
           <div style="flex:1;min-width:130px;background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r-md);padding:14px 12px;text-align:center;">
             <div style="font-size:22px;margin-bottom:4px">📱</div>
-            <div style="font-size:13px;font-weight:700;margin-bottom:3px">탈퇴 요청</div>
-            <div style="font-size:11px;color:var(--text-2)">앱 마이탭에서 신청</div>
-          </div>
-          <div style="display:flex;align-items:center;padding:0 8px;color:var(--text-3);font-size:18px">→</div>
-          <div style="flex:1;min-width:130px;background:var(--amber-soft);border:1px solid rgba(245,158,11,.25);border-radius:var(--r-md);padding:14px 12px;text-align:center;">
-            <div style="font-size:22px;margin-bottom:4px">⏸</div>
-            <div style="font-size:13px;font-weight:700;margin-bottom:3px;color:var(--amber)">30일 유예</div>
-            <div style="font-size:11px;color:var(--text-2)">철회 가능 · 보유 티켓 정지</div>
+            <div style="font-size:13px;font-weight:700;margin-bottom:3px">탈퇴 확인</div>
+            <div style="font-size:11px;color:var(--text-2)">앱 마이탭 → 최종 확인</div>
           </div>
           <div style="display:flex;align-items:center;padding:0 8px;color:var(--text-3);font-size:18px">→</div>
           <div style="flex:1;min-width:130px;background:var(--danger-soft);border:1px solid rgba(220,38,38,.2);border-radius:var(--r-md);padding:14px 12px;text-align:center;">
             <div style="font-size:22px;margin-bottom:4px">🗑️</div>
-            <div style="font-size:13px;font-weight:700;margin-bottom:3px;color:var(--danger)">영구 삭제 (D+30)</div>
-            <div style="font-size:11px;color:var(--text-2)">PII 즉시 삭제 · 복구 불가</div>
+            <div style="font-size:13px;font-weight:700;margin-bottom:3px;color:var(--danger)">즉시 처리</div>
+            <div style="font-size:11px;color:var(--text-2)">status 전환 · PII 스크럽 · 기기 로컬데이터 삭제</div>
           </div>
           <div style="display:flex;align-items:center;padding:0 8px;color:var(--text-3);font-size:18px">→</div>
           <div style="flex:1;min-width:130px;background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r-md);padding:14px 12px;text-align:center;">
-            <div style="font-size:22px;margin-bottom:4px">📊</div>
-            <div style="font-size:13px;font-weight:700;margin-bottom:3px">통계만 보존</div>
-            <div style="font-size:11px;color:var(--text-2)">개인 식별 불가 · 익명화</div>
+            <div style="font-size:22px;margin-bottom:4px">📄</div>
+            <div style="font-size:13px;font-weight:700;margin-bottom:3px">거래 기록 존치</div>
+            <div style="font-size:11px;color:var(--text-2)">티켓·결제 기록은 레코드 유지 · 5년 보관</div>
           </div>
         </div>
       </div>
       <div class="toolbar">
-        <input class="search-box" placeholder="닉네임, UID 검색...">
-        <select class="filter-sel"><option>전체 상태</option><option>유예중</option><option>D+30 임박</option><option>영구 삭제 완료</option><option>철회</option></select>
+        <input class="search-box" placeholder="식별 아이디 검색...">
       </div>
       <div class="card">
-        <div class="card-header"><div class="card-title">탈퇴 요청 목록</div></div>
+        <div class="card-header"><div class="card-title">탈퇴 회원 목록</div></div>
         <table>
-          <thead><tr><th>닉네임 / 카카오톡 ID / 식별 아이디</th><th style="text-align:center">가입 유형</th><th style="text-align:center">보유 티켓</th><th style="text-align:center">요청일</th><th style="text-align:center">상태</th><th style="text-align:center">처리</th></tr></thead>
+          <thead><tr><th>닉네임 / 카카오톡 ID / 식별 아이디</th><th style="text-align:center">가입 유형(탈퇴 전)</th><th style="text-align:center">탈퇴일시</th><th style="text-align:center">상태</th><th style="text-align:center">상세</th></tr></thead>
           <tbody>
           </tbody>
         </table>
       </div>
       <div class="card-grid" style="margin-top:16px">
         <div class="card">
-          <div class="card-header"><div class="card-title">탈퇴 사유 분포</div><select class="filter-sel"><option>이번 달</option><option>지난 달</option><option>최근 3개월</option><option>사용자 지정</option></select></div>
-          <div id="wd-reasons"><!-- PP: 실데이터 (withdrawals.reason 집계) --></div>
-        </div>
-        <div class="card">
           <div class="card-header"><div class="card-title">탈퇴 정책 설정</div><button class="btn btn-ghost btn-sm" onclick="openModal('m-withdrawal-policy')">수정</button></div>
           <div>
-            <div class="policy-item"><div class="policy-label">유예 기간</div><div class="policy-value" id="wp-disp-grace">30일</div><div class="policy-desc">개인정보보호법 권장 · Apple/Google 심사 통과 기준</div></div>
-            <div class="policy-item"><div class="policy-label">보유 티켓 처리</div><div class="policy-value" id="wp-disp-ticket">탈퇴 즉시 회수</div><div class="policy-desc">철회 시 자동 복구</div></div>
-            <div class="policy-item"><div class="policy-label">PII 영구 삭제 항목</div><div class="policy-value" id="wp-disp-pii">이메일, 닉네임, 카카오ID</div><div class="policy-desc">D+30 자동 삭제 (스케줄러)</div></div>
-            <div class="policy-item"><div class="policy-label">통계용 보존 항목</div><div class="policy-value" id="wp-disp-stat">탈퇴 사유, 가입일, 티켓 패턴</div><div class="policy-desc">개인 식별 불가 형태로 익명화</div></div>
+            <div class="policy-item"><div class="policy-label">처리 방식</div><div class="policy-value">즉시 처리 (유예·철회 없음)</div><div class="policy-desc">확인 즉시 status='withdrawn' 전환, 재로그인·복구 불가</div></div>
+            <div class="policy-item"><div class="policy-label">PII 스크럽 항목</div><div class="policy-value" id="wp-disp-pii">닉네임, 카카오 닉네임, 카카오 로그인ID</div><div class="policy-desc">탈퇴 즉시 제거 (레코드는 유지)</div></div>
+            <div class="policy-item"><div class="policy-label">거래·정산 기록</div><div class="policy-value">DB에 그대로 존치</div><div class="policy-desc">PII 없이 user_id로만 연결 · 전자상거래법 5년 보존</div></div>
           </div>
         </div>
       </div>
@@ -3184,14 +3170,8 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
   <div class="modal">
     <div class="modal-header"><div class="modal-title">탈퇴 정책 설정</div><button class="modal-close" onclick="closeModal('m-withdrawal-policy')"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
     <div class="modal-body">
-      <div class="form-row">
-        <div class="form-group"><label class="form-label">유예 기간 (일)</label><input class="form-input" type="number" id="wp-grace-days" value="30"></div>
-        <div class="form-group"><label class="form-label">재가입 쿨타임</label><select class="form-select" id="wp-cooldown"><option value="없음 (즉시 재가입)">없음 (즉시 재가입)</option><option value="7일">7일</option><option value="30일">30일</option></select></div>
-      </div>
-      <div class="form-group"><label class="form-label">보유 티켓 처리</label><select class="form-select" id="wp-ticket-policy"><option value="탈퇴 즉시 회수">탈퇴 즉시 회수</option><option value="유예 만료 시 회수">유예 만료 시 회수</option></select></div>
-      <div class="form-group"><label class="form-label">PII 영구 삭제 항목</label><input class="form-input" id="wp-pii-items" value="이메일, 닉네임, 카카오ID"></div>
-      <div class="form-group"><label class="form-label">통계용 보존 항목 (익명화)</label><input class="form-input" id="wp-stat-items" value="탈퇴 사유, 가입일, 티켓 패턴"></div>
-      <div class="info-box">설정값이 바뀌면 탈퇴 처리 절차·D-day 계산이 이 값을 따라 동적으로 반영됩니다.</div>
+      <div class="form-group"><label class="form-label">PII 스크럽 항목</label><input class="form-input" id="wp-pii-items" value="닉네임, 카카오 닉네임, 카카오 로그인ID"></div>
+      <div class="info-box">탈퇴는 <b>즉시 처리</b>됩니다(유예·철회 없음). 최종 확인과 동시에 위 항목이 회원 문서에서 제거되고, 계정은 재로그인·복구가 불가능합니다. 티켓·결제 등 거래 기록은 회원 문서(레코드)를 그대로 참조한 채 보존됩니다(물리 삭제 없음).</div>
     </div>
     <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('m-withdrawal-policy')">취소</button><button class="btn btn-primary" id="wp-save-btn" onclick="wdPolicySubmit()">저장</button></div>
   </div>
@@ -7031,110 +7011,80 @@ window.inqSubmitAnswer = function() {
   });
 };
 
-/* ── sec-withdrawal ── withdrawals collection (empty state) */
+/* ── sec-withdrawal ── users 컬렉션 status='withdrawn' 기준 (즉시 탈퇴 정책, 2026-07-10 확정)
+   과거엔 withdrawals 컬렉션(유예중/D+30 KPI)을 읽었으나 앱이 실제로 그 컬렉션에 쓴 적이 없어
+   화면이 항상 0건이었다. 지금은 performWithdraw()가 실제로 쓰는 users.status='withdrawn' +
+   withdrawn_at을 그대로 조회한다. */
 var WITHDRAWAL_CACHE = {};
-var WD_GRACE_DAYS = 30;
 function loadWithdrawal() {
   var tbody = document.querySelector('#sec-withdrawal table tbody');
 
-  /* 탈퇴 정책 설정 로드 (모달 + 표시 카드 + D-day 계산에 쓰이는 유예기간) */
+  /* PII 스크럽 항목 설정 로드 (표시용 — 실제 스크럽 필드는 app의 performWithdraw()에 하드코딩됨) */
   db.collection('settings').doc('withdrawal_policy').get().then(function(doc) {
     if (!doc.exists) return;
     var d = doc.data();
-    if (d.grace_days != null) WD_GRACE_DAYS = parseInt(d.grace_days, 10) || 30;
     var setVal = function(id, v){ var e=document.getElementById(id); if(e && v!=null) e.value=v; };
     var setTxt2 = function(id, t){ var e=document.getElementById(id); if(e && t!=null) e.textContent=t; };
-    setVal('wp-grace-days', d.grace_days);
-    setVal('wp-cooldown', d.cooldown);
-    setVal('wp-ticket-policy', d.ticket_policy);
     setVal('wp-pii-items', d.pii_items);
-    setVal('wp-stat-items', d.stat_items);
-    if (d.grace_days != null) setTxt2('wp-disp-grace', d.grace_days + '일');
-    if (d.ticket_policy) setTxt2('wp-disp-ticket', d.ticket_policy);
     if (d.pii_items) setTxt2('wp-disp-pii', d.pii_items);
-    if (d.stat_items) setTxt2('wp-disp-stat', d.stat_items);
-  }).catch(function(e){ console.error('loadWithdrawal settings', e); }).then(function() {
-    /* 정책(유예기간) 로드 이후에 목록/KPI 계산 — D-day가 유예기간에 의존 */
-    if (!tbody) return;
-    db.collection('withdrawals').limit(20).get().then(function(snap) {
-      WITHDRAWAL_CACHE = {};
-      if (snap.empty) { tbody.innerHTML = ppEmpty(6,'탈퇴 요청이 없습니다.'); }
-      else {
-        dmFetchUsersByIds(snap.docs.map(function(doc){ return doc.data().user_id; })).then(function(userMap) {
-          var rows = snap.docs.map(function(doc) {
-            var d = doc.data();
-            WITHDRAWAL_CACHE[doc.id] = Object.assign({}, d, { _userLabel: (userMap[d.user_id]||{}).nickname || d.user_id || '' });
-            var isCancelled = d.status === 'cancelled' || d.status === 'withdrawn_cancel';
-            var statusBadge = isCancelled ? '<span class="badge badge-gray">철회</span>' : '<span class="badge badge-amber">유예중</span>';
-            return '<tr><td>' + renderMemberIdentity(userMap[d.user_id], d.user_id) + '</td>'
-              + '<td style="text-align:center"><span class="member-type-kakao">카카오</span></td>'
-              + '<td style="text-align:center">—</td>'
-              + '<td style="text-align:center">' + ppDt(d.requested_at||d.created_at) + '</td>'
-              + '<td style="text-align:center">' + statusBadge + '</td>'
-              + '<td><button class="btn btn-ghost btn-sm" onclick="wdShowDetail(\'' + doc.id + '\')">상세</button></td></tr>';
-          });
-          tbody.innerHTML = rows.join('');
-        });
-      }
-    }).catch(function(){ tbody.innerHTML = ppEmpty(6,'탈퇴 요청이 없습니다.'); });
-  });
+  }).catch(function(e){ console.error('loadWithdrawal settings', e); });
 
-  var statCards = document.querySelectorAll('#sec-withdrawal .stat-card');
-  db.collection('withdrawals').get().then(function(snap){
-    var grace=0, today=0, month=0, cancel=0, reasons={}, total=0;
-    var now=new Date(), mS=new Date(now.getFullYear(),now.getMonth(),1);
-    snap.forEach(function(doc){ var d=doc.data();
-      var req=(d.requested_at&&d.requested_at.toDate)?d.requested_at.toDate():((d.created_at&&d.created_at.toDate)?d.created_at.toDate():null);
-      var isCancelled = d.status==='cancelled'||d.status==='withdrawn_cancel';
-      if(isCancelled) cancel++;
-      else {
-        grace++;
-        if (req) {
-          var deleteDate = new Date(req); deleteDate.setDate(deleteDate.getDate() + WD_GRACE_DAYS);
-          if (ppDateInputValue(deleteDate) === ppDateInputValue(now)) today++;
-        }
-      }
-      if(req&&req>=mS) month++;
-      if(d.reason){ reasons[d.reason]=(reasons[d.reason]||0)+1; total++; }
+  if (!tbody) return;
+  db.collection('users').where('status', '==', 'withdrawn').limit(50).get().then(function(snap) {
+    WITHDRAWAL_CACHE = {};
+    var docs = snap.docs.slice().sort(function(a, b) {
+      var ta = a.data().withdrawn_at, tb = b.data().withdrawn_at;
+      var da = (ta && ta.toDate) ? ta.toDate().getTime() : 0;
+      var db2 = (tb && tb.toDate) ? tb.toDate().getTime() : 0;
+      return db2 - da;
     });
-    if(statCards[0]) statCards[0].querySelector('.stat-value').textContent=grace+'명';
-    if(statCards[1]) statCards[1].querySelector('.stat-value').textContent=today+'명';
-    if(statCards[2]) statCards[2].querySelector('.stat-value').textContent=month+'명';
-    if(statCards[3]) statCards[3].querySelector('.stat-value').textContent=cancel+'명';
-    var wr=document.getElementById('wd-reasons');
-    if(wr){
-      if(!total){ wr.innerHTML='<div style="padding:20px;color:var(--text-3);font-size:13px;text-align:center">집계할 탈퇴 사유 데이터가 없습니다.</div>'; }
-      else { wr.innerHTML=Object.keys(reasons).sort(function(a,b){return reasons[b]-reasons[a];}).map(function(k){ var p=(reasons[k]/total*100).toFixed(1); return '<div class="policy-item"><div class="policy-label">'+k+'</div><div class="policy-value">'+reasons[k]+'명 ('+p+'%)</div></div>'; }).join(''); }
+    if (!docs.length) { tbody.innerHTML = ppEmpty(5, '탈퇴 회원이 없습니다.'); }
+    else {
+      var rows = docs.map(function(doc) {
+        var d = doc.data();
+        WITHDRAWAL_CACHE[doc.id] = d;
+        var joinType = d.linked_kakao
+          ? '<span class="member-type-kakao">카카오</span>'
+          : '<span style="background:var(--warning-soft);color:var(--warning);padding:2px 8px;border-radius:99px;font-size:11px;font-weight:600;">게스트</span>';
+        return '<tr><td>' + renderMemberIdentity(d, doc.id) + '</td>'
+          + '<td style="text-align:center">' + joinType + '</td>'
+          + '<td style="text-align:center">' + ppDt(d.withdrawn_at) + '</td>'
+          + '<td style="text-align:center"><span class="badge badge-gray">탈퇴 완료</span></td>'
+          + '<td><button class="btn btn-ghost btn-sm" onclick="wdShowDetail(\'' + doc.id + '\')">상세</button></td></tr>';
+      });
+      tbody.innerHTML = rows.join('');
     }
-  }).catch(function(){
-    ['0명','0명','0명','0명'].forEach(function(v,i){ if(statCards[i]) statCards[i].querySelector('.stat-value').textContent=v; });
-    var wr=document.getElementById('wd-reasons'); if(wr) wr.innerHTML='<div style="padding:20px;color:var(--text-3);font-size:13px;text-align:center">집계할 탈퇴 사유 데이터가 없습니다.</div>';
+    updateWithdrawalStats(docs.map(function(doc){ return doc.data(); }));
+  }).catch(function(e) { console.error('loadWithdrawal users', e); tbody.innerHTML = ppEmpty(5, '탈퇴 회원이 없습니다.'); });
+}
+
+function updateWithdrawalStats(list) {
+  var statCards = document.querySelectorAll('#sec-withdrawal .stat-card');
+  var now = new Date(), mS = new Date(now.getFullYear(), now.getMonth(), 1), month = 0;
+  list.forEach(function(d) {
+    var t = (d.withdrawn_at && d.withdrawn_at.toDate) ? d.withdrawn_at.toDate() : null;
+    if (t && t >= mS) month++;
   });
+  if (statCards[0]) statCards[0].querySelector('.stat-value').textContent = month + '명';
+  if (statCards[1]) statCards[1].querySelector('.stat-value').textContent = list.length + '명';
 }
 
 window.wdShowDetail = function(id) {
   var d = WITHDRAWAL_CACHE[id];
   if (!d) return;
-  var req = (d.requested_at&&d.requested_at.toDate)?d.requested_at.toDate():((d.created_at&&d.created_at.toDate)?d.created_at.toDate():null);
-  var deleteDate = req ? new Date(req) : null;
-  if (deleteDate) deleteDate.setDate(deleteDate.getDate() + WD_GRACE_DAYS);
   var lines = [
-    '회원: ' + (d._userLabel || d.user_id || '—'),
-    '요청일: ' + (req ? ppDateInputValue(req) : '—'),
-    '영구 삭제 예정일: ' + (deleteDate ? ppDateInputValue(deleteDate) : '—') + ' (유예 ' + WD_GRACE_DAYS + '일)',
-    '탈퇴 사유: ' + (d.reason || '—'),
-    '상태: ' + (d.status === 'cancelled' || d.status === 'withdrawn_cancel' ? '철회(재가입 의사)' : '유예중'),
+    '식별 아이디: ' + id,
+    '가입 유형(탈퇴 전): ' + (d.linked_kakao ? '카카오 연동' : '게스트'),
+    '탈퇴일시: ' + ppDt(d.withdrawn_at) + ' ' + ppTm(d.withdrawn_at),
+    '상태: 탈퇴 완료 (즉시 처리 · 유예 없음)',
+    'PII: 닉네임·카카오 식별값 스크럽됨 (레코드는 유지, 거래 기록 참조 무결성 보호)',
   ];
   alert(lines.join('\n'));
 };
 
 window.wdPolicySubmit = function() {
   var data = {
-    grace_days: parseInt((document.getElementById('wp-grace-days')||{}).value, 10) || 30,
-    cooldown: (document.getElementById('wp-cooldown')||{}).value || '',
-    ticket_policy: (document.getElementById('wp-ticket-policy')||{}).value || '',
     pii_items: (document.getElementById('wp-pii-items')||{}).value || '',
-    stat_items: (document.getElementById('wp-stat-items')||{}).value || '',
     updated_at: FS.FieldValue.serverTimestamp(),
   };
   var btn = document.getElementById('wp-save-btn');
