@@ -12030,12 +12030,12 @@ body.interactive-mode #ip-nav { display: block; }
         <div class="my-section-title">홈 화면</div>
         <div class="my-section">
           <div class="my-row" style="cursor:pointer;" onclick="cpkOpen()">
-            <div class="my-row-ico" style="background:#FFEDF0;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#E4002B" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="2" width="12" height="20" rx="2.5"/><line x1="12" y1="8.5" x2="12" y2="13.5"/><line x1="9.5" y1="11" x2="14.5" y2="11"/></svg></div>
-            <div class="my-row-body">
-              <div class="my-row-name">홈 화면에 쿠팡 바로 가기 추가</div>
-              <div class="my-row-desc">프라이스픽과 제휴 적립이 항상 유지됩니다.</div>
+            <div class="my-row-ico" data-ip-bound="1" style="background:#FFEDF0;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#E4002B" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="2" width="12" height="20" rx="2.5"/><line x1="12" y1="8.5" x2="12" y2="13.5"/><line x1="9.5" y1="11" x2="14.5" y2="11"/></svg></div>
+            <div class="my-row-body" data-ip-bound="1">
+              <div class="my-row-name" data-ip-bound="1">홈 화면에 쿠팡 바로 가기 추가</div>
+              <div class="my-row-desc" data-ip-bound="1">프라이스픽과 제휴 적립이 항상 유지됩니다.</div>
             </div>
-            <div class="my-row-right">›</div>
+            <div class="my-row-right" data-ip-bound="1">›</div>
           </div>
         </div>
 
@@ -12043,54 +12043,46 @@ body.interactive-mode #ip-nav { display: block; }
         <!-- 표시 -->
         <div class="my-section-title">표시</div>
         <div class="my-section">
-          <div class="my-row">
-            <div class="my-row-ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></div>
-            <div class="my-row-body">
-              <div class="my-row-name">다크모드</div>
-              <div class="my-row-desc">2차 업데이트 예정</div>
+          <div class="my-row" style="cursor:pointer;" onclick="ppOpenSortModal()">
+            <div class="my-row-ico" data-ip-bound="1"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="10" y1="6" x2="21" y2="6"/><line x1="10" y1="12" x2="21" y2="12"/><line x1="10" y1="18" x2="21" y2="18"/><path d="M4 6h1v4"/><path d="M4 10h2"/><path d="M6 18H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg></div>
+            <div class="my-row-body" data-ip-bound="1">
+              <div class="my-row-name" data-ip-bound="1">기본 정렬</div>
+              <div class="my-row-desc" data-ip-bound="1">활동 내역 · 구매 내역 목록에 적용</div>
             </div>
-            <div class="my-toggle"></div>
-          </div>
-          <div class="my-row">
-            <div class="my-row-ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="10" y1="6" x2="21" y2="6"/><line x1="10" y1="12" x2="21" y2="12"/><line x1="10" y1="18" x2="21" y2="18"/><path d="M4 6h1v4"/><path d="M4 10h2"/><path d="M6 18H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg></div>
-            <div class="my-row-body">
-              <div class="my-row-name">기본 정렬</div>
-              <div class="my-row-desc">활동 내역 · 구매 내역 목록에 적용</div>
-            </div>
-            <div class="my-row-right value">최신순 / 오래된순</div>
-            <div class="my-row-right">›</div>
+            <div class="my-row-right value" id="settings-sort-value" data-ip-bound="1">최신순</div>
+            <div class="my-row-right" data-ip-bound="1">›</div>
           </div>
         </div>
 
         <!-- 데이터 -->
         <div class="my-section-title">데이터</div>
         <div class="my-section">
-          <div class="my-row">
-            <div class="my-row-ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg></div>
-            <div class="my-row-body">
-              <div class="my-row-name">캐시 삭제</div>
+          <div class="my-row" style="cursor:pointer;" onclick="ppOpenCacheModal()">
+            <div class="my-row-ico" data-ip-bound="1"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg></div>
+            <div class="my-row-body" data-ip-bound="1">
+              <div class="my-row-name" data-ip-bound="1">캐시 삭제</div>
             </div>
-            <div class="my-row-right value">12.4MB</div>
-            <div class="my-row-right">›</div>
+            <div class="my-row-right value" id="settings-cache-value" data-ip-bound="1">12.4MB</div>
+            <div class="my-row-right" data-ip-bound="1">›</div>
           </div>
         </div>
 
         <!-- 정보 -->
         <div class="my-section-title">정보</div>
         <div class="my-section">
-          <div class="my-row">
-            <div class="my-row-ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div>
-            <div class="my-row-body">
-              <div class="my-row-name">이용약관</div>
+          <div class="my-row" style="cursor:pointer;" onclick="switchTT('tos');showScreen('pw-30-terms')">
+            <div class="my-row-ico" data-ip-bound="1"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div>
+            <div class="my-row-body" data-ip-bound="1">
+              <div class="my-row-name" data-ip-bound="1">이용약관</div>
             </div>
-            <div class="my-row-right">›</div>
+            <div class="my-row-right" data-ip-bound="1">›</div>
           </div>
-          <div class="my-row">
-            <div class="my-row-ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
-            <div class="my-row-body">
-              <div class="my-row-name">개인정보처리방침</div>
+          <div class="my-row" style="cursor:pointer;" onclick="switchTT('pp');showScreen('pw-30-terms')">
+            <div class="my-row-ico" data-ip-bound="1"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
+            <div class="my-row-body" data-ip-bound="1">
+              <div class="my-row-name" data-ip-bound="1">개인정보처리방침</div>
             </div>
-            <div class="my-row-right">›</div>
+            <div class="my-row-right" data-ip-bound="1">›</div>
           </div>
           <div class="my-row">
             <div class="my-row-ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg></div>
@@ -13501,7 +13493,7 @@ const SB_SPECS = {
         "h": "핵심 컨텐츠",
         "items": [
           "알림: 구매/이벤트·티켓/마케팅 (토글)",
-          "표시: 다크모드/만원단위/기본정렬",
+          "표시: 기본정렬(최신순/오래된순)",
           "데이터: 캐시 삭제",
           "정보: 약관/앱버전 + 쿠팡 파트너스 고지"
         ]
@@ -15516,6 +15508,34 @@ function csSubmitInquiry(btn) {
 <!-- 쿠팡 홈 바로가기 URL: 파트너 코드 주입 자리 — https://www.coupang.com/  (TODO: 배포 시 ?lptag=AF... 제휴 추적 코드 주입, 현재 미포함) -->
 <script>function cpkOpen(){var m=document.getElementById('cpk-modal');if(m)m.style.display='flex';var t=document.getElementById('cpk-modal-title');if(t)t.textContent="홈 화면에 '"+((window.currentMall&&currentMall.name)||'쿠팡')+"' 바로 가기 추가";}function cpkClose(){var m=document.getElementById('cpk-modal');if(m)m.style.display='none';}</script>
 
+<!-- pw-31 설정: 기본 정렬 선택 모달 -->
+<div id="sort-modal" style="display:none;position:fixed;inset:0;z-index:2147483600;background:rgba(20,12,10,.5);align-items:center;justify-content:center;padding:20px;">
+  <div style="background:#fff;border-radius:18px;max-width:320px;width:100%;overflow:hidden;box-shadow:0 16px 50px rgba(0,0,0,.32);font-family:-apple-system,'Apple SD Gothic Neo',sans-serif;">
+    <div style="padding:18px 18px 4px;font-size:15.5px;font-weight:800;color:var(--text1);">기본 정렬</div>
+    <div style="padding:0 18px 8px;font-size:11.5px;color:var(--text3);">활동 내역 · 구매 내역 목록에 적용됩니다.</div>
+    <div style="padding:6px 10px 14px;">
+      <button type="button" id="sort-opt-desc" onclick="ppSelectSortOrder('desc')" style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:13px 12px;border:none;background:none;border-radius:12px;cursor:pointer;font-size:14px;font-weight:700;color:var(--text1);"><span>최신순</span><span class="sort-check" style="color:var(--main);font-weight:900;"></span></button>
+      <button type="button" id="sort-opt-asc" onclick="ppSelectSortOrder('asc')" style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:13px 12px;border:none;background:none;border-radius:12px;cursor:pointer;font-size:14px;font-weight:700;color:var(--text1);"><span>오래된순</span><span class="sort-check" style="color:var(--main);font-weight:900;"></span></button>
+    </div>
+    <button type="button" onclick="ppCloseSortModal()" style="width:calc(100% - 28px);margin:0 14px 14px;height:44px;background:var(--bg);border:1px solid var(--border);border-radius:12px;color:var(--text2);font-size:13.5px;font-weight:700;cursor:pointer;">닫기</button>
+  </div>
+</div>
+
+<!-- pw-31 설정: 캐시 삭제 확인/결과 모달 -->
+<div id="cache-modal" style="display:none;position:fixed;inset:0;z-index:2147483600;background:rgba(20,12,10,.5);align-items:center;justify-content:center;padding:20px;">
+  <div style="background:#fff;border-radius:18px;max-width:320px;width:100%;overflow:hidden;box-shadow:0 16px 50px rgba(0,0,0,.32);font-family:-apple-system,'Apple SD Gothic Neo',sans-serif;">
+    <div style="padding:20px 18px 4px;font-size:15.5px;font-weight:800;color:var(--text1);">캐시를 삭제할까요?</div>
+    <div id="cache-modal-body" style="padding:8px 18px 16px;font-size:12.5px;color:var(--text3);line-height:1.6;">임시로 저장된 화면 데이터(<b id="cache-modal-size">12.4MB</b>)를 지웁니다. 로그인 정보·티켓·포인트 등 계정 데이터는 삭제되지 않아요.</div>
+    <div style="display:flex;gap:8px;padding:0 14px 14px;">
+      <button type="button" onclick="ppCloseCacheModal()" style="flex:1;height:44px;background:var(--bg);border:1px solid var(--border);border-radius:12px;color:var(--text2);font-size:13.5px;font-weight:700;cursor:pointer;">취소</button>
+      <button type="button" id="cache-modal-confirm-btn" onclick="ppConfirmClearCache()" style="flex:1;height:44px;background:var(--main);border:none;border-radius:12px;color:#fff;font-size:13.5px;font-weight:700;cursor:pointer;">삭제</button>
+    </div>
+  </div>
+</div>
+<!-- ppOpenSortModal · ppSelectSortOrder · ppOpenCacheModal 등의 실제 로직은
+     PP/db/showToast에 접근해야 하므로 아래 Firebase 연동 IIFE 내부에 정의되고
+     window.*로 노출된다 (해당 IIFE 검색: "pw-31 설정 확장") -->
+
 <!-- ===== PWA 홈화면 바로가기 (프로토타입 설치) ===== -->
 <div id="pp-install" style="display:none;position:fixed;inset:0;z-index:2147483601;background:rgba(20,12,30,.5);align-items:flex-end;justify-content:center;">
   <div id="pp-install-sheet" role="dialog" aria-modal="true" style="background:#fff;border-radius:20px 20px 0 0;max-width:430px;width:100%;box-shadow:0 -10px 40px rgba(0,0,0,.28);font-family:'Pretendard Variable',-apple-system,'Apple SD Gothic Neo',sans-serif;padding:0 0 max(22px,env(safe-area-inset-bottom));">
@@ -16065,7 +16085,7 @@ function onScreenShown(id) {
   if (id === 'pw-22') { refreshHomeData(); renderExchangePoint(); renderGradeSwapScreen(); renderPointTicketExchange(); }
   if (id === 'pw-17') renderStreakMission();
   if (id === 'pw-14' || id === 'pw-14-new' || id === 'pw-14-win' || id === 'pw-14-done') window.ppSyncCheckinScreen(id);
-  if (id === 'pw-31') renderNotifSettings();
+  if (id === 'pw-31') { renderNotifSettings(); renderSettingsExtra(); }
   if (id === 'pw-26') { refreshHomeData(); renderRaffleScreen(); }
   if (id === 'pw-30-nt') renderAppNotices();
 }
@@ -16950,7 +16970,7 @@ function renderActivity(filter) {
   var lists = document.querySelectorAll('.activity-list');
   if (!lists.length) return;
   if (PP._actEvents) {
-    var html = ppRenderActListHtml(PP._actEvents, filter || null);
+    var html = ppRenderActListHtml(ppApplySortOrder(PP._actEvents), filter || null);
     lists.forEach(function (el) { el.innerHTML = html; });
     return;
   }
@@ -16976,7 +16996,7 @@ function renderActivity(filter) {
       ev.push({ d: ppDate(p.created_at), ft: 'event', ico: amt >= 0 ? 'earn' : 'return', title: p.reason || (p.type || '포인트'), detail: '포인트', amt: (amt >= 0 ? '+' : '') + amt + 'P', cls: amt >= 0 ? 'earn' : 'return' });
     });
     PP._actEvents = ev.filter(function (e) { return e.d; }).sort(function (a, b) { return b.d - a.d; });
-    var html = ppRenderActListHtml(PP._actEvents, filter || null);
+    var html = ppRenderActListHtml(ppApplySortOrder(PP._actEvents), filter || null);
     lists.forEach(function (el) { el.innerHTML = html; });
   });
 }
@@ -17413,7 +17433,10 @@ function renderPurchaseHistory() {
   var box = document.getElementById('pw34-list');
   if (!box) return;
   ppQuery('postbacks', 'user_id', PP.uid).then(function (pbs) {
-    pbs = pbs.filter(function (p) { return ppDate(p.created_at); }).sort(function (a, b) { return ppDate(b.created_at) - ppDate(a.created_at); });
+    var asc = (window.ppSortOrder ? ppSortOrder() : 'desc') === 'asc';
+    pbs = pbs.filter(function (p) { return ppDate(p.created_at); }).sort(function (a, b) {
+      return asc ? ppDate(a.created_at) - ppDate(b.created_at) : ppDate(b.created_at) - ppDate(a.created_at);
+    });
     if (!pbs.length) {
       box.innerHTML = ppEmpty('🧾', '구매 내역이 없어요', '쇼핑몰을 경유해 구매하면<br>여기에 주문이 기록돼요');
       return;
@@ -17442,6 +17465,7 @@ function renderPurchaseHistory() {
     }).join('');
   });
 }
+window.ppRenderPurchaseHistory = renderPurchaseHistory;
 
 /* ── pw-17 연속구매 미션 진행률 (실데이터) ──
    "연속구매" = 확정(status:'confirmed') 구매 postback을 최신순 정렬해, 가장 최근 건부터 거슬러
@@ -17920,6 +17944,90 @@ function bindPointTicketExchange() {
 /* pw-22 실핸들러를 outer script의 bindCatchAll()보다 먼저 선점시키기 위한 브릿지
    (bindWithdrawConfirmScreen 등과 동일 이유 — window 경유로 outer script에서 먼저 호출) */
 window.ppBindPw22 = function() { bindGradeSwapScreen(); bindPointTicketExchange(); };
+
+/* ── pw-31 설정 확장: 기본 정렬 · 캐시 삭제 (실동작) ──
+   PP·db·showToast는 이 IIFE 내부 로컬이라, HTML onclick(전역 스코프)에서
+   직접 부르는 함수들은 window.*로 노출해야 한다. */
+var SORT_ORDER_DEFAULT = 'desc';
+function ppSortOrder() {
+  var v = PP.user && PP.user.sort_order;
+  return v === 'asc' ? 'asc' : SORT_ORDER_DEFAULT;
+}
+function ppApplySortOrder(ev) {
+  var asc = ppSortOrder() === 'asc';
+  return ev.slice().sort(function (a, b) { return asc ? a.d - b.d : b.d - a.d; });
+}
+function renderSettingsExtra() {
+  var order = ppSortOrder();
+  var lbl = document.getElementById('settings-sort-value');
+  if (lbl) lbl.textContent = order === 'asc' ? '오래된순' : '최신순';
+  var descCheck = document.querySelector('#sort-opt-desc .sort-check');
+  var ascCheck = document.querySelector('#sort-opt-asc .sort-check');
+  if (descCheck) descCheck.textContent = order === 'desc' ? '✓' : '';
+  if (ascCheck) ascCheck.textContent = order === 'asc' ? '✓' : '';
+}
+function ppOpenSortModal() {
+  renderSettingsExtra();
+  var m = document.getElementById('sort-modal');
+  if (m) m.style.display = 'flex';
+}
+function ppCloseSortModal() {
+  var m = document.getElementById('sort-modal');
+  if (m) m.style.display = 'none';
+}
+function ppSelectSortOrder(order) {
+  PP.user = PP.user || {};
+  PP.user.sort_order = order;
+  if (PP.uid) {
+    db.collection('users').doc(PP.uid).set({ sort_order: order }, { merge: true }).catch(function (e) { console.error('saveSortOrder', e); });
+  }
+  renderSettingsExtra();
+  ppCloseSortModal();
+  renderActivity();
+  renderPurchaseHistory();
+  showToast('정렬 순서가 변경되었어요');
+}
+window.ppOpenSortModal = ppOpenSortModal;
+window.ppCloseSortModal = ppCloseSortModal;
+window.ppSelectSortOrder = ppSelectSortOrder;
+
+var CACHE_CLEARED = false;
+function ppOpenCacheModal() {
+  var body = document.getElementById('cache-modal-size');
+  var btn = document.getElementById('cache-modal-confirm-btn');
+  if (CACHE_CLEARED) {
+    if (body) body.textContent = '0MB';
+    document.getElementById('cache-modal-body').innerHTML = '삭제할 캐시가 없어요. 이미 비어 있습니다.';
+    if (btn) btn.style.display = 'none';
+  } else {
+    if (body) body.textContent = '12.4MB';
+    document.getElementById('cache-modal-body').innerHTML = '임시로 저장된 화면 데이터(<b id="cache-modal-size">12.4MB</b>)를 지웁니다. 로그인 정보·티켓·포인트 등 계정 데이터는 삭제되지 않아요.';
+    if (btn) btn.style.display = '';
+  }
+  var m = document.getElementById('cache-modal');
+  if (m) m.style.display = 'flex';
+}
+function ppCloseCacheModal() {
+  var m = document.getElementById('cache-modal');
+  if (m) m.style.display = 'none';
+}
+function ppConfirmClearCache() {
+  PP._actEvents = null;
+  var clearP = Promise.resolve();
+  if (window.caches && caches.keys) {
+    clearP = caches.keys().then(function (keys) { return Promise.all(keys.map(function (k) { return caches.delete(k); })); }).catch(function (e) { console.error('cacheClear', e); });
+  }
+  clearP.then(function () {
+    CACHE_CLEARED = true;
+    var lbl = document.getElementById('settings-cache-value');
+    if (lbl) lbl.textContent = '0MB';
+    ppCloseCacheModal();
+    showToast('캐시를 삭제했어요');
+  });
+}
+window.ppOpenCacheModal = ppOpenCacheModal;
+window.ppCloseCacheModal = ppCloseCacheModal;
+window.ppConfirmClearCache = ppConfirmClearCache;
 
 /* ── Init ── */
 document.addEventListener('DOMContentLoaded', function() {
