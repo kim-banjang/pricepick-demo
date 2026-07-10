@@ -8015,6 +8015,14 @@ body.interactive-mode #ip-nav { display: block; }
   .C-ac-return { width:100%; padding:0 24px; margin-top:4px; }
   .C-ac-return button { width:100%; height:52px; border:none; border-radius:14px; background:var(--main); color:#fff; font-size:15px; font-weight:700; letter-spacing:-0.2px; cursor:pointer; }
   .C-ac-return button:active { opacity:0.9; }
+  .C-shop-return { width:100%; padding:0 24px; margin-top:4px; }
+  .C-shop-return .C-shop-txt { font-size:11.5px; color:#9A8FB5; line-height:1.6; margin-bottom:14px; text-align:center; padding:0 8px; }
+  .C-shop-return .C-shop-txt b { color:#6B5E8A; }
+  .C-shop-home-btn { width:100%; height:52px; border:none; border-radius:14px; background:var(--main); color:#fff; font-size:15px; font-weight:700; letter-spacing:-0.2px; cursor:pointer; font-family:inherit; }
+  .C-shop-home-btn:active { opacity:0.9; }
+  .C-demo-entry { display:flex; align-items:center; justify-content:center; gap:6px; margin:16px auto 0; background:none; border:none; cursor:pointer; font-family:inherit; padding:6px; }
+  .C-demo-entry .C-demo-chip { background:#FFF3D6; color:#B8860B; font-size:9.5px; font-weight:800; letter-spacing:0.4px; padding:2px 6px; border-radius:5px; flex-shrink:0; }
+  .C-demo-entry .C-demo-txt { font-size:11.5px; color:#9A8FB5; text-decoration:underline; text-underline-offset:2px; }
 
   /* 포인트 ↔ 티켓 교환 (pw-22) */
   .pt-balance-card { display:flex; align-items:center; justify-content:space-between; background:linear-gradient(135deg,#FFF6DE,#FFEFC2); border:1.5px solid #FFD86B; border-radius:14px; padding:14px 16px; margin-bottom:14px; }
@@ -8091,8 +8099,8 @@ body.interactive-mode #ip-nav { display: block; }
   .iv-code-copy { flex-shrink:0; height:44px; padding:0 18px; background:var(--main); color:#fff; border:none; border-radius:10px; font-size:13px; font-weight:700; cursor:pointer; font-family:inherit; }
   .iv-code-copy:active { background:var(--main-dark); }
   .iv-hist-actions { margin-top:9px; }
-  .iv-hist-complete-btn { width:100%; height:34px; background:var(--main); color:#fff; border:none; border-radius:9px; font-size:11.5px; font-weight:700; cursor:pointer; font-family:inherit; }
-  .iv-hist-complete-btn:active { background:var(--main-dark); }
+  .iv-hist-complete-btn { width:100%; height:34px; background:#FFF3D6; color:#B8860B; border:1px dashed #E8B84B; border-radius:9px; font-size:11.5px; font-weight:700; cursor:pointer; font-family:inherit; }
+  .iv-hist-complete-btn:active { background:#FCE8B8; }
   .iv-status-card { margin:12px 16px 0; background:#fff; border-radius:14px; padding:15px 16px; border:1px solid var(--border); }
   .iv-status-head { display:flex; justify-content:space-between; align-items:baseline; margin-bottom:9px; }
   .iv-status-label { font-size:12px; font-weight:600; color:var(--text1); }
@@ -11163,6 +11171,11 @@ body.interactive-mode #ip-nav { display: block; }
             <div style="font-size:11px;color:#9A8FB5;line-height:1.5;margin-bottom:10px;text-align:center;padding:0 8px;">쿠팡에서 30초 이상 둘러봐야 적립돼요.<br>단순히 앱만 켰다 끄면 적립되지 않아요.</div>
             <button id="ac-bridge-return-btn" onclick="acReturnFromBridge()">쿠팡 구경 완료 · 100P 받기</button>
           </div>
+          <div class="C-shop-return" id="shop-bridge-info" style="display:none;">
+            <div class="C-shop-txt">구매하신 내역은 제휴사를 통해 <b>자동으로 감지</b>돼요.<br>지금 앱에서 따로 입력하실 건 없어요.<br>구매가 확인되면 <b>적립 대기(가지급)</b> 티켓이 생기고,<br>구매 확정(카카오 연동 D+7 · 미연동 D+30) 후 사용할 수 있어요.</div>
+            <button class="C-shop-home-btn" onclick="showScreen('pw-10')">홈으로 가기</button>
+            <button class="C-demo-entry" onclick="confirmDemoPurchaseSim()"><span class="C-demo-chip">DEMO</span><span class="C-demo-txt">방금 결제했다고 가정하고 시뮬레이션 보기</span></button>
+          </div>
         </div>
       </div>
     </div>
@@ -13822,6 +13835,9 @@ function acGoCoupang(screenId) {
   window._acPendingScreen = screenId;
   // 쿠팡 컨텍스트로 브릿지 설정 + 이동 (selectMall이 pw-13으로 showScreen)
   selectMall('쿠팡', 'coupang.com', 'pw-13');
+  // 출석 플로우는 경유구매 실제안내/데모 노출 대상이 아님 — selectMall이 세팅한 shopping을 덮어씀
+  // (PP는 이 스코프에서 접근 불가 — Firebase 주입 IIFE가 노출한 전역 setter로 전달)
+  if (window.ppSetBridgePurpose) window.ppSetBridgePurpose('attendance');
   // 출석 모드 브릿지 문구로 전환 + 복귀 버튼 노출
   var t13 = document.getElementById('mall13-title');
   var s13 = document.getElementById('mall13-sub');
@@ -14861,9 +14877,12 @@ function selectMall(name, domain, dest) {
   currentMall = { name: name, domain: domain };
   var favicon = 'https://www.google.com/s2/favicons?domain=' + domain + '&sz=64';
 
-  // 일반 쇼핑 진입 시 출석 복귀 버튼 숨김 (출석 플로우는 acGoCoupang이 다시 노출)
+  // 일반 쇼핑 진입 = 실제 플로우 기본(purpose 설정은 hookSelectMall이 PP 스코프 안에서 처리).
+  // 출석 플로우는 acGoCoupang이 이후에 attendance로 재설정.
   var acRet = document.getElementById('ac-bridge-return');
   if (acRet) acRet.style.display = 'none';
+  var shopInfo = document.getElementById('shop-bridge-info');
+  if (shopInfo) shopInfo.style.display = 'none';
 
   // pw-12 업데이트
   var t12 = document.getElementById('mall12-title');
@@ -15630,7 +15649,7 @@ function csSubmitInquiry(btn) {
         </div>
         <div class="ac-header">
           <button class="back-btn" data-ip-bound="1" onclick="showScreen('pw-10')" style="cursor:pointer;"><svg width="22" height="22" viewBox="0 0 18 18" fill="none"><path d="M11.25 15.5L5.96 10.45C5.17 9.65 5.17 8.35 5.96 7.55L11.25 2.66" stroke="currentColor" stroke-width="1.6" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-          <span class="ac-header-title">티켓 적립</span>
+          <span class="ac-header-title">티켓 적립<span style="margin-left:6px;background:#FFF3D6;color:#B8860B;font-size:9.5px;font-weight:800;letter-spacing:0.4px;padding:2px 6px;border-radius:5px;vertical-align:1px;">DEMO</span></span>
           <div style="width:36px;"></div>
         </div>
         <div style="flex:1;overflow-y:auto;padding:16px 16px 100px;">
@@ -16411,11 +16430,17 @@ function refreshMyData() {
 }
 
 /* ── Mall click logging ── */
+/* outer-scope(선언형 프로토타입 스크립트, PP 접근 불가)에서 purpose를 넘길 수 있게 노출하는 setter.
+   acGoCoupang()이 selectMall() 호출 직후 attendance로 재설정할 때 사용. */
+window.ppSetBridgePurpose = function(p) { PP.bridgePurpose = p; };
+
 function hookSelectMall() {
   var orig = window.selectMall;
   if (!orig || orig._ppHooked) return;
   window.selectMall = function(name, domain, dest) {
     PP.pendingMall = { name: name, domain: domain };
+    // 일반 쇼핑 진입 기본값 = shopping. 출석 목적이면 acGoCoupang이 selectMall 호출 직후 덮어쓴다.
+    PP.bridgePurpose = 'shopping';
     if (PP.uid) {
       db.collection('click_logs').add({
         user_id: PP.uid, mall_name: name, mall_domain: domain,
@@ -16427,15 +16452,54 @@ function hookSelectMall() {
   window.selectMall._ppHooked = true;
 }
 
-/* ── Purchase simulation (bridge screen) ── */
+/* ── 경유구매 브릿지 복귀 ──
+   기본(실제 플로우) = 실서비스에서 구매는 제휴사 포스트백으로 자동 감지되므로 앱 내 입력 화면이 없다.
+   pw-13 체류 3.5초 후 안내(#shop-bridge-info)만 노출. 출석(attendance) 목적일 땐 관여하지 않는다.
+   데모 시뮬(금액 입력→즉시 결과)은 안내 하단 "DEMO" 진입점을 눌러 확인 팝업을 통과해야만 뜬다. */
 var _purchaseShown = false;
 
 function schedulePurchasePrompt() {
   _purchaseShown = false;
+  // purpose 판정은 fire 시점에 한다 — schedule 시점엔 아직 'shopping'이고, acGoCoupang이 selectMall
+  // 호출 직후(동기) 'attendance'로 덮어쓰므로, 스케줄 시점 값만 보면 출석 플로우에도 잘못 뜬다.
   setTimeout(function() {
-    if (ppActiveScreen() === 'pw-13') showPurchaseOverlay();
+    if (PP.bridgePurpose === 'attendance') return; // 출석 플로우는 별도 처리, 경유구매 안내 개입 금지
+    if (ppActiveScreen() === 'pw-13') showBridgeRealInfo();
   }, 3500);
 }
+
+function showBridgeRealInfo() {
+  var info = document.getElementById('shop-bridge-info');
+  if (info) info.style.display = '';
+}
+
+/* ── 데모 시뮬레이션 진입 확인 팝업 (공용) ──
+   실제 앱에 없는 데모 전용 장치(경유구매 시뮬·친구초대 첫구매 완료 처리 등)를 실행하기 전
+   반드시 거치는 확인 게이트. bodyHtml만 바꿔 재사용한다. */
+function ppDemoConfirm(bodyHtml, onContinue) {
+  var existing = document.getElementById('pp-demo-confirm');
+  if (existing) existing.remove();
+  var el = document.createElement('div');
+  el.id = 'pp-demo-confirm';
+  el.style.cssText = 'position:fixed;inset:0;z-index:10000;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.5);';
+  el.innerHTML = '<div style="background:#fff;border-radius:16px;padding:26px 22px;width:86%;max-width:320px;text-align:center;">'
+    + '<div style="width:44px;height:44px;border-radius:12px;background:#FFF3D6;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;">'
+    + '<span style="font-size:11px;font-weight:800;color:#B8860B;letter-spacing:0.4px;">DEMO</span></div>'
+    + '<div style="font-size:15px;font-weight:700;color:#1A1130;margin-bottom:8px;">데모용 시뮬레이션입니다</div>'
+    + '<div style="font-size:13px;color:#6B5E8A;line-height:1.6;margin-bottom:20px;">' + bodyHtml + '</div>'
+    + '<div style="display:flex;gap:8px;">'
+    + '<button id="pp-demo-cancel" style="flex:1;height:46px;background:#F3EEFF;border:none;border-radius:12px;color:#6B5E8A;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit;">취소</button>'
+    + '<button id="pp-demo-continue" style="flex:1;height:46px;background:#845EEE;border:none;border-radius:12px;color:#fff;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit;">계속하기</button>'
+    + '</div></div>';
+  el.querySelector('#pp-demo-cancel').addEventListener('click', function() { el.remove(); });
+  el.querySelector('#pp-demo-continue').addEventListener('click', function() { el.remove(); onContinue(); });
+  document.body.appendChild(el);
+}
+
+function confirmDemoPurchaseSim() {
+  ppDemoConfirm('실제 앱에는 없는 화면이에요.<br>구매 금액을 입력하면 지급 결과를 미리 볼 수 있어요.', function() { showPurchaseOverlay(); });
+}
+window.confirmDemoPurchaseSim = confirmDemoPurchaseSim; // pw-13 인라인 onclick(전역 스코프)에서 호출
 
 function showPurchaseOverlay() {
   if (_purchaseShown) return;
@@ -16453,17 +16517,20 @@ function showPurchaseOverlay() {
   var el = document.createElement('div');
   el.id = 'pp-purchase-overlay';
   el.style.cssText = 'position:fixed;inset:0;z-index:9999;display:flex;align-items:flex-end;justify-content:center;background:rgba(0,0,0,.48);';
-  el.innerHTML = '<div style="background:#fff;border-radius:20px 20px 0 0;padding:28px 24px 44px;width:100%;max-width:480px;">'
+  el.innerHTML = '<div style="background:#fff;border-radius:20px 20px 0 0;padding:22px 24px 44px;width:100%;max-width:480px;border-top:3px dashed #E8B84B;">'
+    + '<div style="display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:12px;">'
+    + '<span style="background:#FFF3D6;color:#B8860B;font-size:10px;font-weight:800;letter-spacing:0.4px;padding:3px 8px;border-radius:6px;">DEMO</span>'
+    + '<span style="font-size:11.5px;color:#B8860B;font-weight:600;">실제 앱에는 없는 시뮬레이션 화면이에요</span></div>'
     + '<div id="pp-mall-name-title" style="text-align:center;font-size:15px;font-weight:700;color:#1A1130;margin-bottom:6px;">' + mn + ' 구매 완료</div>'
-    + '<div style="text-align:center;font-size:13px;color:#6B5E8A;margin-bottom:20px;">구매 금액을 입력하면 티켓이 자동 적립돼요</div>'
+    + '<div style="text-align:center;font-size:13px;color:#6B5E8A;margin-bottom:20px;">구매 금액을 입력하면 데모 지급 결과를 볼 수 있어요</div>'
     + '<div style="position:relative;margin-bottom:14px;">'
     + '<input id="pp-purchase-amount" type="number" inputmode="numeric" placeholder="구매 금액 (원)" min="1000" step="1000"'
     + ' style="width:100%;box-sizing:border-box;height:52px;border:1.5px solid #C6AFFF;border-radius:12px;padding:0 46px 0 16px;font-size:17px;font-weight:600;color:#1A1130;outline:none;font-family:inherit;">'
     + '<span style="position:absolute;right:14px;top:50%;transform:translateY(-50%);font-size:14px;font-weight:600;color:#845EEE;">원</span>'
     + '</div>'
     + '<div id="pp-ticket-preview" style="background:#F3EEFF;border-radius:12px;padding:11px 16px;margin-bottom:14px;font-size:13px;color:#6B5E8A;text-align:center;display:none;"></div>'
-    + '<button id="pp-purchase-confirm" style="width:100%;height:52px;background:#845EEE;border:none;border-radius:13px;color:#fff;font-size:16px;font-weight:800;cursor:pointer;font-family:inherit;margin-bottom:0;">티켓 받기</button>'
-    + '<button id="pp-purchase-cancel" style="width:100%;height:44px;background:none;border:none;color:#9A8FB5;font-size:14px;cursor:pointer;margin-top:8px;font-family:inherit;">이번엔 넘어가기</button>'
+    + '<button id="pp-purchase-confirm" style="width:100%;height:52px;background:#845EEE;border:none;border-radius:13px;color:#fff;font-size:16px;font-weight:800;cursor:pointer;font-family:inherit;margin-bottom:0;">데모로 지급받기</button>'
+    + '<button id="pp-purchase-cancel" style="width:100%;height:44px;background:none;border:none;color:#9A8FB5;font-size:14px;cursor:pointer;margin-top:8px;font-family:inherit;">닫기</button>'
     + '</div>';
 
   el.querySelector('#pp-purchase-amount').addEventListener('input', function() {
@@ -16476,7 +16543,7 @@ function showPurchaseOverlay() {
       if (tk.silver > 0) parts.push('실버 ' + tk.silver + '장');
       if (tk.bronze > 0) parts.push('브론즈 ' + tk.bronze + '장');
       pv.style.display = 'block';
-      pv.textContent = '적립 예정: ' + parts.join(' + ') + ' (' + tk.total + '장)';
+      pv.textContent = '적립 예정(데모 미리보기): ' + parts.join(' + ') + ' (' + tk.total + '장)';
     } else {
       pv.style.display = 'none';
     }
@@ -16493,7 +16560,7 @@ function showPurchaseOverlay() {
 
   el.querySelector('#pp-purchase-cancel').addEventListener('click', function() {
     el.style.display = 'none';
-    window.showScreen('pw-10');
+    _purchaseShown = false;
   });
 
   document.body.appendChild(el);
@@ -16508,23 +16575,26 @@ function processPurchase(amount, overlay) {
   var postRef = db.collection('postbacks').doc();
   /* 정책: 구매 즉시 '가지급(랜덤) 티켓'만 지급 — 실제 등급(브/실/골)은 이미 Greedy로 계산해
      티켓 문서에 저장하되 status는 pending. 확정(연동 D+7·미연동 D+30)은 CMS 포스트백 관리에서
-     상태를 '확정'으로 바꿔야 처리됨(dmConfirmPostbackTickets) — 앱이 스스로 확정하지 않는다. */
+     상태를 '확정'으로 바꿔야 처리됨(dmConfirmPostbackTickets) — 앱이 스스로 확정하지 않는다.
+     is_demo_sim: 실제 포스트백이 아니라 앱 내 데모 시뮬레이션 진입점(금액 직접 입력)으로 생성된
+     건임을 표시 — CMS 등에서 실제 제휴사 포스트백과 구분할 수 있도록 남긴다. */
   batch.set(postRef, {
     user_id: PP.uid, mall_name: mall.name, mall_domain: mall.domain,
-    purchase_amount: amount, status: 'pending', created_at: now,
+    purchase_amount: amount, status: 'pending', created_at: now, is_demo_sim: true,
   });
   var grades = ['bronze', 'silver', 'gold'];
   var cnts = [tk.bronze, tk.silver, tk.gold];
   grades.forEach(function(grade, gi) {
     for (var j = 0; j < cnts[gi]; j++) {
       var tRef = db.collection('user_tickets').doc();
-      batch.set(tRef, { user_id: PP.uid, grade: grade, status: 'pending', postback_id: postRef.id, earned_at: now, confirmed_at: null, expires_at: null });
+      batch.set(tRef, { user_id: PP.uid, grade: grade, status: 'pending', postback_id: postRef.id, earned_at: now, confirmed_at: null, expires_at: null, is_demo_sim: true });
       var txRef = db.collection('ticket_transactions').doc();
-      batch.set(txRef, { user_id: PP.uid, ticket_grade: grade, type: 'earn', postback_id: postRef.id, created_at: now });
+      batch.set(txRef, { user_id: PP.uid, ticket_grade: grade, type: 'earn', postback_id: postRef.id, created_at: now, is_demo_sim: true });
     }
   });
   batch.commit().then(function() {
     overlay.style.display = 'none';
+    _purchaseShown = false;
     PP.randomBundleCount = (PP.randomBundleCount || 0) + (tk.total > 0 ? 1 : 0);
     renderHomeTickets();
     renderMyTicketCard();
@@ -16537,13 +16607,14 @@ function processPurchase(amount, overlay) {
     if (grid) {
       grid.style.display = 'block';
       grid.innerHTML = '<div style="background:#FFF6F5;border:1px solid #FFB8AC;border-radius:12px;padding:14px 16px;text-align:left;">'
-        + '<div style="font-size:12px;font-weight:700;color:#C0291A;margin-bottom:4px;">랜덤 티켓 ' + tk.total + '장 · 대기중</div>'
-        + '<div style="font-size:11.5px;color:#C0291A;opacity:0.85;line-height:1.5;">구매 확정(카카오 연동 시 D+7, 미연동 D+30) 후<br>실제 등급(브론즈·실버·골드)이 공개되고 사용 가능해져요.</div></div>';
+        + '<div style="font-size:12px;font-weight:700;color:#C0291A;margin-bottom:4px;">랜덤 티켓 ' + tk.total + '장 · 가지급(데모) 대기중</div>'
+        + '<div style="font-size:11.5px;color:#C0291A;opacity:0.85;line-height:1.5;">실제 서비스에서는 구매 확정(카카오 연동 시 D+7, 미연동 D+30) 후<br>실제 등급(브론즈·실버·골드)이 공개되고 사용 가능해져요.</div></div>';
     }
     window.showScreen('pw-earn-done');
   }).catch(function(e) {
     console.error('purchase', e);
     overlay.style.display = 'none';
+    _purchaseShown = false;
     window.showScreen('pw-10');
   });
 }
@@ -17247,6 +17318,14 @@ function ppCompleteInvite(inviteId) {
 }
 window.ppCompleteInvite = ppCompleteInvite; // iv-hist-list innerHTML의 inline onclick에서 호출(IIFE 밖 전역 스코프 필요)
 
+/* 실제 앱엔 없는 데모 트리거이므로 실행 전 confirm 게이트를 거친다(ppDemoConfirm 공용 팝업). */
+function ppConfirmCompleteInvite(inviteId) {
+  ppDemoConfirm('실제 앱에는 없는 화면이에요.<br>친구가 방금 첫 구매를 완료했다고 가정하고<br>초대 보상을 지급해요.', function () {
+    ppCompleteInvite(inviteId);
+  });
+}
+window.ppConfirmCompleteInvite = ppConfirmCompleteInvite;
+
 /* ── 피초대자 보상 단건 지급 (Firestore 트랜잭션) ──
    invites 문서의 invitee_rewarded 플래그 확인 + 지급 기록(point_transactions)·잔액 증가(user_points)를
    하나의 트랜잭션으로 묶어 원자적으로 처리한다. 같은 invite에 대해 동시에 여러 트랜잭션이 붙어도
@@ -17343,7 +17422,7 @@ function renderInvites() {
       var top = '<div class="iv-hist-top"><div class="iv-hist-ava">' + ppEsc(ava) + '</div>'
         + '<div class="iv-hist-body"><div class="iv-hist-name">' + nm + '</div><div class="iv-hist-date">' + ppFmt(ppDate(x.created_at)) + '</div></div>'
         + '<div class="iv-hist-chip ' + (done ? 'done' : 'wait') + '">' + (done ? '첫 구매 완료' : '첫 구매 대기') + '</div></div>';
-      var actions = done ? '' : '<div class="iv-hist-actions"><button class="iv-hist-complete-btn" onclick="ppCompleteInvite(\'' + x._id + '\')">첫 구매 완료 처리 (데모)</button></div>';
+      var actions = done ? '' : '<div class="iv-hist-actions"><button class="iv-hist-complete-btn" onclick="ppConfirmCompleteInvite(\'' + x._id + '\')">DEMO · 첫 구매 완료 처리</button></div>';
       return '<div class="iv-hist-item">' + top + actions + '</div>';
     }).join('');
   });
