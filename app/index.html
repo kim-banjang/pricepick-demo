@@ -11113,7 +11113,7 @@ body.interactive-mode #ip-nav { display: block; }
           <!-- 쿠팡 홈 바로가기 (파트너 코드 박힌 쿠팡 링크를 홈 화면 아이콘으로) -->
           <button type="button" onclick="cpkOpen()" style="margin:2px 16px 8px;width:calc(100% - 32px);display:flex;align-items:center;justify-content:center;gap:8px;background:#E4002B;border:none;color:#fff;font-size:13.5px;font-weight:800;border-radius:14px;padding:14px;cursor:pointer;box-shadow:0 5px 16px rgba(228,0,43,.30);">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="2" width="12" height="20" rx="2.5"/><line x1="12" y1="8.5" x2="12" y2="13.5"/><line x1="9.5" y1="11" x2="14.5" y2="11"/></svg>
-            홈 화면에 '쿠팡' 바로 가기 추가
+            홈 화면에 '<span id="mall12-cpk-name">쿠팡</span>' 바로 가기 추가
           </button>
           <div class="C-steps">
             <div class="C-step">
@@ -13866,17 +13866,33 @@ function acGrantCheckin(sid) {
   window._acPendingScreen = null;
   var ret = document.getElementById('ac-bridge-return');
   if (ret) ret.style.display = 'none';
-  // 쿠팡 구경 완료 처리 + 재렌더
-  if (window.CHECKIN_CONFIGS && window.CHECKIN_CONFIGS[sid]) {
-    window.CHECKIN_CONFIGS[sid].checkedToday = true;
-    if (window.renderCheckinScreen) window.renderCheckinScreen(sid);
-  }
-  if (window.ppGrantPoints) window.ppGrantPoints(100, '쿠팡 구경 출석체크');
-  // pw-14는 5일 연속 달성 화면 — 이벤트 티켓 1장 추가 지급
-  if (sid === 'pw-14' && window.ppGrantEventTicket) window.ppGrantEventTicket(1, '출석 5일 연속 달성');
-  if (window.ipToast) ipToast('쿠팡 구경 완료! 100P가 적립됐어요');
-  // 결과 화면: pw-14는 5일차 → 달성, 그 외 → 당일완료
-  setTimeout(function(){ showScreen(sid === 'pw-14' ? 'pw-14-win' : 'pw-14-done'); }, 300);
+
+  // 실제 하루 1회 판정 = 서버(daily_visits 문서 생성, firestore.rules상 create 1회만 허용).
+  // 이게 실패하면(이미 오늘 체크함) 재지급 없이 안내만 하고 캘린더 화면으로 복귀.
+  var claim = window.ppClaimCheckin ? window.ppClaimCheckin() : Promise.resolve(true);
+  claim.then(function(ok) {
+    if (!ok) {
+      if (window.ipToast) ipToast('오늘은 이미 출석체크를 완료했어요');
+      showScreen(sid === 'pw-14-new' ? 'pw-14-new' : 'pw-14');
+      if (window.ppSyncCheckinScreen) window.ppSyncCheckinScreen(sid === 'pw-14-new' ? 'pw-14-new' : 'pw-14');
+      return;
+    }
+    // 쿠팡 구경 완료 처리 + 재렌더
+    if (window.CHECKIN_CONFIGS && window.CHECKIN_CONFIGS[sid]) {
+      window.CHECKIN_CONFIGS[sid].checkedToday = true;
+      if (window.renderCheckinScreen) window.renderCheckinScreen(sid);
+    }
+    if (window.ppGrantPoints) window.ppGrantPoints(100, '쿠팡 구경 출석체크');
+    // pw-14는 5일 연속 달성 화면 — 이벤트 티켓 1장 추가 지급
+    if (sid === 'pw-14' && window.ppGrantEventTicket) window.ppGrantEventTicket(1, '출석 5일 연속 달성');
+    if (window.ipToast) ipToast('쿠팡 구경 완료! 100P가 적립됐어요');
+    // 결과 화면: pw-14는 5일차 → 달성, 그 외 → 당일완료
+    setTimeout(function(){
+      var doneScreen = sid === 'pw-14' ? 'pw-14-win' : 'pw-14-done';
+      showScreen(doneScreen);
+      if (window.ppSyncCheckinScreen) window.ppSyncCheckinScreen(doneScreen);
+    }, 300);
+  });
 }
 function bindAttendanceScreen() {
   [['ac-check-btn-14','pw-14'], ['ac-check-btn-new','pw-14-new']].forEach(function(pair) {
@@ -13886,6 +13902,7 @@ function bindAttendanceScreen() {
     btn.style.cursor = 'pointer';
     btn.addEventListener('click', function(e) {
       e.stopPropagation();
+      if (btn.disabled) return;
       acGoCoupang(pair[1]);
     });
   });
@@ -14861,10 +14878,12 @@ function selectMall(name, domain, dest) {
   var l12 = document.getElementById('mall12-logo');
   var n12 = document.getElementById('mall12-name');
   var c12 = document.getElementById('mall12-cta-txt');
+  var cpk12 = document.getElementById('mall12-cpk-name');
   if (t12) t12.textContent = name + ' 적립 안내';
   if (l12) l12.innerHTML = '<img src="' + favicon + '" alt="' + name + '" onerror="this.remove()"><span>' + name + '</span>';
   if (n12) n12.textContent = name;
   if (c12) c12.textContent = name + ' 바로가기';
+  if (cpk12) cpk12.textContent = name;
 
   // pw-13 업데이트
   var l13 = document.getElementById('mall13-logo');
@@ -15482,7 +15501,7 @@ function csSubmitInquiry(btn) {
       <div style="width:62px;height:62px;margin:2px auto 11px;background:#E4002B;border-radius:16px;box-shadow:0 5px 16px rgba(0,0,0,.28),0 0 0 3px rgba(255,255,255,.30);display:flex;align-items:center;justify-content:center;">
         <span style="display:flex;flex-direction:column;align-items:center;line-height:1.04;"><span style="font-size:12.5px;font-weight:800;color:#fff;letter-spacing:-.4px;">coupang</span><span style="font-size:10px;font-weight:900;color:#fff;letter-spacing:1.5px;margin-top:1px;">PICK</span></span>
       </div>
-      <div style="font-size:16px;font-weight:800;">홈 화면에 '쿠팡' 바로 가기 추가</div>
+      <div id="cpk-modal-title" style="font-size:16px;font-weight:800;">홈 화면에 '쿠팡' 바로 가기 추가</div>
     </div>
     <div style="padding:16px 18px 18px;">
       <div style="font-size:12.5px;color:#444;line-height:1.65;margin-bottom:13px;">홈 화면 아이콘으로 들어가면 앱을 안 거쳐도 구매 적립이 유지돼요. 제휴 추적 코드가 담긴 쿠팡 링크예요.</div>
@@ -15490,12 +15509,12 @@ function csSubmitInquiry(btn) {
         <div>Android — '홈 화면에 추가' 안내가 자동으로 떠요</div>
         <div>iPhone(사파리) — 공유 → '홈 화면에 추가'</div>
       </div>
-      <button type="button" onclick="window.open('/cpk','_blank','noopener');cpkClose();" style="width:100%;height:46px;background:#E4002B;border:none;border-radius:12px;color:#fff;font-size:14px;font-weight:800;cursor:pointer;">홈 화면에 추가</button>
+      <button type="button" onclick="window.open('https://www.' + (window.currentMall ? currentMall.domain : 'coupang.com'), '_blank', 'noopener');cpkClose();" style="width:100%;height:46px;background:#E4002B;border:none;border-radius:12px;color:#fff;font-size:14px;font-weight:800;cursor:pointer;">홈 화면에 추가</button>
     </div>
   </div>
 </div>
 <!-- 쿠팡 홈 바로가기 URL: 파트너 코드 주입 자리 — https://www.coupang.com/  (TODO: 배포 시 ?lptag=AF... 제휴 추적 코드 주입, 현재 미포함) -->
-<script>function cpkOpen(){var m=document.getElementById('cpk-modal');if(m)m.style.display='flex';}function cpkClose(){var m=document.getElementById('cpk-modal');if(m)m.style.display='none';}</script>
+<script>function cpkOpen(){var m=document.getElementById('cpk-modal');if(m)m.style.display='flex';var t=document.getElementById('cpk-modal-title');if(t)t.textContent="홈 화면에 '"+((window.currentMall&&currentMall.name)||'쿠팡')+"' 바로 가기 추가";}function cpkClose(){var m=document.getElementById('cpk-modal');if(m)m.style.display='none';}</script>
 
 <!-- ===== PWA 홈화면 바로가기 (프로토타입 설치) ===== -->
 <div id="pp-install" style="display:none;position:fixed;inset:0;z-index:2147483601;background:rgba(20,12,30,.5);align-items:flex-end;justify-content:center;">
@@ -15930,6 +15949,69 @@ window.ppEventTicketAllowance = function(dailyCap, monthlyCap) {
   });
 };
 
+/* ── pw-14 출석체크 하루 1회 제한 (서버측) + 캘린더 실데이터 ──
+   룰렛과 동일 패턴: daily_visits/{uid}_{날짜} 문서를 "체크 완료" 시점에 생성해 create만
+   허용(firestore.rules)함으로써 같은 날 재지급을 서버측에서 차단한다. 문서 목록을 그대로
+   재사용해 실제 연속 출석일수도 계산 → CHECKIN_CONFIGS(원래 하드코딩 시나리오)를
+   실측값으로 덮어써 기존 캘린더 렌더 로직(buildWeekHTML 등)을 그대로 재사용한다. */
+function ppCheckinDateKey() {
+  var d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+}
+function ppCheckinDateKeyMinus(n) {
+  var d = new Date();
+  d.setDate(d.getDate() - n);
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+}
+function ppComputeCheckinStreak(dateStrs) {
+  var set = {};
+  dateStrs.forEach(function(d) { set[d] = true; });
+  var todayStr = ppCheckinDateKey();
+  var checkedToday = !!set[todayStr];
+  var n = checkedToday ? 0 : 1;
+  var count = 0, earliest = null;
+  while (set[ppCheckinDateKeyMinus(n)]) { count++; earliest = ppCheckinDateKeyMinus(n); n++; }
+  return { today: todayStr, streakStart: earliest, checkedToday: checkedToday };
+}
+window.ppHasCheckedInToday = function() {
+  if (!PP.uid) return Promise.resolve(false);
+  return db.collection('daily_visits').doc(PP.uid + '_' + ppCheckinDateKey()).get()
+    .then(function(doc) { return doc.exists; }).catch(function(e) { console.error('ppHasCheckedInToday', e); return false; });
+};
+window.ppClaimCheckin = function() {
+  if (!PP.uid) return Promise.resolve(false);
+  return db.collection('daily_visits').doc(PP.uid + '_' + ppCheckinDateKey()).set({
+    user_id: PP.uid, date: ppCheckinDateKey(), created_at: FS.FieldValue.serverTimestamp(),
+  }).then(function() { return true; }).catch(function(e) {
+    if (e.code !== 'permission-denied') console.error('ppClaimCheckin', e);
+    return false;
+  });
+};
+// pw-14/pw-14-new(체크 버튼 화면)의 하루 잠금 UI + pw-14/pw-14-win/pw-14-done(캘린더 노출 화면)의
+// 실데이터 반영을 한 번에 처리. screenId가 버튼 화면이 아니면 잠금 UI 갱신은 건너뛴다.
+var CHECKIN_LOCK_BTNS = { 'pw-14': 'ac-check-btn-14', 'pw-14-new': 'ac-check-btn-new' };
+window.ppSyncCheckinScreen = function(screenId) {
+  if (!PP.uid) return Promise.resolve();
+  return db.collection('daily_visits').where('user_id', '==', PP.uid).get().then(function(snap) {
+    var dates = [];
+    snap.forEach(function(d) { var v = d.data(); if (v.date) dates.push(v.date); });
+    var real = ppComputeCheckinStreak(dates);
+    if (window.CHECKIN_CONFIGS && window.CHECKIN_CONFIGS[screenId]) {
+      window.CHECKIN_CONFIGS[screenId] = { today: real.today, streakStart: real.streakStart, checkedToday: real.checkedToday };
+      if (window.renderCheckinScreen) window.renderCheckinScreen(screenId);
+    }
+    var btnId = CHECKIN_LOCK_BTNS[screenId];
+    var btn = btnId ? document.getElementById(btnId) : null;
+    if (btn) {
+      btn.disabled = real.checkedToday;
+      btn.textContent = real.checkedToday ? '오늘 이미 체크했어요' : '쿠팡 구경하러 가기';
+      btn.style.opacity = real.checkedToday ? '0.5' : '';
+      btn.style.cursor = real.checkedToday ? 'not-allowed' : 'pointer';
+    }
+    return real;
+  }).catch(function(e) { console.error('ppSyncCheckinScreen', e); });
+};
+
 /* ── showScreen hook ── */
 function hookShowScreen() {
   var orig = window.showScreen;
@@ -15970,6 +16052,7 @@ function onScreenShown(id) {
   if (id === 'pw-30-cs') renderInquiries();
   if (id === 'pw-22') { refreshHomeData(); renderExchangePoint(); renderGradeSwapScreen(); renderPointTicketExchange(); }
   if (id === 'pw-17') renderStreakMission();
+  if (id === 'pw-14' || id === 'pw-14-new' || id === 'pw-14-win' || id === 'pw-14-done') window.ppSyncCheckinScreen(id);
   if (id === 'pw-31') renderNotifSettings();
   if (id === 'pw-26') { refreshHomeData(); renderRaffleScreen(); }
   if (id === 'pw-30-nt') renderAppNotices();
