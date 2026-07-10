@@ -7236,6 +7236,7 @@
   .ai-ico.return { background: rgba(255,68,82,0.12); }
   .ai-info { flex: 1; }
   .ai-title { font-size: 13px; font-weight: 600; color: var(--text1); margin-bottom: 2px; }
+  .ai-badge { display: inline-block; font-size: 9.5px; font-weight: 700; padding: 1px 6px; border-radius: 5px; margin-left: 5px; vertical-align: 1px; background: #EEF0F4; color: #5B6478; }
   .ai-detail { font-size: 11px; color: var(--text3); }
   .ai-amount { text-align: right; }
   .ai-ticket { font-size: 14px; font-weight: 800; }
@@ -17031,7 +17032,7 @@ function ppRenderActListHtml(ev, filter) {
     if (mk !== cur) { cur = mk; parts.push('<div class="activity-month">' + mk + '</div>'); }
     parts.push('<div class="activity-item">'
       + '<div class="ai-ico ' + e.ico + '"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/></svg></div>'
-      + '<div class="ai-info"><div class="ai-title">' + ppEsc(e.title) + '</div><div class="ai-detail">' + ppEsc(e.detail) + ' · ' + ppFmt(e.d) + '</div></div>'
+      + '<div class="ai-info"><div class="ai-title">' + ppEsc(e.title) + (e.badge ? ' <span class="ai-badge">' + ppEsc(e.badge) + '</span>' : '') + '</div><div class="ai-detail">' + ppEsc(e.detail) + ' · ' + ppFmt(e.d) + '</div></div>'
       + '<div class="ai-amount"><div class="ai-ticket ' + e.cls + '">' + ppEsc(e.amt) + '</div></div></div>');
   });
   return parts.join('');
@@ -17053,10 +17054,17 @@ function renderActivity(filter) {
     var ttx = res[0], gex = res[1], ptx = res[2], ev = [];
     ttx.forEach(function (t) {
       var g = GRADE_KO[t.ticket_grade] || '티켓', type = t.type || 'earn', d = ppDate(t.created_at);
-      if (type === 'earn') ev.push({ d: d, ft: 'earn', ico: 'earn', title: g + ' 티켓 적립', detail: '티켓 적립', amt: '+1장', cls: 'earn' });
-      else if (type === 'use') ev.push({ d: d, ft: 'use', ico: 'use', title: g + ' 티켓 사용', detail: '기프티콘 교환 사용', amt: '-1장', cls: 'use' });
+      var badge = t.manual ? (type === 'clawback' ? '관리자 회수' : '관리자 지급') : null;
+      // 포인트↔티켓 교환은 등급/개수 변동은 있어도 실제 '적립·사용'이 아니라 교환 탭 대상 (전용 탭 신설 없이 기존 '교환'에 편입)
+      if (t.via === 'point_exchange') {
+        if (type === 'earn') ev.push({ d: d, ft: 'swap', ico: 'exchange', title: g + ' 티켓 교환', detail: '포인트 → 티켓 교환', amt: '+1장', cls: 'earn', badge: badge });
+        else ev.push({ d: d, ft: 'swap', ico: 'exchange', title: g + ' 티켓 교환', detail: '티켓 → 포인트 교환', amt: '-1장', cls: 'use', badge: badge });
+        return;
+      }
+      if (type === 'earn') ev.push({ d: d, ft: 'earn', ico: 'earn', title: g + ' 티켓 적립', detail: '티켓 적립', amt: '+1장', cls: 'earn', badge: badge });
+      else if (type === 'use') ev.push({ d: d, ft: 'use', ico: 'use', title: g + ' 티켓 사용', detail: '기프티콘 교환 사용', amt: '-1장', cls: 'use', badge: badge });
       else if (type === 'expire') ev.push({ d: d, ft: 'expire', ico: 'return', title: g + ' 티켓 만료 소멸', detail: '유효기간 경과', amt: '-1장', cls: 'return' });
-      else if (type === 'clawback') ev.push({ d: d, ft: 'claw', ico: 'return', title: g + ' 티켓 환수', detail: '구매 취소·환불', amt: '-1장', cls: 'return' });
+      else if (type === 'clawback') ev.push({ d: d, ft: 'claw', ico: 'return', title: g + ' 티켓 환수', detail: '구매 취소·환불', amt: '-1장', cls: 'return', badge: badge });
       else ev.push({ d: d, ft: 'swap', ico: 'exchange', title: g + ' 티켓 전환', detail: '등급 전환', amt: '', cls: 'use' });
     });
     gex.forEach(function (x) {
@@ -17064,7 +17072,12 @@ function renderActivity(filter) {
     });
     ptx.forEach(function (p) {
       var amt = p.amount != null ? p.amount : (p.qty || 0);
-      ev.push({ d: ppDate(p.created_at), ft: 'event', ico: amt >= 0 ? 'earn' : 'return', title: p.reason || (p.type || '포인트'), detail: '포인트', amt: (amt >= 0 ? '+' : '') + amt + 'P', cls: amt >= 0 ? 'earn' : 'return' });
+      var badge = p.manual ? (amt < 0 ? '관리자 회수' : '관리자 지급') : null;
+      if (p.via === 'point_exchange') {
+        ev.push({ d: ppDate(p.created_at), ft: 'swap', ico: amt >= 0 ? 'earn' : 'return', title: p.reason || '포인트 교환', detail: '포인트 교환', amt: (amt >= 0 ? '+' : '') + amt + 'P', cls: amt >= 0 ? 'earn' : 'return', badge: badge });
+        return;
+      }
+      ev.push({ d: ppDate(p.created_at), ft: 'event', ico: amt >= 0 ? 'earn' : 'return', title: p.reason || (p.type || '포인트'), detail: '포인트', amt: (amt >= 0 ? '+' : '') + amt + 'P', cls: amt >= 0 ? 'earn' : 'return', badge: badge });
     });
     PP._actEvents = ev.filter(function (e) { return e.d; }).sort(function (a, b) { return b.d - a.d; });
     var html = ppRenderActListHtml(ppApplySortOrder(PP._actEvents), filter || null);
@@ -17942,7 +17955,7 @@ function ppBuyTicketWithPoints(grade) {
   var now = FS.FieldValue.serverTimestamp();
   var batch = db.batch();
   batch.set(db.collection('point_transactions').doc(), {
-    user_id: PP.uid, amount: -cost, type: 'use', reason: '포인트→티켓 교환(' + GRADE_NAME[grade] + ')', manual: false, created_at: now,
+    user_id: PP.uid, amount: -cost, type: 'use', reason: '포인트→티켓 교환(' + GRADE_NAME[grade] + ')', manual: false, via: 'point_exchange', created_at: now,
   });
   batch.set(db.collection('user_points').doc(PP.uid), {
     user_id: PP.uid, balance: FS.FieldValue.increment(-cost), updated_at: now,
@@ -17952,7 +17965,7 @@ function ppBuyTicketWithPoints(grade) {
     earned_at: now, confirmed_at: now, expires_at: null,
   });
   batch.set(db.collection('ticket_transactions').doc(), {
-    user_id: PP.uid, ticket_grade: grade, type: 'earn', postback_id: null, created_at: now,
+    user_id: PP.uid, ticket_grade: grade, type: 'earn', postback_id: null, via: 'point_exchange', created_at: now,
   });
   return batch.commit().then(function() {
     PP.points -= cost;
@@ -17981,10 +17994,10 @@ function ppSellTicketForPoints(grade) {
       var batch = db.batch();
       batch.update(doc.ref, { status: 'used', used_at: now });
       batch.set(db.collection('ticket_transactions').doc(), {
-        user_id: PP.uid, ticket_grade: grade, type: 'use', postback_id: null, created_at: now,
+        user_id: PP.uid, ticket_grade: grade, type: 'use', postback_id: null, via: 'point_exchange', created_at: now,
       });
       batch.set(db.collection('point_transactions').doc(), {
-        user_id: PP.uid, amount: reward, type: 'earn', reason: '티켓→포인트 교환(' + GRADE_NAME[grade] + ')', manual: false, created_at: now,
+        user_id: PP.uid, amount: reward, type: 'earn', reason: '티켓→포인트 교환(' + GRADE_NAME[grade] + ')', manual: false, via: 'point_exchange', created_at: now,
       });
       batch.set(db.collection('user_points').doc(PP.uid), {
         user_id: PP.uid, balance: FS.FieldValue.increment(reward), updated_at: now,
