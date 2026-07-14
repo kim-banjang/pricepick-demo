@@ -1699,7 +1699,7 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
             </div>
             <div>
               <label style="font-size:11px;color:var(--text-2);font-weight:600;display:block;margin-bottom:6px;text-transform:uppercase;letter-spacing:.4px">발송 대상</label>
-              <select class="filter-sel" id="noti-target" style="width:100%"><option value="all">전체 회원</option><option value="bronze">브론즈 등급</option><option value="silver">실버 등급</option><option value="gold">골드 등급</option><option value="inactive30">최근 30일 미접속</option><option value="custom">맞춤 세그먼트</option></select>
+              <select class="filter-sel" id="noti-target" style="width:100%"><option value="all">전체 회원</option><option value="kakao">카카오 연동 회원</option><option value="guest">미연동(게스트) 회원</option><option value="inactive30">30일 미접속</option><option value="new7">신규 가입(7일 이내)</option><option value="purchased">구매 이력 있는 회원</option><option value="custom">커스텀 세그먼트</option></select>
             </div>
           </div>
           <div style="margin-bottom:14px">
@@ -2460,11 +2460,10 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
     <!-- ── 출석체크 설정 ── -->
     <div class="section" id="sec-point-attendance">
       <div class="info-box"><strong>출석체크 = 제휴몰 방문 후 복귀 시 적립</strong> — 회원이 연결 제휴몰을 방문하고 앱으로 복귀하면 일일 포인트가 지급됩니다. (폴센트형 UX) · 5일 연속 달성 시 이벤트 티켓 1장 추가 지급.</div>
-      <div class="stats-grid" style="grid-template-columns:repeat(4,1fr)">
+      <div class="stats-grid" style="grid-template-columns:repeat(3,1fr)">
         <div class="stat-card purple"><div class="stat-label">오늘 출석 회원</div><div class="stat-value" id="pa-kpi-visits">—</div><div class="stat-change neutral">오늘 기준</div></div>
         <div class="stat-card green"><div class="stat-label">오늘 지급 포인트</div><div class="stat-value" id="pa-kpi-points">—</div><div class="stat-change neutral">오늘 기준</div></div>
         <div class="stat-card amber"><div class="stat-label">5일 연속 달성</div><div class="stat-value" id="pa-kpi-streak">—</div><div class="stat-change neutral">오늘 기준</div></div>
-        <div class="stat-card blue"><div class="stat-label">제휴몰 방문 전환율</div><div class="stat-value" id="pa-kpi-conv">—</div><div class="stat-change neutral">오늘 방문 / 전체 회원</div></div>
       </div>
       <div class="card-grid">
         <div class="card">
@@ -4125,8 +4124,9 @@ function giSaveTicketEdit() {
     "알림 작성 · 발송":"Viết và gửi thông báo",
     "발송 채널":"Kênh gửi","앱 푸시":"Push app","카카오 알림톡 (연동 회원)":"Kakao AlimTalk (thành viên LK)",
     "푸시 + 알림톡 동시":"Push + AlimTalk đồng thời","발송 대상":"Đối tượng gửi",
-    "브론즈 등급":"Hạng Đồng","실버 등급":"Hạng Bạc","골드 등급":"Hạng Vàng",
-    "최근 30일 미접속":"Chưa truy cập 30 ngày gần nhất","맞춤 세그먼트":"Phân khúc tùy chỉnh",
+    "카카오 연동 회원":"Thành viên liên kết Kakao","미연동(게스트) 회원":"Thành viên chưa liên kết (Guest)",
+    "30일 미접속":"Chưa truy cập 30 ngày","신규 가입(7일 이내)":"Đăng ký mới (trong 7 ngày)","구매 이력 있는 회원":"Thành viên có lịch sử mua hàng",
+    "커스텀 세그먼트":"Phân khúc tùy chỉnh",
     "발송 시점":"Thời điểm gửi","즉시 발송":"Gửi ngay","예약 발송":"Gửi đặt lịch",
     "테스트 발송":"Gửi thử","테스트 발송 (본인)":"Gửi thử (bản thân)",
     "마케팅성 알림은 수신 동의 회원에게만 발송됩니다. 서비스 필수 알림(티켓 지급·기프티콘 발송·경품 당첨)은 동의 여부와 무관하게 발송됩니다.":"Thông báo marketing chỉ gửi cho thành viên đã đồng ý. Thông báo bắt buộc (cấp vé·gửi Gifticon·trúng giải) được gửi bất kể đồng ý.",
@@ -4979,7 +4979,6 @@ function giSaveTicketEdit() {
   "부정거래 검증 지연":"Chậm xác minh giao dịch gian lận",
   "기프티콘 발급 문제":"Vấn đề phát hành Gifticon",
   "티켓 적립이 어려움":"Khó tích lũy vé",
-  "제휴몰 방문 전환율":"Tỷ lệ chuyển đổi truy cập cửa hàng LK",
   "5월 포스트백 기준":"Theo postback tháng 5",
   "교환 마진 · 즉시":"Biên đổi · Ngay lập tức",
   "누적 수익 (올해)":"Doanh thu tích lũy (năm nay)",
@@ -6736,7 +6735,7 @@ window.noticeSubmit = function(status) {
 
 /* ── sec-notifications ── notifications collection (실쿼리 + 실 발송기록) */
 var NOTI_CHANNEL_KO = { push:'앱 푸시', kakao:'카카오 알림톡', push_kakao:'푸시+알림톡' };
-var NOTI_TARGET_KO = { all:'전체 회원', bronze:'브론즈 등급', silver:'실버 등급', gold:'골드 등급', inactive30:'최근 30일 미접속', custom:'맞춤 세그먼트', test:'테스트(본인)' };
+var NOTI_TARGET_KO = { all:'전체 회원', kakao:'카카오 연동 회원', guest:'미연동(게스트) 회원', inactive30:'30일 미접속', new7:'신규 가입(7일 이내)', purchased:'구매 이력 있는 회원', custom:'커스텀 세그먼트', test:'테스트(본인)' };
 function loadNotifications() {
   var tbody = document.querySelector('#sec-notifications table tbody');
   if (!tbody) return;
@@ -6773,10 +6772,30 @@ function loadNotifications() {
   }).catch(function(e){ console.error('loadNotifications', e); tbody.innerHTML = ppEmpty(7,'로드 오류'); });
 }
 
-/* 발송 대상 인원 실집계 — 등급은 users.rep_grade(데이터관리/시나리오 채우기가 채우는 필드) 기준 */
+/* 발송 대상 인원 실집계 — PricePick엔 "회원 등급"이 없다(티켓 등급은 회원이 아니라 개별
+   티켓의 등급이라 발송 대상 분류에 못 씀 — 해리 지적, 김반장 확정). 대신 실제 DB에 있는
+   값(연동 상태·가입일·구매 이력)으로만 세그먼트를 나눈다. */
 function notiCountTarget(target) {
-  if (target === 'bronze' || target === 'silver' || target === 'gold') {
-    return db.collection('users').where('rep_grade', '==', target).get().then(function(s){ return s.size; });
+  if (target === 'kakao') {
+    return db.collection('users').where('linked_kakao', '==', true).get().then(function(s){ return s.size; });
+  }
+  if (target === 'guest') {
+    return db.collection('users').where('linked_kakao', '==', false).get().then(function(s){ return s.size; });
+  }
+  if (target === 'inactive30') {
+    var cutoff30 = FS.Timestamp.fromMillis(Date.now() - 30 * 86400000);
+    return db.collection('users').where('updated_at', '<', cutoff30).get().then(function(s){ return s.size; });
+  }
+  if (target === 'new7') {
+    var cutoff7 = FS.Timestamp.fromMillis(Date.now() - 7 * 86400000);
+    return db.collection('users').where('created_at', '>=', cutoff7).get().then(function(s){ return s.size; });
+  }
+  if (target === 'purchased') {
+    return db.collection('postbacks').get().then(function(s){
+      var uniq = {};
+      s.forEach(function(d){ var uid = d.data().user_id; if (uid) uniq[uid] = true; });
+      return Object.keys(uniq).length;
+    });
   }
   return db.collection('users').get().then(function(s){ return s.size; });
 }
@@ -7586,11 +7605,7 @@ function loadPointAttendance() {
 
   var todayStart = new Date(); todayStart.setHours(0,0,0,0);
   var todayTs = FS.Timestamp.fromDate(todayStart);
-  Promise.all([
-    db.collection('daily_visits').where('created_at', '>=', todayTs).get(),
-    db.collection('users').get(),
-  ]).then(function(res) {
-    var visits = res[0], users = res[1];
+  db.collection('daily_visits').where('created_at', '>=', todayTs).get().then(function(visits) {
     var uniqueUsers = {}, pointsToday = 0, streak5 = 0;
     visits.docs.forEach(function(doc) {
       var d = doc.data();
@@ -7599,12 +7614,10 @@ function loadPointAttendance() {
       if ((d.streak_count || 0) >= 5) streak5++;
     });
     var visitCount = Object.keys(uniqueUsers).length;
-    var conv = users.size > 0 ? (visitCount / users.size * 100).toFixed(1) : '0.0';
     var set = function(id, v){ var e = document.getElementById(id); if (e) e.textContent = v; };
     set('pa-kpi-visits', ppN(visitCount) + '명');
     set('pa-kpi-points', ppN(pointsToday) + 'P');
     set('pa-kpi-streak', ppN(streak5) + '명');
-    set('pa-kpi-conv', conv + '%');
   }).catch(function(e){ console.error('loadPointAttendance kpi', e); });
 }
 
@@ -9388,7 +9401,7 @@ window.dmFillFromScenarios = function() {
         var confirmedAt = linked ? ago(1 + (idx % 14)) : null;
         seq++;
         var orderId = 'CPN-ORDER-' + ymd(created) + '-' + String(seq).padStart(3,'0');
-        USERS[uid] = { nickname:s.name||('손님'+(idx+1)), linked_kakao:linked, status:'active', rep_grade:s.grade||null, scenario_id:sid, created_at:created, updated_at:TS.now() };
+        USERS[uid] = { nickname:s.name||('손님'+(idx+1)), linked_kakao:linked, status:'active', scenario_id:sid, created_at:created, updated_at:TS.now() };
         PB[pbId] = { user_id:uid, mall_name:SCEN_MALL.name, mall_domain:SCEN_MALL.domain, purchase_amount:amount, order_id:orderId, status:(linked?'confirmed':'pending'), created_at:created, confirmed_at:confirmedAt };
         CL[clId] = { user_id:uid, mall_name:SCEN_MALL.name, mall_domain:SCEN_MALL.domain, clicked_at:created };
         CPM['cpm-scn-'+sid] = { user_id:uid, click_id:clId, postback_id:pbId, created_at:created };
