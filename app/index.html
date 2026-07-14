@@ -7242,10 +7242,10 @@
   .activity-month { padding: 10px 16px 4px; font-size: 11px; font-weight: 700; color: var(--text3); }
   .activity-item { background: white; padding: 14px 16px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--border); }
   .ai-ico { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
-  .ai-ico.earn { background: rgba(34,197,94,0.12); }
-  .ai-ico.use { background: rgba(132,94,238,0.12); }
-  .ai-ico.exchange { background: rgba(59,130,246,0.12); }
-  .ai-ico.return { background: rgba(255,68,82,0.12); }
+  .ai-ico.earn { background: rgba(34,197,94,0.12); color: #22C55E; }
+  .ai-ico.use { background: rgba(132,94,238,0.12); color: #845EEE; }
+  .ai-ico.exchange { background: rgba(59,130,246,0.12); color: #3B82F6; }
+  .ai-ico.return { background: rgba(255,68,82,0.12); color: #FF4452; }
   .ai-info { flex: 1; }
   .ai-title { font-size: 13px; font-weight: 600; color: var(--text1); margin-bottom: 2px; }
   .ai-badge { display: inline-block; font-size: 9.5px; font-weight: 700; padding: 1px 6px; border-radius: 5px; margin-left: 5px; vertical-align: 1px; background: #EEF0F4; color: #5B6478; }
@@ -16709,7 +16709,7 @@ function renderGifticons() {
       + '<div class="ex-body">'
       + '<div class="ex-brand">' + (g.brand || '') + '</div>'
       + '<div class="ex-name">' + (g.name || g.product_name || '') + '</div>'
-      + '<div class="ex-cost-mix"><span class="ex-cost-tk">' + gradeName + ' ' + cnt + '장</span></div>'
+      + '<div class="ex-cost-mix"><span class="ex-cost-tk"><span class="m">' + ticketIcon(g.required_grade || 'bronze') + '</span>' + cnt + '</span></div>'
       + '</div></div>';
   }).join('');
   grid.querySelectorAll('.ex-item').forEach(function(el) {
@@ -16734,11 +16734,17 @@ function populateGifticonDetail(g) {
   var gradeName = { bronze: '브론즈', silver: '실버', gold: '골드' }[g.required_grade || 'bronze'];
   var cnt = g.required_count || 1;
   var cost = s.querySelector('.ex-cost-tk');
-  if (cost) cost.innerHTML = gradeName + ' 티켓 ' + cnt + '장';
+  if (cost) cost.innerHTML = '<span class="m">' + ticketIcon(g.required_grade || 'bronze') + '</span>' + gradeName + ' 티켓 ' + cnt + '장';
   var haveEl = s.querySelector('.ex-cost-main span[style*="font-size:11px"]');
   if (haveEl) haveEl.textContent = '현재 보유: ' + (PP.tickets[g.required_grade || 'bronze'] || 0) + '장';
   var noticeEl = s.querySelector('.ex-detail-bottom > div[style*="sub-4"]');
   if (noticeEl) noticeEl.textContent = gradeName + ' 티켓 ' + cnt + '장 차감 → 잔여 ' + Math.max(0, (PP.tickets[g.required_grade || 'bronze'] || 0) - cnt) + '장';
+  /* 유효기간·사용처 — 실제 상품 데이터로 바인딩(이전엔 스타벅스 하드코딩값이 모든 상품에 고정 표시되던 버그).
+     사용처는 매장/온라인 등 상세 위치 데이터가 스키마에 없어 실제 존재하는 brand 필드로 대체 —
+     가짜 매장 정보를 만들지 않는다. 교환정책 3개 항목은 전 상품 공통 정책 문구라 그대로 둔다. */
+  var chips = s.querySelectorAll('.ex-info-chip .eic-val');
+  if (chips[0]) chips[0].textContent = g.validity_days ? ('발급 후 ' + g.validity_days + '일') : '유효기간 안내 예정';
+  if (chips[1]) chips[1].textContent = g.brand ? (g.brand + ' 사용 가능') : '사용처 안내 예정';
 }
 
 /* ── pw-25 exchange ──
@@ -17065,6 +17071,16 @@ function ppQuery(col, field, val) {
 }
 
 /* ── 활동 내역 (pw-32) ── */
+/* type별 아이콘 — 원본 기획의 획일화된 원 아이콘을 적립↑·사용✓·교환⇄·환수/만료↓ 4종으로 구분 */
+function ppActIcon(type) {
+  var p = {
+    earn: '<line x1="12" y1="19" x2="12" y2="6"/><polyline points="6 12 12 6 18 12"/>',
+    use: '<polyline points="5 13 10 18 19 7"/>',
+    exchange: '<polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/>',
+    return: '<line x1="12" y1="5" x2="12" y2="18"/><polyline points="18 12 12 18 6 12"/>',
+  }[type] || '<circle cx="12" cy="12" r="9"/>';
+  return '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">' + p + '</svg>';
+}
 function ppRenderActListHtml(ev, filter) {
   var list = filter ? ev.filter(function (e) { return e.ft === filter; }) : ev;
   if (!list.length) {
@@ -17075,10 +17091,12 @@ function ppRenderActListHtml(ev, filter) {
   list.forEach(function (e) {
     var mk = e.d.getFullYear() + '년 ' + (e.d.getMonth() + 1) + '월';
     if (mk !== cur) { cur = mk; parts.push('<div class="activity-month">' + mk + '</div>'); }
+    var balanceHtml = (e.grade && e.balanceAfter != null)
+      ? '<div class="ai-balance">' + (GRADE_KO[e.grade] || '') + ' 잔여 ' + e.balanceAfter + '장</div>' : '';
     parts.push('<div class="activity-item">'
-      + '<div class="ai-ico ' + e.ico + '"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/></svg></div>'
+      + '<div class="ai-ico ' + e.ico + '">' + ppActIcon(e.ico) + '</div>'
       + '<div class="ai-info"><div class="ai-title">' + ppEsc(e.title) + (e.badge ? ' <span class="ai-badge">' + ppEsc(e.badge) + '</span>' : '') + '</div><div class="ai-detail">' + ppEsc(e.detail) + ' · ' + ppFmt(e.d) + '</div></div>'
-      + '<div class="ai-amount"><div class="ai-ticket ' + e.cls + '">' + ppEsc(e.amt) + '</div></div></div>');
+      + '<div class="ai-amount"><div class="ai-ticket ' + e.cls + '">' + ppEsc(e.amt) + '</div>' + balanceHtml + '</div></div>');
   });
   return parts.join('');
 }
@@ -17098,22 +17116,22 @@ function renderActivity(filter) {
   ]).then(function (res) {
     var ttx = res[0], gex = res[1], ptx = res[2], ev = [];
     ttx.forEach(function (t) {
-      var g = GRADE_KO[t.ticket_grade] || '티켓', type = t.type || 'earn', d = ppDate(t.created_at);
+      var grade = t.ticket_grade, g = GRADE_KO[grade] || '티켓', type = t.type || 'earn', d = ppDate(t.created_at);
       var badge = t.manual ? (type === 'clawback' ? '관리자 회수' : '관리자 지급') : null;
       // 포인트↔티켓 교환은 등급/개수 변동은 있어도 실제 '적립·사용'이 아니라 교환 탭 대상 (전용 탭 신설 없이 기존 '교환'에 편입)
       if (t.via === 'point_exchange') {
-        if (type === 'earn') ev.push({ d: d, ft: 'swap', ico: 'exchange', title: g + ' 티켓 교환', detail: '포인트 → 티켓 교환', amt: '+1장', cls: 'earn', badge: badge });
-        else ev.push({ d: d, ft: 'swap', ico: 'exchange', title: g + ' 티켓 교환', detail: '티켓 → 포인트 교환', amt: '-1장', cls: 'use', badge: badge });
+        if (type === 'earn') ev.push({ d: d, ft: 'swap', ico: 'exchange', title: g + ' 티켓 교환', detail: '포인트 → 티켓 교환', amt: '+1장', cls: 'earn', badge: badge, grade: grade, qty: 1 });
+        else ev.push({ d: d, ft: 'swap', ico: 'exchange', title: g + ' 티켓 교환', detail: '티켓 → 포인트 교환', amt: '-1장', cls: 'use', badge: badge, grade: grade, qty: -1 });
         return;
       }
-      if (type === 'earn') ev.push({ d: d, ft: 'earn', ico: 'earn', title: g + ' 티켓 적립', detail: '티켓 적립', amt: '+1장', cls: 'earn', badge: badge });
-      else if (type === 'use') ev.push({ d: d, ft: 'use', ico: 'use', title: g + ' 티켓 사용', detail: '기프티콘 교환 사용', amt: '-1장', cls: 'use', badge: badge });
-      else if (type === 'expire') ev.push({ d: d, ft: 'expire', ico: 'return', title: g + ' 티켓 만료 소멸', detail: '유효기간 경과', amt: '-1장', cls: 'return' });
-      else if (type === 'clawback') ev.push({ d: d, ft: 'claw', ico: 'return', title: g + ' 티켓 환수', detail: '구매 취소·환불', amt: '-1장', cls: 'return', badge: badge });
+      if (type === 'earn') ev.push({ d: d, ft: 'earn', ico: 'earn', title: g + ' 티켓 적립', detail: '티켓 적립', amt: '+1장', cls: 'earn', badge: badge, grade: grade, qty: 1 });
+      else if (type === 'use') ev.push({ d: d, ft: 'use', ico: 'use', title: g + ' 티켓 사용', detail: '기프티콘 교환 사용', amt: '-1장', cls: 'use', badge: badge, grade: grade, qty: -1 });
+      else if (type === 'expire') ev.push({ d: d, ft: 'expire', ico: 'return', title: g + ' 티켓 만료 소멸', detail: '유효기간 경과', amt: '-1장', cls: 'return', grade: grade, qty: -1 });
+      else if (type === 'clawback') ev.push({ d: d, ft: 'claw', ico: 'return', title: g + ' 티켓 환수', detail: '구매 취소·환불', amt: '-1장', cls: 'return', badge: badge, grade: grade, qty: -1 });
       else ev.push({ d: d, ft: 'swap', ico: 'exchange', title: g + ' 티켓 전환', detail: '등급 전환', amt: '', cls: 'use' });
     });
     gex.forEach(function (x) {
-      ev.push({ d: ppDate(x.exchanged_at), ft: 'use', ico: 'use', title: '기프티콘 교환', detail: (GRADE_KO[x.grade_used] || '') + ' ' + (x.count_used || 1) + '장 사용', amt: '-' + (x.count_used || 1) + '장', cls: 'use' });
+      ev.push({ d: ppDate(x.exchanged_at), ft: 'use', ico: 'use', title: '기프티콘 교환', detail: (GRADE_KO[x.grade_used] || '') + ' ' + (x.count_used || 1) + '장 사용', amt: '-' + (x.count_used || 1) + '장', cls: 'use', grade: x.grade_used, qty: -(x.count_used || 1) });
     });
     ptx.forEach(function (p) {
       var amt = p.amount != null ? p.amount : (p.qty || 0);
@@ -17124,7 +17142,16 @@ function renderActivity(filter) {
       }
       ev.push({ d: ppDate(p.created_at), ft: 'event', ico: amt >= 0 ? 'earn' : 'return', title: p.reason || (p.type || '포인트'), detail: '포인트', amt: (amt >= 0 ? '+' : '') + amt + 'P', cls: amt >= 0 ? 'earn' : 'return', badge: badge });
     });
-    PP._actEvents = ev.filter(function (e) { return e.d; }).sort(function (a, b) { return b.d - a.d; });
+    var validEv = ev.filter(function (e) { return e.d; });
+    /* 등급별 잔여 수량 — 현재 보유량(PP.tickets)에서 최신 이벤트부터 거꾸로 되감아
+       각 이벤트 '직후' 잔여를 역산한다. grade/qty가 없는 이벤트(등급 전환 등 미구현 타입)는 건너뜀. */
+    var runningBal = { bronze: PP.tickets.bronze || 0, silver: PP.tickets.silver || 0, gold: PP.tickets.gold || 0 };
+    validEv.slice().sort(function (a, b) { return b.d - a.d; }).forEach(function (e) {
+      if (!e.grade || !runningBal.hasOwnProperty(e.grade) || typeof e.qty !== 'number') return;
+      e.balanceAfter = runningBal[e.grade];
+      runningBal[e.grade] -= e.qty;
+    });
+    PP._actEvents = validEv.sort(function (a, b) { return b.d - a.d; });
     var html = ppRenderActListHtml(ppApplySortOrder(PP._actEvents), filter || null);
     lists.forEach(function (el) { el.innerHTML = html; });
   });
@@ -17191,6 +17218,16 @@ window.ppMarkAllNotifRead = function() {
   }).catch(function(e) { console.error('ppMarkAllNotifRead', e); });
 };
 
+/* type별 아이콘 — 획일화된 원 아이콘을 구매(쇼핑몰 파비콘)·티켓·이벤트 3종으로 구분 */
+function ppNotifIcon(i) {
+  var bagSvg = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3l1.2 4M18 3l-1.2 4"/><rect x="4.5" y="7" width="15" height="13" rx="2"/><path d="M9 10a3 3 0 0 0 6 0"/></svg>';
+  var ticketSvg = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v2.5a1.5 1.5 0 0 0 0 3V15a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-2.5a1.5 1.5 0 0 0 0-3V7z"/><line x1="12" y1="6" x2="12" y2="16" stroke-dasharray="2 2"/></svg>';
+  var eventSvg = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 3 14.7 9 21 9.8 16.5 14.1 17.6 20.4 12 17.3 6.4 20.4 7.5 14.1 3 9.8 9.3 9"/></svg>';
+  if (i.type === 'ticket') return ticketSvg;
+  if (i.type === 'event') return eventSvg;
+  if (i.type === 'pick') return bagSvg + (i.dom ? '<img src="https://www.google.com/s2/favicons?domain=' + ppEsc(i.dom) + '&sz=64" alt="" onerror="this.remove()">' : '');
+  return bagSvg;
+}
 /* ── 알림 (pw-S1) — 실제 이벤트 기반 ── */
 function renderNotifications() {
   if (!PP.uid) return;
@@ -17204,7 +17241,7 @@ function renderNotifications() {
   ]).then(function (res) {
     var pbs = res[0], gex = res[1], inv = res[2], ptx = res[3], items = [];
     pbs.forEach(function (p) {
-      items.push({ key: 'pb:' + p._id, type: 'pick', d: ppDate(p.created_at), tag: '구매', head: (p.mall_name || '쇼핑몰') + ' 구매로 티켓 적립', desc: (p.purchase_amount ? p.purchase_amount.toLocaleString('ko-KR') + '원 · ' : '') + (p.status === 'confirmed' ? '적립 완료' : '구매 확정 대기') });
+      items.push({ key: 'pb:' + p._id, type: 'pick', dom: p.mall_domain || '', d: ppDate(p.created_at), tag: '구매', head: (p.mall_name || '쇼핑몰') + ' 구매로 티켓 적립', desc: (p.purchase_amount ? p.purchase_amount.toLocaleString('ko-KR') + '원 · ' : '') + (p.status === 'confirmed' ? '적립 완료' : '구매 확정 대기') });
     });
     gex.forEach(function (x) {
       items.push({ key: 'gx:' + x._id, type: 'ticket', d: ppDate(x.exchanged_at), tag: '티켓', head: '기프티콘 교환 완료', desc: (GRADE_KO[x.grade_used] || '') + ' 티켓 ' + (x.count_used || 1) + '장 사용' });
@@ -17240,7 +17277,7 @@ function renderNotifications() {
       var bk = bucket(i.d);
       if (bk !== cur) { cur = bk; parts.push('<div class="notif-date">' + bk + '</div>'); }
       parts.push('<div data-type="' + i.type + '" data-notif-key="' + ppEsc(i.key) + '" class="notif-item' + (readSet[i.key] ? '' : ' unread') + '">'
-        + '<div class="notif-ico ' + i.type + '"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/></svg></div>'
+        + '<div class="notif-ico ' + i.type + '">' + ppNotifIcon(i) + '</div>'
         + '<div class="notif-body"><div class="notif-line1"><span class="notif-tag ' + i.type + '">' + i.tag + '</span><span class="notif-time">' + ppFmt(i.d) + '</span></div>'
         + '<div class="notif-headline">' + ppEsc(i.head) + '</div><div class="notif-desc">' + ppEsc(i.desc) + '</div></div></div>');
     });

@@ -430,14 +430,6 @@ textarea.form-input{resize:vertical;min-height:80px;height:auto;}
 .member-type-kakao{display:inline-flex;align-items:center;gap:5px;background:var(--main-soft);color:var(--main-hover);
   border:1px solid var(--main-line);border-radius:20px;font-size:11px;font-weight:700;padding:2px 8px;}
 .member-type-kakao::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--main);flex-shrink:0;}
-.member-type-apple{display:inline-flex;align-items:center;gap:5px;background:rgba(31,31,31,.07);color:#1F1F1F;
-  border:1px solid rgba(31,31,31,.15);border-radius:20px;font-size:11px;font-weight:700;padding:2px 8px;}
-.member-type-apple::before{content:'';width:6px;height:6px;border-radius:50%;background:#1F1F1F;flex-shrink:0;}
-.member-type-google{display:inline-flex;align-items:center;gap:5px;background:rgba(66,133,244,.08);color:#4285F4;
-  border:1px solid rgba(66,133,244,.2);border-radius:20px;font-size:11px;font-weight:700;padding:2px 8px;}
-.member-type-google::before{content:'';width:6px;height:6px;border-radius:50%;background:#4285F4;flex-shrink:0;}
-body.dark .member-type-apple{background:rgba(255,255,255,.08);color:#E5E7EB;border-color:rgba(255,255,255,.15);}
-body.dark .member-type-apple::before{background:#E5E7EB;}
 
 /* ── 티켓 칩 ── */
 .tk-chips{display:flex;gap:5px;align-items:center;justify-content:center;}
@@ -3270,61 +3262,6 @@ function applyTicketIcons() {
 }
 
 
-// ── 회원 목록 데이터 ──
-const MEMBERS = {};
-
-function openMemberModal(id) {
-  const m = MEMBERS[id];
-  if (!m) return;
-
-  // 닉네임
-  document.getElementById('m-name').value = m.name;
-
-  // 연동 계정
-  const typeClass = {kakao:'member-type-kakao', apple:'member-type-apple', google:'member-type-google'};
-  document.getElementById('m-accounts').innerHTML = m.accounts.map(a =>
-    `<div style="display:flex;align-items:center;gap:8px;">
-      <span class="${typeClass[a.type]}">${a.label}</span>
-      <span style="font-size:12px;color:var(--text2)">${a.email}</span>
-    </div>`
-  ).join('');
-
-  // 상태
-  const sel = document.getElementById('m-status');
-  Array.from(sel.options).forEach(o => { o.selected = o.text === m.status; });
-
-  // 가입 유형
-  document.getElementById('m-join-type').value = m.joinType;
-
-  // 랜덤 티켓
-  const rw = document.getElementById('m-random-wrap');
-  document.getElementById('m-random-count').textContent = m.tickets.random;
-  rw.style.opacity = m.tickets.random === 0 ? '0.3' : '1';
-
-  // 전환예정
-  const cp = document.getElementById('m-conv-preview');
-  if (m.conversion.length > 0) {
-    const gradeColor = {bronze:'rgba(205,127,50,.2)',silver:'rgba(192,192,192,.12)',gold:'rgba(255,215,0,.18)'};
-    const gradeBorder = {bronze:'rgba(205,127,50,.35)',silver:'rgba(192,192,192,.25)',gold:'rgba(255,215,0,.35)'};
-    const gradeText = {bronze:'var(--bronze)',silver:'var(--silver)',gold:'var(--gold)'};
-    cp.style.display = 'flex';
-    cp.innerHTML = '<span style="font-size:11px;color:var(--text3)">전환예정 →</span>' +
-      m.conversion.map(c =>
-        `<span style="font-size:10px;font-weight:800;background:${gradeColor[c.type]};color:${gradeText[c.type]};border:1px solid ${gradeBorder[c.type]};border-radius:5px;padding:2px 7px;">${c.n}</span>`
-      ).join('');
-  } else {
-    cp.style.display = 'none';
-  }
-
-  // 등급·이벤트 티켓
-  ['bronze','silver','gold','event'].forEach(g => {
-    const val = m.tickets[g];
-    document.getElementById(`m-${g}-count`).textContent = val;
-    document.getElementById(`m-${g}-wrap`).style.opacity = val === 0 ? '0.3' : '1';
-  });
-
-  openModal('m-member');
-}
 document.addEventListener('DOMContentLoaded', applyTicketIcons);
 
 let currentRole = 'superadmin';
@@ -4026,14 +3963,14 @@ function giSaveTicketEdit() {
     "회원 가입 안내":"Hướng dẫn đăng ký thành viên",
     "카카오 연동 회원과 미연동 회원이 모두 존재(로그인 정책 변경). 미연동 회원은 적립 확정 대기 D+30 적용.":"Cả hội viên liên kết và chưa liên kết Kakao đều tồn tại. Hội viên chưa liên kết áp dụng thời gian chờ xác nhận D+30.",
     "가입 경로:":"Đường dẫn đăng ký:",
-    "카카오 직접":"Kakao trực tiếp","Apple → 카카오":"Apple → Kakao","Google → 카카오":"Google → Kakao",
+    "카카오 직접":"Kakao trực tiếp",
     "모든 경로 동일하게 적용":"Áp dụng giống nhau cho mọi đường dẫn",
     "구매 즉시":"Ngay khi mua","가지급 티켓(랜덤)":"Vé tạm cấp (ngẫu nhiên)",
     "지급 → 포스트백 수신 후":"Cấp → sau khi nhận Postback",
     "연동 D+7 / 미연동 D+30 확정":"Liên kết D+7 / Chưa LK D+30 xác nhận",
     "시 등급 티켓(브론즈/실버/골드)으로 전환":"chuyển sang vé hạng (Đồng/Bạc/Vàng)",
     "닉네임 검색...":"Tìm biệt danh...","전체 유형":"Tất cả loại","전체 상태":"Tất cả trạng thái",
-    "전체 마케팅":"Tất cả marketing","Apple+카카오":"Apple+Kakao","Google+카카오":"Google+Kakao",
+    "전체 마케팅":"Tất cả marketing",
     "전체 동의":"Đồng ý tất cả","선택 동의":"Đồng ý chọn lọc","전체 거부":"Từ chối tất cả",
     "회원 목록":"Danh sách thành viên",
     "마케팅 수신 동의":"Đồng ý nhận marketing",
