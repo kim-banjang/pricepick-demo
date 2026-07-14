@@ -13920,7 +13920,7 @@ function acGrantCheckin(sid) {
       window.CHECKIN_CONFIGS[sid].checkedToday = true;
       if (window.renderCheckinScreen) window.renderCheckinScreen(sid);
     }
-    if (window.ppGrantPoints) window.ppGrantPoints(100, '쿠팡 구경 출석체크');
+    if (window.ppGrantPoints) window.ppGrantPoints(100, '쿠팡 구경 출석체크', 'attendance');
     // pw-14는 5일 연속 달성 화면 — 이벤트 티켓 1장 추가 지급
     if (sid === 'pw-14' && window.ppGrantEventTicket) window.ppGrantEventTicket(1, '출석 5일 연속 달성');
     if (window.ipToast) ipToast('쿠팡 구경 완료! 100P가 적립됐어요');
@@ -14044,7 +14044,7 @@ function rlGrantReward(seg) {
   if (seg.type === 'point') {
     var amt = seg.value || 0;
     if (!amt || !window.ppGrantPoints) return Promise.resolve(0);
-    return window.ppGrantPoints(amt, '행운 룰렛 당첨').then(function() { return amt; });
+    return window.ppGrantPoints(amt, '행운 룰렛 당첨', 'roulette').then(function() { return amt; });
   }
   if (seg.type === 'event_ticket') {
     var qty = seg.value || 1;
@@ -15954,12 +15954,12 @@ function ppEventTicketExpiry() {
   var ms = Date.now() + EVENT_TICKET_VALID_DAYS * 86400000;
   return FS.Timestamp.fromMillis(ms);
 }
-function ppGrantPoints(amount, reason) {
+function ppGrantPoints(amount, reason, category) {
   if (!PP.uid || !amount) return Promise.resolve();
   var now = FS.FieldValue.serverTimestamp();
   var batch = db.batch();
   batch.set(db.collection('point_transactions').doc(), {
-    user_id: PP.uid, amount: amount, type: 'earn', reason: reason || '적립', manual: false, created_at: now,
+    user_id: PP.uid, amount: amount, type: 'earn', category: category || 'etc', reason: reason || '적립', manual: false, created_at: now,
   });
   batch.set(db.collection('user_points').doc(PP.uid), {
     user_id: PP.uid, balance: FS.FieldValue.increment(amount), updated_at: now,
@@ -16971,7 +16971,7 @@ function bindKakaoComplete() {
          실제 Kakao SDK 없이는 "기존 데이터 인식"을 구현할 수 없어 정적 미리보기로 유지. */
       if (sid === 'pw-02-K-new') {
         if (window.ppGrantEventTicket) window.ppGrantEventTicket(1, '카카오 신규 연동 보상');
-        if (window.ppGrantPoints) window.ppGrantPoints(200, '카카오 연동 가입 축하');
+        if (window.ppGrantPoints) window.ppGrantPoints(200, '카카오 연동 가입 축하', 'onboarding');
       }
     }, true);
   });
@@ -17441,7 +17441,7 @@ function ppCompleteInvite(inviteId) {
       return db.collection('invites').doc(inviteId).update({
         status: 'completed', completed_at: ts, inviter_rewarded: true,
       }).then(function () {
-        return ppGrantPoints(500, '친구초대 보상 (초대자)');
+        return ppGrantPoints(500, '친구초대 보상 (초대자)', 'referral');
       }).then(function () {
         showToast('첫 구매 성사 처리 완료 · 내 500P 지급 (친구 몫은 친구가 다음 접속 시 자동 지급)');
         renderInvites();
@@ -17479,7 +17479,7 @@ function ppClaimInviteeRewardOne(inviteId) {
       var now = FS.FieldValue.serverTimestamp();
       tx.update(inviteRef, { invitee_rewarded: true });
       tx.set(pointsRef, {
-        user_id: uid, amount: 500, type: 'earn', reason: '친구초대 보상 (피초대자)', manual: false, created_at: now,
+        user_id: uid, amount: 500, type: 'earn', category: 'referral', reason: '친구초대 보상 (피초대자)', manual: false, created_at: now,
       });
       tx.set(balanceRef, { user_id: uid, balance: FS.FieldValue.increment(500), updated_at: now }, { merge: true });
       return true;
@@ -18241,7 +18241,7 @@ function ppBuyTicketWithPoints(grade) {
   var now = FS.FieldValue.serverTimestamp();
   var batch = db.batch();
   batch.set(db.collection('point_transactions').doc(), {
-    user_id: PP.uid, amount: -cost, type: 'use', reason: '포인트→티켓 교환(' + GRADE_NAME[grade] + ')', manual: false, via: 'point_exchange', created_at: now,
+    user_id: PP.uid, amount: -cost, type: 'use', category: 'point_to_ticket', reason: '포인트→티켓 교환(' + GRADE_NAME[grade] + ')', manual: false, via: 'point_exchange', created_at: now,
   });
   batch.set(db.collection('user_points').doc(PP.uid), {
     user_id: PP.uid, balance: FS.FieldValue.increment(-cost), updated_at: now,
@@ -18283,7 +18283,7 @@ function ppSellTicketForPoints(grade) {
         user_id: PP.uid, ticket_grade: grade, type: 'use', postback_id: null, via: 'point_exchange', created_at: now,
       });
       batch.set(db.collection('point_transactions').doc(), {
-        user_id: PP.uid, amount: reward, type: 'earn', reason: '티켓→포인트 교환(' + GRADE_NAME[grade] + ')', manual: false, via: 'point_exchange', created_at: now,
+        user_id: PP.uid, amount: reward, type: 'earn', category: 'ticket_to_point', reason: '티켓→포인트 교환(' + GRADE_NAME[grade] + ')', manual: false, via: 'point_exchange', created_at: now,
       });
       batch.set(db.collection('user_points').doc(PP.uid), {
         user_id: PP.uid, balance: FS.FieldValue.increment(reward), updated_at: now,

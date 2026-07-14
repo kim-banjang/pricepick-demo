@@ -410,6 +410,22 @@ tr:hover td{background:var(--surface-2);}
   padding:10px 13px;color:var(--text);font-size:13px;outline:none;font-family:var(--font);height:40px;}
 .form-hint{font-size:11px;color:var(--text-3);margin-top:4px;}
 textarea.form-input{resize:vertical;min-height:80px;height:auto;}
+/* ── 대상 회원 검색형 선택(수동 티켓/포인트 지급·회수 공용) ── */
+.user-search{position:relative;}
+.user-search-results{position:absolute;left:0;right:0;top:calc(100% + 4px);z-index:5;
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--r-md);
+  box-shadow:var(--shadow-lg);max-height:220px;overflow-y:auto;display:none;}
+.user-search-item{padding:9px 13px;font-size:12.5px;color:var(--text);cursor:pointer;border-bottom:1px solid var(--border);}
+.user-search-item:last-child{border-bottom:none;}
+.user-search-item:hover{background:var(--surface-2);}
+.user-search-empty{padding:10px 13px;font-size:12px;color:var(--text-3);}
+.user-search-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;}
+.user-search-chip{display:inline-flex;align-items:center;gap:6px;background:var(--surface-2);
+  border:1px solid var(--border);border-radius:20px;padding:5px 6px 5px 12px;font-size:12px;color:var(--text);}
+.user-search-chip button{border:none;background:transparent;color:var(--text-3);cursor:pointer;
+  width:18px;height:18px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;
+  font-size:14px;line-height:1;padding:0;}
+.user-search-chip button:hover{background:var(--border);color:var(--text);}
 /* ── 등급별 수량 스테퍼(수동 티켓 지급/회수) ── */
 .tm-grade-row{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;}
 .tm-grade-label{font-size:13px;font-weight:600;color:var(--text);flex-shrink:0;min-width:44px;}
@@ -2437,7 +2453,22 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
       </div>
       <div class="toolbar">
         <input class="search-box" id="pt-search" placeholder="회원명, 카카오 ID 검색" onkeydown="if(event.key==='Enter')ptApplyFilters()">
-        <select class="filter-sel" id="pt-filter-type" onchange="ptApplyFilters()"><option value="">전체 유형</option><option value="earn">적립</option><option value="attendance">출석 적립</option><option value="referral">친구초대 보상</option><option value="exchange">기프티콘 교환 보너스</option><option value="daily_visit">일일 방문 보상</option><option value="spend">사용 차감</option><option value="expire">만료 소멸</option></select>
+        <select class="filter-sel" id="pt-filter-type" onchange="ptApplyFilters()">
+          <option value="">전체 유형</option>
+          <optgroup label="적립">
+            <option value="attendance">출석(쿠팡 구경하기)</option>
+            <option value="referral">친구초대 보상</option>
+            <option value="onboarding">온보딩 보상</option>
+            <option value="roulette">행운룰렛 당첨</option>
+            <option value="ticket_to_point">티켓→포인트 전환</option>
+            <option value="admin_grant">관리자 지급</option>
+          </optgroup>
+          <optgroup label="사용·차감">
+            <option value="point_to_ticket">포인트→티켓 전환</option>
+            <option value="expire">만료 소멸</option>
+            <option value="admin_revoke">관리자 회수</option>
+          </optgroup>
+        </select>
         <select class="filter-sel" id="pt-filter-period" onchange="ptApplyFilters()"><option value="">전체 기간</option><option value="7">최근 7일</option><option value="30">최근 30일</option><option value="90">최근 90일</option></select>
         <button class="btn btn-primary btn-sm" onclick="ptApplyFilters()">검색</button>
         <div style="margin-left:auto;display:flex;gap:8px;"><button class="btn btn-ghost btn-sm" onclick="csvExportPoints()">내보내기</button><button class="btn btn-ghost btn-sm" onclick="pmOpenModal()">수동 지급 / 회수</button></div>
@@ -2721,7 +2752,15 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
     </div>
     <div class="modal-body">
       <div class="warn-box"><strong>주의:</strong> 수동 처리는 로그에 기록되며 되돌릴 수 없습니다.</div>
-      <div class="form-group"><label class="form-label">대상 회원</label><select class="form-select" id="tm-user"><option value="">불러오는 중…</option></select></div>
+      <div class="form-group">
+        <label class="form-label">대상 회원</label>
+        <div class="user-search" id="tm-user-search">
+          <input class="form-input" type="text" id="tm-user-q" placeholder="닉네임 또는 아이디로 검색" autocomplete="off" oninput="dmUserSearchInput('tm')" onfocus="dmUserSearchInput('tm')">
+          <div class="user-search-results" id="tm-user-results"></div>
+        </div>
+        <div class="user-search-chips" id="tm-user-chips"></div>
+        <input type="hidden" id="tm-user" value="">
+      </div>
       <div class="form-group"><label class="form-label">처리 유형</label><select class="form-select" id="tm-action"><option value="grant">지급</option><option value="revoke">회수</option></select></div>
       <div class="form-group">
         <label class="form-label">티켓 수량 (등급별, 0보다 큰 것만 처리)</label>
@@ -2778,7 +2817,15 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
     </div>
     <div class="modal-body">
       <div class="warn-box"><strong>주의:</strong> 포인트 원장은 append-only입니다 — 회수도 삭제가 아니라 음수 레코드 추가로 처리되며 되돌릴 수 없습니다.</div>
-      <div class="form-group"><label class="form-label">대상 회원</label><select class="form-select" id="pm-user"><option value="">불러오는 중…</option></select></div>
+      <div class="form-group">
+        <label class="form-label">대상 회원</label>
+        <div class="user-search" id="pm-user-search">
+          <input class="form-input" type="text" id="pm-user-q" placeholder="닉네임 또는 아이디로 검색" autocomplete="off" oninput="dmUserSearchInput('pm')" onfocus="dmUserSearchInput('pm')">
+          <div class="user-search-results" id="pm-user-results"></div>
+        </div>
+        <div class="user-search-chips" id="pm-user-chips"></div>
+        <input type="hidden" id="pm-user" value="">
+      </div>
       <div class="form-row">
         <div class="form-group">
           <label class="form-label">처리 유형</label>
@@ -5975,8 +6022,14 @@ function dmFetchUsersByIds(userIds) {
   })).then(function() { return map; });
 }
 
-/* ── sec-tickets ── ticket_transactions */
+/* ── sec-tickets ── ticket_transactions
+   Vin 확정 답변(2026-07-14): 티켓 칸에 등급+증감수량을 같이 쓴다(브론즈 +20 / 브론즈 −15),
+   등급 전환은 한 줄에 두 값(브론즈 −10 / 실버 +1, 사유 "등급 전환"). 원장은 한 유닛=한 문서라
+   같은 회원·같은 시각(한 배치)에 쓰인 문서들을 등급별로 합산해 한 줄로 보여준다 — 데이터는
+   그대로 두고 표시만 묶는다(원장 불변 원칙 유지). */
 var TK_TYPE_LABELS = { earn:'<span style="color:var(--success)">구매확정 적립</span>', use:'<span style="color:var(--danger)">기프티콘 교환</span>', clawback:'<span style="color:var(--danger)">환수(취소/반품)</span>', expire:'<span style="color:var(--text-3)">만료 소멸</span>', pending:'<span style="color:var(--text-2)">구매 대기</span>' };
+var TK_MANUAL_LABELS = { earn:'<span style="color:var(--success)">관리자 지급</span>', clawback:'<span style="color:var(--danger)">관리자 회수</span>' };
+var TK_EXCHANGE_LABEL = '<span style="color:var(--text-2);font-weight:700">등급 전환</span>';
 var TK_GRADE_CHIPS = { gold:'<span class="tk-chip gold bare">골드</span>', silver:'<span class="tk-chip silver bare">실버</span>', bronze:'<span class="tk-chip bronze bare">브론즈</span>', event:'<span class="tk-chip event bare">이벤트</span>' };
 var TK_STATUS_MAP = {
   earn: '<span style="display:inline-block;font-size:11px;font-weight:700;color:#1f9d57;background:#e6f7ec;border:1px solid #b6e6c8;border-radius:20px;padding:3px 10px">보유 중</span>',
@@ -5985,7 +6038,76 @@ var TK_STATUS_MAP = {
   expire:'<span style="display:inline-block;font-size:11px;font-weight:700;color:#6b7280;background:#f3f4f6;border:1px solid #e5e7eb;border-radius:20px;padding:3px 10px">만료</span>',
   pending:'<span style="display:inline-block;font-size:11px;font-weight:700;color:#d97a17;background:#fdf1e3;border:1px solid #f3d2a0;border-radius:20px;padding:3px 10px">가지급(대기)</span>'
 };
-var TK_TYPE_FILTER_MAP = { '구매 적립':'earn', '관리자 지급':'earn' };
+var TK_EXCHANGE_STATUS = '<span style="display:inline-block;font-size:11px;font-weight:700;color:#6b7280;background:#f3f4f6;border:1px solid #e5e7eb;border-radius:20px;padding:3px 10px">전환 완료</span>';
+
+// 등급칩 + 증감수량(늘면 파란색 +, 줄면 빨간색 −)을 한 조각으로 만든다.
+function tkFmtGradeQty(grade, qty) {
+  var chip = TK_GRADE_CHIPS[grade] || ('<span style="color:var(--text-3)">' + grade + '</span>');
+  var sign = qty >= 0 ? '+' : '−';
+  var color = qty >= 0 ? 'var(--info)' : 'var(--danger)';
+  return chip + ' <span style="color:' + color + ';font-weight:700">' + sign + Math.abs(qty) + '</span>';
+}
+
+// 원장(한 유닛=한 문서)을 화면에 보일 줄 단위로 묶는다: 같은 회원 + 같은 시각(한 배치)을 한 그룹으로
+// 보고, use/earn이 postback_id 없이 함께 있으면(=앱 등급 전환 화면의 유일한 패턴) "등급 전환" 한 줄로
+// 합치고, 그 외엔 유형+등급별로 합산해 "등급 +N/−N" 한 줄씩 만든다.
+function tkGroupForDisplay(items) {
+  var order = [];
+  var groups = {};
+  items.forEach(function(it) {
+    var ms = (it.created_at && it.created_at.toMillis) ? it.created_at.toMillis() : null;
+    var key = (it.user_id || '') + '|' + (ms != null ? ms : ('idx:' + order.length));
+    if (!groups[key]) { groups[key] = []; order.push(key); }
+    groups[key].push(it);
+  });
+  var rows = [];
+  order.forEach(function(key) {
+    var g = groups[key];
+    var types = {};
+    g.forEach(function(it) { types[it.type] = true; });
+    var isExchange = types.use && types.earn && Object.keys(types).length === 2
+      && g.every(function(it) { return !it.postback_id && !it.manual; });
+    if (isExchange) {
+      var qtyByGrade = {};
+      g.forEach(function(it) {
+        qtyByGrade[it.ticket_grade] = (qtyByGrade[it.ticket_grade] || 0) + (it.type === 'earn' ? 1 : -1);
+      });
+      var parts = Object.keys(qtyByGrade)
+        .sort(function(a, b) { return qtyByGrade[a] - qtyByGrade[b]; })
+        .map(function(gr) { return tkFmtGradeQty(gr, qtyByGrade[gr]); });
+      rows.push({
+        _user: g[0]._user, user_id: g[0].user_id, created_at: g[0].created_at, type: 'grade_exchange',
+        _reasonHtml: TK_EXCHANGE_LABEL,
+        _ticketHtml: parts.join(' <span style="color:var(--text-3)">/</span> '),
+        _statusHtml: TK_EXCHANGE_STATUS,
+      });
+      return;
+    }
+    var sub = {}, subOrder = [];
+    g.forEach(function(it) {
+      var sk = it.type + '|' + it.ticket_grade;
+      if (!sub[sk]) {
+        sub[sk] = { type: it.type, ticket_grade: it.ticket_grade, count: 0, manual: false, _user: it._user, user_id: it.user_id, created_at: it.created_at };
+        subOrder.push(sk);
+      }
+      sub[sk].count += 1;
+      if (it.manual) sub[sk].manual = true;
+    });
+    subOrder.forEach(function(sk) {
+      var s = sub[sk];
+      var qty = (s.type === 'earn' || s.type === 'pending') ? s.count : -s.count;
+      var reasonHtml = (s.manual && TK_MANUAL_LABELS[s.type]) ? TK_MANUAL_LABELS[s.type] : (TK_TYPE_LABELS[s.type] || s.type);
+      rows.push({
+        _user: s._user, user_id: s.user_id, created_at: s.created_at, type: s.type,
+        _reasonHtml: reasonHtml,
+        _ticketHtml: tkFmtGradeQty(s.ticket_grade, qty),
+        _statusHtml: TK_STATUS_MAP[s.type] || '',
+      });
+    });
+  });
+  return rows;
+}
+
 var TICKETS_CTRL = window.TICKETS_CTRL = ppMakeListController(20, function(pageItems, state, totalPages) {
   var tbody = document.querySelector('#sec-tickets table tbody');
   var pag = document.getElementById('tickets-pagination');
@@ -5993,9 +6115,9 @@ var TICKETS_CTRL = window.TICKETS_CTRL = ppMakeListController(20, function(pageI
   if (!pageItems.length) { tbody.innerHTML = ppEmpty(5,'조건에 맞는 티켓 이력이 없습니다.'); if (pag) pag.innerHTML = ''; return; }
   tbody.innerHTML = pageItems.map(function(d) {
     return '<tr><td>' + renderMemberIdentity(d._user, d.user_id) + '</td>'
-      + '<td>' + (TK_TYPE_LABELS[d.type]||d.type) + '</td>'
-      + '<td style="text-align:center">' + (TK_GRADE_CHIPS[d.ticket_grade]||'<span style="color:var(--text-3)">—</span>') + '</td>'
-      + '<td style="text-align:center">' + (TK_STATUS_MAP[d.type]||'') + '</td>'
+      + '<td>' + d._reasonHtml + '</td>'
+      + '<td style="text-align:center">' + d._ticketHtml + '</td>'
+      + '<td style="text-align:center">' + d._statusHtml + '</td>'
       + '<td style="color:var(--text-3);font-size:12px;text-align:center"><div style="font-weight:700;color:#333">' + ppDt(d.created_at) + '</div><div>' + ppTm(d.created_at) + '</div></td></tr>';
   }).join('');
   if (pag) pag.innerHTML = ppPaginationHtml('TICKETS_CTRL', state.page, totalPages);
@@ -6020,7 +6142,7 @@ function loadTickets() {
       if (snap.empty) { TICKETS_CTRL.setRows([]); return; }
       dmFetchUsersByIds(snap.docs.map(function(doc){ return doc.data().user_id; })).then(function(userMap) {
         var items = snap.docs.map(function(doc) { return Object.assign({ _id: doc.id, _user: userMap[doc.data().user_id] }, doc.data()); });
-        TICKETS_CTRL.setRows(items);
+        TICKETS_CTRL.setRows(tkGroupForDisplay(items));
       });
     }).catch(function(e){ console.error('loadTickets',e); tbody.innerHTML = ppEmpty(5,'로드 오류'); });
   /* 전체 원장 기준 통계 */
@@ -7630,8 +7752,28 @@ window.pointAttendanceSubmitEdit = function() {
   });
 };
 
-/* ── sec-points ── point_transactions */
-var PT_TYPE_LABEL = { referral:'<span style="color:var(--main)">친구초대 보상</span>', attendance:'<span style="color:#c084fc">출석 적립</span>', exchange:'<span style="color:var(--main)">기프티콘 교환 보너스</span>', daily_visit:'<span style="color:#c084fc">일일 방문 보상</span>', earn:'<span style="color:var(--success)">적립</span>', spend:'<span style="color:var(--danger)">사용 차감</span>', expire:'<span style="color:var(--text-2)">만료 소멸</span>' };
+/* ── sec-points ── point_transactions
+   Harry 확정 답변(2026-07-14): 근거 없던 "기프티콘 교환 보너스"·"일일 방문 보상" 삭제,
+   "행운룰렛 당첨"·"포인트→티켓 전환" 추가. 실제 원장은 category 필드로 분류하고(레거시 시드
+   데이터는 category가 없어 type 필드를 그대로 분류값으로 재사용), 온보딩 보상만 분류는
+   하나로 묶되 화면 문구는 각 보상의 개별 이름을 그대로 보여준다(보상이 늘어도 개발 수정 불필요). */
+var PT_CATEGORY_LABEL = {
+  attendance:      '<span style="color:#c084fc">출석(쿠팡 구경하기)</span>',
+  referral:        '<span style="color:var(--main)">친구초대 보상</span>',
+  onboarding:      '<span style="color:var(--main)">온보딩 보상</span>',
+  roulette:        '<span style="color:#c084fc">행운룰렛 당첨</span>',
+  ticket_to_point: '<span style="color:var(--success)">티켓→포인트 전환</span>',
+  point_to_ticket: '<span style="color:var(--danger)">포인트→티켓 전환</span>',
+  expire:          '<span style="color:var(--text-2)">만료 소멸</span>',
+  admin_grant:     '<span style="color:var(--success)">관리자 지급</span>',
+  admin_revoke:    '<span style="color:var(--danger)">관리자 회수</span>',
+};
+function ptCategoryOf(d) { return d.category || d.type; }
+function ptReasonHtml(d) {
+  var cat = ptCategoryOf(d);
+  if (cat === 'onboarding' && d.reason) return d.reason;
+  return PT_CATEGORY_LABEL[cat] || (d.reason || cat || '—');
+}
 var POINTS_CTRL = window.POINTS_CTRL = ppMakeListController(20, function(pageItems, state, totalPages) {
   var tbody = document.querySelector('#sec-points table tbody');
   var pag = document.getElementById('points-pagination');
@@ -7642,7 +7784,7 @@ var POINTS_CTRL = window.POINTS_CTRL = ppMakeListController(20, function(pageIte
     var sign = amt >= 0 ? '+' : '';
     var color = amt >= 0 ? 'color:var(--success);font-weight:700' : 'color:var(--danger);font-weight:700';
     return '<tr><td>' + renderMemberIdentity(d._user, d.user_id) + '</td>'
-      + '<td>' + (PT_TYPE_LABEL[d.type]||d.type) + '</td>'
+      + '<td>' + ptReasonHtml(d) + '</td>'
       + '<td style="text-align:center;' + color + '">' + sign + ppN(amt) + 'P</td>'
       + '<td style="text-align:center;font-weight:600">—</td>'
       + '<td style="color:var(--text-3);font-size:12px;text-align:center"><div style="font-weight:700;color:#333">' + ppDt(d.created_at) + '</div><div>' + ppTm(d.created_at) + '</div></td></tr>';
@@ -7657,7 +7799,7 @@ window.ptApplyFilters = function() {
   var cutoff = periodDays ? (Date.now() - periodDays*24*60*60*1000) : 0;
   POINTS_CTRL.applyFilter(function(d) {
     if (q && !ppMatch((d._user||{}).nickname, q) && !ppMatch((d._user||{}).kakao_login_id, q)) return false;
-    if (type && d.type !== type) return false;
+    if (type && ptCategoryOf(d) !== type) return false;
     if (cutoff) {
       var ts = d.created_at && d.created_at.toDate ? d.created_at.toDate().getTime() : 0;
       if (ts < cutoff) return false;
@@ -8537,6 +8679,92 @@ function dmRevokePostbackTickets(postbackId, reason) {
 }
 
 // ════════════════════════════════════════════════
+// 대상 회원 검색형 선택 (수동 티켓/포인트 지급·회수 공용)
+// 100명만 넘어도 드롭다운에서 사람을 못 찾는다는 지적(Vin, 2026-07-14 확정 답변)에 따라
+// 드롭다운을 없애고 검색 입력 + 후보 목록 + 칩 선택 방식으로 교체. 두 화면(tm/pm)이 prefix만
+// 다르게 이 컴포넌트를 그대로 재사용한다 — "화면이 둘이라고 다르게 만들 이유가 없다"(확정 답변).
+// ════════════════════════════════════════════════
+var DM_USER_CACHE = null;
+function dmLoadUserCache() {
+  if (DM_USER_CACHE) return Promise.resolve(DM_USER_CACHE);
+  return db.collection('users').orderBy('created_at', 'desc').limit(200).get().then(function(snap) {
+    DM_USER_CACHE = {};
+    snap.forEach(function(doc) { DM_USER_CACHE[doc.id] = doc.data(); });
+    return DM_USER_CACHE;
+  }).catch(function(e) {
+    console.error('dmLoadUserCache', e);
+    DM_USER_CACHE = {};
+    return DM_USER_CACHE;
+  });
+}
+
+// 모달을 열 때 호출 — 이전 선택 상태를 지우고 회원 캐시를 미리 불러온다.
+function dmUserSearchReset(prefix) {
+  var hidden = document.getElementById(prefix + '-user'); if (hidden) hidden.value = '';
+  var q = document.getElementById(prefix + '-user-q'); if (q) q.value = '';
+  var results = document.getElementById(prefix + '-user-results');
+  if (results) { results.innerHTML = ''; results.style.display = 'none'; }
+  var chips = document.getElementById(prefix + '-user-chips'); if (chips) chips.innerHTML = '';
+  dmLoadUserCache();
+}
+
+// 입력할 때마다 닉네임 · 카카오 로그인ID · 식별 아이디(문서ID)로 후보를 찾아 목록으로 보여준다.
+window.dmUserSearchInput = function(prefix) {
+  var q = document.getElementById(prefix + '-user-q');
+  var results = document.getElementById(prefix + '-user-results');
+  if (!q || !results) return;
+  var kw = q.value.trim().toLowerCase();
+  dmLoadUserCache().then(function(cache) {
+    if (!kw) { results.innerHTML = ''; results.style.display = 'none'; return; }
+    var matches = Object.keys(cache).filter(function(id) {
+      var u = cache[id];
+      return (u.nickname || '').toLowerCase().indexOf(kw) > -1
+        || (u.kakao_login_id || '').toLowerCase().indexOf(kw) > -1
+        || id.toLowerCase().indexOf(kw) > -1;
+    }).slice(0, 8);
+    if (!matches.length) {
+      results.innerHTML = '<div class="user-search-empty">일치하는 회원이 없습니다</div>';
+      results.style.display = 'block';
+      return;
+    }
+    results.innerHTML = matches.map(function(id) {
+      return '<div class="user-search-item" onclick="dmUserSearchSelect(\'' + prefix + '\',\'' + id + '\')">'
+        + renderMemberIdentityInline(cache[id], id) + '</div>';
+    }).join('');
+    results.style.display = 'block';
+  });
+};
+
+// 후보를 클릭하면 선택을 확정한다 — 히든 인풋에 회원 ID를 채우고 칩으로 표시, 검색창은 비운다.
+window.dmUserSearchSelect = function(prefix, userId) {
+  var hidden = document.getElementById(prefix + '-user'); if (hidden) hidden.value = userId;
+  var chips = document.getElementById(prefix + '-user-chips');
+  if (chips) {
+    var label = (DM_USER_CACHE && DM_USER_CACHE[userId]) ? renderMemberIdentityInline(DM_USER_CACHE[userId], userId) : userId;
+    chips.innerHTML = '<span class="user-search-chip">' + label
+      + '<button type="button" onclick="dmUserSearchClear(\'' + prefix + '\')" aria-label="선택 해제">&times;</button></span>';
+  }
+  var q = document.getElementById(prefix + '-user-q'); if (q) q.value = '';
+  var results = document.getElementById(prefix + '-user-results');
+  if (results) { results.innerHTML = ''; results.style.display = 'none'; }
+};
+
+// 칩의 × — 선택 해제
+window.dmUserSearchClear = function(prefix) {
+  var hidden = document.getElementById(prefix + '-user'); if (hidden) hidden.value = '';
+  var chips = document.getElementById(prefix + '-user-chips'); if (chips) chips.innerHTML = '';
+};
+
+// 바깥을 클릭하면 후보 목록을 닫는다.
+document.addEventListener('click', function(e) {
+  ['tm', 'pm'].forEach(function(prefix) {
+    var wrap = document.getElementById(prefix + '-user-search');
+    var results = document.getElementById(prefix + '-user-results');
+    if (wrap && results && !wrap.contains(e.target)) results.style.display = 'none';
+  });
+});
+
+// ════════════════════════════════════════════════
 // 티켓 내역 화면 — 수동 지급 / 회수 (m-ticket-manual)
 // ════════════════════════════════════════════════
 var TM_GRADE_KO = { bronze: '브론즈', silver: '실버', gold: '골드', event: '이벤트' };
@@ -8556,7 +8784,7 @@ window.tmOpenModal = function() {
   });
   var reasonEl = document.getElementById('tm-reason'); if (reasonEl) reasonEl.value = '';
   var actionEl = document.getElementById('tm-action'); if (actionEl) actionEl.value = 'grant';
-  dmPopulateUserSelect('tm-user');
+  dmUserSearchReset('tm');
   openModal('m-ticket-manual');
 };
 
@@ -8754,7 +8982,7 @@ window.pmOpenModal = function() {
   var amountEl = document.getElementById('pm-amount'); if (amountEl) amountEl.value = '';
   var reasonEl = document.getElementById('pm-reason'); if (reasonEl) reasonEl.value = '';
   var actionEl = document.getElementById('pm-action'); if (actionEl) actionEl.value = 'grant';
-  dmPopulateUserSelect('pm-user');
+  dmUserSearchReset('pm');
   openModal('m-point-manual');
 };
 
@@ -8791,7 +9019,7 @@ window.pmSubmit = function() {
 function pmGrantPoints(userId, amount, reason) {
   var now = FS.Timestamp.now();
   var b = db.batch();
-  b.set(db.collection('point_transactions').doc(), { user_id: userId, amount: amount, type: 'earn', reason: reason, manual: true, created_at: now });
+  b.set(db.collection('point_transactions').doc(), { user_id: userId, amount: amount, type: 'earn', category: 'admin_grant', reason: reason, manual: true, created_at: now });
   b.set(db.collection('user_points').doc(userId), { user_id: userId, balance: firebase.firestore.FieldValue.increment(amount), updated_at: now }, { merge: true });
   return b.commit().then(function() { return { amount: amount }; });
 }
@@ -8805,7 +9033,7 @@ function pmRevokePoints(userId, amount, reason) {
     if (actual <= 0) return { amount: 0 };
     var now = FS.Timestamp.now();
     var b = db.batch();
-    b.set(db.collection('point_transactions').doc(), { user_id: userId, amount: -actual, type: 'spend', reason: reason, manual: true, created_at: now });
+    b.set(db.collection('point_transactions').doc(), { user_id: userId, amount: -actual, type: 'spend', category: 'admin_revoke', reason: reason, manual: true, created_at: now });
     b.set(db.collection('user_points').doc(userId), { user_id: userId, balance: firebase.firestore.FieldValue.increment(-actual), updated_at: now }, { merge: true });
     return b.commit().then(function() { return { amount: actual }; });
   });
@@ -9267,18 +9495,18 @@ window.dmSeedInject = function() {
     'ptx-frank-01':  { user_id:'user-frank-001',  amount:300,  type:'referral',   reason:'초대 보상',   created_at:ago(55) },
     'ptx-frank-02':  { user_id:'user-frank-001',  amount:200,  type:'attendance', reason:'출석 보상',   created_at:ago(30) },
     'ptx-grace-01':  { user_id:'user-grace-001',  amount:200,  type:'attendance', reason:'출석 보상',   created_at:ago(40) },
-    'ptx-henry-01':  { user_id:'user-henry-001',  amount:500,  type:'exchange',   reason:'교환 보너스', created_at:ago(20) },
+    'ptx-henry-01':  { user_id:'user-henry-001',  amount:500,  type:'attendance', reason:'출석·이벤트 누적 보상', created_at:ago(20) },
     'ptx-henry-02':  { user_id:'user-henry-001',  amount:300,  type:'referral',   reason:'초대 보상',   created_at:ago(30) },
     'ptx-henry-03':  { user_id:'user-henry-001',  amount:200,  type:'attendance', reason:'출석 보상',   created_at:ago(25) },
     'ptx-iris-01':   { user_id:'user-iris-001',   amount:300,  type:'referral',   reason:'초대 보상',   created_at:ago(15) },
     'ptx-jake-01':   { user_id:'user-jake-001',   amount:50,   type:'attendance', reason:'첫 출석',     created_at:ago(3)  },
     'ptx-leo-01':    { user_id:'user-leo-001',    amount:200,  type:'attendance', reason:'출석 보상',   created_at:ago(40) },
-    'ptx-leo-02':    { user_id:'user-leo-001',    amount:200,  type:'daily_visit',reason:'방문 보상',   created_at:ago(2)  },
-    'ptx-mia-01':    { user_id:'user-mia-001',    amount:100,  type:'daily_visit',reason:'방문 보상',   created_at:ago(5)  },
+    'ptx-leo-02':    { user_id:'user-leo-001',    amount:200,  type:'attendance', reason:'출석 보상',   created_at:ago(2)  },
+    'ptx-mia-01':    { user_id:'user-mia-001',    amount:100,  type:'attendance', reason:'출석 보상',   created_at:ago(5)  },
     'ptx-noah-01':   { user_id:'user-noah-001',   amount:50,   type:'attendance', reason:'첫 출석',     created_at:ago(5)  },
     'ptx-olivia-01': { user_id:'user-olivia-001', amount:500,  type:'referral',   reason:'초대 보상',   created_at:ago(10) },
     'ptx-olivia-02': { user_id:'user-olivia-001', amount:500,  type:'attendance', reason:'출석 보상',   created_at:ago(35) },
-    'ptx-olivia-03': { user_id:'user-olivia-001', amount:500,  type:'daily_visit',reason:'방문 보상',   created_at:ago(2)  },
+    'ptx-olivia-03': { user_id:'user-olivia-001', amount:500,  type:'attendance', reason:'출석 보상',   created_at:ago(2)  },
   };
   var GIFS = {
     'gif-ediya-2000': { category:'카페', brand:'이디야커피', name:'이디야 아메리카노', emoji:'☕', product_code:'EDIYA-AMR-001', price:2000, required_grade:'bronze', required_count:2, validity_days:30, status:'active', sale_end_at:null, created_at:ts('2026-03-01') },
