@@ -12451,6 +12451,8 @@ body.interactive-mode #ip-nav { display: block; }
           <div class="gd-section">
             <div class="gd-section-t">등급 티켓 보유 현황</div>
             <div id="gd-holdings" style="display:flex;flex-direction:column;gap:6px;padding:0 2px;"><!-- PP: 실데이터 렌더 (등급별 보유) --></div>
+            <button type="button" onclick="var p=this.nextElementSibling;p.style.display=(p.style.display==='block')?'none':'block';" style="margin-top:8px;width:100%;background:none;border:none;font-size:11px;font-weight:700;color:var(--main);cursor:pointer;text-align:left;padding:2px;">장별 만료일 자세히 보기 ▾</button>
+            <div id="gd-expiry-accordion" style="display:none;margin-top:6px;background:#fff;border:1px solid #EFEAF7;border-radius:8px;overflow:hidden;"><!-- PP: 실데이터 렌더 --></div>
           </div>
 
           <!-- 등급 간 교환 -->
@@ -17638,53 +17640,167 @@ function renderStreakMission() {
   }).catch(function(e) { console.error('renderStreakMission', e); });
 }
 
+/* ── 적립 티켓 아이콘 (등급별/랜덤 색 구분) — 원본 pw-21 seal 아이콘 이식 ── */
+var TICKET_ICON_MAIN = "M306.6,106.8l-49.5,49.5,2.4,2.4c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-2.4-2.4-138.6,138.6c-3.7,3.7-3.7,9.6,0,13.3l75.5,75.5c3.7,3.7,9.6,3.7,13.3,0l138.6-138.6-2.3-2.3c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l2.3,2.3,49.5-49.5c3.7-3.7,3.7-9.6,0-13.3l-75.5-75.5c-3.7-3.7-9.6-3.7-13.3,0ZM335.6,234.8c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM322.9,222.1c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM310.2,209.4c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM297.6,196.7c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM284.9,184.1c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM272.2,171.4c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7Z";
+var TICKET_ICON_SEAL = "M316.2,155.8l12.1,6.2c.8.4,1.8.3,2.4-.4l9.6-9.6c1.4-1.4,3.8-.2,3.5,1.8l-2.1,13.5c-.1.9.3,1.8,1.1,2.2l12.1,6.2c1.8.9,1.4,3.6-.6,3.9l-13.5,2.1c-.9.1-1.6.8-1.7,1.7l-2.1,13.5c-.3,2-3,2.4-3.9.6l-6.2-12.1c-.4-.8-1.3-1.3-2.2-1.1l-13.5,2.1c-2,.3-3.2-2.1-1.8-3.5l9.6-9.6c.6-.6.8-1.6.4-2.4l-6.2-12.1c-.9-1.8,1-3.7,2.8-2.8Z";
+var TICKET_ICON_RIBBON = "M180.7,298.9l-5.2,5.2,27.4,27.4-4.7,4.7-27.4-27.4-5.2,5.2-4.2-4.2,15.1-15.1,4.2,4.2ZM215.3,319.1l-4.7,4.7-31.6-31.6,4.7-4.7,31.6,31.6ZM231.9,296.8c1.9,1.9,1.9,3.9,0,5.8l-9.9,9.9c-1.9,1.9-3.8,1.8-5.7,0l-25.8-25.8c-1.9-1.9-2-3.8-.1-5.7l9.9-9.9c1.9-1.9,3.9-1.9,5.8,0l7.4,7.4-4.7,4.7-6.2-6.2-6.1,6.1,23.5,23.5,6.1-6.1-6.6-6.6,4.7-4.7,7.8,7.8ZM254.4,280l-5.2,5.2-20.1-8.1,14.1,14.1-4.7,4.7-31.6-31.6,4.7-4.7,13.4,13.4-8.1-18.6,5.2-5.2.2.2,8.6,21.4,23.6,9.2ZM269.5,265l-13.1,13.1-31.6-31.6,13-13,4.2,4.2-8.3,8.3,9.2,9.2,7.1-7.1,4.1,4.1-7.1,7.1,9.9,9.9,8.4-8.4,4.2,4.2ZM259,220.6l-5.2,5.2,27.4,27.4-4.7,4.7-27.4-27.4-5.2,5.2-4.2-4.2,15.1-15.1,4.2,4.2Z";
+var TICKET_COLORS = {
+  bronze: ['#C68250', '#8B5A2B', 'rgba(255,255,255,0.95)'],
+  silver: ['#D8D8D8', '#999999', 'rgba(50,50,50,0.75)'],
+  gold:   ['#FFD93B', '#E6A800', 'rgba(255,255,255,0.95)'],
+  random: ['#FF6B55', '#C8200A', 'rgba(255,255,255,0.95)'],
+};
+var _tkiSeq = 0;
+function ticketIcon(kind) {
+  var c = TICKET_COLORS[kind] || TICKET_COLORS.bronze;
+  var gid = 'tki' + (_tkiSeq++);
+  var q = kind === 'random' ? '<text x="220" y="370" font-family="Arial Black, Arial" font-size="270" font-weight="900" fill="rgba(255,255,255,0.5)" text-anchor="middle">?</text>' : '';
+  return '<svg width="40" height="40" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="' + gid + '" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="' + c[0] + '"/><stop offset="100%" stop-color="' + c[1] + '"/></linearGradient></defs>'
+    + '<path d="' + TICKET_ICON_MAIN + '" fill="url(#' + gid + ')"/>'
+    + '<path d="' + TICKET_ICON_SEAL + '" fill="' + c[2] + '"/>'
+    + '<path d="' + TICKET_ICON_RIBBON + '" fill="' + c[2] + '"/>' + q + '</svg>';
+}
+var GRADE_ROW_STYLE = {
+  bronze: { bg: '#FFF9F0', border: '#FDE68A', text: '#92400E' },
+  silver: { bg: '#F8F7FC', border: '#E4DFF0', text: '#5A5370' },
+  gold:   { bg: '#FFFBF0', border: '#FDE68A', text: '#92400E' },
+};
+
 /* ── 내 적립 티켓 (pw-21 / phone19) ── */
 function renderTicketDetail() {
   if (!PP.uid) return;
-  ppQuery('user_tickets', 'user_id', PP.uid).then(function (tk) {
-    var act = { bronze: 0, silver: 0, gold: 0 }, pend = [];
+  Promise.all([
+    ppQuery('user_tickets', 'user_id', PP.uid),
+    ppQuery('postbacks', 'user_id', PP.uid),
+  ]).then(function (res) {
+    var tk = res[0], pbs = res[1];
+    var pbMap = {};
+    pbs.forEach(function (p) { pbMap[p._id] = p; });
+    function purchaseLine(pb) {
+      if (!pb) return '';
+      var d = ppFmt(ppDate(pb.created_at));
+      var amt = pb.purchase_amount ? pb.purchase_amount.toLocaleString('ko-KR') + '원 구매' : '';
+      if (!d && !amt) return '';
+      return '<div style="font-size:10px;color:var(--text3);margin-top:4px;padding-left:48px;">' + d + (d && amt ? ' · ' : '') + amt + '</div>';
+    }
+
+    var act = { bronze: 0, silver: 0, gold: 0 };
+    var activeByGrade = { bronze: [], silver: [], gold: [] };
+    var pend = [];
+    var done = {}; /* postback_id -> { grades:{bronze:n,...}, earnedAt } — 이미 등급 전환된 랜덤 티켓 묶음 */
     tk.forEach(function (t) {
       var g = (t.grade || '').toLowerCase();
-      if (t.status === 'active' && act.hasOwnProperty(g)) act[g]++;
-      if (t.status === 'pending') pend.push(t);
+      if (t.status === 'pending') { pend.push(t); return; }
+      if (!act.hasOwnProperty(g)) return;
+      act[g]++;
+      activeByGrade[g].push(t);
+      var key = t.postback_id || t._id;
+      if (!done[key]) done[key] = { grades: {}, earnedAt: null };
+      done[key].grades[g] = (done[key].grades[g] || 0) + 1;
+      var ea = ppDate(t.earned_at);
+      if (ea && (!done[key].earnedAt || ea < done[key].earnedAt)) done[key].earnedAt = ea;
     });
-    /* 보유 현황 */
+
+    /* 보유 현황 — 등급색 + 임박(D-7 이내) 경고뱃지 / 만료일 */
+    var now = Date.now();
     var rows = '';
     ['bronze', 'silver', 'gold'].forEach(function (g) {
       if (!act[g]) return;
-      rows += '<div style="display:flex;align-items:center;justify-content:space-between;background:#F8F7FC;border:1px solid #E4DFF0;border-radius:8px;padding:8px 10px;">'
-        + '<div style="font-size:11px;font-weight:700;color:#5A5370;">' + GRADE_KO[g] + ' ' + act[g] + '장</div></div>';
+      var expiries = activeByGrade[g].map(function (t) { return ppDate(t.expires_at); }).filter(Boolean).sort(function (a, b) { return a - b; });
+      var near = expiries.filter(function (d) { return Math.ceil((d - now) / 86400000) <= 7; });
+      var right = '';
+      if (near.length) {
+        var minDays = Math.max(0, Math.ceil((near[0] - now) / 86400000));
+        right = '<div style="font-size:9.5px;color:#DC2626;background:#FEF2F2;border:1px solid #FECACA;border-radius:4px;padding:2px 6px;font-weight:700;">⚠ ' + near.length + '장 D-' + minDays + ' 만료</div>';
+      } else if (expiries.length) {
+        right = '<div style="font-size:9.5px;color:#9B93B0;">만료 ' + ppFmt(expiries[0]) + '</div>';
+      }
+      var st = GRADE_ROW_STYLE[g];
+      rows += '<div style="display:flex;align-items:center;justify-content:space-between;background:' + st.bg + ';border:1px solid ' + st.border + ';border-radius:8px;padding:8px 10px;">'
+        + '<div style="font-size:11px;font-weight:700;color:' + st.text + ';">' + GRADE_KO[g] + ' ' + act[g] + '장</div>' + right + '</div>';
     });
     if (!rows) rows = '<div style="font-size:11.5px;color:var(--text3);padding:10px 2px;">보유한 등급 티켓이 없어요. 쇼핑몰 구매로 티켓을 적립해 보세요.</div>';
     document.querySelectorAll('#gd-holdings, #gd-holdings-19').forEach(function (el) { el.innerHTML = rows; });
-    /* 대기/활성 목록 — CMS와 동일하게 postback_id 단위로 "랜덤 티켓 묶음" 1개로 표시.
-       정책: 전환될 등급은 사전 미공개 — D-day(대기 기간)만 노출, 등급 구성은 표시 안 함. */
-    var bundles = {};
+
+    /* 장별 만료일 아코디언 — 등급별로 만료일 같은 티켓끼리 묶어 임박순 정렬, D-7 이내 빨강 강조 */
+    var accEl = document.getElementById('gd-expiry-accordion');
+    if (accEl) {
+      var acc = '';
+      ['bronze', 'silver', 'gold'].forEach(function (g) {
+        if (!act[g]) return;
+        var groups = {};
+        activeByGrade[g].forEach(function (t) {
+          var d = ppDate(t.expires_at);
+          var key = d ? ppFmt(d) : '—';
+          if (!groups[key]) groups[key] = { d: d, n: 0 };
+          groups[key].n++;
+        });
+        var keys = Object.keys(groups).sort(function (a, b) {
+          var da = groups[a].d ? groups[a].d.getTime() : Infinity;
+          var db = groups[b].d ? groups[b].d.getTime() : Infinity;
+          return da - db;
+        });
+        acc += '<div style="font-size:10px;color:var(--text3);padding:7px 10px;background:#FAF8FF;font-weight:700;">' + GRADE_KO[g] + ' ' + act[g] + '장 · 만료일 오름차순(임박순)</div>';
+        keys.forEach(function (k) {
+          var grp = groups[k];
+          var days = grp.d ? Math.ceil((grp.d - now) / 86400000) : null;
+          var warn = days != null && days <= 7;
+          acc += '<div style="display:flex;justify-content:space-between;font-size:11px;padding:7px 10px;border-top:1px solid #F3EFFA;"><span>' + GRADE_KO[g] + ' ' + grp.n + '장</span><span style="color:' + (warn ? '#DC2626' : 'var(--text3)') + ';font-weight:' + (warn ? '700' : '400') + ';">' + k + (warn ? ' (D-' + Math.max(0, days) + ')' : '') + '</span></div>';
+        });
+      });
+      accEl.innerHTML = acc || '<div style="font-size:11px;color:var(--text3);padding:10px;">보유 중인 등급 티켓이 없어요.</div>';
+    }
+
+    /* 랜덤 티켓 활성화 목록 — 전환 완료(postback 단위 등급 구성 공개) + 대기중(D-day, 등급 미공개) */
+    var waitDays = (PP.user && PP.user.linked_kakao) ? 7 : 30;
+    var doneItems = Object.keys(done).map(function (key) {
+      var b = done[key];
+      var mainGrade = ['bronze', 'silver', 'gold'].reduce(function (best, g) {
+        if (!b.grades[g]) return best;
+        if (!best || b.grades[g] > b.grades[best]) return g;
+        return best;
+      }, null) || 'bronze';
+      var label = ['bronze', 'silver', 'gold'].filter(function (g) { return b.grades[g]; })
+        .map(function (g) { return GRADE_KO[g] + ' ' + b.grades[g] + '장'; }).join(' + ');
+      return { earnedAt: b.earnedAt, label: label, grade: mainGrade, pb: pbMap[key] };
+    }).sort(function (a, b) { return (b.earnedAt ? b.earnedAt.getTime() : 0) - (a.earnedAt ? a.earnedAt.getTime() : 0); });
+
+    var pendBundles = {};
     pend.forEach(function (t) {
       var key = t.postback_id || t._id;
-      if (!bundles[key]) bundles[key] = { total: 0, earnedAt: null };
-      bundles[key].total++;
+      if (!pendBundles[key]) pendBundles[key] = { total: 0, earnedAt: null, pb: pbMap[t.postback_id] };
+      pendBundles[key].total++;
       var d = ppDate(t.earned_at);
-      if (d && (!bundles[key].earnedAt || d < bundles[key].earnedAt)) bundles[key].earnedAt = d;
+      if (d && (!pendBundles[key].earnedAt || d < pendBundles[key].earnedAt)) pendBundles[key].earnedAt = d;
     });
-    var bundleKeys = Object.keys(bundles);
-    var waitDays = (PP.user && PP.user.linked_kakao) ? 7 : 30;
+    var pendItems = Object.keys(pendBundles).map(function (key) { return pendBundles[key]; })
+      .sort(function (a, b) { return (b.earnedAt ? b.earnedAt.getTime() : 0) - (a.earnedAt ? a.earnedAt.getTime() : 0); });
+
     var pm = '';
-    if (bundleKeys.length) {
-      pm = bundleKeys.map(function (key) {
-        var b = bundles[key];
-        var ddayLabel = '전환 예정';
-        if (b.earnedAt) {
-          var daysLeft = Math.ceil((b.earnedAt.getTime() + waitDays * 86400000 - Date.now()) / 86400000);
-          if (daysLeft > 0) ddayLabel = daysLeft + '일 후 전환 예정';
+    doneItems.forEach(function (it) {
+      pm += '<div class="gd-pending-item" style="opacity:0.75;"><div class="gd-pending-head">'
+        + ticketIcon(it.grade)
+        + '<div class="gd-pending-info" style="flex:1;">' + it.label + '<span class="dim">· 전환 완료</span></div>'
+        + '<div style="font-size:10px;font-weight:600;color:#22C55E;background:#F0FDF4;padding:2px 7px;border-radius:20px;flex-shrink:0;">완료</div></div>'
+        + purchaseLine(it.pb) + '</div>';
+    });
+    pendItems.forEach(function (it) {
+      var ddayLabel = '전환 예정', barHtml = '';
+      if (it.earnedAt) {
+        var daysLeft = Math.ceil((it.earnedAt.getTime() + waitDays * 86400000 - Date.now()) / 86400000);
+        if (daysLeft > 0) {
+          ddayLabel = daysLeft + '일 후 전환 예정';
+          var pct = Math.min(100, Math.max(2, Math.round(100 * (waitDays - daysLeft) / waitDays)));
+          barHtml = '<div style="display:flex;align-items:center;gap:6px;margin-top:6px;padding-left:48px;"><div style="height:4px;flex:1;background:var(--bg);border-radius:99px;overflow:hidden;max-width:80px;"><div style="height:100%;width:' + pct + '%;background:linear-gradient(90deg,#FF6B55,#C8200A);border-radius:99px;"></div></div><span style="font-size:10px;color:var(--text3);">D-' + daysLeft + '</span></div>';
         }
-        return '<div class="gd-pending-item"><div class="gd-pending-head">'
-          + '<div class="gd-pending-info" style="flex:1;">랜덤 티켓 ' + b.total + '장<span class="dim"> · ' + ddayLabel + '</span></div>'
-          + '<div style="font-size:10px;font-weight:600;color:#FF6B55;background:#FFF4F2;padding:2px 7px;border-radius:20px;flex-shrink:0;">대기중</div></div></div>';
-      }).join('');
-    } else {
-      pm = '<div style="font-size:11.5px;color:var(--text3);padding:10px 2px;">대기 중인 티켓이 없어요.</div>';
-    }
+      }
+      pm += '<div class="gd-pending-item"><div class="gd-pending-head">'
+        + ticketIcon('random')
+        + '<div class="gd-pending-info" style="flex:1;">랜덤 티켓 ' + it.total + '장<span class="dim">· ' + ddayLabel + '</span></div>'
+        + '<div style="font-size:10px;font-weight:600;color:#FF6B55;background:#FFF4F2;padding:2px 7px;border-radius:20px;flex-shrink:0;">대기중</div></div>'
+        + barHtml + purchaseLine(it.pb) + '</div>';
+    });
+    if (!pm) pm = '<div style="font-size:11.5px;color:var(--text3);padding:10px 2px;">대기 중이거나 최근 전환된 랜덤 티켓이 없어요.</div>';
     document.querySelectorAll('#gd-pending-multi, #gd-pending-multi-19').forEach(function (el) { el.innerHTML = pm; });
   });
 }
