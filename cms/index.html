@@ -2395,16 +2395,15 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
     <!-- ── 환수 이력 (신규 v4.12) ── -->
     <div class="section" id="sec-clawback">
       <div class="info-box"><strong>티켓 회수·소멸 이력</strong>은 구매 취소·반품에 의한 회수 및 등급 티켓 유효기간 만료 소멸 내역입니다. TicketTransaction 테이블의 type='CLAWBACK'·'EXPIRE' 레코드를 조회합니다.</div>
-      <div class="stats-grid" style="grid-template-columns:repeat(5,1fr)">
+      <div class="stats-grid" style="grid-template-columns:repeat(4,1fr)">
         <div class="stat-card red"><div class="stat-label">환수·소멸 건수</div><div class="stat-value">—</div><div class="stat-change neutral">누적</div></div>
         <div class="stat-card amber"><div class="stat-label">환수 티켓 (브론즈)</div><div class="stat-value">—</div><div class="stat-change neutral">누적</div></div>
         <div class="stat-card amber"><div class="stat-label">환수 티켓 (실버)</div><div class="stat-value">—</div><div class="stat-change neutral">누적</div></div>
         <div class="stat-card"><div class="stat-label">환수 티켓 (골드)</div><div class="stat-value">—</div><div class="stat-change neutral">누적</div></div>
-        <div class="stat-card"><div class="stat-label">환수 티켓 (이벤트)</div><div class="stat-value">—</div><div class="stat-change neutral">누적</div></div>
       </div>
       <div class="toolbar">
         <input class="search-box" id="cb-search" placeholder="닉네임 또는 주문 ID 검색..." onkeydown="if(event.key==='Enter')cbApplyFilters()">
-        <select class="filter-sel" id="cb-filter-grade" onchange="cbApplyFilters()"><option value="">전체 등급</option><option value="bronze">브론즈</option><option value="silver">실버</option><option value="gold">골드</option><option value="event">이벤트</option></select>
+        <select class="filter-sel" id="cb-filter-grade" onchange="cbApplyFilters()"><option value="">전체 등급</option><option value="bronze">브론즈</option><option value="silver">실버</option><option value="gold">골드</option></select>
         <select class="filter-sel" id="cb-filter-type" onchange="cbApplyFilters()"><option value="">전체 사유</option><option value="clawback">반품/취소</option><option value="expire">만료</option></select>
         <button class="btn btn-primary btn-sm" onclick="cbApplyFilters()">검색</button>
         <div style="margin-left:auto;"><button class="btn btn-ghost btn-sm" onclick="csvExportClawback()">내보내기</button></div>
@@ -4362,7 +4361,7 @@ function giSaveTicketEdit() {
     "구매 확정가 (원)":"Giá xác nhận mua (won)",
     /* Ticket chip texts that appear in DOM */
     "골드 1장":"Vàng 1 vé","골드 2장":"Vàng 2 vé","실버 1장":"Bạc 1 vé","실버 2장":"Bạc 2 vé",
-    "브론즈 1장":"Đồng 1 vé","브론즈 2장":"Đồng 2 vé","브론즈 3장":"Đồng 3 vé","이벤트 1장":"Sự kiện 1 vé",
+    "브론즈 1장":"Đồng 1 vé","브론즈 2장":"Đồng 2 vé","브론즈 3장":"Đồng 3 vé",
     "이벤트 1장":"SK 1 vé","이벤트 2장":"SK 2 vé","이벤트 3장":"SK 3 vé","이벤트 5장":"SK 5 vé",
     "랜덤 1장":"Ngẫu nhiên 1 vé","골드 ${gold}장":"Vàng ${gold} vé",
     /* Stat change texts */
@@ -4511,7 +4510,6 @@ function giSaveTicketEdit() {
   "환수 티켓 (골드)":"Vé thu hồi (Vàng)",
   "환수 티켓 (실버)":"Vé thu hồi (Bạc)",
   "환수 티켓 (브론즈)":"Vé thu hồi (Đồng)",
-  "환수 티켓 (이벤트)":"Vé thu hồi (Sự kiện)",
   "티켓 교환 (브론즈)":"Đổi vé (Đồng)",
   "티켓 교환 (실버 받기)":"Đổi vé (Nhận Bạc)",
   "연결 제휴몰":"Cửa hàng LK đã kết nối",
@@ -7506,7 +7504,7 @@ function loadAbuse() {
 
 /* ── sec-clawback ── ticket_transactions where type in [clawback,expire] */
 var CB_TYPE_BADGE = { clawback:'<span class="badge badge-red">반품/취소</span>', expire:'<span class="badge" style="background:var(--surface-2);color:var(--text-2)">만료</span>' };
-var CB_GRADE_CHIP = { gold:'<span class="tk-chip gold bare">골드 1장</span>', silver:'<span class="tk-chip silver bare">실버 1장</span>', bronze:'<span class="tk-chip bronze bare">브론즈 1장</span>', event:'<span class="tk-chip event bare">이벤트 1장</span>' };
+var CB_GRADE_CHIP = { gold:'<span class="tk-chip gold bare">골드 1장</span>', silver:'<span class="tk-chip silver bare">실버 1장</span>', bronze:'<span class="tk-chip bronze bare">브론즈 1장</span>' };
 var CLAWBACK_CACHE = {};
 var CLAWBACK_CTRL = window.CLAWBACK_CTRL = ppMakeListController(20, function(pageItems, state, totalPages) {
   var tbody = document.querySelectorAll('#sec-clawback table tbody')[0];
@@ -7519,7 +7517,7 @@ var CLAWBACK_CTRL = window.CLAWBACK_CTRL = ppMakeListController(20, function(pag
       + '<td style="font-family:monospace;font-size:11px;color:var(--text-2)">' + (d.postback_id||'—') + '</td>'
       + '<td>' + (CB_GRADE_CHIP[d.ticket_grade]||'—') + '</td>'
       + '<td>' + (CB_TYPE_BADGE[d.type]||d.type) + '</td>'
-      + '<td style="font-size:12px;color:var(--text-3)">' + (d.earned_at ? ppDt(d.earned_at) : '—') + '</td>'
+      + '<td style="font-size:12px;color:var(--text-3)">—</td>'
       + '<td><button class="btn btn-ghost btn-sm" onclick="cbShowDetail(\'' + d._id + '\')">상세</button></td></tr>';
   }).join('');
   if (pag) pag.innerHTML = ppPaginationHtml('CLAWBACK_CTRL', state.page, totalPages);
@@ -7550,7 +7548,7 @@ function loadClawback() {
       if (!docs.length) {
         CLAWBACK_CTRL.setRows([]);
         var ec = document.querySelectorAll('#sec-clawback .stat-card');
-        ['0','0장','0장','0장','0장'].forEach(function(v,i){ if(ec[i]) ec[i].querySelector('.stat-value').textContent=v; });
+        ['0','0장','0장','0장'].forEach(function(v,i){ if(ec[i]) ec[i].querySelector('.stat-value').textContent=v; });
       } else {
         dmFetchUsersByIds(docs.map(function(doc){ return doc.data().user_id; })).then(function(userMap) {
           CLAWBACK_CACHE = {};
@@ -7567,11 +7565,9 @@ function loadClawback() {
         var bCnt = docs.filter(function(d){ return d.data().ticket_grade==='bronze'; }).length;
         var sCnt = docs.filter(function(d){ return d.data().ticket_grade==='silver'; }).length;
         var gCnt = docs.filter(function(d){ return d.data().ticket_grade==='gold'; }).length;
-        var eCnt = docs.filter(function(d){ return d.data().ticket_grade==='event'; }).length;
         if (statCards[1]) statCards[1].querySelector('.stat-value').textContent = ppN(bCnt)+'장';
         if (statCards[2]) statCards[2].querySelector('.stat-value').textContent = ppN(sCnt)+'장';
         if (statCards[3]) statCards[3].querySelector('.stat-value').textContent = ppN(gCnt)+'장';
-        if (statCards[4]) statCards[4].querySelector('.stat-value').textContent = ppN(eCnt)+'장';
       }
       if (debtTbody) debtTbody.innerHTML = ppEmpty(5,'부채 추적 데이터가 없습니다.');
     }).catch(function(e){ console.error('loadClawback',e); if(tbody) tbody.innerHTML = ppEmpty(7,'로드 오류'); });
@@ -8547,7 +8543,7 @@ function dmRevokePostbackTickets(postbackId, reason) {
     docs.forEach(function(doc) {
       var d = doc.data();
       b.update(doc.ref, { status: 'revoked', revoked_at: now, revoke_reason: reason || '포스트백 환불' });
-      b.set(db.collection('ticket_transactions').doc(), { user_id: d.user_id, ticket_grade: d.grade, type: 'clawback', postback_id: postbackId, created_at: now, earned_at: d.earned_at || null });
+      b.set(db.collection('ticket_transactions').doc(), { user_id: d.user_id, ticket_grade: d.grade, type: 'clawback', postback_id: postbackId, created_at: now });
     });
     return b.commit().then(function() { return { revoked: docs.length }; });
   });
@@ -8673,7 +8669,7 @@ function tmRevokeTickets(userId, grade, qty, reason) {
       var b = db.batch();
       toRevoke.forEach(function(doc) {
         b.update(doc.ref, { status: 'revoked', revoked_at: now, revoke_reason: reason });
-        b.set(db.collection('ticket_transactions').doc(), { user_id: userId, ticket_grade: grade, type: 'clawback', postback_id: doc.data().postback_id || null, created_at: now, manual: true, reason: reason, earned_at: doc.data().earned_at || null });
+        b.set(db.collection('ticket_transactions').doc(), { user_id: userId, ticket_grade: grade, type: 'clawback', postback_id: doc.data().postback_id || null, created_at: now, manual: true, reason: reason });
       });
       return b.commit().then(function() {
         var msg = (TM_GRADE_KO[grade] || grade) + ' ' + toRevoke.length + '장 회수 완료';
