@@ -3,3 +3,51 @@ node_modules/
 *.log
 .DS_Store
 .vercel
+
+# ── 시크릿·자격증명 (퍼블릭 전환 대비 보강 2026-07-14) ─────────────
+# 환경변수
+.env
+.env.*
+!.env.example
+*.env
+
+# 인증서·키
+*.pem
+*.key
+*.p12
+*.pfx
+*.p8
+*.cer
+*.der
+*.mobileprovision
+*.jks
+*.keystore
+
+# 안드로이드 서명 (⚠️ 유출 시 앱 서명 위조 가능)
+key.properties
+android/key.properties
+flutter/android/key.properties
+flutter/android/keystore/
+**/keystore/
+
+# 서비스 계정 / 관리자 SDK
+serviceAccountKey*.json
+service-account*.json
+*serviceAccount*.json
+*adminsdk*.json
+firebase-adminsdk*.json
+gcp-*.json
+credentials.json
+
+# 기타 시크릿
+secrets.*
+*secret*.json
+*.secret
+.npmrc
+.netrc
+
+# 빌드 산출물
+flutter/build/
+build/
+dist/
+.next/
