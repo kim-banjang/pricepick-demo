@@ -2395,15 +2395,11 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
     <!-- ── 환수 이력 (신규 v4.12) ── -->
     <div class="section" id="sec-clawback">
       <div class="info-box"><strong>티켓 회수·소멸 이력</strong>은 구매 취소·반품에 의한 회수 및 등급 티켓 유효기간 만료 소멸 내역입니다. TicketTransaction 테이블의 type='CLAWBACK'·'EXPIRE' 레코드를 조회합니다.</div>
-      <div class="stats-grid" style="grid-template-columns:repeat(4,1fr)">
+      <div class="stats-grid" style="grid-template-columns:repeat(1,1fr)">
         <div class="stat-card red"><div class="stat-label">환수·소멸 건수</div><div class="stat-value">—</div><div class="stat-change neutral">누적</div></div>
-        <div class="stat-card amber"><div class="stat-label">환수 티켓 (브론즈)</div><div class="stat-value">—</div><div class="stat-change neutral">누적</div></div>
-        <div class="stat-card amber"><div class="stat-label">환수 티켓 (실버)</div><div class="stat-value">—</div><div class="stat-change neutral">누적</div></div>
-        <div class="stat-card"><div class="stat-label">환수 티켓 (골드)</div><div class="stat-value">—</div><div class="stat-change neutral">누적</div></div>
       </div>
       <div class="toolbar">
         <input class="search-box" id="cb-search" placeholder="닉네임 또는 주문 ID 검색..." onkeydown="if(event.key==='Enter')cbApplyFilters()">
-        <select class="filter-sel" id="cb-filter-grade" onchange="cbApplyFilters()"><option value="">전체 등급</option><option value="bronze">브론즈</option><option value="silver">실버</option><option value="gold">골드</option></select>
         <select class="filter-sel" id="cb-filter-type" onchange="cbApplyFilters()"><option value="">전체 사유</option><option value="clawback">반품/취소</option><option value="expire">만료</option></select>
         <button class="btn btn-primary btn-sm" onclick="cbApplyFilters()">검색</button>
         <div style="margin-left:auto;"><button class="btn btn-ghost btn-sm" onclick="csvExportClawback()">내보내기</button></div>
@@ -2411,7 +2407,7 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
       <div class="card">
         <div class="card-header"><div class="card-title">티켓 회수·소멸 이력</div><div style="font-size:12px;color:var(--text-2)">취소·반품 회수 및 유효기간 만료 소멸 자동 처리</div></div>
         <table>
-          <thead><tr><th>처리일시</th><th>닉네임 / 카카오톡 ID / 식별 아이디</th><th>주문 ID</th><th>환수 티켓</th><th>원인</th><th>원 적립일</th><th>상세</th></tr></thead>
+          <thead><tr><th>처리일시</th><th>닉네임 / 카카오톡 ID / 식별 아이디</th><th>주문 ID</th><th>환수 티켓</th><th>원인</th><th>상세</th></tr></thead>
           <tbody>
           </tbody>
         </table>
@@ -7510,14 +7506,13 @@ var CLAWBACK_CTRL = window.CLAWBACK_CTRL = ppMakeListController(20, function(pag
   var tbody = document.querySelectorAll('#sec-clawback table tbody')[0];
   var pag = document.getElementById('clawback-pagination');
   if (!tbody) return;
-  if (!pageItems.length) { tbody.innerHTML = ppEmpty(7,'조건에 맞는 회수·소멸 이력이 없습니다.'); if (pag) pag.innerHTML = ''; return; }
+  if (!pageItems.length) { tbody.innerHTML = ppEmpty(6,'조건에 맞는 회수·소멸 이력이 없습니다.'); if (pag) pag.innerHTML = ''; return; }
   tbody.innerHTML = pageItems.map(function(d) {
     return '<tr><td style="text-align:center"><div style="font-weight:700;color:#333">' + ppDt(d.created_at) + '</div><div style="color:var(--text-3)">' + ppTm(d.created_at) + '</div></td>'
       + '<td>' + renderMemberIdentity(d._user, d.user_id) + '</td>'
       + '<td style="font-family:monospace;font-size:11px;color:var(--text-2)">' + (d.postback_id||'—') + '</td>'
       + '<td>' + (CB_GRADE_CHIP[d.ticket_grade]||'—') + '</td>'
       + '<td>' + (CB_TYPE_BADGE[d.type]||d.type) + '</td>'
-      + '<td style="font-size:12px;color:var(--text-3)">—</td>'
       + '<td><button class="btn btn-ghost btn-sm" onclick="cbShowDetail(\'' + d._id + '\')">상세</button></td></tr>';
   }).join('');
   if (pag) pag.innerHTML = ppPaginationHtml('CLAWBACK_CTRL', state.page, totalPages);
@@ -7525,11 +7520,9 @@ var CLAWBACK_CTRL = window.CLAWBACK_CTRL = ppMakeListController(20, function(pag
 
 window.cbApplyFilters = function() {
   var q = (document.getElementById('cb-search')||{}).value || '';
-  var grade = (document.getElementById('cb-filter-grade')||{}).value || '';
   var type = (document.getElementById('cb-filter-type')||{}).value || '';
   CLAWBACK_CTRL.applyFilter(function(d) {
     if (q && !ppMatch((d._user||{}).nickname, q) && !ppMatch(d.postback_id, q)) return false;
-    if (grade && d.ticket_grade !== grade) return false;
     if (type && d.type !== type) return false;
     return true;
   });
@@ -7548,7 +7541,7 @@ function loadClawback() {
       if (!docs.length) {
         CLAWBACK_CTRL.setRows([]);
         var ec = document.querySelectorAll('#sec-clawback .stat-card');
-        ['0','0장','0장','0장'].forEach(function(v,i){ if(ec[i]) ec[i].querySelector('.stat-value').textContent=v; });
+        if (ec[0]) ec[0].querySelector('.stat-value').textContent = '0';
       } else {
         dmFetchUsersByIds(docs.map(function(doc){ return doc.data().user_id; })).then(function(userMap) {
           CLAWBACK_CACHE = {};
@@ -7562,15 +7555,9 @@ function loadClawback() {
         });
         var statCards = document.querySelectorAll('#sec-clawback .stat-card');
         if (statCards[0]) statCards[0].querySelector('.stat-value').textContent = ppN(docs.length);
-        var bCnt = docs.filter(function(d){ return d.data().ticket_grade==='bronze'; }).length;
-        var sCnt = docs.filter(function(d){ return d.data().ticket_grade==='silver'; }).length;
-        var gCnt = docs.filter(function(d){ return d.data().ticket_grade==='gold'; }).length;
-        if (statCards[1]) statCards[1].querySelector('.stat-value').textContent = ppN(bCnt)+'장';
-        if (statCards[2]) statCards[2].querySelector('.stat-value').textContent = ppN(sCnt)+'장';
-        if (statCards[3]) statCards[3].querySelector('.stat-value').textContent = ppN(gCnt)+'장';
       }
       if (debtTbody) debtTbody.innerHTML = ppEmpty(5,'부채 추적 데이터가 없습니다.');
-    }).catch(function(e){ console.error('loadClawback',e); if(tbody) tbody.innerHTML = ppEmpty(7,'로드 오류'); });
+    }).catch(function(e){ console.error('loadClawback',e); if(tbody) tbody.innerHTML = ppEmpty(6,'로드 오류'); });
 }
 
 var CLAWBACK_GRADE_KO = { bronze:'브론즈 1장', silver:'실버 1장', gold:'골드 1장' };
