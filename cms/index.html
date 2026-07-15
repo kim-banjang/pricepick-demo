@@ -1184,7 +1184,18 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
       <div class="info-box"><strong>티켓 원장은 절대 삭제 금지</strong> — 회계/세무/부정거래 추적의 근거. 회수 시에도 음수 레코드로 추가, 원본 보존. (append-only)</div>
       <div class="toolbar">
         <input class="search-box" id="tk-search" placeholder="회원명, UID 검색" onkeydown="if(event.key==='Enter')tkApplyFilters()">
-        <select class="filter-sel" id="tk-filter-status" onchange="tkApplyFilters()"><option>전체 상태</option><option>보유 중</option><option>사용 완료</option></select>
+        <select class="filter-sel" id="tk-filter-status" onchange="tkApplyFilters()"><option>전체 상태</option><option>보유 중</option><option>사용 완료</option><option>가지급(대기)</option><option>회수</option><option>만료</option></select>
+        <select class="filter-sel" id="tk-filter-reason" onchange="tkApplyFilters()">
+          <option value="">전체 사유</option>
+          <option value="earn">구매확정 적립</option>
+          <option value="pending">구매 대기</option>
+          <option value="use">기프티콘 교환</option>
+          <option value="clawback">환수(취소/반품)</option>
+          <option value="expire">만료 소멸</option>
+          <option value="admin_grant">관리자 지급</option>
+          <option value="admin_revoke">관리자 회수</option>
+          <option value="grade_exchange">등급 전환</option>
+        </select>
         <button class="btn btn-primary btn-sm" onclick="tkApplyFilters()">검색</button>
         <div style="margin-left:auto;display:flex;gap:8px;" id="ticket-hdr-actions"><button class="btn btn-ghost btn-sm" onclick="csvExportTickets()">CSV 내보내기</button><button class="btn btn-ghost btn-sm" onclick="tmOpenModal()">수동 지급 / 회수</button></div>
       </div>
@@ -2548,6 +2559,7 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
             <div class="policy-item"><div class="policy-label">일일 적립 한도</div><div class="policy-value" id="pp-disp-limit">없음</div></div>
             <div class="policy-item"><div class="policy-label">교환 방향</div><div class="policy-value" id="pp-disp-direction">포인트 ↔ 티켓 쌍방 교환</div><div class="policy-desc">어느 방향으로 바꿔도 보유 가치는 동일</div></div>
             <div class="policy-item"><div class="policy-label">주 적립 경로</div><div class="policy-value">출석체크 (일 100P)</div></div>
+            <div class="policy-item"><div class="policy-label">적용 시점</div><div class="policy-value" id="pp-disp-apply">즉시 적용</div><div class="policy-desc" id="pp-disp-apply-sub" style="display:none"></div></div>
           </div>
       </div>
     </div>
@@ -3185,14 +3197,22 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
     <div class="modal-header"><div class="modal-title">포인트 정책 수정</div><button class="modal-close" onclick="closeModal('m-point-policy-edit')"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
     <div class="modal-body">
       <div class="form-row">
-        <div class="form-group"><label class="form-label">교환 비율 (P = 원)</label><input class="form-input" id="pp-rate" value="10P = 1원"></div>
+        <div class="form-group"><label class="form-label">교환 비율 (P = 원)</label>
+          <div style="display:flex;align-items:center;gap:8px">
+            <input class="form-input" type="number" id="pp-rate-p" min="1" value="10" style="max-width:88px;flex:none">
+            <span style="color:var(--text-2);font-size:13px">P =</span>
+            <input class="form-input" type="number" id="pp-rate-won" min="1" value="1" style="max-width:88px;flex:none">
+            <span style="color:var(--text-2);font-size:13px">원</span>
+          </div>
+        </div>
         <div class="form-group"><label class="form-label">만료 기간</label><select class="form-select" id="pp-expiry"><option value="적립일 + 1년 (FIFO 소멸)" selected>적립일 + 1년 (FIFO 소멸)</option><option value="적립일 + 6개월">적립일 + 6개월</option><option value="만료 없음">만료 없음</option></select></div>
       </div>
       <div class="form-row">
         <div class="form-group"><label class="form-label">일일 적립 한도</label><input class="form-input" id="pp-limit" value="없음"></div>
         <div class="form-group"><label class="form-label">교환 방향</label><select class="form-select" id="pp-direction"><option value="포인트 ↔ 티켓 쌍방 교환" selected>양방향 (포인트 ↔ 티켓)</option><option value="포인트 → 티켓 단방향">단방향 (포인트 → 티켓)</option></select></div>
       </div>
-      <div class="form-group"><label class="form-label">적용 시점</label><select class="form-select" id="pp-apply"><option>즉시 적용</option><option>예약 적용</option></select></div>
+      <div class="form-group"><label class="form-label">적용 시점</label><select class="form-select" id="pp-apply" onchange="ppToggleScheduleField()"><option>즉시 적용</option><option>예약 적용</option></select></div>
+      <div class="form-group" id="pp-schedule-group" style="display:none"><label class="form-label">예약 적용 시각</label><input class="form-input" type="datetime-local" id="pp-schedule-at"></div>
       <div class="warn-box"><strong>주의:</strong> 포인트 환율·만료는 비용·민원 직결. 저장 시 변경 전후 비교 + 변경 이력이 기록됩니다.</div>
     </div>
     <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('m-point-policy-edit')">취소</button><button class="btn btn-primary" id="pp-save-btn" onclick="pointPolicySubmitEdit()">저장</button></div>
@@ -6077,6 +6097,7 @@ function tkGroupForDisplay(items) {
         .map(function(gr) { return tkFmtGradeQty(gr, qtyByGrade[gr]); });
       rows.push({
         _user: g[0]._user, user_id: g[0].user_id, created_at: g[0].created_at, type: 'grade_exchange',
+        _reasonKey: 'grade_exchange',
         _reasonHtml: TK_EXCHANGE_LABEL,
         _ticketHtml: parts.join(' <span style="color:var(--text-3)">/</span> '),
         _statusHtml: TK_EXCHANGE_STATUS,
@@ -6096,9 +6117,12 @@ function tkGroupForDisplay(items) {
     subOrder.forEach(function(sk) {
       var s = sub[sk];
       var qty = (s.type === 'earn' || s.type === 'pending') ? s.count : -s.count;
-      var reasonHtml = (s.manual && TK_MANUAL_LABELS[s.type]) ? TK_MANUAL_LABELS[s.type] : (TK_TYPE_LABELS[s.type] || s.type);
+      var isManual = s.manual && (s.type === 'earn' || s.type === 'clawback');
+      var reasonKey = isManual ? (s.type === 'earn' ? 'admin_grant' : 'admin_revoke') : s.type;
+      var reasonHtml = isManual ? TK_MANUAL_LABELS[s.type] : (TK_TYPE_LABELS[s.type] || s.type);
       rows.push({
         _user: s._user, user_id: s.user_id, created_at: s.created_at, type: s.type,
+        _reasonKey: reasonKey,
         _reasonHtml: reasonHtml,
         _ticketHtml: tkFmtGradeQty(s.ticket_grade, qty),
         _statusHtml: TK_STATUS_MAP[s.type] || '',
@@ -6126,10 +6150,15 @@ var TICKETS_CTRL = window.TICKETS_CTRL = ppMakeListController(20, function(pageI
 window.tkApplyFilters = function() {
   var q = (document.getElementById('tk-search')||{}).value || '';
   var status = (document.getElementById('tk-filter-status')||{}).value || '';
+  var reason = (document.getElementById('tk-filter-reason')||{}).value || '';
   TICKETS_CTRL.applyFilter(function(d) {
     if (q && !ppMatch((d._user||{}).nickname, q) && !ppMatch(d.user_id, q)) return false;
     if (status === '보유 중' && d.type !== 'earn') return false;
     if (status === '사용 완료' && d.type !== 'use') return false;
+    if (status === '가지급(대기)' && d.type !== 'pending') return false;
+    if (status === '회수' && d.type !== 'clawback') return false;
+    if (status === '만료' && d.type !== 'expire') return false;
+    if (reason && d._reasonKey !== reason) return false;
     return true;
   });
 };
@@ -7841,6 +7870,24 @@ function loadPoints() {
 }
 
 /* ── sec-point-policy ── settings/point_policy */
+// [예약 적용] 선택 시에만 예약 시각 입력칸을 보여준다(Vin 확정 답변 #3-Q4).
+window.ppToggleScheduleField = function() {
+  var sel = document.getElementById('pp-apply');
+  var grp = document.getElementById('pp-schedule-group');
+  if (!sel || !grp) return;
+  grp.style.display = sel.value === '예약 적용' ? '' : 'none';
+};
+
+// <input type="datetime-local"> 값("YYYY-MM-DDTHH:MM")을 "YYYY.MM.DD 오전/오후 HH:MM부터 적용 예정"으로.
+function ppFormatScheduledAt(v) {
+  var m = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/.exec(v || '');
+  if (!m) return '';
+  var h = parseInt(m[4], 10);
+  var ampm = h < 12 ? '오전' : '오후';
+  var h12 = h % 12; if (h12 === 0) h12 = 12;
+  return m[1] + '.' + m[2] + '.' + m[3] + ' ' + ampm + ' ' + String(h12).padStart(2, '0') + ':' + m[5] + '부터 적용 예정';
+}
+
 function loadPointPolicy() {
   db.collection('settings').doc('point_policy').get().then(function(doc) {
     if (!doc.exists) return;
@@ -7851,21 +7898,41 @@ function loadPointPolicy() {
     setTxt2('pp-disp-expiry', d.expiry);
     setTxt2('pp-disp-limit', d.limit);
     setTxt2('pp-disp-direction', d.direction);
-    setVal('pp-rate', d.rate);
+    // 교환 비율: 저장 포맷("10P = 1원")은 그대로 유지하고, 수정 팝업에서만 P칸/원칸 2개로 나눠 보여준다.
+    var rm = /^(\d+)P\s*=\s*(\d+)원$/.exec(d.rate || '');
+    if (rm) { setVal('pp-rate-p', rm[1]); setVal('pp-rate-won', rm[2]); }
     setVal('pp-expiry', d.expiry);
     setVal('pp-limit', d.limit);
     setVal('pp-direction', d.direction);
-    setVal('pp-apply', d.apply);
+    setVal('pp-apply', d.apply || '즉시 적용');
+    setVal('pp-schedule-at', d.apply_at);
+    ppToggleScheduleField();
+    // 적립·만료 정책 요약의 [적용 시점] 줄 — 질문 4에서 저장한 값을 그대로 읽어와 보여준다(별도 저장 로직 없음).
+    var applySub = document.getElementById('pp-disp-apply-sub');
+    if (d.apply === '예약 적용' && d.apply_at) {
+      setTxt2('pp-disp-apply', '예약 적용');
+      if (applySub) { applySub.textContent = ppFormatScheduledAt(d.apply_at); applySub.style.display = ''; }
+    } else {
+      setTxt2('pp-disp-apply', '즉시 적용');
+      if (applySub) { applySub.textContent = ''; applySub.style.display = 'none'; }
+    }
   }).catch(function(e){ console.error('loadPointPolicy', e); });
 }
 
 window.pointPolicySubmitEdit = function() {
+  var rateP = parseInt((document.getElementById('pp-rate-p')||{}).value, 10) || 0;
+  var rateWon = parseInt((document.getElementById('pp-rate-won')||{}).value, 10) || 0;
+  if (rateP < 1 || rateWon < 1) { toast('교환 비율의 P·원 값을 입력하세요.'); return; }
+  var apply = (document.getElementById('pp-apply')||{}).value || '즉시 적용';
+  var scheduleAt = (document.getElementById('pp-schedule-at')||{}).value || '';
+  if (apply === '예약 적용' && !scheduleAt) { toast('예약 적용 시각을 입력하세요.'); return; }
   var data = {
-    rate: (document.getElementById('pp-rate')||{}).value || '',
+    rate: rateP + 'P = ' + rateWon + '원',
     expiry: (document.getElementById('pp-expiry')||{}).value || '',
     limit: (document.getElementById('pp-limit')||{}).value || '',
     direction: (document.getElementById('pp-direction')||{}).value || '',
-    apply: (document.getElementById('pp-apply')||{}).value || '',
+    apply: apply,
+    apply_at: apply === '예약 적용' ? scheduleAt : '',
     updated_at: FS.FieldValue.serverTimestamp(),
   };
   var btn = document.getElementById('pp-save-btn');
