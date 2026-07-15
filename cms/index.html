@@ -2345,7 +2345,7 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
       <div class="warn-box"><strong>보안 주의</strong> — API 키는 마스킹 처리됩니다. 키 노출 시 즉시 재발급 후 교체하세요. 키 교체 시 해당 제휴몰의 적립 추적이 일시 중단됩니다.</div>
       <div class="card-grid">
         <div class="card">
-          <div class="card-header"><div class="card-title">쿠팡 파트너스 API 키</div><button class="btn btn-ghost btn-sm" onclick="apOpenEdit('coupang')">키/상태 수정</button></div>
+          <div class="card-header"><div class="card-title">쿠팡 파트너스 API 키</div><button class="btn btn-ghost btn-sm" id="apikeys-edit-btn" onclick="apOpenEdit('coupang')">키/상태 수정</button></div>
           <div>
             <div class="policy-item"><div class="policy-label">Access Key</div><div class="policy-value" style="font-family:monospace;font-size:13px;color:var(--main)" id="ap-coupang-key">—</div><div class="policy-desc" id="ap-coupang-updated">운영 데이터 없음</div></div>
             <div class="policy-item"><div class="policy-label">API 상태</div><div class="policy-value" id="ap-coupang-status">—</div><div class="policy-desc">운영자 수동 갱신 (데모 범위 밖: 실제 API 호출 없음)</div></div>
@@ -2401,8 +2401,7 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
           <div class="card-header"><div class="card-title">권한별 가능 작업</div></div>
           <div>
             <div class="policy-item"><div class="policy-label" style="color:var(--main)">슈퍼어드민</div><div class="policy-value">전체 권한 + 계정 관리 + API 키 관리</div></div>
-            <div class="policy-item"><div class="policy-label" style="color:var(--success)">운영자</div><div class="policy-value">설정/정책/콘텐츠 변경 가능 · 계정 관리 ❌</div></div>
-            <div class="policy-item"><div class="policy-label" style="color:var(--info)">CS</div><div class="policy-value">조회 전용 · 1:1 문의 답변 · 수정 ❌</div></div>
+            <div class="policy-item"><div class="policy-label" style="color:var(--success)">운영자</div><div class="policy-value">설정·정책·콘텐츠 변경, 회원·티켓·포인트 관리, 1:1 문의 답변 · 계정 관리·API 키 관리 ❌</div></div>
           </div>
         </div>
         <div class="card">
@@ -3124,7 +3123,7 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
     <div class="modal-body">
       <div class="form-group"><label class="form-label">이름</label><input class="form-input" id="ac-name" placeholder="예: 홍길동"></div>
       <div class="form-group"><label class="form-label">로그인 아이디</label><input class="form-input" id="ac-username" placeholder="예: hong (실제 로그인 아이디)"></div>
-      <div class="form-group"><label class="form-label">역할</label><select class="form-select" id="ac-role"><option value="operator">운영자</option><option value="cs">CS</option></select><div class="form-hint">슈퍼어드민 계정은 추가 불가.</div></div>
+      <div class="form-group"><label class="form-label">역할</label><select class="form-select" id="ac-role"><option value="operator">운영자</option></select><div class="form-hint">슈퍼어드민 계정은 추가 불가.</div></div>
       <div class="form-group"><label class="form-label">임시 비밀번호</label><input class="form-input" type="password" id="ac-password" placeholder="최초 로그인 후 변경 필요 (6자 이상)"></div>
     </div>
     <div class="modal-footer">
@@ -3419,7 +3418,6 @@ const I18N = {
     // 역할
     'role.superadmin': '슈퍼어드민',
     'role.operator': '운영자',
-    'role.cs': 'CS',
     // PAGE_META
     'page.dashboard.title': '대시보드', 'page.dashboard.bc': '개요',
     'page.members.title': '회원 목록', 'page.members.bc': '회원 관리',
@@ -3526,7 +3524,7 @@ function applyLang() {
   };
   Object.entries(navMap).forEach(([id, key]) => setTxt(id, t(key)));
   // 역할칩 (현재 role 반영)
-  const roleLabel = { superadmin: t('role.superadmin'), operator: t('role.operator'), cs: t('role.cs') };
+  const roleLabel = { superadmin: t('role.superadmin'), operator: t('role.operator') };
   const rl = roleLabel[currentRole] || '';
   setTxt('topbar-role', rl);
   setTxt('sb-role-name', rl);
@@ -3554,7 +3552,6 @@ function setPlaceholder(id, val) {
 const ROLES = {
   superadmin: { initial:'S', email:'admin@pricepick.co.kr' },
   operator:   { initial:'O', email:'ops@pricepick.co.kr' },
-  cs:         { initial:'C', email:'cs@pricepick.co.kr' },
 };
 function getRoleLabel(role) {
   return t('role.' + role) || role;
@@ -3606,7 +3603,9 @@ function applyRole(role) {
   setT('topbar-role', label);
 
   const isSA = role === 'superadmin';
-  const canWrite = role !== 'cs';
+  // 역할은 슈퍼어드민/운영자 2개뿐 — 운영자도 일상 운영 전반(설정·정책·콘텐츠·회원·티켓·포인트·문의)은
+  // 전부 쓸 수 있으므로 canWrite는 항상 true. 슈퍼어드민 전용은 계정 관리·API 키 관리 둘뿐이라 isSA로 따로 가른다.
+  const canWrite = true;
 
   // 계정 관리 — 슈퍼어드민만
   const grpAdmin = document.getElementById('grp-admin');
@@ -3616,6 +3615,15 @@ function applyRole(role) {
   }
   const navAcc = document.getElementById('nav-accounts');
   if (navAcc) navAcc.classList.toggle('disabled', !isSA);
+
+  // 제휴몰 API 관리 — 슈퍼어드민만
+  const navApi = document.getElementById('nav-apikeys');
+  if (navApi) {
+    navApi.style.opacity = isSA ? '1' : '0.3';
+    navApi.style.pointerEvents = isSA ? 'auto' : 'none';
+  }
+  const apiEditBtn = document.getElementById('apikeys-edit-btn');
+  if (apiEditBtn) apiEditBtn.style.display = isSA ? '' : 'none';
 
   // 회원 액션
   const memHdr = document.getElementById('member-hdr-actions');
@@ -3639,7 +3647,7 @@ function applyRole(role) {
   const mTicketSec = document.getElementById('m-ticket-section');
   if (mTicketSec) mTicketSec.style.display = canWrite ? 'block' : 'none';
 
-  // 티켓 수동 지급/회수 — canWrite(슈퍼어드민/운영자)만 노출, CS는 조회 전용이라 숨김
+  // 티켓 수동 지급/회수 — 슈퍼어드민·운영자 둘 다 사용 가능
   const tkHdr = document.getElementById('ticket-hdr-actions');
   tkHdr.innerHTML = canWrite
     ? `<button class="btn btn-ghost btn-sm" onclick="csvExportTickets()">CSV 내보내기</button><button class="btn btn-ghost btn-sm" onclick="tmOpenModal()">수동 지급 / 회수</button>`
@@ -4886,6 +4894,7 @@ function giSaveTicketEdit() {
   "제휴몰 추가 안내 (11번가·G마켓 오픈)":"Thông báo thêm cửa hàng LK (mở 11번가·Gmarket)",
   "[점검] 5/15 새벽 서버 정기 점검 안내":"[Bảo trì] Thông báo bảo trì máy chủ định kỳ rạng sáng 15/5",
   "설정/정책/콘텐츠 변경 가능 · 계정 관리 ❌":"Có thể thay đổi cài đặt/chính sách/nội dung · Quản lý tài khoản ❌",
+  "설정·정책·콘텐츠 변경, 회원·티켓·포인트 관리, 1:1 문의 답변 · 계정 관리·API 키 관리 ❌":"Thay đổi cài đặt·chính sách·nội dung, quản lý thành viên·vé·điểm, trả lời 1:1 · Quản lý tài khoản·khóa API ❌",
   "우리 DB 집계 · 추정 매출 (포스트백 기준)":"Tổng hợp DB · Doanh thu ước tính (theo postback)",
   "이며, 추첨이 이벤트 티켓을 발급하지 않습니다.":"đây, rút thăm không phát hành vé sự kiện.",
   "제휴몰 정산 API · 수수료 (D+30 확정)":"API quyết toán cửa hàng LK · Hoa hồng (D+30 xác nhận)",
@@ -7462,7 +7471,7 @@ function loadPostback() {
 
 /* ── sec-accounts ── admin_accounts collection */
 var ACCOUNTS_CACHE = {};
-var ROLE_TAG = { superadmin:'<span class="role-tag superadmin">슈퍼어드민</span>', operator:'<span class="role-tag operator">운영자</span>', cs:'<span class="role-tag operator">CS</span>' };
+var ROLE_TAG = { superadmin:'<span class="role-tag superadmin">슈퍼어드민</span>', operator:'<span class="role-tag operator">운영자</span>' };
 function loadAccounts() {
   var tbodies = document.querySelectorAll('#sec-accounts table tbody');
   var tbody = tbodies[0];
@@ -7484,7 +7493,7 @@ function loadAccounts() {
       var statusBadge = (d.status === 'active' || d.active === true) ? '<span class="badge badge-green">활성</span>' : '<span class="badge badge-gray">비활성</span>';
       var nameCell = '<strong>' + (d.display_name||d.name||d.username||doc.id) + '</strong>' + (isMe?' <span style="font-size:10px;color:var(--text-3)">(본인)</span>':'');
       var actions = (isSuper && !isMe && d.role !== 'superadmin')
-        ? '<div style="display:flex;gap:6px"><button class="btn btn-ghost btn-sm" onclick="acChangeRole(\'' + doc.id + '\')">역할 변경</button><button class="btn btn-danger btn-sm" onclick="acDelete(\'' + doc.id + '\')">삭제</button></div>'
+        ? '<button class="btn btn-danger btn-sm" onclick="acDelete(\'' + doc.id + '\')">삭제</button>'
         : '<span style="font-size:11px;color:var(--text-3)">' + (isMe?'삭제 불가':'권한 없음') + '</span>';
       return '<tr><td>' + nameCell + '</td><td>' + (d.username||doc.id||'') + '</td><td>' + roleTag + '</td><td style="color:var(--text-3)">—</td><td>' + statusBadge + '</td><td>' + actions + '</td></tr>';
     });
@@ -7549,18 +7558,6 @@ window.acSubmit = function() {
   }).finally(function() {
     if (btn) { btn.disabled = false; btn.textContent = '계정 생성'; }
   });
-};
-
-window.acChangeRole = function(id) {
-  var d = ACCOUNTS_CACHE[id];
-  if (!d) return;
-  var next = d.role === 'cs' ? 'operator' : 'cs';
-  if (!confirm((d.display_name||d.username) + '의 역할을 ' + (next==='cs'?'CS':'운영자') + '(으)로 변경할까요?')) return;
-  db.collection('admin_accounts').doc(id).update({ role: next, updated_at: FS.FieldValue.serverTimestamp() }).then(function() {
-    toast('역할이 변경되었습니다.');
-    logAdmin('관리자 역할 변경: ' + (d.username||id) + ' → ' + next);
-    loadAccounts();
-  }).catch(function(e) { toast('역할 변경 실패: ' + (e.message||e)); });
 };
 
 window.acDelete = function(id) {
