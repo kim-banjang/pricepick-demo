@@ -1187,17 +1187,21 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
       <div class="info-box"><strong>티켓 원장은 절대 삭제 금지</strong> — 회계/세무/부정거래 추적의 근거. 회수 시에도 음수 레코드로 추가, 원본 보존. (append-only)</div>
       <div class="toolbar">
         <input class="search-box" id="tk-search" placeholder="회원명, UID 검색" onkeydown="if(event.key==='Enter')tkApplyFilters()">
-        <select class="filter-sel" id="tk-filter-status" onchange="tkApplyFilters()"><option>전체 상태</option><option>보유 중</option><option>사용 완료</option><option>가지급(대기)</option><option>회수</option><option>만료</option></select>
-        <select class="filter-sel" id="tk-filter-reason" onchange="tkApplyFilters()">
-          <option value="">전체 사유</option>
-          <option value="earn">구매확정 적립</option>
-          <option value="pending">구매 대기</option>
-          <option value="use">기프티콘 교환</option>
-          <option value="clawback">환수(취소/반품)</option>
-          <option value="expire">만료 소멸</option>
+        <select class="filter-sel" id="tk-filter-type" onchange="tkApplyFilters()">
+          <option value="">전체 거래유형</option>
+          <option value="earn">구매 적립</option>
+          <option value="pending">구매 대기(등급 미정)</option>
+          <option value="attendance">출석 보너스</option>
+          <option value="lucky_spin">룰렛 당첨</option>
+          <option value="kakao_link">카카오 연동 보상</option>
+          <option value="use_gifticon">기프티콘 사용</option>
+          <option value="use_prize_draw">경품 응모</option>
+          <option value="point_exchange">포인트 전환</option>
+          <option value="grade_exchange">등급 전환</option>
           <option value="admin_grant">관리자 지급</option>
           <option value="admin_revoke">관리자 회수</option>
-          <option value="grade_exchange">등급 전환</option>
+          <option value="clawback">환불(취소·반품)</option>
+          <option value="expire">만료 소멸</option>
         </select>
         <button class="btn btn-primary btn-sm" onclick="tkApplyFilters()">검색</button>
         <div style="margin-left:auto;display:flex;gap:8px;" id="ticket-hdr-actions"><button class="btn btn-ghost btn-sm" onclick="csvExportTickets()">CSV 내보내기</button><button class="btn btn-ghost btn-sm" onclick="tmOpenModal()">수동 지급 / 회수</button></div>
@@ -2630,7 +2634,7 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
               <div style="display:flex;align-items:center;gap:8px"><input class="form-input" type="number" id="pa-daily-points" value="100" style="max-width:140px"><span style="color:var(--text-2);font-size:13px">P / 1일 1회</span></div>
             </div>
             <div class="form-group"><label class="form-label">연결 제휴몰</label>
-              <select class="form-select" id="pa-mall"><option value="쿠팡 (단독)" selected>쿠팡 (단독)</option><option value="쿠팡 + 11번가">쿠팡 + 11번가</option><option value="전체 제휴몰">전체 제휴몰</option></select>
+              <select class="form-select" id="pa-mall"><option value="쿠팡" selected>쿠팡</option></select>
               <div style="font-size:12px;color:var(--text-3);margin-top:4px">현재 쿠팡 전용. 회원은 쿠팡 방문 후 복귀해야 출석이 인정됩니다.</div>
             </div>
             <div class="form-group"><label class="form-label">5일 연속 보너스</label>
@@ -3815,13 +3819,6 @@ function applyRole(role) {
   // 계정
   document.getElementById('account-hdr-actions').innerHTML = isSA
     ? `<button class="btn btn-primary btn-sm" onclick="openModal('m-account')">+ 계정 추가</button>` : '';
-  ['account-action-1','account-action-2'].forEach(id => {
-    const el = document.getElementById(id);
-    if (!el) return;
-    el.innerHTML = isSA
-      ? `<div style="display:flex;gap:6px"><button class="btn btn-ghost btn-sm" onclick="toast('역할 변경')">역할 변경</button><button class="btn btn-danger btn-sm" onclick="toast('계정 삭제')">삭제</button></div>`
-      : `<span style="font-size:11px;color:var(--text-3)">권한 없음</span>`;
-  });
 
   // 보상 정책
   const pEdit = document.getElementById('policy-edit-btn');
@@ -6191,10 +6188,21 @@ function dmFetchUsersByIds(userIds) {
    Vin 확정 답변(2026-07-14): 티켓 칸에 등급+증감수량을 같이 쓴다(브론즈 +20 / 브론즈 −15),
    등급 전환은 한 줄에 두 값(브론즈 −10 / 실버 +1, 사유 "등급 전환"). 원장은 한 유닛=한 문서라
    같은 회원·같은 시각(한 배치)에 쓰인 문서들을 등급별로 합산해 한 줄로 보여준다 — 데이터는
-   그대로 두고 표시만 묶는다(원장 불변 원칙 유지). */
-var TK_TYPE_LABELS = { earn:'<span style="color:var(--success)">구매확정 적립</span>', use:'<span style="color:var(--danger)">기프티콘 교환</span>', clawback:'<span style="color:var(--danger)">환수(취소/반품)</span>', expire:'<span style="color:var(--text-3)">만료 소멸</span>', pending:'<span style="color:var(--text-2)">구매 대기</span>' };
+   그대로 두고 표시만 묶는다(원장 불변 원칙 유지).
+   해리 확정 답변(2026-07-16, #12): "상태"·"사유" 2칸 필터는 하나로 합친다 — 티켓 이력은
+   "어떻게 생기고 없어졌는지"를 남긴 장부라, 거르는 기준도 "어떻게 생겼는지"(거래유형)
+   하나여야 한다. "보유중/사용완료" 같은 상태는 지금 남아있는지를 보여줄 뿐 거래유형이
+   아니라서 필터에서 뺀다(상태 배지 자체는 그대로 표시). */
+var TK_TYPE_LABELS = { earn:'<span style="color:var(--success)">구매 적립</span>', use:'<span style="color:var(--danger)">기프티콘 사용</span>', clawback:'<span style="color:var(--danger)">환불(취소·반품)</span>', expire:'<span style="color:var(--text-3)">만료 소멸</span>', pending:'<span style="color:var(--text-2)">구매 대기(등급 미정)</span>' };
 var TK_MANUAL_LABELS = { earn:'<span style="color:var(--success)">관리자 지급</span>', clawback:'<span style="color:var(--danger)">관리자 회수</span>' };
 var TK_EXCHANGE_LABEL = '<span style="color:var(--text-2);font-weight:700">등급 전환</span>';
+var TK_POINT_EXCHANGE_LABEL = '<span style="color:var(--main)">포인트 전환</span>';
+var TK_PRIZE_DRAW_LABEL = '<span style="color:var(--danger)">경품 응모</span>';
+var TK_EVENT_CATEGORY_LABELS = {
+  attendance: '<span style="color:var(--success)">출석 보너스</span>',
+  lucky_spin: '<span style="color:var(--success)">룰렛 당첨</span>',
+  kakao_link: '<span style="color:var(--success)">카카오 연동 보상</span>',
+};
 var TK_GRADE_CHIPS = { gold:'<span class="tk-chip gold bare">골드</span>', silver:'<span class="tk-chip silver bare">실버</span>', bronze:'<span class="tk-chip bronze bare">브론즈</span>', event:'<span class="tk-chip event bare">이벤트</span>' };
 var TK_STATUS_MAP = {
   earn: '<span style="display:inline-block;font-size:11px;font-weight:700;color:#1f9d57;background:#e6f7ec;border:1px solid #b6e6c8;border-radius:20px;padding:3px 10px">보유 중</span>',
@@ -6214,8 +6222,10 @@ function tkFmtGradeQty(grade, qty) {
 }
 
 // 원장(한 유닛=한 문서)을 화면에 보일 줄 단위로 묶는다: 같은 회원 + 같은 시각(한 배치)을 한 그룹으로
-// 보고, use/earn이 postback_id 없이 함께 있으면(=앱 등급 전환 화면의 유일한 패턴) "등급 전환" 한 줄로
-// 합치고, 그 외엔 유형+등급별로 합산해 "등급 +N/−N" 한 줄씩 만든다.
+// 보고, use/earn이 postback_id·via 없이 함께 있으면(=앱 등급 전환 화면의 유일한 패턴) "등급 전환" 한 줄로
+// 합치고, 그 외엔 유형+등급+출처별로 합산해 "등급 +N/−N" 한 줄씩 만든다. 거래유형(_reasonKey)은
+// 관리자 지급/회수 → 포인트 전환(via) → 이벤트 출처(category: 출석/룰렛/카카오연동) → 기프티콘 사용/
+// 경품 응모(등급이 event인 사용) → 그 외 기본 유형 순으로 판정한다.
 function tkGroupForDisplay(items) {
   var order = [];
   var groups = {};
@@ -6231,7 +6241,7 @@ function tkGroupForDisplay(items) {
     var types = {};
     g.forEach(function(it) { types[it.type] = true; });
     var isExchange = types.use && types.earn && Object.keys(types).length === 2
-      && g.every(function(it) { return !it.postback_id && !it.manual; });
+      && g.every(function(it) { return !it.postback_id && !it.manual && !it.via; });
     if (isExchange) {
       var qtyByGrade = {};
       g.forEach(function(it) {
@@ -6251,9 +6261,9 @@ function tkGroupForDisplay(items) {
     }
     var sub = {}, subOrder = [];
     g.forEach(function(it) {
-      var sk = it.type + '|' + it.ticket_grade;
+      var sk = it.type + '|' + it.ticket_grade + '|' + (it.via||'') + '|' + (it.category||'');
       if (!sub[sk]) {
-        sub[sk] = { type: it.type, ticket_grade: it.ticket_grade, count: 0, manual: false, _user: it._user, user_id: it.user_id, created_at: it.created_at };
+        sub[sk] = { type: it.type, ticket_grade: it.ticket_grade, via: it.via||'', category: it.category||'', count: 0, manual: false, _user: it._user, user_id: it.user_id, created_at: it.created_at };
         subOrder.push(sk);
       }
       sub[sk].count += 1;
@@ -6263,8 +6273,26 @@ function tkGroupForDisplay(items) {
       var s = sub[sk];
       var qty = (s.type === 'earn' || s.type === 'pending') ? s.count : -s.count;
       var isManual = s.manual && (s.type === 'earn' || s.type === 'clawback');
-      var reasonKey = isManual ? (s.type === 'earn' ? 'admin_grant' : 'admin_revoke') : s.type;
-      var reasonHtml = isManual ? TK_MANUAL_LABELS[s.type] : (TK_TYPE_LABELS[s.type] || s.type);
+      var reasonKey, reasonHtml;
+      if (isManual) {
+        reasonKey = s.type === 'earn' ? 'admin_grant' : 'admin_revoke';
+        reasonHtml = TK_MANUAL_LABELS[s.type];
+      } else if (s.via === 'point_exchange') {
+        reasonKey = 'point_exchange';
+        reasonHtml = TK_POINT_EXCHANGE_LABEL;
+      } else if (s.category && TK_EVENT_CATEGORY_LABELS[s.category]) {
+        reasonKey = s.category;
+        reasonHtml = TK_EVENT_CATEGORY_LABELS[s.category];
+      } else if (s.type === 'use' && s.ticket_grade === 'event') {
+        reasonKey = 'use_prize_draw';
+        reasonHtml = TK_PRIZE_DRAW_LABEL;
+      } else if (s.type === 'use') {
+        reasonKey = 'use_gifticon';
+        reasonHtml = TK_TYPE_LABELS.use;
+      } else {
+        reasonKey = s.type;
+        reasonHtml = TK_TYPE_LABELS[s.type] || s.type;
+      }
       rows.push({
         _user: s._user, user_id: s.user_id, created_at: s.created_at, type: s.type,
         _reasonKey: reasonKey,
@@ -6294,16 +6322,10 @@ var TICKETS_CTRL = window.TICKETS_CTRL = ppMakeListController(20, function(pageI
 
 window.tkApplyFilters = function() {
   var q = (document.getElementById('tk-search')||{}).value || '';
-  var status = (document.getElementById('tk-filter-status')||{}).value || '';
-  var reason = (document.getElementById('tk-filter-reason')||{}).value || '';
+  var type = (document.getElementById('tk-filter-type')||{}).value || '';
   TICKETS_CTRL.applyFilter(function(d) {
     if (q && !ppMatch((d._user||{}).nickname, q) && !ppMatch(d.user_id, q)) return false;
-    if (status === '보유 중' && d.type !== 'earn') return false;
-    if (status === '사용 완료' && d.type !== 'use') return false;
-    if (status === '가지급(대기)' && d.type !== 'pending') return false;
-    if (status === '회수' && d.type !== 'clawback') return false;
-    if (status === '만료' && d.type !== 'expire') return false;
-    if (reason && d._reasonKey !== reason) return false;
+    if (type && d._reasonKey !== type) return false;
     return true;
   });
 };
@@ -7906,7 +7928,7 @@ function loadPointAttendance() {
     setVal('pa-condition', d.condition);
     setVal('pa-reset-time', d.reset_time);
     if (d.daily_points != null) setTxt2('pa-disp-points', d.daily_points + 'P (' + Math.round(d.daily_points/10) + '원 상당)');
-    if (d.mall) setTxt2('pa-disp-mall', d.mall.replace(' (단독)','') + (d.mall.indexOf('단독')>=0 ? ' 단독' : ''));
+    if (d.mall) setTxt2('pa-disp-mall', d.mall);
     if (d.streak_bonus) setTxt2('pa-disp-streak', '5일 연속 → ' + d.streak_bonus);
     if (d.reset_time) setTxt2('pa-disp-reset', '매일 ' + d.reset_time + ' 자동 초기화');
   }).catch(function(e){ console.error('loadPointAttendance settings', e); });

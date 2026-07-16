@@ -13922,7 +13922,7 @@ function acGrantCheckin(sid) {
     }
     if (window.ppGrantPoints) window.ppGrantPoints(100, '쿠팡 구경 출석체크', 'attendance');
     // pw-14는 5일 연속 달성 화면 — 이벤트 티켓 1장 추가 지급
-    if (sid === 'pw-14' && window.ppGrantEventTicket) window.ppGrantEventTicket(1, '출석 5일 연속 달성');
+    if (sid === 'pw-14' && window.ppGrantEventTicket) window.ppGrantEventTicket(1, '출석 5일 연속 달성', 'attendance');
     if (window.ipToast) ipToast('쿠팡 구경 완료! 100P가 적립됐어요');
     // 결과 화면: pw-14는 5일차 → 달성, 그 외 → 당일완료
     setTimeout(function(){
@@ -14050,7 +14050,7 @@ function rlGrantReward(seg) {
     var qty = seg.value || 1;
     return rlEventTicketAllowance().then(function(remain) {
       if (qty > remain.daily || qty > remain.monthly || !window.ppGrantEventTicket) return 0;
-      return window.ppGrantEventTicket(qty, '행운 룰렛 당첨').then(function() { return qty; });
+      return window.ppGrantEventTicket(qty, '행운 룰렛 당첨', 'lucky_spin').then(function() { return qty; });
     });
   }
   return Promise.resolve(0);
@@ -15969,7 +15969,7 @@ function ppGrantPoints(amount, reason, category) {
     renderHomePoints();
   }).catch(function(e) { console.error('ppGrantPoints', e); });
 }
-function ppGrantEventTicket(qty, reason) {
+function ppGrantEventTicket(qty, reason, category) {
   if (!PP.uid || !qty) return Promise.resolve();
   var now = FS.FieldValue.serverTimestamp();
   var expiresAt = ppEventTicketExpiry();
@@ -15980,7 +15980,7 @@ function ppGrantEventTicket(qty, reason) {
       earned_at: now, confirmed_at: now, expires_at: expiresAt,
     });
     batch.set(db.collection('ticket_transactions').doc(), {
-      user_id: PP.uid, ticket_grade: 'event', type: 'earn', postback_id: null, created_at: now,
+      user_id: PP.uid, ticket_grade: 'event', type: 'earn', postback_id: null, category: category || 'etc', created_at: now,
     });
   }
   return batch.commit().then(function() {
@@ -16971,7 +16971,7 @@ function bindKakaoComplete() {
          명시적으로 약속하므로 실제로 지급. pw-02-K-existing(기존 계정 재로그인 데모)은
          실제 Kakao SDK 없이는 "기존 데이터 인식"을 구현할 수 없어 정적 미리보기로 유지. */
       if (sid === 'pw-02-K-new') {
-        if (window.ppGrantEventTicket) window.ppGrantEventTicket(1, '카카오 신규 연동 보상');
+        if (window.ppGrantEventTicket) window.ppGrantEventTicket(1, '카카오 신규 연동 보상', 'kakao_link');
         if (window.ppGrantPoints) window.ppGrantPoints(200, '카카오 연동 가입 축하', 'onboarding');
       }
     }, true);
