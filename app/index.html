@@ -16154,6 +16154,7 @@ function onScreenShown(id) {
   if (id === 'pw-31') { renderNotifSettings(); renderSettingsExtra(); }
   if (id === 'pw-26') { refreshHomeData(); renderRaffleScreen(); }
   if (id === 'pw-30-nt') renderAppNotices();
+  if (id === 'pw-30-terms') renderTermsFromCms();
 }
 
 /* ── Auth ── */
@@ -18030,6 +18031,24 @@ function renderInquiries() {
         + '<div style="font-size:11px;color:var(--text3);">' + ppFmt(ppDate(x.created_at)) + ' 접수</div>' + ans + '</div>';
     }).join('');
   });
+}
+
+/* ── 약관 및 정책 (pw-30-terms) — CMS 약관 관리(terms 컬렉션)를 그대로 읽어서 표시.
+   CMS가 저장한 원문 그대로(줄바꿈 포함) 보여줘야 해서 개행만 살리고(white-space:pre-wrap)
+   나머지 서식은 임의로 손대지 않는다. Firestore에 문서가 아직 없으면 화면의 기존 문구를 유지. */
+function renderTermsFromCms() {
+  var tosBox = document.getElementById('tb-tos');
+  var ppBox = document.getElementById('tb-pp');
+  if (!tosBox && !ppBox) return;
+  Promise.all([
+    db.collection('terms').doc('service').get(),
+    db.collection('terms').doc('privacy').get(),
+  ]).then(function(docs) {
+    var svc = docs[0].exists ? docs[0].data().body : null;
+    var priv = docs[1].exists ? docs[1].data().body : null;
+    if (tosBox && svc) { tosBox.style.whiteSpace = 'pre-wrap'; tosBox.textContent = svc; }
+    if (ppBox && priv) { ppBox.style.whiteSpace = 'pre-wrap'; ppBox.textContent = priv; }
+  }).catch(function(e) { console.error('renderTermsFromCms', e); });
 }
 
 /* ── 공지사항 (pw-30-nt) — notices 컬렉션 ── */

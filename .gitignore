@@ -54,3 +54,6 @@ dist/
 
 # 아이콘 작업용 원본(실제 배포 아이콘 파일만 커밋)
 new-app-icon-source.png
+
+# 약관·개인정보 작업용 원본(실제 반영은 Firestore/코드로, 이 텍스트는 커밋 안 함)
+new-terms-privacy.txt
