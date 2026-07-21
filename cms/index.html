@@ -2506,6 +2506,12 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
 
     <!-- ── 관리자 계정 ── -->
     <div class="section" id="sec-accounts">
+      <!-- ── VIN 재구성 대기 (김반장 지시 2026-07-21) ── -->
+      <div class="vin-rebuild-notice" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;min-height:320px;border:1px dashed var(--border,#dcdce4);border-radius:12px;background:var(--bg-2,#fafafb);text-align:center;padding:40px 24px">
+        <div style="font-size:18px;font-weight:700;color:var(--text-1,#1a1a2e);letter-spacing:-0.3px">VIN 화면 구성예정</div>
+      </div>
+      <!-- ↓ 기존 구성 — 삭제 아님. Vin 재구성 참고용으로 숨김 보존 -->
+      <div class="vin-rebuild-hidden" style="display:none" aria-hidden="true">
       <div class="warn-box"><strong>주의</strong> — 슈퍼어드민만 계정 추가·삭제가 가능합니다. 슈퍼어드민 계정은 추가할 수 없습니다. 퇴사자 즉시 삭제 필수.</div>
       <div class="card">
         <div class="card-header"><div><div class="card-title">관리자 계정</div></div><div id="account-hdr-actions"></div></div>
@@ -2532,6 +2538,8 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
           </table>
         </div>
       </div>
+      </div>
+      <!-- ↑ 기존 구성 숨김 끝 -->
     </div>
 
 
