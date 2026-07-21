@@ -18069,8 +18069,6 @@ function renderAppNotices() {
     snap.forEach(function (d) { var x = d.data(); x._id = d.id; arr.push(x); });
     arr = arr.filter(function (n) { return n.published_at || n.created_at; });
     arr.sort(function (a, b) {
-      var pa = (a.is_pinned ? 1 : 0), pb = (b.is_pinned ? 1 : 0);
-      if (pa !== pb) return pb - pa;
       return (ppDate(b.published_at || b.created_at) || 0) - (ppDate(a.published_at || a.created_at) || 0);
     });
     if (!arr.length) {
@@ -18080,10 +18078,9 @@ function renderAppNotices() {
     PP._notices = arr;
     box.innerHTML = arr.map(function (n, i) {
       var d = ppDate(n.published_at || n.created_at);
-      var pin = n.is_pinned ? '<span style="font-size:10px;font-weight:700;color:#fff;background:var(--main);padding:2px 7px;border-radius:20px;">공지</span>' : '';
       var body = (n.content || '').replace(/<[^>]+>/g, '');
       return '<div data-nt="' + i + '" style="padding:16px;border-bottom:1px solid var(--border);cursor:pointer;">'
-        + '<div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;">' + pin
+        + '<div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;">'
         + '<span style="font-size:11px;color:var(--text3);">' + ppFmt(d) + '</span></div>'
         + '<div style="font-size:14px;font-weight:700;color:var(--text1);">' + ppEsc(n.title || '공지') + '</div>'
         + '<div style="font-size:12px;color:var(--text2);margin-top:4px;">' + ppEsc(body.slice(0, 40)) + (body.length > 40 ? '…' : '') + '</div></div>';

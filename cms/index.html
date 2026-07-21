@@ -1784,7 +1784,6 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
       <div class="card">
         <div class="card-header"><div class="card-title">공지 작성</div></div>
         <div style="padding:18px">
-          <input type="hidden" id="notice-edit-id">
           <div style="display:grid;grid-template-columns:2fr 1fr;gap:14px;margin-bottom:14px">
             <div>
               <label style="font-size:11px;color:var(--text-2);font-weight:600;display:block;margin-bottom:6px;text-transform:uppercase;letter-spacing:.4px">제목</label>
@@ -1800,7 +1799,6 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
             <textarea class="terms-editor" id="notice-body" style="min-height:110px" placeholder="공지 본문 (앱 마이 &gt; 공지사항에 게시됩니다)"></textarea>
           </div>
           <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
-            <label style="font-size:12px;color:var(--text-2);display:flex;align-items:center;gap:6px"><input type="checkbox" id="notice-pinned"> 상단 고정</label>
             <div style="margin-left:auto;display:flex;gap:8px">
               <button class="btn btn-ghost btn-sm" onclick="noticeSubmit('draft')">임시저장</button>
               <button class="btn btn-primary" id="notice-publish-btn" onclick="noticeSubmit('published')">게시</button>
@@ -1811,7 +1809,7 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
       <div class="card">
         <div class="card-header"><div class="card-title">공지 목록</div><div style="font-size:12px;color:var(--text-2)" id="notice-count">—</div></div>
         <table>
-          <thead><tr><th>제목</th><th style="text-align:center">분류</th><th style="text-align:center">게시일</th><th style="text-align:center">조회수</th><th style="text-align:center">노출</th><th style="text-align:center">관리</th></tr></thead>
+          <thead><tr><th>제목</th><th style="text-align:center">분류</th><th style="text-align:center">게시일</th><th style="text-align:center">조회수</th><th style="text-align:center">상태</th><th style="text-align:center">관리</th></tr></thead>
           <tbody>
           </tbody>
         </table>
@@ -2240,10 +2238,10 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
       </div>
       <div class="card-grid" style="margin-top:16px">
         <div class="card">
-          <div class="card-header"><div class="card-title">탈퇴 정책 설정</div><button class="btn btn-ghost btn-sm" onclick="openModal('m-withdrawal-policy')">수정</button></div>
+          <div class="card-header"><div class="card-title">탈퇴 정책 설정</div><button class="btn btn-ghost btn-sm" onclick="openModal('m-withdrawal-policy')">안내</button></div>
           <div>
             <div class="policy-item"><div class="policy-label">처리 방식</div><div class="policy-value">즉시 처리 (유예·철회 없음)</div><div class="policy-desc">확인 즉시 status='withdrawn' 전환, 재로그인·복구 불가</div></div>
-            <div class="policy-item"><div class="policy-label">PII 스크럽 항목</div><div class="policy-value" id="wp-disp-pii">닉네임, 카카오 닉네임, 카카오 로그인ID</div><div class="policy-desc">탈퇴 즉시 제거 (레코드는 유지)</div></div>
+            <div class="policy-item"><div class="policy-label">PII 스크럽 항목</div><div class="policy-value">닉네임, 카카오 닉네임, 카카오 로그인ID</div><div class="policy-desc">탈퇴 즉시 제거 (레코드는 유지, 고정 정책)</div></div>
             <div class="policy-item"><div class="policy-label">거래·정산 기록</div><div class="policy-value">DB에 그대로 존치</div><div class="policy-desc">PII 없이 user_id로만 연결 · 전자상거래법 5년 보존</div></div>
           </div>
         </div>
@@ -3329,15 +3327,44 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
   </div>
 </div>
 
-<!-- ── 모달: 탈퇴 정책 설정 ── -->
+<!-- ── 모달: 탈퇴 정책 안내 ── -->
 <div class="modal-overlay" id="m-withdrawal-policy">
   <div class="modal">
-    <div class="modal-header"><div class="modal-title">탈퇴 정책 설정</div><button class="modal-close" onclick="closeModal('m-withdrawal-policy')"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
+    <div class="modal-header"><div class="modal-title">탈퇴 정책 안내</div><button class="modal-close" onclick="closeModal('m-withdrawal-policy')"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
     <div class="modal-body">
-      <div class="form-group"><label class="form-label">PII 스크럽 항목</label><input class="form-input" id="wp-pii-items" value="닉네임, 카카오 닉네임, 카카오 로그인ID"></div>
+      <div class="policy-item"><div class="policy-label">PII 스크럽 항목</div><div class="policy-value">닉네임, 카카오 닉네임, 카카오 로그인ID</div><div class="policy-desc">고정 정책 — 운영자가 수정할 수 없습니다.</div></div>
       <div class="info-box">탈퇴는 <b>즉시 처리</b>됩니다(유예·철회 없음). 최종 확인과 동시에 위 항목이 회원 문서에서 제거되고, 계정은 재로그인·복구가 불가능합니다. 티켓·결제 등 거래 기록은 회원 문서(레코드)를 그대로 참조한 채 보존됩니다(물리 삭제 없음).</div>
     </div>
-    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('m-withdrawal-policy')">취소</button><button class="btn btn-primary" id="wp-save-btn" onclick="wdPolicySubmit()">저장</button></div>
+    <div class="modal-footer"><button class="btn btn-primary" onclick="closeModal('m-withdrawal-policy')">닫기</button></div>
+  </div>
+</div>
+
+<!-- ── 모달: 탈퇴 회원 상세 ── -->
+<div class="modal-overlay" id="m-withdrawal-detail">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title">탈퇴 회원 상세</div><button class="modal-close" onclick="closeModal('m-withdrawal-detail')"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
+    <div class="modal-body">
+      <div class="policy-item"><div class="policy-label">식별 아이디</div><div class="policy-value" id="wd-id">—</div></div>
+      <div class="policy-item"><div class="policy-label">가입 유형(탈퇴 전)</div><div class="policy-value" id="wd-jointype">—</div></div>
+      <div class="policy-item"><div class="policy-label">탈퇴일시</div><div class="policy-value" id="wd-at">—</div></div>
+      <div class="policy-item"><div class="policy-label">상태</div><div class="policy-value">탈퇴 완료 (즉시 처리 · 유예 없음)</div></div>
+      <div class="policy-item"><div class="policy-label">PII 처리</div><div class="policy-value">닉네임·카카오 식별값 스크럽됨</div><div class="policy-desc">레코드는 유지, 거래 기록 참조 무결성 보호</div></div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-primary" onclick="closeModal('m-withdrawal-detail')">닫기</button></div>
+  </div>
+</div>
+
+<!-- ── 모달: 공지 수정 ── -->
+<div class="modal-overlay" id="m-notice-edit">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title">공지 수정</div><button class="modal-close" onclick="closeModal('m-notice-edit')"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
+    <div class="modal-body">
+      <input type="hidden" id="ne-id">
+      <div class="form-group"><label class="form-label">제목</label><input class="form-input" id="ne-title" placeholder="공지 제목"></div>
+      <div class="form-group"><label class="form-label">분류</label><select class="form-select" id="ne-type"><option value="general">일반</option><option value="service">서비스 점검</option><option value="update">업데이트</option><option value="policy">정책 변경</option><option value="event">이벤트</option></select></div>
+      <div class="form-group"><label class="form-label">내용</label><textarea class="terms-editor" id="ne-body" style="min-height:110px" placeholder="공지 본문 (앱 마이 &gt; 공지사항에 게시됩니다)"></textarea></div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('m-notice-edit')">취소</button><button class="btn btn-ghost" id="ne-draft-btn" onclick="noticeEditSubmit('draft')">임시저장</button><button class="btn btn-primary" id="ne-publish-btn" onclick="noticeEditSubmit('published')">게시</button></div>
   </div>
 </div>
 
@@ -5202,6 +5229,8 @@ Object.assign(KO2VI, {"카카오 연동 회원과 미연동(게스트) 회원이
 Object.assign(KO2VI,{"전체 거래유형":"Tất cả loại giao dịch","구매 대기(등급 미정)":"Chờ mua (chưa định hạng)","출석 보너스":"Thưởng điểm danh","룰렛 당첨":"Trúng vòng quay","카카오 연동 보상":"Thưởng liên kết Kakao","기프티콘 사용":"Sử dụng Gifticon","경품 응모":"Dự thưởng quà","포인트 전환":"Chuyển đổi điểm","등급 전환":"Chuyển hạng","관리자 회수":"Admin thu hồi","환불(취소·반품)":"Hoàn tiền (hủy·trả hàng)","꽝":"Trượt","이벤트티켓":"Vé sự kiện","출석(쿠팡 구경하기)":"Điểm danh (Dạo Coupang)","행운룰렛 당첨":"Trúng vòng quay may mắn","티켓→포인트 전환":"Chuyển vé→điểm","포인트→티켓 전환":"Chuyển điểm→vé","전체 기간":"Toàn bộ thời gian","사용완료":"Đã sử dụng","취소됨":"Đã hủy","기프티콘 문의":"Hỏi đáp Gifticon","정상(확정)":"Bình thường (đã xác nhận)","대기":"Chờ","환불":"Hoàn tiền"});
 /* ── i18n 보강 (2026-07-21) — VI 전환 시 한국어로 남던 문구 ── */
 Object.assign(KO2VI,{"행운룰렛 설정":"Cài đặt vòng quay may mắn","어뷰징 모니터링":"Giám sát lạm dụng","개발 · 데모":"Phát triển · Demo","데이터 관리(데모)":"Quản lý dữ liệu (Demo)","순수익 (추정)":"Lợi nhuận ròng (ước tính)","데모 Firestore 집계":"Tổng hợp Firestore Demo","포스트백 확정 기준":"Theo chuẩn postback đã xác nhận","교환 마진":"Biên đổi thưởng","데모 실데이터":"Dữ liệu thật của Demo","발행 티켓 (누적 적립)":"Vé đã phát hành (tích lũy)","적립 확정 기준":"Theo chuẩn tích lũy đã xác nhận","pending 상태":"Trạng thái pending","마감 후 미처리":"Đã đóng nhưng chưa xử lý","운영 데이터 없음":"Không có dữ liệu vận hành","운영 누적 데이터 없음 (시계열 집계는 실서비스 운영 후 표시)":"Không có dữ liệu vận hành tích lũy (tổng hợp theo chuỗi thời gian sẽ hiển thị sau khi vận hành dịch vụ thật)","실행 이력 없음 (배치 스케줄러 미가동)":"Không có lịch sử chạy (batch scheduler chưa hoạt động)","닉네임 / 카카오톡 ID / 식별 아이디":"Biệt danh / Kakao ID / ID định danh","총 매출":"Tổng doanh thu","포스트백 + 교환 마진":"Postback + biên đổi thưởng","확정 정산 (집계)":"Quyết toán đã xác nhận (tổng hợp)","데모 집계":"Tổng hợp Demo","포스트백 기준":"Theo chuẩn postback","누적 수익":"Doanh thu tích lũy","차액 사유":"Lý do chênh lệch","—  차이 발생 원인: 환불 누락 · 포스트백 미수신 · 제휴몰별 수수료율 변경 · 부정거래 검증 지연. (실제 차액 데이터는 제휴몰 정산 확정 후 표시)":"—  Nguyên nhân phát sinh chênh lệch: bỏ sót hoàn tiền · không nhận được postback · thay đổi tỷ lệ hoa hồng theo từng cửa hàng LK · chậm xác minh giao dịch gian lận. (Dữ liệu chênh lệch thật sẽ hiển thị sau khi chốt quyết toán với cửa hàng LK)","총":"Tổng","누적 발행 (적립)":"Tổng phát hành (tích lũy)","티켓 소모":"Tiêu dùng vé","전체 원장 레코드":"Toàn bộ bản ghi sổ cái","유효기간 경과":"Quá thời hạn sử dụng","취소·반품":"Hủy·Trả hàng","오늘 기준":"Tính đến hôm nay","행운룰렛 = 포인트·이벤트티켓을 확률로 지급":"Vòng quay may mắn = cấp điểm·vé sự kiện theo xác suất","— 확률·배분은 정책상 미결이라 운영자가 직접 정합니다. 룰렛은 6칸이며 각 칸을 균등 확률(1/6)로 추첨합니다. 여기서 저장한 설정을 앱이 그대로 읽어 룰렛을 렌더링하고 당첨 보상을 지급합니다.":"— Xác suất·phân bổ chưa chốt trong chính sách nên Vận hành viên tự quyết định. Vòng quay có 6 ô và mỗi ô được quay với xác suất đều nhau (1/6). App đọc nguyên cài đặt lưu ở đây để render vòng quay và cấp thưởng trúng.","룰렛 6칸 설정":"Cài đặt 6 ô vòng quay","칸":"Ô","값":"Giá trị","1칸":"Ô 1","2칸":"Ô 2","3칸":"Ô 3","4칸":"Ô 4","5칸":"Ô 5","6칸":"Ô 6","저장된 설정을 불러왔습니다.":"Đã tải cài đặt đã lưu.","장수":"Số vé","P 액수":"Số điểm P","누적 사용·차감":"Tích lũy sử dụng·trừ","닉네임 또는 취소사유 검색":"Tìm biệt danh hoặc lý do hủy","CSV 파일로 상품 설명을 일괄 등록·수정합니다. 상품코드가 일치하는 항목은 덮어쓰기됩니다.":"Đăng ký·sửa hàng loạt mô tả sản phẩm bằng file CSV. Mục có mã sản phẩm trùng khớp sẽ bị ghi đè.","(.xlsx는 데모 범위 밖 — CSV만 지원)":"(.xlsx nằm ngoài phạm vi demo — chỉ hỗ trợ CSV)","CSV 파일을 선택하세요":"Hãy chọn file CSV","지원 형식: .csv (헤더: 상품코드,브랜드,상품명,이모지,카테고리,등급,필요장수,유효일수)":"Định dạng hỗ trợ: .csv (header: mã sản phẩm, thương hiệu, tên sản phẩm, emoji, danh mục, hạng, số vé cần, số ngày hiệu lực)","홈 상단 슬라이드 · 카드 순서 드래그로 노출 순서 변경":"Slide đầu trang chủ · kéo thứ tự thẻ để đổi thứ tự hiển thị","전체 공지":"Thông báo toàn bộ","등록 누적":"Tổng đã đăng ký","데모 범위 밖(열람 추적 미구현)":"Ngoài phạm vi demo (chưa triển khai theo dõi lượt xem)","데모 범위 밖":"Ngoài phạm vi demo","— 실제 FCM/카카오 알림톡 발송 연동은 없고, 발송 내역만 Firestore에 기록됩니다(대상 인원은 실집계).":"— Không có kết nối gửi FCM/Kakao AlimTalk thật, chỉ ghi lịch sử gửi vào Firestore (số người nhận là số liệu tổng hợp thật).","답변 완료 기준":"Theo chuẩn đã trả lời xong","닉네임, 제목 검색...":"Tìm biệt danh, tiêu đề...","— 회원이 앱 \"마이 → 계정탈퇴\" 누르면":"— Khi hội viên bấm \"Của tôi → Hủy tài khoản\" trong app thì","그 자리에서 즉시 처리":"xử lý ngay tại chỗ","됩니다(유예·철회 기간 없음). 개인정보(PII)는 즉시 스크럽되고 회원 문서(레코드)는 유지됩니다. 처리 누락 시 개인정보보호법 위반 소지.":"(không có thời gian ân hạn·rút lại). Thông tin cá nhân (PII) được scrub ngay và document (bản ghi) hội viên vẫn được giữ. Bỏ sót xử lý có thể vi phạm Luật bảo vệ thông tin cá nhân.","0명":"0 người","누적 탈퇴 회원":"Tổng hội viên đã hủy","탈퇴 확인":"Xác nhận hủy","앱 마이탭 → 최종 확인":"Tab Của tôi trong app → xác nhận cuối","status 전환 · PII 스크럽 · 기기 로컬데이터 삭제":"Chuyển status · scrub PII · xóa dữ liệu local trên thiết bị","거래 기록 존치":"Giữ lại bản ghi giao dịch","티켓·결제 기록은 레코드 유지 · 5년 보관":"Bản ghi vé·thanh toán được giữ lại · lưu 5 năm","탈퇴 회원 목록":"Danh sách hội viên đã hủy","가입 유형(탈퇴 전)":"Loại đăng ký (trước khi hủy)","탈퇴일시":"Thời điểm hủy","처리 방식":"Cách xử lý","즉시 처리 (유예·철회 없음)":"Xử lý ngay (không ân hạn·không rút lại)","확인 즉시 status='withdrawn' 전환, 재로그인·복구 불가":"Xác nhận xong là chuyển ngay status='withdrawn', không thể đăng nhập lại·khôi phục","PII 스크럽 항목":"Mục scrub PII","닉네임, 카카오 닉네임, 카카오 로그인ID":"Biệt danh, biệt danh Kakao, ID đăng nhập Kakao","탈퇴 즉시 제거 (레코드는 유지)":"Xóa ngay khi hủy (bản ghi vẫn giữ)","거래·정산 기록":"Bản ghi giao dịch·quyết toán","DB에 그대로 존치":"Giữ nguyên trong DB","PII 없이 user_id로만 연결 · 전자상거래법 5년 보존":"Chỉ liên kết bằng user_id, không có PII · lưu 5 năm theo luật TMĐT","식별 아이디 검색...":"Tìm ID định danh...","어뷰징·이상적립 모니터링":"Giám sát lạm dụng·tích lũy bất thường","— 적립형 서비스 부정 사용(다계정·부정적립·환불 어뷰징)을 탐지합니다. 환불 포스트백·정지 계정·티켓 환수 기록을 실시간 집계합니다.":"— Phát hiện việc lạm dụng dịch vụ tích lũy (đa tài khoản·tích lũy gian lận·lạm dụng hoàn tiền). Tổng hợp thời gian thực các bản ghi postback hoàn tiền·tài khoản bị đình chỉ·thu hồi vé.","이상 징후 계정":"Tài khoản có dấu hiệu bất thường","중복 제거":"Đã khử trùng lặp","환불 어뷰징":"Lạm dụng hoàn tiền","환불 포스트백":"Postback hoàn tiền","정지 계정":"Tài khoản bị đình chỉ","운영자 차단":"Admin chặn","티켓 환수":"Thu hồi vé","탐지 케이스":"Trường hợp phát hiện","환불 어뷰징 · 정지 계정 · 티켓 환수 — 최신순":"Lạm dụng hoàn tiền · tài khoản bị đình chỉ · thu hồi vé — mới nhất trước","근거":"Căn cứ","닉네임, 주문번호 검색...":"Tìm biệt danh, mã đơn hàng...","배포 이력 없음":"Không có lịch sử phát hành","키/상태 수정":"Sửa khóa/trạng thái","운영자 수동 갱신 (데모 범위 밖: 실제 API 호출 없음)":"Vận hành viên cập nhật thủ công (ngoài phạm vi demo: không gọi API thật)","오늘 사용: 운영 데이터 없음":"Dùng hôm nay: không có dữ liệu vận hành","데모 범위 밖 — 실제 API 호출 로그 연동 없음":"Ngoài phạm vi demo — không kết nối log gọi API thật","— 실제 cron 실행 엔진은 없습니다. 일시정지/재시작/즉시 실행은 상태·로그를 Firestore(scheduler_jobs)에 실제로 기록하는 것까지만 동작합니다.":"— Không có engine chạy cron thật. Tạm dừng/khởi động lại/chạy ngay chỉ hoạt động đến mức ghi thật trạng thái·log vào Firestore (scheduler_jobs).","시스템 정의 배치 — 생성·삭제 없음 · 활성/비활성 토글·즉시 실행만 제공":"Batch do hệ thống định nghĩa — không tạo·xóa · chỉ cung cấp toggle bật/tắt·chạy ngay","실행 로그 없음 (배치 스케줄러 미가동)":"Không có log chạy (batch scheduler chưa hoạt động)","VIN 화면 구성예정":"VIN sẽ dựng màn hình","데이터 관리 (데모 전용)":"Quản lý dữ liệu (chỉ dành cho Demo)","문의":"Hỏi đáp","교환이력":"Lịch sử đổi","포인트원장":"Sổ cái điểm","클릭":"Click","티켓원장":"Sổ cái vé","초대":"Mời","방문":"Truy cập","시나리오 채우기":"Đổ dữ liệu kịch bản","새로고침":"Làm mới","전체 비우기":"Xóa toàn bộ","[시나리오 채우기]는":"[Đổ dữ liệu kịch bản] sẽ","(scripts/seed-demo.js로 등록)에 등록된 가상 손님대로 데이터를 생성합니다. [전체 비우기]는 가상 데이터만 삭제하고\n          운영 뼈대(관리자 계정 firstadmin · 마스터 데이터 · 기프티콘 상품 · 배너 · 공지 · 시나리오 정의)는 보존합니다.":"(đăng ký qua scripts/seed-demo.js) tạo dữ liệu đúng theo các khách ảo đã đăng ký. [Xóa toàn bộ] chỉ xóa dữ liệu ảo và\n          giữ lại bộ khung vận hành (tài khoản quản trị firstadmin · dữ liệu master · sản phẩm Gifticon · banner · thông báo · định nghĩa kịch bản).","문서 추가 — users":"Thêm document — users","카카오연동":"Liên kết Kakao","카카오 닉네임":"Biệt danh Kakao","카카오 로그인 ID":"ID đăng nhập Kakao","+ 추가":"+ Thêm","오류: Missing or insufficient permissions.":"Lỗi: Missing or insufficient permissions."});
+/* ── i18n 보강 (2026-07-21 재질문 답변 반영) — 탈퇴 정책·탈퇴 상세·공지 관리 UI 변경 ── */
+Object.assign(KO2VI,{"안내":"Hướng dẫn","탈퇴 정책 안내":"Hướng dẫn chính sách hủy TK","고정 정책 — 운영자가 수정할 수 없습니다.":"Chính sách cố định — quản trị viên không thể sửa.","탈퇴 즉시 제거 (레코드는 유지, 고정 정책)":"Xóa ngay khi hủy (bản ghi vẫn giữ, chính sách cố định)","탈퇴 회원 상세":"Chi tiết hội viên đã hủy","식별 아이디":"ID định danh","탈퇴 완료 (즉시 처리 · 유예 없음)":"Đã hủy hoàn tất (xử lý ngay · không ân hạn)","PII 처리":"Xử lý PII","닉네임·카카오 식별값 스크럽됨":"Nickname·mã định danh Kakao đã được scrub","레코드는 유지, 거래 기록 참조 무결성 보호":"Bản ghi vẫn giữ, bảo vệ tính toàn vẹn tham chiếu lịch sử giao dịch","공지 수정":"Sửa thông báo"});
 
 
   var _orig=new Map(), _tracked=new Set(), _applying=false;
@@ -6949,12 +6978,11 @@ function loadNotices() {
       NOTICES_CACHE[doc.id] = n;
       var badge = TYPE_BADGE[n.type] || '<span class="badge badge-gray">일반</span>';
       var isPublished = n.status === 'published';
-      var statusBadge = isPublished ? '<span class="badge badge-green">노출</span>' : (n.status === 'hidden' ? '<span class="badge badge-gray">숨김</span>' : '<span class="badge badge-amber">임시저장</span>');
-      var hideBtnLabel = isPublished ? '숨김' : '게시';
+      var statusBadge = isPublished ? '<span class="badge badge-green">게시</span>' : '<span class="badge badge-amber">임시저장</span>';
       return '<tr><td style="font-weight:500">' + (n.title||'') + '</td><td style="text-align:center">' + badge + '</td>'
         + '<td style="text-align:center;white-space:nowrap"><div style="font-weight:700;color:#333">' + ppDt(n.created_at) + '</div></td>'
         + '<td style="text-align:center">' + ppN(n.view_count||0) + '</td><td style="text-align:center">' + statusBadge + '</td>'
-        + '<td style="text-align:center"><button class="btn btn-ghost btn-sm" onclick="noticeEdit(\'' + doc.id + '\')">수정</button> <button class="btn btn-ghost btn-sm" onclick="noticeToggleStatus(\'' + doc.id + '\')">' + hideBtnLabel + '</button></td></tr>';
+        + '<td style="text-align:center"><button class="btn btn-ghost btn-sm" onclick="noticeEdit(\'' + doc.id + '\')">수정</button> <button class="btn btn-ghost btn-sm" onclick="noticeDelete(\'' + doc.id + '\')">삭제</button></td></tr>';
     });
     tbody.innerHTML = rows.join('');
     var statCards = document.querySelectorAll('#sec-notice .stat-card');
@@ -6970,27 +6998,51 @@ var NOTICES_CACHE = {};
 window.noticeEdit = function(id) {
   var n = NOTICES_CACHE[id];
   if (!n) return;
-  document.getElementById('notice-edit-id').value = id;
-  document.getElementById('notice-title').value = n.title || '';
-  document.getElementById('notice-type').value = n.type || 'general';
-  document.getElementById('notice-body').value = n.body || '';
-  document.getElementById('notice-pinned').checked = !!n.pinned;
-  document.getElementById('notice-title').scrollIntoView({ behavior:'smooth', block:'center' });
+  document.getElementById('ne-id').value = id;
+  document.getElementById('ne-title').value = n.title || '';
+  document.getElementById('ne-type').value = n.type || 'general';
+  document.getElementById('ne-body').value = n.body || '';
+  openModal('m-notice-edit');
 };
 
-window.noticeToggleStatus = function(id) {
+window.noticeDelete = function(id) {
   var n = NOTICES_CACHE[id];
   if (!n) return;
-  var next = n.status === 'published' ? 'hidden' : 'published';
-  db.collection('notices').doc(id).update({ status: next, updated_at: FS.FieldValue.serverTimestamp() }).then(function() {
-    toast(next === 'published' ? '게시되었습니다.' : '숨김 처리되었습니다.');
-    logAdmin('공지 상태 변경: ' + id + ' → ' + next);
+  if (!confirm('"' + (n.title||'') + '" 공지를 삭제할까요? 되돌릴 수 없습니다.')) return;
+  db.collection('notices').doc(id).delete().then(function() {
+    toast('공지가 삭제되었습니다.');
+    logAdmin('공지 삭제: ' + id + ' ' + (n.title||''));
     loadNotices();
-  }).catch(function(e) { toast('처리 실패: ' + (e.message||e)); });
+  }).catch(function(e) { toast('삭제 실패: ' + (e.message||e)); });
+};
+
+window.noticeEditSubmit = function(status) {
+  var id = document.getElementById('ne-id').value;
+  var title = document.getElementById('ne-title').value.trim();
+  var body = document.getElementById('ne-body').value.trim();
+  if (!id || !title || !body) { toast('제목과 내용을 입력하세요.'); return; }
+  var data = {
+    title: title,
+    type: document.getElementById('ne-type').value,
+    body: body,
+    status: status,
+    updated_at: FS.FieldValue.serverTimestamp(),
+  };
+  var draftBtn = document.getElementById('ne-draft-btn'), pubBtn = document.getElementById('ne-publish-btn');
+  if (draftBtn) draftBtn.disabled = true; if (pubBtn) pubBtn.disabled = true;
+  db.collection('notices').doc(id).set(data, { merge: true }).then(function() {
+    toast(status === 'published' ? '공지가 수정되었습니다.' : '임시저장되었습니다.');
+    logAdmin('공지 수정: ' + title + ' (' + status + ')');
+    closeModal('m-notice-edit');
+    loadNotices();
+  }).catch(function(e) {
+    toast('저장 실패: ' + (e.message||e));
+  }).finally(function() {
+    if (draftBtn) draftBtn.disabled = false; if (pubBtn) pubBtn.disabled = false;
+  });
 };
 
 window.noticeSubmit = function(status) {
-  var id = document.getElementById('notice-edit-id').value;
   var title = document.getElementById('notice-title').value.trim();
   var body = document.getElementById('notice-body').value.trim();
   if (!title || !body) { toast('제목과 내용을 입력하세요.'); return; }
@@ -6998,22 +7050,16 @@ window.noticeSubmit = function(status) {
     title: title,
     type: document.getElementById('notice-type').value,
     body: body,
-    pinned: document.getElementById('notice-pinned').checked,
     status: status,
     updated_at: FS.FieldValue.serverTimestamp(),
   };
   var btn = document.getElementById('notice-publish-btn');
   if (btn) btn.disabled = true;
-  var task = id
-    ? db.collection('notices').doc(id).set(data, { merge: true })
-    : db.collection('notices').add(Object.assign({ created_at: FS.FieldValue.serverTimestamp(), view_count: 0 }, data));
-  task.then(function() {
+  db.collection('notices').add(Object.assign({ created_at: FS.FieldValue.serverTimestamp(), view_count: 0 }, data)).then(function() {
     toast(status === 'published' ? '공지가 게시되었습니다.' : '임시저장되었습니다.');
-    logAdmin((id?'공지 수정: ':'공지 작성: ') + title + ' (' + status + ')');
-    document.getElementById('notice-edit-id').value = '';
+    logAdmin('공지 작성: ' + title + ' (' + status + ')');
     document.getElementById('notice-title').value = '';
     document.getElementById('notice-body').value = '';
-    document.getElementById('notice-pinned').checked = false;
     loadNotices();
   }).catch(function(e) {
     toast('저장 실패: ' + (e.message||e));
@@ -7263,17 +7309,6 @@ window.inqSubmitAnswer = function() {
 var WITHDRAWAL_CACHE = {};
 function loadWithdrawal() {
   var tbody = document.querySelector('#sec-withdrawal table tbody');
-
-  /* PII 스크럽 항목 설정 로드 (표시용 — 실제 스크럽 필드는 app의 performWithdraw()에 하드코딩됨) */
-  db.collection('settings').doc('withdrawal_policy').get().then(function(doc) {
-    if (!doc.exists) return;
-    var d = doc.data();
-    var setVal = function(id, v){ var e=document.getElementById(id); if(e && v!=null) e.value=v; };
-    var setTxt2 = function(id, t){ var e=document.getElementById(id); if(e && t!=null) e.textContent=t; };
-    setVal('wp-pii-items', d.pii_items);
-    if (d.pii_items) setTxt2('wp-disp-pii', d.pii_items);
-  }).catch(function(e){ console.error('loadWithdrawal settings', e); });
-
   if (!tbody) return;
   db.collection('users').where('status', '==', 'withdrawn').limit(50).get().then(function(snap) {
     WITHDRAWAL_CACHE = {};
@@ -7317,33 +7352,10 @@ function updateWithdrawalStats(list) {
 window.wdShowDetail = function(id) {
   var d = WITHDRAWAL_CACHE[id];
   if (!d) return;
-  var lines = [
-    '식별 아이디: ' + id,
-    '가입 유형(탈퇴 전): ' + (d.linked_kakao ? '카카오 연동' : '게스트'),
-    '탈퇴일시: ' + ppDt(d.withdrawn_at) + ' ' + ppTm(d.withdrawn_at),
-    '상태: 탈퇴 완료 (즉시 처리 · 유예 없음)',
-    'PII: 닉네임·카카오 식별값 스크럽됨 (레코드는 유지, 거래 기록 참조 무결성 보호)',
-  ];
-  alert(lines.join('\n'));
-};
-
-window.wdPolicySubmit = function() {
-  var data = {
-    pii_items: (document.getElementById('wp-pii-items')||{}).value || '',
-    updated_at: FS.FieldValue.serverTimestamp(),
-  };
-  var btn = document.getElementById('wp-save-btn');
-  if (btn) { btn.disabled = true; btn.textContent = '저장 중…'; }
-  db.collection('settings').doc('withdrawal_policy').set(data, { merge: true }).then(function() {
-    toast('탈퇴 정책이 저장되었습니다.');
-    logAdmin('탈퇴 정책 설정 수정');
-    closeModal('m-withdrawal-policy');
-    loadWithdrawal();
-  }).catch(function(e) {
-    toast('저장 실패: ' + (e.message||e));
-  }).finally(function() {
-    if (btn) { btn.disabled = false; btn.textContent = '저장'; }
-  });
+  document.getElementById('wd-id').textContent = id;
+  document.getElementById('wd-jointype').textContent = d.linked_kakao ? '카카오 연동' : '게스트';
+  document.getElementById('wd-at').textContent = ppDt(d.withdrawn_at) + ' ' + ppTm(d.withdrawn_at);
+  openModal('m-withdrawal-detail');
 };
 
 /* ── sec-scheduler ── scheduler_jobs collection (상태·설정만 저장 — 실제 cron 실행은 데모 범위 밖) */
