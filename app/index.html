@@ -9273,7 +9273,7 @@ body.interactive-mode #ip-nav { display: block; }
                   </div>
                   <div class="hmc-desc">구매 시 티켓 적립 <b>실시간</b></div>
                 </div>
-                <button class="hmc-go primary">바로가기 ›</button>
+                <button class="hmc-go primary" onclick="selectMall('쿠팡','coupang.com','pw-13')">바로가기 ›</button>
               </div>
 
               <div class="home-mall-card">
@@ -14948,6 +14948,16 @@ function bindTicketCards() {
 
 var currentMall = { name: '쿠팡', domain: 'coupang.com' };
 
+// 쿠팡 테스트 API 경유 이동 (1단계: 쿠팡 단독). click_id는 세션당 1개 발급 + 클릭마다 순번 증가.
+var _ppCoupangSid = null, _ppCoupangSeq = 0;
+function ppOpenCoupang() {
+  if (!_ppCoupangSid) _ppCoupangSid = 'ppdemo' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+  _ppCoupangSeq++;
+  var clickId = _ppCoupangSid + '-c' + _ppCoupangSeq;
+  var url = 'https://api.ddaynet.com/cou/reco_link.php?code=androidTEST&click_type=2&adid=&click_id=' + encodeURIComponent(clickId);
+  window.open(url, '_blank');
+}
+
 function selectMall(name, domain, dest) {
   currentMall = { name: name, domain: domain };
   var favicon = 'https://www.google.com/s2/favicons?domain=' + domain + '&sz=64';
@@ -14982,6 +14992,11 @@ function selectMall(name, domain, dest) {
   if (h13) h13.textContent = '잠시 후 ' + name + ' 앱이 열려요…';
 
   showScreen(dest);
+
+  // 쿠팡만 실제 경유 이동 시연 (1단계: 알리·테무 등은 시뮬레이션 화면만 유지)
+  if (domain === 'coupang.com' && dest === 'pw-13') {
+    ppOpenCoupang();
+  }
 }
 
 function bindNotifItems() {
