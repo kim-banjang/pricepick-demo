@@ -7565,24 +7565,35 @@ window.avSubmit = function() {
   var link = document.getElementById('av-link').value.trim();
   var changelog = document.getElementById('av-changelog').value.trim();
   var today = ppTodayStr();
+  var prev = APP_VERSIONS_CACHE[platform] || {};
+  var isNewVersion = latest !== prev.latest_version;
+  var history = (prev.history || []).slice();
+  if (isNewVersion) {
+    history.push({ version: latest, date: today, changelog: changelog, force_update: force });
+  } else {
+    var idx = -1;
+    for (var i = history.length - 1; i >= 0; i--) { if (history[i].version === latest) { idx = i; break; } }
+    if (idx >= 0) history[idx] = { version: latest, date: history[idx].date, changelog: changelog || history[idx].changelog, force_update: force };
+    else history.push({ version: latest, date: today, changelog: changelog, force_update: force });
+  }
   var data = {
     latest_version: latest,
     min_version: min,
     force_update: force,
     store_link: link,
-    release_date: today,
+    release_date: isNewVersion ? today : (prev.release_date || today),
     updated_at: FS.FieldValue.serverTimestamp(),
-    history: FS.FieldValue.arrayUnion({ version: latest, date: today, changelog: changelog, force_update: force }),
+    history: history,
   };
   var btn = document.getElementById('av-save-btn');
   if (btn) { btn.disabled = true; btn.textContent = '등록 중…'; }
   db.collection('app_versions').doc(platform).set(data, { merge: true }).then(function() {
-    toast('버전이 등록되었습니다.');
-    logAdmin('앱 버전 등록: ' + platform + ' ' + latest + (force ? ' (강제 업데이트)' : ''));
+    toast(isNewVersion ? '새 버전이 등록되었습니다.' : '버전 정보가 수정되었습니다.');
+    logAdmin('앱 버전 ' + (isNewVersion ? '등록' : '수정') + ': ' + platform + ' ' + latest + (force ? ' (강제 업데이트)' : ''));
     closeModal('m-appver');
     loadAppVersions();
   }).catch(function(e) {
-    toast('등록 실패: ' + (e.message||e));
+    toast('저장 실패: ' + (e.message||e));
   }).finally(function() {
     if (btn) { btn.disabled = false; btn.textContent = '등록'; }
   });
