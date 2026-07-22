@@ -404,6 +404,13 @@ tr:hover td{background:var(--surface-2);}
 .modal-close:hover{color:var(--text);background:var(--surface-2);}
 .modal-body{padding:20px 22px;}
 .modal-footer{padding:14px 22px;border-top:1px solid var(--border);display:flex;gap:10px;justify-content:flex-end;}
+.push-preview{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:14px 16px;box-shadow:var(--shadow-md);max-width:360px;margin:0 auto;}
+.push-preview-app{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+.push-preview-icon{width:20px;height:20px;border-radius:6px;background:var(--main);color:#fff;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.push-preview-appname{font-size:12px;font-weight:700;color:var(--text-2);text-transform:uppercase;letter-spacing:.3px;}
+.push-preview-time{font-size:11px;color:var(--text-3);margin-left:auto;}
+.push-preview-title{font-size:14px;font-weight:700;color:var(--text);margin-bottom:3px;}
+.push-preview-body{font-size:13px;color:var(--text-2);line-height:1.5;white-space:pre-wrap;}
 .form-group{margin-bottom:14px;}
 .form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
 .form-label{font-size:11px;font-weight:700;color:var(--text-2);margin-bottom:5px;display:block;text-transform:uppercase;letter-spacing:.4px;}
@@ -1819,9 +1826,8 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
     </div>
 
     <div class="section" id="sec-notifications">
-      <div class="stats-grid" style="grid-template-columns:repeat(3,1fr)">
+      <div class="stats-grid" style="grid-template-columns:repeat(2,1fr)">
         <div class="stat-card purple"><div class="stat-label">이번달 발송</div><div class="stat-value" id="noti-kpi-month">—</div><div class="stat-change neutral">이번달 누적</div></div>
-        <div class="stat-card green"><div class="stat-label">평균 열람율</div><div class="stat-value" id="noti-kpi-open">—</div><div class="stat-change neutral">데모 범위 밖(열람 추적 미구현)</div></div>
         <div class="stat-card amber"><div class="stat-label">예약 대기</div><div class="stat-value" id="noti-kpi-scheduled">—</div><div class="stat-change neutral">발송 예정</div></div>
       </div>
       <div class="card">
@@ -2912,6 +2918,31 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModal('m-ticket-manual')">취소</button>
       <button class="btn btn-primary" onclick="tmSubmit()">처리하기</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── 모달: 알림 테스트 발송 미리보기 ── -->
+<div class="modal-overlay" id="m-noti-preview">
+  <div class="modal" style="width:420px">
+    <div class="modal-header">
+      <div class="modal-title">테스트 발송 미리보기</div>
+      <button class="modal-close" onclick="closeModal('m-noti-preview')"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <div class="info-box">실제 수신 시 보이는 모습과 동일한 형태입니다. 본인 계정으로만 발송됩니다.</div>
+      <div class="push-preview">
+        <div class="push-preview-app">
+          <div class="push-preview-icon">P</div>
+          <div class="push-preview-appname">PricePick</div>
+          <div class="push-preview-time">지금</div>
+        </div>
+        <div class="push-preview-title" id="noti-preview-title">제목</div>
+        <div class="push-preview-body" id="noti-preview-body">내용</div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-primary" onclick="closeModal('m-noti-preview')">확인</button>
     </div>
   </div>
 </div>
@@ -5238,6 +5269,7 @@ Object.assign(KO2VI,{"안내":"Hướng dẫn","탈퇴 정책 안내":"Hướng 
 Object.assign(KO2VI,{"답변하기":"Trả lời","답변 수정":"Sửa câu trả lời","작성자":"Người viết","문의를 삭제했습니다.":"Đã xóa hỏi đáp.","공지가 삭제되었습니다.":"Đã xóa thông báo.","공지가 수정되었습니다.":"Thông báo đã được sửa.","공지가 게시되었습니다.":"Thông báo đã được đăng.","제목과 내용을 입력하세요.":"Hãy nhập tiêu đề và nội dung.","작성일":"Ngày viết"});
 /* ── i18n 보강 (2026-07-21 해리 답변 반영) — QA 상태 뱃지 3단계·발송 대상 맞춤 세그먼트 제거 ── */
 Object.assign(KO2VI,{"확인중":"Đang kiểm tra","미확인":"Chưa xác nhận","클릭해서 확정/확인중/미확인 전환":"Nhấn để chuyển Đã xác nhận/Đang kiểm tra/Chưa xác nhận"});
+Object.assign(KO2VI,{"테스트 발송 미리보기":"Xem trước gửi thử","실제 수신 시 보이는 모습과 동일한 형태입니다. 본인 계정으로만 발송됩니다.":"Đây là hình thức giống hệt lúc nhận thực tế. Chỉ được gửi đến tài khoản của chính bạn.","지금":"Bây giờ"});
 
 
   var _orig=new Map(), _tracked=new Set(), _applying=false;
@@ -7092,11 +7124,9 @@ function loadNotifications() {
       if (d.status === 'scheduled') scheduled++;
     });
     if (statCards[0]) statCards[0].querySelector('.stat-value').textContent = ppN(monthCount) + '건';
-    if (statCards[1]) statCards[1].querySelector('.stat-value').textContent = '—';
-    if (statCards[2]) statCards[2].querySelector('.stat-value').textContent = ppN(scheduled) + '건';
+    if (statCards[1]) statCards[1].querySelector('.stat-value').textContent = ppN(scheduled) + '건';
     var set = function(id,v){ var e=document.getElementById(id); if(e) e.textContent=v; };
     set('noti-kpi-month', ppN(monthCount) + '건');
-    set('noti-kpi-open', '—');
     set('noti-kpi-scheduled', ppN(scheduled) + '건');
 
     if (snap.empty) { tbody.innerHTML = ppEmpty(7,'발송 내역이 없습니다.'); return; }
@@ -7179,6 +7209,9 @@ window.notiSendTest = function() {
   var body = document.getElementById('noti-body').value.trim() || '(내용 없음)';
   var channel = document.getElementById('noti-channel').value;
   var btn = document.getElementById('noti-test-btn');
+  document.getElementById('noti-preview-title').textContent = title;
+  document.getElementById('noti-preview-body').textContent = body;
+  openModal('m-noti-preview');
   if (btn) { btn.disabled = true; btn.textContent = '발송 중…'; }
   db.collection('notifications').add({
     title: title, body: body, channel: channel, target: 'test',
