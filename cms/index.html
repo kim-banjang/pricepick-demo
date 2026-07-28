@@ -6272,11 +6272,20 @@ function loadDraws() {
     tbodyActive.innerHTML = tbodyUpcoming.innerHTML = tbodyPast.innerHTML = ppEmpty(5,'로드 오류');
   });
 }
+function pdIsVi() { return (typeof window.ipGetLang === 'function') && window.ipGetLang() === 'vi'; }
+function pdRankBadgeHtml(r) {
+  var label = pdIsVi() ? ('Hạng ' + r) : (r + '등');
+  return '<span class="badge badge-purple" style="margin-right:6px">' + label + '</span>';
+}
+function pdWinnerTagHtml(r) {
+  var label = pdIsVi() ? ('Trúng thưởng · Hạng ' + r) : ('당첨 · ' + r + '등');
+  return '<span class="badge badge-purple" style="margin-bottom:4px">' + label + '</span><br>';
+}
 function pdWinnerSummary(winners) {
   var byRank = {};
   winners.forEach(function(w){ var r = ppRankNum(w.rank); (byRank[r] = byRank[r] || []).push(ppEsc(w.nickname||'—')); });
   var ranks = Object.keys(byRank).map(Number).sort(function(a,b){return a-b;});
-  return ranks.map(function(r){ return r + '등 ' + byRank[r].join(', '); }).join('<br>');
+  return ranks.map(function(r){ return pdRankBadgeHtml(r) + byRank[r].join(', '); }).join('<br>');
 }
 /* 이번 주 월요일(진행 중인 주 포함) */
 function ppCurrentMondayStr(now) {
@@ -6446,8 +6455,9 @@ function pdRenderEntrantRows() {
   tbody.innerHTML = pdOrderedEntrants().map(function(e) {
     var staged = pdStagedWinners[e._id];
     var rank = staged ? staged.rank : '';
+    var winnerTag = staged ? pdWinnerTagHtml(ppRankNum(rank)) : '';
     return '<tr data-entry-id="' + e._id + '">'
-      + '<td>' + renderMemberIdentityListOnly(e._userObj, e.user_id) + '</td>'
+      + '<td>' + winnerTag + renderMemberIdentityListOnly(e._userObj, e.user_id) + '</td>'
       + '<td>' + pdDtTime(e.created_at) + '</td>'
       + '<td><select class="form-select" style="font-size:13px;width:100%" onchange="pdAssignRank(this,\'' + e._id + '\',\'' + e.user_id + '\')">' + pdRankOptionsHtml(rank) + '</select></td>'
       + '</tr>';
