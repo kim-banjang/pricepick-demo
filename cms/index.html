@@ -1287,18 +1287,18 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
         <div class="card-header"><div class="card-title" id="pd-ent-title">응모자 리스트</div><button class="btn btn-ghost btn-sm" onclick="pdCloseEntrantsModal()">✕ 닫기</button></div>
         <div style="padding:18px">
           <div class="info-box" id="pd-ent-summary"></div>
-          <div style="display:flex;justify-content:space-between;align-items:center;margin:10px 0">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin:10px 0;flex-wrap:wrap;gap:8px">
             <span class="badge" id="pd-ent-status-badge">미선정</span>
-            <button class="btn btn-ghost btn-sm" onclick="pdAutoSelectWinners()">자동 당첨자 선택</button>
+            <div style="display:flex;gap:8px">
+              <button class="btn btn-ghost btn-sm" onclick="pdAutoSelectWinners()">자동 당첨자 선택</button>
+              <button class="btn btn-ghost btn-sm" onclick="pdCloseEntrantsModal()">취소</button>
+              <button class="btn btn-primary btn-sm" onclick="pdApplyWinners()">적용</button>
+            </div>
           </div>
           <table style="table-layout:fixed;width:100%">
             <thead><tr><th style="width:26%">닉네임(카카오ID)</th><th style="width:32%">응모일시</th><th style="width:42%">당첨 등수</th></tr></thead>
             <tbody id="pd-ent-tbody"></tbody>
           </table>
-        </div>
-        <div class="modal-footer">
-          <button class="btn btn-ghost" onclick="pdCloseEntrantsModal()">취소</button>
-          <button class="btn btn-primary" onclick="pdApplyWinners()">적용</button>
         </div>
       </div>
       </div>
@@ -6438,7 +6438,8 @@ var pdCurrentRoundPrizes = [];
 var pdCurrentEntrants = [];
 var pdStagedWinners = {}; /* entryId -> {rank, uid} — 응모 행(티켓 1장) 단위 스테이징 */
 var pdConfirmedWinnersSnapshot = {}; /* uid -> rank — winners_confirmed는 사람 기준 저장 */
-var pdConfirmedWinners = []; /* winners_confirmed 원본(paid·memo 포함) — 지급 상태·메모 토글/저장의 소스 */
+var pdConfirmedWinners = []; /* winners_confirmed 원본(paid·memo 포함) — 화면에 표시되는 현재(임시 편집 포함) 상태 */
+var pdConfirmedWinnersBaseline = []; /* 마지막 저장 시점 스냅샷 — 지급 상태·메모의 미저장 변경 여부 판정용 */
 var pdCurrentRoundEndDate = null; /* 모달 제목을 언어 토글 시에도 재계산하기 위한 캐시(재조회 없이) */
 /* 모달 제목 = "응모자 리스트"(사전 매칭) + " — " + 마감일 기준 회차명(pdWeekLabel, 호출 시점 언어 그대로 반영) */
 function pdRefreshEntrantsTitle() {
@@ -6492,6 +6493,14 @@ function pdRenderEntrantRows() {
   pdUpdateEntStatusBadge();
 }
 
+/* 지급 상태·메모가 마지막 저장 스냅샷과 달라졌는지(=적용 전 임시 편집 존재) */
+function pdHasUnsavedPayoutChanges() {
+  return pdConfirmedWinners.some(function(w) {
+    var base = pdConfirmedWinnersBaseline.find(function(b){ return b.user_id === w.user_id; });
+    if (!base) return true;
+    return !!w.paid !== !!base.paid || (w.memo || '') !== (base.memo || '');
+  });
+}
 function pdUpdateEntStatusBadge() {
   var badge = document.getElementById('pd-ent-status-badge');
   if (!badge) return;
@@ -6499,7 +6508,8 @@ function pdUpdateEntStatusBadge() {
   Object.keys(pdStagedWinners).forEach(function(id){ stagedByUid[pdStagedWinners[id].uid] = pdStagedWinners[id].rank; });
   var stagedKeys = Object.keys(stagedByUid).sort();
   var confirmedKeys = Object.keys(pdConfirmedWinnersSnapshot).sort();
-  var same = stagedKeys.length === confirmedKeys.length && stagedKeys.every(function(k, i){ return k === confirmedKeys[i] && String(stagedByUid[k]) === String(pdConfirmedWinnersSnapshot[k]); });
+  var rankSame = stagedKeys.length === confirmedKeys.length && stagedKeys.every(function(k, i){ return k === confirmedKeys[i] && String(stagedByUid[k]) === String(pdConfirmedWinnersSnapshot[k]); });
+  var same = rankSame && !pdHasUnsavedPayoutChanges();
   if (!stagedKeys.length) { badge.textContent = '미선정'; badge.className = 'badge'; }
   else if (same) { badge.textContent = '적용됨'; badge.className = 'badge badge-green'; }
   else { badge.textContent = '적용 전 (임시 선택)'; badge.className = 'badge badge-amber'; }
@@ -6510,6 +6520,7 @@ window.pdOpenEntrantsModal = function(raffleId) {
   pdStagedWinners = {};
   pdConfirmedWinnersSnapshot = {};
   pdConfirmedWinners = [];
+  pdConfirmedWinnersBaseline = [];
   pdCurrentEntrants = [];
   pdCurrentRoundEndDate = null;
   pdRefreshEntrantsTitle();
@@ -6528,6 +6539,7 @@ window.pdOpenEntrantsModal = function(raffleId) {
     pdRefreshEntrantsTitle();
     document.getElementById('pd-ent-summary').innerHTML = '<span>등수별 구성:</span> ' + pdCurrentRoundPrizes.slice().sort(function(a,b){return ppRankNum(a.rank)-ppRankNum(b.rank);}).map(function(p){ return '<span>' + ppRankNum(p.rank) + '등</span> ' + p.count + '<span>명</span>(' + ppEsc(p.name) + ')'; }).join(' · ');
     pdConfirmedWinners = (Array.isArray(d.winners_confirmed) ? d.winners_confirmed : []).map(function(w){ return Object.assign({paid:false, memo:''}, w); });
+    pdConfirmedWinnersBaseline = JSON.parse(JSON.stringify(pdConfirmedWinners));
     pdConfirmedWinners.forEach(function(w){ pdConfirmedWinnersSnapshot[w.user_id] = String(ppRankNum(w.rank)); });
     pdCurrentEntrants = entriesSnap.docs.map(function(doc){ return Object.assign({_id: doc.id}, doc.data()); });
     /* 확정 당첨(사람 기준)을 그 사람의 응모 행 중 하나에 매핑해 초기 스테이징 구성 */
@@ -6603,6 +6615,7 @@ window.pdAutoSelectWinners = function() {
   toast('자동으로 당첨자를 선택했습니다. 적용을 눌러야 확정됩니다.');
 };
 
+/* 적용 = 당첨 선택(등수)·지급 상태·메모를 한 번에 저장하는 유일한 저장 경로 */
 window.pdApplyWinners = function() {
   var entryIds = Object.keys(pdStagedWinners);
   if (!entryIds.length) { toast('선택된 당첨자가 없습니다.'); return; }
@@ -6622,6 +6635,7 @@ window.pdApplyWinners = function() {
     toast('당첨자가 적용되었습니다.');
     logAdmin('회차 당첨자 적용: ' + pdCurrentRoundId);
     pdConfirmedWinners = winners;
+    pdConfirmedWinnersBaseline = JSON.parse(JSON.stringify(winners));
     pdConfirmedWinnersSnapshot = {};
     entryIds.forEach(function(id){ pdConfirmedWinnersSnapshot[pdStagedWinners[id].uid] = pdStagedWinners[id].rank; });
     pdRenderEntrantRows();
@@ -6629,24 +6643,19 @@ window.pdApplyWinners = function() {
   }).catch(function(e) { toast('적용 실패: ' + (e.message||e)); });
 };
 
+/* 지급 상태·메모는 여기서 로컬 상태만 바꾸고, 실제 저장은 상단 "적용" 클릭 시 한 번에 처리 */
 window.pdTogglePaid = function(uid) {
   var w = pdConfirmedWinnerFor(uid);
   if (!w) return;
-  var next = !w.paid;
-  w.paid = next;
-  db.collection('raffles').doc(pdCurrentRoundId).update({ winners_confirmed: pdConfirmedWinners }).then(function() {
-    toast(next ? '지급 완료로 변경했습니다.' : '지급 대기로 되돌렸습니다.');
-    pdRenderEntrantRows();
-  }).catch(function(e) { w.paid = !next; toast('저장 실패: ' + (e.message||e)); });
+  w.paid = !w.paid;
+  pdRenderEntrantRows();
 };
 
 window.pdSaveMemo = function(uid, value) {
   var w = pdConfirmedWinnerFor(uid);
   if (!w) return;
   w.memo = value;
-  db.collection('raffles').doc(pdCurrentRoundId).update({ winners_confirmed: pdConfirmedWinners }).then(function() {
-    toast('메모가 저장되었습니다.');
-  }).catch(function(e) { toast('저장 실패: ' + (e.message||e)); });
+  pdUpdateEntStatusBadge();
 };
 
 /* KO/VI 토글 시 회차명(pdWeekLabel)·모달 제목처럼 사전 매칭이 안 되는 동적 텍스트를 현재 언어로 재계산.
