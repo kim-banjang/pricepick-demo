@@ -158,14 +158,13 @@ html,body{font-family:var(--font);background:var(--bg);color:var(--text);-webkit
   border-radius:10px;padding:1px 7px;min-width:18px;text-align:center;flex-shrink:0;}
 .sb-item.active .sb-item-badge{background:rgba(255,255,255,.25);}
 
-/* 메뉴 상태 태그 (확정/확인중/미확인) — 운영자가 클릭해서 전환 */
+/* 메뉴 상태 태그 (확인중/확정) — 운영자가 클릭해서 전환 */
 .sb-status-tag{margin-left:auto;flex-shrink:0;font-size:10px;font-weight:700;
   border-radius:10px;padding:2px 8px;cursor:pointer;white-space:nowrap;
   transition:filter .12s;}
 .sb-status-tag:hover{filter:brightness(0.96);}
 .sb-status-tag.confirmed{background:#DCFCE7;color:#15803D;}
 .sb-status-tag.checking{background:#FEF3C7;color:#92400E;}
-.sb-status-tag.unverified{background:#E5E7EB;color:#4B5563;}
 .sb-item.active .sb-status-tag{box-shadow:0 0 0 1px rgba(255,255,255,.5) inset;}
 .sidebar.sb-mini .sb-status-tag{display:none;}
 
@@ -5215,7 +5214,7 @@ Object.assign(KO2VI,{"행운룰렛 설정":"Cài đặt vòng quay may mắn","�
 Object.assign(KO2VI,{"안내":"Hướng dẫn","탈퇴 정책 안내":"Hướng dẫn chính sách hủy TK","고정 정책 — 운영자가 수정할 수 없습니다.":"Chính sách cố định — quản trị viên không thể sửa.","탈퇴 즉시 제거 (레코드는 유지, 고정 정책)":"Xóa ngay khi hủy (bản ghi vẫn giữ, chính sách cố định)","탈퇴 회원 상세":"Chi tiết hội viên đã hủy","식별 아이디":"ID định danh","탈퇴 완료 (즉시 처리 · 유예 없음)":"Đã hủy hoàn tất (xử lý ngay · không ân hạn)","PII 처리":"Xử lý PII","닉네임·카카오 식별값 스크럽됨":"Nickname·mã định danh Kakao đã được scrub","레코드는 유지, 거래 기록 참조 무결성 보호":"Bản ghi vẫn giữ, bảo vệ tính toàn vẹn tham chiếu lịch sử giao dịch","공지 수정":"Sửa thông báo"});
 Object.assign(KO2VI,{"답변하기":"Trả lời","답변 수정":"Sửa câu trả lời","작성자":"Người viết","문의를 삭제했습니다.":"Đã xóa hỏi đáp.","공지가 삭제되었습니다.":"Đã xóa thông báo.","공지가 수정되었습니다.":"Thông báo đã được sửa.","공지가 게시되었습니다.":"Thông báo đã được đăng.","제목과 내용을 입력하세요.":"Hãy nhập tiêu đề và nội dung.","작성일":"Ngày viết"});
 /* ── i18n 보강 (2026-07-21 해리 답변 반영) — QA 상태 뱃지 3단계·발송 대상 맞춤 세그먼트 제거 ── */
-Object.assign(KO2VI,{"확인중":"Đang kiểm tra","미확인":"Chưa xác nhận","클릭해서 확정/확인중/미확인 전환":"Nhấn để chuyển Đã xác nhận/Đang kiểm tra/Chưa xác nhận"});
+Object.assign(KO2VI,{"확인중":"Đang kiểm tra","클릭해서 확인중/확정 전환":"Nhấn để chuyển Đang kiểm tra/Đã xác nhận"});
 Object.assign(KO2VI,{"테스트 발송 미리보기":"Xem trước gửi thử","실제 수신 시 보이는 모습과 동일한 형태입니다. 본인 계정으로만 발송됩니다.":"Đây là hình thức giống hệt lúc nhận thực tế. Chỉ được gửi đến tài khoản của chính bạn.","지금":"Bây giờ"});
 
 
@@ -10194,33 +10193,25 @@ window.rltSave = function() {
   });
 };
 
-/* ── 좌측 네비 메뉴 상태 태그 (확정/확인중/미확인) ──
-   settings/menu_status 문서(statuses: {navId: 'confirmed'|'checking'|'unverified'})에 저장.
-   기본값은 '확인중' — 단, 실데이터 근거가 없어 QA 자체가 불가능한 메뉴(DEFAULT_UNVERIFIED)는
-   저장된 값이 없을 때 '미확인'을 기본값으로 사용한다(해리 답변 #H2·H3, 2026-07-21 확정).
-   운영자가 태그를 클릭하면 확인중→확정→미확인→확인중 순으로 순환 + 저장. */
+/* ── 좌측 네비 메뉴 상태 태그 (확인중/확정) ──
+   settings/menu_status 문서(statuses: {navId: 'confirmed'|'checking'})에 저장.
+   기본값은 '확인중'. 운영자가 태그를 클릭하면 확인중↔확정으로 전환 + 저장. */
 var MT_STATUS = {};
-var DEFAULT_UNVERIFIED = { postback: 1, stats: 1, revenue: 1, settlement: 1 };
 function mtNavId(el) {
   return (el.id || '').replace(/^nav-/, '');
-}
-function mtDefaultStatus(navId) {
-  return DEFAULT_UNVERIFIED[navId] ? 'unverified' : 'checking';
 }
 function mtApplyStatuses() {
   document.querySelectorAll('.sb-status-tag').forEach(function(tag) {
     var navId = tag.dataset.navId;
-    var st = MT_STATUS[navId] || mtDefaultStatus(navId);
+    var st = MT_STATUS[navId] === 'confirmed' ? 'confirmed' : 'checking';
     tag.classList.toggle('confirmed', st === 'confirmed');
     tag.classList.toggle('checking', st === 'checking');
-    tag.classList.toggle('unverified', st === 'unverified');
-    tag.textContent = st === 'confirmed' ? '확정' : (st === 'unverified' ? '미확인' : '확인중');
+    tag.textContent = st === 'confirmed' ? '확정' : '확인중';
   });
 }
 function mtToggleStatus(navId) {
-  var cur = MT_STATUS[navId] || mtDefaultStatus(navId);
-  var next = cur === 'checking' ? 'confirmed' : (cur === 'confirmed' ? 'unverified' : 'checking');
-  MT_STATUS[navId] = next;
+  var cur = MT_STATUS[navId] === 'confirmed' ? 'confirmed' : 'checking';
+  MT_STATUS[navId] = cur === 'checking' ? 'confirmed' : 'checking';
   mtApplyStatuses();
   db.collection('settings').doc('menu_status').set({
     statuses: MT_STATUS,
@@ -10240,7 +10231,7 @@ function mtInjectStatusTags() {
     tag.className = 'sb-status-tag checking';
     tag.dataset.navId = navId;
     tag.textContent = '확인중';
-    tag.title = '클릭해서 확정/확인중/미확인 전환';
+    tag.title = '클릭해서 확인중/확정 전환';
     tag.addEventListener('click', function(e) {
       e.preventDefault();
       e.stopPropagation();
