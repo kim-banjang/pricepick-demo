@@ -6933,16 +6933,27 @@ function loadInvites() {
       return;
     }
     /* aggregate by inviter */
+    var now = new Date();
+    var curYear = now.getFullYear(), curMonth = now.getMonth();
     var byInviter = {};
     snap.docs.forEach(function(doc) {
       var d = doc.data();
       var k = d.inviter_id || d.user_id;
       if (!k) return;
-      if (!byInviter[k]) byInviter[k] = { total:0, success:0 };
+      if (!byInviter[k]) byInviter[k] = { total:0, success:0, thisMonth:0, lastAt:0 };
       byInviter[k].total++;
-      if (d.status === 'completed') byInviter[k].success++;
+      var ts = (d.created_at && d.created_at.toMillis) ? d.created_at.toMillis() : 0;
+      if (ts > byInviter[k].lastAt) byInviter[k].lastAt = ts;
+      if (d.status === 'completed') {
+        byInviter[k].success++;
+        if (d.created_at && d.created_at.toDate) {
+          var cd = d.created_at.toDate();
+          if (cd.getFullYear() === curYear && cd.getMonth() === curMonth) byInviter[k].thisMonth++;
+        }
+      }
     });
-    var sorted = Object.keys(byInviter).sort(function(a,b){ return byInviter[b].success - byInviter[a].success; });
+    /* 최신순(가장 최근 초대 활동 기준) · TOP 10만, 페이지네이션 없음 */
+    var sorted = Object.keys(byInviter).sort(function(a,b){ return byInviter[b].lastAt - byInviter[a].lastAt; }).slice(0,10);
     dmFetchUsersByIds(sorted).then(function(userMap) {
       var rows = sorted.map(function(uid, i) {
         var v = byInviter[uid];
@@ -6951,7 +6962,7 @@ function loadInvites() {
           + '<td style="text-align:center">' + ppN(v.total) + '명</td>'
           + '<td style="text-align:center">' + ppN(v.success) + '명</td>'
           + '<td style="text-align:center">' + ppN(v.success * 500) + 'P</td>'
-          + '<td style="text-align:center">—</td></tr>';
+          + '<td style="text-align:center">' + ppN(v.thisMonth) + '명</td></tr>';
       });
       tbody.innerHTML = rows.join('');
     });
