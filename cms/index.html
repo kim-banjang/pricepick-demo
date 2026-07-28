@@ -1209,7 +1209,7 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
       <div class="card">
         <div class="card-header"><div class="card-title">회차 등록 안내</div></div>
         <div style="padding:16px 18px">
-          <div style="font-size:13px;color:var(--text);line-height:1.7;max-width:640px">회차는 매월 초 한 달치가 자동 등록됩니다 (매주 월요일 시작 ~ 일요일 23:59:59 마감). 회차명은 마감일(추첨일) 기준 "YYYY년 N월 M주차" 형식으로 자동 부여됩니다.</div>
+          <div style="font-size:13px;color:var(--text);line-height:1.7;max-width:720px;word-break:keep-all">회차는 매월 초 한 달치가 자동 등록됩니다 (매주 월요일 시작 ~ 일요일 23:59:59 마감). 회차명은 마감일(추첨일) 기준 "YYYY년 N월 M주차" 형식으로 자동 부여됩니다.</div>
           <div style="margin-top:14px">
             <button class="btn btn-ghost btn-sm" onclick="ppOpenTemplateModal()">기본 경품 구성 템플릿 편집</button>
           </div>
@@ -1218,7 +1218,7 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
       <div class="card">
         <div class="card-header"><div><div class="card-title">진행중인 주간 이벤트</div><div class="card-sub" id="draw-card-sub">추첨 방식: 매주 월요일 0시 시작 ~ 일요일 23:59:59 마감 (자동 생성)</div></div><div id="draw-hdr-actions"></div></div>
         <table>
-          <thead><tr><th>회차</th><th>기간</th><th>응모자 수</th><th>당첨자</th><th>액션</th></tr></thead>
+          <thead><tr><th>회차</th><th>기간</th><th>응모건 수</th><th>당첨자</th><th>액션</th></tr></thead>
           <tbody id="draws-tbody-active">
           </tbody>
         </table>
@@ -1226,7 +1226,7 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
       <div class="card" style="margin-top:14px">
         <div class="card-header"><div class="card-title">진행예정 주간 이벤트</div></div>
         <table>
-          <thead><tr><th>회차</th><th>기간</th><th>응모자 수</th><th>당첨자</th><th>액션</th></tr></thead>
+          <thead><tr><th>회차</th><th>기간</th><th>응모건 수</th><th>당첨자</th><th>액션</th></tr></thead>
           <tbody id="draws-tbody-upcoming">
           </tbody>
         </table>
@@ -1234,7 +1234,7 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
       <div class="card" style="margin-top:14px">
         <div class="card-header"><div class="card-title">종료된 주간 이벤트</div></div>
         <table>
-          <thead><tr><th>회차</th><th>기간</th><th>응모자 수</th><th>당첨자</th><th>액션</th></tr></thead>
+          <thead><tr><th>회차</th><th>기간</th><th>응모건 수</th><th>당첨자</th><th>액션</th></tr></thead>
           <tbody id="draws-tbody-past">
           </tbody>
         </table>
@@ -1291,8 +1291,8 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
             <span class="badge" id="pd-ent-status-badge">미선정</span>
             <button class="btn btn-ghost btn-sm" onclick="pdAutoSelectWinners()">자동 당첨자 선택</button>
           </div>
-          <table>
-            <thead><tr><th>닉네임 / 카카오톡 ID / 식별 아이디</th><th>사용 티켓</th><th>응모일시</th><th>당첨 등수</th></tr></thead>
+          <table style="table-layout:fixed;width:100%">
+            <thead><tr><th style="width:40%">닉네임(카카오ID)</th><th style="width:32%">응모일시</th><th style="width:28%">당첨 등수</th></tr></thead>
             <tbody id="pd-ent-tbody"></tbody>
           </table>
         </div>
@@ -5044,7 +5044,7 @@ Object.assign(KO2VI,{"경품 추첨 관리":"Quản lý bốc thăm quà","응�
 Object.assign(KO2VI,{"이벤트 설정 관리":"Quản lý cài đặt sự kiện","이벤트 응모/추첨 관리":"Quản lý dự thưởng/bốc thăm sự kiện","— 출석 5연속·행운룰렛·이부장 패키지 등으로 획득한 이벤트 티켓은 현재 진행 중인 추첨 회차에 자동 응모됩니다. 응모한 티켓 수에 비례해 당첨 확률이 높아지며, 당첨자 수만큼 비복원 추첨됩니다. 회차 목록·응모 현황·당첨 처리는":"— Vé sự kiện nhận được qua điểm danh 5 ngày liên tiếp·vòng quay may mắn·gói Trưởng phòng Lee v.v. sẽ tự động ứng tuyển vào đợt rút thăm đang diễn ra. Xác suất trúng tăng theo số vé đã ứng tuyển, và rút thăm không hoàn lại theo đúng số người trúng. Danh sách đợt·tình hình dự thưởng·xử lý trúng thưởng được quản lý ở màn","화면에서 관리합니다.":"để quản lý.","자동 회차 등록 체크박스·마감 시각·기본 경품 구성 템플릿은":"Checkbox đăng ký đợt tự động·giờ đóng·mẫu cấu hình quà mặc định được quản lý ở màn","켜두면 매주 월요일 0시 시작 ~ 일요일 마감 주기로, 마감된 회차 다음의 신규 회차가 아래 기본 경품 구성 템플릿을 복사해 자동 생성됩니다. 회차명은 마감일(추첨일) 기준 \"N월 M주차\" 형식으로 자동 부여되며, 생성 후에도 개별 수정할 수 있습니다. 수동 등록·수정은 이 설정과 무관하게 항상 가능합니다.":"Khi bật, theo chu kỳ bắt đầu 0h Thứ Hai ~ đóng Chủ Nhật hàng tuần, đợt mới tiếp theo sau đợt đã đóng sẽ tự động được tạo bằng cách sao chép mẫu cấu hình quà mặc định bên dưới. Tên đợt được tự động đặt theo định dạng \"Tuần M tháng N\" dựa trên ngày đóng (ngày rút thăm), và có thể sửa riêng từng đợt sau khi tạo. Đăng ký·sửa thủ công luôn khả dụng bất kể cài đặt này."});
 Object.assign(KO2VI,{"예: 2026년 8월 1주차":"VD: Tuần 1 tháng 8 năm 2026"});
 Object.assign(KO2VI,{"주간 회차 리스트":"Danh sách đợt hàng tuần","기간":"Thời gian","미선정":"Chưa chọn","응모 상세 보기":"Xem chi tiết dự thưởng","응모자 리스트":"Danh sách người dự thưởng","당첨 등수":"Hạng trúng thưởng","자동 당첨자 선택":"Chọn người trúng tự động","적용됨":"Đã áp dụng","적용 전 (임시 선택)":"Trước khi áp dụng (chọn tạm)","선택된 당첨자가 없습니다.":"Chưa chọn người trúng thưởng nào.","당첨자가 적용되었습니다.":"Đã áp dụng người trúng thưởng.","자동으로 당첨자를 선택했습니다. 적용을 눌러야 확정됩니다.":"Đã tự động chọn người trúng thưởng. Phải bấm Áp dụng mới được xác nhận.","회차를 찾을 수 없습니다.":"Không tìm thấy đợt.","미선택":"Chưa chọn","등수별 구성:":"Cơ cấu theo hạng:","불러오는 중…":"Đang tải…"});
-Object.assign(KO2VI,{"예정":"Sắp diễn ra","종료":"Đã kết thúc","마감: 매주 일요일 23:59:59 (고정)":"Đóng: 23:59:59 Chủ Nhật hàng tuần (cố định)","켜두면 매월 초에 그 달의 전체 회차(주차별)가 미리 자동 생성됩니다. 회차명은 마감일(추첨일) 기준 \"YYYY년 N월 M주차\" 형식으로 자동 부여되며, 생성 후에도 개별 수정할 수 있습니다. 수동 등록·수정은 이 설정과 무관하게 항상 가능합니다.":"Khi bật, vào đầu mỗi tháng toàn bộ các đợt (theo tuần) của tháng đó sẽ được tạo tự động trước. Tên đợt được tự động đặt theo định dạng \"Tuần M tháng N năm YYYY\" dựa trên ngày đóng (ngày rút thăm), và có thể sửa riêng từng đợt sau khi tạo. Đăng ký·sửa thủ công luôn khả dụng bất kể cài đặt này.","추첨 방식: 매주 월요일 0시 시작 ~ 일요일 23:59:59 마감 (자동/수동 전환 가능)":"Phương thức rút thăm: bắt đầu 0h Thứ Hai ~ đóng 23:59:59 Chủ Nhật hàng tuần (chuyển đổi tự động/thủ công được)","경품 수정":"Chỉnh sửa giải thưởng","진행중인 주간 이벤트":"Sự kiện tuần đang diễn ra","진행예정 주간 이벤트":"Sự kiện tuần sắp diễn ra","종료된 주간 이벤트":"Sự kiện tuần đã kết thúc","진행 중인 회차가 없습니다.":"Không có đợt nào đang diễn ra.","예정된 회차가 없습니다.":"Không có đợt nào sắp diễn ra.","종료된 회차가 없습니다.":"Không có đợt nào đã kết thúc.","로드 오류":"Lỗi tải dữ liệu","켜두면 매월 초에 그 달의 전체 회차(주차별)가 자동 생성됩니다. 회차명은 마감일(추첨일) 기준 \"YYYY년 N월 M주차\" 형식으로 자동 부여됩니다. 회차는 자동 생성만 가능하며, 운영자는 생성된 회차의 경품 구성 수정과 당첨자 선정만 진행합니다.":"Khi bật, vào đầu mỗi tháng toàn bộ các đợt (theo tuần) của tháng đó sẽ được tạo tự động. Tên đợt được tự động đặt theo định dạng \"Tuần M tháng N năm YYYY\" dựa trên ngày đóng (ngày rút thăm). Đợt chỉ được tạo tự động — quản trị viên chỉ chỉnh sửa cấu hình quà và chọn người trúng của đợt đã tạo.","추첨 방식: 매주 월요일 0시 시작 ~ 일요일 23:59:59 마감 (자동 생성)":"Phương thức rút thăm: bắt đầu 0h Thứ Hai ~ đóng 23:59:59 Chủ Nhật hàng tuần (tạo tự động)","회차 등록 안내":"Hướng dẫn đăng ký đợt","회차는 매월 초 한 달치가 자동 등록됩니다 (매주 월요일 시작 ~ 일요일 23:59:59 마감). 회차명은 마감일(추첨일) 기준 \"YYYY년 N월 M주차\" 형식으로 자동 부여됩니다.":"Đợt được đăng ký tự động mỗi tháng, trọn một tháng (bắt đầu Thứ Hai ~ đóng 23:59:59 Chủ Nhật hàng tuần). Tên đợt được tự động đặt theo định dạng \"Tuần M tháng N năm YYYY\" dựa trên ngày đóng (ngày rút thăm).","이미 다른 응모 건으로 당첨 처리된 응모자입니다 (1인 1등수만 가능).":"Người này đã được chọn trúng thưởng ở một lượt dự thưởng khác (mỗi người chỉ được 1 hạng)."});
+Object.assign(KO2VI,{"예정":"Sắp diễn ra","종료":"Đã kết thúc","마감: 매주 일요일 23:59:59 (고정)":"Đóng: 23:59:59 Chủ Nhật hàng tuần (cố định)","켜두면 매월 초에 그 달의 전체 회차(주차별)가 미리 자동 생성됩니다. 회차명은 마감일(추첨일) 기준 \"YYYY년 N월 M주차\" 형식으로 자동 부여되며, 생성 후에도 개별 수정할 수 있습니다. 수동 등록·수정은 이 설정과 무관하게 항상 가능합니다.":"Khi bật, vào đầu mỗi tháng toàn bộ các đợt (theo tuần) của tháng đó sẽ được tạo tự động trước. Tên đợt được tự động đặt theo định dạng \"Tuần M tháng N năm YYYY\" dựa trên ngày đóng (ngày rút thăm), và có thể sửa riêng từng đợt sau khi tạo. Đăng ký·sửa thủ công luôn khả dụng bất kể cài đặt này.","추첨 방식: 매주 월요일 0시 시작 ~ 일요일 23:59:59 마감 (자동/수동 전환 가능)":"Phương thức rút thăm: bắt đầu 0h Thứ Hai ~ đóng 23:59:59 Chủ Nhật hàng tuần (chuyển đổi tự động/thủ công được)","경품 수정":"Chỉnh sửa giải thưởng","진행중인 주간 이벤트":"Sự kiện tuần đang diễn ra","진행예정 주간 이벤트":"Sự kiện tuần sắp diễn ra","종료된 주간 이벤트":"Sự kiện tuần đã kết thúc","진행 중인 회차가 없습니다.":"Không có đợt nào đang diễn ra.","예정된 회차가 없습니다.":"Không có đợt nào sắp diễn ra.","종료된 회차가 없습니다.":"Không có đợt nào đã kết thúc.","로드 오류":"Lỗi tải dữ liệu","켜두면 매월 초에 그 달의 전체 회차(주차별)가 자동 생성됩니다. 회차명은 마감일(추첨일) 기준 \"YYYY년 N월 M주차\" 형식으로 자동 부여됩니다. 회차는 자동 생성만 가능하며, 운영자는 생성된 회차의 경품 구성 수정과 당첨자 선정만 진행합니다.":"Khi bật, vào đầu mỗi tháng toàn bộ các đợt (theo tuần) của tháng đó sẽ được tạo tự động. Tên đợt được tự động đặt theo định dạng \"Tuần M tháng N năm YYYY\" dựa trên ngày đóng (ngày rút thăm). Đợt chỉ được tạo tự động — quản trị viên chỉ chỉnh sửa cấu hình quà và chọn người trúng của đợt đã tạo.","추첨 방식: 매주 월요일 0시 시작 ~ 일요일 23:59:59 마감 (자동 생성)":"Phương thức rút thăm: bắt đầu 0h Thứ Hai ~ đóng 23:59:59 Chủ Nhật hàng tuần (tạo tự động)","회차 등록 안내":"Hướng dẫn đăng ký đợt","회차는 매월 초 한 달치가 자동 등록됩니다 (매주 월요일 시작 ~ 일요일 23:59:59 마감). 회차명은 마감일(추첨일) 기준 \"YYYY년 N월 M주차\" 형식으로 자동 부여됩니다.":"Đợt được đăng ký tự động mỗi tháng, trọn một tháng (bắt đầu Thứ Hai ~ đóng 23:59:59 Chủ Nhật hàng tuần). Tên đợt được tự động đặt theo định dạng \"Tuần M tháng N năm YYYY\" dựa trên ngày đóng (ngày rút thăm).","이미 다른 응모 건으로 당첨 처리된 응모자입니다 (1인 1등수만 가능).":"Người này đã được chọn trúng thưởng ở một lượt dự thưởng khác (mỗi người chỉ được 1 hạng).","응모건 수":"Số lượt dự thưởng","닉네임(카카오ID)":"Biệt danh (Kakao ID)"});
   var _orig=new Map(), _tracked=new Set(), _applying=false;
   function hasKo(s){ return /[가-힯ᄀ-ᇿ㄰-㆏]/.test(s); }
   function tcore(s){
@@ -6236,7 +6236,7 @@ function loadDraws() {
     var now = new Date();
     var docs = snap.docs;
     return Promise.all(docs.map(function(doc) {
-      return db.collection('raffle_entries').where('raffle_id', '==', doc.id).get().then(function(es){ return new Set(es.docs.map(function(x){ return x.data().user_id; })).size; }).catch(function(){ return 0; });
+      return db.collection('raffle_entries').where('raffle_id', '==', doc.id).get().then(function(es){ return es.size; }).catch(function(){ return 0; });
     })).then(function(counts) {
       var items = docs.map(function(doc, i) {
         var d = doc.data();
@@ -6253,7 +6253,7 @@ function loadDraws() {
         return '<tr>'
           + '<td style="font-weight:600">' + ppEsc(d.title||'') + '</td>'
           + '<td style="font-size:12px">' + period + '</td>'
-          + '<td style="text-align:center">' + ppN(it.count) + '명</td>'
+          + '<td style="text-align:center">' + ppN(it.count) + '건</td>'
           + '<td><div style="font-size:12px;line-height:1.6">' + winnerCell + '</div></td>'
           + '<td>' + actionCell + '</td></tr>';
       }
@@ -6438,10 +6438,9 @@ function pdRenderEntrantRows() {
     var staged = pdStagedWinners[e._id];
     var rank = staged ? staged.rank : '';
     return '<tr data-entry-id="' + e._id + '">'
-      + '<td>' + renderMemberIdentityInline(e._userObj, e.user_id) + '</td>'
-      + '<td style="text-align:center">' + ppN(e.tickets_used||1) + '장</td>'
+      + '<td>' + renderMemberIdentityListOnly(e._userObj, e.user_id) + '</td>'
       + '<td>' + pdDtTime(e.created_at) + '</td>'
-      + '<td><select class="form-select" style="font-size:13px" onchange="pdAssignRank(this,\'' + e._id + '\',\'' + e.user_id + '\')">' + pdRankOptionsHtml(rank) + '</select></td>'
+      + '<td><select class="form-select" style="font-size:13px;width:100%" onchange="pdAssignRank(this,\'' + e._id + '\',\'' + e.user_id + '\')">' + pdRankOptionsHtml(rank) + '</select></td>'
       + '</tr>';
   }).join('');
   pdUpdateEntStatusBadge();
@@ -6487,7 +6486,7 @@ window.pdOpenEntrantsModal = function(raffleId) {
       if (row) pdStagedWinners[row._id] = { rank: pdConfirmedWinnersSnapshot[uid], uid: uid };
     });
     if (!pdCurrentEntrants.length) {
-      document.getElementById('pd-ent-tbody').innerHTML = ppEmpty(4, '응모 내역이 없습니다.');
+      document.getElementById('pd-ent-tbody').innerHTML = ppEmpty(3, '응모 내역이 없습니다.');
       pdUpdateEntStatusBadge();
       return;
     }
