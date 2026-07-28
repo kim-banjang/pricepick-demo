@@ -12429,22 +12429,9 @@ body.interactive-mode #ip-nav { display: block; }
           <div style="margin:12px 16px 20px;background:white;border:1px solid var(--border);border-radius:12px;overflow:hidden;">
             <div style="padding:13px 16px 10px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;">
               <div style="font-size:11px;font-weight:700;color:var(--text2);">지난 회차 당첨 결과</div>
-              <div style="font-size:10px;color:var(--text3);">2026년 5월 1주차</div>
+              <div id="raffle-past-title" style="font-size:10px;color:var(--text3);"></div>
             </div>
-            <div style="padding:12px 16px;display:flex;flex-direction:column;gap:8px;">
-              <div style="display:flex;justify-content:space-between;align-items:center;">
-                <div style="display:flex;align-items:center;gap:6px;"><span style="font-size:12px;">🥇</span><span style="font-size:11px;font-weight:600;color:var(--text1);">신세계 5만원권</span></div>
-                <span style="font-size:10px;color:var(--text3);">김*준 외 0명</span>
-              </div>
-              <div style="display:flex;justify-content:space-between;align-items:center;">
-                <div style="display:flex;align-items:center;gap:6px;"><span style="font-size:12px;">🥈</span><span style="font-size:11px;font-weight:600;color:var(--text1);">스타벅스 아메리카노</span></div>
-                <span style="font-size:10px;color:var(--text3);">이*희 외 2명</span>
-              </div>
-              <div style="display:flex;justify-content:space-between;align-items:center;">
-                <div style="display:flex;align-items:center;gap:6px;"><span style="font-size:12px;">🥉</span><span style="font-size:11px;font-weight:600;color:var(--text1);">이벤트 티켓 추가 지급</span></div>
-                <span style="font-size:10px;color:var(--text3);">박*수 외 11명</span>
-              </div>
-            </div>
+            <div id="raffle-past-list" style="padding:12px 16px;display:flex;flex-direction:column;gap:8px;"></div>
           </div>
 
         </div>
@@ -15490,6 +15477,10 @@ function csSubmitInquiry(btn) {
     "이 화면은 데모용으로 만든 시뮬레이션입니다.": "Màn hình này là mô phỏng được tạo riêng cho bản demo.",
     "실제 서비스에서는 카카오톡 앱으로 진짜 전환됩니다.": "Trong dịch vụ thực tế, ứng dụng sẽ chuyển thật sang KakaoTalk.",
     "실제 서비스에서는 iOS가 진짜 시스템 팝업을 띄웁니다.": "Trong dịch vụ thực tế, iOS sẽ hiển thị hộp thoại hệ thống thật.",
+    "경품 추첨에 당첨되셨어요!": "Bạn đã trúng thưởng bốc thăm quà!",
+    "당첨 안내를 확인하고 배송 정보를 입력해주세요.": "Xem thông báo trúng thưởng và nhập thông tin giao hàng.",
+    "지난 회차 당첨 결과": "Kết quả trúng thưởng đợt trước",
+    "아직 발표된 당첨 결과가 없어요": "Chưa có kết quả trúng thưởng nào được công bố",
   });
   var IPLANG='ko';
   var KO_RE=/[\uac00-\ud7a3]/;
@@ -16974,6 +16965,7 @@ function renderRaffleScreen() {
   if (badge) badge.textContent = PP.tickets.event || 0;
   var remain = document.getElementById('raffle-remain-tickets');
   if (remain) remain.textContent = PP.tickets.event || 0;
+  ppRenderPastRaffleWinners();
   if (!PP.uid) return;
   ppQuery('raffle_entries', 'user_id', PP.uid).then(function(list) {
     var now = new Date();
@@ -16988,6 +16980,48 @@ function renderRaffleScreen() {
     var totalEl = document.getElementById('raffle-total-count');
     if (totalEl) totalEl.textContent = list.length;
   });
+}
+/* 회차명 = 마감일 기준 "N월 M주차" — CMS(pdWeekLabel)와 동일한 계산식, 언어에 맞춰 즉시 계산 */
+function ppRaffleWeekLabel(endDateStr) {
+  var d = new Date(endDateStr + 'T00:00:00');
+  var year = d.getFullYear();
+  var month = d.getMonth() + 1;
+  var week = Math.ceil(d.getDate() / 7);
+  var isVi = (typeof window.ipGetLang === 'function') && window.ipGetLang() === 'vi';
+  return isVi ? ('Tuần ' + week + ' tháng ' + month + ' năm ' + year) : (year + '년 ' + month + '월 ' + week + '주차');
+}
+/* 지난 회차 당첨 결과 — 가장 최근 마감·추첨된 회차 1개만, 등수·경품명·당첨자 닉네임만 노출(카카오ID 등 개인정보 없음) */
+function ppRenderPastRaffleWinners() {
+  var titleEl = document.getElementById('raffle-past-title');
+  var listEl = document.getElementById('raffle-past-list');
+  if (!listEl) return;
+  db.collection('prize_winners').orderBy('created_at', 'desc').limit(30).get().then(function(snap) {
+    var items = [];
+    snap.forEach(function(d) { items.push(d.data()); });
+    if (!items.length) {
+      if (titleEl) titleEl.textContent = '';
+      listEl.innerHTML = '<div style="font-size:11px;color:var(--text3);text-align:center;padding:6px 0;">아직 발표된 당첨 결과가 없어요</div>';
+      return;
+    }
+    var latest = items[0];
+    var rows = items.filter(function(w) { return w.raffle_id === latest.raffle_id; });
+    var byRank = {};
+    rows.forEach(function(w) {
+      var r = w.rank;
+      (byRank[r] = byRank[r] || { prize: w.prize_name, names: [] }).names.push(w.nickname || '닉네임없음');
+    });
+    var ranks = Object.keys(byRank).sort(function(a, b) { return (parseInt(a,10)||0) - (parseInt(b,10)||0); });
+    if (titleEl) titleEl.textContent = latest.raffle_end_date ? ppRaffleWeekLabel(latest.raffle_end_date) : (latest.raffle_title || '');
+    listEl.innerHTML = ranks.map(function(r) {
+      var g = byRank[r];
+      var med = r === '1' ? '🥇' : r === '2' ? '🥈' : r === '3' ? '🥉' : (r + '등');
+      var names = g.names.length > 1 ? (g.names[0] + ' 외 ' + (g.names.length - 1) + '명') : g.names[0];
+      return '<div style="display:flex;justify-content:space-between;align-items:center;">'
+        + '<div style="display:flex;align-items:center;gap:6px;"><span style="font-size:12px;">' + med + '</span><span style="font-size:11px;font-weight:600;color:var(--text1);">' + ppEsc(g.prize || '') + '</span></div>'
+        + '<span style="font-size:10px;color:var(--text3);">' + ppEsc(names) + '</span>'
+        + '</div>';
+    }).join('');
+  }).catch(function(e) { console.error('ppRenderPastRaffleWinners', e); });
 }
 
 /* ── Kakao mock complete ──
@@ -17348,8 +17382,9 @@ function renderNotifications() {
     ppQuery('gifticon_exchanges', 'user_id', PP.uid),
     ppQuery('invites', 'inviter_id', PP.uid),
     ppQuery('point_transactions', 'user_id', PP.uid),
+    ppQuery('prize_winners', 'user_id', PP.uid),
   ]).then(function (res) {
-    var pbs = res[0], gex = res[1], inv = res[2], ptx = res[3], items = [];
+    var pbs = res[0], gex = res[1], inv = res[2], ptx = res[3], pzw = res[4], items = [];
     pbs.forEach(function (p) {
       items.push({ key: 'pb:' + p._id, type: 'pick', dom: p.mall_domain || '', d: ppDate(p.created_at), tag: '구매', head: (p.mall_name || '쇼핑몰') + ' 구매로 티켓 적립', desc: (p.purchase_amount ? p.purchase_amount.toLocaleString('ko-KR') + '원 · ' : '') + (p.status === 'confirmed' ? '적립 완료' : '구매 확정 대기') });
     });
@@ -17362,6 +17397,9 @@ function renderNotifications() {
     ptx.forEach(function (p) {
       var amt = p.amount != null ? p.amount : (p.qty || 0);
       if (amt > 0) items.push({ key: 'pt:' + p._id, type: 'event', d: ppDate(p.created_at), tag: '이벤트', head: (p.reason || '포인트 적립'), desc: '+' + amt + 'P 적립' });
+    });
+    pzw.forEach(function (w) {
+      items.push({ key: 'pw:' + w._id, type: 'event', d: ppDate(w.created_at), tag: '이벤트', head: '경품 추첨에 당첨되셨어요!', desc: '당첨 안내를 확인하고 배송 정보를 입력해주세요.' });
     });
     items = items.filter(function (i) { return i.d; }).sort(function (a, b) { return b.d - a.d; });
     var readSet = {};

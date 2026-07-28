@@ -6330,6 +6330,7 @@ function ppDrawRoundWinners(raffleId, d, entries) {
         batch.set(ref, {
           raffle_id: raffleId,
           raffle_title: pdWeekLabel(d.end_date),
+          raffle_end_date: d.end_date,
           rank: String(p.rank),
           prize_name: p.prizeName || '',
           user_id: p.entry.user_id,
