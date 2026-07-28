@@ -17003,8 +17003,17 @@ function ppRenderPastRaffleWinners() {
       listEl.innerHTML = '<div style="font-size:11px;color:var(--text3);text-align:center;padding:6px 0;">아직 발표된 당첨 결과가 없어요</div>';
       return;
     }
-    var latest = items[0];
-    var rows = items.filter(function(w) { return w.raffle_id === latest.raffle_id; });
+    /* created_at(추첨 실행 시각) 순이 아니라 raffle_end_date(회차 마감일) 기준으로 가장 최근 회차를 고른다 —
+       데모 환경은 여러 회차가 CMS 접속 한 번에 몰아서 추첨 처리될 수 있어 추첨 시각 순서가 회차 순서와 다를 수 있다. */
+    var byRaffle = {};
+    items.forEach(function(w) { (byRaffle[w.raffle_id] = byRaffle[w.raffle_id] || []).push(w); });
+    var raffleIds = Object.keys(byRaffle).sort(function(a, b) {
+      var da = byRaffle[a][0].raffle_end_date || '';
+      var dbb = byRaffle[b][0].raffle_end_date || '';
+      return dbb.localeCompare(da);
+    });
+    var rows = byRaffle[raffleIds[0]];
+    var latest = rows[0];
     var byRank = {};
     rows.forEach(function(w) {
       var r = w.rank;
