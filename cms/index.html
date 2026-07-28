@@ -1287,6 +1287,7 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
         <div class="card-header"><div class="card-title" id="pd-ent-title">응모자 리스트</div><button class="btn btn-ghost btn-sm" onclick="pdCloseEntrantsModal()">✕ 닫기</button></div>
         <div style="padding:18px">
           <div class="info-box" id="pd-ent-summary"></div>
+          <div style="font-size:11.5px;color:var(--text-sub);margin:8px 2px 2px">응모 건 단위 무작위 추첨 · 티켓을 많이 쓸수록 확률 상승 · 1인 1회 당첨 · 1등부터 정원만큼 선정</div>
           <div style="display:flex;justify-content:space-between;align-items:center;margin:10px 0;flex-wrap:wrap;gap:8px">
             <span class="badge" id="pd-ent-status-badge">미선정</span>
             <div style="display:flex;gap:8px">
@@ -1296,7 +1297,7 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
             </div>
           </div>
           <table style="table-layout:fixed;width:100%">
-            <thead><tr><th style="width:20%">닉네임(카카오ID)</th><th style="width:18%">응모일시</th><th style="width:24%">당첨 경품 지급</th><th style="width:38%">당첨 등수</th></tr></thead>
+            <thead><tr><th style="width:22%">닉네임(카카오ID)</th><th style="width:16%">응모일시</th><th style="width:42%">당첨 경품 지급</th><th style="width:20%">당첨 등수</th></tr></thead>
             <tbody id="pd-ent-tbody"></tbody>
           </table>
         </div>
@@ -5043,7 +5044,7 @@ Object.assign(KO2VI,{"자동 회차 등록":"Đăng ký đợt tự động","�
 Object.assign(KO2VI,{"경품 추첨 관리":"Quản lý bốc thăm quà","응모 현황":"Tình hình dự thưởng","회차 선택":"Chọn đợt","응모자 수":"Số người dự thưởng","선택 회차 기준":"Theo đợt đã chọn","완료된 회차 당첨 결과":"Kết quả trúng thưởng đợt đã hoàn tất","등수별 당첨자":"Người trúng theo hạng","완료된 회차가 없습니다.":"Chưa có đợt nào hoàn tất.","응모 내역이 없습니다.":"Chưa có lịch sử dự thưởng.","등록된 회차 없음":"Chưa có đợt nào","사용 티켓":"Vé đã dùng","응모일시":"Thời điểm dự thưởng","회차별 응모자·소모 이벤트 티켓 현황입니다. 회차를 선택하면 상세 응모 내역이 표시됩니다.":"Đây là tình hình người dự thưởng·vé sự kiện tiêu theo từng đợt. Chọn một đợt để xem chi tiết lịch sử dự thưởng.","마감된 회차의 당첨 처리(추첨 실행)는":"Xử lý trúng thưởng (thực hiện bốc thăm) của đợt đã đóng được thực hiện ở","탭의 해당 회차 행에서 진행합니다. 이 탭에서는 처리 완료된 회차의 당첨 결과와, 아직 발송하지 않은 경품을 확인·발송합니다.":"tab, tại dòng đợt tương ứng. Ở tab này, bạn xác nhận kết quả trúng thưởng của các đợt đã xử lý xong và xác nhận·gửi những phần quà chưa gửi."});
 Object.assign(KO2VI,{"이벤트 설정 관리":"Quản lý cài đặt sự kiện","이벤트 응모/추첨 관리":"Quản lý dự thưởng/bốc thăm sự kiện","— 출석 5연속·행운룰렛·이부장 패키지 등으로 획득한 이벤트 티켓은 현재 진행 중인 추첨 회차에 자동 응모됩니다. 응모한 티켓 수에 비례해 당첨 확률이 높아지며, 당첨자 수만큼 비복원 추첨됩니다. 회차 목록·응모 현황·당첨 처리는":"— Vé sự kiện nhận được qua điểm danh 5 ngày liên tiếp·vòng quay may mắn·gói Trưởng phòng Lee v.v. sẽ tự động ứng tuyển vào đợt rút thăm đang diễn ra. Xác suất trúng tăng theo số vé đã ứng tuyển, và rút thăm không hoàn lại theo đúng số người trúng. Danh sách đợt·tình hình dự thưởng·xử lý trúng thưởng được quản lý ở màn","화면에서 관리합니다.":"để quản lý.","자동 회차 등록 체크박스·마감 시각·기본 경품 구성 템플릿은":"Checkbox đăng ký đợt tự động·giờ đóng·mẫu cấu hình quà mặc định được quản lý ở màn","켜두면 매주 월요일 0시 시작 ~ 일요일 마감 주기로, 마감된 회차 다음의 신규 회차가 아래 기본 경품 구성 템플릿을 복사해 자동 생성됩니다. 회차명은 마감일(추첨일) 기준 \"N월 M주차\" 형식으로 자동 부여되며, 생성 후에도 개별 수정할 수 있습니다. 수동 등록·수정은 이 설정과 무관하게 항상 가능합니다.":"Khi bật, theo chu kỳ bắt đầu 0h Thứ Hai ~ đóng Chủ Nhật hàng tuần, đợt mới tiếp theo sau đợt đã đóng sẽ tự động được tạo bằng cách sao chép mẫu cấu hình quà mặc định bên dưới. Tên đợt được tự động đặt theo định dạng \"Tuần M tháng N\" dựa trên ngày đóng (ngày rút thăm), và có thể sửa riêng từng đợt sau khi tạo. Đăng ký·sửa thủ công luôn khả dụng bất kể cài đặt này."});
 Object.assign(KO2VI,{"예: 2026년 8월 1주차":"VD: Tuần 1 tháng 8 năm 2026"});
-Object.assign(KO2VI,{"주간 회차 리스트":"Danh sách đợt hàng tuần","기간":"Thời gian","미선정":"Chưa chọn","응모 상세 보기":"Xem chi tiết dự thưởng","응모자 리스트":"Danh sách người dự thưởng","당첨 등수":"Hạng trúng thưởng","자동 당첨자 선택":"Chọn người trúng tự động","적용됨":"Đã áp dụng","적용 전 (임시 선택)":"Trước khi áp dụng (chọn tạm)","선택된 당첨자가 없습니다.":"Chưa chọn người trúng thưởng nào.","당첨자가 적용되었습니다.":"Đã áp dụng người trúng thưởng.","자동으로 당첨자를 선택했습니다. 적용을 눌러야 확정됩니다.":"Đã tự động chọn người trúng thưởng. Phải bấm Áp dụng mới được xác nhận.","회차를 찾을 수 없습니다.":"Không tìm thấy đợt.","미선택":"Chưa chọn","등수별 구성:":"Cơ cấu theo hạng:","불러오는 중…":"Đang tải…"});
+Object.assign(KO2VI,{"주간 회차 리스트":"Danh sách đợt hàng tuần","기간":"Thời gian","미선정":"Chưa chọn","응모 상세 보기":"Xem chi tiết dự thưởng","응모자 리스트":"Danh sách người dự thưởng","당첨 등수":"Hạng trúng thưởng","자동 당첨자 선택":"Chọn người trúng tự động","적용됨":"Đã áp dụng","적용 전 (임시 선택)":"Trước khi áp dụng (chọn tạm)","선택된 당첨자가 없습니다.":"Chưa chọn người trúng thưởng nào.","당첨자가 적용되었습니다.":"Đã áp dụng người trúng thưởng.","자동으로 당첨자를 선택했습니다. 적용을 눌러야 확정됩니다.":"Đã tự động chọn người trúng thưởng. Phải bấm Áp dụng mới được xác nhận.","회차를 찾을 수 없습니다.":"Không tìm thấy đợt.","미선택":"Chưa chọn","등수별 구성:":"Cơ cấu theo hạng:","불러오는 중…":"Đang tải…","응모 건 단위 무작위 추첨 · 티켓을 많이 쓸수록 확률 상승 · 1인 1회 당첨 · 1등부터 정원만큼 선정":"Rút thăm ngẫu nhiên theo đơn vị lượt dự thưởng · Dùng càng nhiều vé thì xác suất trúng càng cao · Mỗi người chỉ trúng thưởng 1 lần · Chọn từ hạng 1 cho đến khi đủ số lượng"});
 Object.assign(KO2VI,{"예정":"Sắp diễn ra","종료":"Đã kết thúc","마감: 매주 일요일 23:59:59 (고정)":"Đóng: 23:59:59 Chủ Nhật hàng tuần (cố định)","켜두면 매월 초에 그 달의 전체 회차(주차별)가 미리 자동 생성됩니다. 회차명은 마감일(추첨일) 기준 \"YYYY년 N월 M주차\" 형식으로 자동 부여되며, 생성 후에도 개별 수정할 수 있습니다. 수동 등록·수정은 이 설정과 무관하게 항상 가능합니다.":"Khi bật, vào đầu mỗi tháng toàn bộ các đợt (theo tuần) của tháng đó sẽ được tạo tự động trước. Tên đợt được tự động đặt theo định dạng \"Tuần M tháng N năm YYYY\" dựa trên ngày đóng (ngày rút thăm), và có thể sửa riêng từng đợt sau khi tạo. Đăng ký·sửa thủ công luôn khả dụng bất kể cài đặt này.","추첨 방식: 매주 월요일 0시 시작 ~ 일요일 23:59:59 마감 (자동/수동 전환 가능)":"Phương thức rút thăm: bắt đầu 0h Thứ Hai ~ đóng 23:59:59 Chủ Nhật hàng tuần (chuyển đổi tự động/thủ công được)","경품 수정":"Chỉnh sửa giải thưởng","진행중인 주간 이벤트":"Sự kiện tuần đang diễn ra","진행예정 주간 이벤트":"Sự kiện tuần sắp diễn ra","종료된 주간 이벤트":"Sự kiện tuần đã kết thúc","진행 중인 회차가 없습니다.":"Không có đợt nào đang diễn ra.","예정된 회차가 없습니다.":"Không có đợt nào sắp diễn ra.","종료된 회차가 없습니다.":"Không có đợt nào đã kết thúc.","로드 오류":"Lỗi tải dữ liệu","켜두면 매월 초에 그 달의 전체 회차(주차별)가 자동 생성됩니다. 회차명은 마감일(추첨일) 기준 \"YYYY년 N월 M주차\" 형식으로 자동 부여됩니다. 회차는 자동 생성만 가능하며, 운영자는 생성된 회차의 경품 구성 수정과 당첨자 선정만 진행합니다.":"Khi bật, vào đầu mỗi tháng toàn bộ các đợt (theo tuần) của tháng đó sẽ được tạo tự động. Tên đợt được tự động đặt theo định dạng \"Tuần M tháng N năm YYYY\" dựa trên ngày đóng (ngày rút thăm). Đợt chỉ được tạo tự động — quản trị viên chỉ chỉnh sửa cấu hình quà và chọn người trúng của đợt đã tạo.","추첨 방식: 매주 월요일 0시 시작 ~ 일요일 23:59:59 마감 (자동 생성)":"Phương thức rút thăm: bắt đầu 0h Thứ Hai ~ đóng 23:59:59 Chủ Nhật hàng tuần (tạo tự động)","회차 등록 안내":"Hướng dẫn đăng ký đợt","회차는 매월 초 한 달치가 자동 등록됩니다 (매주 월요일 시작 ~ 일요일 23:59:59 마감). 회차명은 마감일(추첨일) 기준 \"YYYY년 N월 M주차\" 형식으로 자동 부여됩니다.":"Đợt được đăng ký tự động mỗi tháng, trọn một tháng (bắt đầu Thứ Hai ~ đóng 23:59:59 Chủ Nhật hàng tuần). Tên đợt được tự động đặt theo định dạng \"Tuần M tháng N năm YYYY\" dựa trên ngày đóng (ngày rút thăm).","이미 다른 응모 건으로 당첨 처리된 응모자입니다 (1인 1등수만 가능).":"Người này đã được chọn trúng thưởng ở một lượt dự thưởng khác (mỗi người chỉ được 1 hạng).","응모건 수":"Số lượt dự thưởng","닉네임(카카오ID)":"Biệt danh (Kakao ID)","회차는 현재 시점 기준 4주치가 자동 등록됩니다 (매주 월요일 시작 ~ 일요일 23:59:59 마감). 회차명은 마감일(추첨일) 기준 \"YYYY년 N월 M주차\" 형식으로 자동 부여됩니다.":"Đợt được đăng ký tự động luôn có sẵn 4 tuần tính từ thời điểm hiện tại (bắt đầu Thứ Hai ~ đóng 23:59:59 Chủ Nhật hàng tuần). Tên đợt được tự động đặt theo định dạng \"Tuần M tháng N năm YYYY\" dựa trên ngày đóng (ngày rút thăm).","주간 이벤트 추첨 관리":"Quản lý rút thăm sự kiện tuần","당첨 ·":"Trúng thưởng ·","지급 대기":"Chờ gửi quà","지급 완료":"Đã gửi quà","메모(기프티콘 발송일·송장번호 등)":"Ghi chú (ngày gửi Gifticon · mã vận đơn v.v.)","지급 완료로 변경했습니다.":"Đã chuyển sang trạng thái đã gửi quà.","지급 대기로 되돌렸습니다.":"Đã chuyển lại về trạng thái chờ gửi quà.","메모가 저장되었습니다.":"Đã lưu ghi chú.","회차는 현재 시점 기준 4주치가 자동 등록됩니다 (매주 월요일~일요일 23:59:59 마감 · 회차명은 마감일 기준 자동 부여)":"Đợt được đăng ký tự động luôn có sẵn 4 tuần tính từ thời điểm hiện tại (đóng Chủ Nhật 23:59:59 hàng tuần · tên đợt tự động đặt theo ngày đóng)","당첨 경품 지급":"Trúng thưởng · Gửi quà"});
   var _orig=new Map(), _tracked=new Set(), _applying=false;
   function hasKo(s){ return /[가-힯ᄀ-ᇿ㄰-㆏]/.test(s); }
@@ -6459,13 +6460,9 @@ function pdDtTimeHtml(ts) {
     + '</div>';
 }
 
-function pdRankOptionsHtml(selectedRank) {
-  var opts = '<option value="">미선택</option>';
-  pdCurrentRoundPrizes.slice().sort(function(a,b){return ppRankNum(a.rank)-ppRankNum(b.rank);}).forEach(function(p){
-    var r = ppRankNum(p.rank);
-    opts += '<option value="' + r + '"' + (String(selectedRank)===String(r)?' selected':'') + '>' + r + '등</option>';
-  });
-  return opts;
+/* 당첨 등수 컬럼은 자동 추첨 결과 표시 전용(수동 선택 없음) */
+function pdRankResultHtml(rank) {
+  return rank ? pdRankBadgeHtml(ppRankNum(rank)) : '<span style="color:var(--text-sub)">—</span>';
 }
 
 /* 응모 행(사용 티켓 1장 = 1행) 단위로 렌더 — 같은 사람이 티켓을 여러 장 썼으면 그만큼 행이 나열됨 */
@@ -6493,7 +6490,7 @@ function pdRenderEntrantRows() {
       + '<td>' + renderMemberIdentityListOnly(e._userObj, e.user_id) + '</td>'
       + '<td>' + pdDtTimeHtml(e.created_at) + '</td>'
       + '<td>' + winnerCell + '</td>'
-      + '<td><select class="form-select" style="font-size:13px;width:100%" onchange="pdAssignRank(this,\'' + e._id + '\',\'' + e.user_id + '\')">' + pdRankOptionsHtml(rank) + '</select></td>'
+      + '<td style="text-align:center">' + pdRankResultHtml(rank) + '</td>'
       + '</tr>';
   }).join('');
   pdUpdateEntStatusBadge();
@@ -6569,51 +6566,29 @@ window.pdCloseEntrantsModal = function() {
   document.getElementById('pd-entrants-ov').style.display = 'none';
 };
 
-/* 등수 배정: 응모 행(entryId) 단위로 스테이징하되, 등수 내 슬롯 한도·1인 1등수(사람 기준 중복 방지)는 기존 규칙 유지 */
-window.pdAssignRank = function(selectEl, entryId, uid) {
-  var newRank = selectEl.value;
-  if (newRank) {
-    var limit = 0;
-    pdCurrentRoundPrizes.forEach(function(p){ if (String(ppRankNum(p.rank)) === String(newRank)) limit = p.count; });
-    var used = 0;
-    Object.keys(pdStagedWinners).forEach(function(id){ if (id !== entryId && String(pdStagedWinners[id].rank) === String(newRank)) used++; });
-    if (used >= limit) {
-      toast(newRank + '등 인원이 이미 다 찼습니다 (최대 ' + limit + '명).');
-      selectEl.value = (pdStagedWinners[entryId] && pdStagedWinners[entryId].rank) || '';
-      return;
-    }
-    var dupId = Object.keys(pdStagedWinners).find(function(id){ return id !== entryId && pdStagedWinners[id].uid === uid; });
-    if (dupId) {
-      toast('이미 다른 응모 건으로 당첨 처리된 응모자입니다 (1인 1등수만 가능).');
-      selectEl.value = (pdStagedWinners[entryId] && pdStagedWinners[entryId].rank) || '';
-      return;
-    }
-    pdStagedWinners[entryId] = { rank: newRank, uid: uid };
-  } else {
-    delete pdStagedWinners[entryId];
-  }
-  pdRenderEntrantRows();
-};
-
-/* 자동 선택도 사람 단위로 뽑은 뒤, 그 사람의 응모 행 중 하나를 당첨 행으로 표시(1인 1등수 유지) */
+/* 당첨자 선정은 "자동 당첨자 선택" 버튼 클릭만이 유일한 경로다(수동 등수 지정 없음).
+   응모 건(행) 단위로 무작위 순서를 섞으므로 티켓을 많이 쓴 사람일수록 그만큼 행이 많아 뽑힐 확률이 비례해서 높아진다.
+   섞인 순서를 1등부터 등수별 정원만큼 채우며, 이미 당첨된 사람의 다른 응모 행은 건너뛴다(1인 1회 당첨).
+   다시 눌러 재추첨하면 이전 임시 선택은 통째로 새 결과로 교체되고, 적용 후에도 재추첨→재적용이 항상 가능하다. */
 window.pdAutoSelectWinners = function() {
   if (!pdCurrentEntrants.length) { toast('응모자가 없습니다.'); return; }
-  var byUid = {};
-  pdCurrentEntrants.forEach(function(e){ (byUid[e.user_id] = byUid[e.user_id] || []).push(e); });
-  var uids = Object.keys(byUid);
-  for (var i = uids.length - 1; i > 0; i--) {
+  var pool = pdCurrentEntrants.slice();
+  for (var i = pool.length - 1; i > 0; i--) {
     var j = Math.floor(Math.random() * (i + 1));
-    var tmp = uids[i]; uids[i] = uids[j]; uids[j] = tmp;
+    var tmp = pool[i]; pool[i] = pool[j]; pool[j] = tmp;
   }
   var newStaged = {};
+  var won = {};
   var idx = 0;
   pdCurrentRoundPrizes.slice().sort(function(a,b){return ppRankNum(a.rank)-ppRankNum(b.rank);}).forEach(function(p) {
     var r = ppRankNum(p.rank);
-    for (var k = 0; k < p.count && idx < uids.length; k++, idx++) {
-      var uid = uids[idx];
-      var rows = byUid[uid];
-      var row = rows[Math.floor(Math.random() * rows.length)];
-      newStaged[row._id] = { rank: String(r), uid: uid };
+    var filled = 0;
+    while (filled < p.count && idx < pool.length) {
+      var row = pool[idx]; idx++;
+      if (won[row.user_id]) continue;
+      newStaged[row._id] = { rank: String(r), uid: row.user_id };
+      won[row.user_id] = true;
+      filled++;
     }
   });
   pdStagedWinners = newStaged;
