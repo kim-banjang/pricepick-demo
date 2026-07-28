@@ -6429,10 +6429,21 @@ function pdRankOptionsHtml(selectedRank) {
 }
 
 /* 응모 행(사용 티켓 1장 = 1행) 단위로 렌더 — 같은 사람이 티켓을 여러 장 썼으면 그만큼 행이 나열됨 */
+/* 당첨(적용됨·임시 선택 공통) 응모 행을 1등부터 등수 순으로 최상단에, 그 아래 나머지는 기존 순서 */
+function pdOrderedEntrants() {
+  var winners = [], rest = [];
+  pdCurrentEntrants.forEach(function(e) {
+    if (pdStagedWinners[e._id]) winners.push(e); else rest.push(e);
+  });
+  winners.sort(function(a, b) {
+    return ppRankNum(pdStagedWinners[a._id].rank) - ppRankNum(pdStagedWinners[b._id].rank);
+  });
+  return winners.concat(rest);
+}
 function pdRenderEntrantRows() {
   var tbody = document.getElementById('pd-ent-tbody');
   if (!tbody) return;
-  tbody.innerHTML = pdCurrentEntrants.map(function(e) {
+  tbody.innerHTML = pdOrderedEntrants().map(function(e) {
     var staged = pdStagedWinners[e._id];
     var rank = staged ? staged.rank : '';
     return '<tr data-entry-id="' + e._id + '">'
@@ -6522,7 +6533,7 @@ window.pdAssignRank = function(selectEl, entryId, uid) {
   } else {
     delete pdStagedWinners[entryId];
   }
-  pdUpdateEntStatusBadge();
+  pdRenderEntrantRows();
 };
 
 /* 자동 선택도 사람 단위로 뽑은 뒤, 그 사람의 응모 행 중 하나를 당첨 행으로 표시(1인 1등수 유지) */
