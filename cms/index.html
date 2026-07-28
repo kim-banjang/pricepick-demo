@@ -6479,14 +6479,14 @@ function ppCheckAutoGenerate() {
   });
 }
 
-function ppOnAutoToggle(checked) {
+window.ppOnAutoToggle = function(checked) {
   db.collection('settings').doc('draw_auto').set({enabled: checked, deadlineTime: (ppDrawSettings&&ppDrawSettings.deadlineTime)||'21:00'}, {merge:true}).then(function() {
     toast(checked ? '자동 회차 등록을 켰습니다.' : '자동 회차 등록을 껐습니다.');
     logAdmin('자동 회차 등록 ' + (checked?'사용':'해제'));
     loadDraws();
   }).catch(function(e){ toast('저장 실패: ' + (e.message||e)); });
 }
-function ppOnDeadlineTimeChange(val) {
+window.ppOnDeadlineTimeChange = function(val) {
   var t = val || '21:00';
   db.collection('settings').doc('draw_auto').set({enabled: !!(ppDrawSettings&&ppDrawSettings.enabled), deadlineTime: t}, {merge:true}).then(function() {
     toast('마감 시각이 저장되었습니다.');
@@ -6529,7 +6529,7 @@ function ppCollectPrizeRows(containerId) {
   return prizes;
 }
 
-function ppOpenDrawModal(id) {
+window.ppOpenDrawModal = function(id) {
   ppEditingDrawId = id || null;
   var titleEl = document.getElementById('draw-modal-title');
   var submitBtn = document.getElementById('draw-create-btn');
@@ -6565,7 +6565,7 @@ function ppOpenDrawModal(id) {
     document.getElementById('draw-create-ov').style.display = 'block';
   });
 }
-function ppCloseDrawModal() { document.getElementById('draw-create-ov').style.display = 'none'; }
+window.ppCloseDrawModal = function() { document.getElementById('draw-create-ov').style.display = 'none'; };
 
 /* ── sec-draws ── "+ 회차 등록" / 수정 모달 실저장 (raffles collection) */
 window.ppSubmitDraw = function() {
@@ -6613,13 +6613,13 @@ window.drawDelete = function(id) {
 };
 
 /* ── 기본 경품 구성 템플릿 편집 ── */
-function ppOpenTemplateModal() {
+window.ppOpenTemplateModal = function() {
   document.getElementById('template-rows').innerHTML = '';
   (ppDrawTemplate || DEFAULT_DRAW_TEMPLATE).forEach(function(p){ ppAppendPrizeRow('template-rows', p.rank, p.name, p.count); });
   document.getElementById('draw-template-ov').style.display = 'block';
 }
-function ppCloseTemplateModal() { document.getElementById('draw-template-ov').style.display = 'none'; }
-function ppAddTemplateRow() { ppAppendPrizeRow('template-rows', null, '', 1); }
+window.ppCloseTemplateModal = function() { document.getElementById('draw-template-ov').style.display = 'none'; };
+window.ppAddTemplateRow = function() { ppAppendPrizeRow('template-rows', null, '', 1); };
 window.ppSaveTemplate = function() {
   var tpl = ppCollectPrizeRows('template-rows');
   if (!tpl) return;
