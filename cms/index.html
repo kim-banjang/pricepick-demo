@@ -6277,9 +6277,27 @@ function pdRankBadgeHtml(r) {
   var label = pdIsVi() ? ('Hạng ' + r) : (r + '등');
   return '<span class="badge badge-purple" style="margin-right:6px">' + label + '</span>';
 }
-function pdWinnerTagHtml(r) {
+function pdConfirmedWinnerFor(uid) {
+  return pdConfirmedWinners.find(function(w){ return w.user_id === uid; });
+}
+/* 당첨 뱃지 — 확정된(적용됨) 당첨자면 지급 상태 뱃지를 나란히 붙인다. 임시 선택 상태는 지급 상태가 아직 없으므로 당첨 뱃지만. */
+function pdWinnerTagHtml(uid, r) {
   var label = pdIsVi() ? ('Trúng thưởng · Hạng ' + r) : ('당첨 · ' + r + '등');
-  return '<span class="badge badge-purple" style="margin-bottom:4px">' + label + '</span><br>';
+  var html = '<span class="badge badge-purple">' + label + '</span>';
+  var w = pdConfirmedWinnerFor(uid);
+  if (w) {
+    var paid = !!w.paid;
+    var payoutLabel = pdIsVi() ? (paid ? 'Đã gửi quà' : 'Chờ gửi quà') : (paid ? '지급 완료' : '지급 대기');
+    html += ' <span class="badge ' + (paid ? 'badge-green' : 'badge-amber') + '" style="cursor:pointer" onclick="pdTogglePaid(\'' + uid + '\')">' + payoutLabel + '</span>';
+  }
+  return '<div style="margin-bottom:4px">' + html + '</div>';
+}
+/* 당첨자 메모(기프티콘 발송일·실물 송장번호 등) — 확정된 당첨자에 한해 노출 */
+function pdMemoInputHtml(uid) {
+  var w = pdConfirmedWinnerFor(uid);
+  if (!w) return '';
+  var ph = pdIsVi() ? 'Ghi chú (ngày gửi Gifticon · mã vận đơn...)' : '메모(기프티콘 발송일·송장번호 등)';
+  return '<input class="form-input" style="margin-top:4px;font-size:12px;padding:5px 8px" placeholder="' + ph + '" value="' + ppEsc(w.memo||'') + '" onchange="pdSaveMemo(\'' + uid + '\', this.value)">';
 }
 function pdWinnerSummary(winners) {
   var byRank = {};
@@ -6422,6 +6440,7 @@ var pdCurrentRoundPrizes = [];
 var pdCurrentEntrants = [];
 var pdStagedWinners = {}; /* entryId -> {rank, uid} — 응모 행(티켓 1장) 단위 스테이징 */
 var pdConfirmedWinnersSnapshot = {}; /* uid -> rank — winners_confirmed는 사람 기준 저장 */
+var pdConfirmedWinners = []; /* winners_confirmed 원본(paid·memo 포함) — 지급 상태·메모 토글/저장의 소스 */
 
 function pdDtTime(ts) {
   var d = ts ? (ts.toDate ? ts.toDate() : new Date(ts)) : new Date();
@@ -6455,9 +6474,10 @@ function pdRenderEntrantRows() {
   tbody.innerHTML = pdOrderedEntrants().map(function(e) {
     var staged = pdStagedWinners[e._id];
     var rank = staged ? staged.rank : '';
-    var winnerTag = staged ? pdWinnerTagHtml(ppRankNum(rank)) : '';
+    var winnerTag = staged ? pdWinnerTagHtml(e.user_id, ppRankNum(rank)) : '';
+    var memoInput = staged ? pdMemoInputHtml(e.user_id) : '';
     return '<tr data-entry-id="' + e._id + '">'
-      + '<td>' + winnerTag + renderMemberIdentityListOnly(e._userObj, e.user_id) + '</td>'
+      + '<td>' + winnerTag + renderMemberIdentityListOnly(e._userObj, e.user_id) + memoInput + '</td>'
       + '<td>' + pdDtTime(e.created_at) + '</td>'
       + '<td><select class="form-select" style="font-size:13px;width:100%" onchange="pdAssignRank(this,\'' + e._id + '\',\'' + e.user_id + '\')">' + pdRankOptionsHtml(rank) + '</select></td>'
       + '</tr>';
@@ -6482,6 +6502,7 @@ window.pdOpenEntrantsModal = function(raffleId) {
   pdCurrentRoundId = raffleId;
   pdStagedWinners = {};
   pdConfirmedWinnersSnapshot = {};
+  pdConfirmedWinners = [];
   pdCurrentEntrants = [];
   document.getElementById('pd-ent-title').textContent = '응모자 리스트';
   document.getElementById('pd-ent-summary').textContent = '불러오는 중…';
@@ -6497,7 +6518,8 @@ window.pdOpenEntrantsModal = function(raffleId) {
     pdCurrentRoundPrizes = Array.isArray(d.prizes) ? d.prizes : [];
     document.getElementById('pd-ent-title').textContent = '응모자 리스트 — ' + (d.title||'');
     document.getElementById('pd-ent-summary').innerHTML = '등수별 구성: ' + pdCurrentRoundPrizes.slice().sort(function(a,b){return ppRankNum(a.rank)-ppRankNum(b.rank);}).map(function(p){ return ppRankNum(p.rank) + '등 ' + p.count + '명(' + ppEsc(p.name) + ')'; }).join(' · ');
-    (d.winners_confirmed || []).forEach(function(w){ pdConfirmedWinnersSnapshot[w.user_id] = String(ppRankNum(w.rank)); });
+    pdConfirmedWinners = (Array.isArray(d.winners_confirmed) ? d.winners_confirmed : []).map(function(w){ return Object.assign({paid:false, memo:''}, w); });
+    pdConfirmedWinners.forEach(function(w){ pdConfirmedWinnersSnapshot[w.user_id] = String(ppRankNum(w.rank)); });
     pdCurrentEntrants = entriesSnap.docs.map(function(doc){ return Object.assign({_id: doc.id}, doc.data()); });
     /* 확정 당첨(사람 기준)을 그 사람의 응모 행 중 하나에 매핑해 초기 스테이징 구성 */
     Object.keys(pdConfirmedWinnersSnapshot).forEach(function(uid) {
@@ -6579,17 +6601,43 @@ window.pdApplyWinners = function() {
   dmFetchUsersByIds(uids).then(function(userMap) {
     var winners = entryIds.map(function(id) {
       var uid = pdStagedWinners[id].uid;
-      return { rank: pdStagedWinners[id].rank, user_id: uid, nickname: (userMap[uid] && userMap[uid].nickname) || '닉네임없음' };
+      var prev = pdConfirmedWinnerFor(uid);
+      return {
+        rank: pdStagedWinners[id].rank, user_id: uid,
+        nickname: (userMap[uid] && userMap[uid].nickname) || '닉네임없음',
+        paid: prev ? !!prev.paid : false, memo: prev ? (prev.memo || '') : '',
+      };
     });
-    return db.collection('raffles').doc(pdCurrentRoundId).update({ winners_confirmed: winners });
-  }).then(function() {
+    return db.collection('raffles').doc(pdCurrentRoundId).update({ winners_confirmed: winners }).then(function(){ return winners; });
+  }).then(function(winners) {
     toast('당첨자가 적용되었습니다.');
     logAdmin('회차 당첨자 적용: ' + pdCurrentRoundId);
+    pdConfirmedWinners = winners;
     pdConfirmedWinnersSnapshot = {};
     entryIds.forEach(function(id){ pdConfirmedWinnersSnapshot[pdStagedWinners[id].uid] = pdStagedWinners[id].rank; });
-    pdUpdateEntStatusBadge();
+    pdRenderEntrantRows();
     loadDraws();
   }).catch(function(e) { toast('적용 실패: ' + (e.message||e)); });
+};
+
+window.pdTogglePaid = function(uid) {
+  var w = pdConfirmedWinnerFor(uid);
+  if (!w) return;
+  var next = !w.paid;
+  w.paid = next;
+  db.collection('raffles').doc(pdCurrentRoundId).update({ winners_confirmed: pdConfirmedWinners }).then(function() {
+    toast(next ? '지급 완료로 변경했습니다.' : '지급 대기로 되돌렸습니다.');
+    pdRenderEntrantRows();
+  }).catch(function(e) { w.paid = !next; toast('저장 실패: ' + (e.message||e)); });
+};
+
+window.pdSaveMemo = function(uid, value) {
+  var w = pdConfirmedWinnerFor(uid);
+  if (!w) return;
+  w.memo = value;
+  db.collection('raffles').doc(pdCurrentRoundId).update({ winners_confirmed: pdConfirmedWinners }).then(function() {
+    toast('메모가 저장되었습니다.');
+  }).catch(function(e) { toast('저장 실패: ' + (e.message||e)); });
 };
 
 /* ── 기프티콘 교환 취소 (구매/사용 내역 화면에서 관리자가 실행) ── */
