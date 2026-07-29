@@ -8564,36 +8564,40 @@ body.interactive-mode #ip-nav { display: block; }
   </div>
 
   <div class="phone-wrap" id="pw-01" data-screen="02">
-    <div class="phone">
-      <div class="notif-perm">
-        <div class="statusbar">
+    <div class="phone" style="width:390px;height:844px;border-radius:44px;overflow:hidden;background:#FAFAFA;position:relative;">
+      <div class="notif-perm" style="height:100%;display:flex;flex-direction:column;">
+        <img src="assets/onboard-bg.jpg" alt="" style="position:absolute;top:0;left:0;width:100%;height:46%;object-fit:cover;opacity:.9;">
+        <div style="position:absolute;top:0;left:0;right:0;height:46%;background:linear-gradient(rgba(250,250,250,0) 40%,#FAFAFA 100%);"></div>
+        <div style="position:relative;display:flex;align-items:center;justify-content:space-between;padding:14px 26px 0;font-size:13px;font-weight:700;color:#1A1130;">
           <span>9:41</span>
           <div class="statusbar-icons"><svg width="17" height="12" viewBox="0 0 17 12" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><rect x="0" y="4" width="3" height="8" rx="1"/><rect x="4.5" y="2.5" width="3" height="9.5" rx="1"/><rect x="9" y="1" width="3" height="11" rx="1"/><rect x="13.5" y="0" width="3" height="12" rx="1"/></svg><svg width="16" height="12" viewBox="0 0 16 12" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M8 2.5C10.2 2.5 12.2 3.4 13.6 4.9L15 3.4C13.2 1.5 10.7 0.3 8 0.3C5.3 0.3 2.8 1.5 1 3.4L2.4 4.9C3.8 3.4 5.8 2.5 8 2.5Z"/><path d="M8 5.5C9.4 5.5 10.7 6.1 11.6 7L13 5.5C11.7 4.2 10 3.3 8 3.3C6 3.3 4.3 4.2 3 5.5L4.4 7C5.3 6.1 6.6 5.5 8 5.5Z"/><circle cx="8" cy="10" r="1.8"/></svg><svg width="25" height="12" viewBox="0 0 25 12" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="currentColor" stroke-opacity="0.35"/><rect x="2" y="2" width="17" height="8" rx="2" fill="currentColor"/><path d="M23 4V8C23.8 7.6 24.5 6.9 24.5 6C24.5 5.1 23.8 4.4 23 4Z" fill="currentColor" fill-opacity="0.4"/></svg></div>
         </div>
-        <div class="np-body">
-          <div class="np-icon-frame">
-            <div class="np-bell"><svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M40 14c-1.7 0-3 1.4-3 3.1v1.7C29 20.5 22 27.8 22 36.8v11L17.5 53h45l-4.5-5.2v-11c0-9-7-16.3-15-18V17.1C43 15.4 41.7 14 40 14z" fill="var(--sub-3)" stroke="var(--main)" stroke-width="2.5" stroke-linejoin="round"/><path d="M33.5 53c0 3.6 2.9 6.5 6.5 6.5s6.5-2.9 6.5-6.5" stroke="var(--main)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="np-body" style="position:relative;flex:1;display:flex;flex-direction:column;padding:52px 26px 0;text-align:left;align-items:flex-start;justify-content:flex-start;">
+          <div style="width:64px;height:64px;border-radius:20px;background:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 10px 26px rgba(132,94,238,0.18);">
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#845EEE" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8.5a6 6 0 1 0-12 0c0 5-2 6.5-2 6.5h16s-2-1.5-2-6.5Z"/><path d="M10.3 19a2 2 0 0 0 3.4 0"/></svg>
           </div>
-          <div class="np-title">혜택을 놓치고 싶지<br>않다면 허용하세요</div>
-          <div class="np-desc">티켓 적립·등급 전환·만료 임박 등<br>중요한 알림만 엄선해서 보내요.</div>
-          <div class="np-benefits">
-            <div class="np-benefit">
-              <div class="np-benefit-ico">🎟️</div>
-              티켓 적립 완료 및 등급 전환 알림
+          <div class="np-title" style="margin-top:26px;font-size:22px;font-weight:800;color:#1A1130;line-height:1.35;letter-spacing:-0.02em;"><span class="i18n"><span class="ko">혜택을 놓치고 싶지</span><span class="vi">Đừng bỏ lỡ ưu đãi,</span></span><br><span class="i18n"><span class="ko">않다면 허용하세요</span><span class="vi">hãy cho phép nhé</span></span></div>
+          <div class="np-desc" style="margin-top:12px;font-size:12px;font-weight:500;color:#5A5370;line-height:1.6;">
+            <span class="i18n"><span class="ko">티켓 적립·등급 전환·만료 임박 등</span><span class="vi">Tích lũy vé · chuyển hạng · sắp hết hạn,</span></span><br><span class="i18n"><span class="ko">중요한 알림만 엄선해서 보내요.</span><span class="vi">chúng tôi chỉ gửi những thông báo quan trọng.</span></span>
+          </div>
+          <div class="np-benefits" style="margin-top:30px;display:flex;flex-direction:column;gap:10px;width:100%;">
+            <div class="np-benefit" style="display:flex;align-items:center;gap:12px;padding:14px 16px;border-radius:12px;background:#fff;box-shadow:0 3px 12px rgba(26,17,48,0.05);font-size:13px;font-weight:600;color:#1A1130;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#845EEE" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M3 9.5 12 4l9 5.5-9 5.5-9-5.5Z"/><path d="M3 14.5 12 20l9-5.5"/></svg>
+              <span class="i18n"><span class="ko">티켓 적립 완료 및 등급 전환 알림</span><span class="vi">Thông báo tích lũy vé xong &amp; chuyển hạng</span></span>
             </div>
-            <div class="np-benefit">
-              <div class="np-benefit-ico">⏰</div>
-              티켓 만료 임박 알림 (D-30·D-7)
+            <div class="np-benefit" style="display:flex;align-items:center;gap:12px;padding:14px 16px;border-radius:12px;background:#fff;box-shadow:0 3px 12px rgba(26,17,48,0.05);font-size:13px;font-weight:600;color:#1A1130;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#845EEE" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.8V12l3 2"/></svg>
+              <span class="i18n"><span class="ko">티켓 만료 임박 알림 (D-30·D-7)</span><span class="vi">Thông báo vé sắp hết hạn (D-30·D-7)</span></span>
             </div>
-            <div class="np-benefit">
-              <div class="np-benefit-ico">🎁</div>
-              이벤트·경품 소식
+            <div class="np-benefit" style="display:flex;align-items:center;gap:12px;padding:14px 16px;border-radius:12px;background:#fff;box-shadow:0 3px 12px rgba(26,17,48,0.05);font-size:13px;font-weight:600;color:#1A1130;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FF6FA8" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><rect x="3.5" y="9" width="17" height="11.5" rx="2"/><path d="M3.5 13.5h17"/><path d="M12 9v11.5"/><path d="M12 9s-.9-3.2-3.2-3.2A2 2 0 0 0 8.8 9H12Zm0 0s.9-3.2 3.2-3.2A2 2 0 0 1 15.2 9H12Z"/></svg>
+              <span class="i18n"><span class="ko">이벤트·경품 소식</span><span class="vi">Tin tức sự kiện · quà tặng</span></span>
             </div>
           </div>
         </div>
-        <div class="np-footer">
-          <button class="btn-primary">다음</button>
-          <button class="btn-ghost">나중에 설정하기</button>
+        <div class="np-footer" style="position:relative;display:flex;flex-direction:column;gap:14px;padding:0 26px 40px;">
+          <button class="btn-primary" style="width:100%;height:52px;border:none;border-radius:12px;background:#845EEE;color:#fff;font-family:inherit;font-size:15px;font-weight:700;cursor:pointer;"><span class="i18n"><span class="ko">다음</span><span class="vi">Tiếp theo</span></span></button>
+          <button class="btn-ghost" style="width:100%;height:22px;border:none;background:transparent;color:#9B93B0;font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;"><span class="i18n"><span class="ko">나중에 설정하기</span><span class="vi">Cài đặt sau</span></span></button>
         </div>
 
         <!-- iOS 팝업 -->
@@ -8616,60 +8620,53 @@ body.interactive-mode #ip-nav { display: block; }
   </div>
 
   <div class="phone-wrap" id="pw-01b" data-screen="02b">
-    <div class="phone">
-      <div class="att-screen">
-        <div class="statusbar">
+    <div class="phone" style="width:390px;height:844px;border-radius:44px;overflow:hidden;background:#FAFAFA;position:relative;">
+      <div class="att-screen" style="height:100%;display:flex;flex-direction:column;">
+        <img src="assets/onboard-bg.jpg" alt="" style="position:absolute;top:0;left:0;width:100%;height:46%;object-fit:cover;opacity:.9;">
+        <div style="position:absolute;top:0;left:0;right:0;height:46%;background:linear-gradient(rgba(250,250,250,0) 40%,#FAFAFA 100%);"></div>
+        <div class="statusbar" style="position:relative;display:flex;align-items:center;justify-content:space-between;padding:14px 26px 0;height:auto;font-size:13px;font-weight:700;color:#1A1130;">
           <span>9:41</span>
           <div class="statusbar-icons"><svg width="17" height="12" viewBox="0 0 17 12" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><rect x="0" y="4" width="3" height="8" rx="1"/><rect x="4.5" y="2.5" width="3" height="9.5" rx="1"/><rect x="9" y="1" width="3" height="11" rx="1"/><rect x="13.5" y="0" width="3" height="12" rx="1"/></svg><svg width="16" height="12" viewBox="0 0 16 12" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M8 2.5C10.2 2.5 12.2 3.4 13.6 4.9L15 3.4C13.2 1.5 10.7 0.3 8 0.3C5.3 0.3 2.8 1.5 1 3.4L2.4 4.9C3.8 3.4 5.8 2.5 8 2.5Z"/><path d="M8 5.5C9.4 5.5 10.7 6.1 11.6 7L13 5.5C11.7 4.2 10 3.3 8 3.3C6 3.3 4.3 4.2 3 5.5L4.4 7C5.3 6.1 6.6 5.5 8 5.5Z"/><circle cx="8" cy="10" r="1.8"/></svg><svg width="25" height="12" viewBox="0 0 25 12" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="currentColor" stroke-opacity="0.35"/><rect x="2" y="2" width="17" height="8" rx="2" fill="currentColor"/><path d="M23 4V8C23.8 7.6 24.5 6.9 24.5 6C24.5 5.1 23.8 4.4 23 4Z" fill="currentColor" fill-opacity="0.4"/></svg></div>
         </div>
 
         <!-- 앱 자체 프리-팝업 레이어 -->
-        <div class="att-pre-popup">
-          <div class="att-pre-inner">
-            <div class="att-pre-icon"><svg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">
-  <defs><linearGradient id="attBg60" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#9B78FF"/><stop offset="100%" stop-color="#6B3FD4"/></linearGradient></defs>
-  <rect width="60" height="60" rx="14" fill="url(#attBg60)"/>
-  <svg x="10" y="10" width="40" height="40" viewBox="0 0 360 363" fill="none">
-    <path d="M179.565 82.6926C126.235 82.6926 83 125.942 83 179.289V277.43H116.474V252.409C133.398 267.036 155.453 275.873 179.565 275.873C232.895 275.873 276.13 232.624 276.13 179.276C276.13 125.929 232.895 82.6797 179.565 82.6797V82.6926ZM179.565 242.401C144.715 242.401 116.474 214.151 116.474 179.289C116.474 144.428 144.715 116.178 179.565 116.178C214.415 116.178 242.656 144.428 242.656 179.289C242.656 214.151 214.415 242.401 179.565 242.401Z" fill="#BEA5F3"/>
-<path d="M180 0C80.593 0 0 80.6195 0 180.059V363H62.3962V316.368C93.9416 343.627 135.042 360.118 180 360.118C279.407 360.118 360 279.499 360 180.059C360 80.6195 279.42 0 180 0ZM180 297.702C115.045 297.702 62.3962 245.023 62.3962 180.059C62.3962 115.095 115.058 62.4168 180 62.4168C244.942 62.4168 297.604 115.095 297.604 180.059C297.604 245.023 244.942 297.702 180 297.702Z" fill="white"/>
-<path d="M209.118 189.436L205.118 182.814C204.278 181.338 203.518 178.546 203.518 176.91V166.818C203.518 153.814 192.918 143.203 179.838 143.203C166.758 143.203 156.158 153.814 156.158 166.818V176.91C156.158 178.546 155.398 181.338 154.558 182.774L150.518 189.436C148.918 192.108 148.558 195.06 149.558 197.773C150.518 200.445 152.798 202.52 155.758 203.517C163.518 206.15 171.678 207.426 179.838 207.426C187.998 207.426 196.158 206.15 203.918 203.557C206.718 202.639 208.878 200.525 209.918 197.773C210.958 195.02 210.678 191.989 209.118 189.436Z" fill="white"/>
-<path d="M188.757 144.883C185.997 143.806 182.997 143.207 179.837 143.207C176.717 143.207 173.717 143.766 170.957 144.883C172.677 141.652 176.077 139.617 179.837 139.617C183.637 139.617 186.997 141.652 188.757 144.883Z" fill="white"/>
-<path d="M191.077 211.462C189.397 216.089 184.957 219.4 179.757 219.4C176.597 219.4 173.477 218.123 171.277 215.85C169.997 214.653 169.037 213.057 168.477 211.422C168.997 211.502 169.517 211.542 170.077 211.621C170.997 211.741 171.957 211.861 172.917 211.94C175.197 212.14 177.517 212.26 179.837 212.26C182.117 212.26 184.397 212.14 186.637 211.94C187.477 211.861 188.317 211.821 189.117 211.701C189.757 211.621 190.397 211.542 191.077 211.462Z" fill="white"/>
-  </svg>
-</svg></div>
-            <div class="att-pre-title">더 나은 서비스를 위해<br>추적을 허용해 주세요</div>
-            <div class="att-pre-desc">프라이스픽은 맞춤 혜택과 개인화된 티켓 적립 서비스를 위해 기기 추적 권한이 필요해요.</div>
+        <div class="att-pre-popup" style="position:relative;flex:1;display:flex;flex-direction:column;">
+          <div class="att-pre-inner" style="padding:52px 26px 0;">
+            <div class="att-pre-icon" style="width:64px;height:64px;border-radius:20px;background:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 10px 26px rgba(132,94,238,0.18);">
+              <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#845EEE" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5c3 1.6 5.5 2 6.5 2v6c0 4.4-3.2 7.4-6.5 9-3.3-1.6-6.5-4.6-6.5-9v-6c1 0 3.5-.4 6.5-2Z"/><path d="M9.3 12.2l1.9 1.9 3.5-3.9"/></svg>
+            </div>
+            <div class="att-pre-title" style="margin-top:26px;font-size:22px;font-weight:800;color:#1A1130;line-height:1.35;letter-spacing:-0.02em;"><span class="i18n"><span class="ko">더 나은 서비스를 위해</span><span class="vi">Để mang đến dịch vụ tốt hơn,</span></span><br><span class="i18n"><span class="ko">추적을 허용해 주세요</span><span class="vi">vui lòng cho phép theo dõi</span></span></div>
+            <div class="att-pre-desc" style="margin-top:12px;font-size:12px;font-weight:500;color:#5A5370;line-height:1.6;"><span class="i18n"><span class="ko">맞춤 혜택과 개인화된 티켓 적립을 위해</span><span class="vi">Để nhận ưu đãi và tích lũy vé riêng cho bạn,</span></span><br><span class="i18n"><span class="ko">기기 추적 권한이 필요해요.</span><span class="vi">chúng tôi cần quyền theo dõi thiết bị.</span></span></div>
 
-            <div class="att-benefit-list">
-              <div class="att-benefit-item">
-                <div class="att-benefit-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--main)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2H2v10l9.29 9.29a2 2 0 0 0 2.83 0l7.17-7.17a2 2 0 0 0 0-2.83Z"/><path d="M7 7h.01"/></svg></div>
-                <div class="att-benefit-text">
-                  <div class="att-benefit-title">맞춤 쇼핑 적립 최적화</div>
-                  <div class="att-benefit-sub">구매 패턴 기반 적립 혜택 우선 제공</div>
+            <div class="att-benefit-list" style="margin-top:30px;display:flex;flex-direction:column;gap:10px;">
+              <div class="att-benefit-item" style="display:flex;gap:12px;padding:14px 16px;border-radius:12px;background:#fff;box-shadow:0 3px 12px rgba(26,17,48,0.05);">
+                <div class="att-benefit-icon" style="flex-shrink:0;margin-top:1px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#845EEE" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h16l-1 11a2 2 0 0 1-2 1.8H7A2 2 0 0 1 5 19L4 8Z"/><path d="M9 8V6.5a3 3 0 0 1 6 0V8"/></svg></div>
+                <div class="att-benefit-text" style="display:flex;flex-direction:column;gap:3px;">
+                  <div class="att-benefit-title" style="font-size:13px;font-weight:600;color:#1A1130;"><span class="i18n"><span class="ko">맞춤 쇼핑 적립 최적화</span><span class="vi">Tối ưu tích lũy mua sắm cá nhân hóa</span></span></div>
+                  <div class="att-benefit-sub" style="font-size:11px;font-weight:500;color:#9B93B0;"><span class="i18n"><span class="ko">구매 패턴 기반 적립 혜택 우선 제공</span><span class="vi">Ưu tiên ưu đãi tích lũy dựa trên thói quen mua hàng</span></span></div>
                 </div>
               </div>
-              <div class="att-benefit-item">
-                <div class="att-benefit-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--main)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/><path d="M13 5v2"/><path d="M13 17v2"/><path d="M13 11v2"/></svg></div>
-                <div class="att-benefit-text">
-                  <div class="att-benefit-title">티켓 적립 최적화</div>
-                  <div class="att-benefit-sub">구매 패턴 분석으로 더 많은 티켓 기회 제공</div>
+              <div class="att-benefit-item" style="display:flex;gap:12px;padding:14px 16px;border-radius:12px;background:#fff;box-shadow:0 3px 12px rgba(26,17,48,0.05);">
+                <div class="att-benefit-icon" style="flex-shrink:0;margin-top:1px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#845EEE" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V9.5"/><path d="M10 19V5.5"/><path d="M16 19v-8"/><path d="M3 19h18"/></svg></div>
+                <div class="att-benefit-text" style="display:flex;flex-direction:column;gap:3px;">
+                  <div class="att-benefit-title" style="font-size:13px;font-weight:600;color:#1A1130;"><span class="i18n"><span class="ko">티켓 적립 최적화</span><span class="vi">Tối ưu tích lũy vé</span></span></div>
+                  <div class="att-benefit-sub" style="font-size:11px;font-weight:500;color:#9B93B0;"><span class="i18n"><span class="ko">구매 패턴 분석으로 더 많은 티켓 기회</span><span class="vi">Phân tích thói quen mua hàng để có thêm cơ hội nhận vé</span></span></div>
                 </div>
               </div>
-              <div class="att-benefit-item">
-                <div class="att-benefit-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--main)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg></div>
-                <div class="att-benefit-text">
-                  <div class="att-benefit-title">광고 관련성 개선</div>
-                  <div class="att-benefit-sub">관심 없는 광고 대신 실제 도움이 되는 정보</div>
+              <div class="att-benefit-item" style="display:flex;gap:12px;padding:14px 16px;border-radius:12px;background:#fff;box-shadow:0 3px 12px rgba(26,17,48,0.05);">
+                <div class="att-benefit-icon" style="flex-shrink:0;margin-top:1px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#845EEE" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.5-4.5"/></svg></div>
+                <div class="att-benefit-text" style="display:flex;flex-direction:column;gap:3px;">
+                  <div class="att-benefit-title" style="font-size:13px;font-weight:600;color:#1A1130;"><span class="i18n"><span class="ko">광고 관련성 개선</span><span class="vi">Cải thiện độ liên quan của quảng cáo</span></span></div>
+                  <div class="att-benefit-sub" style="font-size:11px;font-weight:500;color:#9B93B0;"><span class="i18n"><span class="ko">관심 없는 광고 대신 도움이 되는 정보</span><span class="vi">Thông tin hữu ích thay vì quảng cáo không liên quan</span></span></div>
                 </div>
               </div>
             </div>
 
-            <div class="att-pre-note">수집된 데이터는 앱 개선 목적으로만 사용되며<br>제3자에게 판매되지 않아요.</div>
-
-            <div class="att-pre-btns">
-              <button class="att-pre-allow">계속하기</button>
-              <button class="att-pre-deny">나중에 결정할게요</button>
-            </div>
+            <div class="att-pre-note" style="margin-top:20px;font-size:11px;font-weight:500;color:#9B93B0;line-height:1.6;"><span class="i18n"><span class="ko">수집된 데이터는 앱 개선 목적으로만 사용되며</span><span class="vi">Dữ liệu thu thập chỉ dùng để cải thiện ứng dụng</span></span><br><span class="i18n"><span class="ko">제3자에게 판매되지 않아요.</span><span class="vi">và không được bán cho bên thứ ba.</span></span></div>
+          </div>
+          <div class="att-pre-btns" style="margin-top:auto;display:flex;flex-direction:column;gap:14px;padding:20px 26px 40px;">
+            <button class="att-pre-allow" style="width:100%;height:52px;border:none;border-radius:12px;background:#845EEE;color:#fff;font-family:inherit;font-size:15px;font-weight:700;cursor:pointer;"><span class="i18n"><span class="ko">계속하기</span><span class="vi">Tiếp tục</span></span></button>
+            <button class="att-pre-deny" style="width:100%;height:22px;border:none;background:transparent;color:#9B93B0;font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;"><span class="i18n"><span class="ko">나중에 결정할게요</span><span class="vi">Tôi sẽ quyết định sau</span></span></button>
           </div>
         </div>
 
@@ -8705,64 +8702,65 @@ body.interactive-mode #ip-nav { display: block; }
 
   <!-- 03 닉네임 설정 (v8 신규 진입 · 결정 18) -->
   <div class="phone-wrap" id="pw-02-nick" data-screen="03">
-    <div class="phone">
-      <div class="login-screen">
-        <div class="statusbar"><span>9:41</span><div class="statusbar-icons"><svg width="17" height="12" viewBox="0 0 17 12" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><rect x="0" y="4" width="3" height="8" rx="1"/><rect x="4.5" y="2.5" width="3" height="9.5" rx="1"/><rect x="9" y="1" width="3" height="11" rx="1"/><rect x="13.5" y="0" width="3" height="12" rx="1"/></svg></div></div>
-        <div class="login-content" style="display:flex;flex-direction:column;height:100%;padding:26px 24px 22px;background:var(--bg);overflow-y:auto;">
-          <div style="display:flex;flex-direction:column;align-items:center;padding-top:6px;padding-bottom:20px;">
-            <div style="width:54px;height:54px;border-radius:15px;background:var(--main);display:flex;align-items:center;justify-content:center;margin-bottom:10px;">
-              <svg width="30" height="30" viewBox="0 0 360 363" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M178.702 82.6926C125.372 82.6926 82.1367 125.942 82.1367 179.289V277.43H115.611V252.409C132.535 267.036 154.589 275.873 178.702 275.873C232.032 275.873 275.267 232.624 275.267 179.276C275.267 125.929 232.032 82.6797 178.702 82.6797V82.6926ZM178.702 242.401C143.851 242.401 115.611 214.151 115.611 179.289C115.611 144.428 143.851 116.178 178.702 116.178C213.552 116.178 241.792 144.428 241.792 179.289C241.792 214.151 213.552 242.401 178.702 242.401Z" fill="white"/><path d="M180 0C80.593 0 0 80.6195 0 180.059V363H62.3962V316.368C93.9416 343.627 135.042 360.118 180 360.118C279.407 360.118 360 279.499 360 180.059C360 80.6195 279.42 0 180 0ZM180 297.702C115.045 297.702 62.3962 245.023 62.3962 180.059C62.3962 115.095 115.058 62.4168 180 62.4168C244.942 62.4168 297.604 115.095 297.604 180.059C297.604 245.023 244.942 297.702 180 297.702Z" fill="rgba(255,255,255,.92)"/></svg>
+    <div class="phone" style="width:390px;height:844px;border-radius:44px;overflow:hidden;background:#FAFAFA;position:relative;">
+      <div class="login-screen" style="height:100%;display:flex;flex-direction:column;">
+        <img src="assets/onboard-bg.jpg" alt="" style="position:absolute;top:0;left:0;width:100%;height:46%;object-fit:cover;opacity:.9;">
+        <div style="position:absolute;top:0;left:0;right:0;height:46%;background:linear-gradient(rgba(250,250,250,0) 40%,#FAFAFA 100%);"></div>
+        <div class="statusbar" style="position:relative;display:flex;align-items:center;justify-content:space-between;padding:14px 26px 0;height:auto;font-size:13px;font-weight:700;color:#1A1130;">
+          <span>9:41</span>
+          <div class="statusbar-icons"><svg width="17" height="12" viewBox="0 0 17 12" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><rect x="0" y="4" width="3" height="8" rx="1"/><rect x="4.5" y="2.5" width="3" height="9.5" rx="1"/><rect x="9" y="1" width="3" height="11" rx="1"/><rect x="13.5" y="0" width="3" height="12" rx="1"/></svg></div>
+        </div>
+        <div class="login-content" style="position:relative;flex:1;display:flex;flex-direction:column;padding:52px 26px 0;overflow-y:auto;">
+          <div style="font-size:22px;font-weight:800;color:#1A1130;letter-spacing:-0.02em;"><span class="i18n"><span class="ko">프라이스픽 시작하기</span><span class="vi">Bắt đầu với PricePick</span></span></div>
+          <div style="margin-top:10px;font-size:12px;font-weight:500;color:#5A5370;"><span class="i18n"><span class="ko">로그인 없이 닉네임만 정하면 바로 시작해요</span><span class="vi">Không cần đăng nhập, chỉ cần đặt biệt danh là bắt đầu ngay</span></span></div>
+          <div style="margin-top:34px;display:flex;flex-direction:column;gap:8px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;">
+              <span style="font-size:12px;font-weight:600;color:#5A5370;"><span class="i18n"><span class="ko">닉네임</span><span class="vi">Biệt danh</span></span></span>
+              <span id="nick2-cnt" style="font-size:11px;font-weight:600;color:#9B93B0;">0/10</span>
             </div>
-            <div style="font-size:23px;font-weight:800;color:var(--text1);letter-spacing:-1.1px;">프라이스픽 시작하기</div>
-            <div style="font-size:13px;color:var(--text3);margin-top:6px;text-align:center;line-height:1.5;">로그인 없이 닉네임만 정하면 바로 시작해요</div>
-          </div>
-          <div style="margin-bottom:14px;">
-            <div style="font-size:12px;font-weight:600;color:var(--text2);margin-bottom:8px;">닉네임</div>
-            <div style="position:relative;">
-              <input id="nick2-input" type="text" value="" maxlength="10"
-                style="width:100%;padding:14px 52px 14px 14px;border:1.5px solid var(--main);border-radius:12px;font-size:16px;font-weight:700;color:var(--text1);background:#fff;box-sizing:border-box;font-family:inherit;outline:none;"
-                oninput="(function(el){var c=document.getElementById('nick2-cnt');if(c)c.textContent=el.value.length+'/10';var b=document.getElementById('nick2-start');if(b){var ok=el.value.trim().length>=2;b.disabled=!ok;b.style.opacity=ok?'1':'0.5';b.style.cursor=ok?'pointer':'not-allowed';}var err=document.getElementById('nick2-err');if(err)err.style.display='none';})(this)">
-              <span id="nick2-cnt" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);font-size:12px;color:var(--text3);">0/10</span>
+            <div style="display:flex;align-items:center;gap:10px;height:52px;padding:0 16px;border:1.5px solid #845EEE;border-radius:12px;background:#fff;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9B93B0" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8.5" r="3.6"/><path d="M5 20c1.3-3.4 4-5 7-5s5.7 1.6 7 5"/></svg>
+              <input id="nick2-input" type="text" maxlength="10" value=""
+                oninput="(function(el){var c=document.getElementById('nick2-cnt');if(c)c.textContent=el.value.length+'/10';var b=document.getElementById('nick2-start');if(b){var ok=el.value.trim().length>=2;b.disabled=!ok;b.style.opacity=ok?'1':'0.5';b.style.cursor=ok?'pointer':'not-allowed';}var err=document.getElementById('nick2-err');if(err)err.style.display='none';})(this)"
+                style="border:none;outline:none;background:transparent;font-size:14px;font-weight:600;color:#1A1130;font-family:inherit;flex:1;min-width:0;">
             </div>
-            <div id="nick2-err" style="display:none;font-size:11.5px;font-weight:600;color:#E5533D;margin-top:6px;">이미 사용중인 닉네임입니다.</div>
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px;">
-              <div style="font-size:11px;color:var(--text3);">한글·영문·숫자 조합, 2~10자</div>
-              <button type="button" id="nick2-suggest-btn" data-ip-bound="1" onclick="window.ppRefreshNickSuggestion(true)"
-                style="display:flex;align-items:center;gap:4px;background:none;border:none;font-size:12px;font-weight:700;color:var(--main);cursor:pointer;padding:2px 4px;">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
-                추천 닉네임 다시 받기
+            <div id="nick2-err" style="display:none;font-size:11.5px;font-weight:600;color:#E5533D;">이미 사용중인 닉네임입니다.</div>
+            <div style="display:flex;align-items:center;justify-content:space-between;">
+              <span style="font-size:11px;font-weight:500;color:#9B93B0;"><span class="i18n"><span class="ko">한글·영문·숫자 조합, 2~10자</span><span class="vi">Kết hợp chữ · số, 2-10 ký tự</span></span></span>
+              <button type="button" id="nick2-suggest-btn" data-ip-bound="1" onclick="window.ppRefreshNickSuggestion(true)" style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;color:#845EEE;background:none;border:none;cursor:pointer;font-family:inherit;">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#845EEE" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8 8 0 1 0-2.6 5.9"/><path d="M20 4.5V11h-6"/></svg>
+                <span class="i18n"><span class="ko">추천 닉네임 다시 받기</span><span class="vi">Nhận gợi ý biệt danh khác</span></span>
               </button>
             </div>
           </div>
-          <div style="display:flex;align-items:center;gap:8px;background:var(--sub-4);border-radius:10px;padding:11px 13px;margin-bottom:12px;">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--main)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
-            <div style="font-size:12px;color:var(--text2);line-height:1.45;">닉네임은 언제든 <b style="color:var(--text1);">마이 &gt; 닉네임</b>에서 바꿀 수 있어요.</div>
+          <div style="margin-top:22px;padding:14px 16px;border-radius:12px;background:#F0EBFF;">
+            <div style="font-size:11px;font-weight:500;color:#5A5370;line-height:1.7;"><span class="i18n"><span class="ko">닉네임은 언제든</span><span class="vi">Bạn có thể đổi biệt danh bất cứ lúc nào tại</span></span> <span style="font-weight:700;color:#6C4AB6;"><span class="i18n"><span class="ko">마이 &gt; 닉네임</span><span class="vi">Của tôi &gt; Biệt danh</span></span></span><span class="i18n"><span class="ko">에서 바꿀 수 있어요.</span><span class="vi"> để thay đổi.</span></span></div>
           </div>
-          <div id="nick2-warn-teaser" data-ip-bound="1" onclick="document.getElementById('nick2-warn-modal').classList.add('show')" style="display:flex;align-items:center;gap:8px;background:#FFF7F5;border:1px solid #FFD2C7;border-radius:12px;padding:11px 13px;margin-bottom:auto;cursor:pointer;">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#E5533D" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-            <div style="flex:1;font-size:12px;font-weight:700;color:#C0392B;">재설치·기기 변경 주의</div>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#C0392B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M9 18l6-6-6-6"/></svg>
+          <div style="margin-top:14px;display:flex;align-items:center;justify-content:center;gap:6px;">
+            <button type="button" id="nick2-warn-open" data-ip-bound="1" onclick="document.getElementById('nick2-warn-modal').classList.add('show')" aria-label="자세히 보기" style="display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;padding:0;border:none;border-radius:50%;background:transparent;cursor:pointer;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#845EEE" stroke-width="1.7" stroke-linecap="round"><circle cx="12" cy="12" r="8.6"/><path d="M12 8v5.2"/><circle cx="12" cy="16.4" r=".85" fill="#845EEE" stroke="none"/></svg>
+            </button>
+            <span onclick="document.getElementById('nick2-warn-modal').classList.add('show')" style="font-size:11px;font-weight:500;color:#9B93B0;cursor:pointer;"><span class="i18n"><span class="ko">재설치·기기 변경 주의</span><span class="vi">Lưu ý khi cài lại · đổi thiết bị</span></span></span>
           </div>
-          <div style="padding-top:18px;">
-            <button id="nick2-start" class="nick-start-btn" data-ip-bound="1" disabled
-              style="width:100%;height:54px;background:var(--main);border:none;border-radius:14px;font-size:16px;font-weight:800;color:#fff;cursor:not-allowed;opacity:0.5;">시작하기</button>
-            <div class="login-terms" style="margin-top:12px;">계속 진행하면 <b>이용약관</b> 및 <b>개인정보처리방침</b>에<br>동의하는 것으로 간주됩니다.</div>
-          </div>
+        </div>
+        <div style="position:relative;display:flex;flex-direction:column;gap:12px;padding:0 26px 40px;">
+          <button id="nick2-start" class="nick-start-btn" data-ip-bound="1" disabled style="width:100%;height:52px;border:none;border-radius:12px;background:#845EEE;color:#fff;font-family:inherit;font-size:15px;font-weight:700;cursor:not-allowed;opacity:0.5;"><span class="i18n"><span class="ko">시작하기</span><span class="vi">Bắt đầu</span></span></button>
+          <div class="login-terms" style="text-align:center;font-size:10px;font-weight:500;color:#9B93B0;line-height:1.7;"><span class="i18n"><span class="ko">계속 진행하면</span><span class="vi">Nếu tiếp tục,</span></span> <b><span class="i18n"><span class="ko">이용약관</span><span class="vi">Điều khoản sử dụng</span></span></b> <span class="i18n"><span class="ko">및</span><span class="vi">và</span></span> <b><span class="i18n"><span class="ko">개인정보처리방침</span><span class="vi">Chính sách bảo mật</span></span></b><span class="i18n"><span class="ko">에</span><span class="vi"></span></span><br><span class="i18n"><span class="ko">동의하는 것으로 간주됩니다.</span><span class="vi">được xem là bạn đã đồng ý.</span></span></div>
         </div>
 
         <!-- 재설치·기기 변경 주의 모달 -->
-        <div class="nick-warn-overlay" id="nick2-warn-modal">
-          <div class="nick-warn-sheet">
-            <div class="nick-warn-handle"></div>
-            <div class="nick-warn-head">
-              <div class="nick-warn-title"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#E5533D" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>재설치·기기 변경 주의</div>
-              <button type="button" class="nick-warn-close" onclick="document.getElementById('nick2-warn-modal').classList.remove('show')" aria-label="닫기">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M6 6L18 18M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-              </button>
+        <div id="nick2-warn-modal" style="position:absolute;inset:0;z-index:5;display:none;align-items:flex-end;background:rgba(26,17,48,0.42);">
+          <div style="position:relative;width:100%;padding:26px 24px 30px;border-radius:20px 20px 44px 44px;background:#fff;box-shadow:0 -12px 40px rgba(26,17,48,0.18);display:flex;flex-direction:column;gap:14px;">
+            <div style="display:flex;align-items:center;gap:9px;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#845EEE" stroke-width="1.7" stroke-linecap="round"><circle cx="12" cy="12" r="8.6"/><path d="M12 8v5.2"/><circle cx="12" cy="16.4" r=".85" fill="#845EEE" stroke="none"/></svg>
+              <span style="font-size:17px;font-weight:700;color:#1A1130;"><span class="i18n"><span class="ko">재설치·기기 변경 주의</span><span class="vi">Lưu ý khi cài lại · đổi thiết bị</span></span></span>
             </div>
-            <div class="nick-warn-body">지금은 <b>이 기기에만</b> 정보가 저장돼요. 카카오 미연동 상태에서 <b>앱 삭제·기기 변경 시 티켓·포인트·활동 내역이 모두 초기화</b>됩니다.</div>
-            <div class="nick-warn-tip">카카오를 연동하면 안전하게 보관돼요. 앱 안에서 언제든 가능해요.</div>
-            <button type="button" class="nick-warn-confirm" onclick="document.getElementById('nick2-warn-modal').classList.remove('show')">알았어요</button>
+            <div style="font-size:12px;font-weight:500;color:#5A5370;line-height:1.75;"><span class="i18n"><span class="ko">지금은</span><span class="vi">Hiện tại,</span></span> <span style="font-weight:700;color:#1A1130;"><span class="i18n"><span class="ko">이 기기에만</span><span class="vi">chỉ trên thiết bị này</span></span></span> <span class="i18n"><span class="ko">정보가 저장돼요. 카카오 미연동 상태에서 앱 삭제·기기 변경 시 티켓·포인트·활동 내역이 모두 초기화됩니다.</span><span class="vi">thông tin được lưu. Nếu chưa liên kết Kakao mà xóa ứng dụng hoặc đổi thiết bị, vé·điểm·lịch sử hoạt động sẽ bị xóa hết.</span></span></div>
+            <div style="display:flex;gap:10px;padding:13px 15px;border-radius:12px;background:#F0EBFF;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#845EEE" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:1px;"><path d="M12 3.5c3 1.6 5.5 2 6.5 2v6c0 4.4-3.2 7.4-6.5 9-3.3-1.6-6.5-4.6-6.5-9v-6c1 0 3.5-.4 6.5-2Z"/><path d="M9.3 12.2l1.9 1.9 3.5-3.9"/></svg>
+              <span style="font-size:11px;font-weight:500;color:#5A5370;line-height:1.7;"><span class="i18n"><span class="ko">카카오를 연동하면 안전하게 보관돼요. 앱 안에서 언제든 연동할 수 있어요.</span><span class="vi">Liên kết Kakao để lưu trữ an toàn. Bạn có thể liên kết bất cứ lúc nào trong ứng dụng.</span></span></span>
+            </div>
+            <button type="button" onclick="document.getElementById('nick2-warn-modal').classList.remove('show')" style="margin-top:2px;width:100%;height:50px;border:none;border-radius:12px;background:#845EEE;color:#fff;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;"><span class="i18n"><span class="ko">알았어요</span><span class="vi">Đã hiểu</span></span></button>
           </div>
         </div>
       </div>
