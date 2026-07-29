@@ -358,6 +358,10 @@
   }
 
   /* 폰 프레임 */
+  /* 신규 시안 원본(20260729)의 KO/VI 마크업 그대로 이식 — 기존 KO2VI 사전 방식과 별개로 body.lang-vi가 토글 */
+  .i18n .vi { display: none; }
+  body.lang-vi .i18n .ko { display: none; }
+  body.lang-vi .i18n .vi { display: inline; }
   .phone {
     width: 390px;
     height: 844px;
@@ -6654,6 +6658,14 @@
     0%, 100% { transform: translateY(0); }
     50% { transform: translateY(-10px); }
   }
+  @keyframes ppHalo {
+    0% { transform: scale(1); opacity: .9; }
+    100% { transform: scale(1.35); opacity: 0; }
+  }
+  @keyframes ppDots {
+    0%, 100% { opacity: .4; }
+    50% { opacity: 1; }
+  }
 
   .bridge-arrows {
     display: flex; gap: 4px;
@@ -8505,33 +8517,48 @@ body.interactive-mode #ip-nav { display: block; }
 <div class="ip-stage">
   <div id="ip-screen-container">
   <div class="phone-wrap" id="pw-00" data-screen="01">
-    <div class="phone">
-      <div class="splash" style="background:linear-gradient(160deg,#FDEBEF 0%,#EDE7FB 45%,#E3ECFB 100%);position:relative;overflow:hidden;">
-        <div class="si" style="position:absolute;top:0;left:0;right:0;bottom:0;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;">
-<!-- 파스텔 선물 무드 장식(쇼핑백·기프트박스) -->
-<svg width="46" height="46" viewBox="0 0 24 24" fill="none" style="position:absolute;top:16%;left:10%;opacity:.85;filter:drop-shadow(0 6px 10px rgba(132,94,238,0.18));animation:pp-float 3.6s ease-in-out infinite;"><rect x="3" y="8" width="18" height="12" rx="2" fill="#FFD3E0"/><path d="M8 8V6a4 4 0 0 1 8 0v2" stroke="#C77BA0" stroke-width="1.6" stroke-linecap="round"/></svg>
-<svg width="34" height="34" viewBox="0 0 24 24" fill="none" style="position:absolute;top:12%;right:14%;opacity:.85;filter:drop-shadow(0 6px 10px rgba(132,94,238,0.18));animation:pp-float 4.2s .4s ease-in-out infinite;"><rect x="3" y="9" width="18" height="11" rx="1.5" fill="#C9DBFF"/><rect x="3" y="9" width="18" height="3" fill="#8FAEEA"/><line x1="12" y1="9" x2="12" y2="20" stroke="#8FAEEA" stroke-width="1.6"/></svg>
-<svg width="30" height="30" viewBox="0 0 24 24" fill="none" style="position:absolute;bottom:32%;left:14%;opacity:.8;filter:drop-shadow(0 6px 10px rgba(132,94,238,0.18));animation:pp-float 3.8s .8s ease-in-out infinite;"><circle cx="12" cy="12" r="9" fill="#FFE7B3"/><path d="M9 12h6M12 9v6" stroke="#D9A63C" stroke-width="1.6" stroke-linecap="round"/></svg>
-<svg width="38" height="38" viewBox="0 0 24 24" fill="none" style="position:absolute;bottom:26%;right:11%;opacity:.85;filter:drop-shadow(0 6px 10px rgba(132,94,238,0.18));animation:pp-float 4s .2s ease-in-out infinite;"><rect x="3" y="8" width="18" height="12" rx="2" fill="#D8CCFB"/><path d="M8 8V6a4 4 0 0 1 8 0v2" stroke="#8F6ED6" stroke-width="1.6" stroke-linecap="round"/></svg>
-<div style="margin-left:auto;margin-right:auto;text-align:center;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;margin-top:-60px;animation:pp-fadein .7s ease both;">
-  <div style="width:100px;height:100px;border-radius:26px;background:#fff;box-shadow:0 14px 32px rgba(132,94,238,0.25);display:flex;align-items:center;justify-content:center;margin-bottom:24px;"><div style="width:62px;height:62px"><svg viewBox="0 0 360 363" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path d="M178.702 82.6926C125.372 82.6926 82.1367 125.942 82.1367 179.289V277.43H115.611V252.409C132.535 267.036 154.589 275.873 178.702 275.873C232.032 275.873 275.267 232.624 275.267 179.276C275.267 125.929 232.032 82.6797 178.702 82.6797V82.6926ZM178.702 242.401C143.851 242.401 115.611 214.151 115.611 179.289C115.611 144.428 143.851 116.178 178.702 116.178C213.552 116.178 241.792 144.428 241.792 179.289C241.792 214.151 213.552 242.401 178.702 242.401Z" fill="url(#splashMark)"/>
-<path d="M180 0C80.593 0 0 80.6195 0 180.059V363H62.3962V316.368C93.9416 343.627 135.042 360.118 180 360.118C279.407 360.118 360 279.499 360 180.059C360 80.6195 279.42 0 180 0ZM180 297.702C115.045 297.702 62.3962 245.023 62.3962 180.059C62.3962 115.095 115.058 62.4168 180 62.4168C244.942 62.4168 297.604 115.095 297.604 180.059C297.604 245.023 244.942 297.702 180 297.702Z" fill="url(#splashMark)"/>
-<path d="M208.118 189.436L204.118 182.814C203.278 181.338 202.518 178.546 202.518 176.91V166.818C202.518 153.814 191.918 143.203 178.838 143.203C165.758 143.203 155.158 153.814 155.158 166.818V176.91C155.158 178.546 154.398 181.338 153.558 182.774L149.518 189.436C147.918 192.108 147.558 195.06 148.558 197.773C149.518 200.445 151.798 202.52 154.758 203.517C162.518 206.15 170.678 207.426 178.838 207.426C186.998 207.426 195.158 206.15 202.918 203.557C205.718 202.639 207.878 200.525 208.918 197.773C209.958 195.02 209.678 191.989 208.118 189.436Z" fill="url(#splashMark)" opacity=".5"/>
-<path d="M187.757 144.883C184.997 143.806 181.997 143.207 178.837 143.207C175.717 143.207 172.717 143.766 169.957 144.883C171.677 141.652 175.077 139.617 178.837 139.617C182.637 139.617 185.997 141.652 187.757 144.883Z" fill="url(#splashMark)" opacity=".5"/>
-<path d="M190.077 211.462C188.397 216.089 183.957 219.4 178.757 219.4C175.597 219.4 172.477 218.123 170.277 215.85C168.997 214.653 168.037 213.057 167.477 211.422C167.997 211.502 168.517 211.542 169.077 211.621C169.997 211.741 170.957 211.861 171.917 211.94C174.197 212.14 176.517 212.26 178.837 212.26C181.117 212.26 183.397 212.14 185.637 211.94C186.477 211.861 187.317 211.821 188.117 211.701C188.757 211.621 189.397 211.542 190.077 211.462Z" fill="url(#splashMark)" opacity=".5"/>
-<defs><linearGradient id="splashMark" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#9B78FF"/><stop offset="100%" stop-color="#6C4AB6"/></linearGradient></defs>
-</svg></div></div>
-  <div style="font-family:'Pretendard Variable',sans-serif;font-size:36px;font-weight:800;color:#3A2A5C;letter-spacing:-2px;line-height:1;margin-bottom:5px;">프라이스픽</div>
-<div style="font-family:'Poppins',sans-serif;font-size:10px;font-weight:600;color:#9B8CBF;letter-spacing:5px;margin-bottom:3px;">PRICEPICK</div>
-<div style="font-size:11px;color:#8F7FB8;letter-spacing:.3px;margin-bottom:16px;">쇼핑이 선물이 되는 곳</div>
-<div style="display:flex;gap:8px;">
-  <div style="background:#fff;color:var(--main);font-size:11px;font-weight:700;padding:7px 13px;border-radius:99px;box-shadow:0 3px 10px rgba(132,94,238,0.15);">🛍️ 쇼핑 적립</div>
-  <div style="background:#fff;color:var(--main);font-size:11px;font-weight:700;padding:7px 13px;border-radius:99px;box-shadow:0 3px 10px rgba(132,94,238,0.15);">🎡 매주 추첨</div>
-</div>
-</div>
-<div style="position:absolute;bottom:44px;display:flex;gap:6px;"><div style="width:5px;height:5px;border-radius:50%;background:rgba(132,94,238,.4);animation:pp-pulse 1.4s 0.00s ease-in-out infinite;"></div><div style="width:5px;height:5px;border-radius:50%;background:rgba(132,94,238,.4);animation:pp-pulse 1.4s 0.22s ease-in-out infinite;"></div><div style="width:5px;height:5px;border-radius:50%;background:rgba(132,94,238,.4);animation:pp-pulse 1.4s 0.44s ease-in-out infinite;"></div></div>
-</div>
+    <div class="phone" style="width:390px;height:844px;border-radius:44px;overflow:hidden;background:linear-gradient(#FFF7FB 0%, #F6F1FF 46%, #E2D9FF 100%);position:relative;">
+      <img src="assets/onboard-bg.jpg" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;">
+      <div style="position:relative;display:flex;align-items:center;justify-content:space-between;padding:14px 26px 0;font-size:13px;font-weight:700;color:#1A1130;">
+        <span>9:41</span>
+        <span style="display:flex;gap:6px;align-items:center;color:#1A1130;">
+          <svg width="17" height="12" viewBox="0 0 17 12" fill="none" stroke="#1A1130" stroke-width="1.5" stroke-linecap="round"><path d="M1.5 10.5v-2"/><path d="M5.5 10.5v-4"/><path d="M9.5 10.5v-6"/><path d="M13.5 10.5v-8"/></svg>
+          <svg width="15" height="12" viewBox="0 0 15 12" fill="none" stroke="#1A1130" stroke-width="1.5" stroke-linecap="round"><path d="M1 4.4a9 9 0 0 1 13 0"/><path d="M3.4 7a5.6 5.6 0 0 1 8.2 0"/><circle cx="7.5" cy="9.8" r=".9" fill="#1A1130" stroke="none"/></svg>
+          <svg width="24" height="12" viewBox="0 0 24 12" fill="none" stroke="#1A1130" stroke-width="1.4" stroke-linecap="round"><rect x="1" y="2" width="19" height="8" rx="2.4"/><rect x="2.8" y="3.8" width="12" height="4.4" rx="1.2" fill="#1A1130" stroke="none"/><path d="M22 4.6v2.8"/></svg>
+        </span>
+      </div>
+      <div style="position:relative;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px;padding-bottom:70px;height:calc(100% - 30px);">
+        <div style="position:relative;width:132px;height:132px;display:flex;align-items:center;justify-content:center;">
+          <div style="position:absolute;width:132px;height:132px;border-radius:40px;border:1.5px solid rgba(132,94,238,0.45);animation:ppHalo 2.8s ease-out .7s infinite;"></div>
+          <div style="position:absolute;width:132px;height:132px;border-radius:40px;border:1.5px solid rgba(255,111,168,0.35);animation:ppHalo 2.8s ease-out 1.7s infinite;"></div>
+          <div style="position:relative;width:132px;height:132px;border-radius:36px;background:rgba(255,255,255,0.72);display:flex;align-items:center;justify-content:center;box-shadow:0 18px 40px rgba(132,94,238,0.22);">
+            <div style="position:relative;width:96px;height:96px;border-radius:26px;overflow:hidden;box-shadow:0 8px 20px rgba(132,94,238,0.3);background:linear-gradient(135deg,#845EEE,#6C4AB6);display:flex;align-items:center;justify-content:center;">
+              <svg width="60" height="60" viewBox="0 0 360 363" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="PricePick"><path d="M179.565 82.6926C126.235 82.6926 83 125.942 83 179.289V277.43H116.474V252.409C133.398 267.036 155.453 275.873 179.565 275.873C232.895 275.873 276.13 232.624 276.13 179.276C276.13 125.929 232.895 82.6797 179.565 82.6797V82.6926ZM179.565 242.401C144.715 242.401 116.474 214.151 116.474 179.289C116.474 144.428 144.715 116.178 179.565 116.178C214.415 116.178 242.656 144.428 242.656 179.289C242.656 214.151 214.415 242.401 179.565 242.401Z" fill="#BEA5F3"/><path d="M180 0C80.593 0 0 80.6195 0 180.059V363H62.3962V316.368C93.9416 343.627 135.042 360.118 180 360.118C279.407 360.118 360 279.499 360 180.059C360 80.6195 279.42 0 180 0ZM180 297.702C115.045 297.702 62.3962 245.023 62.3962 180.059C62.3962 115.095 115.058 62.4168 180 62.4168C244.942 62.4168 297.604 115.095 297.604 180.059C297.604 245.023 244.942 297.702 180 297.702Z" fill="#fff"/><path d="M209.118 189.436L205.118 182.814C204.278 181.338 203.518 178.546 203.518 176.91V166.818C203.518 153.814 192.918 143.203 179.838 143.203C166.758 143.203 156.158 153.814 156.158 166.818V176.91C156.158 178.546 155.398 181.338 154.558 182.774L150.518 189.436C148.918 192.108 148.558 195.06 149.558 197.773C150.518 200.445 152.798 202.52 155.758 203.517C163.518 206.15 171.678 207.426 179.838 207.426C187.998 207.426 196.158 206.15 203.918 203.557C206.718 202.639 208.878 200.525 209.918 197.773C210.958 195.02 210.678 191.989 209.118 189.436Z" fill="#fff"/><path d="M188.757 144.883C185.997 143.806 182.997 143.207 179.837 143.207C176.717 143.207 173.717 143.766 170.957 144.883C172.677 141.652 176.077 139.617 179.837 139.617C183.637 139.617 186.997 141.652 188.757 144.883Z" fill="#fff"/><path d="M191.077 211.462C189.397 216.089 184.957 219.4 179.757 219.4C176.597 219.4 173.477 218.123 171.277 215.85C169.997 214.653 169.037 213.057 168.477 211.422C168.997 211.502 169.517 211.542 170.077 211.621C170.997 211.741 171.957 211.861 172.917 211.94C175.197 212.14 177.517 212.26 179.837 212.26C182.117 212.26 184.397 212.14 186.637 211.94C187.477 211.861 188.317 211.821 189.117 211.701C189.757 211.621 190.397 211.542 191.077 211.462Z" fill="#fff"/></svg>
+            </div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:3px;">
+          <div style="font-size:32px;letter-spacing:-0.02em;"><span style="font-weight:400;color:#645C7E;">프라이스</span><span style="font-weight:700;color:#4A3576;">픽</span></div>
+          <div style="font-size:19px;color:#1A1130;letter-spacing:0.22em;padding-left:0.22em;"><span style="font-weight:500;font-size:16px;color:#A79EC0;">PRICE</span><span style="font-weight:800;font-size:16px;color:#6E5AA6;">PICK</span></div>
+          <div style="margin-top:26px;font-size:12px;font-weight:500;color:#5A5370;"><span class="i18n"><span class="ko">쇼핑이 선물이 되는 곳</span><span class="vi">Nơi mua sắm trở thành món quà</span></span></div>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:4px;">
+          <span style="display:inline-flex;align-items:center;gap:6px;padding:7px 13px;border-radius:999px;background:#fff;font-size:11px;font-weight:700;color:#6C4AB6;box-shadow:0 4px 12px rgba(132,94,238,0.14);">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#845EEE" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h16l-1 11a2 2 0 0 1-2 1.8H7A2 2 0 0 1 5 19L4 8Z"/><path d="M9 8V6.5a3 3 0 0 1 6 0V8"/></svg>
+            <span class="i18n"><span class="ko">쇼핑 적립</span><span class="vi">Tích lũy khi mua sắm</span></span>
+          </span>
+          <span style="display:inline-flex;align-items:center;gap:6px;padding:7px 13px;border-radius:999px;background:#fff;font-size:11px;font-weight:700;color:#B8437A;box-shadow:0 4px 12px rgba(255,111,168,0.16);">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FF6FA8" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="9" width="17" height="11.5" rx="2"/><path d="M3.5 13.5h17"/><path d="M12 9v11.5"/><path d="M12 9s-.9-3.2-3.2-3.2A2 2 0 0 0 8.8 9H12Zm0 0s.9-3.2 3.2-3.2A2 2 0 0 1 15.2 9H12Z"/></svg>
+            <span class="i18n"><span class="ko">매주 추첨</span><span class="vi">Quay số hàng tuần</span></span>
+          </span>
+        </div>
+      </div>
+      <div style="position:relative;display:flex;flex-direction:column;align-items:center;gap:18px;padding:0 0 46px;">
+        <div style="display:flex;gap:6px;">
+          <div style="width:6px;height:6px;border-radius:50%;background:#845EEE;animation:ppDots 1.2s ease-in-out 0s infinite;"></div>
+          <div style="width:6px;height:6px;border-radius:50%;background:#845EEE;animation:ppDots 1.2s ease-in-out .2s infinite;"></div>
+          <div style="width:6px;height:6px;border-radius:50%;background:#845EEE;animation:ppDots 1.2s ease-in-out .4s infinite;"></div>
+        </div>
       </div>
     </div>
   </div>
@@ -15728,6 +15755,7 @@ function csSubmitInquiry(btn) {
   }
   window.ipSetLang=function(lang){
     lang=(lang==='vi')?'vi':'ko';
+    document.body.classList.toggle('lang-vi', lang==='vi');
     if(lang===IPLANG){syncToggle(lang);return;}
     IPLANG=lang;
     document.documentElement.lang=lang;
