@@ -8533,10 +8533,8 @@ body.interactive-mode #ip-nav { display: block; }
         <div style="position:relative;width:132px;height:132px;display:flex;align-items:center;justify-content:center;">
           <div style="position:absolute;width:132px;height:132px;border-radius:40px;border:1.5px solid rgba(132,94,238,0.45);animation:ppHalo 2.8s ease-out .7s infinite;"></div>
           <div style="position:absolute;width:132px;height:132px;border-radius:40px;border:1.5px solid rgba(255,111,168,0.35);animation:ppHalo 2.8s ease-out 1.7s infinite;"></div>
-          <div style="position:relative;width:132px;height:132px;border-radius:36px;background:rgba(255,255,255,0.72);display:flex;align-items:center;justify-content:center;box-shadow:0 18px 40px rgba(132,94,238,0.22);">
-            <div style="position:relative;width:96px;height:96px;border-radius:26px;overflow:hidden;box-shadow:0 8px 20px rgba(132,94,238,0.3);background:linear-gradient(135deg,#845EEE,#6C4AB6);display:flex;align-items:center;justify-content:center;">
-              <svg width="60" height="60" viewBox="0 0 360 363" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="PricePick"><path d="M179.565 82.6926C126.235 82.6926 83 125.942 83 179.289V277.43H116.474V252.409C133.398 267.036 155.453 275.873 179.565 275.873C232.895 275.873 276.13 232.624 276.13 179.276C276.13 125.929 232.895 82.6797 179.565 82.6797V82.6926ZM179.565 242.401C144.715 242.401 116.474 214.151 116.474 179.289C116.474 144.428 144.715 116.178 179.565 116.178C214.415 116.178 242.656 144.428 242.656 179.289C242.656 214.151 214.415 242.401 179.565 242.401Z" fill="#BEA5F3"/><path d="M180 0C80.593 0 0 80.6195 0 180.059V363H62.3962V316.368C93.9416 343.627 135.042 360.118 180 360.118C279.407 360.118 360 279.499 360 180.059C360 80.6195 279.42 0 180 0ZM180 297.702C115.045 297.702 62.3962 245.023 62.3962 180.059C62.3962 115.095 115.058 62.4168 180 62.4168C244.942 62.4168 297.604 115.095 297.604 180.059C297.604 245.023 244.942 297.702 180 297.702Z" fill="#fff"/><path d="M209.118 189.436L205.118 182.814C204.278 181.338 203.518 178.546 203.518 176.91V166.818C203.518 153.814 192.918 143.203 179.838 143.203C166.758 143.203 156.158 153.814 156.158 166.818V176.91C156.158 178.546 155.398 181.338 154.558 182.774L150.518 189.436C148.918 192.108 148.558 195.06 149.558 197.773C150.518 200.445 152.798 202.52 155.758 203.517C163.518 206.15 171.678 207.426 179.838 207.426C187.998 207.426 196.158 206.15 203.918 203.557C206.718 202.639 208.878 200.525 209.918 197.773C210.958 195.02 210.678 191.989 209.118 189.436Z" fill="#fff"/><path d="M188.757 144.883C185.997 143.806 182.997 143.207 179.837 143.207C176.717 143.207 173.717 143.766 170.957 144.883C172.677 141.652 176.077 139.617 179.837 139.617C183.637 139.617 186.997 141.652 188.757 144.883Z" fill="#fff"/><path d="M191.077 211.462C189.397 216.089 184.957 219.4 179.757 219.4C176.597 219.4 173.477 218.123 171.277 215.85C169.997 214.653 169.037 213.057 168.477 211.422C168.997 211.502 169.517 211.542 170.077 211.621C170.997 211.741 171.957 211.861 172.917 211.94C175.197 212.14 177.517 212.26 179.837 212.26C182.117 212.26 184.397 212.14 186.637 211.94C187.477 211.861 188.317 211.821 189.117 211.701C189.757 211.621 190.397 211.542 191.077 211.462Z" fill="#fff"/></svg>
-            </div>
+          <div style="position:relative;width:132px;height:132px;border-radius:36px;background:rgba(255,255,255,0.72);display:flex;align-items:center;justify-content:center;box-shadow:0 18px 40px rgba(132,94,238,0.22);overflow:hidden;">
+            <img src="assets/app-icon-3d.png" alt="PricePick" style="width:100%;height:100%;object-fit:cover;display:block;">
           </div>
         </div>
         <div style="display:flex;flex-direction:column;align-items:center;gap:3px;">
@@ -15289,7 +15287,7 @@ function startSplashTimer() {
   if (currentScreen === 'pw-00') {
     setTimeout(() => {
       if (currentScreen === 'pw-00') showScreen('pw-01');
-    }, 2500);
+    }, 5000);
   }
 }
 
