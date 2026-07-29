@@ -11642,35 +11642,53 @@ body.interactive-mode #ip-nav { display: block; }
           <span class="ac-header-title">행운룰렛</span>
           <div style="width:36px"></div>
         </div>
-        <div class="rl-hero">
-          <div class="rl-hero-title">매일 한 번, 행운룰렛</div>
-          <div class="rl-hero-sub">버튼을 눌러 룰렛을 돌리고<br>티켓을 받아보세요</div>
-          <div class="rl-hero-badge">오늘 남은 기회 1회</div>
-        </div>
-        <div class="rl-stage">
-          <div class="rl-wheel-box">
-            <div class="rl-pointer">
-              <svg width="30" height="34" viewBox="0 0 30 34" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M15 33L3.7 13C0.8 7.9 4.5 1.5 10.4 1.5H19.6C25.5 1.5 29.2 7.9 26.3 13L15 33Z" fill="#6C4AB6" stroke="#fff" stroke-width="2.5" stroke-linejoin="round"/></svg>
-            </div>
-            <svg class="rl-wheel" id="rl-wheel" viewBox="0 0 264 264" xmlns="http://www.w3.org/2000/svg"></svg>
-            <div class="rl-hub"><div class="rl-hub-dot"></div></div>
+        <div style="text-align:center;padding:26px 24px 4px;">
+          <div style="width:52px;height:52px;border-radius:16px;margin:0 auto 14px;background:#FFD7E5;display:flex;align-items:center;justify-content:center;">
+            <svg width="34" height="34" viewBox="0 0 40 40"><defs><linearGradient id="rlIco" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#FF6FA8"/><stop offset="100%" stop-color="#FF5D8F"/></linearGradient></defs><circle cx="20" cy="21" r="13" fill="none" stroke="url(#rlIco)" stroke-width="2.6"/><path d="M20,21 L20,8 A13,13 0 0 1 31.26,14.5 Z" fill="url(#rlIco)" opacity="0.9"/><path d="M20,21 L31.26,27.5 A13,13 0 0 1 20,34 Z" fill="url(#rlIco)" opacity="0.9"/><path d="M20,21 L8.74,27.5 A13,13 0 0 1 8.74,14.5 Z" fill="url(#rlIco)" opacity="0.9"/><circle cx="20" cy="21" r="3.2" fill="#FFD7E5" stroke="url(#rlIco)" stroke-width="2"/><path d="M20,2 L24,8 L16,8 Z" fill="url(#rlIco)"/></svg>
+          </div>
+          <div style="font-size:22px;font-weight:800;letter-spacing:-0.4px;line-height:1.35;color:#1A1130;"><span class="i18n"><span class="ko">매일 한 번, 행운을 돌려보세요</span><span class="vi">Mỗi ngày một lần, quay thử vận may nhé</span></span></div>
+          <div style="font-size:12px;font-weight:500;color:#5A5370;margin-top:8px;"><span class="i18n"><span class="ko">포인트와 이벤트 티켓이 매일 기다리고 있어요</span><span class="vi">Điểm và vé sự kiện đang chờ bạn mỗi ngày</span></span></div>
+          <div style="display:inline-flex;align-items:center;gap:6px;margin-top:16px;padding:7px 14px;border-radius:999px;background:#E2D9FF;font-size:12px;font-weight:600;color:#845EEE;">
+            <span style="width:6px;height:6px;border-radius:50%;background:#22C55E;display:inline-block;"></span>
+            <span id="rl-hero-badge-text"><span class="i18n"><span class="ko">오늘 남은 기회 1회</span><span class="vi">Còn 1 lần hôm nay</span></span></span>
           </div>
         </div>
-        <div class="rl-footer">
-          <button class="rl-spin-btn" id="rl-spin-btn">돌리기</button>
-          <div class="rl-spin-info">룰렛은 매일 자정 초기화 · 당첨 티켓은 자동 지급</div>
+        <div style="display:flex;justify-content:center;padding:26px 0 6px;">
+          <div style="position:relative;width:340px;height:340px;">
+            <div style="position:absolute;inset:-12px;border-radius:50%;background:linear-gradient(160deg,#9B78FF,#6C4AB6);box-shadow:0 14px 34px rgba(132,94,238,0.32);"></div>
+            <div id="rl-wheel-rotor" style="position:absolute;left:20px;top:20px;width:300px;height:300px;border-radius:50%;transform:rotate(0deg);will-change:transform;">
+              <svg id="rl-wheel" width="300" height="300" viewBox="0 0 300 300" style="display:block;border-radius:50%;"></svg>
+            </div>
+            <div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:72px;height:72px;border-radius:50%;background:#fff;box-shadow:0 4px 12px rgba(26,17,48,0.18);display:flex;align-items:center;justify-content:center;">
+              <div style="width:54px;height:54px;border-radius:50%;background:#845EEE;display:flex;align-items:center;justify-content:center;">
+                <svg viewBox="0 0 360 363" width="34" height="34" style="display:block;"><path d="M179.565 82.6926C126.235 82.6926 83 125.942 83 179.289V277.43H116.474V252.409C133.398 267.036 155.453 275.873 179.565 275.873C232.895 275.873 276.13 232.624 276.13 179.276C276.13 125.929 232.895 82.6797 179.565 82.6797V82.6926ZM179.565 242.401C144.715 242.401 116.474 214.151 116.474 179.289C116.474 144.428 144.715 116.178 179.565 116.178C214.415 116.178 242.656 144.428 242.656 179.289C242.656 214.151 214.415 242.401 179.565 242.401Z" fill="#BEA5F3"/><path d="M180 0C80.593 0 0 80.6195 0 180.059V363H62.3962V316.368C93.9416 343.627 135.042 360.118 180 360.118C279.407 360.118 360 279.499 360 180.059C360 80.6195 279.42 0 180 0ZM180 297.702C115.045 297.702 62.3962 245.023 62.3962 180.059C62.3962 115.095 115.058 62.4168 180 62.4168C244.942 62.4168 297.604 115.095 297.604 180.059C297.604 245.023 244.942 297.702 180 297.702Z" fill="#fff"/><path d="M209.118 189.436L205.118 182.814C204.278 181.338 203.518 178.546 203.518 176.91V166.818C203.518 153.814 192.918 143.203 179.838 143.203C166.758 143.203 156.158 153.814 156.158 166.818V176.91C156.158 178.546 155.398 181.338 154.558 182.774L150.518 189.436C148.918 192.108 148.558 195.06 149.558 197.773C150.518 200.445 152.798 202.52 155.758 203.517C163.518 206.15 171.678 207.426 179.838 207.426C187.998 207.426 196.158 206.15 203.918 203.557C206.718 202.639 208.878 200.525 209.918 197.773C210.958 195.02 210.678 191.989 209.118 189.436Z" fill="#fff"/><path d="M188.757 144.883C185.997 143.806 182.997 143.207 179.837 143.207C176.717 143.207 173.717 143.766 170.957 144.883C172.677 141.652 176.077 139.617 179.837 139.617C183.637 139.617 186.997 141.652 188.757 144.883Z" fill="#fff"/><path d="M191.077 211.462C189.397 216.089 184.957 219.4 179.757 219.4C176.597 219.4 173.477 218.123 171.277 215.85C169.997 214.653 169.037 213.057 168.477 211.422C168.997 211.502 169.517 211.542 170.077 211.621C170.997 211.741 171.957 211.861 172.917 211.94C175.197 212.14 177.517 212.26 179.837 212.26C182.117 212.26 184.397 212.14 186.637 211.94C187.477 211.861 188.317 211.821 189.117 211.701C189.757 211.621 190.397 211.542 191.077 211.462Z" fill="#fff"/></svg>
+              </div>
+            </div>
+            <div style="position:absolute;left:50%;top:-18px;margin-left:-20px;z-index:3;">
+              <svg width="40" height="50" viewBox="0 0 40 50" style="display:block;"><defs><linearGradient id="rlPin" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FF6FA8"/><stop offset="1" stop-color="#FF5D8F"/></linearGradient></defs><path d="M20 48 C10 33 4 26 4 18 A16 16 0 0 1 36 18 C36 26 30 33 20 48 Z" fill="url(#rlPin)" stroke="#FFFFFF" stroke-width="3"/><circle cx="20" cy="18" r="5.5" fill="#FFFFFF"/></svg>
+            </div>
+          </div>
+        </div>
+        <div style="padding:24px 20px 10px;display:flex;flex-direction:column;gap:10px;">
+          <button id="rl-spin-btn" style="width:100%;border:none;cursor:pointer;padding:16px 0;border-radius:12px;font-family:inherit;font-size:15px;font-weight:700;color:#fff;background:#845EEE;"><span class="i18n"><span class="ko">돌리기</span><span class="vi">Quay</span></span></button>
+          <div class="rl-spin-info" style="text-align:center;font-size:10px;font-weight:500;color:#9B93B0;line-height:1.6;padding-bottom:28px;"><span class="i18n"><span class="ko">룰렛은 매일 자정 초기화 · 당첨 보상(포인트·이벤트티켓) 자동 지급</span><span class="vi">Vòng quay đặt lại vào 0h mỗi ngày · Thưởng trúng (điểm·vé sự kiện) được cấp tự động</span></span></div>
         </div>
 
-        <!-- 룰렛 결과 모달 -->
-        <div class="rl-result-overlay" id="rl-result-overlay">
-          <div class="rl-result-modal" id="rl-result-modal">
-            <div class="rl-result-chip" id="rl-result-chip"></div>
-            <div class="rl-result-ico" id="rl-result-ico"></div>
-            <div class="rl-result-val" id="rl-result-val"></div>
-            <div class="rl-result-sub" id="rl-result-sub"></div>
-            <div class="rl-result-headline" id="rl-result-headline"></div>
-            <div class="rl-result-desc" id="rl-result-desc"></div>
-            <button class="rl-result-confirm" id="rl-result-confirm">확인</button>
+        <!-- 룰렛 결과 모달: 어두운 프레임(#1A1130) 안에 흰 카드 -->
+        <div id="rl-result-overlay" style="position:absolute;inset:0;z-index:50;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,0.4);padding:20px;">
+          <div style="width:100%;max-width:280px;">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+              <span id="rl-result-chip" style="font-size:10px;font-weight:700;letter-spacing:1.1px;color:#845EEE;background:#E2D9FF;padding:5px 10px;border-radius:999px;"></span>
+              <span id="rl-result-prob" style="font-size:12px;font-weight:500;color:#F0EEF5;"></span>
+            </div>
+            <div style="border-radius:20px;background:#1A1130;padding:30px 22px;display:flex;align-items:center;justify-content:center;box-sizing:border-box;">
+              <div style="background:#fff;border-radius:20px;padding:30px 22px 20px;width:100%;max-width:268px;text-align:center;color:#1A1130;">
+                <div id="rl-result-ico" style="margin:0 auto 16px;padding:16px 0;border-radius:16px;background:#E2D9FF;display:flex;align-items:center;justify-content:center;gap:12px;min-height:60px;"></div>
+                <div id="rl-result-headline" style="font-size:17px;font-weight:700;"></div>
+                <div id="rl-result-desc" style="font-size:12px;font-weight:500;color:#5A5370;margin-top:6px;line-height:1.55;"></div>
+                <button id="rl-result-confirm" style="width:100%;margin-top:18px;border:none;cursor:pointer;padding:14px 0;border-radius:12px;font-family:inherit;font-size:14px;font-weight:700;color:#fff;background:#845EEE;"><span class="i18n"><span class="ko">확인</span><span class="vi">Xác nhận</span></span></button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -14093,7 +14111,7 @@ var RL_DEFAULT_WHEEL = [
   { type:'miss' },
   { type:'point', value:200 }
 ];
-var RL_COLORS = ['#9B78FF', '#C6AFFF', '#6C4AB6', '#845EEE', '#C6AFFF', '#7C5BE0'];
+var RL_COLORS = ['#6C4AB6', '#C6AFFF', '#845EEE', '#7C5BE0', '#C6AFFF', '#9B78FF'];
 var RL_ACTIVE_WHEEL = RL_DEFAULT_WHEEL;
 var RL_EVENT_TICKET_DAILY_CAP = 5;
 var RL_EVENT_TICKET_MONTHLY_CAP = 30;
@@ -14143,30 +14161,25 @@ function rlPolar(cx, cy, r, deg) {
 function rlBuildWheel() {
   var svg = document.getElementById('rl-wheel');
   if (!svg) return;
-  var cx = 132, cy = 132, R = 132, n = RL_ACTIVE_WHEEL.length, seg = 360 / n;
+  var cx = 150, cy = 150, R = 146, n = RL_ACTIVE_WHEEL.length, seg = 360 / n;
   var parts = '';
   for (var i = 0; i < n; i++) {
     var a0 = i * seg, a1 = (i + 1) * seg;
     var p0 = rlPolar(cx, cy, R, a0), p1 = rlPolar(cx, cy, R, a1);
-    parts += '<path d="M' + cx + ' ' + cy + ' L' + p0[0].toFixed(2) + ' ' + p0[1].toFixed(2) +
-      ' A' + R + ' ' + R + ' 0 0 1 ' + p1[0].toFixed(2) + ' ' + p1[1].toFixed(2) + ' Z" fill="' +
-      RL_COLORS[i % RL_COLORS.length] + '" stroke="rgba(255,255,255,0.55)" stroke-width="1.5"/>';
-    // 라벨 (반경 중간, 슬라이스 중심각)
+    parts += '<path d="M' + cx + ',' + cy + ' L' + p0[0].toFixed(2) + ',' + p0[1].toFixed(2) +
+      ' A' + R + ',' + R + ' 0 0 1 ' + p1[0].toFixed(2) + ',' + p1[1].toFixed(2) + ' Z" fill="' +
+      RL_COLORS[i % RL_COLORS.length] + '" stroke="#FFFFFF" stroke-width="2"/>';
     var mid = a0 + seg / 2;
-    var lp = rlPolar(cx, cy, 86, mid);
     var rw = rlSegDisplay(RL_ACTIVE_WHEEL[i]);
-    var txtFill = rw.win ? '#ffffff' : '#6C4AB6';
+    var jackpot = rlIsJackpot(RL_ACTIVE_WHEEL[i]);
     if (rw.win) {
-      parts += '<text x="' + lp[0].toFixed(1) + '" y="' + (lp[1] - 4).toFixed(1) + '" fill="' + txtFill +
-        '" font-size="12.5" font-weight="700" text-anchor="middle" font-family="inherit" transform="rotate(' +
-        mid.toFixed(1) + ' ' + lp[0].toFixed(1) + ' ' + lp[1].toFixed(1) + ')">' + rw.label + '</text>';
-      parts += '<text x="' + lp[0].toFixed(1) + '" y="' + (lp[1] + 11).toFixed(1) + '" fill="' + txtFill +
-        '" font-size="11" font-weight="700" text-anchor="middle" font-family="inherit" transform="rotate(' +
-        mid.toFixed(1) + ' ' + lp[0].toFixed(1) + ' ' + lp[1].toFixed(1) + ')">' + rw.sub + '</text>';
+      var lp1 = rlPolar(cx, cy, 104, mid), lp2 = rlPolar(cx, cy, 82, mid), lp3 = rlPolar(cx, cy, 66, mid);
+      parts += '<text x="' + lp1[0].toFixed(1) + '" y="' + lp1[1].toFixed(1) + '" font-size="12" font-weight="600" fill="#FFFFFF" opacity="0.9" text-anchor="middle" font-family="inherit" transform="rotate(' + mid.toFixed(1) + ' ' + lp1[0].toFixed(1) + ' ' + lp1[1].toFixed(1) + ')">' + rw.label + '</text>';
+      parts += '<text x="' + lp2[0].toFixed(1) + '" y="' + lp2[1].toFixed(1) + '" font-size="19" font-weight="800" fill="#FFFFFF" text-anchor="middle" font-family="inherit" transform="rotate(' + mid.toFixed(1) + ' ' + lp2[0].toFixed(1) + ' ' + lp2[1].toFixed(1) + ')">' + rw.sub + '</text>';
+      if (jackpot) parts += '<text x="' + lp3[0].toFixed(1) + '" y="' + lp3[1].toFixed(1) + '" font-size="10" font-weight="700" fill="#FFD7E5" text-anchor="middle" font-family="inherit" transform="rotate(' + mid.toFixed(1) + ' ' + lp3[0].toFixed(1) + ' ' + lp3[1].toFixed(1) + ')">JACKPOT</text>';
     } else {
-      parts += '<text x="' + lp[0].toFixed(1) + '" y="' + (lp[1] + 4).toFixed(1) + '" fill="' + txtFill +
-        '" font-size="15" font-weight="800" text-anchor="middle" font-family="inherit" transform="rotate(' +
-        mid.toFixed(1) + ' ' + lp[0].toFixed(1) + ' ' + lp[1].toFixed(1) + ')">' + rw.label + '</text>';
+      var lp = rlPolar(cx, cy, 88, mid);
+      parts += '<text x="' + lp[0].toFixed(1) + '" y="' + lp[1].toFixed(1) + '" font-size="14" font-weight="700" fill="#1A1130" text-anchor="middle" font-family="inherit" transform="rotate(' + mid.toFixed(1) + ' ' + lp[0].toFixed(1) + ' ' + lp[1].toFixed(1) + ')">' + rw.label + '</text>';
     }
   }
   svg.innerHTML = parts;
@@ -14204,63 +14217,57 @@ function rlIsJackpot(seg) {
   if (seg.type === 'event_ticket') return (seg.value || 1) >= 2;
   return false;
 }
+var RL_POINT_ICO_ROW = '<svg width="60" height="60" viewBox="0 0 64 64" style="flex-shrink:0;"><defs><linearGradient id="pcoin_ms" x1="0" y1="0" x2="0.35" y2="1"><stop offset="49.9%" stop-color="#FFE066"/><stop offset="50%" stop-color="#F0AE00"/></linearGradient><linearGradient id="pcoin_ms_face" x1="0" y1="0" x2="0.35" y2="1"><stop offset="49.9%" stop-color="#FFDA3D"/><stop offset="50%" stop-color="#FFC400"/></linearGradient></defs><ellipse cx="32" cy="57" rx="17" ry="3" fill="#E6A800" opacity="0.16"/><circle cx="32" cy="30" r="27" fill="url(#pcoin_ms)"/><circle cx="32" cy="30" r="21.5" fill="url(#pcoin_ms_face)"/><text x="32" y="40.5" text-anchor="middle" font-family="inherit" font-size="30" font-weight="800" fill="#FFE477" stroke="#E0A600" stroke-width="1.2" paint-order="stroke" stroke-linejoin="round">P</text></svg>';
 function rlShowResult(idx, grantedQty) {
   var overlay = document.getElementById('rl-result-overlay');
-  var modal = document.getElementById('rl-result-modal');
   var chip = document.getElementById('rl-result-chip');
+  var prob = document.getElementById('rl-result-prob');
   var ico = document.getElementById('rl-result-ico');
-  var val = document.getElementById('rl-result-val');
-  var sub = document.getElementById('rl-result-sub');
   var headline = document.getElementById('rl-result-headline');
   var desc = document.getElementById('rl-result-desc');
   var seg = RL_ACTIVE_WHEEL[idx];
   var disp = rlSegDisplay(seg);
-  modal.classList.remove('jackpot', 'miss');
   var pct = rlWinChancePct(seg);
+  function textBlock(value, label) {
+    return '<div style="text-align:left;"><div style="font-size:24px;font-weight:800;color:#845EEE;line-height:1.1;">' + value + '</div><div style="font-size:12px;font-weight:600;color:#5A5370;margin-top:2px;">' + label + '</div></div>';
+  }
   if (disp.win && grantedQty > 0) {
     var jackpot = rlIsJackpot(seg);
-    if (jackpot) modal.classList.add('jackpot');
-    chip.textContent = '당첨 확률 ' + pct + '%';
+    chip.textContent = jackpot ? (seg.type === 'point' ? 'POINT JACKPOT' : 'TICKET JACKPOT') : (seg.type === 'point' ? 'POINT' : 'TICKET');
+    prob.textContent = '당첨 확률 ' + pct + '%';
     if (seg.type === 'point') {
-      ico.innerHTML = RL_POINT_SVG;
-      val.textContent = grantedQty + 'P';
-      sub.textContent = '포인트 적립';
+      ico.innerHTML = RL_POINT_ICO_ROW + textBlock(grantedQty + 'P', '포인트 적립');
       headline.textContent = jackpot ? ('잭팟! 포인트 ' + grantedQty + 'P') : '축하해요!';
       desc.textContent = jackpot ? '가장 희귀한 보상이에요 · 포인트에 자동 적립됐어요' : '포인트가 자동으로 적립됐어요';
     } else {
-      ico.innerHTML = RL_TICKET_SVG;
-      val.textContent = grantedQty + '장';
-      sub.textContent = '이벤트 티켓';
+      ico.innerHTML = RL_TICKET_SVG + textBlock(grantedQty + '장', '이벤트 티켓');
       headline.textContent = jackpot ? ('잭팟! 이벤트 티켓 ' + grantedQty + '장') : '축하해요!';
       desc.textContent = jackpot ? '가장 희귀한 보상이에요 · 내 티켓에 보관됐어요' : '마이페이지 > 내 티켓에 보관됐어요';
     }
   } else if (disp.win && grantedQty === 0 && seg.type === 'event_ticket') {
-    modal.classList.add('miss');
-    chip.textContent = '지급 한도 초과';
-    ico.innerHTML = RL_MISS_SVG;
-    val.textContent = '';
-    sub.textContent = '';
+    chip.textContent = 'MISS';
+    prob.textContent = '지급 한도 초과';
+    ico.innerHTML = '';
     headline.textContent = '아쉽지만 지급 한도를 넘었어요';
     desc.textContent = '이벤트 티켓 지급 한도 초과 (일 ' + RL_EVENT_TICKET_DAILY_CAP + '장 · 월 ' + RL_EVENT_TICKET_MONTHLY_CAP + '장)';
   } else {
-    modal.classList.add('miss');
-    chip.textContent = '당첨 확률 ' + pct + '%';
-    ico.innerHTML = RL_MISS_SVG;
-    val.textContent = '';
-    sub.textContent = '';
+    chip.textContent = 'MISS';
+    prob.textContent = '당첨 확률 ' + pct + '%';
+    ico.innerHTML = '';
     headline.textContent = '아쉬워요, 꽝!';
     desc.textContent = '내일 자정에 기회가 다시 충전돼요';
   }
+  overlay.style.display = 'flex';
   overlay.classList.add('show');
 }
 function rlHideResult() {
   var overlay = document.getElementById('rl-result-overlay');
-  if (overlay) overlay.classList.remove('show');
+  if (overlay) { overlay.style.display = 'none'; overlay.classList.remove('show'); }
 }
 // 오늘 이미 참여한 경우 잠금 UI 반영 (localStorage는 즉시 반영용 캐시일 뿐 — 실제 판정은 서버 기록)
 function rlApplyDailyLock() {
   var btn = document.getElementById('rl-spin-btn');
-  var badge = document.querySelector('#pw-15 .rl-hero-badge');
+  var badge = document.getElementById('rl-hero-badge-text');
   var info = document.querySelector('#pw-15 .rl-spin-info');
   if (!btn) return;
   function setLocked() {
