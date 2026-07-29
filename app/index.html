@@ -3609,42 +3609,6 @@
     flex-shrink: 0;
   }
 
-  /* 12번 추가: 경품 응모 미니 카드 */
-  .draw-mini {
-    background: linear-gradient(135deg, #FFF1E6 0%, #FFE6F0 100%);
-    margin: 0 16px 16px;
-    border-radius: var(--r);
-    padding: 14px 16px;
-    display: flex; align-items: center; gap: 12px;
-    cursor: pointer;
-  }
-  .draw-mini-ico {
-    width: 40px; height: 40px;
-    background: white;
-    border-radius: 10px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 22px;
-    flex-shrink: 0;
-  }
-  .draw-mini-body { flex: 1; min-width: 0; }
-  .draw-mini-title {
-    font-size: 14px; font-weight: 700; color: var(--text1);
-    letter-spacing: -0.3px;
-    margin-bottom: 2px;
-    display: flex; align-items: center; gap: 6px;
-  }
-  .draw-mini-pill {
-    background: var(--red); color: white;
-    font-size: 10px; font-weight: 800;
-    padding: 2px 7px;
-    border-radius: 99px;
-    letter-spacing: 0;
-  }
-  .draw-mini-desc {
-    font-size: 11.5px; color: var(--text2);
-  }
-  .draw-mini-arrow { color: var(--text2); font-size: 14px; flex-shrink: 0; }
-
   /* ============== 19. 등급 상세 (실버 예시) ============== */
   .grade-detail-screen {
     height: 100%;
@@ -10148,16 +10112,6 @@ body.interactive-mode #ip-nav { display: block; }
             </div>
           </div>
 
-          <!-- 경품 응모 (한 줄 요약 — 13번 응모 탭으로 이동) -->
-          <div class="draw-mini">
-            <div class="draw-mini-ico">🎁</div>
-            <div class="draw-mini-body">
-              <div class="draw-mini-title">이번 주 행운의 추첨 <span class="draw-mini-pill">이벤트 티켓 3장</span></div>
-              <div class="draw-mini-desc">신세계 5만원권·스타벅스·티켓 추가 지급</div>
-            </div>
-            <div class="draw-mini-arrow">›</div>
-          </div>
-
           <!-- 진행중 이벤트 -->
           <div class="reward-section no-pad-r">
             <div class="rs-hd">
@@ -10165,7 +10119,8 @@ body.interactive-mode #ip-nav { display: block; }
               <div class="rs-sub">이벤트 티켓을 추가로 받을 수 있어요</div>
             </div>
             <div class="event-list">
-              <div class="event-row">
+              <!-- 주간 추첨 이벤트: "이번 주 행운의 추첨" 배너가 여기로 이동해 경품 응모(pw-26) 링크를 대신 담당 -->
+              <div class="event-row draw-link">
                 <div class="event-ico">📅</div>
                 <div class="event-body">
                   <div class="event-name">주간 추첨 이벤트</div>
