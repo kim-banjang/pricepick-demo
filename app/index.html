@@ -8019,47 +8019,49 @@ body.interactive-mode #ip-nav { display: block; }
 .hmc-ico.attend { background: linear-gradient(140deg,#FFE89A,#FFC54D); box-shadow: 0 5px 12px rgba(240,170,30,.4), inset 0 2px 3px rgba(255,255,255,.7); }
   /* ============== 14. 쿠팡 구경하기 ============== */
   .ac-screen { height:100%; display:flex; flex-direction:column; background:var(--bg); position:relative; }
-  /* 출석체크 결과 모달 — 쿠팡 구경 복귀 직후(win/done 화면 진입 시) 노출 */
-  .ac-result-overlay { position:absolute; inset:0; z-index:50; display:none; align-items:center; justify-content:center; background:rgba(20,12,40,0.55); }
+  /* 출석체크 결과 모달 — 쿠팡 구경 복귀 직후(win/done 화면 진입 시) 노출. 원본과 동일하게 다크프레임+화이트카드 */
+  .ac-result-overlay { position:absolute; inset:0; z-index:50; display:none; align-items:center; justify-content:center; background:rgba(0,0,0,0.4); padding:20px; }
   .ac-result-overlay.show { display:flex; }
-  .ac-result-modal { width:250px; background:#fff; border-radius:20px; padding:22px 20px 20px; text-align:center; animation:rl-modal-pop .32s cubic-bezier(.34,1.56,.64,1); box-shadow:0 20px 44px rgba(0,0,0,0.2); }
-  .ac-result-chip { display:inline-block; font-size:10px; font-weight:800; letter-spacing:.2px; padding:4px 11px; border-radius:99px; background:var(--sub-4); color:var(--main); margin-bottom:14px; }
-  .ac-result-modal.goal .ac-result-chip { background:linear-gradient(135deg,#FFD740,#FFB300); color:#5A3E00; }
-  .ac-result-ico { width:60px; height:60px; margin:0 auto 12px; display:flex; align-items:center; justify-content:center; border-radius:50%; background:var(--sub-4); }
-  .ac-result-val { font-size:26px; font-weight:800; color:var(--text1); letter-spacing:-1px; margin-bottom:2px; }
-  .ac-result-sub { font-size:11px; color:var(--text3); margin-bottom:16px; font-weight:600; }
-  .ac-result-headline { font-size:16px; font-weight:800; color:var(--text1); margin-bottom:6px; letter-spacing:-.3px; }
-  .ac-result-desc { font-size:11.5px; color:var(--text3); line-height:1.5; margin-bottom:18px; }
-  .ac-result-confirm { width:100%; height:46px; border:none; border-radius:12px; background:var(--main); color:#fff; font-size:14px; font-weight:700; cursor:pointer; font-family:inherit; }
+  .ac-result-chip { font-size:10px; font-weight:700; letter-spacing:1.1px; color:#845EEE; background:#E2D9FF; padding:5px 10px; border-radius:999px; }
+  .ac-result-sub2 { font-size:12px; font-weight:500; color:#F0EEF5; }
+  .ac-result-frame { border-radius:20px; background:#1A1130; padding:30px 22px; display:flex; align-items:center; justify-content:center; box-sizing:border-box; }
+  .ac-result-modal { background:#fff; border-radius:20px; padding:30px 22px 20px; width:100%; max-width:268px; text-align:center; }
+  .ac-result-ico { margin:0 auto 16px; padding:16px 0; border-radius:16px; background:#E2D9FF; display:flex; align-items:center; justify-content:center; gap:12px; min-height:60px; }
+  .ac-result-headline { font-size:17px; font-weight:700; color:#1A1130; }
+  .ac-result-desc { font-size:12px; font-weight:500; color:#5A5370; margin-top:6px; line-height:1.55; }
+  .ac-result-confirm { width:100%; margin-top:18px; border:none; border-radius:12px; background:#845EEE; color:#fff; font-size:14px; font-weight:700; cursor:pointer; font-family:inherit; padding:14px 0; }
   .ac-result-confirm:active { opacity:0.85; }
-  .ac-header { display:flex; align-items:center; justify-content:space-between; padding:8px 16px 12px; background:white; border-bottom:1px solid var(--border); }
-  .ac-header-title { font-size:16px; font-weight:700; color:var(--text1); }
-  .ac-streak-card { margin:16px 16px 0; background:linear-gradient(135deg,#845EEE,#6C4AB6); border-radius:18px; padding:22px 20px 18px; display:flex; flex-direction:column; align-items:center; color:white; text-align:center; }
-  .ac-streak-row { display:flex; align-items:baseline; gap:3px; margin-bottom:4px; }
-  .ac-streak-num { font-size:48px; font-weight:800; line-height:1; letter-spacing:-2px; }
-  .ac-streak-unit { font-size:16px; font-weight:600; }
-  .ac-streak-label { font-size:13px; color:rgba(255,255,255,0.75); }
-  .ac-streak-badge { margin-top:10px; font-size:11px; color:rgba(255,255,255,0.6); background:rgba(255,255,255,0.12); border-radius:20px; padding:4px 12px; }
-  .ac-week-card { margin:12px 16px 0; background:white; border-radius:14px; padding:14px 12px; border:1px solid var(--border); }
-  .ac-week-title { font-size:11px; color:var(--text3); margin-bottom:10px; text-align:center; font-weight:500; letter-spacing:.3px; }
-  .ac-week-row { display:grid; grid-template-columns:repeat(7,1fr); gap:3px; }
-  .ac-day { display:flex; flex-direction:column; align-items:center; gap:5px; }
-  .ac-day-label { font-size:10px; color:var(--text3); font-weight:500; }
-  .ac-day-dot { width:33px; height:33px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:600; color:var(--text3); background:var(--bg); }
-  .ac-day-dot.done { background:var(--main); color:white; }
-  .ac-day-dot.today { background:white; color:var(--main); border:2px solid var(--main); font-weight:700; font-size:9px; }
-  .ac-progress-section { margin:10px 16px 0; background:white; border-radius:14px; padding:14px 16px; border:1px solid var(--border); }
-  .ac-progress-header { display:flex; justify-content:space-between; margin-bottom:8px; }
-  .ac-progress-label { font-size:12px; font-weight:600; color:var(--text1); }
-  .ac-progress-count { font-size:12px; color:var(--main); font-weight:700; }
-  .ac-progress-bar { height:6px; background:var(--sub-3); border-radius:99px; overflow:hidden; }
-  .ac-progress-fill { height:100%; background:var(--main); border-radius:99px; }
-  .ac-progress-sub { font-size:11px; color:var(--text3); margin-top:6px; }
-  .ac-reward-row { margin:10px 16px 0; background:var(--sub-4); border-radius:12px; padding:12px 14px; display:flex; align-items:center; gap:12px; }
-  .ac-reward-ico { width:36px; height:36px; border-radius:10px; background:white; display:flex; align-items:center; justify-content:center; flex-shrink:0; box-shadow:0 1px 4px rgba(0,0,0,0.08); }
-  .ac-reward-title { font-size:13px; font-weight:700; color:var(--text1); margin-bottom:2px; }
-  .ac-reward-sub { font-size:11px; color:var(--text2); }
-  .ac-footer { margin-top:auto; padding:16px 16px 36px; }
+  .ac-header { display:flex; align-items:center; justify-content:center; position:relative; padding:16px 20px 8px; background:#fff; }
+  .ac-header-title { font-size:17px; font-weight:700; color:#1A1130; }
+  .ac-streak-card { margin:16px 20px 0; background:#fff; border-radius:20px; padding:24px 20px; display:flex; flex-direction:column; align-items:center; text-align:center; }
+  .ac-streak-row { display:flex; align-items:baseline; gap:1px; margin-bottom:0; }
+  .ac-streak-num { font-size:24px; font-weight:800; line-height:1; color:#845EEE; }
+  .ac-streak-unit { font-size:24px; font-weight:800; color:#845EEE; }
+  .ac-streak-label { font-size:13px; font-weight:600; color:#5A5370; margin-top:6px; }
+  .ac-streak-badge { display:inline-flex; align-items:center; gap:6px; margin-top:14px; font-size:12px; font-weight:600; color:#845EEE; background:#E2D9FF; border-radius:999px; padding:7px 14px; }
+  .ac-streak-badge::before { content:''; width:6px; height:6px; border-radius:50%; background:#845EEE; flex-shrink:0; }
+  .ac-week-card { margin:12px 20px 0; background:#fff; border-radius:20px; padding:20px 14px 18px; }
+  .ac-week-title { font-size:14px; font-weight:700; color:#1A1130; margin-bottom:16px; padding-left:4px; text-align:left; }
+  .ac-week-row { display:grid; grid-template-columns:repeat(7,1fr); gap:4px; }
+  .ac-day { display:flex; flex-direction:column; align-items:center; gap:8px; }
+  .ac-day-label { font-size:10px; color:#9B93B0; font-weight:500; }
+  .ac-day-dot { width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:600; color:#9B93B0; background:#FAFAFA; border:1px solid #E2D9FF; box-sizing:border-box; }
+  .ac-day-dot.done { background:#845EEE; color:#fff; border-color:#845EEE; }
+  .ac-day-dot.today { background:#F3EEFF; color:#845EEE; border:1.5px solid #845EEE; font-weight:600; font-size:12px; }
+  .ac-progress-section { margin:12px 20px 0; background:#fff; border-radius:20px; padding:20px; }
+  .ac-progress-header { display:flex; justify-content:space-between; align-items:baseline; margin-bottom:12px; }
+  .ac-progress-label { font-size:13px; font-weight:600; color:#1A1130; }
+  .ac-progress-count { font-size:13px; color:#845EEE; font-weight:700; }
+  .ac-progress-bar { height:8px; background:#E2D9FF; border-radius:999px; overflow:hidden; }
+  .ac-progress-fill { height:100%; background:linear-gradient(90deg,#9B78FF,#845EEE); border-radius:999px; }
+  .ac-progress-sub { font-size:12px; font-weight:500; color:#5A5370; margin-top:10px; }
+  .ac-reward-row { margin:12px 20px 0; background:#fff; border-radius:20px; padding:16px 18px; display:flex; align-items:center; gap:14px; }
+  .ac-reward-ico { width:52px; height:52px; border-radius:14px; background:#E2D9FF; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .ac-reward-title { font-size:13px; font-weight:600; color:#1A1130; margin-bottom:3px; }
+  .ac-reward-sub { font-size:12px; font-weight:500; color:#5A5370; line-height:1.5; }
+  .ac-footer { margin-top:auto; padding:24px 20px 10px; display:flex; flex-direction:column; gap:10px; }
+  .ac-footer .btn-primary { height:52px; border-radius:12px; background:#2D7FF9; }
+  .ac-footer .btn-primary:active { background:#2469D6; }
   .ac-done-badge { display:flex; align-items:center; justify-content:center; gap:8px; height:54px; background:var(--sub-3); border-radius:var(--r-lg); font-size:15px; font-weight:700; color:var(--main); }
 
 
@@ -8110,7 +8112,7 @@ body.interactive-mode #ip-nav { display: block; }
   .ac-fail-ico { width:36px; height:36px; border-radius:10px; background:#FFE5E5; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
   .ac-fail-title { font-size:13px; font-weight:700; color:#C0392B; margin-bottom:3px; }
   .ac-fail-sub { font-size:11px; color:var(--text2); line-height:1.5; }
-  .ac-check-info { font-size:11px; color:var(--text3); text-align:center; margin-top:10px; line-height:1.5; }
+  .ac-check-info { font-size:10px; font-weight:500; color:#9B93B0; text-align:center; margin-top:0; line-height:1.6; }
 
   /* ===== 행운룰렛 (pw-15) — v8.2 신규 디자인 이식 ===== */
   .rl-screen { height:100%; display:flex; flex-direction:column; background:var(--bg); position:relative; }
@@ -11429,16 +11431,22 @@ body.interactive-mode #ip-nav { display: block; }
 
         <!-- 출석체크 결과 모달 — 5일 연속 달성(GOAL) -->
         <div class="ac-result-overlay" id="ac-result-overlay-win">
-          <div class="ac-result-modal goal">
-            <div class="ac-result-chip">GOAL 100P + TICKET</div>
-            <div class="ac-result-ico">
-              <svg width="30" height="30" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="ac_res_win" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#C9AAFF"/><stop offset="100%" stop-color="#845EEE"/></linearGradient></defs><path d="M306.6,106.8l-49.5,49.5,2.4,2.4c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-2.4-2.4-138.6,138.6c-3.7,3.7-3.7,9.6,0,13.3l75.5,75.5c3.7,3.7,9.6,3.7,13.3,0l138.6-138.6-2.3-2.3c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l2.3,2.3,49.5-49.5c3.7-3.7,3.7-9.6,0-13.3l-75.5-75.5c-3.7-3.7-9.6-3.7-13.3,0Z" fill="url(#ac_res_win)"/><circle cx="428.9" cy="83.1" r="21.9" fill="rgba(132,94,238,0.45)"/><circle cx="83.1" cy="428.9" r="21.9" fill="rgba(132,94,238,0.45)"/></svg>
+          <div style="width:100%;max-width:280px;">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+              <span class="ac-result-chip">GOAL 100P + TICKET</span>
+              <span class="ac-result-sub2"><span class="i18n"><span class="ko">5일 달성</span><span class="vi">Đạt 5 ngày</span></span></span>
             </div>
-            <div class="ac-result-val">100P +1장</div>
-            <div class="ac-result-sub">포인트 · 이벤트 티켓</div>
-            <div class="ac-result-headline">축하해요!</div>
-            <div class="ac-result-desc">5일 연속 달성 · 내 티켓에 보관됐어요</div>
-            <button class="ac-result-confirm" data-ac-confirm="1">확인</button>
+            <div class="ac-result-frame">
+              <div class="ac-result-modal">
+                <div class="ac-result-ico">
+                  <svg width="64" height="64" viewBox="96 96 320 320" style="flex-shrink:0;"><defs><linearGradient id="ac_res_win" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#C9AAFF"/><stop offset="100%" stop-color="#845EEE"/></linearGradient></defs><path d="M306.6,106.8l-49.5,49.5,2.4,2.4c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-2.4-2.4-138.6,138.6c-3.7,3.7-3.7,9.6,0,13.3l75.5,75.5c3.7,3.7,9.6,3.7,13.3,0l138.6-138.6-2.3-2.3c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l2.3,2.3,49.5-49.5c3.7-3.7,3.7-9.6,0-13.3l-75.5-75.5c-3.7-3.7-9.6-3.7-13.3,0Z" fill="url(#ac_res_win)"/></svg>
+                  <div style="text-align:left;"><div style="font-size:20px;font-weight:800;color:#845EEE;line-height:1.1;"><span class="i18n"><span class="ko">100P +1장</span><span class="vi">100P +1 vé</span></span></div><div style="font-size:12px;font-weight:600;color:#5A5370;margin-top:2px;"><span class="i18n"><span class="ko">포인트 · 이벤트 티켓</span><span class="vi">Điểm · Vé sự kiện</span></span></div></div>
+                </div>
+                <div class="ac-result-headline"><span class="i18n"><span class="ko">축하해요!</span><span class="vi">Chúc mừng!</span></span></div>
+                <div class="ac-result-desc"><span class="i18n"><span class="ko">5일 연속 달성 · 내 티켓에 보관됐어요</span><span class="vi">Đạt 5 ngày liên tiếp · đã lưu vào vé của tôi</span></span></div>
+                <button class="ac-result-confirm" data-ac-confirm="1"><span class="i18n"><span class="ko">확인</span><span class="vi">Xác nhận</span></span></button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -11612,16 +11620,22 @@ body.interactive-mode #ip-nav { display: block; }
 
         <!-- 출석체크 결과 모달 — 일반 100P(DAILY) -->
         <div class="ac-result-overlay" id="ac-result-overlay-done">
-          <div class="ac-result-modal">
-            <div class="ac-result-chip" id="ac-result-done-chip">DAILY 100P</div>
-            <div class="ac-result-ico">
-              <div style="width:100%;height:100%;border-radius:50%;background:linear-gradient(135deg,#FFD740,#FFB300);display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:900;color:#7A5600;">P</div>
+          <div style="width:100%;max-width:280px;">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+              <span class="ac-result-chip" id="ac-result-done-chip">DAILY 100P</span>
+              <span class="ac-result-sub2" id="ac-result-done-days">1~4일차</span>
             </div>
-            <div class="ac-result-val">100P</div>
-            <div class="ac-result-sub">포인트 적립</div>
-            <div class="ac-result-headline">100P 적립 완료!</div>
-            <div class="ac-result-desc" id="ac-result-done-desc">연속 방문 · 1일 더 구경하면 보상 지급</div>
-            <button class="ac-result-confirm" data-ac-confirm="1">확인</button>
+            <div class="ac-result-frame">
+              <div class="ac-result-modal">
+                <div class="ac-result-ico">
+                  <svg width="60" height="60" viewBox="0 0 64 64" style="flex-shrink:0;"><defs><linearGradient id="pcoin_acm" x1="0" y1="0" x2="0.35" y2="1"><stop offset="49.9%" stop-color="#FFE066"/><stop offset="50%" stop-color="#F0AE00"/></linearGradient><linearGradient id="pcoin_acm_face" x1="0" y1="0" x2="0.35" y2="1"><stop offset="49.9%" stop-color="#FFDA3D"/><stop offset="50%" stop-color="#FFC400"/></linearGradient></defs><ellipse cx="32" cy="57" rx="17" ry="3" fill="#E6A800" opacity="0.16"/><circle cx="32" cy="30" r="27" fill="url(#pcoin_acm)"/><circle cx="32" cy="30" r="21.5" fill="url(#pcoin_acm_face)"/><text x="32" y="40.5" text-anchor="middle" font-family="inherit" font-size="30" font-weight="800" fill="#FFE477" stroke="#E0A600" stroke-width="1.2" paint-order="stroke" stroke-linejoin="round">P</text></svg>
+                  <div style="text-align:left;"><div style="font-size:24px;font-weight:800;color:#845EEE;line-height:1.1;">100P</div><div style="font-size:12px;font-weight:600;color:#5A5370;margin-top:2px;"><span class="i18n"><span class="ko">포인트 적립</span><span class="vi">Tích lũy điểm</span></span></div></div>
+                </div>
+                <div class="ac-result-headline"><span class="i18n"><span class="ko">100P 적립 완료!</span><span class="vi">Đã tích lũy 100P!</span></span></div>
+                <div class="ac-result-desc" id="ac-result-done-desc">연속 방문 · 1일 더 구경하면 보상 지급</div>
+                <button class="ac-result-confirm" data-ac-confirm="1"><span class="i18n"><span class="ko">확인</span><span class="vi">Xác nhận</span></span></button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -14069,14 +14083,15 @@ function acShowResultModal(screenId, real) {
   if (screenId === 'pw-14-done' && real) {
     var days = real.count || 1;
     var remain = Math.max(1, 5 - days);
-    var chip = document.getElementById('ac-result-done-chip');
+    var daysEl = document.getElementById('ac-result-done-days');
     var desc = document.getElementById('ac-result-done-desc');
-    if (chip) chip.textContent = 'DAILY 100P · ' + days + '일차';
+    if (daysEl) daysEl.textContent = days + '일차';
     if (desc) desc.textContent = '연속 ' + days + '일째 · ' + remain + '일 더 구경하면 보상 지급';
   }
+  overlay.style.display = 'flex';
   overlay.classList.add('show');
 }
-function acHideResultModal(overlay) { overlay.classList.remove('show'); }
+function acHideResultModal(overlay) { overlay.style.display = 'none'; overlay.classList.remove('show'); }
 document.addEventListener('click', function(e) {
   var btn = e.target.closest && e.target.closest('[data-ac-confirm]');
   if (!btn) return;
