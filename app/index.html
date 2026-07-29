@@ -14889,7 +14889,11 @@ function bindRaffleScreen() {
       btn.disabled = true;
       window.ppEnterRaffle().then(function(ok) {
         btn.disabled = false;
-        if (ok) showScreen('pw-20');
+        if (ok) {
+          var isVi = (typeof window.ipGetLang === 'function') && window.ipGetLang() === 'vi';
+          showToast(isVi ? 'Đã hoàn tất ứng tuyển. Người trúng thưởng sẽ được công bố vào thứ Hai hàng tuần.' : '응모가 완료됐어요. 당첨자는 매주 월요일 발표됩니다.');
+          showScreen('pw-20');
+        }
       });
     }, true);
   }
