@@ -3609,6 +3609,43 @@
     flex-shrink: 0;
   }
 
+  /* 홈 화면: 주간 추첨 배너 (경품 응모 화면으로 이동, 진행 중 회차 실데이터 연동) */
+  .draw-mini {
+    background: linear-gradient(135deg, #FFF1E6 0%, #FFE6F0 100%);
+    margin: 14px 16px 0;
+    border-radius: var(--r);
+    padding: 14px 16px;
+    display: flex; align-items: center; gap: 12px;
+    cursor: pointer;
+  }
+  .draw-mini-ico {
+    width: 40px; height: 40px;
+    background: white;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px;
+    flex-shrink: 0;
+  }
+  .draw-mini-body { flex: 1; min-width: 0; }
+  .draw-mini-title {
+    font-size: 14px; font-weight: 700; color: var(--text1);
+    letter-spacing: -0.3px;
+    margin-bottom: 2px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .draw-mini-pill {
+    background: var(--red); color: white;
+    font-size: 10px; font-weight: 800;
+    padding: 2px 7px;
+    border-radius: 99px;
+    letter-spacing: 0;
+  }
+  .draw-mini-desc {
+    font-size: 11.5px; color: var(--text2);
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .draw-mini-arrow { color: var(--text2); font-size: 14px; flex-shrink: 0; }
+
   /* ============== 19. 등급 상세 (실버 예시) ============== */
   .grade-detail-screen {
     height: 100%;
@@ -9218,6 +9255,16 @@ body.interactive-mode #ip-nav { display: block; }
             </div>
           </div>
 
+          <!-- 주간 추첨 배너 — 경품 응모(pw-26) 링크, 진행 중 회차 실데이터 연동(ppRenderHomeDrawBanner) -->
+          <div class="draw-mini">
+            <div class="draw-mini-ico">🎁</div>
+            <div class="draw-mini-body">
+              <div class="draw-mini-title">이번 주 행운의 추첨 <span class="draw-mini-pill" id="home-draw-dday">D-0</span></div>
+              <div class="draw-mini-desc" id="home-draw-desc"></div>
+            </div>
+            <div class="draw-mini-arrow">›</div>
+          </div>
+
           <!-- 구매 쇼핑몰 -->
           <div class="home-mall-section">
             <div class="home-mall-head">
@@ -10116,7 +10163,7 @@ body.interactive-mode #ip-nav { display: block; }
           <div class="reward-section no-pad-r">
             <div class="rs-hd">
               <div class="rs-title">🎉 진행중 이벤트</div>
-              <div class="rs-sub">이벤트 티켓을 추가로 받을 수 있어요</div>
+              <div class="rs-sub">지금 참여할 수 있는 이벤트를 모았어요.</div>
             </div>
             <div class="event-list">
               <!-- 주간 추첨 이벤트: "이번 주 행운의 추첨" 배너가 여기로 이동해 경품 응모(pw-26) 링크를 대신 담당 -->
@@ -12920,6 +12967,7 @@ const FLOW_MAP = [
   ['pw-10', '.hmc-roulette',       'pw-15', '행운룰렛 → 15'],
   ['pw-10', '.hmc-invite',         'pw-16', '친구초대 → 16'],
   ['pw-10', '.hmc-streak',         'pw-17', '연속구매 미션 → 17'],
+  ['pw-10', '[class*="draw"], [class*="raffle"]', 'pw-26', '주간 추첨 배너 → 26'],
   ['pw-10', '.htc-more',           'pw-21', '자세히 › → 21'],
   ['pw-10', '.htc-cta, .htc-cta-ico', 'pw-24', '기프티콘 교환 → 24'],
   ['pw-10', '.hms-all',            'pw-11', '전체 › → 11'],
@@ -15413,6 +15461,8 @@ function csSubmitInquiry(btn) {
     "매주 일요일 마감": "Đóng Chủ Nhật hàng tuần",
     "당첨자 자동 발표": "Tự động công bố người trúng",
     "명": "người",
+    "지금 참여할 수 있는 이벤트를 모았어요.": "Tổng hợp các sự kiện bạn có thể tham gia ngay.",
+    "종": "loại",
     "지난 회차 당첨 결과": "Kết quả trúng thưởng đợt trước",
     "아직 발표된 당첨 결과가 없어요": "Chưa có kết quả trúng thưởng nào được công bố",
   });
@@ -16131,7 +16181,7 @@ function onScreenShown(id) {
     if (kp) kp.textContent = (window.ppGetKakaoNickname && window.ppGetKakaoNickname()) || '마크김';
   }
   if (!PP.uid) return;
-  if (id === 'pw-10') { refreshHomeData(); ppClaimInviteeRewards(); }
+  if (id === 'pw-10') { refreshHomeData(); ppClaimInviteeRewards(); ppRenderHomeDrawBanner(); }
   if (id === 'pw-20') { refreshKakaoBannerVisibility(); refreshBenefitBadges(); renderPointPanel(); renderMyTicketCard(); }
   if (id === 'pw-24') loadGifticons();
   if (id === 'pw-30') { refreshMyData(); ppClaimInviteeRewards(); }
@@ -16933,13 +16983,9 @@ function ppRafflePhase(d, now) {
   if (now > end) return 'past';
   return 'active';
 }
-/* 히어로 카드 — 진행 중 회차의 실데이터(등수별 경품·마감 D-day)를 그대로 반영한다.
-   CMS "경품 수정"으로 바꾼 값이 하드코딩 없이 여기 즉시 반영된다. */
-function ppRenderRaffleHero() {
-  var ddayEl = document.getElementById('raffle-hero-dday');
-  var prizesEl = document.getElementById('raffle-hero-prizes');
-  if (!prizesEl) return;
-  db.collection('raffles').orderBy('start_date', 'desc').limit(20).get().then(function(snap) {
+/* 진행 중(active) 회차 하나를 찾아 반환 — 히어로 카드·홈 배너가 같은 소스를 공유한다(중복 하드코딩 방지). */
+function ppFindActiveRaffle() {
+  return db.collection('raffles').orderBy('start_date', 'desc').limit(20).get().then(function(snap) {
     var now = new Date();
     var active = null;
     snap.forEach(function(doc) {
@@ -16947,14 +16993,27 @@ function ppRenderRaffleHero() {
       var d = doc.data();
       if (ppRafflePhase(d, now) === 'active') active = d;
     });
+    return active;
+  });
+}
+function ppRaffleDdayFrom(endDateStr) {
+  var end = new Date(endDateStr + 'T23:59:59');
+  var now = new Date();
+  return Math.max(0, Math.ceil((end - now) / 86400000));
+}
+/* 히어로 카드 — 진행 중 회차의 실데이터(등수별 경품·마감 D-day)를 그대로 반영한다.
+   CMS "경품 수정"으로 바꾼 값이 하드코딩 없이 여기 즉시 반영된다. */
+function ppRenderRaffleHero() {
+  var ddayEl = document.getElementById('raffle-hero-dday');
+  var prizesEl = document.getElementById('raffle-hero-prizes');
+  if (!prizesEl) return;
+  ppFindActiveRaffle().then(function(active) {
     if (!active) {
       if (ddayEl) ddayEl.textContent = '-';
       prizesEl.innerHTML = '';
       return;
     }
-    var end = new Date(active.end_date + 'T23:59:59');
-    var diffDays = Math.max(0, Math.ceil((end - now) / 86400000));
-    if (ddayEl) ddayEl.textContent = 'D-' + diffDays;
+    if (ddayEl) ddayEl.textContent = 'D-' + ppRaffleDdayFrom(active.end_date);
     var prizes = (Array.isArray(active.prizes) ? active.prizes : []).slice().sort(function(a, b) {
       return (parseInt(a.rank, 10) || 0) - (parseInt(b.rank, 10) || 0);
     });
@@ -16971,6 +17030,22 @@ function ppRenderRaffleHero() {
         + '</div>';
     }).join('');
   }).catch(function(e) { console.error('ppRenderRaffleHero', e); });
+}
+/* 홈 화면 주간 추첨 배너 — 1등 경품명 + (경품 종류가 여럿이면) "외 N종", 마감 D-day. 히어로 카드와 동일 소스(ppFindActiveRaffle). */
+function ppRenderHomeDrawBanner() {
+  var ddayEl = document.getElementById('home-draw-dday');
+  var descEl = document.getElementById('home-draw-desc');
+  if (!descEl) return;
+  ppFindActiveRaffle().then(function(active) {
+    if (!active) { if (ddayEl) ddayEl.textContent = ''; descEl.textContent = ''; return; }
+    if (ddayEl) ddayEl.textContent = 'D-' + ppRaffleDdayFrom(active.end_date);
+    var prizes = (Array.isArray(active.prizes) ? active.prizes : []).slice().sort(function(a, b) {
+      return (parseInt(a.rank, 10) || 0) - (parseInt(b.rank, 10) || 0);
+    });
+    if (!prizes.length) { descEl.textContent = ''; return; }
+    var first = ppEsc(prizes[0].name || '');
+    descEl.innerHTML = prizes.length > 1 ? (first + ' 외 <span>' + (prizes.length - 1) + '</span><span>종</span>') : first;
+  }).catch(function(e) { console.error('ppRenderHomeDrawBanner', e); });
 }
 /* 지난 회차 당첨 결과 — 가장 최근 마감·추첨된 회차 1개만, 등수·경품명·당첨자 닉네임만 노출(카카오ID 등 개인정보 없음) */
 function ppRenderPastRaffleWinners() {
