@@ -12279,43 +12279,19 @@ body.interactive-mode #ip-nav { display: block; }
 
         <div class="reward-scroll">
 
-          <!-- 이번 주 추첨 히어로 카드 -->
+          <!-- 이번 주 추첨 히어로 카드 — 진행 중 회차 실데이터(raffles) 연동, ppRenderRaffleHero()가 채움 -->
           <div style="margin:14px 16px 0;border-radius:16px;overflow:hidden;background:linear-gradient(135deg,#FFD89B 0%,#FF7EB3 60%,#FF5D8F 100%);padding:20px 18px 18px;">
             <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;">
               <div>
                 <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,0.8);letter-spacing:0.5px;margin-bottom:4px;">이번 주 행운의 추첨</div>
-                <div style="font-size:18px;font-weight:800;color:white;letter-spacing:-0.5px;line-height:1.2;">매주 월요일<br>당첨자 발표</div>
+                <div style="font-size:18px;font-weight:800;color:white;letter-spacing:-0.5px;line-height:1.2;">매주 일요일 마감<br>당첨자 자동 발표</div>
               </div>
               <div style="background:rgba(255,255,255,0.25);border-radius:10px;padding:8px 12px;text-align:center;">
                 <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,0.85);">마감까지</div>
-                <div style="font-size:20px;font-weight:800;color:white;letter-spacing:-1px;line-height:1;">D-3</div>
+                <div id="raffle-hero-dday" style="font-size:20px;font-weight:800;color:white;letter-spacing:-1px;line-height:1;">D-0</div>
               </div>
             </div>
-            <div style="background:rgba(255,255,255,0.2);border-radius:10px;padding:10px 12px;margin-bottom:14px;display:flex;flex-direction:column;gap:6px;">
-              <div style="display:flex;justify-content:space-between;align-items:center;">
-                <div style="display:flex;align-items:center;gap:6px;">
-                  <span style="font-size:13px;">🥇</span>
-                  <span style="font-size:11px;font-weight:700;color:white;">신세계 상품권 5만원</span>
-                </div>
-                <span style="font-size:10px;font-weight:600;color:rgba(255,255,255,0.8);">1명</span>
-              </div>
-              <div style="height:0.5px;background:rgba(255,255,255,0.2);"></div>
-              <div style="display:flex;justify-content:space-between;align-items:center;">
-                <div style="display:flex;align-items:center;gap:6px;">
-                  <span style="font-size:13px;">🥈</span>
-                  <span style="font-size:11px;font-weight:700;color:white;">스타벅스 아메리카노</span>
-                </div>
-                <span style="font-size:10px;font-weight:600;color:rgba(255,255,255,0.8);">3명</span>
-              </div>
-              <div style="height:0.5px;background:rgba(255,255,255,0.2);"></div>
-              <div style="display:flex;justify-content:space-between;align-items:center;">
-                <div style="display:flex;align-items:center;gap:6px;">
-                  <span style="font-size:13px;">🥉</span>
-                  <span style="font-size:11px;font-weight:700;color:white;">이벤트 티켓 추가 지급</span>
-                </div>
-                <span style="font-size:10px;font-weight:600;color:rgba(255,255,255,0.8);">다수</span>
-              </div>
-            </div>
+            <div id="raffle-hero-prizes" style="background:rgba(255,255,255,0.2);border-radius:10px;padding:10px 12px;margin-bottom:14px;display:flex;flex-direction:column;gap:6px;"></div>
             <button id="raffle-enter-btn" style="width:100%;background:white;border:none;border-radius:10px;padding:12px;font-size:13px;font-weight:800;color:#FF5D8F;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:6px;"><svg width="28" height="28" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="evt_05b_btn" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#FF7EB3"/><stop offset="100%" stop-color="#FF5D8F"/></linearGradient></defs><path d="M306.6,106.8l-49.5,49.5,2.4,2.4c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-2.4-2.4-138.6,138.6c-3.7,3.7-3.7,9.6,0,13.3l75.5,75.5c3.7,3.7,9.6,3.7,13.3,0l138.6-138.6-2.3-2.3c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l2.3,2.3,49.5-49.5c3.7-3.7,3.7-9.6,0-13.3l-75.5-75.5c-3.7-3.7-9.6-3.7-13.3,0ZM335.6,234.8c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM322.9,222.1c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM310.2,209.4c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM297.6,196.7c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM284.9,184.1c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM272.2,171.4c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7Z" fill="url(#evt_05b_btn)"/><path d="M316.2,155.8l12.1,6.2c.8.4,1.8.3,2.4-.4l9.6-9.6c1.4-1.4,3.8-.2,3.5,1.8l-2.1,13.5c-.1.9.3,1.8,1.1,2.2l12.1,6.2c1.8.9,1.4,3.6-.6,3.9l-13.5,2.1c-.9.1-1.6.8-1.7,1.7l-2.1,13.5c-.3,2-3,2.4-3.9.6l-6.2-12.1c-.4-.8-1.3-1.3-2.2-1.1l-13.5,2.1c-2,.3-3.2-2.1-1.8-3.5l9.6-9.6c.6-.6.8-1.6.4-2.4l-6.2-12.1c-.9-1.8,1-3.7,2.8-2.8Z" fill="rgba(255,255,255,0.95)"/><path d="M180.7,298.9l-5.2,5.2,27.4,27.4-4.7,4.7-27.4-27.4-5.2,5.2-4.2-4.2,15.1-15.1,4.2,4.2ZM215.3,319.1l-4.7,4.7-31.6-31.6,4.7-4.7,31.6,31.6ZM231.9,296.8c1.9,1.9,1.9,3.9,0,5.8l-9.9,9.9c-1.9,1.9-3.8,1.8-5.7,0l-25.8-25.8c-1.9-1.9-2-3.8-.1-5.7l9.9-9.9c1.9-1.9,3.9-1.9,5.8,0l7.4,7.4-4.7,4.7-6.2-6.2-6.1,6.1,23.5,23.5,6.1-6.1-6.6-6.6,4.7-4.7,7.8,7.8ZM254.4,280l-5.2,5.2-20.1-8.1,14.1,14.1-4.7,4.7-31.6-31.6,4.7-4.7,13.4,13.4-8.1-18.6,5.2-5.2.2.2,8.6,21.4,23.6,9.2ZM269.5,265l-13.1,13.1-31.6-31.6,13-13,4.2,4.2-8.3,8.3,9.2,9.2,7.1-7.1,4.1,4.1-7.1,7.1,9.9,9.9,8.4-8.4,4.2,4.2ZM259,220.6l-5.2,5.2,27.4,27.4-4.7,4.7-27.4-27.4-5.2,5.2-4.2-4.2,15.1-15.1,4.2,4.2Z" fill="rgba(255,255,255,0.95)"/></svg> 이벤트 티켓 1장으로 응모하기</button>
           </div>
 
@@ -15434,6 +15410,9 @@ function csSubmitInquiry(btn) {
     "실제 서비스에서는 iOS가 진짜 시스템 팝업을 띄웁니다.": "Trong dịch vụ thực tế, iOS sẽ hiển thị hộp thoại hệ thống thật.",
     "경품 추첨에 당첨되셨어요!": "Bạn đã trúng thưởng bốc thăm quà!",
     "당첨 안내를 확인하고 배송 정보를 입력해주세요.": "Xem thông báo trúng thưởng và nhập thông tin giao hàng.",
+    "매주 일요일 마감": "Đóng Chủ Nhật hàng tuần",
+    "당첨자 자동 발표": "Tự động công bố người trúng",
+    "명": "người",
     "지난 회차 당첨 결과": "Kết quả trúng thưởng đợt trước",
     "아직 발표된 당첨 결과가 없어요": "Chưa có kết quả trúng thưởng nào được công bố",
   });
@@ -16920,6 +16899,7 @@ function renderRaffleScreen() {
   if (badge) badge.textContent = PP.tickets.event || 0;
   var remain = document.getElementById('raffle-remain-tickets');
   if (remain) remain.textContent = PP.tickets.event || 0;
+  ppRenderRaffleHero();
   ppRenderPastRaffleWinners();
   if (!PP.uid) return;
   ppQuery('raffle_entries', 'user_id', PP.uid).then(function(list) {
@@ -16944,6 +16924,53 @@ function ppRaffleWeekLabel(endDateStr) {
   var week = Math.ceil(d.getDate() / 7);
   var isVi = (typeof window.ipGetLang === 'function') && window.ipGetLang() === 'vi';
   return isVi ? ('Tuần ' + week + ' tháng ' + month + ' năm ' + year) : (year + '년 ' + month + '월 ' + week + '주차');
+}
+function ppRafflePhase(d, now) {
+  if (!d.start_date || !d.end_date) return 'past';
+  var start = new Date(d.start_date + 'T00:00:00');
+  var end = new Date(d.end_date + 'T23:59:59');
+  if (now < start) return 'upcoming';
+  if (now > end) return 'past';
+  return 'active';
+}
+/* 히어로 카드 — 진행 중 회차의 실데이터(등수별 경품·마감 D-day)를 그대로 반영한다.
+   CMS "경품 수정"으로 바꾼 값이 하드코딩 없이 여기 즉시 반영된다. */
+function ppRenderRaffleHero() {
+  var ddayEl = document.getElementById('raffle-hero-dday');
+  var prizesEl = document.getElementById('raffle-hero-prizes');
+  if (!prizesEl) return;
+  db.collection('raffles').orderBy('start_date', 'desc').limit(20).get().then(function(snap) {
+    var now = new Date();
+    var active = null;
+    snap.forEach(function(doc) {
+      if (active) return;
+      var d = doc.data();
+      if (ppRafflePhase(d, now) === 'active') active = d;
+    });
+    if (!active) {
+      if (ddayEl) ddayEl.textContent = '-';
+      prizesEl.innerHTML = '';
+      return;
+    }
+    var end = new Date(active.end_date + 'T23:59:59');
+    var diffDays = Math.max(0, Math.ceil((end - now) / 86400000));
+    if (ddayEl) ddayEl.textContent = 'D-' + diffDays;
+    var prizes = (Array.isArray(active.prizes) ? active.prizes : []).slice().sort(function(a, b) {
+      return (parseInt(a.rank, 10) || 0) - (parseInt(b.rank, 10) || 0);
+    });
+    prizesEl.innerHTML = prizes.map(function(p, i) {
+      var r = parseInt(p.rank, 10) || (i + 1);
+      var med = r === 1 ? '🥇' : r === 2 ? '🥈' : r === 3 ? '🥉' : (r + '등');
+      var sep = i > 0 ? '<div style="height:0.5px;background:rgba(255,255,255,0.2);"></div>' : '';
+      return sep + '<div style="display:flex;justify-content:space-between;align-items:center;">'
+        + '<div style="display:flex;align-items:center;gap:6px;">'
+        + '<span style="font-size:13px;">' + med + '</span>'
+        + '<span style="font-size:11px;font-weight:700;color:white;">' + ppEsc(p.name || '') + '</span>'
+        + '</div>'
+        + '<span style="font-size:10px;font-weight:600;color:rgba(255,255,255,0.8);">' + (p.count || 0) + '<span>명</span></span>'
+        + '</div>';
+    }).join('');
+  }).catch(function(e) { console.error('ppRenderRaffleHero', e); });
 }
 /* 지난 회차 당첨 결과 — 가장 최근 마감·추첨된 회차 1개만, 등수·경품명·당첨자 닉네임만 노출(카카오ID 등 개인정보 없음) */
 function ppRenderPastRaffleWinners() {
