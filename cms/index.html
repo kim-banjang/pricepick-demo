@@ -1295,10 +1295,15 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
               <button class="btn btn-primary btn-sm" onclick="pdSavePayout()">저장</button>
             </div>
           </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin:10px 0 8px;flex-wrap:wrap;gap:8px">
+            <input class="search-box" id="pd-ent-search" placeholder="닉네임·카카오ID 검색" style="width:220px" oninput="pdEntSearch(this.value)">
+            <span style="font-size:12px;color:var(--text-2)" id="pd-ent-count"></span>
+          </div>
           <table style="table-layout:fixed;width:100%">
             <thead><tr><th style="width:22%">닉네임(카카오ID)</th><th style="width:16%">응모일시</th><th style="width:42%">당첨 경품 지급</th><th style="width:20%">당첨 등수</th></tr></thead>
             <tbody id="pd-ent-tbody"></tbody>
           </table>
+          <div class="pagination" id="pd-ent-pager" style="display:none"></div>
         </div>
       </div>
       </div>
@@ -5045,6 +5050,8 @@ Object.assign(KO2VI,{"이벤트 설정 관리":"Quản lý cài đặt sự ki�
 Object.assign(KO2VI,{"예: 2026년 8월 1주차":"VD: Tuần 1 tháng 8 năm 2026"});
 Object.assign(KO2VI,{"주간 회차 리스트":"Danh sách đợt hàng tuần","기간":"Thời gian","미선정":"Chưa chọn","응모 상세 보기":"Xem chi tiết dự thưởng","응모자 리스트":"Danh sách người dự thưởng","당첨 등수":"Hạng trúng thưởng","자동 당첨자 선택":"Chọn người trúng tự động","적용됨":"Đã áp dụng","적용 전 (임시 선택)":"Trước khi áp dụng (chọn tạm)","선택된 당첨자가 없습니다.":"Chưa chọn người trúng thưởng nào.","당첨자가 적용되었습니다.":"Đã áp dụng người trúng thưởng.","자동으로 당첨자를 선택했습니다. 적용을 눌러야 확정됩니다.":"Đã tự động chọn người trúng thưởng. Phải bấm Áp dụng mới được xác nhận.","회차를 찾을 수 없습니다.":"Không tìm thấy đợt.","미선택":"Chưa chọn","등수별 구성:":"Cơ cấu theo hạng:","불러오는 중…":"Đang tải…","응모 건 단위 무작위 추첨 · 티켓을 많이 쓸수록 확률 상승 · 1인 1회 당첨 · 1등부터 정원만큼 선정":"Rút thăm ngẫu nhiên theo đơn vị lượt dự thưởng · Dùng càng nhiều vé thì xác suất trúng càng cao · Mỗi người chỉ trúng thưởng 1 lần · Chọn từ hạng 1 cho đến khi đủ số lượng"});
 Object.assign(KO2VI,{"예정":"Sắp diễn ra","종료":"Đã kết thúc","마감: 매주 일요일 23:59:59 (고정)":"Đóng: 23:59:59 Chủ Nhật hàng tuần (cố định)","켜두면 매월 초에 그 달의 전체 회차(주차별)가 미리 자동 생성됩니다. 회차명은 마감일(추첨일) 기준 \"YYYY년 N월 M주차\" 형식으로 자동 부여되며, 생성 후에도 개별 수정할 수 있습니다. 수동 등록·수정은 이 설정과 무관하게 항상 가능합니다.":"Khi bật, vào đầu mỗi tháng toàn bộ các đợt (theo tuần) của tháng đó sẽ được tạo tự động trước. Tên đợt được tự động đặt theo định dạng \"Tuần M tháng N năm YYYY\" dựa trên ngày đóng (ngày rút thăm), và có thể sửa riêng từng đợt sau khi tạo. Đăng ký·sửa thủ công luôn khả dụng bất kể cài đặt này.","추첨 방식: 매주 월요일 0시 시작 ~ 일요일 23:59:59 마감 (자동/수동 전환 가능)":"Phương thức rút thăm: bắt đầu 0h Thứ Hai ~ đóng 23:59:59 Chủ Nhật hàng tuần (chuyển đổi tự động/thủ công được)","경품 수정":"Chỉnh sửa giải thưởng","진행중인 주간 이벤트":"Sự kiện tuần đang diễn ra","진행예정 주간 이벤트":"Sự kiện tuần sắp diễn ra","종료된 주간 이벤트":"Sự kiện tuần đã kết thúc","진행 중인 회차가 없습니다.":"Không có đợt nào đang diễn ra.","예정된 회차가 없습니다.":"Không có đợt nào sắp diễn ra.","종료된 회차가 없습니다.":"Không có đợt nào đã kết thúc.","로드 오류":"Lỗi tải dữ liệu","켜두면 매월 초에 그 달의 전체 회차(주차별)가 자동 생성됩니다. 회차명은 마감일(추첨일) 기준 \"YYYY년 N월 M주차\" 형식으로 자동 부여됩니다. 회차는 자동 생성만 가능하며, 운영자는 생성된 회차의 경품 구성 수정과 당첨자 선정만 진행합니다.":"Khi bật, vào đầu mỗi tháng toàn bộ các đợt (theo tuần) của tháng đó sẽ được tạo tự động. Tên đợt được tự động đặt theo định dạng \"Tuần M tháng N năm YYYY\" dựa trên ngày đóng (ngày rút thăm). Đợt chỉ được tạo tự động — quản trị viên chỉ chỉnh sửa cấu hình quà và chọn người trúng của đợt đã tạo.","추첨 방식: 매주 월요일 0시 시작 ~ 일요일 23:59:59 마감 (자동 생성)":"Phương thức rút thăm: bắt đầu 0h Thứ Hai ~ đóng 23:59:59 Chủ Nhật hàng tuần (tạo tự động)","회차 등록 안내":"Hướng dẫn đăng ký đợt","회차는 매월 초 한 달치가 자동 등록됩니다 (매주 월요일 시작 ~ 일요일 23:59:59 마감). 회차명은 마감일(추첨일) 기준 \"YYYY년 N월 M주차\" 형식으로 자동 부여됩니다.":"Đợt được đăng ký tự động mỗi tháng, trọn một tháng (bắt đầu Thứ Hai ~ đóng 23:59:59 Chủ Nhật hàng tuần). Tên đợt được tự động đặt theo định dạng \"Tuần M tháng N năm YYYY\" dựa trên ngày đóng (ngày rút thăm).","이미 다른 응모 건으로 당첨 처리된 응모자입니다 (1인 1등수만 가능).":"Người này đã được chọn trúng thưởng ở một lượt dự thưởng khác (mỗi người chỉ được 1 hạng).","응모건 수":"Số lượt dự thưởng","닉네임(카카오ID)":"Biệt danh (Kakao ID)","회차는 현재 시점 기준 4주치가 자동 등록됩니다 (매주 월요일 시작 ~ 일요일 23:59:59 마감). 회차명은 마감일(추첨일) 기준 \"YYYY년 N월 M주차\" 형식으로 자동 부여됩니다.":"Đợt được đăng ký tự động luôn có sẵn 4 tuần tính từ thời điểm hiện tại (bắt đầu Thứ Hai ~ đóng 23:59:59 Chủ Nhật hàng tuần). Tên đợt được tự động đặt theo định dạng \"Tuần M tháng N năm YYYY\" dựa trên ngày đóng (ngày rút thăm).","주간 이벤트 추첨 관리":"Quản lý rút thăm sự kiện tuần","당첨 ·":"Trúng thưởng ·","지급 대기":"Chờ gửi quà","지급 완료":"Đã gửi quà","메모(기프티콘 발송일·송장번호 등)":"Ghi chú (ngày gửi Gifticon · mã vận đơn v.v.)","지급 완료로 변경했습니다.":"Đã chuyển sang trạng thái đã gửi quà.","지급 대기로 되돌렸습니다.":"Đã chuyển lại về trạng thái chờ gửi quà.","메모가 저장되었습니다.":"Đã lưu ghi chú.","회차는 현재 시점 기준 4주치가 자동 등록됩니다 (매주 월요일~일요일 23:59:59 마감 · 회차명은 마감일 기준 자동 부여)":"Đợt được đăng ký tự động luôn có sẵn 4 tuần tính từ thời điểm hiện tại (đóng Chủ Nhật 23:59:59 hàng tuần · tên đợt tự động đặt theo ngày đóng)","당첨 경품 지급":"Trúng thưởng · Gửi quà","당첨자 확정":"Đã chốt người trúng","회차 종료와 동시에 자동 추첨됩니다 · 응모 건 단위 무작위 · 1인 1회 당첨":"Tự động rút thăm ngay khi đợt kết thúc · Ngẫu nhiên theo đơn vị lượt dự thưởng · Mỗi người chỉ trúng thưởng 1 lần","회차는 현재 시점 기준 4주치가 자동 등록되고, 마감과 동시에 당첨자도 자동 추첨됩니다 (매주 월요일~일요일 23:59:59 마감 · 회차명은 마감일 기준 자동 부여)":"Đợt được đăng ký tự động luôn có sẵn 4 tuần tính từ thời điểm hiện tại, và người trúng cũng được rút thăm tự động ngay khi đóng đợt (đóng Chủ Nhật 23:59:59 hàng tuần · tên đợt tự động đặt theo ngày đóng)","당첨자가 없는 회차입니다.":"Đợt này chưa có người trúng thưởng."});
+/* 응모자 리스트 검색·페이지네이션 */
+Object.assign(KO2VI,{"닉네임·카카오ID 검색":"Tìm biệt danh·Kakao ID","전체 응모 건수":"Tổng số lượt dự thưởng","검색 결과":"Kết quả tìm kiếm","검색 결과가 없습니다.":"Không có kết quả tìm kiếm."});
   var _orig=new Map(), _tracked=new Set(), _applying=false;
   function hasKo(s){ return /[가-힯ᄀ-ᇿ㄰-㆏]/.test(s); }
   function tcore(s){
@@ -6553,11 +6560,101 @@ function pdOrderedEntrants() {
   });
   return winners.concat(rest);
 }
+
+/* ── 닉네임 검색 + 페이지네이션(10건씩) ──
+   정렬(당첨자 우선·등수순)을 먼저 적용한 뒤 그 순서 그대로 필터링·페이지 분할한다.
+   즉 검색 중에도 당첨자가 위, 페이지 1의 맨 앞이 1등이다.
+   행 단위(티켓 1장 = 1행)는 그대로라 당첨 뱃지·지급 상태·메모칸도 검색 결과에서 동일하게 동작한다. */
+var PD_ENT_PAGE_SIZE = 10;
+var pdEntQuery = '';
+var pdEntPage = 1;
+/* 검색 대상 = 닉네임 + 카카오ID(연동된 회원만) · 부분 일치 · 대소문자 무시 */
+function pdEntMatch(e, q) {
+  if (!q) return true;
+  var u = e._userObj || {};
+  var nick = String(u.nickname || '').toLowerCase();
+  var kid = (u.linked_kakao && u.kakao_login_id) ? String(u.kakao_login_id).toLowerCase() : '';
+  return nick.indexOf(q) !== -1 || kid.indexOf(q) !== -1;
+}
+function pdFilteredEntrants() {
+  var q = pdEntQuery.trim().toLowerCase();
+  return pdOrderedEntrants().filter(function(e){ return pdEntMatch(e, q); });
+}
+function pdResetEntSearch() {
+  pdEntQuery = '';
+  pdEntPage = 1;
+  var box = document.getElementById('pd-ent-search');
+  if (box) box.value = '';
+  var pager = document.getElementById('pd-ent-pager');
+  if (pager) { pager.innerHTML = ''; pager.style.display = 'none'; }
+}
+window.pdEntSearch = function(v) {
+  pdEntQuery = v || '';
+  pdEntPage = 1; /* 검색어가 바뀌면 항상 1페이지부터 */
+  pdRenderEntrantRows();
+};
+window.pdEntGoPage = function(p) {
+  var totalPages = Math.max(1, Math.ceil(pdFilteredEntrants().length / PD_ENT_PAGE_SIZE));
+  if (p < 1 || p > totalPages || p === pdEntPage) return;
+  pdEntPage = p;
+  pdRenderEntrantRows();
+};
+/* 페이지 번호 배열 — 7페이지 이하는 전부, 넘으면 첫·끝 + 현재 주변만 남기고 "···"로 접는다 */
+function pdEntPageNums(totalPages, cur) {
+  var i, out = [];
+  if (totalPages <= 7) { for (i = 1; i <= totalPages; i++) out.push(i); return out; }
+  var keep = {};
+  keep[1] = 1; keep[totalPages] = 1;
+  for (i = cur - 1; i <= cur + 1; i++) if (i >= 1 && i <= totalPages) keep[i] = 1;
+  var nums = Object.keys(keep).map(Number).sort(function(a, b){ return a - b; });
+  nums.forEach(function(n, idx) {
+    if (idx > 0 && n - nums[idx - 1] > 1) out.push('···');
+    out.push(n);
+  });
+  return out;
+}
+function pdRenderEntPager(totalPages) {
+  var el = document.getElementById('pd-ent-pager');
+  if (!el) return;
+  if (totalPages <= 1) { el.innerHTML = ''; el.style.display = 'none'; return; }
+  el.style.display = 'flex';
+  var dim = 'opacity:.35;cursor:default';
+  var html = '<button class="page-btn" onclick="pdEntGoPage(' + (pdEntPage - 1) + ')"' + (pdEntPage === 1 ? ' disabled style="' + dim + '"' : '') + '>‹</button>';
+  pdEntPageNums(totalPages, pdEntPage).forEach(function(p) {
+    html += (p === '···')
+      ? '<button class="page-btn" disabled style="border-color:transparent;cursor:default">···</button>'
+      : '<button class="page-btn' + (p === pdEntPage ? ' active' : '') + '" onclick="pdEntGoPage(' + p + ')">' + p + '</button>';
+  });
+  html += '<button class="page-btn" onclick="pdEntGoPage(' + (pdEntPage + 1) + ')"' + (pdEntPage === totalPages ? ' disabled style="' + dim + '"' : '') + '>›</button>';
+  el.innerHTML = html;
+}
+/* 총계는 티켓 1장 = 1행 기준 응모 건수 그대로. 검색 중에는 결과 건수를 앞에 덧붙일 뿐 총계는 계속 보여준다. */
+function pdRenderEntCount(filteredLen) {
+  var el = document.getElementById('pd-ent-count');
+  if (!el) return;
+  var totalHtml = '<span>전체 응모 건수</span> <strong>' + pdCurrentEntrants.length + '</strong>';
+  el.innerHTML = pdEntQuery.trim()
+    ? '<span>검색 결과</span> <strong>' + filteredLen + '</strong> / ' + totalHtml
+    : totalHtml;
+}
+
 function pdRenderEntrantRows() {
   var tbody = document.getElementById('pd-ent-tbody');
   if (!tbody) return;
   var winMap = pdWinnerEntryIdMap();
-  tbody.innerHTML = pdOrderedEntrants().map(function(e) {
+  var list = pdFilteredEntrants();
+  var totalPages = Math.max(1, Math.ceil(list.length / PD_ENT_PAGE_SIZE));
+  if (pdEntPage > totalPages) pdEntPage = totalPages;
+  var from = (pdEntPage - 1) * PD_ENT_PAGE_SIZE;
+  var pageRows = list.slice(from, from + PD_ENT_PAGE_SIZE);
+  if (!pageRows.length) {
+    tbody.innerHTML = ppEmpty(4, '검색 결과가 없습니다.');
+    pdRenderEntCount(list.length);
+    pdRenderEntPager(totalPages);
+    pdUpdateEntStatusBadge();
+    return;
+  }
+  tbody.innerHTML = pageRows.map(function(e) {
     var w = winMap[e._id];
     var winnerCell = w
       ? (pdWinnerTagHtml(e.user_id, ppRankNum(w.rank)) + pdMemoInputHtml(e.user_id))
@@ -6569,6 +6666,8 @@ function pdRenderEntrantRows() {
       + '<td style="text-align:center">' + pdRankResultHtml(w ? w.rank : '') + '</td>'
       + '</tr>';
   }).join('');
+  pdRenderEntCount(list.length);
+  pdRenderEntPager(totalPages);
   pdUpdateEntStatusBadge();
 }
 
@@ -6585,6 +6684,7 @@ window.pdOpenEntrantsModal = function(raffleId) {
   pdConfirmedWinnersBaseline = [];
   pdCurrentEntrants = [];
   pdCurrentRoundEndDate = null;
+  pdResetEntSearch(); /* 회차를 새로 열 때마다 검색어·페이지 초기화 */
   pdRefreshEntrantsTitle();
   document.getElementById('pd-ent-summary').textContent = '불러오는 중…';
   document.getElementById('pd-ent-tbody').innerHTML = '';
@@ -6605,6 +6705,7 @@ window.pdOpenEntrantsModal = function(raffleId) {
     pdCurrentEntrants = entriesSnap.docs.map(function(doc){ return Object.assign({_id: doc.id}, doc.data()); });
     if (!pdCurrentEntrants.length) {
       document.getElementById('pd-ent-tbody').innerHTML = ppEmpty(4, '응모 내역이 없습니다.');
+      pdRenderEntCount(0);
       pdUpdateEntStatusBadge();
       return;
     }
