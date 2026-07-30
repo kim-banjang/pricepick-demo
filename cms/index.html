@@ -513,11 +513,6 @@ textarea.form-input{resize:vertical;min-height:80px;height:auto;}
   color:var(--text);font-family:var(--font);outline:none;text-align:left;transition:border-color .15s;}
 .pd-memo-input:focus{border-color:var(--main);}
 .pd-memo-input::placeholder{color:var(--text-3);}
-/* 진행 중인 회차: 아직 지급이 성립하지 않으므로 지급 상태 뱃지·메모칸을 비활성 표시 */
-.pd-memo-input:disabled{background:var(--surface-3,var(--surface-2));color:var(--text-3);
-  border-style:dashed;opacity:.6;cursor:not-allowed;}
-.badge.pd-payout-off{background:var(--surface-2);color:var(--text-3);border:1px dashed var(--border);
-  opacity:.75;cursor:not-allowed;}
 /* 표 안 뱃지는 한 톤 작게 — 등수 옆 경품명이 들어가도 행 높이가 안 커지게 */
 #pd-ent-table .badge{padding:2px 8px;}
 #pd-ent-table .badge-purple{margin-right:0;}
@@ -5106,7 +5101,7 @@ Object.assign(KO2VI,{
 /* 진행 중 회차 지급 관리 비활성(2026-07-30) — 툴팁·안내문구 */
 Object.assign(KO2VI,{
   "회차 종료 후 지급 관리 가능":"Có thể quản lý gửi quà sau khi đợt kết thúc",
-  "지급 상태·메모는 아직 지급이 성립하지 않는 구간이라 비활성 상태입니다 — 회차 종료 후 지급 관리 가능":"Trạng thái gửi quà·ghi chú đang bị vô hiệu vì chưa tới lúc phát sinh việc gửi quà — có thể quản lý gửi quà sau khi đợt kết thúc"
+  "지급 상태·메모는 아직 지급이 성립하지 않는 구간이라 표시하지 않습니다 — 회차 종료 후 이 리스트에 함께 나타납니다":"Trạng thái gửi quà·ghi chú không được hiển thị vì chưa tới lúc phát sinh việc gửi quà — sẽ xuất hiện trong danh sách này sau khi đợt kết thúc"
 });
 /* 응모자 리스트 검색·페이지네이션 */
 Object.assign(KO2VI,{"닉네임·카카오ID 검색":"Tìm biệt danh·Kakao ID","전체 응모 건수":"Tổng số lượt dự thưởng","검색 결과":"Kết quả tìm kiếm","검색 결과가 없습니다.":"Không có kết quả tìm kiếm.","메모(발송일·송장번호 등)":"Ghi chú (ngày gửi·mã vận đơn v.v.)"});
@@ -6435,7 +6430,8 @@ function pdConfirmedWinnerFor(uid) {
   return pdConfirmedWinners.find(function(w){ return w.user_id === uid; });
 }
 /* 지급 관리(지급 상태 뱃지 토글·메모 입력) 잠금 여부 — 진행 중인 회차는 마감 전이라 지급이 성립하지 않는다.
-   진행 중 회차에서 운영자가 할 수 있는 일은 당첨자 수동 지정까지이고, 지급 관리는 회차 종료 후에 열린다. */
+   진행 중 회차에서는 지급 표기 자체를 렌더하지 않으므로 화면에서 호출될 일은 없고, 콘솔·구버전 DOM 등으로
+   우회 호출되는 경우를 막는 안전장치로만 남겨둔다(운영자가 할 수 있는 일은 당첨자 수동 지정까지). */
 function pdPayoutLocked() {
   return pdCurrentRoundPhase === 'active';
 }
@@ -6447,10 +6443,8 @@ function pdWinnerTagHtml(uid, r) {
   if (w) {
     var paid = !!w.paid;
     var payoutLabel = paid ? '지급 완료' : '지급 대기';
-    /* 진행 중인 회차는 아직 지급이 성립하지 않으므로 토글 불가 — 클릭 핸들러를 아예 붙이지 않고 비활성 표시 */
-    html += pdPayoutLocked()
-      ? '<span class="badge pd-payout-off" title="회차 종료 후 지급 관리 가능">' + payoutLabel + '</span>'
-      : '<span class="badge ' + (paid ? 'badge-green' : 'badge-amber') + '" style="cursor:pointer" onclick="pdTogglePaid(\'' + uid + '\')">' + payoutLabel + '</span>';
+    /* 지급 상태 뱃지는 종료된 회차에서만 렌더된다(진행 중 회차는 지급 표기 자체가 없음) */
+    html += '<span class="badge ' + (paid ? 'badge-green' : 'badge-amber') + '" style="cursor:pointer" onclick="pdTogglePaid(\'' + uid + '\')">' + payoutLabel + '</span>';
   }
   return html;
 }
@@ -6461,10 +6455,6 @@ function pdMemoInputHtml(uid) {
   var w = pdConfirmedWinnerFor(uid);
   if (!w) return '';
   var v = ppEsc(w.memo || '');
-  /* 진행 중인 회차는 지급 자체가 아직 없으므로 메모칸도 입력 불가(비활성) — 이유는 툴팁으로 알린다 */
-  if (pdPayoutLocked()) {
-    return '<input class="pd-memo-input" placeholder="메모(발송일·송장번호 등)" title="회차 종료 후 지급 관리 가능" value="' + v + '" disabled>';
-  }
   return '<input class="pd-memo-input" placeholder="메모(발송일·송장번호 등)" title="' + v + '" value="' + v + '" onchange="pdSaveMemo(\'' + uid + '\', this.value)">';
 }
 /* 운영자가 직접 지정한 당첨자는 "(수동)" 표시를 붙여 자동 추첨분과 구분한다 */
@@ -6789,10 +6779,11 @@ function pdRenderEntrantRows() {
        진행 중 회차는 등수 자리에 수동 지정 드롭다운이 들어간다. */
     var rankCell;
     if (isActive) {
+      /* 진행 중 회차는 지급 관련 표기(지급 상태·메모)를 아예 넣지 않는다 — 마감 전이라 지급이 성립하지 않음.
+         등수 드롭다운과, 그 등수에 걸린 경품명만 보여준다. */
       rankCell = '<div class="pd-pay-line">'
         + '<select class="form-select pd-rank-select" onchange="pdAssignRank(this,\'' + e._id + '\',\'' + e.user_id + '\')">' + pdRankOptionsHtml(rank) + '</select>'
         + pdPrizeNameHtml(rank)
-        + (rank ? pdMemoInputHtml(e.user_id) : '')
         + '</div>';
     } else {
       rankCell = rank
@@ -6860,15 +6851,20 @@ function pdCollapseEntNote() {
 function pdSyncEntNoteTitle() {
   var el = document.getElementById('pd-ent-note');
   var btn = document.getElementById('pd-ent-note-btn');
-  if (el && btn) btn.title = el.textContent || '';
+  if (!el || !btn) return;
+  /* 안내가 여러 줄(div)로 들어올 수 있어 textContent를 그대로 쓰면 문장이 붙어버린다 — 줄 단위로 끊어서 잇는다 */
+  var lines = el.children.length
+    ? Array.prototype.map.call(el.children, function(c){ return (c.textContent || '').trim(); }).filter(Boolean)
+    : [(el.textContent || '').trim()];
+  btn.title = lines.join('\n');
 }
 function pdRefreshEntrantsNote() {
   var el = document.getElementById('pd-ent-note');
   if (!el) return;
-  /* 진행 중 회차는 안내 2줄 — 위: 수동 지정 규칙, 아래: 지급 관리가 잠긴 이유(비활성 표시와 짝) */
+  /* 진행 중 회차는 안내 2줄 — 위: 수동 지정 규칙, 아래: 지급 관리가 이 리스트에 없는 이유 */
   if (pdCurrentRoundPhase === 'active') {
     el.innerHTML = '<div>진행 중인 회차입니다 · 등수 슬롯별로 당첨자를 직접 지정할 수 있고, 마감(일요일 23:59:59) 시 비어 있는 슬롯만 응모 건 단위 무작위 추첨으로 채워집니다 · 1인 1회 당첨 · 마감 전까지 변경·해제 가능</div>'
-      + '<div style="color:var(--amber);margin-top:3px">지급 상태·메모는 아직 지급이 성립하지 않는 구간이라 비활성 상태입니다 — 회차 종료 후 지급 관리 가능</div>';
+      + '<div style="color:var(--amber);margin-top:3px">지급 상태·메모는 아직 지급이 성립하지 않는 구간이라 표시하지 않습니다 — 회차 종료 후 이 리스트에 함께 나타납니다</div>';
     pdSyncEntNoteTitle();
     return;
   }
@@ -7020,10 +7016,16 @@ window.pdSaveMemo = function(uid, value) {
 
 /* KO/VI 토글 시 회차명(pdWeekLabel)·모달 제목처럼 사전 매칭이 안 되는 동적 텍스트를 현재 언어로 재계산.
    경품 수정 폼 등 진행 중인 입력은 건드리지 않아 데이터 유실 없음. */
+/* 주의: i18n 엔진(window.ipSetLang)은 이 파일 뒤쪽 스크립트 블록에서 정의된다. 파싱 시점에 바로 감싸려 하면
+   아직 undefined라 훅이 설치되지 않고 조용히 사라진다(그래서 언어 토글이 회차명·툴팁에 반영되지 않았다).
+   엔진 정의가 끝난 뒤 설치되도록 지연시키고, 중복 설치는 플래그로 막는다. */
 (function() {
-  var _origIpSetLang = window.ipSetLang;
-  if (typeof _origIpSetLang !== 'function') return;
-  window.ipSetLang = function(lang) {
+  function installDrawLangHook() {
+    if (window.__ppDrawLangHooked) return;
+    var _origIpSetLang = window.ipSetLang;
+    if (typeof _origIpSetLang !== 'function') return;
+    window.__ppDrawLangHooked = true;
+    window.ipSetLang = function(lang) {
     _origIpSetLang(lang);
     var sec = document.getElementById('sec-weekly-draws');
     if (sec && sec.classList.contains('active') && typeof loadDraws === 'function') loadDraws();
@@ -7032,7 +7034,11 @@ window.pdSaveMemo = function(uid, value) {
       /* 안내 문구가 번역된 뒤(옵저버는 비동기) (i) 버튼 툴팁도 같은 언어로 맞춘다 */
       setTimeout(function(){ if (typeof pdSyncEntNoteTitle === 'function') pdSyncEntNoteTitle(); }, 60);
     }
-  };
+    };
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', installDrawLangHook);
+  else installDrawLangHook();
+  setTimeout(installDrawLangHook, 0);
 })();
 
 /* ── 기프티콘 교환 취소 (구매/사용 내역 화면에서 관리자가 실행) ── */
