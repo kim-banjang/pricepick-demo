@@ -513,6 +513,11 @@ textarea.form-input{resize:vertical;min-height:80px;height:auto;}
   color:var(--text);font-family:var(--font);outline:none;text-align:left;transition:border-color .15s;}
 .pd-memo-input:focus{border-color:var(--main);}
 .pd-memo-input::placeholder{color:var(--text-3);}
+/* 진행 중인 회차: 아직 지급이 성립하지 않으므로 지급 상태 뱃지·메모칸을 비활성 표시 */
+.pd-memo-input:disabled{background:var(--surface-3,var(--surface-2));color:var(--text-3);
+  border-style:dashed;opacity:.6;cursor:not-allowed;}
+.badge.pd-payout-off{background:var(--surface-2);color:var(--text-3);border:1px dashed var(--border);
+  opacity:.75;cursor:not-allowed;}
 
 /* ── 마케팅 수신 배지 ── */
 .mkt-badge{display:inline-flex;align-items:center;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600;}
@@ -5081,6 +5086,11 @@ Object.assign(KO2VI,{
   "수동 지정 당첨자가 저장되었습니다. 남은 슬롯은 마감 시 무작위 추첨으로 채워집니다.":"Đã lưu người trúng thưởng chỉ định thủ công. Các suất còn lại sẽ được rút thăm ngẫu nhiên khi đóng đợt.",
   "수동 지정이 모두 해제되었습니다. 마감 시 전체가 무작위 추첨으로 결정됩니다.":"Đã huỷ toàn bộ chỉ định thủ công. Khi đóng đợt, toàn bộ sẽ được quyết định bằng rút thăm ngẫu nhiên."
 });
+/* 진행 중 회차 지급 관리 비활성(2026-07-30) — 툴팁·안내문구 */
+Object.assign(KO2VI,{
+  "회차 종료 후 지급 관리 가능":"Có thể quản lý gửi quà sau khi đợt kết thúc",
+  "지급 상태·메모는 아직 지급이 성립하지 않는 구간이라 비활성 상태입니다 — 회차 종료 후 지급 관리 가능":"Trạng thái gửi quà·ghi chú đang bị vô hiệu vì chưa tới lúc phát sinh việc gửi quà — có thể quản lý gửi quà sau khi đợt kết thúc"
+});
 /* 응모자 리스트 검색·페이지네이션 */
 Object.assign(KO2VI,{"닉네임·카카오ID 검색":"Tìm biệt danh·Kakao ID","전체 응모 건수":"Tổng số lượt dự thưởng","검색 결과":"Kết quả tìm kiếm","검색 결과가 없습니다.":"Không có kết quả tìm kiếm.","메모(발송일·송장번호 등)":"Ghi chú (ngày gửi·mã vận đơn v.v.)"});
   var _orig=new Map(), _tracked=new Set(), _applying=false;
@@ -6407,6 +6417,11 @@ function pdRankBadgeHtml(r) {
 function pdConfirmedWinnerFor(uid) {
   return pdConfirmedWinners.find(function(w){ return w.user_id === uid; });
 }
+/* 지급 관리(지급 상태 뱃지 토글·메모 입력) 잠금 여부 — 진행 중인 회차는 마감 전이라 지급이 성립하지 않는다.
+   진행 중 회차에서 운영자가 할 수 있는 일은 당첨자 수동 지정까지이고, 지급 관리는 회차 종료 후에 열린다. */
+function pdPayoutLocked() {
+  return pdCurrentRoundPhase === 'active';
+}
 /* 당첨 뱃지 — 확정된(적용됨) 당첨자면 지급 상태 뱃지를 나란히 붙인다. 임시 선택 상태는 지급 상태가 아직 없으므로 당첨 뱃지만.
    "N등"은 별도 노드로 분리해 KO2VI 사전 매칭, "당첨 ·"·지급 상태 라벨도 사전 항목으로 매칭(언어 토글 시 자동 재번역). */
 function pdWinnerTagHtml(uid, r) {
@@ -6415,7 +6430,10 @@ function pdWinnerTagHtml(uid, r) {
   if (w) {
     var paid = !!w.paid;
     var payoutLabel = paid ? '지급 완료' : '지급 대기';
-    html += '<span class="badge ' + (paid ? 'badge-green' : 'badge-amber') + '" style="cursor:pointer" onclick="pdTogglePaid(\'' + uid + '\')">' + payoutLabel + '</span>';
+    /* 진행 중인 회차는 아직 지급이 성립하지 않으므로 토글 불가 — 클릭 핸들러를 아예 붙이지 않고 비활성 표시 */
+    html += pdPayoutLocked()
+      ? '<span class="badge pd-payout-off" title="회차 종료 후 지급 관리 가능">' + payoutLabel + '</span>'
+      : '<span class="badge ' + (paid ? 'badge-green' : 'badge-amber') + '" style="cursor:pointer" onclick="pdTogglePaid(\'' + uid + '\')">' + payoutLabel + '</span>';
   }
   return html;
 }
@@ -6426,6 +6444,10 @@ function pdMemoInputHtml(uid) {
   var w = pdConfirmedWinnerFor(uid);
   if (!w) return '';
   var v = ppEsc(w.memo || '');
+  /* 진행 중인 회차는 지급 자체가 아직 없으므로 메모칸도 입력 불가(비활성) — 이유는 툴팁으로 알린다 */
+  if (pdPayoutLocked()) {
+    return '<input class="pd-memo-input" placeholder="메모(발송일·송장번호 등)" title="회차 종료 후 지급 관리 가능" value="' + v + '" disabled>';
+  }
   return '<input class="pd-memo-input" placeholder="메모(발송일·송장번호 등)" title="' + v + '" value="' + v + '" onchange="pdSaveMemo(\'' + uid + '\', this.value)">';
 }
 /* 운영자가 직접 지정한 당첨자는 "(수동)" 표시를 붙여 자동 추첨분과 구분한다 */
@@ -6785,9 +6807,13 @@ function pdUpdateEntStatusBadge() {
 function pdRefreshEntrantsNote() {
   var el = document.getElementById('pd-ent-note');
   if (!el) return;
-  el.textContent = (pdCurrentRoundPhase === 'active')
-    ? '진행 중인 회차입니다 · 등수 슬롯별로 당첨자를 직접 지정할 수 있고, 마감(일요일 23:59:59) 시 비어 있는 슬롯만 응모 건 단위 무작위 추첨으로 채워집니다 · 1인 1회 당첨 · 마감 전까지 변경·해제 가능'
-    : '마감 시 비어 있던 등수 슬롯이 응모 건 단위 무작위 추첨으로 채워져 확정된 결과입니다 · 1인 1회 당첨 · 종료된 회차는 당첨자를 변경할 수 없습니다';
+  /* 진행 중 회차는 안내 2줄 — 위: 수동 지정 규칙, 아래: 지급 관리가 잠긴 이유(비활성 표시와 짝) */
+  if (pdCurrentRoundPhase === 'active') {
+    el.innerHTML = '<div>진행 중인 회차입니다 · 등수 슬롯별로 당첨자를 직접 지정할 수 있고, 마감(일요일 23:59:59) 시 비어 있는 슬롯만 응모 건 단위 무작위 추첨으로 채워집니다 · 1인 1회 당첨 · 마감 전까지 변경·해제 가능</div>'
+      + '<div style="color:var(--amber);margin-top:3px">지급 상태·메모는 아직 지급이 성립하지 않는 구간이라 비활성 상태입니다 — 회차 종료 후 지급 관리 가능</div>';
+    return;
+  }
+  el.textContent = '마감 시 비어 있던 등수 슬롯이 응모 건 단위 무작위 추첨으로 채워져 확정된 결과입니다 · 1인 1회 당첨 · 종료된 회차는 당첨자를 변경할 수 없습니다';
 }
 
 window.pdOpenEntrantsModal = function(raffleId) {
@@ -6917,6 +6943,7 @@ window.pdSaveEntrants = function() {
 
 /* 지급 상태·메모는 여기서 로컬 상태만 바꾸고, 실제 저장은 상단 "저장" 클릭 시 한 번에 처리 */
 window.pdTogglePaid = function(uid) {
+  if (pdPayoutLocked()) { toast('회차 종료 후 지급 관리 가능'); return; }
   var w = pdConfirmedWinnerFor(uid);
   if (!w) return;
   w.paid = !w.paid;
@@ -6924,6 +6951,7 @@ window.pdTogglePaid = function(uid) {
 };
 
 window.pdSaveMemo = function(uid, value) {
+  if (pdPayoutLocked()) return;
   var w = pdConfirmedWinnerFor(uid);
   if (!w) return;
   w.memo = value;
