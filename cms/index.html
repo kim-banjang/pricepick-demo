@@ -6260,7 +6260,8 @@ function loadDraws() {
           var d = it.d, doc = it.doc;
           var period = (d.start_date||'—') + ' ~ ' + (d.end_date||'—');
           var winnerCell = it.hasWinners ? pdWinnerSummary(d.winners_confirmed) : '<span style="color:var(--text-sub)">미선정</span>';
-          var actionCell = '<button class="btn btn-primary btn-sm" onclick="pdOpenEntrantsModal(\'' + doc.id + '\')">응모 상세 보기</button> '
+          /* 진행예정 회차는 아직 응모가 0건이라 볼 게 없으므로 "응모 상세 보기"를 아예 노출하지 않는다 */
+          var actionCell = (it.phase === 'upcoming' ? '' : '<button class="btn btn-primary btn-sm" onclick="pdOpenEntrantsModal(\'' + doc.id + '\')">응모 상세 보기</button> ')
             + '<button class="btn btn-ghost btn-sm" onclick="ppOpenDrawModal(\'' + doc.id + '\')">경품 수정</button>';
           return '<tr>'
             + '<td style="font-weight:600">' + pdWeekLabel(d.end_date) + '</td>'
