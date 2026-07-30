@@ -507,8 +507,11 @@ textarea.form-input{resize:vertical;min-height:80px;height:auto;}
 #pd-entrants-ov .info-box{padding:6px 12px;margin-bottom:0;line-height:1.45;}
 #pd-ent-table th{padding:6px 8px;}
 #pd-ent-table td{padding:5px 8px;line-height:1.35;vertical-align:middle;}
+/* 행 높이를 못 박아 페이지를 넘겨도, 진행중/종료 회차가 달라도 표 높이가 같게 유지된다 */
+#pd-ent-table tbody tr{height:54px;}
+#pd-ent-fill{flex:none;}
 #pd-ent-table td > div{line-height:1.35;}
-#pd-ent-pager{padding:4px 0 0;}
+#pd-ent-pager{padding:4px 0 0;min-height:34px;box-sizing:content-box;}
 /* 진행 중 회차의 등수 수동 지정 셀렉트도 행 높이에 맞춰 압축(기본 .form-select는 40px) */
 #pd-ent-table .form-select{height:32px;padding:4px 8px;}
 .pd-pay-line{display:flex;align-items:center;gap:6px;}
@@ -1356,7 +1359,9 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
             <thead><tr><th style="width:20%">닉네임(카카오ID)</th><th style="width:14%">응모일시</th><th style="width:66%">당첨 등수</th></tr></thead>
             <tbody id="pd-ent-tbody"></tbody>
           </table>
-          <div class="pagination" id="pd-ent-pager" style="display:none"></div>
+          <!-- 페이지에 행이 10건보다 적어도 표 영역 높이가 그대로 유지되도록 남는 만큼 빈 공간만 채운다(더미 행 아님) -->
+          <div id="pd-ent-fill" aria-hidden="true" style="height:0"></div>
+          <div class="pagination" id="pd-ent-pager" style="display:flex"></div>
         </div>
       </div>
       </div>
@@ -6761,7 +6766,7 @@ function pdResetEntSearch() {
   var box = document.getElementById('pd-ent-search');
   if (box) box.value = '';
   var pager = document.getElementById('pd-ent-pager');
-  if (pager) { pager.innerHTML = ''; pager.style.display = 'none'; }
+  if (pager) { pager.innerHTML = ''; pager.style.display = 'flex'; }
 }
 window.pdEntSearch = function(v) {
   pdEntQuery = v || '';
@@ -6791,7 +6796,8 @@ function pdEntPageNums(totalPages, cur) {
 function pdRenderEntPager(totalPages) {
   var el = document.getElementById('pd-ent-pager');
   if (!el) return;
-  if (totalPages <= 1) { el.innerHTML = ''; el.style.display = 'none'; return; }
+  /* 페이지가 1개뿐이어도 바 자리는 그대로 비워둔다 — 모달 높이·페이저 위치가 안 변하게 */
+  if (totalPages <= 1) { el.innerHTML = ''; el.style.display = 'flex'; return; }
   el.style.display = 'flex';
   var dim = 'opacity:.35;cursor:default';
   var html = '<button class="page-btn" onclick="pdEntGoPage(' + (pdEntPage - 1) + ')"' + (pdEntPage === 1 ? ' disabled style="' + dim + '"' : '') + '>‹</button>';
@@ -6834,6 +6840,18 @@ function pdApplyEntColLayout() {
   Array.prototype.forEach.call(ths, function(th, i){ th.style.width = widths[i] || ''; });
   table.classList.toggle('is-active', isActive);
 }
+/* 표 영역을 10행 높이로 고정 — 현재 페이지 행 수가 적으면 모자란 만큼만 빈 공간으로 채운다.
+   더미 행을 넣지 않고 스페이서 높이만 조절하므로 데이터에는 영향이 없다. */
+var PD_ENT_ROW_H = 54;
+function pdFillEntTableHeight() {
+  var fill = document.getElementById('pd-ent-fill');
+  var tbody = document.getElementById('pd-ent-tbody');
+  if (!fill || !tbody) return;
+  var target = PD_ENT_PAGE_SIZE * PD_ENT_ROW_H;
+  var actual = tbody.getBoundingClientRect().height;
+  fill.style.height = Math.max(0, Math.round(target - actual)) + 'px';
+}
+
 function pdRenderEntrantRows() {
   var tbody = document.getElementById('pd-ent-tbody');
   if (!tbody) return;
@@ -6850,6 +6868,7 @@ function pdRenderEntrantRows() {
     pdRenderEntCount(list.length);
     pdRenderEntPager(totalPages);
     pdUpdateEntStatusBadge();
+    pdFillEntTableHeight();
     return;
   }
   tbody.innerHTML = pageRows.map(function(e) {
@@ -6882,6 +6901,7 @@ function pdRenderEntrantRows() {
   pdRenderEntCount(list.length);
   pdRenderEntPager(totalPages);
   pdUpdateEntStatusBadge();
+  pdFillEntTableHeight();
 }
 
 /* 지급 상태·메모가 마지막 저장 스냅샷과 달라졌는지(=저장 전 임시 편집 존재) */
@@ -7003,6 +7023,7 @@ window.pdOpenEntrantsModal = function(raffleId) {
     }
     if (!pdCurrentEntrants.length) {
       document.getElementById('pd-ent-tbody').innerHTML = ppEmpty(3, '응모 내역이 없습니다.');
+    pdFillEntTableHeight();
       pdRenderEntCount(0);
       pdUpdateEntStatusBadge();
       return;
