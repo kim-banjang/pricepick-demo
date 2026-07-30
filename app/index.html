@@ -15654,7 +15654,7 @@ function csSubmitInquiry(btn) {
     "실제 서비스에서는 카카오톡 앱으로 진짜 전환됩니다.": "Trong dịch vụ thực tế, ứng dụng sẽ chuyển thật sang KakaoTalk.",
     "실제 서비스에서는 iOS가 진짜 시스템 팝업을 띄웁니다.": "Trong dịch vụ thực tế, iOS sẽ hiển thị hộp thoại hệ thống thật.",
     "경품 추첨에 당첨되셨어요!": "Bạn đã trúng thưởng bốc thăm quà!",
-    "당첨 안내를 확인하고 배송 정보를 입력해주세요.": "Xem thông báo trúng thưởng và nhập thông tin giao hàng.",
+    "당첨을 축하해요! 경품 수령 정보를 1:1 문의로 보내주세요.": "Chúc mừng bạn đã trúng thưởng! Vui lòng gửi thông tin nhận quà qua Hỏi đáp 1:1.",
     "매주 일요일 마감": "Đóng Chủ Nhật hàng tuần",
     "당첨자 자동 발표": "Tự động công bố người trúng",
     "명": "người",
@@ -17682,7 +17682,7 @@ function renderNotifications() {
       if (amt > 0) items.push({ key: 'pt:' + p._id, type: 'event', d: ppDate(p.created_at), tag: '이벤트', head: (p.reason || '포인트 적립'), desc: '+' + amt + 'P 적립' });
     });
     pzw.forEach(function (w) {
-      items.push({ key: 'pw:' + w._id, type: 'event', d: ppDate(w.created_at), tag: '이벤트', head: '경품 추첨에 당첨되셨어요!', desc: '당첨 안내를 확인하고 배송 정보를 입력해주세요.' });
+      items.push({ key: 'pw:' + w._id, type: 'event', d: ppDate(w.created_at), tag: '이벤트', head: '경품 추첨에 당첨되셨어요!', desc: '당첨을 축하해요! 경품 수령 정보를 1:1 문의로 보내주세요.' });
     });
     items = items.filter(function (i) { return i.d; }).sort(function (a, b) { return b.d - a.d; });
     var readSet = {};
