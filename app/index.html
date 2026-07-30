@@ -15756,6 +15756,193 @@ Object.assign(KO2VI, {
   "Android — 버튼을 누르면 홈 화면에 바로 추가돼요": "Android — bấm nút là thêm ngay vào màn hình chính",
   "iPhone(사파리) — OS 제약으로 자동 추가가 안 돼요. 공유 → '홈 화면에 추가'를 직접 눌러주세요": "iPhone(Safari) — do giới hạn OS nên không tự thêm được. Hãy tự chạm Chia sẻ → 'Thêm vào màn hình chính'"
 });
+  /* ── 데모 앱 VI 미번역 63건 보강 (2026-07-30) ────────────────────────────
+     배포본 VI 모드 전수 스캔(텍스트 노드 + placeholder/title/value/alt/aria-label)에서
+     남아 있던 한국어 잔류분. 정본(interactive.html)·CMS에 이미 확정된 용어를 그대로 따른다.
+       티켓=vé · 이벤트 티켓=vé sự kiện · 등급 티켓=vé hạng · 포인트=điểm
+       적립=tích lũy · 경유구매=mua qua liên kết · 픽구매=Pick-mua
+       구매 확정=xác nhận mua · 적립 대기=chờ tích lũy · 카카오 연동=liên kết Kakao
+       기프티콘=Gifticon · 티켓 교환소=Quầy đổi vé · 혜택(탭)=Ưu đãi · 마이=Của tôi
+       닉네임=Biệt danh · 탈퇴=Hủy tài khoản · 초대=mời · 코드=mã · 바로가기(명사)=lối tắt
+       금액=N.NNN₩ (베트남식 . 구분자)
+     ※ 한 문장이 <b>·<br>로 쪼개진 자리는 조각 단위로 넣되 베트남어 어순이 맞게 배분했다.
+       조각 키만 보면 뜻이 이상해 보여도 화면에서 이어 붙으면 한 문장이 된다. */
+  Object.assign(KO2VI, {
+    /* 01 스플래시 — 워드마크는 두 span의 굵기 대비를 살려 Price/Pick으로 분리 */
+    "프라이스": "Price",
+    "픽": "Pick",
+    "CMS 데모 회원으로 보기": "Xem với tư cách thành viên demo CMS",
+
+    /* 03 닉네임 설정 */
+    "이미 사용중인 닉네임입니다.": "Biệt danh này đã có người dùng.",
+
+    /* 03b-A 카카오 계정 중복 */
+    "유저": "Người dùng",
+    "이 카카오 계정은 다른 프로필과 이미 연결되어 있어요.": "Tài khoản Kakao này đã liên kết với hồ sơ khác rồi.",
+    "새 계정으로 시작할게요": "Tôi sẽ bắt đầu bằng tài khoản mới",
+
+    /* 04 홈 미션 카드 보상 뱃지 — "매일 <b>100P</b>" / "하루 <b>1회</b>" / "각 <b>500P</b>" */
+    "매일": "Mỗi ngày",
+    "하루": "Mỗi ngày",
+    "1회": "1 lần",
+    "각": "Mỗi",
+
+    /* 11 마이 */
+    "가입 1일째": "Ngày thứ 1",
+    "초대코드 입력": "Nhập mã mời",
+    "친구의 초대코드를 입력하고 500P 받기": "Nhập mã mời của bạn bè và nhận 500P",
+    "미입력": "Chưa nhập",
+
+    /* 11d 탈퇴 최종 확인 */
+    "즉시 탈퇴 처리": "Hủy tài khoản ngay lập tức",
+    "확인 즉시 탈퇴 처리되며 유예·철회 기간이 없습니다. 개인정보는 즉시 삭제되고, 거래 기록은 전자상거래법에 따라 5년간 보관됩니다.": "Ngay khi xác nhận, tài khoản sẽ bị hủy và không có thời gian hoãn·rút lại. Thông tin cá nhân bị xóa ngay, lịch sử giao dịch được lưu 5 năm theo luật TMĐT.",
+
+    /* 04c 쿠팡 적립 안내 — "홈 화면에 '<span>쿠팡</span>' 바로 가기 추가" */
+    "홈 화면에 '": "Thêm lối tắt '",
+    "' 바로 가기 추가": "' vào màn hình chính",
+
+    /* 04d 경유 브릿지 복귀 안내 — <b>·<br>로 8조각 */
+    "구매하신 내역은 제휴사를 통해": "Lịch sử mua của bạn được đối tác",
+    "자동으로 감지": "tự động ghi nhận",
+    "돼요.": ".",
+    "지금 앱에서 따로 입력하실 건 없어요.": "Bạn không cần nhập gì thêm trong app lúc này.",
+    "구매가 확인되면": "Khi mua hàng được xác nhận, vé",
+    "적립 대기(가지급)": "chờ tích lũy (tạm cấp)",
+    "티켓이 생기고,": "sẽ xuất hiện,",
+    "구매 확정(카카오 연동 D+7 · 미연동 D+30) 후 사용할 수 있어요.": "và dùng được sau khi xác nhận mua (liên kết Kakao D+7 · chưa liên kết D+30).",
+    "방금 결제했다고 가정하고 시뮬레이션 보기": "Giả định vừa thanh toán xong và xem mô phỏng",
+
+    /* 14-done 출석 결과 */
+    "연속 방문 · 1일 더 구경하면 보상 지급": "Ghé liên tục · dạo thêm 1 ngày sẽ được thưởng",
+
+    /* 16 친구초대 */
+    "내 초대코드": "Mã mời của tôi",
+    "복사": "Sao chép",
+    "이번 달 초대 현황 (첫 구매 성사 기준)": "Tình trạng mời tháng này (theo Pick-mua đầu thành công)",
+    "매월 1일 0시에 초기화 · 이번 달 50명 더 인정받을 수 있어요": "Reset 0h ngày 1 mỗi tháng · tháng này còn được công nhận thêm 50 người",
+    /* 16 동적: 남은 인원이 매번 바뀌어 조각으로 조립(renderInviteHistory) */
+    "매월 1일 0시에 초기화 · 이번 달": "Reset 0h ngày 1 mỗi tháng · tháng này còn được công nhận thêm",
+    "명 더 인정받을 수 있어요": " người",
+    "이번 달 한도(50명)에 도달했어요 · 다음 달 1일 초기화": "Đã đạt hạn mức tháng này (50 người) · reset ngày 1 tháng sau",
+    "첫 구매 완료": "Đã mua lần đầu",
+
+    /* 17 연속구매 미션 */
+    "현재 0 / 3회": "Hiện tại 0 / 3 lần",
+    "3회 연속으로 경유구매하면 이벤트티켓 1장!": "Mua qua liên kết 3 lần liên tục để nhận 1 vé sự kiện!",
+    /* 17 동적: streak 값에 따라 문구가 갈린다(renderStreakMission) */
+    "현재 1 / 3회": "Hiện tại 1 / 3 lần",
+    "현재 3 / 3회": "Hiện tại 3 / 3 lần",
+    "2회만 더 경유구매하면 이벤트티켓 1장!": "Mua qua liên kết thêm 2 lần nữa để nhận 1 vé sự kiện!",
+    "3회만 더 경유구매하면 이벤트티켓 1장!": "Mua qua liên kết thêm 3 lần nữa để nhận 1 vé sự kiện!",
+    "3회 연속 달성! 이벤트티켓 1장이 지급돼요": "Đạt 3 lần liên tục! Sẽ được cấp 1 vé sự kiện",
+    "첫 경유구매로 연속구매 미션을 시작해보세요": "Hãy bắt đầu nhiệm vụ mua liên tục bằng lần mua qua liên kết đầu tiên",
+
+    /* 30-CS-K 카카오채널 상담 브릿지 */
+    "카카오채널 상담 (데모)": "Tư vấn kênh Kakao (DEMO)",
+    "이 데모에는 실제 카카오채널이 연결되어 있지 않아요.": "Bản demo này chưa kết nối kênh Kakao thật.",
+    "지금은 아래 1:1 문의로 접수해 주시면": "Hiện tại bạn hãy gửi câu hỏi 1:1 bên dưới,",
+    "운영팀이 확인 후 답변드려요.": "đội ngũ vận hành sẽ kiểm tra và trả lời.",
+
+    /* 30-invite 초대코드 입력 */
+    "친구의 초대코드를 입력하면": "Nhập mã mời của bạn bè",
+    "나와 친구 모두 500P를 받을 수 있어요": "Cả tôi và bạn ấy đều nhận được 500P",
+    "초대코드": "Mã mời",
+    "등록하기": "Đăng ký",
+    "이미 초대코드를 입력했어요": "Bạn đã nhập mã mời rồi",
+
+    /* 06a 설정 */
+    "홈 화면에 쿠팡 바로 가기 추가": "Thêm lối tắt Coupang vào màn hình chính",
+    "프라이스픽과 제휴 적립이 항상 유지됩니다.": "Tích lũy liên kết với PricePick luôn được giữ nguyên.",
+    "홈 화면에 '쿠팡' 바로 가기 추가": "Thêm lối tắt 'Coupang' vào màn hình chính",
+    "활동 내역 · 구매 내역 목록에 적용됩니다.": "Áp dụng cho danh sách Lịch sử hoạt động · Lịch sử mua.",
+
+    /* 캐시 삭제 모달 — "임시로 저장된 화면 데이터(<b>12.4MB</b>)를 지웁니다. …" */
+    "캐시를 삭제할까요?": "Xóa cache nhé?",
+    "임시로 저장된 화면 데이터(": "Xóa dữ liệu màn hình lưu tạm (",
+    ")를 지웁니다. 로그인 정보·티켓·포인트 등 계정 데이터는 삭제되지 않아요.": "). Dữ liệu tài khoản như thông tin đăng nhập·vé·điểm sẽ không bị xóa.",
+    "삭제": "Xóa",
+
+    /* earn-done 티켓 적립 완료 */
+    "티켓 적립 완료!": "Đã tích lũy vé!",
+    "쿠팡 구매 50,000원": "Mua Coupang 50.000₩",
+    "장 적립됨": "vé đã tích lũy",
+    "티켓 사용 안내": "Hướng dẫn dùng vé",
+    "구매 확정 후 등급 티켓으로 전환되면 사용 가능해요.": "Sau khi xác nhận mua, vé sẽ chuyển thành vé hạng và dùng được.",
+    "혜택 탭 > 티켓 교환소에서 기프티콘으로 교환하세요.": "Vào tab Ưu đãi > Quầy đổi vé để đổi lấy Gifticon.",
+    "원": "₩",
+
+    /* ex-done 기프티콘 교환 완료 */
+    "교환 완료!": "Đã đổi xong!",
+    "기프티콘이 발급되었어요.": "Gifticon đã được cấp.",
+    "아래 코드로 사용하세요.": "Hãy dùng bằng mã bên dưới.",
+    "교환 코드": "Mã đổi",
+    "발급일로부터 90일 유효": "Có hiệu lực 90 ngày kể từ ngày cấp"
+  });
+  /* ── 런타임 렌더 문구 보강 (2026-07-30) ────────────────────────────────
+     정적 DOM에는 없고 JS가 그려 넣는 앱 UI 카피(빈 상태 안내·출석 진행 문구).
+     화면을 열어야 나타나므로 정적 스캔 63건에는 안 잡혔지만 VI 순회에서 한국어로 남았다.
+     ※ 공지 본문·약관 전문·기프티콘 상품명·당첨자 닉네임은 Firestore 데모 데이터라 여기 대상 아님. */
+  Object.assign(KO2VI, {
+    "0장": "0 vé",
+    /* 빈 상태 — ppEmpty(제목/설명) 2줄 구조라 줄 단위로 넣는다 */
+    "활동 내역이 없어요": "Chưa có lịch sử hoạt động",
+    "티켓을 적립하거나 기프티콘을 교환하면": "Khi bạn tích lũy vé hoặc đổi Gifticon",
+    "여기에 기록돼요": "sẽ được ghi lại ở đây",
+    "구매 내역이 없어요": "Chưa có lịch sử mua",
+    "쇼핑몰을 경유해 구매하면": "Khi mua qua cửa hàng liên kết",
+    "여기에 주문이 기록돼요": "đơn hàng sẽ được ghi lại ở đây",
+    "알림이 없어요": "Chưa có thông báo",
+    "티켓 적립·교환·이벤트 소식을": "Tin tức tích lũy·đổi vé·sự kiện",
+    "여기서 받아볼 수 있어요": "sẽ được nhận ở đây",
+    "문의 내역이 없어요": "Chưa có lịch sử hỏi đáp",
+    "궁금한 점이 있으면 1:1 문의를 남겨주세요": "Có thắc mắc thì hãy gửi câu hỏi 1:1",
+    "아직 초대한 친구가 없어요": "Bạn chưa mời bạn bè nào",
+    "친구를 초대하고 첫 구매가 성사되면": "Mời bạn bè và khi họ mua lần đầu thành công",
+    "아직 포인트 적립·사용 내역이 없어요": "Chưa có lịch sử tích lũy·sử dụng điểm",
+    "아직 교환한 기프티콘이 없어요": "Chưa có Gifticon nào đã đổi",
+    "대기 중이거나 최근 전환된 랜덤 티켓이 없어요.": "Không có vé ngẫu nhiên đang chờ hoặc vừa chuyển đổi.",
+    "보유한 등급 티켓이 없어요. 쇼핑몰 구매로 티켓을 적립해 보세요.": "Bạn chưa có vé hạng nào. Hãy mua ở cửa hàng để tích lũy vé.",
+    "보유 중인 등급 티켓이 없어요.": "Bạn chưa có vé hạng nào.",
+    /* 출석 결과 — '연속 N일째 · M일 더 구경하면 보상 지급' (N+M=5 조합 전부) */
+    "연속 1일째 · 4일 더 구경하면 보상 지급": "Liên tục ngày thứ 1 · dạo thêm 4 ngày sẽ được thưởng",
+    "연속 2일째 · 3일 더 구경하면 보상 지급": "Liên tục ngày thứ 2 · dạo thêm 3 ngày sẽ được thưởng",
+    "연속 3일째 · 2일 더 구경하면 보상 지급": "Liên tục ngày thứ 3 · dạo thêm 2 ngày sẽ được thưởng",
+    "연속 4일째 · 1일 더 구경하면 보상 지급": "Liên tục ngày thứ 4 · dạo thêm 1 ngày sẽ được thưởng",
+    "연속 5일째 · 0일 더 구경하면 보상 지급": "Liên tục ngày thứ 5 · dạo thêm 0 ngày sẽ được thưởng"
+  });
+  /* ── 데모 데이터(기프티콘 상품·경품·당첨 닉네임) VI 보강 ──────────────
+     Firestore 데모 레코드라 앱 카피는 아니지만, 이미 같은 성격의 항목이
+     사전에 들어와 있어(신세계 상품권 5만원 → Phiếu Shinsegae 5 vạn₩,
+     현명한너구리 → GấuMèoKhônNgoan) 같은 규칙으로 맞춘다.
+     금액: 5천원=5 nghìn₩ · 1만원=1 vạn₩ · 5만원=5 vạn₩ · 3,000원=3.000₩
+     ※ CMS에서 레코드를 바꾸면 이 항목들은 다시 한국어로 돌아온다 — 콘텐츠 쪽 관리 필요. */
+  Object.assign(KO2VI, {
+    "이디야커피": "Ediya Coffee",
+    "아메리카노": "Americano",
+    "이디야 아메리카노": "Americano Ediya",
+    "아메리카노 Tall (4,500원)": "Americano Tall (4.500₩)",
+    "배달의민족": "Baemin",
+    "배민 10,000원 상품권": "Phiếu Baemin 10.000₩",
+    "CU 3,000원 금액권": "Phiếu 3.000₩ CU",
+    "GS25 3,000원 금액권": "Phiếu 3.000₩ GS25",
+    "테스트브랜드": "Thương hiệu test",
+    "테스트브랜드2": "Thương hiệu test 2",
+    "테스트상품": "Sản phẩm test",
+    "테스트상품2": "Sản phẩm test 2",
+    "신세계 상품권 5만원 외": "Phiếu Shinsegae 5 vạn₩ và khác",
+    "스타벅스 상품권 1만원": "Phiếu Starbucks 1 vạn₩",
+    "스타벅스 5만원권": "Phiếu 5 vạn₩ Starbucks",
+    "편의점 상품권 1만원": "Phiếu cửa hàng tiện lợi 1 vạn₩",
+    "편의점 상품권 5천원": "Phiếu cửa hàng tiện lợi 5 nghìn₩",
+    "느긋한토끼": "ThỏThongThả",
+    "씩씩한고양이 외 2명": "MèoDũngCảm và 2 người",
+    "부지런한너구리 외 4명": "GấuMèoChămChỉ và 4 người",
+    /* 공지 레코드 제목 (본문은 이미 사전에 있고, 목록 미리보기는 자르기 전에 L()로 번역) */
+    "테스트 공지": "Thông báo test",
+    "테스트 공지2": "Thông báo test 2",
+    "[이벤트] 쿠팡 픽구매 티켓 2배 적립": "[Sự kiện] Tích lũy vé Pick-mua Coupang gấp đôi",
+    "이번 주 한정, 쿠팡 경유 픽구매 시 등급 티켓을 2배로 드립니다. 지금 픽하고 더 많은 티켓을 받아보세요!": "Chỉ trong tuần này, Pick-mua qua Coupang được tích vé hạng gấp đôi. Pick ngay để nhận thêm nhiều vé!"
+  });
   var IPLANG='ko';
   var KO_RE=/[\uac00-\ud7a3]/;
   var _orig=new Map();
@@ -17056,7 +17243,9 @@ function processPurchase(amount, overlay) {
     renderMyTicketCard();
     /* 결과 화면 이동 — 확정 전까지 실제 등급은 비공개, 랜덤 티켓 장수만 안내 */
     var sub = document.getElementById('earn-mall-sub');
-    if (sub) sub.textContent = mall.name + ' 구매 ' + amount.toLocaleString('ko-KR') + '원';
+    /* 구매 금액은 사용자 입력이라 통짜 매칭이 안 된다 → 몰이름·단위는 L(), 숫자는 언어별 구분자로 조립 */
+    var _lg = (typeof window.ipGetLang === 'function') ? window.ipGetLang() : 'ko';
+    if (sub) sub.textContent = window.L(mall.name + ' 구매 ') + amount.toLocaleString(_lg === 'vi' ? 'vi-VN' : 'ko-KR') + window.L('원');
     var tc = document.getElementById('earn-total-count');
     if (tc) tc.textContent = tk.total;
     var grid = document.getElementById('earn-grade-grid');
@@ -18099,9 +18288,10 @@ function renderInvites() {
     var mcEl = document.getElementById('iv-month-count'); if (mcEl) mcEl.textContent = mc;
     var fill = document.getElementById('iv-status-fill'); if (fill) fill.style.width = Math.min(100, mc / INVITE_MONTHLY_CAP * 100) + '%';
     var sub = document.getElementById('iv-status-sub');
+    /* 남은 인원 숫자가 매번 달라 사전 통짜 매칭이 안 된다 → 앞·뒤 조각을 각각 L()로 번역해 조립 */
     if (sub) sub.textContent = mc >= INVITE_MONTHLY_CAP
-      ? '이번 달 한도(' + INVITE_MONTHLY_CAP + '명)에 도달했어요 · 다음 달 1일 초기화'
-      : '매월 1일 0시에 초기화 · 이번 달 ' + (INVITE_MONTHLY_CAP - mc) + '명 더 인정받을 수 있어요';
+      ? window.L('이번 달 한도(' + INVITE_MONTHLY_CAP + '명)에 도달했어요 · 다음 달 1일 초기화')
+      : window.L('매월 1일 0시에 초기화 · 이번 달 ') + (INVITE_MONTHLY_CAP - mc) + window.L('명 더 인정받을 수 있어요');
     if (!inv.length) {
       list.innerHTML = ppEmpty('👥', '아직 초대한 친구가 없어요', '친구를 초대하고 첫 구매가 성사되면<br>두 사람 모두 500P를 받아요');
       return;
@@ -18648,7 +18838,9 @@ function renderAppNotices() {
     PP._notices = arr;
     box.innerHTML = arr.map(function (n, i) {
       var d = ppDate(n.published_at || n.created_at);
-      var body = (n.content || '').replace(/<[^>]+>/g, '');
+      /* 미리보기는 40자로 자른 뒤라 사전 통짜 매칭이 안 된다 → 자르기 전에 줄 단위로 번역한다.
+         (상세 모달은 \n을 <br>로 풀어 줄마다 텍스트 노드가 생기므로 옵저버가 알아서 처리) */
+      var body = (n.content || '').replace(/<[^>]+>/g, '').split('\n').map(function (ln) { return window.L(ln); }).join('\n');
       return '<div data-nt="' + i + '" style="padding:16px;border-bottom:1px solid var(--border);cursor:pointer;">'
         + '<div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;">'
         + '<span style="font-size:11px;color:var(--text3);">' + ppFmt(d) + '</span></div>'
