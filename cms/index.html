@@ -550,6 +550,9 @@ textarea.form-input{resize:vertical;min-height:80px;height:auto;}
 .pd-cell2-row .badge{flex:none;}
 .pd-cell2-row .pd-memo-input{height:24px;font-size:11.5px;padding:2px 8px;}
 #pd-ent-table .badge-purple{margin-right:0;}
+/* 상단 요약의 등수별 남은 자리 표기 — 경품 구성 뒤에 옅게 붙인다 */
+.pd-remain{font-size:11px;color:var(--text-3);}
+.pd-remain-full{color:var(--amber);font-weight:600;}
 /* 등수 옆에 붙는 경품명 — 회차의 등수별 경품 구성에서 읽어온다(하드코딩 아님).
    칸보다 길면 말줄임 + title로 전체 노출해 행 높이를 한 줄로 고정. */
 .pd-prize-name{flex:0 1 auto;min-width:0;max-width:190px;font-size:11px;color:var(--text-3);
@@ -5144,7 +5147,10 @@ Object.assign(KO2VI,{
 Object.assign(KO2VI,{
   "회차 종료 후 지급 관리 가능":"Có thể quản lý gửi quà sau khi đợt kết thúc",
   "지급 상태·메모는 아직 지급이 성립하지 않는 구간이라 표시하지 않습니다 — 회차 종료 후 이 리스트에 함께 나타납니다":"Trạng thái gửi quà·ghi chú không được hiển thị vì chưa tới lúc phát sinh việc gửi quà — sẽ xuất hiện trong danh sách này sau khi đợt kết thúc",
-  "종료된 회차는 경품을 수정할 수 없습니다.":"Đợt đã kết thúc thì không thể sửa giải thưởng."
+  "종료된 회차는 경품을 수정할 수 없습니다.":"Đợt đã kết thúc thì không thể sửa giải thưởng.",
+  "남은":"còn",
+  "자리":" suất",
+  "지정 완료":"Đã chỉ định đủ"
 });
 /* 응모자 리스트 검색·페이지네이션 */
 Object.assign(KO2VI,{"닉네임·카카오ID 검색":"Tìm biệt danh·Kakao ID","전체 응모 건수":"Tổng số lượt dự thưởng","검색 결과":"Kết quả tìm kiếm","검색 결과가 없습니다.":"Không có kết quả tìm kiếm.","메모(발송일·송장번호 등)":"Ghi chú (ngày gửi·mã vận đơn v.v.)"});
@@ -6756,13 +6762,54 @@ function pdPrizeNameHtml(rank) {
   return '<span class="pd-prize-name" title="' + ppEsc(name) + '">' + ppEsc(name) + '</span>';
 }
 /* 진행 중인 회차의 당첨 등수 컬럼 — 등수 슬롯 수동 지정 드롭다운(해제는 "미선택") */
+/* 등수별 남은 슬롯 수 — 정원(경품 구성의 당첨자 수) − 지금 지정돼 있는 수.
+   지정/해제할 때마다 pdRenderEntrantRows()가 다시 돌면서 이 값이 재계산되므로,
+   다른 행 드롭다운의 선택지도 즉시 갱신된다(검색·페이지 이동 후에도 같은 기준). */
+function pdRankRemaining() {
+  var used = {};
+  Object.keys(pdStagedWinners).forEach(function(id) {
+    var r = String(ppRankNum(pdStagedWinners[id].rank));
+    used[r] = (used[r] || 0) + 1;
+  });
+  var remain = {};
+  pdCurrentRoundPrizes.forEach(function(p) {
+    var r = String(ppRankNum(p.rank));
+    remain[r] = (p.count || 0) - (used[r] || 0);
+  });
+  return remain;
+}
+/* 정원이 다 찬 등수는 선택지에서 뺀다 — 단 이 행이 이미 그 등수로 지정돼 있으면 해제·변경할 수 있어야
+   하므로 자기 등수는 남긴다. 옵션 라벨은 "N등" 그대로 둬야 KO2VI 사전("1등"→"Giải Nhất")이 매칭되므로,
+   남은 자리 수는 라벨에 끼워넣지 않고 상단 "등수별 구성" 줄에 따로 표시한다(pdRefreshEntSummary). */
 function pdRankOptionsHtml(selectedRank) {
+  var remain = pdRankRemaining();
   var opts = '<option value="">미선택</option>';
   pdCurrentRoundPrizes.slice().sort(function(a,b){return ppRankNum(a.rank)-ppRankNum(b.rank);}).forEach(function(p){
     var r = ppRankNum(p.rank);
-    opts += '<option value="' + r + '"' + (String(selectedRank)===String(r)?' selected':'') + '>' + r + '등</option>';
+    var isMine = String(selectedRank) === String(r);
+    if (!isMine && (remain[String(r)] || 0) <= 0) return;
+    opts += '<option value="' + r + '"' + (isMine ? ' selected' : '') + '>' + r + '등</option>';
   });
   return opts;
+}
+/* 상단 "등수별 구성" 줄 — 진행 중 회차에서는 등수별 남은 자리를 함께 보여준다.
+   숫자는 그대로 두고 단위·문구만 별도 텍스트 노드로 감싸 KO/VI 사전이 매칭되게 한다. */
+function pdRefreshEntSummary() {
+  var el = document.getElementById('pd-ent-summary');
+  if (!el) return;
+  var isActive = pdCurrentRoundPhase === 'active';
+  var remain = isActive ? pdRankRemaining() : null;
+  el.innerHTML = '<span>등수별 구성:</span> ' + pdCurrentRoundPrizes.slice()
+    .sort(function(a,b){return ppRankNum(a.rank)-ppRankNum(b.rank);})
+    .map(function(p) {
+      var r = ppRankNum(p.rank);
+      var base = '<span>' + r + '등</span> ' + p.count + '<span>명</span>(' + ppEsc(p.name) + ')';
+      if (!isActive) return base;
+      var left = remain[String(r)] || 0;
+      return base + (left > 0
+        ? ' <span class="pd-remain">남은</span> <span class="pd-remain">' + left + '</span><span class="pd-remain">자리</span>'
+        : ' <span class="pd-remain pd-remain-full">지정 완료</span>');
+    }).join(' · ');
 }
 
 /* 응모 행(사용 티켓 1장 = 1행) 단위로 렌더 — 같은 사람이 티켓을 여러 장 썼으면 그만큼 행이 나열됨.
@@ -6896,6 +6943,7 @@ function pdRenderEntrantRows() {
   if (!tbody) return;
   var isActive = pdCurrentRoundPhase === 'active';
   pdApplyEntColLayout();
+  pdRefreshEntSummary();
   var rankMap = pdRankMapForRender();
   var list = pdFilteredEntrants();
   var totalPages = Math.max(1, Math.ceil(list.length / PD_ENT_PAGE_SIZE));
@@ -7043,7 +7091,7 @@ window.pdOpenEntrantsModal = function(raffleId) {
     pdCurrentRoundEndDate = d.end_date;
     pdRefreshEntrantsTitle();
     pdRefreshEntrantsNote();
-    document.getElementById('pd-ent-summary').innerHTML = '<span>등수별 구성:</span> ' + pdCurrentRoundPrizes.slice().sort(function(a,b){return ppRankNum(a.rank)-ppRankNum(b.rank);}).map(function(p){ return '<span>' + ppRankNum(p.rank) + '등</span> ' + p.count + '<span>명</span>(' + ppEsc(p.name) + ')'; }).join(' · ');
+    pdRefreshEntSummary();
     pdConfirmedWinners = (Array.isArray(d.winners_confirmed) ? d.winners_confirmed : []).map(function(w){ return Object.assign({paid:false, memo:''}, w); });
     pdConfirmedWinnersBaseline = JSON.parse(JSON.stringify(pdConfirmedWinners));
     pdCurrentEntrants = entriesSnap.docs.map(function(doc){ return Object.assign({_id: doc.id}, doc.data()); });
