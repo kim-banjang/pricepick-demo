@@ -5138,8 +5138,6 @@ Object.assign(KO2VI,{
   "수동 지정 저장됨":"Đã lưu chỉ định thủ công",
   "저장 전 (임시 지정)":"Trước khi lưu (chỉ định tạm)",
   "(수동)":"(thủ công)",
-  "해당 등수의 슬롯이 이미 모두 찼습니다.":"Các suất của hạng này đã đầy.",
-  "이미 다른 응모 건으로 당첨 처리된 응모자입니다 (1인 1회 당첨).":"Người này đã được chọn trúng thưởng ở một lượt dự thưởng khác (mỗi người chỉ trúng 1 lần).",
   "수동 지정 당첨자가 저장되었습니다. 남은 슬롯은 마감 시 무작위 추첨으로 채워집니다.":"Đã lưu người trúng thưởng chỉ định thủ công. Các suất còn lại sẽ được rút thăm ngẫu nhiên khi đóng đợt.",
   "수동 지정이 모두 해제되었습니다. 마감 시 전체가 무작위 추첨으로 결정됩니다.":"Đã huỷ toàn bộ chỉ định thủ công. Khi đóng đợt, toàn bộ sẽ được quyết định bằng rút thăm ngẫu nhiên."
 });
@@ -5150,7 +5148,9 @@ Object.assign(KO2VI,{
   "종료된 회차는 경품을 수정할 수 없습니다.":"Đợt đã kết thúc thì không thể sửa giải thưởng.",
   "남은":"còn",
   "자리":" suất",
-  "지정 완료":"Đã chỉ định đủ"
+  "지정 완료":"Đã chỉ định đủ",
+  "같은 응모자가 두 번 지정돼 있습니다. 화면을 새로 불러와 주세요.":"Cùng một người dự thưởng bị chỉ định hai lần. Vui lòng tải lại màn hình.",
+  "등수별 정원을 넘겨 지정돼 있습니다. 화면을 새로 불러와 주세요.":"Đã chỉ định vượt số lượng của hạng. Vui lòng tải lại màn hình."
 });
 /* 응모자 리스트 검색·페이지네이션 */
 Object.assign(KO2VI,{"닉네임·카카오ID 검색":"Tìm biệt danh·Kakao ID","전체 응모 건수":"Tổng số lượt dự thưởng","검색 결과":"Kết quả tìm kiếm","검색 결과가 없습니다.":"Không có kết quả tìm kiếm.","메모(발송일·송장번호 등)":"Ghi chú (ngày gửi·mã vận đơn v.v.)"});
@@ -6778,12 +6778,26 @@ function pdRankRemaining() {
   });
   return remain;
 }
-/* 정원이 다 찬 등수는 선택지에서 뺀다 — 단 이 행이 이미 그 등수로 지정돼 있으면 해제·변경할 수 있어야
-   하므로 자기 등수는 남긴다. 옵션 라벨은 "N등" 그대로 둬야 KO2VI 사전("1등"→"Giải Nhất")이 매칭되므로,
-   남은 자리 수는 라벨에 끼워넣지 않고 상단 "등수별 구성" 줄에 따로 표시한다(pdRefreshEntSummary). */
-function pdRankOptionsHtml(selectedRank) {
-  var remain = pdRankRemaining();
+/* 이 유저가 다른 응모 행으로 이미 지정돼 있으면 그 행의 entryId를 돌려준다(1인 1회 당첨 판정용).
+   티켓을 여러 장 쓴 사람은 응모 행이 여러 개인데, 그중 하나가 당첨이면 나머지 행은 지정 대상이 아니다. */
+function pdUserStagedEntryId(uid) {
+  var ids = Object.keys(pdStagedWinners);
+  for (var i = 0; i < ids.length; i++) {
+    if (pdStagedWinners[ids[i]].uid === uid) return ids[i];
+  }
+  return null;
+}
+/* 선택지 규칙 — 고를 수 없는 등수는 애초에 목록에 넣지 않는다(그래서 지정 시점 경고 토스트가 필요 없다).
+   · 정원이 다 찬 등수는 제외
+   · 이 유저가 다른 행으로 이미 당첨이면 "미선택"만 (1인 1회 당첨)
+   · 단 이 행 자신이 지정된 등수는 해제·변경할 수 있어야 하므로 계속 남긴다
+   옵션 라벨은 "N등" 그대로 둬야 KO2VI 사전("1등"→"Giải Nhất")이 매칭되므로, 남은 자리 수는 라벨에
+   끼워넣지 않고 상단 "등수별 구성" 줄에 따로 표시한다(pdRefreshEntSummary). */
+function pdRankOptionsHtml(selectedRank, entryId, uid) {
   var opts = '<option value="">미선택</option>';
+  var otherId = uid ? pdUserStagedEntryId(uid) : null;
+  if (otherId && otherId !== entryId) return opts;
+  var remain = pdRankRemaining();
   pdCurrentRoundPrizes.slice().sort(function(a,b){return ppRankNum(a.rank)-ppRankNum(b.rank);}).forEach(function(p){
     var r = ppRankNum(p.rank);
     var isMine = String(selectedRank) === String(r);
@@ -6791,6 +6805,26 @@ function pdRankOptionsHtml(selectedRank) {
     opts += '<option value="' + r + '"' + (isMine ? ' selected' : '') + '>' + r + '등</option>';
   });
   return opts;
+}
+/* 저장 직전 최종 검증 — 정원 초과·1인 중복 당첨을 막는다. 정상 흐름에서는 선택지 자체가 걸러지므로
+   여기 걸릴 일이 없고(그래서 지정 시점 경고를 없앴다), 동시 편집·화면 조작 같은 비정상 경로만 잡는다. */
+function pdValidateStagedWinners() {
+  var byRank = {}, seenUid = {};
+  var ids = Object.keys(pdStagedWinners);
+  for (var i = 0; i < ids.length; i++) {
+    var w = pdStagedWinners[ids[i]];
+    var r = String(ppRankNum(w.rank));
+    byRank[r] = (byRank[r] || 0) + 1;
+    if (seenUid[w.uid]) return '같은 응모자가 두 번 지정돼 있습니다. 화면을 새로 불러와 주세요.';
+    seenUid[w.uid] = true;
+  }
+  var over = false;
+  pdCurrentRoundPrizes.forEach(function(p) {
+    var r = String(ppRankNum(p.rank));
+    if ((byRank[r] || 0) > (p.count || 0)) over = true;
+  });
+  if (over) return '등수별 정원을 넘겨 지정돼 있습니다. 화면을 새로 불러와 주세요.';
+  return null;
 }
 /* 상단 "등수별 구성" 줄 — 진행 중 회차에서는 등수별 남은 자리를 함께 보여준다.
    숫자는 그대로 두고 단위·문구만 별도 텍스트 노드로 감싸 KO/VI 사전이 매칭되게 한다. */
@@ -6966,7 +7000,7 @@ function pdRenderEntrantRows() {
       /* 진행 중 회차는 지급 관련 표기(지급 상태·메모)를 아예 넣지 않는다 — 마감 전이라 지급이 성립하지 않음.
          등수 드롭다운과, 그 등수에 걸린 경품명만 보여준다. */
       rankCell = '<div class="pd-pay-line">'
-        + '<select class="form-select pd-rank-select" onchange="pdAssignRank(this,\'' + e._id + '\',\'' + e.user_id + '\')">' + pdRankOptionsHtml(rank) + '</select>'
+        + '<select class="form-select pd-rank-select" onchange="pdAssignRank(this,\'' + e._id + '\',\'' + e.user_id + '\')">' + pdRankOptionsHtml(rank, e._id, e.user_id) + '</select>'
         + pdPrizeNameHtml(rank)
         + '</div>';
     } else {
@@ -7127,23 +7161,10 @@ window.pdCloseEntrantsModal = function() {
    등수별 정원 초과와 1인 중복 당첨은 여기서 막는다. "미선택"으로 되돌리면 지정 해제(마감 전까지 언제든 가능). */
 window.pdAssignRank = function(selectEl, entryId, uid) {
   if (pdCurrentRoundPhase !== 'active') { pdRenderEntrantRows(); return; }
+  /* 고를 수 없는 등수(정원 초과·1인 중복 당첨)는 pdRankOptionsHtml에서 이미 선택지에 없으므로
+     여기서 되돌리며 경고를 띄우는 사후 처리는 두지 않는다. 최종 방어는 저장 시점(pdValidateStagedWinners). */
   var newRank = selectEl.value;
   if (newRank) {
-    var limit = 0;
-    pdCurrentRoundPrizes.forEach(function(p){ if (String(ppRankNum(p.rank)) === String(newRank)) limit = p.count; });
-    var used = 0;
-    Object.keys(pdStagedWinners).forEach(function(id){ if (id !== entryId && String(pdStagedWinners[id].rank) === String(newRank)) used++; });
-    if (used >= limit) {
-      toast('해당 등수의 슬롯이 이미 모두 찼습니다.');
-      selectEl.value = (pdStagedWinners[entryId] && pdStagedWinners[entryId].rank) || '';
-      return;
-    }
-    var dupId = Object.keys(pdStagedWinners).find(function(id){ return id !== entryId && pdStagedWinners[id].uid === uid; });
-    if (dupId) {
-      toast('이미 다른 응모 건으로 당첨 처리된 응모자입니다 (1인 1회 당첨).');
-      selectEl.value = (pdStagedWinners[entryId] && pdStagedWinners[entryId].rank) || '';
-      return;
-    }
     pdStagedWinners[entryId] = { rank: newRank, uid: uid };
   } else {
     delete pdStagedWinners[entryId];
@@ -7157,6 +7178,8 @@ window.pdAssignRank = function(selectEl, entryId, uid) {
 window.pdSaveEntrants = function() {
   var updates;
   if (pdCurrentRoundPhase === 'active') {
+    var invalid = pdValidateStagedWinners();
+    if (invalid) { toast(invalid); pdRenderEntrantRows(); return; }
     updates = Object.keys(pdStagedWinners).map(function(entryId) {
       var uid = pdStagedWinners[entryId].uid;
       var prev = pdConfirmedWinnerFor(uid);
