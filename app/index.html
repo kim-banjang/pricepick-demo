@@ -15696,6 +15696,59 @@ function csSubmitInquiry(btn) {
     "100P 적립 완료!": "Đã cộng 100P!",
     "100P +1장": "100P +1 vé",
   });
+/* interactive.html(정본 프로토타입) 사전에 이미 있던 항목을 데모 앱으로 이식 — VI 전수 점검(2026-07-30) */
+Object.assign(KO2VI, {
+  "적립 티켓": "Vé tích lũy",
+  "브론즈 12장 · 실버 4장 · 골드 2장": "Đồng 12 vé · Bạc 4 vé · Vàng 2 vé",
+  "포인트": "Điểm",
+  "활동·구매 내역 (구매 이력 · 이벤트 참여 기록)": "Lịch sử hoạt động·mua (lịch sử Pick-mua · ghi nhận tham gia sự kiện)",
+  "닉네임 · 카카오 연동 정보 (재가입 시 초기화)": "Biệt danh · thông tin liên kết Kakao (đặt lại khi đăng ký lại)",
+  "① 앱 사용 중 다음 서버 통신에서 차단 응답 수신 시 전환 ② 로그인된 상태로 앱 재실행 시 진입 즉시 표시 (프픽은 로그아웃 개념이 없어 '재로그인' 케이스는 없음)": "① Chuyển sang khi nhận phản hồi chặn ở lần gọi máy chủ kế tiếp trong lúc dùng app ② Hiện ngay khi mở lại app ở trạng thái đã đăng nhập (PricePick không có khái niệm đăng xuất nên không có ca 'đăng nhập lại')",
+  "앱 버전 < CMS '앱 버전 관리'의 최소 지원 버전 — 앱 진입 시 즉시 차단": "Phiên bản app < phiên bản hỗ trợ tối thiểu ở 'Quản lý phiên bản app' của CMS — chặn ngay khi vào app",
+  "스토어 이동 (앱 외부) — 닫기·건너뛰기 없음(강제)": "Đi tới cửa hàng ứng dụng (ngoài app) — không có đóng·bỏ qua (bắt buộc)",
+  "쇼핑하고 티켓 받기": "Mua sắm để nhận vé",
+  "초대 성공(친구 첫 구매) 시 양쪽 각 500P 지급": "Mời thành công (bạn Pick-mua đầu) cấp mỗi bên 500P",
+  "사용 가능 포인트": "Điểm khả dụng",
+  "만료 예정 포인트": "Điểm sắp hết hạn",
+  "최근 적립·사용": "Tích lũy·sử dụng gần đây",
+  "추천순": "Đề xuất",
+  "가격 낮은순": "Giá thấp dần",
+  "가격 높은순": "Giá cao dần",
+  "교환 가능순": "Đổi được trước",
+  "교환 내역": "Lịch sử đổi",
+  "기프티콘 교환 내역": "Lịch sử đổi Gifticon",
+  "초대한 친구가 첫 구매를 완료하면": "Khi bạn được mời hoàn tất Pick-mua đầu",
+  "친구 첫 구매 완료 시 지급": "Cấp khi bạn hoàn tất Pick-mua đầu",
+  "첫 구매 완료 시 지급": "Cấp khi hoàn tất Pick-mua đầu",
+  "최초 구매 완료(성사)": "Hoàn tất Pick-mua đầu (thành công)",
+  "시 지급 · 월 최대 50명까지 인정": "cấp khi · tối đa 50 người/tháng",
+  "/50명": "/50 người",
+  "활동 내역 · 구매 내역 목록에 적용": "Áp dụng cho danh sách Lịch sử hoạt động · Lịch sử mua",
+  "활동 내역 (구매 이력, 이벤트 참여 기록)": "Lịch sử hoạt động (Pick-mua, tham gia sự kiện)",
+  "카카오 미연동(게스트) 계정은 재인증 단계가 없어요. 아래": "Tài khoản chưa liên kết Kakao (Guest) không có bước xác thực lại. Dùng",
+  "동의 체크": "tick đồng ý",
+  "로 본인 확인을 갈음하고, 탈퇴 시 삭제 항목을 한 번 더 안내드립니다.": "bên dưới thay cho xác minh danh tính, và sẽ nhắc lại các mục bị xóa khi hủy.",
+  "동의 체크(미연동) 또는 카카오 재인증(연동) 후 '탈퇴 최종 확인' 화면에서 삭제 항목을 다시 확인하면 탈퇴 처리됩니다.": "Sau khi tick đồng ý (chưa liên kết) hoặc xác thực lại Kakao (đã liên kết), xác nhận lại các mục bị xóa ở màn 'Xác nhận hủy cuối cùng' thì sẽ xử lý hủy tài khoản.",
+  "장별 만료일 자세히 보기 ▾": "Xem chi tiết hạn hết theo từng vé ▾",
+  "합칠 때는": "Khi gộp",
+  "만료가 임박한(적립일이 오래된) 티켓부터 자동 사용": "tự dùng vé sắp hết hạn (ngày tích lũy cũ) trước",
+  "하고, 새로 생기는 상위 티켓은": ", và vé bậc cao mới tạo",
+  "원본 중 가장 이른 적립일을 그대로 승계": "kế thừa nguyên ngày tích lũy sớm nhất trong các vé gốc",
+  "합니다(만료일 연장 없음). 나눌 때도 원 적립일을 그대로 이어받아요.": " (không gia hạn ngày hết hạn). Khi tách cũng kế thừa nguyên ngày tích lũy gốc.",
+  "사용 기한 처리": "Xử lý thời hạn sử dụng",
+  "· 합칠 때:": "· Khi gộp:",
+  "만료 임박분(적립일이 오래된 티켓)부터 자동 사용": "tự dùng phần sắp hết hạn (vé có ngày tích lũy cũ) trước",
+  "(FIFO). 새 상위 티켓은": "(FIFO). Vé bậc cao mới",
+  "원본 중 가장 이른 적립일을 승계": "kế thừa ngày tích lũy sớm nhất trong các vé gốc",
+  "해 만료일이 연장되지 않아요.": " nên ngày hết hạn không bị kéo dài.",
+  "· 나눌 때: 새 하위 티켓들은": "· Khi tách: các vé bậc thấp mới",
+  "원본 티켓의 적립일을 그대로 승계": "kế thừa nguyên ngày tích lũy của vé gốc",
+  "(전부 동일).": "(tất cả như nhau).",
+  "오래된순": "Cũ nhất",
+  "홈 화면 아이콘으로 들어가면 앱을 안 거쳐도 구매 적립이 유지돼요. 제휴 추적 코드가 담긴 쿠팡 링크예요.": "Vào bằng icon ở màn hình chính thì dù không qua app vẫn giữ tích lũy Pick-mua. Là link Coupang có gắn mã theo dõi liên kết.",
+  "Android — 버튼을 누르면 홈 화면에 바로 추가돼요": "Android — bấm nút là thêm ngay vào màn hình chính",
+  "iPhone(사파리) — OS 제약으로 자동 추가가 안 돼요. 공유 → '홈 화면에 추가'를 직접 눌러주세요": "iPhone(Safari) — do giới hạn OS nên không tự thêm được. Hãy tự chạm Chia sẻ → 'Thêm vào màn hình chính'"
+});
   var IPLANG='ko';
   var KO_RE=/[\uac00-\ud7a3]/;
   var _orig=new Map();
@@ -15711,12 +15764,44 @@ function csSubmitInquiry(btn) {
     var i=raw.indexOf(core);
     return raw.slice(0,i)+vi+raw.slice(i+core.length);
   }
+  /* ── 숫자-단위 붙음 방지(VI 공통) ──
+     한국어는 "12장"처럼 숫자와 단위를 붙여 쓰지만 베트남어는 "12 vé"처럼 띄어 써야 한다.
+     사전은 단위 텍스트 노드만 치환하므로("장"→"vé") 그대로 두면 "12vé"가 된다.
+     번역 결과가 문자로 시작하고 바로 앞 인라인 내용이 숫자로 끝나면 공백 한 칸을 끼워 넣는다.
+     엔진 공통 처리라 화면별 땜질 없이 전 화면에 적용된다. */
+  function ipIsInlineEl(el){
+    var d;
+    try{ d=getComputedStyle(el).display; }catch(e){ return false; }
+    return d.indexOf('inline')===0||d==='contents';
+  }
+  function ipPrevInlineChar(n){
+    var cur=n, guard=0;
+    while(cur&&guard++<64){
+      var p=cur.previousSibling;
+      while(p){
+        if(p.nodeType===3){ if(p.nodeValue) return p.nodeValue.slice(-1); }
+        else if(p.nodeType===1){
+          var t=p.textContent;
+          if(t) return ipIsInlineEl(p) ? t.slice(-1) : '';
+        }
+        p=p.previousSibling;
+      }
+      cur=cur.parentNode;
+      if(!cur||cur.nodeType!==1||cur===document.body||!ipIsInlineEl(cur)) break;
+    }
+    return '';
+  }
+  function ipViPad(n,out){
+    if(!/^[0-9A-Za-zÀ-ỹĐđ]/.test(out)) return out;
+    return /[0-9]$/.test(ipPrevInlineChar(n)) ? ' '+out : out;
+  }
   function trNode(n){
     if(!n||n.nodeType!==3) return;
     var p=n.parentNode; if(p){var t=p.nodeName; if(t==='SCRIPT'||t==='STYLE'||t==='NOSCRIPT') return;}
     if(!hasKo(n.nodeValue||'')) return;
     var out=tcore(n.nodeValue);
     if(out!=null&&out!==n.nodeValue){
+      out=ipViPad(n,out);
       if(!_orig.has(n)) _orig.set(n,n.nodeValue);
       _tracked.add(n);
       n.nodeValue=out;

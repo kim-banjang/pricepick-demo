@@ -1327,7 +1327,7 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
               <label class="form-label" style="margin:0">등수별 경품 구성 <span style="font-weight:500;color:var(--text-sub);font-size:11px">· 등수당 1행(중복 등수 금지), 한 등수에 경품 여러 개 가능</span></label>
               <button class="btn btn-ghost btn-sm" onclick="addPrizeRow()">+ 등수 추가</button>
             </div>
-            <div style="display:grid;grid-template-columns:80px 1fr 100px 36px;gap:8px;margin-bottom:6px;padding:0 4px">
+            <div style="display:grid;grid-template-columns:112px 1fr 100px 36px;gap:8px;margin-bottom:6px;padding:0 4px">
               <span style="font-size:11px;color:var(--text-sub)">등수</span>
               <span style="font-size:11px;color:var(--text-sub)">경품명</span>
               <span style="font-size:11px;color:var(--text-sub)">당첨자 수</span>
@@ -1346,7 +1346,7 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
         <div class="card-header"><div class="card-title">기본 경품 구성 템플릿</div><button class="btn btn-ghost btn-sm" onclick="ppCloseTemplateModal()">✕ 닫기</button></div>
         <div style="padding:18px">
           <div class="info-box" style="margin-bottom:14px">자동 생성되는 회차는 이 템플릿을 그대로 복사해 만들어집니다. 생성된 개별 회차는 이후 따로 수정할 수 있습니다.</div>
-          <div style="display:grid;grid-template-columns:80px 1fr 100px 36px;gap:8px;margin-bottom:6px;padding:0 4px">
+          <div style="display:grid;grid-template-columns:112px 1fr 100px 36px;gap:8px;margin-bottom:6px;padding:0 4px">
             <span style="font-size:11px;color:var(--text-sub)">등수</span>
             <span style="font-size:11px;color:var(--text-sub)">경품명</span>
             <span style="font-size:11px;color:var(--text-sub)">당첨자 수</span>
@@ -3751,6 +3751,9 @@ function go(id, navEl) {
   document.getElementById('page-bc').textContent = t('page.' + id + '.bc') || '';
   window.scrollTo({top:0, behavior:'instant'});
   // 섹션 진입 시 초기화 훅
+  /* 회차명(pdWeekLabel)은 렌더 시점의 언어로 굳는다 — 다른 메뉴에서 언어를 바꾼 뒤 들어오면
+     회차명만 한국어로 남으므로 진입할 때 현재 언어로 다시 그린다. */
+  if (id === 'weekly-draws' && typeof loadDraws === 'function') loadDraws();
   if (id === 'demo-mgmt' && window.dmLoadStats) window.dmLoadStats();
   if (id === 'roulette-settings' && window.rltLoad) window.rltLoad();
   // 모바일: 메뉴 항목 선택 시 드로어 닫기
@@ -3872,7 +3875,7 @@ function startClock() {
       const opts = labels.map((l,i) => `<option${i===count-1?' selected':''}>${l}</option>`).join('');
       const row = document.createElement('div');
       row.className = 'prize-row';
-      row.style.cssText = 'display:grid;grid-template-columns:80px 1fr 100px 36px;gap:8px;margin-bottom:8px';
+      row.style.cssText = 'display:grid;grid-template-columns:112px 1fr 100px 36px;gap:8px;margin-bottom:8px';
       row.innerHTML = `<select class="form-select" style="font-size:13px">${opts}</select><input class="form-input" style="font-size:13px" placeholder="경품명"><input class="form-input" style="font-size:13px;text-align:center" type="number" value="1" min="1"><button class="btn btn-ghost btn-sm" style="padding:0;width:36px;color:var(--danger)" onclick="this.closest('.prize-row').remove()">✕</button>`;
       rows.appendChild(row);
     }
@@ -5168,9 +5171,41 @@ Object.assign(KO2VI,{
     var vi=KO2VI[t]; if(vi!=null) return s.replace(t,vi);
     return null;
   }
+  /* ── 숫자-단위 붙음 방지(VI 공통) ──
+     한국어는 "11건"처럼 숫자와 단위를 붙여 쓰지만 베트남어는 "11 trường hợp"처럼 띄어 써야 한다.
+     사전은 단위 텍스트 노드만 치환하므로("건"→"trường hợp") 그대로 두면 "11trường hợp"이 된다.
+     그래서 번역 결과가 문자로 시작하고 바로 앞 인라인 내용이 숫자로 끝나면 공백 한 칸을 끼워 넣는다.
+     특정 화면 땜질이 아니라 번역 엔진 공통 처리라 전 메뉴에 한 번에 적용된다. */
+  function prevInlineChar(n){
+    var cur=n, guard=0;
+    while(cur&&guard++<64){
+      var p=cur.previousSibling;
+      while(p){
+        if(p.nodeType===3){ if(p.nodeValue) return p.nodeValue.slice(-1); }
+        else if(p.nodeType===1){
+          var t=p.textContent;
+          if(t) return isInlineEl(p) ? t.slice(-1) : '';
+        }
+        p=p.previousSibling;
+      }
+      cur=cur.parentNode;
+      if(!cur||cur.nodeType!==1||cur===document.body||!isInlineEl(cur)) break;
+    }
+    return '';
+  }
+  function isInlineEl(el){
+    var d;
+    try{ d=getComputedStyle(el).display; }catch(e){ return false; }
+    return d.indexOf('inline')===0||d==='contents';
+  }
+  function viPad(n,out){
+    if(!/^[0-9A-Za-zÀ-ỹĐđ]/.test(out)) return out;
+    return /[0-9]$/.test(prevInlineChar(n)) ? ' '+out : out;
+  }
   function trNode(n){
     var out=tcore(n.nodeValue);
     if(out!=null&&out!==n.nodeValue){
+      out=viPad(n,out);
       if(!_orig.has(n)) _orig.set(n,n.nodeValue);
       _tracked.add(n); n.nodeValue=out;
     }
@@ -6560,7 +6595,9 @@ function pdWinnerSummary(winners) {
   var byRank = {};
   winners.forEach(function(w){
     var r = ppRankNum(w.rank);
-    var name = ppEsc(w.nickname||'—') + (w.manual ? '<span style="font-size:10px;color:var(--amber)"> (수동)</span>' : '');
+    /* 닉네임을 각각 별도 텍스트 노드로 둔다 — ", "로 이어 붙이면 한 노드가 돼 사전이 매칭되지 않고
+       이 컬럼만 한국어로 남는다(같은 화면 언어 갈림). */
+    var name = '<span>' + ppEsc(w.nickname||'—') + '</span>' + (w.manual ? '<span style="font-size:10px;color:var(--amber)"> (수동)</span>' : '');
     (byRank[r] = byRank[r] || []).push(name);
   });
   var ranks = Object.keys(byRank).map(Number).sort(function(a,b){return a-b;});
@@ -6611,7 +6648,7 @@ function ppAppendPrizeRow(containerId, rank, name, count) {
   var opts = labels.map(function(l,i){ return '<option' + (i+1===rn?' selected':'') + '>' + l + '</option>'; }).join('');
   var row = document.createElement('div');
   row.className = 'prize-row';
-  row.style.cssText = 'display:grid;grid-template-columns:80px 1fr 100px 36px;gap:8px;margin-bottom:8px';
+  row.style.cssText = 'display:grid;grid-template-columns:112px 1fr 100px 36px;gap:8px;margin-bottom:8px';
   row.innerHTML = '<select class="form-select" style="font-size:13px">' + opts + '</select>'
     + '<input class="form-input" style="font-size:13px" placeholder="경품명" value="' + ppEsc(name || '') + '">'
     + '<input class="form-input" style="font-size:13px;text-align:center" type="number" value="' + (count || 1) + '" min="1">'
@@ -6654,10 +6691,22 @@ window.ppOpenDrawModal = function(id) {
       return;
     }
     var d = doc.data();
-    titleEl.textContent = '경품 수정 — ' + (d.title||'');
+    ppDrawModalRound = {end_date: d.end_date || '', title: d.title || ''};
+    ppRefreshDrawModalTitle();
     (Array.isArray(d.prizes) ? d.prizes : []).forEach(function(p){ ppAppendPrizeRow('prize-rows', p.rank, p.name, p.count); });
     document.getElementById('draw-create-ov').style.display = 'block';
   });
+}
+/* 모달 제목 = "경품 수정"(사전 매칭) + " — " + 회차명(pdWeekLabel, 호출 시점 언어).
+   한 텍스트 노드로 붙여 쓰면 사전 키와 어긋나 앞부분만 한국어로 남는다.
+   회차명 기준도 리스트와 같은 pdWeekLabel로 통일(저장된 KO 제목을 그대로 쓰지 않는다).
+   응모자 리스트 제목(pdRefreshEntrantsTitle)과 같은 방식. */
+var ppDrawModalRound = null;
+function ppRefreshDrawModalTitle() {
+  var titleEl = document.getElementById('draw-modal-title');
+  if (!titleEl || !ppDrawModalRound) return;
+  var label = ppDrawModalRound.end_date ? pdWeekLabel(ppDrawModalRound.end_date) : (ppDrawModalRound.title || '');
+  titleEl.innerHTML = '<span>경품 수정</span> — <span>' + ppEsc(label) + '</span>';
 }
 window.ppCloseDrawModal = function() { document.getElementById('draw-create-ov').style.display = 'none'; };
 
@@ -6837,7 +6886,9 @@ function pdRefreshEntSummary() {
     .sort(function(a,b){return ppRankNum(a.rank)-ppRankNum(b.rank);})
     .map(function(p) {
       var r = ppRankNum(p.rank);
-      var base = '<span>' + r + '등</span> ' + p.count + '<span>명</span>(' + ppEsc(p.name) + ')';
+      /* 경품명도 별도 텍스트 노드로 분리 — 괄호와 한 노드로 묶으면 사전이 매칭되지 않아
+         같은 모달 안에서 리스트 행은 VI, 이 요약줄만 KO로 남는다(언어 갈림). */
+      var base = '<span>' + r + '등</span> ' + p.count + '<span>명</span>(<span>' + ppEsc(p.name) + '</span>)';
       if (!isActive) return base;
       var left = remain[String(r)] || 0;
       return base + (left > 0
@@ -7244,6 +7295,8 @@ window.pdSaveMemo = function(uid, value) {
     _origIpSetLang(lang);
     var sec = document.getElementById('sec-weekly-draws');
     if (sec && sec.classList.contains('active') && typeof loadDraws === 'function') loadDraws();
+    if (typeof ppRefreshDrawModalTitle === 'function' && document.getElementById('draw-create-ov')
+        && document.getElementById('draw-create-ov').style.display !== 'none') ppRefreshDrawModalTitle();
     if (typeof pdRefreshEntrantsTitle === 'function' && document.getElementById('pd-entrants-ov') && document.getElementById('pd-entrants-ov').style.display === 'flex') {
       pdRefreshEntrantsTitle();
       /* 안내 문구가 번역된 뒤(옵저버는 비동기) (i) 버튼 툴팁도 같은 언어로 맞춘다 */
