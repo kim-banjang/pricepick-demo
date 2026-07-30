@@ -501,11 +501,11 @@ textarea.form-input{resize:vertical;min-height:80px;height:auto;}
    한 줄 입력으로 붙여 당첨 행 높이를 미당첨 행과 같게 맞춘다(기존엔 메모칸이 아래로 펼쳐져 2배). */
 #pd-entrants-ov .info-box{padding:6px 12px;margin-bottom:0;line-height:1.45;}
 #pd-ent-table th{padding:6px 8px;}
-#pd-ent-table td{padding:2px 8px;line-height:1.2;vertical-align:middle;}
-#pd-ent-table td > div{line-height:1.2;}
+#pd-ent-table td{padding:5px 8px;line-height:1.35;vertical-align:middle;}
+#pd-ent-table td > div{line-height:1.35;}
 #pd-ent-pager{padding:4px 0 0;}
 /* 진행 중 회차의 등수 수동 지정 셀렉트도 행 높이에 맞춰 압축(기본 .form-select는 40px) */
-#pd-ent-table .form-select{height:28px;padding:3px 8px;}
+#pd-ent-table .form-select{height:32px;padding:4px 8px;}
 .pd-pay-line{display:flex;align-items:center;gap:6px;}
 .pd-pay-line .badge{flex:none;}
 .pd-memo-input{flex:1 1 auto;min-width:0;height:26px;background:var(--surface-2);
@@ -518,10 +518,10 @@ textarea.form-input{resize:vertical;min-height:80px;height:auto;}
 /* 종료 회차 "당첨 등수" 칸 — 2행 구조.
    1행: 당첨 뱃지(등수) + 경품명 / 2행: 메모 입력 + 지급 상태 뱃지.
    2행이 되는 만큼 셀 패딩·행 간격·메모 높이를 조여 10건 스크롤 없이를 유지한다. */
-.pd-cell2{display:flex;flex-direction:column;gap:1px;min-width:0;}
+.pd-cell2{display:flex;flex-direction:column;gap:2px;min-width:0;}
 .pd-cell2-row{display:flex;align-items:center;gap:6px;min-width:0;}
 .pd-cell2-row .badge{flex:none;}
-.pd-cell2-row .pd-memo-input{height:20px;font-size:11.5px;padding:1px 8px;}
+.pd-cell2-row .pd-memo-input{height:24px;font-size:11.5px;padding:2px 8px;}
 #pd-ent-table .badge-purple{margin-right:0;}
 /* 등수 옆에 붙는 경품명 — 회차의 등수별 경품 구성에서 읽어온다(하드코딩 아님).
    칸보다 길면 말줄임 + title로 전체 노출해 행 높이를 한 줄로 고정. */
@@ -1327,8 +1327,8 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
       </div>
       </div>
 
-      <div id="pd-entrants-ov" style="display:none;position:fixed;inset:0;z-index:210;background:rgba(0,0,0,.45)" onclick="if(event.target===this)pdCloseEntrantsModal()">
-      <div class="card" style="max-width:840px;margin:0.5vh auto;max-height:99vh;overflow:auto">
+      <div id="pd-entrants-ov" style="display:none;position:fixed;inset:0;z-index:210;background:rgba(0,0,0,.45);align-items:center;justify-content:center;overflow:auto;padding:12px" onclick="if(event.target===this)pdCloseEntrantsModal()">
+      <div class="card" style="width:100%;max-width:840px;margin:auto;max-height:calc(100vh - 24px);overflow:auto">
         <div class="card-header" style="padding:10px 18px"><div class="card-title" id="pd-ent-title">응모자 리스트</div><button class="btn btn-ghost btn-sm" onclick="pdCloseEntrantsModal()">✕ 닫기</button></div>
         <div style="padding:10px 16px 8px">
           <div class="info-box" id="pd-ent-summary"></div>
@@ -6929,7 +6929,11 @@ window.pdOpenEntrantsModal = function(raffleId) {
   pdRefreshEntrantsNote();
   document.getElementById('pd-ent-summary').textContent = '불러오는 중…';
   document.getElementById('pd-ent-tbody').innerHTML = '';
-  document.getElementById('pd-entrants-ov').style.display = 'block';
+  var _entOv = document.getElementById('pd-entrants-ov');
+  /* 섹션(.section.active)에 걸린 전환 애니메이션의 transform이 position:fixed의 기준을 바꿔버리므로
+     오버레이를 body 직속으로 올린다 — 그래야 항상 브라우저 화면 기준으로 중앙에 온다. */
+  if (_entOv.parentElement !== document.body) document.body.appendChild(_entOv);
+  _entOv.style.display = 'flex'; /* 가로·세로 중앙 정렬 */
   Promise.all([
     db.collection('raffles').doc(raffleId).get(),
     db.collection('raffle_entries').where('raffle_id', '==', raffleId).limit(300).get(),
@@ -7072,7 +7076,7 @@ window.pdSaveMemo = function(uid, value) {
     _origIpSetLang(lang);
     var sec = document.getElementById('sec-weekly-draws');
     if (sec && sec.classList.contains('active') && typeof loadDraws === 'function') loadDraws();
-    if (typeof pdRefreshEntrantsTitle === 'function' && document.getElementById('pd-entrants-ov') && document.getElementById('pd-entrants-ov').style.display === 'block') {
+    if (typeof pdRefreshEntrantsTitle === 'function' && document.getElementById('pd-entrants-ov') && document.getElementById('pd-entrants-ov').style.display === 'flex') {
       pdRefreshEntrantsTitle();
       /* 안내 문구가 번역된 뒤(옵저버는 비동기) (i) 버튼 툴팁도 같은 언어로 맞춘다 */
       setTimeout(function(){ if (typeof pdSyncEntNoteTitle === 'function') pdSyncEntNoteTitle(); }, 60);
