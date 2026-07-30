@@ -1209,7 +1209,7 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
       <div class="card">
         <div class="card-header"><div class="card-title">회차 등록 안내</div></div>
         <div style="padding:16px 18px">
-          <div style="font-size:13px;color:var(--text);line-height:1.7;word-break:keep-all">회차는 현재 시점 기준 4주치가 자동 등록되고, 마감과 동시에 당첨자도 자동 추첨됩니다 (매주 월요일~일요일 23:59:59 마감 · 회차명은 마감일 기준 자동 부여)</div>
+          <div style="font-size:13px;color:var(--text);line-height:1.7;word-break:keep-all">회차는 현재 시점 기준 4주치가 자동 등록됩니다 (매주 월요일~일요일 23:59:59 마감 · 회차명은 마감일 기준 자동 부여). 진행 중인 회차는 등수 슬롯별로 당첨자를 직접 지정할 수 있고, 마감 시 비어 있는 슬롯만 응모 건 단위 무작위 추첨으로 채워집니다.</div>
           <div style="margin-top:14px">
             <button class="btn btn-ghost btn-sm" onclick="ppOpenTemplateModal()">기본 경품 구성 템플릿 편집</button>
           </div>
@@ -1287,12 +1287,12 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
         <div class="card-header"><div class="card-title" id="pd-ent-title">응모자 리스트</div><button class="btn btn-ghost btn-sm" onclick="pdCloseEntrantsModal()">✕ 닫기</button></div>
         <div style="padding:18px">
           <div class="info-box" id="pd-ent-summary"></div>
-          <div style="font-size:11.5px;color:var(--text-sub);margin:8px 2px 2px">회차 종료와 동시에 자동 추첨됩니다 · 응모 건 단위 무작위 · 1인 1회 당첨</div>
+          <div id="pd-ent-note" style="font-size:11.5px;color:var(--text-sub);margin:8px 2px 2px"></div>
           <div style="display:flex;justify-content:space-between;align-items:center;margin:10px 0;flex-wrap:wrap;gap:8px">
             <span class="badge" id="pd-ent-status-badge">미선정</span>
             <div style="display:flex;gap:8px">
               <button class="btn btn-ghost btn-sm" onclick="pdCloseEntrantsModal()">취소</button>
-              <button class="btn btn-primary btn-sm" onclick="pdSavePayout()">저장</button>
+              <button class="btn btn-primary btn-sm" onclick="pdSaveEntrants()">저장</button>
             </div>
           </div>
           <div style="display:flex;justify-content:space-between;align-items:center;margin:10px 0 8px;flex-wrap:wrap;gap:8px">
@@ -4817,7 +4817,7 @@ function giSaveTicketEdit() {
   "약 +10% &nbsp;|&nbsp;":"Khoảng +10% &nbsp;|&nbsp;",
   "우리 DB · revenue_logs":"DB của chúng tôi · revenue_logs",
   "마지막 업데이트: 2026-03-15":"Cập nhật cuối: 2026-03-15",
-  "매주 월요일 자정 · 자동 당첨 처리":"Nửa đêm thứ Hai hàng tuần · Xử lý trúng thưởng tự động",
+  "매주 월요일 자정 · 빈 등수 슬롯 자동 추첨":"Nửa đêm thứ Hai hàng tuần · Tự động rút thăm các suất hạng còn trống",
   "매일 새벽 3시 · S3 자동 업로드":"3 giờ sáng hàng ngày · Tự động upload S3",
   "오늘 47건 · 마진 합 38,600원":"Hôm nay 47 tr.hợp · Tổng biên 38.600 won",
   "ATT 팝업 추가, 포스트백 오류 수정":"Thêm popup ATT, sửa lỗi postback",
@@ -5050,6 +5050,20 @@ Object.assign(KO2VI,{"이벤트 설정 관리":"Quản lý cài đặt sự ki�
 Object.assign(KO2VI,{"예: 2026년 8월 1주차":"VD: Tuần 1 tháng 8 năm 2026"});
 Object.assign(KO2VI,{"주간 회차 리스트":"Danh sách đợt hàng tuần","기간":"Thời gian","미선정":"Chưa chọn","응모 상세 보기":"Xem chi tiết dự thưởng","응모자 리스트":"Danh sách người dự thưởng","당첨 등수":"Hạng trúng thưởng","자동 당첨자 선택":"Chọn người trúng tự động","적용됨":"Đã áp dụng","적용 전 (임시 선택)":"Trước khi áp dụng (chọn tạm)","선택된 당첨자가 없습니다.":"Chưa chọn người trúng thưởng nào.","당첨자가 적용되었습니다.":"Đã áp dụng người trúng thưởng.","자동으로 당첨자를 선택했습니다. 적용을 눌러야 확정됩니다.":"Đã tự động chọn người trúng thưởng. Phải bấm Áp dụng mới được xác nhận.","회차를 찾을 수 없습니다.":"Không tìm thấy đợt.","미선택":"Chưa chọn","등수별 구성:":"Cơ cấu theo hạng:","불러오는 중…":"Đang tải…","응모 건 단위 무작위 추첨 · 티켓을 많이 쓸수록 확률 상승 · 1인 1회 당첨 · 1등부터 정원만큼 선정":"Rút thăm ngẫu nhiên theo đơn vị lượt dự thưởng · Dùng càng nhiều vé thì xác suất trúng càng cao · Mỗi người chỉ trúng thưởng 1 lần · Chọn từ hạng 1 cho đến khi đủ số lượng"});
 Object.assign(KO2VI,{"예정":"Sắp diễn ra","종료":"Đã kết thúc","마감: 매주 일요일 23:59:59 (고정)":"Đóng: 23:59:59 Chủ Nhật hàng tuần (cố định)","켜두면 매월 초에 그 달의 전체 회차(주차별)가 미리 자동 생성됩니다. 회차명은 마감일(추첨일) 기준 \"YYYY년 N월 M주차\" 형식으로 자동 부여되며, 생성 후에도 개별 수정할 수 있습니다. 수동 등록·수정은 이 설정과 무관하게 항상 가능합니다.":"Khi bật, vào đầu mỗi tháng toàn bộ các đợt (theo tuần) của tháng đó sẽ được tạo tự động trước. Tên đợt được tự động đặt theo định dạng \"Tuần M tháng N năm YYYY\" dựa trên ngày đóng (ngày rút thăm), và có thể sửa riêng từng đợt sau khi tạo. Đăng ký·sửa thủ công luôn khả dụng bất kể cài đặt này.","추첨 방식: 매주 월요일 0시 시작 ~ 일요일 23:59:59 마감 (자동/수동 전환 가능)":"Phương thức rút thăm: bắt đầu 0h Thứ Hai ~ đóng 23:59:59 Chủ Nhật hàng tuần (chuyển đổi tự động/thủ công được)","경품 수정":"Chỉnh sửa giải thưởng","진행중인 주간 이벤트":"Sự kiện tuần đang diễn ra","진행예정 주간 이벤트":"Sự kiện tuần sắp diễn ra","종료된 주간 이벤트":"Sự kiện tuần đã kết thúc","진행 중인 회차가 없습니다.":"Không có đợt nào đang diễn ra.","예정된 회차가 없습니다.":"Không có đợt nào sắp diễn ra.","종료된 회차가 없습니다.":"Không có đợt nào đã kết thúc.","로드 오류":"Lỗi tải dữ liệu","켜두면 매월 초에 그 달의 전체 회차(주차별)가 자동 생성됩니다. 회차명은 마감일(추첨일) 기준 \"YYYY년 N월 M주차\" 형식으로 자동 부여됩니다. 회차는 자동 생성만 가능하며, 운영자는 생성된 회차의 경품 구성 수정과 당첨자 선정만 진행합니다.":"Khi bật, vào đầu mỗi tháng toàn bộ các đợt (theo tuần) của tháng đó sẽ được tạo tự động. Tên đợt được tự động đặt theo định dạng \"Tuần M tháng N năm YYYY\" dựa trên ngày đóng (ngày rút thăm). Đợt chỉ được tạo tự động — quản trị viên chỉ chỉnh sửa cấu hình quà và chọn người trúng của đợt đã tạo.","추첨 방식: 매주 월요일 0시 시작 ~ 일요일 23:59:59 마감 (자동 생성)":"Phương thức rút thăm: bắt đầu 0h Thứ Hai ~ đóng 23:59:59 Chủ Nhật hàng tuần (tạo tự động)","회차 등록 안내":"Hướng dẫn đăng ký đợt","회차는 매월 초 한 달치가 자동 등록됩니다 (매주 월요일 시작 ~ 일요일 23:59:59 마감). 회차명은 마감일(추첨일) 기준 \"YYYY년 N월 M주차\" 형식으로 자동 부여됩니다.":"Đợt được đăng ký tự động mỗi tháng, trọn một tháng (bắt đầu Thứ Hai ~ đóng 23:59:59 Chủ Nhật hàng tuần). Tên đợt được tự động đặt theo định dạng \"Tuần M tháng N năm YYYY\" dựa trên ngày đóng (ngày rút thăm).","이미 다른 응모 건으로 당첨 처리된 응모자입니다 (1인 1등수만 가능).":"Người này đã được chọn trúng thưởng ở một lượt dự thưởng khác (mỗi người chỉ được 1 hạng).","응모건 수":"Số lượt dự thưởng","닉네임(카카오ID)":"Biệt danh (Kakao ID)","회차는 현재 시점 기준 4주치가 자동 등록됩니다 (매주 월요일 시작 ~ 일요일 23:59:59 마감). 회차명은 마감일(추첨일) 기준 \"YYYY년 N월 M주차\" 형식으로 자동 부여됩니다.":"Đợt được đăng ký tự động luôn có sẵn 4 tuần tính từ thời điểm hiện tại (bắt đầu Thứ Hai ~ đóng 23:59:59 Chủ Nhật hàng tuần). Tên đợt được tự động đặt theo định dạng \"Tuần M tháng N năm YYYY\" dựa trên ngày đóng (ngày rút thăm).","주간 이벤트 추첨 관리":"Quản lý rút thăm sự kiện tuần","당첨 ·":"Trúng thưởng ·","지급 대기":"Chờ gửi quà","지급 완료":"Đã gửi quà","메모(기프티콘 발송일·송장번호 등)":"Ghi chú (ngày gửi Gifticon · mã vận đơn v.v.)","지급 완료로 변경했습니다.":"Đã chuyển sang trạng thái đã gửi quà.","지급 대기로 되돌렸습니다.":"Đã chuyển lại về trạng thái chờ gửi quà.","메모가 저장되었습니다.":"Đã lưu ghi chú.","회차는 현재 시점 기준 4주치가 자동 등록됩니다 (매주 월요일~일요일 23:59:59 마감 · 회차명은 마감일 기준 자동 부여)":"Đợt được đăng ký tự động luôn có sẵn 4 tuần tính từ thời điểm hiện tại (đóng Chủ Nhật 23:59:59 hàng tuần · tên đợt tự động đặt theo ngày đóng)","당첨 경품 지급":"Trúng thưởng · Gửi quà","당첨자 확정":"Đã chốt người trúng","회차 종료와 동시에 자동 추첨됩니다 · 응모 건 단위 무작위 · 1인 1회 당첨":"Tự động rút thăm ngay khi đợt kết thúc · Ngẫu nhiên theo đơn vị lượt dự thưởng · Mỗi người chỉ trúng thưởng 1 lần","회차는 현재 시점 기준 4주치가 자동 등록되고, 마감과 동시에 당첨자도 자동 추첨됩니다 (매주 월요일~일요일 23:59:59 마감 · 회차명은 마감일 기준 자동 부여)":"Đợt được đăng ký tự động luôn có sẵn 4 tuần tính từ thời điểm hiện tại, và người trúng cũng được rút thăm tự động ngay khi đóng đợt (đóng Chủ Nhật 23:59:59 hàng tuần · tên đợt tự động đặt theo ngày đóng)","당첨자가 없는 회차입니다.":"Đợt này chưa có người trúng thưởng."});
+/* 당첨자 수동 지정 부활(2026-07-30) — 진행 중 회차만 등수 슬롯 지정 가능, 마감 시 빈 슬롯만 무작위 추첨 */
+Object.assign(KO2VI,{
+  "회차는 현재 시점 기준 4주치가 자동 등록됩니다 (매주 월요일~일요일 23:59:59 마감 · 회차명은 마감일 기준 자동 부여). 진행 중인 회차는 등수 슬롯별로 당첨자를 직접 지정할 수 있고, 마감 시 비어 있는 슬롯만 응모 건 단위 무작위 추첨으로 채워집니다.":"Đợt được đăng ký tự động luôn có sẵn 4 tuần tính từ thời điểm hiện tại (đóng Chủ Nhật 23:59:59 hàng tuần · tên đợt tự động đặt theo ngày đóng). Với đợt đang diễn ra, có thể trực tiếp chỉ định người trúng theo từng suất hạng, và khi đóng đợt chỉ những suất còn trống mới được rút thăm ngẫu nhiên theo đơn vị lượt dự thưởng.",
+  "진행 중인 회차입니다 · 등수 슬롯별로 당첨자를 직접 지정할 수 있고, 마감(일요일 23:59:59) 시 비어 있는 슬롯만 응모 건 단위 무작위 추첨으로 채워집니다 · 1인 1회 당첨 · 마감 전까지 변경·해제 가능":"Đợt đang diễn ra · Có thể trực tiếp chỉ định người trúng theo từng suất hạng, và khi đóng đợt (23:59:59 Chủ Nhật) chỉ những suất còn trống mới được rút thăm ngẫu nhiên theo đơn vị lượt dự thưởng · Mỗi người chỉ trúng thưởng 1 lần · Có thể thay đổi·huỷ chỉ định cho đến khi đóng đợt",
+  "마감 시 비어 있던 등수 슬롯이 응모 건 단위 무작위 추첨으로 채워져 확정된 결과입니다 · 1인 1회 당첨 · 종료된 회차는 당첨자를 변경할 수 없습니다":"Đây là kết quả đã chốt — khi đóng đợt, các suất hạng còn trống đã được rút thăm ngẫu nhiên theo đơn vị lượt dự thưởng · Mỗi người chỉ trúng thưởng 1 lần · Đợt đã kết thúc không thể thay đổi người trúng",
+  "미지정 (마감 시 전체 무작위 추첨)":"Chưa chỉ định (khi đóng đợt sẽ rút thăm ngẫu nhiên toàn bộ)",
+  "수동 지정 저장됨":"Đã lưu chỉ định thủ công",
+  "저장 전 (임시 지정)":"Trước khi lưu (chỉ định tạm)",
+  "(수동)":"(thủ công)",
+  "해당 등수의 슬롯이 이미 모두 찼습니다.":"Các suất của hạng này đã đầy.",
+  "이미 다른 응모 건으로 당첨 처리된 응모자입니다 (1인 1회 당첨).":"Người này đã được chọn trúng thưởng ở một lượt dự thưởng khác (mỗi người chỉ trúng 1 lần).",
+  "수동 지정 당첨자가 저장되었습니다. 남은 슬롯은 마감 시 무작위 추첨으로 채워집니다.":"Đã lưu người trúng thưởng chỉ định thủ công. Các suất còn lại sẽ được rút thăm ngẫu nhiên khi đóng đợt.",
+  "수동 지정이 모두 해제되었습니다. 마감 시 전체가 무작위 추첨으로 결정됩니다.":"Đã huỷ toàn bộ chỉ định thủ công. Khi đóng đợt, toàn bộ sẽ được quyết định bằng rút thăm ngẫu nhiên."
+});
 /* 응모자 리스트 검색·페이지네이션 */
 Object.assign(KO2VI,{"닉네임·카카오ID 검색":"Tìm biệt danh·Kakao ID","전체 응모 건수":"Tổng số lượt dự thưởng","검색 결과":"Kết quả tìm kiếm","검색 결과가 없습니다.":"Không có kết quả tìm kiếm."});
   var _orig=new Map(), _tracked=new Set(), _applying=false;
@@ -6293,56 +6307,75 @@ function loadDraws() {
     tbodyActive.innerHTML = tbodyUpcoming.innerHTML = tbodyPast.innerHTML = ppEmpty(5,'로드 오류');
   });
 }
-/* 회차 마감과 동시에 응모 건(행) 단위 가중 무작위 추첨을 자동 실행한다 — 티켓을 많이 쓴 사람일수록
-   응모 행이 많아 그만큼 뽑힐 확률이 비례해서 높아지고, 1등부터 등수별 정원만큼 채우며 1인 1회 당첨만 허용한다.
+/* 회차 마감 시 "비어 있는 등수 슬롯만" 응모 건(행) 단위 무작위 추첨으로 채운다.
+   진행 중에 운영자가 수동 지정해 둔 당첨자(manual:true)는 그대로 유지되고, 그 사람은 자동 추첨 대상에서 제외된다
+   (같은 사람의 다른 응모 행도 건너뜀 = 1인 1회 당첨). 남은 슬롯은 1등부터 등수별 정원까지 채우며,
+   티켓을 많이 쓴 사람일수록 응모 행이 많아 그만큼 뽑힐 확률이 비례해서 높아진다.
    winners_drawn 플래그로 중복 추첨을 막는다(응모자 0명이어도 플래그는 남겨 재시도하지 않음).
-   당첨자별로 prize_winners에도 개인정보 없이(닉네임만) 별도 기록해 앱 당첨 알림·지난 회차 당첨자 명단에 쓴다. */
+   prize_winners는 마감 시점에 최종 당첨자(수동 지정분 포함) 전체를 개인정보 없이(닉네임만) 기록한다 —
+   앱 당첨 알림·지난 회차 당첨자 명단은 마감 후에만 노출돼야 하므로 수동 지정 저장 시에는 쓰지 않는다. */
 function ppDrawRoundWinners(raffleId, d, entries) {
   var prizes = Array.isArray(d.prizes) ? d.prizes : [];
-  var pool = entries.slice();
+  var prizeNameByRank = {};
+  prizes.forEach(function(p){ prizeNameByRank[String(ppRankNum(p.rank))] = p.name || ''; });
+  /* 마감 전 수동 지정분 = 그대로 유지, 등수별 남은 슬롯 계산의 기준 */
+  var kept = (Array.isArray(d.winners_confirmed) ? d.winners_confirmed : []).map(function(w) {
+    return {
+      rank: String(ppRankNum(w.rank)), user_id: w.user_id, entry_id: w.entry_id || '',
+      nickname: w.nickname || '닉네임없음',
+      paid: !!w.paid, memo: w.memo || '', manual: true,
+    };
+  });
+  var filledByRank = {};
+  var won = {};
+  kept.forEach(function(w) {
+    filledByRank[w.rank] = (filledByRank[w.rank] || 0) + 1;
+    won[w.user_id] = true;
+  });
+  var pool = entries.filter(function(e){ return !won[e.user_id]; });
   for (var i = pool.length - 1; i > 0; i--) {
     var j = Math.floor(Math.random() * (i + 1));
     var tmp = pool[i]; pool[i] = pool[j]; pool[j] = tmp;
   }
   var picks = [];
-  var won = {};
   var idx = 0;
   prizes.slice().sort(function(a,b){return ppRankNum(a.rank)-ppRankNum(b.rank);}).forEach(function(p) {
     var r = ppRankNum(p.rank);
-    var filled = 0;
+    var filled = filledByRank[String(r)] || 0;
     while (filled < p.count && idx < pool.length) {
       var row = pool[idx]; idx++;
       if (won[row.user_id]) continue;
-      picks.push({ rank: r, entry: row, prizeName: p.name });
+      picks.push({ rank: r, entry: row });
       won[row.user_id] = true;
       filled++;
     }
   });
   var uids = picks.map(function(p){ return p.entry.user_id; });
   return dmFetchUsersByIds(uids).then(function(userMap) {
-    var winners = picks.map(function(p) {
+    var drawn = picks.map(function(p) {
       var u = userMap[p.entry.user_id];
       return {
         rank: String(p.rank), user_id: p.entry.user_id, entry_id: p.entry._id,
         nickname: (u && u.nickname) || '닉네임없음',
-        paid: false, memo: '',
+        paid: false, memo: '', manual: false,
       };
     });
+    var winners = kept.concat(drawn).sort(function(a,b){ return ppRankNum(a.rank) - ppRankNum(b.rank); });
     return db.collection('raffles').doc(raffleId).update({
       winners_confirmed: winners, winners_drawn: true,
     }).then(function() {
       if (!winners.length) return;
       var batch = db.batch();
-      picks.forEach(function(p) {
+      winners.forEach(function(w) {
         var ref = db.collection('prize_winners').doc();
         batch.set(ref, {
           raffle_id: raffleId,
           raffle_title: pdWeekLabel(d.end_date),
           raffle_end_date: d.end_date,
-          rank: String(p.rank),
-          prize_name: p.prizeName || '',
-          user_id: p.entry.user_id,
-          nickname: (userMap[p.entry.user_id] && userMap[p.entry.user_id].nickname) || '닉네임없음',
+          rank: String(w.rank),
+          prize_name: prizeNameByRank[String(w.rank)] || '',
+          user_id: w.user_id,
+          nickname: w.nickname || '닉네임없음',
           created_at: FS.FieldValue.serverTimestamp(),
         });
       });
@@ -6375,9 +6408,14 @@ function pdMemoInputHtml(uid) {
   if (!w) return '';
   return '<input class="form-input" style="margin-top:4px;font-size:12px;padding:5px 8px" placeholder="메모(기프티콘 발송일·송장번호 등)" value="' + ppEsc(w.memo||'') + '" onchange="pdSaveMemo(\'' + uid + '\', this.value)">';
 }
+/* 운영자가 직접 지정한 당첨자는 "(수동)" 표시를 붙여 자동 추첨분과 구분한다 */
 function pdWinnerSummary(winners) {
   var byRank = {};
-  winners.forEach(function(w){ var r = ppRankNum(w.rank); (byRank[r] = byRank[r] || []).push(ppEsc(w.nickname||'—')); });
+  winners.forEach(function(w){
+    var r = ppRankNum(w.rank);
+    var name = ppEsc(w.nickname||'—') + (w.manual ? '<span style="font-size:10px;color:var(--amber)"> (수동)</span>' : '');
+    (byRank[r] = byRank[r] || []).push(name);
+  });
   var ranks = Object.keys(byRank).map(Number).sort(function(a,b){return a-b;});
   return ranks.map(function(r){ return pdRankBadgeHtml(r) + byRank[r].join(', '); }).join('<br>');
 }
@@ -6510,12 +6548,14 @@ window.ppSaveTemplate = function() {
   });
 };
 
-/* ── 응모 상세 보기: 응모자 리스트 + 당첨 결과(자동 추첨 확정)·지급 관리 ── */
+/* ── 응모 상세 보기: 응모자 리스트 + 당첨자 수동 지정(진행 중 회차 한정)·지급 관리 ── */
 var pdCurrentRoundId = null;
 var pdCurrentRoundPrizes = [];
 var pdCurrentEntrants = [];
-var pdConfirmedWinners = []; /* winners_confirmed 원본(paid·memo 포함, entry_id로 응모 행과 매칭) — 당첨자 자체는 여기서 변경 불가 */
-var pdConfirmedWinnersBaseline = []; /* 마지막 저장 시점 스냅샷(참고용) */
+var pdCurrentRoundPhase = 'past'; /* 'active'일 때만 등수 슬롯 수동 지정 가능(예정·종료 회차는 결과 표시 전용) */
+var pdStagedWinners = {}; /* entryId -> {rank, uid} — 진행 중 회차의 수동 지정 임시 상태(저장 시 winners_confirmed로 커밋) */
+var pdConfirmedWinners = []; /* winners_confirmed 원본(paid·memo 포함, entry_id로 응모 행과 매칭) */
+var pdConfirmedWinnersBaseline = []; /* 마지막 저장 시점 스냅샷(미저장 변경 여부 판정용) */
 var pdCurrentRoundEndDate = null; /* 모달 제목을 언어 토글 시에도 재계산하기 위한 캐시(재조회 없이) */
 /* 모달 제목 = "응모자 리스트"(사전 매칭) + " — " + 마감일 기준 회차명(pdWeekLabel, 호출 시점 언어 그대로 반영) */
 function pdRefreshEntrantsTitle() {
@@ -6537,26 +6577,44 @@ function pdDtTimeHtml(ts) {
     + '</div>';
 }
 
-/* 당첨 등수 컬럼은 자동 추첨 결과 표시 전용(수동 선택 없음) */
+/* 종료된 회차의 당첨 등수 컬럼 — 결과 표시 전용 */
 function pdRankResultHtml(rank) {
   return rank ? pdRankBadgeHtml(ppRankNum(rank)) : '<span style="color:var(--text-sub)">—</span>';
 }
+/* 진행 중인 회차의 당첨 등수 컬럼 — 등수 슬롯 수동 지정 드롭다운(해제는 "미선택") */
+function pdRankOptionsHtml(selectedRank) {
+  var opts = '<option value="">미선택</option>';
+  pdCurrentRoundPrizes.slice().sort(function(a,b){return ppRankNum(a.rank)-ppRankNum(b.rank);}).forEach(function(p){
+    var r = ppRankNum(p.rank);
+    opts += '<option value="' + r + '"' + (String(selectedRank)===String(r)?' selected':'') + '>' + r + '등</option>';
+  });
+  return opts;
+}
 
 /* 응모 행(사용 티켓 1장 = 1행) 단위로 렌더 — 같은 사람이 티켓을 여러 장 썼으면 그만큼 행이 나열됨.
-   당첨 여부·등수는 회차 마감 시 자동 추첨으로 이미 확정된 결과(entry_id로 응모 행과 매칭)를 표시만 한다. */
+   표시 기준: 진행 중인 회차는 수동 지정 임시 상태(pdStagedWinners), 종료된 회차는 확정 결과(entry_id 매칭). */
 function pdWinnerEntryIdMap() {
   var m = {};
   pdConfirmedWinners.forEach(function(w){ if (w.entry_id) m[w.entry_id] = w; });
   return m;
 }
+function pdRankMapForRender() {
+  var m = {};
+  if (pdCurrentRoundPhase === 'active') {
+    Object.keys(pdStagedWinners).forEach(function(id){ m[id] = String(pdStagedWinners[id].rank); });
+  } else {
+    pdConfirmedWinners.forEach(function(w){ if (w.entry_id) m[w.entry_id] = String(ppRankNum(w.rank)); });
+  }
+  return m;
+}
 function pdOrderedEntrants() {
-  var winMap = pdWinnerEntryIdMap();
+  var rankMap = pdRankMapForRender();
   var winners = [], rest = [];
   pdCurrentEntrants.forEach(function(e) {
-    if (winMap[e._id]) winners.push(e); else rest.push(e);
+    if (rankMap[e._id]) winners.push(e); else rest.push(e);
   });
   winners.sort(function(a, b) {
-    return ppRankNum(winMap[a._id].rank) - ppRankNum(winMap[b._id].rank);
+    return ppRankNum(rankMap[a._id]) - ppRankNum(rankMap[b._id]);
   });
   return winners.concat(rest);
 }
@@ -6641,7 +6699,8 @@ function pdRenderEntCount(filteredLen) {
 function pdRenderEntrantRows() {
   var tbody = document.getElementById('pd-ent-tbody');
   if (!tbody) return;
-  var winMap = pdWinnerEntryIdMap();
+  var isActive = pdCurrentRoundPhase === 'active';
+  var rankMap = pdRankMapForRender();
   var list = pdFilteredEntrants();
   var totalPages = Math.max(1, Math.ceil(list.length / PD_ENT_PAGE_SIZE));
   if (pdEntPage > totalPages) pdEntPage = totalPages;
@@ -6655,15 +6714,18 @@ function pdRenderEntrantRows() {
     return;
   }
   tbody.innerHTML = pageRows.map(function(e) {
-    var w = winMap[e._id];
-    var winnerCell = w
-      ? (pdWinnerTagHtml(e.user_id, ppRankNum(w.rank)) + pdMemoInputHtml(e.user_id))
+    var rank = rankMap[e._id] || '';
+    var winnerCell = rank
+      ? (pdWinnerTagHtml(e.user_id, ppRankNum(rank)) + pdMemoInputHtml(e.user_id))
       : '<span style="color:var(--text-sub)">—</span>';
+    var rankCell = isActive
+      ? '<select class="form-select" style="font-size:13px;width:100%" onchange="pdAssignRank(this,\'' + e._id + '\',\'' + e.user_id + '\')">' + pdRankOptionsHtml(rank) + '</select>'
+      : pdRankResultHtml(rank);
     return '<tr data-entry-id="' + e._id + '">'
       + '<td>' + renderMemberIdentityListOnly(e._userObj, e.user_id) + '</td>'
       + '<td>' + pdDtTimeHtml(e.created_at) + '</td>'
       + '<td>' + winnerCell + '</td>'
-      + '<td style="text-align:center">' + pdRankResultHtml(w ? w.rank : '') + '</td>'
+      + '<td style="text-align:center">' + rankCell + '</td>'
       + '</tr>';
   }).join('');
   pdRenderEntCount(list.length);
@@ -6671,11 +6733,41 @@ function pdRenderEntrantRows() {
   pdUpdateEntStatusBadge();
 }
 
+/* 지급 상태·메모가 마지막 저장 스냅샷과 달라졌는지(=저장 전 임시 편집 존재) */
+function pdHasUnsavedPayoutChanges() {
+  return pdConfirmedWinners.some(function(w) {
+    var base = pdConfirmedWinnersBaseline.find(function(b){ return b.user_id === w.user_id; });
+    if (!base) return true;
+    return !!w.paid !== !!base.paid || (w.memo || '') !== (base.memo || '');
+  });
+}
 function pdUpdateEntStatusBadge() {
   var badge = document.getElementById('pd-ent-status-badge');
   if (!badge) return;
-  if (!pdConfirmedWinners.length) { badge.textContent = '미선정'; badge.className = 'badge'; }
-  else { badge.textContent = '당첨자 확정'; badge.className = 'badge badge-green'; }
+  if (pdCurrentRoundPhase !== 'active') {
+    if (!pdConfirmedWinners.length) { badge.textContent = '미선정'; badge.className = 'badge'; }
+    else { badge.textContent = '당첨자 확정'; badge.className = 'badge badge-green'; }
+    return;
+  }
+  /* 진행 중인 회차: 수동 지정이 저장돼 있는지 + 저장 전 변경이 있는지를 구분해서 보여준다 */
+  var stagedIds = Object.keys(pdStagedWinners);
+  var savedMap = {};
+  pdConfirmedWinners.forEach(function(w){ if (w.entry_id) savedMap[w.entry_id] = String(ppRankNum(w.rank)); });
+  var savedIds = Object.keys(savedMap);
+  var same = stagedIds.length === savedIds.length
+    && stagedIds.every(function(id){ return savedMap[id] === String(pdStagedWinners[id].rank); })
+    && !pdHasUnsavedPayoutChanges();
+  if (!stagedIds.length && !savedIds.length) { badge.textContent = '미지정 (마감 시 전체 무작위 추첨)'; badge.className = 'badge'; }
+  else if (same) { badge.textContent = '수동 지정 저장됨'; badge.className = 'badge badge-green'; }
+  else { badge.textContent = '저장 전 (임시 지정)'; badge.className = 'badge badge-amber'; }
+}
+/* 모달 안내문구는 회차 상태에 따라 달라진다(문구는 KO2VI 사전 키와 정확히 일치시켜 언어 토글 시 자동 번역) */
+function pdRefreshEntrantsNote() {
+  var el = document.getElementById('pd-ent-note');
+  if (!el) return;
+  el.textContent = (pdCurrentRoundPhase === 'active')
+    ? '진행 중인 회차입니다 · 등수 슬롯별로 당첨자를 직접 지정할 수 있고, 마감(일요일 23:59:59) 시 비어 있는 슬롯만 응모 건 단위 무작위 추첨으로 채워집니다 · 1인 1회 당첨 · 마감 전까지 변경·해제 가능'
+    : '마감 시 비어 있던 등수 슬롯이 응모 건 단위 무작위 추첨으로 채워져 확정된 결과입니다 · 1인 1회 당첨 · 종료된 회차는 당첨자를 변경할 수 없습니다';
 }
 
 window.pdOpenEntrantsModal = function(raffleId) {
@@ -6683,9 +6775,12 @@ window.pdOpenEntrantsModal = function(raffleId) {
   pdConfirmedWinners = [];
   pdConfirmedWinnersBaseline = [];
   pdCurrentEntrants = [];
+  pdStagedWinners = {};
+  pdCurrentRoundPhase = 'past';
   pdCurrentRoundEndDate = null;
   pdResetEntSearch(); /* 회차를 새로 열 때마다 검색어·페이지 초기화 */
   pdRefreshEntrantsTitle();
+  pdRefreshEntrantsNote();
   document.getElementById('pd-ent-summary').textContent = '불러오는 중…';
   document.getElementById('pd-ent-tbody').innerHTML = '';
   document.getElementById('pd-entrants-ov').style.display = 'block';
@@ -6697,12 +6792,25 @@ window.pdOpenEntrantsModal = function(raffleId) {
     if (!roundDoc.exists) { toast('회차를 찾을 수 없습니다.'); pdCloseEntrantsModal(); return; }
     var d = roundDoc.data();
     pdCurrentRoundPrizes = Array.isArray(d.prizes) ? d.prizes : [];
+    pdCurrentRoundPhase = pdRoundPhase(d, new Date());
     pdCurrentRoundEndDate = d.end_date;
     pdRefreshEntrantsTitle();
+    pdRefreshEntrantsNote();
     document.getElementById('pd-ent-summary').innerHTML = '<span>등수별 구성:</span> ' + pdCurrentRoundPrizes.slice().sort(function(a,b){return ppRankNum(a.rank)-ppRankNum(b.rank);}).map(function(p){ return '<span>' + ppRankNum(p.rank) + '등</span> ' + p.count + '<span>명</span>(' + ppEsc(p.name) + ')'; }).join(' · ');
     pdConfirmedWinners = (Array.isArray(d.winners_confirmed) ? d.winners_confirmed : []).map(function(w){ return Object.assign({paid:false, memo:''}, w); });
     pdConfirmedWinnersBaseline = JSON.parse(JSON.stringify(pdConfirmedWinners));
     pdCurrentEntrants = entriesSnap.docs.map(function(doc){ return Object.assign({_id: doc.id}, doc.data()); });
+    /* 진행 중인 회차: 이미 저장된 수동 지정분을 드롭다운 초기값으로 되살린다(entry_id 없으면 그 사람의 응모 행 하나에 매칭) */
+    if (pdCurrentRoundPhase === 'active') {
+      pdConfirmedWinners.forEach(function(w) {
+        var eid = w.entry_id;
+        if (!eid || !pdCurrentEntrants.some(function(e){ return e._id === eid; })) {
+          var row = pdCurrentEntrants.find(function(e){ return e.user_id === w.user_id; });
+          eid = row ? row._id : null;
+        }
+        if (eid) pdStagedWinners[eid] = { rank: String(ppRankNum(w.rank)), uid: w.user_id };
+      });
+    }
     if (!pdCurrentEntrants.length) {
       document.getElementById('pd-ent-tbody').innerHTML = ppEmpty(4, '응모 내역이 없습니다.');
       pdRenderEntCount(0);
@@ -6720,16 +6828,69 @@ window.pdCloseEntrantsModal = function() {
   document.getElementById('pd-entrants-ov').style.display = 'none';
 };
 
-/* 당첨자 자체는 회차 마감 시 자동 추첨으로 이미 확정되어 여기서 바꿀 수 없다.
-   "저장"은 지급 상태·메모만 한 번에 저장하는 용도다(뱃지 클릭·메모 입력은 로컬 상태만 바꾸고 여기서 커밋). */
-window.pdSavePayout = function() {
+/* 등수 슬롯 수동 지정(진행 중인 회차 한정) — 응모 행(entryId) 단위로 스테이징하고,
+   등수별 정원 초과와 1인 중복 당첨은 여기서 막는다. "미선택"으로 되돌리면 지정 해제(마감 전까지 언제든 가능). */
+window.pdAssignRank = function(selectEl, entryId, uid) {
+  if (pdCurrentRoundPhase !== 'active') { pdRenderEntrantRows(); return; }
+  var newRank = selectEl.value;
+  if (newRank) {
+    var limit = 0;
+    pdCurrentRoundPrizes.forEach(function(p){ if (String(ppRankNum(p.rank)) === String(newRank)) limit = p.count; });
+    var used = 0;
+    Object.keys(pdStagedWinners).forEach(function(id){ if (id !== entryId && String(pdStagedWinners[id].rank) === String(newRank)) used++; });
+    if (used >= limit) {
+      toast('해당 등수의 슬롯이 이미 모두 찼습니다.');
+      selectEl.value = (pdStagedWinners[entryId] && pdStagedWinners[entryId].rank) || '';
+      return;
+    }
+    var dupId = Object.keys(pdStagedWinners).find(function(id){ return id !== entryId && pdStagedWinners[id].uid === uid; });
+    if (dupId) {
+      toast('이미 다른 응모 건으로 당첨 처리된 응모자입니다 (1인 1회 당첨).');
+      selectEl.value = (pdStagedWinners[entryId] && pdStagedWinners[entryId].rank) || '';
+      return;
+    }
+    pdStagedWinners[entryId] = { rank: newRank, uid: uid };
+  } else {
+    delete pdStagedWinners[entryId];
+  }
+  pdRenderEntrantRows();
+};
+
+/* "저장" — 진행 중인 회차는 수동 지정분(manual:true) + 지급 상태·메모를 함께 커밋한다.
+   앱 당첨 알림·지난 회차 명단이 마감 전에 노출되면 안 되므로 prize_winners는 여기서 쓰지 않는다(마감 시 일괄 기록).
+   종료된 회차는 당첨자 구성이 이미 확정돼 있으므로 지급 상태·메모만 저장한다. */
+window.pdSaveEntrants = function() {
+  var updates;
+  if (pdCurrentRoundPhase === 'active') {
+    updates = Object.keys(pdStagedWinners).map(function(entryId) {
+      var uid = pdStagedWinners[entryId].uid;
+      var prev = pdConfirmedWinnerFor(uid);
+      var row = pdCurrentEntrants.find(function(e){ return e._id === entryId; });
+      var u = row && row._userObj;
+      return {
+        rank: String(pdStagedWinners[entryId].rank), user_id: uid, entry_id: entryId,
+        nickname: (u && u.nickname) || (prev && prev.nickname) || '닉네임없음',
+        paid: prev ? !!prev.paid : false, memo: prev ? (prev.memo || '') : '',
+        manual: true,
+      };
+    }).sort(function(a,b){ return ppRankNum(a.rank) - ppRankNum(b.rank); });
+    db.collection('raffles').doc(pdCurrentRoundId).update({ winners_confirmed: updates }).then(function() {
+      toast(updates.length ? '수동 지정 당첨자가 저장되었습니다. 남은 슬롯은 마감 시 무작위 추첨으로 채워집니다.' : '수동 지정이 모두 해제되었습니다. 마감 시 전체가 무작위 추첨으로 결정됩니다.');
+      pdConfirmedWinners = updates.map(function(w){ return Object.assign({}, w); });
+      pdConfirmedWinnersBaseline = JSON.parse(JSON.stringify(updates));
+      pdRenderEntrantRows();
+      loadDraws();
+    }).catch(function(e) { toast('저장 실패: ' + (e.message||e)); });
+    return;
+  }
   if (!pdConfirmedWinners.length) { toast('당첨자가 없는 회차입니다.'); return; }
-  var updates = pdConfirmedWinners.map(function(w) {
-    return { rank: w.rank, user_id: w.user_id, entry_id: w.entry_id, nickname: w.nickname, paid: !!w.paid, memo: w.memo || '' };
+  updates = pdConfirmedWinners.map(function(w) {
+    return { rank: w.rank, user_id: w.user_id, entry_id: w.entry_id, nickname: w.nickname, paid: !!w.paid, memo: w.memo || '', manual: !!w.manual };
   });
   db.collection('raffles').doc(pdCurrentRoundId).update({ winners_confirmed: updates }).then(function() {
     toast('저장되었습니다.');
     pdConfirmedWinnersBaseline = JSON.parse(JSON.stringify(updates));
+    pdRenderEntrantRows();
     loadDraws();
   }).catch(function(e) { toast('저장 실패: ' + (e.message||e)); });
 };
@@ -7443,7 +7604,7 @@ window.wdShowDetail = function(id) {
 /* ── sec-scheduler ── scheduler_jobs collection (상태·설정만 저장 — 실제 cron 실행은 데모 범위 밖) */
 var SCHED_JOBS = [
   { id:'notify_dispatch', name:'알림 발송', desc:'매 5분 · 예약·이벤트 알림 큐 처리' },
-  { id:'weekly_draw', name:'주간 추첨 집계', desc:'매주 월요일 자정 · 자동 당첨 처리' },
+  { id:'weekly_draw', name:'주간 추첨 집계', desc:'매주 월요일 자정 · 빈 등수 슬롯 자동 추첨' },
   { id:'ticket_confirm', name:'티켓 확정 배치', desc:'매일 오전 3시 · 대기 티켓 자동 확정 (연동 D+7 / 미연동 D+30)' },
   { id:'ticket_expire', name:'티켓 만료 배치', desc:'매일 새벽 4시 · 등급 티켓 만료 소멸 + D-30/D-7 임박 알림' },
   { id:'db_backup', name:'DB 백업', desc:'매일 새벽 3시 · S3 자동 업로드' },
