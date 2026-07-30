@@ -499,6 +499,11 @@ textarea.form-input{resize:vertical;min-height:80px;height:auto;}
 /* ── 응모자 리스트 모달 — 한 페이지 10건이 모달 내부 스크롤 없이 다 보이도록 행 밀도 압축 ──
    글자 크기는 그대로 두고 셀 패딩·줄간격·모달 여백만 줄였다. 지급 메모는 뱃지와 같은 줄에
    한 줄 입력으로 붙여 당첨 행 높이를 미당첨 행과 같게 맞춘다(기존엔 메모칸이 아래로 펼쳐져 2배). */
+/* 종료된 주간 이벤트 — 당첨자 명단이 등수별 여러 줄로 들어가 행이 빠듯해 보이므로 행 높이를 1.5배로.
+   패딩만 1.5배(18px)로는 실측 1.29배밖에 안 됐다(등수 뱃지 박스 높이가 줄 높이를 지배해서).
+   패딩 24px + 당첨자 줄간격 2.3 조합으로 3줄 행이 96px → 143px(약 1.49배)이 되는 값을 실측으로 잡았다.
+   진행중·진행예정 표는 그대로 둔다. */
+#draws-table-past td{padding-top:24px;padding-bottom:24px;}
 #pd-entrants-ov .info-box{padding:6px 12px;margin-bottom:0;line-height:1.45;}
 #pd-ent-table th{padding:6px 8px;}
 #pd-ent-table td{padding:5px 8px;line-height:1.35;vertical-align:middle;}
@@ -1270,15 +1275,16 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
       </div>
       <div class="card" style="margin-top:14px">
         <div class="card-header"><div class="card-title">진행예정 주간 이벤트</div></div>
-        <table>
-          <thead><tr><th>회차</th><th>기간</th><th>응모건 수</th><th>당첨자</th><th>액션</th></tr></thead>
+        <!-- 진행예정 회차는 응모건 수가 항상 0건, 당첨자는 항상 미선정이라 두 컬럼을 두지 않는다 -->
+        <table id="draws-table-upcoming" style="table-layout:fixed;width:100%">
+          <thead><tr><th style="width:30%">회차</th><th style="width:40%">기간</th><th style="width:30%">액션</th></tr></thead>
           <tbody id="draws-tbody-upcoming">
           </tbody>
         </table>
       </div>
       <div class="card" style="margin-top:14px">
         <div class="card-header"><div class="card-title">종료된 주간 이벤트</div></div>
-        <table>
+        <table id="draws-table-past">
           <thead><tr><th>회차</th><th>기간</th><th>응모건 수</th><th>당첨자</th><th>액션</th></tr></thead>
           <tbody id="draws-tbody-past">
           </tbody>
@@ -5114,7 +5120,8 @@ Object.assign(KO2VI,{
 /* 진행 중 회차 지급 관리 비활성(2026-07-30) — 툴팁·안내문구 */
 Object.assign(KO2VI,{
   "회차 종료 후 지급 관리 가능":"Có thể quản lý gửi quà sau khi đợt kết thúc",
-  "지급 상태·메모는 아직 지급이 성립하지 않는 구간이라 표시하지 않습니다 — 회차 종료 후 이 리스트에 함께 나타납니다":"Trạng thái gửi quà·ghi chú không được hiển thị vì chưa tới lúc phát sinh việc gửi quà — sẽ xuất hiện trong danh sách này sau khi đợt kết thúc"
+  "지급 상태·메모는 아직 지급이 성립하지 않는 구간이라 표시하지 않습니다 — 회차 종료 후 이 리스트에 함께 나타납니다":"Trạng thái gửi quà·ghi chú không được hiển thị vì chưa tới lúc phát sinh việc gửi quà — sẽ xuất hiện trong danh sách này sau khi đợt kết thúc",
+  "종료된 회차는 경품을 수정할 수 없습니다.":"Đợt đã kết thúc thì không thể sửa giải thưởng."
 });
 /* 응모자 리스트 검색·페이지네이션 */
 Object.assign(KO2VI,{"닉네임·카카오ID 검색":"Tìm biệt danh·Kakao ID","전체 응모 건수":"Tổng số lượt dự thưởng","검색 결과":"Kết quả tìm kiếm","검색 결과가 없습니다.":"Không có kết quả tìm kiếm.","메모(발송일·송장번호 등)":"Ghi chú (ngày gửi·mã vận đơn v.v.)"});
@@ -6332,16 +6339,30 @@ function loadDraws() {
         function rowHtml(it) {
           var d = it.d, doc = it.doc;
           var period = (d.start_date||'—') + ' ~ ' + (d.end_date||'—');
+          var isUpcoming = it.phase === 'upcoming';
+          var isPast = it.phase === 'past';
+          /* 액션은 회차 상태별로 다르다 —
+             진행중: 응모자 보기 + 경품 수정 / 진행예정: 경품 수정만(응모 0건이라 볼 게 없음)
+             종료: 응모자 보기만(이미 확정된 회차라 경품을 수정할 수 없다) */
+          var actions = [];
+          if (!isUpcoming) actions.push('<button class="btn btn-primary btn-sm" onclick="pdOpenEntrantsModal(\'' + doc.id + '\')">응모자 보기</button>');
+          if (!isPast) actions.push('<button class="btn btn-ghost btn-sm" onclick="ppOpenDrawModal(\'' + doc.id + '\')">경품 수정</button>');
+          /* 진행예정 회차는 응모건 수·당첨자가 항상 0건·미선정이라 그 두 칸을 아예 두지 않는다(회차·기간·액션 3칸) */
+          if (isUpcoming) {
+            return '<tr>'
+              + '<td style="font-weight:600">' + pdWeekLabel(d.end_date) + '</td>'
+              + '<td style="font-size:12px">' + period + '</td>'
+              + '<td>' + actions.join(' ') + '</td></tr>';
+          }
           var winnerCell = it.hasWinners ? pdWinnerSummary(d.winners_confirmed) : '<span style="color:var(--text-sub)">미선정</span>';
-          /* 진행예정 회차는 아직 응모가 0건이라 볼 게 없으므로 "응모자 보기"를 아예 노출하지 않는다 */
-          var actionCell = (it.phase === 'upcoming' ? '' : '<button class="btn btn-primary btn-sm" onclick="pdOpenEntrantsModal(\'' + doc.id + '\')">응모자 보기</button> ')
-            + '<button class="btn btn-ghost btn-sm" onclick="ppOpenDrawModal(\'' + doc.id + '\')">경품 수정</button>';
+          /* 종료 회차는 당첨자 명단이 등수별로 여러 줄 들어가 답답하므로 줄간격을 넉넉히 준다
+             (행 위아래 여백은 #draws-table-past CSS에서 함께 키운다) */
           return '<tr>'
             + '<td style="font-weight:600">' + pdWeekLabel(d.end_date) + '</td>'
             + '<td style="font-size:12px">' + period + '</td>'
             + '<td style="text-align:center">' + ppN(it.count) + '<span>건</span></td>'
-            + '<td><div style="font-size:12px;line-height:1.6">' + winnerCell + '</div></td>'
-            + '<td>' + actionCell + '</td></tr>';
+            + '<td><div style="font-size:12px;line-height:' + (isPast ? '2.3' : '1.6') + '">' + winnerCell + '</div></td>'
+            + '<td>' + actions.join(' ') + '</td></tr>';
         }
         var active = items.filter(function(it){ return it.phase === 'active'; });
         var upcoming = items.filter(function(it){ return it.phase === 'upcoming'; })
@@ -6350,7 +6371,7 @@ function loadDraws() {
           .sort(function(a,b){ return (b.d.end_date||'').localeCompare(a.d.end_date||''); });
 
         tbodyActive.innerHTML = active.length ? active.map(rowHtml).join('') : ppEmpty(5,'진행 중인 회차가 없습니다.');
-        tbodyUpcoming.innerHTML = upcoming.length ? upcoming.map(rowHtml).join('') : ppEmpty(5,'예정된 회차가 없습니다.');
+        tbodyUpcoming.innerHTML = upcoming.length ? upcoming.map(rowHtml).join('') : ppEmpty(3,'예정된 회차가 없습니다.');
         tbodyPast.innerHTML = past.length ? past.map(rowHtml).join('') : ppEmpty(5,'종료된 회차가 없습니다.');
       });
     });
@@ -6562,6 +6583,13 @@ window.ppOpenDrawModal = function(id) {
   document.getElementById('prize-rows').innerHTML = '';
   db.collection('raffles').doc(ppEditingDrawId).get().then(function(doc) {
     if (!doc.exists) return;
+    /* 종료된 회차는 당첨자까지 확정된 상태라 경품 구성을 바꿀 수 없다 — 버튼을 빼는 것과 별개로
+       여기서도 막아 콘솔·구버전 DOM으로 우회 진입하는 경로를 차단한다. */
+    if (pdRoundPhase(doc.data(), new Date()) === 'past') {
+      toast('종료된 회차는 경품을 수정할 수 없습니다.');
+      ppEditingDrawId = null;
+      return;
+    }
     var d = doc.data();
     titleEl.textContent = '경품 수정 — ' + (d.title||'');
     (Array.isArray(d.prizes) ? d.prizes : []).forEach(function(p){ ppAppendPrizeRow('prize-rows', p.rank, p.name, p.count); });
@@ -6576,15 +6604,27 @@ window.ppSubmitDraw = function() {
   if (!prizes) return;
   var btn = document.getElementById('draw-create-btn');
   if (btn) { btn.disabled = true; btn.textContent = '저장 중…'; }
-  db.collection('raffles').doc(ppEditingDrawId).update({ prizes: prizes }).then(function() {
-    toast('경품 구성이 수정되었습니다.');
-    ppCloseDrawModal();
-    loadDraws();
+  var id = ppEditingDrawId;
+  function restoreBtn() { if (btn) { btn.disabled = false; btn.textContent = '저장'; } }
+  /* 저장 직전에 회차를 다시 읽어 마감 여부를 최신 데이터로 판정한다 — 모달을 열어둔 채 회차가
+     마감되는 경우와, 화면 상태만 조작해 우회하는 경우를 함께 막는다. */
+  db.collection('raffles').doc(id).get().then(function(fresh) {
+    if (fresh.exists && pdRoundPhase(fresh.data(), new Date()) === 'past') {
+      toast('종료된 회차는 경품을 수정할 수 없습니다.');
+      restoreBtn();
+      ppCloseDrawModal();
+      return;
+    }
+    return db.collection('raffles').doc(id).update({ prizes: prizes }).then(function() {
+      toast('경품 구성이 수정되었습니다.');
+      restoreBtn();
+      ppCloseDrawModal();
+      loadDraws();
+    });
   }).catch(function(e) {
     console.error('ppSubmitDraw', e);
     toast('저장 실패: ' + (e.message||e));
-  }).finally(function() {
-    if (btn) { btn.disabled = false; btn.textContent = '저장'; }
+    restoreBtn();
   });
 };
 
