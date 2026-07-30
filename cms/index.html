@@ -390,6 +390,14 @@ tr:hover td{background:var(--surface-2);}
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(26,17,48,.35);z-index:200;
   align-items:center;justify-content:center;backdrop-filter:blur(2px);}
 .modal-overlay.open{display:flex;animation:overlayIn .18s ease-out;}
+/* ── 모달 오버레이 공통(주간 이벤트 추첨 관리 등 인라인으로 만들어진 모달용) ──
+   .modal-overlay를 쓰는 모달들과 똑같이 브라우저 화면 기준 가로·세로 정중앙에 띄운다.
+   모달마다 margin/max-height를 따로 박지 않고 여기 한 곳에서만 관리한다.
+   화면보다 길어지면 카드가 잘리지 않고 카드 안에서만 스크롤된다. */
+.pp-modal-ov{display:none;position:fixed;inset:0;z-index:210;background:rgba(0,0,0,.45);
+  align-items:center;justify-content:center;overflow:auto;padding:12px;}
+.pp-modal-ov.open{display:flex;}
+.pp-modal-ov > .card{width:100%;margin:auto;max-height:calc(100vh - 24px);overflow:auto;}
 @keyframes overlayIn{from{opacity:0}to{opacity:1}}
 .modal{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-xl);
   width:500px;max-width:95vw;max-height:88vh;overflow-y:auto;box-shadow:var(--shadow-lg);
@@ -1294,8 +1302,8 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
         </table>
       </div>
 
-      <div id="draw-create-ov" style="display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.45)" onclick="if(event.target===this)ppCloseDrawModal()">
-      <div class="card" id="draw-create-card" style="max-width:580px;margin:5vh auto;max-height:86vh;overflow:auto">
+      <div id="draw-create-ov" class="pp-modal-ov" onclick="if(event.target===this)ppCloseDrawModal()">
+      <div class="card" id="draw-create-card" style="max-width:580px">
         <div class="card-header"><div class="card-title" id="draw-modal-title">경품 수정</div><button class="btn btn-ghost btn-sm" onclick="ppCloseDrawModal()">✕ 닫기</button></div>
         <div style="padding:18px">
           <!-- 등수별 경품 구성 -->
@@ -1318,8 +1326,8 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
       </div>
       </div>
 
-      <div id="draw-template-ov" style="display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.45)" onclick="if(event.target===this)ppCloseTemplateModal()">
-      <div class="card" style="max-width:520px;margin:8vh auto;max-height:80vh;overflow:auto">
+      <div id="draw-template-ov" class="pp-modal-ov" onclick="if(event.target===this)ppCloseTemplateModal()">
+      <div class="card" style="max-width:520px">
         <div class="card-header"><div class="card-title">기본 경품 구성 템플릿</div><button class="btn btn-ghost btn-sm" onclick="ppCloseTemplateModal()">✕ 닫기</button></div>
         <div style="padding:18px">
           <div class="info-box" style="margin-bottom:14px">자동 생성되는 회차는 이 템플릿을 그대로 복사해 만들어집니다. 생성된 개별 회차는 이후 따로 수정할 수 있습니다.</div>
@@ -1336,8 +1344,8 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
       </div>
       </div>
 
-      <div id="pd-entrants-ov" style="display:none;position:fixed;inset:0;z-index:210;background:rgba(0,0,0,.45);align-items:center;justify-content:center;overflow:auto;padding:12px" onclick="if(event.target===this)pdCloseEntrantsModal()">
-      <div class="card" style="width:100%;max-width:840px;margin:auto;max-height:calc(100vh - 24px);overflow:auto">
+      <div id="pd-entrants-ov" class="pp-modal-ov" onclick="if(event.target===this)pdCloseEntrantsModal()">
+      <div class="card" style="max-width:840px">
         <div class="card-header" style="padding:10px 18px"><div class="card-title" id="pd-ent-title">응모자 리스트</div><button class="btn btn-ghost btn-sm" onclick="pdCloseEntrantsModal()">✕ 닫기</button></div>
         <div style="padding:10px 16px 8px">
           <div class="info-box" id="pd-ent-summary"></div>
@@ -6581,6 +6589,23 @@ function ppCollectPrizeRows(containerId) {
 }
 
 /* ── sec-draws ── 경품 수정 전용(회차는 4주 롤링 자동 생성만 — 수동 등록 없음. 회차명·기간은 자동 생성 규칙으로 고정이라 편집 불가) */
+/* 모달 오버레이 공통 열기/닫기 — 섹션(.section.active)의 전환 애니메이션 transform이
+   position:fixed의 기준을 바꿔버리므로, 열 때 오버레이를 body 직속으로 올린 뒤 표시한다.
+   그래야 어떤 메뉴에서 열든 항상 브라우저 화면 정중앙에 뜬다. */
+window.ppShowModalOv = function(id) {
+  var ov = document.getElementById(id);
+  if (!ov) return;
+  if (ov.parentElement !== document.body) document.body.appendChild(ov);
+  ov.classList.add('open');
+};
+window.ppHideModalOv = function(id) {
+  var ov = document.getElementById(id);
+  if (ov) ov.classList.remove('open');
+};
+window.ppIsModalOvOpen = function(id) {
+  var ov = document.getElementById(id);
+  return !!ov && ov.classList.contains('open');
+};
 window.ppOpenDrawModal = function(id) {
   if (!id) return;
   ppEditingDrawId = id;
@@ -6598,10 +6623,10 @@ window.ppOpenDrawModal = function(id) {
     var d = doc.data();
     titleEl.textContent = '경품 수정 — ' + (d.title||'');
     (Array.isArray(d.prizes) ? d.prizes : []).forEach(function(p){ ppAppendPrizeRow('prize-rows', p.rank, p.name, p.count); });
-    document.getElementById('draw-create-ov').style.display = 'block';
+    ppShowModalOv('draw-create-ov');
   });
 }
-window.ppCloseDrawModal = function() { document.getElementById('draw-create-ov').style.display = 'none'; };
+window.ppCloseDrawModal = function() { ppHideModalOv('draw-create-ov'); };
 
 window.ppSubmitDraw = function() {
   if (!ppEditingDrawId) return;
@@ -6637,9 +6662,9 @@ window.ppSubmitDraw = function() {
 window.ppOpenTemplateModal = function() {
   document.getElementById('template-rows').innerHTML = '';
   (ppDrawTemplate || DEFAULT_DRAW_TEMPLATE).forEach(function(p){ ppAppendPrizeRow('template-rows', p.rank, p.name, p.count); });
-  document.getElementById('draw-template-ov').style.display = 'block';
+  ppShowModalOv('draw-template-ov');
 }
-window.ppCloseTemplateModal = function() { document.getElementById('draw-template-ov').style.display = 'none'; };
+window.ppCloseTemplateModal = function() { ppHideModalOv('draw-template-ov'); };
 window.ppAddTemplateRow = function() { ppAppendPrizeRow('template-rows', null, '', 1); };
 window.ppSaveTemplate = function() {
   var tpl = ppCollectPrizeRows('template-rows');
@@ -6989,11 +7014,7 @@ window.pdOpenEntrantsModal = function(raffleId) {
   pdRefreshEntrantsNote();
   document.getElementById('pd-ent-summary').textContent = '불러오는 중…';
   document.getElementById('pd-ent-tbody').innerHTML = '';
-  var _entOv = document.getElementById('pd-entrants-ov');
-  /* 섹션(.section.active)에 걸린 전환 애니메이션의 transform이 position:fixed의 기준을 바꿔버리므로
-     오버레이를 body 직속으로 올린다 — 그래야 항상 브라우저 화면 기준으로 중앙에 온다. */
-  if (_entOv.parentElement !== document.body) document.body.appendChild(_entOv);
-  _entOv.style.display = 'flex'; /* 가로·세로 중앙 정렬 */
+  ppShowModalOv('pd-entrants-ov');
   Promise.all([
     db.collection('raffles').doc(raffleId).get(),
     db.collection('raffle_entries').where('raffle_id', '==', raffleId).limit(300).get(),
@@ -7036,7 +7057,7 @@ window.pdOpenEntrantsModal = function(raffleId) {
 };
 
 window.pdCloseEntrantsModal = function() {
-  document.getElementById('pd-entrants-ov').style.display = 'none';
+  ppHideModalOv('pd-entrants-ov');
 };
 
 /* 등수 슬롯 수동 지정(진행 중인 회차 한정) — 응모 행(entryId) 단위로 스테이징하고,
@@ -7137,7 +7158,7 @@ window.pdSaveMemo = function(uid, value) {
     _origIpSetLang(lang);
     var sec = document.getElementById('sec-weekly-draws');
     if (sec && sec.classList.contains('active') && typeof loadDraws === 'function') loadDraws();
-    if (typeof pdRefreshEntrantsTitle === 'function' && document.getElementById('pd-entrants-ov') && document.getElementById('pd-entrants-ov').style.display === 'flex') {
+    if (typeof pdRefreshEntrantsTitle === 'function' && document.getElementById('pd-entrants-ov') && ppIsModalOvOpen('pd-entrants-ov')) {
       pdRefreshEntrantsTitle();
       /* 안내 문구가 번역된 뒤(옵저버는 비동기) (i) 버튼 툴팁도 같은 언어로 맞춘다 */
       setTimeout(function(){ if (typeof pdSyncEntNoteTitle === 'function') pdSyncEntNoteTitle(); }, 60);
