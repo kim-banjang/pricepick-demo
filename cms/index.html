@@ -6624,9 +6624,12 @@ var pdCurrentRoundEndDate = null; /* 모달 제목을 언어 토글 시에도 �
 function pdRefreshEntrantsTitle() {
   var el = document.getElementById('pd-ent-title');
   if (!el) return;
-  el.innerHTML = pdCurrentRoundEndDate
-    ? '<span>응모자 리스트</span> — ' + pdWeekLabel(pdCurrentRoundEndDate)
-    : '<span>응모자 리스트</span>';
+  /* 회차 구분을 앞에 붙인다 — "진행중인 주간 이벤트 / 응모자 리스트 — N월 M주차".
+     구분 문구는 회차 리스트 구역 제목과 같은 KO2VI 사전 키를 쓰므로 언어 토글 시 그대로 번역된다.
+     (진행예정 회차는 "응모 상세 보기" 버튼 자체가 없어 여기 올 일이 없다) */
+  var phaseLabel = (pdCurrentRoundPhase === 'active') ? '진행중인 주간 이벤트' : '종료된 주간 이벤트';
+  var head = '<span>' + phaseLabel + '</span> / <span>응모자 리스트</span>';
+  el.innerHTML = pdCurrentRoundEndDate ? (head + ' — ' + pdWeekLabel(pdCurrentRoundEndDate)) : head;
 }
 
 /* 응모일시 — 두 줄(위: 날짜 YYYY/MM/DD 진하게, 아래: 시각 HH:MM:SS 연한 회색), 가운데 정렬 */
