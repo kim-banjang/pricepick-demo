@@ -496,6 +496,24 @@ textarea.form-input{resize:vertical;min-height:80px;height:auto;}
 #sec-members table td,#sec-members table th{vertical-align:middle;}
 #sec-members table td{white-space:normal;overflow:hidden;text-overflow:ellipsis;}
 
+/* ── 응모자 리스트 모달 — 한 페이지 10건이 모달 내부 스크롤 없이 다 보이도록 행 밀도 압축 ──
+   글자 크기는 그대로 두고 셀 패딩·줄간격·모달 여백만 줄였다. 지급 메모는 뱃지와 같은 줄에
+   한 줄 입력으로 붙여 당첨 행 높이를 미당첨 행과 같게 맞춘다(기존엔 메모칸이 아래로 펼쳐져 2배). */
+#pd-entrants-ov .info-box{padding:6px 12px;margin-bottom:0;line-height:1.45;}
+#pd-ent-table th{padding:6px 8px;}
+#pd-ent-table td{padding:4px 8px;line-height:1.2;vertical-align:middle;}
+#pd-ent-table td > div{line-height:1.2;}
+#pd-ent-pager{padding:6px 0 0;}
+/* 진행 중 회차의 등수 수동 지정 셀렉트도 행 높이에 맞춰 압축(기본 .form-select는 40px) */
+#pd-ent-table .form-select{height:28px;padding:3px 8px;}
+.pd-pay-line{display:flex;align-items:center;gap:6px;}
+.pd-pay-line .badge{flex:none;}
+.pd-memo-input{flex:1 1 auto;min-width:0;height:26px;background:var(--surface-2);
+  border:1px solid var(--border);border-radius:var(--r-sm);padding:4px 8px;font-size:12px;
+  color:var(--text);font-family:var(--font);outline:none;text-align:left;transition:border-color .15s;}
+.pd-memo-input:focus{border-color:var(--main);}
+.pd-memo-input::placeholder{color:var(--text-3);}
+
 /* ── 마케팅 수신 배지 ── */
 .mkt-badge{display:inline-flex;align-items:center;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600;}
 .mkt-badge.all{background:var(--success-soft);color:var(--success);}
@@ -1283,24 +1301,23 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
       </div>
 
       <div id="pd-entrants-ov" style="display:none;position:fixed;inset:0;z-index:210;background:rgba(0,0,0,.45)" onclick="if(event.target===this)pdCloseEntrantsModal()">
-      <div class="card" style="max-width:760px;margin:4vh auto;max-height:92vh;overflow:auto">
-        <div class="card-header"><div class="card-title" id="pd-ent-title">응모자 리스트</div><button class="btn btn-ghost btn-sm" onclick="pdCloseEntrantsModal()">✕ 닫기</button></div>
-        <div style="padding:18px">
+      <div class="card" style="max-width:840px;margin:1vh auto;max-height:98vh;overflow:auto">
+        <div class="card-header" style="padding:10px 18px"><div class="card-title" id="pd-ent-title">응모자 리스트</div><button class="btn btn-ghost btn-sm" onclick="pdCloseEntrantsModal()">✕ 닫기</button></div>
+        <div style="padding:10px 16px 12px">
           <div class="info-box" id="pd-ent-summary"></div>
-          <div id="pd-ent-note" style="font-size:11.5px;color:var(--text-sub);margin:8px 2px 2px"></div>
-          <div style="display:flex;justify-content:space-between;align-items:center;margin:10px 0;flex-wrap:wrap;gap:8px">
+          <div id="pd-ent-note" style="font-size:11.5px;color:var(--text-sub);margin:5px 2px 0"></div>
+          <!-- 상태 뱃지·검색·건수·취소/저장을 한 줄로 합쳤다 — 줄 하나를 줄여 10건이 스크롤 없이 들어오게 함 -->
+          <div style="display:flex;align-items:center;margin:6px 0 4px;flex-wrap:wrap;gap:8px">
             <span class="badge" id="pd-ent-status-badge">미선정</span>
+            <input class="search-box" id="pd-ent-search" placeholder="닉네임·카카오ID 검색" style="width:210px;min-width:160px;padding:5px 12px" oninput="pdEntSearch(this.value)">
+            <span style="font-size:12px;color:var(--text-2);margin-left:auto" id="pd-ent-count"></span>
             <div style="display:flex;gap:8px">
               <button class="btn btn-ghost btn-sm" onclick="pdCloseEntrantsModal()">취소</button>
               <button class="btn btn-primary btn-sm" onclick="pdSaveEntrants()">저장</button>
             </div>
           </div>
-          <div style="display:flex;justify-content:space-between;align-items:center;margin:10px 0 8px;flex-wrap:wrap;gap:8px">
-            <input class="search-box" id="pd-ent-search" placeholder="닉네임·카카오ID 검색" style="width:220px" oninput="pdEntSearch(this.value)">
-            <span style="font-size:12px;color:var(--text-2)" id="pd-ent-count"></span>
-          </div>
-          <table style="table-layout:fixed;width:100%">
-            <thead><tr><th style="width:22%">닉네임(카카오ID)</th><th style="width:16%">응모일시</th><th style="width:42%">당첨 경품 지급</th><th style="width:20%">당첨 등수</th></tr></thead>
+          <table id="pd-ent-table" style="table-layout:fixed;width:100%">
+            <thead><tr><th style="width:19%">닉네임(카카오ID)</th><th style="width:13%">응모일시</th><th style="width:54%">당첨 경품 지급</th><th style="width:14%">당첨 등수</th></tr></thead>
             <tbody id="pd-ent-tbody"></tbody>
           </table>
           <div class="pagination" id="pd-ent-pager" style="display:none"></div>
@@ -5065,7 +5082,7 @@ Object.assign(KO2VI,{
   "수동 지정이 모두 해제되었습니다. 마감 시 전체가 무작위 추첨으로 결정됩니다.":"Đã huỷ toàn bộ chỉ định thủ công. Khi đóng đợt, toàn bộ sẽ được quyết định bằng rút thăm ngẫu nhiên."
 });
 /* 응모자 리스트 검색·페이지네이션 */
-Object.assign(KO2VI,{"닉네임·카카오ID 검색":"Tìm biệt danh·Kakao ID","전체 응모 건수":"Tổng số lượt dự thưởng","검색 결과":"Kết quả tìm kiếm","검색 결과가 없습니다.":"Không có kết quả tìm kiếm."});
+Object.assign(KO2VI,{"닉네임·카카오ID 검색":"Tìm biệt danh·Kakao ID","전체 응모 건수":"Tổng số lượt dự thưởng","검색 결과":"Kết quả tìm kiếm","검색 결과가 없습니다.":"Không có kết quả tìm kiếm.","메모(발송일·송장번호 등)":"Ghi chú (ngày gửi·mã vận đơn v.v.)"});
   var _orig=new Map(), _tracked=new Set(), _applying=false;
   function hasKo(s){ return /[가-힯ᄀ-ᇿ㄰-㆏]/.test(s); }
   function tcore(s){
@@ -6398,15 +6415,18 @@ function pdWinnerTagHtml(uid, r) {
   if (w) {
     var paid = !!w.paid;
     var payoutLabel = paid ? '지급 완료' : '지급 대기';
-    html += ' <span class="badge ' + (paid ? 'badge-green' : 'badge-amber') + '" style="cursor:pointer" onclick="pdTogglePaid(\'' + uid + '\')">' + payoutLabel + '</span>';
+    html += '<span class="badge ' + (paid ? 'badge-green' : 'badge-amber') + '" style="cursor:pointer" onclick="pdTogglePaid(\'' + uid + '\')">' + payoutLabel + '</span>';
   }
-  return '<div style="margin-bottom:4px">' + html + '</div>';
+  return html;
 }
-/* 당첨자 메모(기프티콘 발송일·실물 송장번호 등) — 확정된 당첨자에 한해 노출 */
+/* 당첨자 메모(기프티콘 발송일·실물 송장번호 등) — 확정된 당첨자에 한해 노출.
+   뱃지 아래로 펼치지 않고 같은 줄에 한 줄 입력으로 붙인다(행 높이 절약).
+   칸보다 긴 메모는 잘려 보이므로 title로 전체 내용을 마우스오버에 노출. */
 function pdMemoInputHtml(uid) {
   var w = pdConfirmedWinnerFor(uid);
   if (!w) return '';
-  return '<input class="form-input" style="margin-top:4px;font-size:12px;padding:5px 8px" placeholder="메모(기프티콘 발송일·송장번호 등)" value="' + ppEsc(w.memo||'') + '" onchange="pdSaveMemo(\'' + uid + '\', this.value)">';
+  var v = ppEsc(w.memo || '');
+  return '<input class="pd-memo-input" placeholder="메모(발송일·송장번호 등)" title="' + v + '" value="' + v + '" onchange="pdSaveMemo(\'' + uid + '\', this.value)">';
 }
 /* 운영자가 직접 지정한 당첨자는 "(수동)" 표시를 붙여 자동 추첨분과 구분한다 */
 function pdWinnerSummary(winners) {
@@ -6716,7 +6736,7 @@ function pdRenderEntrantRows() {
   tbody.innerHTML = pageRows.map(function(e) {
     var rank = rankMap[e._id] || '';
     var winnerCell = rank
-      ? (pdWinnerTagHtml(e.user_id, ppRankNum(rank)) + pdMemoInputHtml(e.user_id))
+      ? ('<div class="pd-pay-line">' + pdWinnerTagHtml(e.user_id, ppRankNum(rank)) + pdMemoInputHtml(e.user_id) + '</div>')
       : '<span style="color:var(--text-sub)">—</span>';
     var rankCell = isActive
       ? '<select class="form-select" style="font-size:13px;width:100%" onchange="pdAssignRank(this,\'' + e._id + '\',\'' + e.user_id + '\')">' + pdRankOptionsHtml(rank) + '</select>'
