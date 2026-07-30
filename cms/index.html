@@ -7131,6 +7131,12 @@ function pdSyncEntNoteTitle() {
     : [(el.textContent || '').trim()];
   btn.title = lines.join('\n');
 }
+/* 안내 문구를 새로 그린 직후에는 아직 번역 전이다(i18n 옵저버가 비동기) — 그대로 title에 넣으면
+   VI 모드에서 툴팁만 한국어로 남는다. 언어 토글 경로와 같은 방식으로 한 틱 뒤 다시 맞춘다. */
+function pdSyncEntNoteTitleDeferred() {
+  pdSyncEntNoteTitle();
+  setTimeout(pdSyncEntNoteTitle, 60);
+}
 function pdRefreshEntrantsNote() {
   var el = document.getElementById('pd-ent-note');
   if (!el) return;
@@ -7138,11 +7144,11 @@ function pdRefreshEntrantsNote() {
   if (pdCurrentRoundPhase === 'active') {
     el.innerHTML = '<div>진행 중인 회차입니다 · 등수 슬롯별로 당첨자를 직접 지정할 수 있고, 마감(일요일 23:59:59) 시 비어 있는 슬롯만 응모 건 단위 무작위 추첨으로 채워집니다 · 1인 1회 당첨 · 마감 전까지 변경·해제 가능</div>'
       + '<div style="color:var(--amber);margin-top:3px">지급 상태·메모는 아직 지급이 성립하지 않는 구간이라 표시하지 않습니다 — 회차 종료 후 이 리스트에 함께 나타납니다</div>';
-    pdSyncEntNoteTitle();
+    pdSyncEntNoteTitleDeferred();
     return;
   }
   el.textContent = '마감 시 비어 있던 등수 슬롯이 응모 건 단위 무작위 추첨으로 채워져 확정된 결과입니다 · 1인 1회 당첨 · 종료된 회차는 당첨자를 변경할 수 없습니다';
-  pdSyncEntNoteTitle();
+  pdSyncEntNoteTitleDeferred();
 }
 
 window.pdOpenEntrantsModal = function(raffleId) {
