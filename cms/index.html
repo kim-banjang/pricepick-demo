@@ -918,9 +918,13 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
             <span class="sb-item-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13"/><path d="M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7"/><path d="M7.5 8a2.5 2.5 0 0 1 0-5A4.8 8 0 0 1 12 8a4.8 8 0 0 1 4.5-5 2.5 2.5 0 0 1 0 5"/></svg></span>
             <span class="sb-item-lbl" id="nav-label-weekly-draws">주간 이벤트 추첨 관리</span>
           </button>
-          <button class="sb-item" id="nav-roulette-settings" data-label="매일 행운 룰렛 설정" onclick="go('roulette-settings',this)">
+          <button class="sb-item" id="nav-roulette-settings" data-label="매일 행운 룰렛" onclick="go('roulette-settings',this)">
             <span class="sb-item-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 3v9l6 3"/></svg></span>
-            <span class="sb-item-lbl" id="nav-label-roulette-settings">매일 행운 룰렛 설정</span>
+            <span class="sb-item-lbl" id="nav-label-roulette-settings">매일 행운 룰렛</span>
+          </button>
+          <button class="sb-item" id="nav-jackpot-roulette" data-label="잭팟 룰렛" onclick="go('jackpot-roulette',this)">
+            <span class="sb-item-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/><path d="M4.5 5.5 6 7"/><path d="M19.5 5.5 18 7"/></svg></span>
+            <span class="sb-item-lbl" id="nav-label-jackpot-roulette">잭팟 룰렛</span>
           </button>
         </div>
       </div>
@@ -3620,7 +3624,8 @@ const I18N = {
     'page.demo-mgmt.title': '데이터 관리(데모)', 'page.demo-mgmt.bc': '개발 · 데모',
     'nav.op-policy': '운영 정책', 'page.op-policy.title': '운영 정책', 'page.op-policy.bc': '운영',
     'page.clawback.title': '환수 이력', 'page.clawback.bc': '티켓 · 보상',
-    'nav.roulette-settings': '매일 행운 룰렛 설정', 'page.roulette-settings.title': '매일 행운 룰렛 설정', 'page.roulette-settings.bc': '티켓 · 보상',
+    'nav.roulette-settings': '매일 행운 룰렛', 'page.roulette-settings.title': '매일 행운 룰렛', 'page.roulette-settings.bc': '티켓 · 보상',
+    'nav.jackpot-roulette': '잭팟 룰렛', 'page.jackpot-roulette.title': '잭팟 룰렛', 'page.jackpot-roulette.bc': '티켓 · 보상',
     'nav.group.points': '포인트 관리',
     'nav.points': '포인트 내역', 'page.points.title': '포인트 내역', 'page.points.bc': '포인트 관리',
     'nav.point-attendance': '출석체크 설정', 'page.point-attendance.title': '출석체크 설정', 'page.point-attendance.bc': '포인트 관리',
@@ -3853,7 +3858,8 @@ const PAGE_META = {
   members:       { title:'회원 목록',           bc:'회원 관리' },
   tickets:       { title:'티켓 내역',           bc:'티켓 · 보상' },
   'weekly-draws': { title:'주간 이벤트 추첨 관리', bc:'티켓 · 보상' },
-  'roulette-settings': { title:'매일 행운 룰렛 설정',    bc:'티켓 · 보상' },
+  'roulette-settings': { title:'매일 행운 룰렛',      bc:'티켓 · 보상' },
+  'jackpot-roulette':  { title:'잭팟 룰렛',          bc:'티켓 · 보상' },
   gifticons:     { title:'구매/사용 내역',        bc:'티켓 · 보상' },
   banners:       { title:'배너 관리',           bc:'콘텐츠' },
   invite:        { title:'친구초대 관리',        bc:'콘텐츠' },
@@ -3892,7 +3898,8 @@ function go(id, navEl) {
      회차명만 한국어로 남으므로 진입할 때 현재 언어로 다시 그린다. */
   if (id === 'weekly-draws' && typeof loadDraws === 'function') loadDraws();
   if (id === 'demo-mgmt' && window.dmLoadStats) window.dmLoadStats();
-  if (id === 'roulette-settings' && window.rltLoad) window.rltLoad();
+  if (id === 'roulette-settings' && window.rltLoad) window.rltLoad('daily');
+  if (id === 'jackpot-roulette' && window.rltLoad) window.rltLoad('jackpot');
   // 모바일: 메뉴 항목 선택 시 드로어 닫기
   if (window.innerWidth <= 768) closeMobileSidebar();
   // 새로고침/뒤로가기 복원을 위해 현재 섹션을 URL 해시에 반영
