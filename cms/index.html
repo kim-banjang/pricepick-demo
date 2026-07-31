@@ -585,11 +585,23 @@ textarea.form-input{resize:vertical;min-height:80px;height:auto;}
    텍스트 계열(슬롯 번호·보상 유형·삭제)은 기존대로 가운데 그대로 둔다. */
 #rlt-table td:nth-child(3),#rlt-table td:nth-child(4),#rlt-table td:nth-child(5),#rlt-table td:nth-child(6),
 #jkr-table td:nth-child(3),#jkr-table td:nth-child(4),#jkr-table td:nth-child(5),#jkr-table td:nth-child(6){text-align:right!important;}
-/* 합계 행 — 확률 합계(2번째 칸)·기대값 합계(3번째 칸)도 같은 기준. "합계" 라벨은 가운데 유지 */
+/* 합계 행 — 확률 합계(2번째 칸)·기대값 합계(3번째 칸)도 같은 기준. "합계" 라벨은 가운데 유지.
+   확률 합계는 본문 행이 단위("%")+간격(22px)만큼 안쪽에서 끝나므로 같은 만큼 밀어야
+   숫자 오른쪽 끝이 위아래로 맞는다(기본 padding 18 + 22 = 40). */
 #rlt-table tfoot td:nth-child(2),#rlt-table tfoot td:nth-child(3),
 #jkr-table tfoot td:nth-child(2),#jkr-table tfoot td:nth-child(3){text-align:right!important;}
+#rlt-table tfoot td:nth-child(2),#jkr-table tfoot td:nth-child(2){padding-right:40px;}
 /* 실행 로그 — 보상 수량이 들어가는 "결과"(4번째 칸)만 우측. 일시·룰렛 종류·지급 상태는 가운데 유지 */
 #rlt-log-table td:nth-child(4),#jkr-log-table td:nth-child(4){text-align:right!important;}
+
+/* 수량·확률 칸 — 입력 박스(스피너 포함)와 단위를 한 덩어리로 셀 우측 끝에 붙인다.
+   .form-input이 width:100%라 flex 안에서 내용만큼 쭈그러들어 행마다 폭이 달라졌다.
+   입력 폭·단위 폭을 둘 다 고정해야 단위 글자 폭이 달라도("장"/"P"/"%")
+   숫자의 오른쪽 끝이 컬럼 안에서 세로로 일직선이 된다. */
+.rlt-numcell{display:flex;align-items:center;justify-content:flex-end;gap:6px;}
+.rlt-numcell .rlt-num{flex:none;width:72px;max-width:none;text-align:right;}
+.rlt-numcell .rlt-unit{flex:none;width:16px;text-align:left;font-size:12px;color:var(--text-2);}
+.rlt-numcell .rlt-none{font-size:12px;color:var(--text-3);}
 
 /* ── 마케팅 수신 배지 ── */
 .mkt-badge{display:inline-flex;align-items:center;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600;}
@@ -1436,7 +1448,7 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
               <th style="width:150px">보상 유형</th>
               <th style="width:150px">수량</th>
               <th style="width:110px">가치(원)</th>
-              <th style="width:130px">확률(%)</th>
+              <th style="width:150px">확률(%)</th>
               <th style="width:120px">기대값 기여</th>
               <th style="width:60px">삭제</th>
             </tr>
@@ -1501,7 +1513,7 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
               <th style="width:150px">보상 유형</th>
               <th style="width:150px">수량</th>
               <th style="width:110px">가치(원)</th>
-              <th style="width:130px">확률(%)</th>
+              <th style="width:150px">확률(%)</th>
               <th style="width:120px">기대값 기여</th>
               <th style="width:60px">삭제</th>
             </tr>
@@ -10879,11 +10891,11 @@ function rltRenderSlots(k) {
     return '<tr>'
       + '<td style="font-weight:700;color:var(--text-2)">' + (i + 1) + '번</td>'
       + '<td><select class="form-select" onchange="rltSetType(\'' + k + '\', ' + i + ', this.value)">' + opts + '</select></td>'
-      + '<td>' + (isMiss
-        ? '<span style="color:var(--text-3);font-size:12px">보상 없음</span>'
-        : '<div style="display:flex;align-items:center;justify-content:flex-end;gap:6px"><input class="form-input" type="number" min="1" step="1" value="' + s.qty + '" style="max-width:92px;text-align:right" oninput="rltSetQty(\'' + k + '\', ' + i + ', this.value)"><span style="font-size:12px;color:var(--text-2)">' + meta.unit + '</span></div>') + '</td>'
+      + '<td><div class="rlt-numcell">' + (isMiss
+        ? '<span class="rlt-none">보상 없음</span><span class="rlt-unit"></span>'
+        : '<input class="form-input rlt-num" type="number" min="1" step="1" value="' + s.qty + '" oninput="rltSetQty(\'' + k + '\', ' + i + ', this.value)"><span class="rlt-unit">' + meta.unit + '</span>') + '</div></td>'
       + '<td style="text-align:right;color:var(--text-2)">' + (isMiss ? '—' : rltFmt(rltSlotValue(s)) + '원') + '</td>'
-      + '<td><div style="display:flex;align-items:center;justify-content:flex-end;gap:6px"><input class="form-input" type="number" min="0" max="100" step="0.1" value="' + s.prob + '" style="max-width:88px;text-align:right" oninput="rltSetProb(\'' + k + '\', ' + i + ', this.value)"><span style="font-size:12px;color:var(--text-2)">%</span></div></td>'
+      + '<td><div class="rlt-numcell"><input class="form-input rlt-num" type="number" min="0" max="100" step="0.1" value="' + s.prob + '" oninput="rltSetProb(\'' + k + '\', ' + i + ', this.value)"><span class="rlt-unit">%</span></div></td>'
       + '<td style="text-align:right;font-weight:600">' + rltFmt(rltSlotEv(s)) + '원</td>'
       + '<td style="text-align:center">' + (rltState[k].slots.length > 2
         ? '<button class="btn btn-ghost btn-sm" style="padding:2px 8px;font-size:11px" onclick="rltRemoveSlot(\'' + k + '\', ' + i + ')">삭제</button>'
