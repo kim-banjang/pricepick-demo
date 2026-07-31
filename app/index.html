@@ -8166,29 +8166,31 @@ body.interactive-mode #ip-nav { display: block; }
   .jp-screen .statusbar { color:#FFFFFF; }
   .jp-spin-btn:hover:not(:disabled) { background:linear-gradient(180deg,rgba(255,214,94,0.22),rgba(255,214,94,0.08)) !important; }
 
-  /* ===== 티켓 교환 홈(pw-22) — 보유 현황 + 교환 메뉴 3개 ===== */
-  .tx-hold2 { display:flex; gap:9px; }
-  .tx-hold2-item { flex:1; background:#fff; border:1px solid var(--border); border-radius:14px; padding:13px 14px; }
-  .tx-hold2-label { font-size:11.5px; font-weight:600; color:var(--text3); }
-  .tx-hold2-val { font-size:20px; font-weight:800; color:var(--text1); margin-top:4px; letter-spacing:-0.4px; }
-  .tx-hold2-val .unit { font-size:12px; font-weight:600; color:var(--text3); margin-left:2px; }
-  .tx-menu-list { display:flex; flex-direction:column; gap:9px; }
-  .tx-menu {
-    width:100%; display:flex; align-items:center; gap:12px; text-align:left; cursor:pointer;
-    background:#fff; border:1px solid var(--border); border-radius:14px; padding:14px 14px; font-family:inherit;
-    transition:border-color .15s, box-shadow .15s;
-  }
-  .tx-menu:active { border-color:var(--main); box-shadow:0 0 0 3px var(--sub-4); }
-  .tx-menu-ico { width:40px; height:40px; border-radius:12px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
-  .tx-menu-ico.grade { background:#FFF1D6; color:#C98A0E; }
-  .tx-menu-ico.point { background:var(--sub-4); color:var(--main); }
-  .tx-menu-ico.event { background:#E7DEFF; color:#7A49DE; }
-  .tx-menu-body { flex:1; min-width:0; }
-  .tx-menu-title { font-size:14px; font-weight:700; color:var(--text1); }
-  .tx-menu-desc { font-size:11.5px; font-weight:500; color:var(--text3); margin-top:3px; line-height:1.5; word-break:keep-all; }
-  .tx-menu-arrow { color:var(--text3); flex-shrink:0; }
+  /* ===== 티켓 교환(pw-22) — 상단 보유 카드 고정 + 하단 탭 패널 교체 ===== */
+  /* 보유 현황은 카드 하나에 모은다: 등급 티켓 3종은 나란히, 이벤트 티켓·포인트는 구분선 아래 */
+  .tx-hold-card { background:#fff; border:1px solid var(--border); border-radius:16px; padding:16px 14px 14px; box-shadow:0 2px 8px rgba(26,17,48,.04); }
+  .tx-hold-head { font-size:12px; font-weight:700; color:var(--text3); letter-spacing:-0.2px; margin-bottom:12px; padding:0 2px; }
+  .tx-hold-card .swap-hold-row { display:flex; gap:8px; }
+  .tx-hold-card .swap-hold-card { flex:1; }
+  .tx-hold-div { height:1px; background:var(--border); margin:14px 2px 12px; }
+  .tx-hold-sub { display:flex; align-items:stretch; }
+  .tx-hold-sub-item { flex:1; display:flex; flex-direction:column; gap:4px; align-items:center; }
+  .tx-hold-sub-sep { width:1px; background:var(--border); margin:2px 0; }
+  .tx-hold-sub-label { font-size:11.5px; font-weight:600; color:var(--text3); }
+  .tx-hold-sub-val { font-size:18px; font-weight:800; color:var(--text1); letter-spacing:-0.4px; }
+  .tx-hold-sub-val .unit { font-size:11.5px; font-weight:600; color:var(--text3); margin-left:2px; }
 
-  /* ===== 이벤트 티켓 → 브론즈 교환(pw-22c · 단방향) ===== */
+  /* 탭 — 누르면 아래 패널만 교체된다(화면 이동 없음) */
+  .tx-tabs { display:flex; gap:6px; margin-top:16px; background:var(--sub-4); border-radius:12px; padding:4px; }
+  .tx-tab {
+    flex:1; padding:9px 4px; border:none; border-radius:9px; cursor:pointer; font-family:inherit;
+    font-size:12px; font-weight:700; color:var(--text3); background:transparent; transition:background .15s, color .15s;
+    white-space:nowrap;
+  }
+  .tx-tab.on { background:#fff; color:var(--main); box-shadow:0 1px 3px rgba(26,17,48,.10); }
+  .tx-panel-lead { margin:14px 2px 0; font-size:12px; font-weight:500; color:var(--text2); line-height:1.6; word-break:keep-all; }
+
+  /* ===== 이벤트티켓 교환 탭 — 이벤트 티켓 → 브론즈(단방향) ===== */
   .tx-ev-rate { display:flex; align-items:center; justify-content:center; gap:18px; background:#fff; border:1px solid var(--border); border-radius:14px; padding:18px 14px; }
   .tx-ev-side { text-align:center; }
   .tx-ev-num { font-size:26px; font-weight:800; color:var(--main); letter-spacing:-0.6px; }
@@ -12746,10 +12748,10 @@ window.PP_FEATURES = {
         </div>
 
         <div class="gd-scroll">
-<!-- 보유 현황 -->
-          <div class="gd-section">
-            <div class="gd-section-t">내 보유 티켓</div>
-            <div class="swap-hold-row">
+          <!-- 상단 고정: 내 보유 현황 (등급 티켓 3종 + 이벤트 티켓 + 포인트를 한 카드에) -->
+          <div class="tx-hold-card">
+            <div class="tx-hold-head">내 보유</div>
+<div class="swap-hold-row">
               <div class="swap-hold-card bronze">
                 <div class="swap-hold-medal"><svg width="60" height="60" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="g05d_4001" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#C68250"/><stop offset="100%" stop-color="#8B5A2B"/></linearGradient></defs><path d="M306.6,106.8l-49.5,49.5,2.4,2.4c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-2.4-2.4-138.6,138.6c-3.7,3.7-3.7,9.6,0,13.3l75.5,75.5c3.7,3.7,9.6,3.7,13.3,0l138.6-138.6-2.3-2.3c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l2.3,2.3,49.5-49.5c3.7-3.7,3.7-9.6,0-13.3l-75.5-75.5c-3.7-3.7-9.6-3.7-13.3,0ZM335.6,234.8c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM322.9,222.1c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM310.2,209.4c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM297.6,196.7c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM284.9,184.1c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM272.2,171.4c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7Z" fill="url(#g05d_4001)"/><path d="M316.2,155.8l12.1,6.2c.8.4,1.8.3,2.4-.4l9.6-9.6c1.4-1.4,3.8-.2,3.5,1.8l-2.1,13.5c-.1.9.3,1.8,1.1,2.2l12.1,6.2c1.8.9,1.4,3.6-.6,3.9l-13.5,2.1c-.9.1-1.6.8-1.7,1.7l-2.1,13.5c-.3,2-3,2.4-3.9.6l-6.2-12.1c-.4-.8-1.3-1.3-2.2-1.1l-13.5,2.1c-2,.3-3.2-2.1-1.8-3.5l9.6-9.6c.6-.6.8-1.6.4-2.4l-6.2-12.1c-.9-1.8,1-3.7,2.8-2.8Z" fill="rgba(255,255,255,0.95)"/><path d="M180.7,298.9l-5.2,5.2,27.4,27.4-4.7,4.7-27.4-27.4-5.2,5.2-4.2-4.2,15.1-15.1,4.2,4.2ZM215.3,319.1l-4.7,4.7-31.6-31.6,4.7-4.7,31.6,31.6ZM231.9,296.8c1.9,1.9,1.9,3.9,0,5.8l-9.9,9.9c-1.9,1.9-3.8,1.8-5.7,0l-25.8-25.8c-1.9-1.9-2-3.8-.1-5.7l9.9-9.9c1.9-1.9,3.9-1.9,5.8,0l7.4,7.4-4.7,4.7-6.2-6.2-6.1,6.1,23.5,23.5,6.1-6.1-6.6-6.6,4.7-4.7,7.8,7.8ZM254.4,280l-5.2,5.2-20.1-8.1,14.1,14.1-4.7,4.7-31.6-31.6,4.7-4.7,13.4,13.4-8.1-18.6,5.2-5.2.2.2,8.6,21.4,23.6,9.2ZM269.5,265l-13.1,13.1-31.6-31.6,13-13,4.2,4.2-8.3,8.3,9.2,9.2,7.1-7.1,4.1,4.1-7.1,7.1,9.9,9.9,8.4-8.4,4.2,4.2ZM259,220.6l-5.2,5.2,27.4,27.4-4.7,4.7-27.4-27.4-5.2,5.2-4.2-4.2,15.1-15.1,4.2,4.2Z" fill="rgba(255,255,255,0.95)"/></svg></div>
                 <div class="swap-hold-name">브론즈</div>
@@ -12766,75 +12768,30 @@ window.PP_FEATURES = {
                 <div class="swap-hold-count" id="swap-hold-gold" data-gold="2">2<span class="unit">장</span></div>
               </div>
             </div>
-          </div>
-
-          
-          <!-- 이벤트 티켓 · 포인트 보유 -->
-          <div class="gd-section">
-            <div class="gd-section-t">이벤트 티켓 · 포인트</div>
-            <div class="tx-hold2">
-              <div class="tx-hold2-item">
-                <div class="tx-hold2-label">이벤트 티켓</div>
-                <div class="tx-hold2-val" id="tx-hold-event">0<span class="unit">장</span></div>
+            <div class="tx-hold-div"></div>
+            <div class="tx-hold-sub">
+              <div class="tx-hold-sub-item">
+                <span class="tx-hold-sub-label"><span class="i18n"><span class="ko">이벤트 티켓</span><span class="vi">Vé sự kiện</span></span></span>
+                <span class="tx-hold-sub-val" id="tx-hold-event">0<span class="unit">장</span></span>
               </div>
-              <div class="tx-hold2-item">
-                <div class="tx-hold2-label">포인트</div>
-                <div class="tx-hold2-val" id="tx-hold-point">0<span class="unit">P</span></div>
+              <div class="tx-hold-sub-sep"></div>
+              <div class="tx-hold-sub-item">
+                <span class="tx-hold-sub-label"><span class="i18n"><span class="ko">포인트</span><span class="vi">Điểm</span></span></span>
+                <span class="tx-hold-sub-val" id="tx-hold-point">0<span class="unit">P</span></span>
               </div>
             </div>
           </div>
 
-          <!-- 교환 메뉴 (각 항목 → 전용 화면 한 뎁스 진입) -->
-          <div class="gd-section">
-            <div class="gd-section-t">무엇을 교환할까요?</div>
-            <div class="tx-menu-list">
-              <button class="tx-menu" data-jump="pw-22a">
-                <div class="tx-menu-ico grade"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 3l2.5 5 5.5.8-4 3.9.95 5.5L12 15.6 7.05 18.2 8 12.7 4 8.8l5.5-.8L12 3z" fill="currentColor"/></svg></div>
-                <div class="tx-menu-body">
-                  <div class="tx-menu-title">티켓 등급 교환</div>
-                  <div class="tx-menu-desc">브론즈 10장 → 실버 1장 · 실버 2장 → 골드 1장</div>
-                </div>
-                <svg class="tx-menu-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              </button>
-              <button class="tx-menu" data-jump="pw-22b">
-                <div class="tx-menu-ico point"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M7 7h6a4 4 0 0 1 0 8H7V7z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M7 15v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div>
-                <div class="tx-menu-body">
-                  <div class="tx-menu-title">포인트 ↔ 티켓 교환</div>
-                  <div class="tx-menu-desc">포인트로 티켓을 사거나, 티켓을 포인트로 바꿔요</div>
-                </div>
-                <svg class="tx-menu-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              </button>
-              <button class="tx-menu" data-jump="pw-22c">
-                <div class="tx-menu-ico event"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M4 8a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2 2 2 0 0 0 0 4 2 2 0 0 1-2 2H6a2 2 0 0 1-2-2 2 2 0 0 0 0-4z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg></div>
-                <div class="tx-menu-body">
-                  <div class="tx-menu-title">이벤트 티켓 → 브론즈 티켓</div>
-                  <div class="tx-menu-desc">이벤트 티켓 5장을 브론즈 티켓 1장으로 (되돌리기 불가)</div>
-                </div>
-                <svg class="tx-menu-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              </button>
-            </div>
+          <!-- 하단 교체 영역: 탭 3개로 아래 패널만 바뀐다 (화면 이동 없음) -->
+          <div class="tx-tabs">
+            <button class="tx-tab on" data-tx-tab="grade"><span class="i18n"><span class="ko">등급 교환</span><span class="vi">Đổi hạng</span></span></button>
+            <button class="tx-tab" data-tx-tab="point"><span class="i18n"><span class="ko">포인트 교환</span><span class="vi">Đổi điểm</span></span></button>
+            <button class="tx-tab" data-tx-tab="event"><span class="i18n"><span class="ko">이벤트티켓 교환</span><span class="vi">Đổi vé sự kiện</span></span></button>
           </div>
 
-        </div>
-      </div>
-    </div>
-  </div>
+          <div class="tx-panel" data-tx-panel="grade">
+            <div class="tx-panel-lead"><span class="i18n"><span class="ko">브론즈 10장 → 실버 1장 · 실버 2장 → 골드 1장으로 등급을 올려요.</span><span class="vi">Nâng hạng: 10 Đồng → 1 Bạc · 2 Bạc → 1 Vàng.</span></span></div>
 
-  <div class="phone-wrap" id="pw-22a" data-screen="05d-grade">
-    <div class="phone">
-      <div class="grade-detail-screen">
-        <div class="statusbar">
-          <div>9:41</div>
-          <div class="statusbar-icons">••• ▸ ▇</div>
-        </div>
-        <div class="gd-top">
-          <button class="back-btn" data-jump="pw-22">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M15 5L8 12L15 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          </button>
-          <div class="gd-top-title">티켓 등급 교환</div>
-        </div>
-
-        <div class="gd-scroll">
 <!-- 교환 비율 안내 -->
           <div class="gd-section">
             <div class="swap-info-box">
@@ -12965,26 +12922,12 @@ window.PP_FEATURES = {
           </div>
 
           
-        </div>
-        <div class="gd-bottom">\n          <button class="gd-cta swap-cta" id="swap-cta-btn">티켓 교환하기</button>\n        </div>\n      </div>
-    </div>
-  </div>
+        
+          </div>
 
-  <div class="phone-wrap" id="pw-22b" data-screen="05d-point">
-    <div class="phone">
-      <div class="grade-detail-screen">
-        <div class="statusbar">
-          <div>9:41</div>
-          <div class="statusbar-icons">••• ▸ ▇</div>
-        </div>
-        <div class="gd-top">
-          <button class="back-btn" data-jump="pw-22">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M15 5L8 12L15 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          </button>
-          <div class="gd-top-title">포인트 ↔ 티켓 교환</div>
-        </div>
+          <div class="tx-panel" data-tx-panel="point" style="display:none">
+            <div class="tx-panel-lead"><span class="i18n"><span class="ko">포인트로 티켓을 사거나, 티켓을 포인트로 바꿔요.</span><span class="vi">Mua vé bằng điểm, hoặc đổi vé thành điểm.</span></span></div>
 
-        <div class="gd-scroll">
 <!-- 포인트 ↔ 티켓 교환 -->
           <div class="gd-section">
             <div class="gd-section-t">포인트 ↔ 티켓 교환</div>
@@ -13046,29 +12989,12 @@ window.PP_FEATURES = {
             <div class="swap-info-foot" style="margin-top:10px;">10P = 1원 · 포인트 유효기간 1년 · 일일 한도 없음</div>
           </div>
 
-        </div>
-
         
-        </div>
-      </div>
-    </div>
-  </div>
+          </div>
 
-  <div class="phone-wrap" id="pw-22c" data-screen="05d-event">
-    <div class="phone">
-      <div class="grade-detail-screen">
-        <div class="statusbar">
-          <div>9:41</div>
-          <div class="statusbar-icons">••• ▸ ▇</div>
-        </div>
-        <div class="gd-top">
-          <button class="back-btn" data-jump="pw-22">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M15 5L8 12L15 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          </button>
-          <div class="gd-top-title">이벤트 티켓 → 브론즈 티켓</div>
-        </div>
+          <div class="tx-panel" data-tx-panel="event" style="display:none">
+            <div class="tx-panel-lead"><span class="i18n"><span class="ko">이벤트 티켓 5장을 브론즈 티켓 1장으로 바꿔요. 되돌릴 수는 없어요.</span><span class="vi">Đổi 5 vé sự kiện lấy 1 vé Đồng. Không thể đổi ngược lại.</span></span></div>
 
-        <div class="gd-scroll">
           <div class="gd-section">
             <div class="gd-section-t">교환 비율</div>
             <div class="tx-ev-rate">
@@ -13106,9 +13032,13 @@ window.PP_FEATURES = {
             </div>
           </div>
 
+        
+          </div>
         </div>
+
         <div class="gd-bottom">
-          <button class="gd-cta swap-cta" id="ev-cta-btn">브론즈 티켓으로 교환하기</button>
+          <button class="gd-cta swap-cta" id="swap-cta-btn" data-tx-cta="grade">티켓 교환하기</button>
+          <button class="gd-cta swap-cta" id="ev-cta-btn" data-tx-cta="event" style="display:none">브론즈 티켓으로 교환하기</button>
         </div>
       </div>
     </div>
@@ -13310,10 +13240,7 @@ const SCREEN_MAP = {
   'pw-17':         { id:'17',           name:'연속구매 미션' },
   'pw-20':          { id:'20',             name:'혜택 메인 — 티켓 시스템' },
   'pw-21':          { id:'21',             name:'적립 티켓 통합 상세' },
-  'pw-22':          { id:'22',             name:'티켓 교환 (홈)' },
-  'pw-22a':         { id:'22a',            name:'티켓 등급 교환' },
-  'pw-22b':         { id:'22b',            name:'포인트 ↔ 티켓 교환' },
-  'pw-22c':         { id:'22c',            name:'이벤트 티켓 → 브론즈 티켓' },
+  'pw-22':          { id:'22',             name:'티켓 교환' },
   'pw-23':          { id:'23',             name:'적립 조건 안내' },
   'pw-24':          { id:'24',             name:'티켓 교환소 (카탈로그)' },
   'pw-25':          { id:'25',             name:'기프티콘 교환 상세' },
@@ -14187,11 +14114,8 @@ function showScreen(screenId, pushHistory = true) {
     jpHideResult();
     jpRefresh();
   }
-  // 티켓 교환: 홈은 보유 현황, 각 전용 화면은 자기 입력 상태를 진입 시 갱신
-  if (screenId === 'pw-22' && typeof renderTicketExchangeHome === 'function') renderTicketExchangeHome();
-  if (screenId === 'pw-22a' && typeof renderGradeSwapScreen === 'function') renderGradeSwapScreen();
-  if (screenId === 'pw-22b' && typeof renderPointTicketExchange === 'function') { renderExchangePoint(); renderPointTicketExchange(); }
-  if (screenId === 'pw-22c' && typeof renderEventSwapScreen === 'function') renderEventSwapScreen();
+  // 티켓 교환: 상단 보유 카드 + 현재 열려 있는 탭 패널을 진입 시 갱신
+  if (screenId === 'pw-22' && typeof renderTicketExchange === 'function') renderTicketExchange();
 }
 
 function ipGoBack() {
@@ -19600,7 +19524,7 @@ function renderAppNotices() {
   }).catch(function (e) { console.error('notices', e); box.innerHTML = ppEmpty('📢', '공지를 불러올 수 없어요', ''); });
 }
 
-/* ── pw-22b 보유 포인트 ── */
+/* ── pw-22 포인트 교환 탭: 보유 포인트 ── */
 function renderExchangePoint() {
   var el = document.getElementById('pt-balance-22');
   if (el) el.textContent = (PP.points || 0).toLocaleString('ko-KR') + 'P';
@@ -19640,7 +19564,7 @@ function ppSwapDenyReason(from, to) {
 }
 window.ppSwapAllowed = ppSwapAllowed;
 
-/* ── pw-22a 등급 티켓 교환 (실로직) ──
+/* ── pw-22 등급 교환 탭 (실로직) ──
    정책: 위 TICKET_SWAP_ALLOWED 화이트리스트에 있는 방향만. 하향·역방향은 방향 선택과
    실행(CTA) 양쪽에서 거부한다(UI 차단만으로는 우회 가능하므로 실행 직전에도 재검사).
    합칠 때 만료 임박분(적립일이 오래된 티켓)부터 소진(FIFO) — 기프티콘 교환(bindExchangeBtn)과 동일 패턴.
@@ -19649,7 +19573,7 @@ var GRADE_NAME = { bronze: '브론즈', silver: '실버', gold: '골드', event:
 var _swapState = { from: 'bronze', to: 'silver', ratioFrom: 10, ratioTo: 1 };
 
 function renderGradeSwapScreen() {
-  var screen = document.getElementById('pw-22a');
+  var screen = document.getElementById('pw-22');
   if (!screen) return;
   ['bronze', 'silver', 'gold'].forEach(function(g) {
     var el = document.getElementById('swap-hold-' + g);
@@ -19687,7 +19611,7 @@ function renderGradeSwapScreen() {
 }
 
 function bindGradeSwapScreen() {
-  var screen = document.getElementById('pw-22a');
+  var screen = document.getElementById('pw-22');
   if (!screen || screen.dataset.ppSwapBound) return;
   screen.dataset.ppSwapBound = '1';
 
@@ -19743,13 +19667,12 @@ function bindGradeSwapScreen() {
       if (!ok) return;
       renderGradeSwapScreen();
       showToast(GRADE_NAME[from] + ' ' + consume + '장 → ' + GRADE_NAME[to] + ' ' + receive + '장 교환 완료');
-      showScreen('pw-22');
     });
   }); }
 }
 
 /* ── 티켓 전환 실행 (공통) ──
-   등급 교환(pw-22a)과 이벤트 티켓 교환(pw-22c)이 함께 쓴다. 허용 방향 검사를 여기서
+   등급 교환 탭과 이벤트티켓 교환 탭이 함께 쓴다. 허용 방향 검사를 여기서
    한 번 더 하므로, 어떤 화면에서 부르든 화이트리스트에 없는 방향은 쓰기가 일어나지 않는다.
    소진은 만료 임박분(적립일이 오래된 티켓)부터 FIFO. */
 function ppExecuteTicketSwap(from, to, consume, receive) {
@@ -19796,12 +19719,12 @@ function ppExecuteTicketSwap(from, to, consume, receive) {
       PP.tickets.total = PP.tickets.bronze + PP.tickets.silver + PP.tickets.gold;
       renderHomeTickets();
       renderMyTicketCard();
-      renderTicketExchangeHome();
+      renderTicketExchange();   // 상단 보유 카드 즉시 반영
       return true;
     }).catch(function(e) { console.error('ppExecuteTicketSwap', e); showToast('교환 중 오류가 발생했어요'); return false; });
 }
 
-/* ── pw-22b 포인트 ↔ 티켓 교환 (실로직) ── 정책: 쌍방 허용, 10P=1원, 브1,000P·실10,000P·골20,000P
+/* ── pw-22 포인트 교환 탭 (실로직) ── 정책: 쌍방 허용, 10P=1원, 브1,000P·실10,000P·골20,000P
    비율은 2026-07-31 기준 현행값 그대로다(임의 변경 없음). */
 var PT_TICKET_RATE = { bronze: 1000, silver: 10000, gold: 20000 };
 
@@ -19845,7 +19768,7 @@ function ppBuyTicketWithPoints(grade) {
     PP.points -= cost;
     PP.tickets[grade] = (PP.tickets[grade] || 0) + 1;
     PP.tickets.total = PP.tickets.bronze + PP.tickets.silver + PP.tickets.gold;
-    renderHomePoints(); renderHomeTickets(); renderMyTicketCard(); renderExchangePoint(); renderGradeSwapScreen();
+    renderHomePoints(); renderHomeTickets(); renderMyTicketCard(); renderTicketExchange();
     showToast(cost.toLocaleString('ko-KR') + 'P → ' + GRADE_NAME[grade] + ' 1장 교환 완료');
   }).catch(function(e) { console.error('ppBuyTicketWithPoints', e); showToast('교환 중 오류가 발생했어요'); });
 }
@@ -19883,13 +19806,13 @@ function ppSellTicketForPoints(grade) {
       PP.tickets[grade] -= 1;
       PP.tickets.total = PP.tickets.bronze + PP.tickets.silver + PP.tickets.gold;
       PP.points += reward;
-      renderHomePoints(); renderHomeTickets(); renderMyTicketCard(); renderExchangePoint(); renderGradeSwapScreen();
+      renderHomePoints(); renderHomeTickets(); renderMyTicketCard(); renderTicketExchange();
       showToast(GRADE_NAME[grade] + ' 1장 → ' + reward.toLocaleString('ko-KR') + 'P 교환 완료');
     }).catch(function(e) { console.error('ppSellTicketForPoints', e); showToast('교환 중 오류가 발생했어요'); });
 }
 
 function bindPointTicketExchange() {
-  var screen = document.getElementById('pw-22b');
+  var screen = document.getElementById('pw-22');
   if (!screen || screen.dataset.ppPtBound) return;
   screen.dataset.ppPtBound = '1';
   [['pt-btn-buy-bronze', 'bronze', ppBuyTicketWithPoints], ['pt-btn-buy-silver', 'silver', ppBuyTicketWithPoints], ['pt-btn-buy-gold', 'gold', ppBuyTicketWithPoints],
@@ -19909,7 +19832,9 @@ function bindPointTicketExchange() {
 
 /* pw-22 실핸들러를 outer script의 bindCatchAll()보다 먼저 선점시키기 위한 브릿지
    (bindWithdrawConfirmScreen 등과 동일 이유 — window 경유로 outer script에서 먼저 호출) */
-/* ── pw-22 티켓 교환 홈 — 보유 현황(등급3종·이벤트·포인트) + 교환 메뉴 3개 ── */
+/* ── pw-22 상단 보유 카드 (고정) ──
+   등급 티켓 3종 + 이벤트 티켓 + 포인트를 한 카드에 표시한다. 탭을 바꿔도 이 영역은
+   그대로 있고, 교환이 성사되면 ppExecuteTicketSwap / 포인트 교환에서 즉시 다시 그린다. */
 function renderTicketExchangeHome() {
   ['bronze', 'silver', 'gold'].forEach(function(g) {
     var el = document.getElementById('swap-hold-' + g);
@@ -19921,7 +19846,7 @@ function renderTicketExchangeHome() {
   if (pt) pt.innerHTML = (PP.points || 0).toLocaleString('ko-KR') + '<span class="unit">P</span>';
 }
 
-/* ── pw-22c 이벤트 티켓 → 브론즈 티켓 (단방향 · 5:1) ──
+/* ── pw-22 이벤트티켓 교환 탭: 이벤트 티켓 → 브론즈 티켓 (단방향 · 5:1) ──
    역방향(브론즈→이벤트)은 진입 경로를 만들지 않았고, ppSwapAllowed/ppExecuteTicketSwap에서도
    차단된다. 비율 5:1은 김반장 확정값. */
 var EV_SWAP_RATIO = { from: 5, to: 1 };
@@ -19949,7 +19874,7 @@ function renderEventSwapScreen() {
 }
 
 function bindEventSwapScreen() {
-  var screen = document.getElementById('pw-22c');
+  var screen = document.getElementById('pw-22');
   if (!screen || screen.dataset.ppEvBound) return;
   screen.dataset.ppEvBound = '1';
 
@@ -19986,12 +19911,45 @@ function bindEventSwapScreen() {
       if (input) input.value = 0;
       renderEventSwapScreen();
       showToast('이벤트 티켓 ' + consume + '장 → 브론즈 티켓 ' + receive + '장 교환 완료');
-      showScreen('pw-22');
     });
   }); }
 }
 
-window.ppBindPw22 = function() { bindGradeSwapScreen(); bindPointTicketExchange(); bindEventSwapScreen(); };
+/* ── pw-22 하단 탭 전환 — 화면 이동 없이 패널만 교체 ── */
+var _txTab = 'grade';
+function txShowTab(tab) {
+  var screen = document.getElementById('pw-22');
+  if (!screen) return;
+  _txTab = tab;
+  screen.querySelectorAll('.tx-tab').forEach(function(b) { b.classList.toggle('on', b.dataset.txTab === tab); });
+  screen.querySelectorAll('.tx-panel').forEach(function(p) { p.style.display = (p.dataset.txPanel === tab) ? '' : 'none'; });
+  // 하단 CTA도 탭에 맞춰 교체(포인트 교환 탭은 행별 버튼이라 CTA 없음)
+  screen.querySelectorAll('[data-tx-cta]').forEach(function(c) { c.style.display = (c.dataset.txCta === tab) ? '' : 'none'; });
+  var bottom = screen.querySelector('.gd-bottom');
+  if (bottom) bottom.style.display = (tab === 'point') ? 'none' : '';
+  var scroll = screen.querySelector('.gd-scroll');
+  if (scroll) scroll.scrollTop = 0;
+  renderTicketExchange();
+}
+/* 상단 보유 카드 + 현재 탭 패널을 함께 갱신 */
+function renderTicketExchange() {
+  renderTicketExchangeHome();
+  if (_txTab === 'grade') renderGradeSwapScreen();
+  else if (_txTab === 'point') { renderExchangePoint(); renderPointTicketExchange(); }
+  else if (_txTab === 'event') renderEventSwapScreen();
+}
+function bindTicketExchangeTabs() {
+  var screen = document.getElementById('pw-22');
+  if (!screen || screen.dataset.ppTxTabBound) return;
+  screen.dataset.ppTxTabBound = '1';
+  screen.querySelectorAll('.tx-tab').forEach(function(btn) {
+    btn.dataset.ipBound = '1';
+    btn.addEventListener('click', function(e) { e.stopPropagation(); txShowTab(btn.dataset.txTab); });
+  });
+  txShowTab('grade');
+}
+
+window.ppBindPw22 = function() { bindGradeSwapScreen(); bindPointTicketExchange(); bindEventSwapScreen(); bindTicketExchangeTabs(); };
 
 /* ── pw-31 설정 확장: 기본 정렬 · 캐시 삭제 (실동작) ──
    PP·db·showToast는 이 IIFE 내부 로컬이라, HTML onclick(전역 스코프)에서
