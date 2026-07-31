@@ -5371,6 +5371,7 @@ Object.assign(KO2VI,{
   "여기서 저장한 슬롯 구성·보상·확률을 데모 앱 룰렛 화면이 그대로 읽어 렌더링하고 추첨·지급합니다. 등급 티켓(브론즈·실버·골드) 슬롯도 앱에서 정상 표시·지급됩니다. 앱을 새로고침하면 반영됩니다.":"App demo đọc nguyên cơ cấu ô·thưởng·xác suất đã lưu ở đây để render vòng quay, quay số và cấp thưởng. Ô vé theo hạng (Đồng·Bạc·Vàng) cũng hiển thị·cấp phát bình thường trên app. Làm mới app là được áp dụng.",
   "여기서 저장한 슬롯 구성·보상·확률과 아래 참여 제한 정책을 데모 앱 잭팟 룰렛 화면(홈 하단 잭팟 배너로 진입)이 그대로 읽어 적용합니다. 실행 로그·월 집계도 앱 실행 기록 실집계입니다.":"Màn Vòng quay Jackpot của app demo (vào từ banner Jackpot ở dưới trang chủ) đọc nguyên cơ cấu ô·thưởng·xác suất đã lưu ở đây cùng chính sách giới hạn tham gia bên dưới để áp dụng. Log lượt quay·tổng hợp theo tháng cũng là tổng hợp thật từ bản ghi lượt quay của app.",
   "지급완료 건 원화 환산":"Quy đổi ra KRW các lượt đã cấp thưởng",
+  "지급완료 건 환산 · 구 기록 제외(결과 미기록)":"Quy đổi các lượt đã cấp thưởng · loại trừ bản ghi cũ (chưa ghi kết quả)",
   "실행 기록 없음 · 데모 표시 데이터":"Không có bản ghi lượt quay · dữ liệu hiển thị demo",
   "참여 제한 정책":"Chính sách giới hạn tham gia",
   "하루 최대 참여 횟수":"Số lượt tối đa mỗi ngày",
@@ -11115,7 +11116,7 @@ function rltLoadStats(k) {
   var spinsEl = document.getElementById(p + '-stat-spins');
   var payEl = document.getElementById(p + '-stat-payout');
   db.collection('roulette_spins').get().then(function(snap) {
-    var n = 0, won = 0, any = false;
+    var n = 0, won = 0, any = false, legacy = 0;
     snap.forEach(function(doc) {
       var d = doc.data();
       if (rltSpinKind(d) !== k) return;
@@ -11123,6 +11124,8 @@ function rltLoadStats(k) {
       var day = d.date || (rltTsDate(d.created_at) ? ppFmtYMD(rltTsDate(d.created_at)) : '');
       if (String(day).slice(0, 7) !== thisYm) return;
       n++;
+      /* 결과를 문서에 남기기 전(2026-07-31 이전) 기록은 지급액을 알 수 없다 — 집계에서 빼고 건수만 밝힌다 */
+      if (!d.result_type) { legacy++; return; }
       if (d.payout_status === 'paid') won += rltSlotValue({ type: d.result_type, qty: d.result_qty });
     });
     if (!any) {
@@ -11133,7 +11136,9 @@ function rltLoadStats(k) {
       return;
     }
     rltSetStatCard(k, n.toLocaleString('ko-KR') + '회', Math.round(won).toLocaleString('ko-KR') + '원',
-      'roulette_spins 실집계', '지급완료 건 원화 환산');
+      'roulette_spins 실집계', legacy
+        ? '지급완료 건 환산 · 구 기록 ' + legacy + '건 제외(결과 미기록)'
+        : '지급완료 건 원화 환산');
   }).catch(function(e) {
     console.error('rltLoadStats', e);
     if (spinsEl) spinsEl.textContent = '—';
