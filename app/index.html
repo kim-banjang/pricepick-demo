@@ -11699,7 +11699,9 @@ window.PP_FEATURES = {
           <div class="statusbar-icons"><svg width="17" height="12" viewBox="0 0 17 12" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><rect x="0" y="4" width="3" height="8" rx="1"/><rect x="4.5" y="2.5" width="3" height="9.5" rx="1"/><rect x="9" y="1" width="3" height="11" rx="1"/><rect x="13.5" y="0" width="3" height="12" rx="1"/></svg><svg width="16" height="12" viewBox="0 0 16 12" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M8 2.5C10.2 2.5 12.2 3.4 13.6 4.9L15 3.4C13.2 1.5 10.7 0.3 8 0.3C5.3 0.3 2.8 1.5 1 3.4L2.4 4.9C3.8 3.4 5.8 2.5 8 2.5Z"/><path d="M8 5.5C9.4 5.5 10.7 6.1 11.6 7L13 5.5C11.7 4.2 10 3.3 8 3.3C6 3.3 4.3 4.2 3 5.5L4.4 7C5.3 6.1 6.6 5.5 8 5.5Z"/><circle cx="8" cy="10" r="1.8"/></svg><svg width="25" height="12" viewBox="0 0 25 12" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="currentColor" stroke-opacity="0.35"/><rect x="2" y="2" width="17" height="8" rx="2" fill="currentColor"/><path d="M23 4V8C23.8 7.6 24.5 6.9 24.5 6C24.5 5.1 23.8 4.4 23 4Z" fill="currentColor" fill-opacity="0.4"/></svg></div>
         </div>
         <div style="display:flex; align-items:center; justify-content:center; position:relative; padding:16px 20px 8px;">
-          <svg class="back-btn" data-jump="10" width="22" height="22" viewBox="0 0 24 24" style="position:absolute; left:20px; cursor:pointer;"><path d="M15 5 L8 12 L15 19" fill="none" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+          <!-- .back-btn 클래스는 붙이지 않는다 — 앱 전역 .back-btn 규칙(36x36 · color:var(--text1) · flex)이
+               시안 인라인 스타일을 덮어써 22x22 흰색 화살표가 깨진다. 이동은 data-jump 바인더가 처리한다. -->
+          <svg data-jump="10" width="22" height="22" viewBox="0 0 24 24" style="position:absolute; left:20px; cursor:pointer;"><path d="M15 5 L8 12 L15 19" fill="none" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
           <div style="font-size:17px; font-weight:700;"><span class="i18n"><span class="ko">잭팟 룰렛</span><span class="vi">Vòng quay Jackpot</span></span></div>
         </div>
         <div style="text-align:center; padding:18px 24px 0;">
@@ -14612,24 +14614,33 @@ function jpWheelTicketIcon(y, fill, ink) {
     + '<path d="' + PP_TICKET_PATH_STAR + '" fill="' + ink + '"></path>'
     + '<path d="' + PP_TICKET_PATH_TEXT + '" fill="' + ink + '"></path></g>';
 }
+/* 시안 원본은 슬롯별 확률 텍스트의 불투명도가 조금씩 다르다(등급이 높을수록 진하게).
+   가변 슬롯에서도 확정 6칸 구성이 시안과 1:1로 같아지도록 타입별 값을 그대로 표로 둔다. */
+var JP_PROB_OPACITY = { gold_ticket:'0.45', silver_ticket:'0.55', bronze_ticket:'0.5', miss:'0.4' };
 function jpBuildWheel() {
   var svg = document.getElementById('jp-wheel');
   if (!svg) return;
   var cx = 150, cy = 150, R = 146, n = JP_ACTIVE_SLOTS.length, seg = 360 / n;
-  var parts = JP_DEFS, pointN = 0;
+  /* 시안 원본 SVG는 6칸 path를 먼저 전부 그린 뒤 라벨 그룹 6개를 그린다 —
+     라벨이 이웃 칸 path에 덮이지 않게 하는 순서라 그대로 따른다. */
+  var paths = JP_DEFS, labels = '', pointN = 0;
+  /* 포인트가 여러 칸이면 최고액 칸을 시안 1,000P 칸과 같은 톤(연보라 라벨)으로 강조한다 */
+  var maxPoint = JP_ACTIVE_SLOTS.reduce(function(m, s) {
+    return (s.type === 'point' && (s.qty || 0) > m) ? (s.qty || 0) : m;
+  }, -1);
   for (var i = 0; i < n; i++) {
     var slot = JP_ACTIVE_SLOTS[i];
     var a0 = i * seg, a1 = (i + 1) * seg;
     var p0 = rlPolar(cx, cy, R, a0), p1 = rlPolar(cx, cy, R, a1);
     var fill = JP_SEG_FILL[slot.type];
     if (!fill) { fill = (slot.type === 'point') ? JP_POINT_FILLS[pointN++ % 2] : '#845EEE'; }
-    parts += '<path d="M' + cx + ',' + cy + ' L' + p0[0].toFixed(2) + ',' + p0[1].toFixed(2)
+    paths += '<path d="M' + cx + ',' + cy + ' L' + p0[0].toFixed(2) + ',' + p0[1].toFixed(2)
       + ' A' + R + ',' + R + ' 0 0 1 ' + p1[0].toFixed(2) + ',' + p1[1].toFixed(2)
       + ' Z" fill="' + fill + '" stroke="#0E0821" stroke-width="2"></path>';
 
     var mid = a0 + seg / 2;
     var ink = JP_SEG_INK[slot.type] || '#FFFFFF';
-    var probOp = JP_SEG_INK[slot.type] ? '0.5' : '0.4';
+    var probOp = JP_PROB_OPACITY[slot.type];
     var g = '<g transform="rotate(' + mid.toFixed(1) + ' 150 150)" text-anchor="middle" font-family="inherit">';
     if (slot.type === 'gold_ticket') {
       // 시안 원본: JACKPOT 라벨 + 티켓 아트 + 등급명 + 확률
@@ -14641,15 +14652,19 @@ function jpBuildWheel() {
       g += jpWheelTicketIcon(32, slot.type === 'silver_ticket' ? '#6F6F6F' : (slot.type === 'bronze_ticket' ? '#7A4014' : tier.icon), '#FFFFFF');
       g += '<text x="150" y="73" font-size="15" font-weight="800" fill="' + ink + '">' + PP_SLOT_META[slot.type].label + '</text>';
     } else if (slot.type === 'point') {
-      g += '<text x="150" y="50" font-size="11" font-weight="600" fill="#B9AEE0">포인트</text>';
+      var top = (slot.qty || 0) === maxPoint;
+      g += top
+        ? '<text x="150" y="50" font-size="11" font-weight="600" fill="#B9AEE0">포인트</text>'
+        : '<text x="150" y="50" font-size="11" font-weight="600" fill="#FFFFFF" opacity="0.85">포인트</text>';
       g += '<text x="150" y="72" font-size="19" font-weight="800" fill="#FFFFFF">' + (slot.qty || 0).toLocaleString('ko-KR') + 'P</text>';
+      if (!probOp) probOp = top ? '0.4' : '0.45';
     } else {
       g += '<text x="150" y="62" font-size="21" font-weight="800" fill="#FFFFFF">꽝</text>';
     }
-    g += '<text x="150" y="108" font-size="11" font-weight="400" fill="' + ink + '" opacity="' + probOp + '">' + ppSlotProbText(slot) + '</text>';
-    parts += g + '</g>';
+    g += '<text x="150" y="108" font-size="11" font-weight="400" fill="' + ink + '" opacity="' + (probOp || '0.4') + '">' + ppSlotProbText(slot) + '</text>';
+    labels += g + '</g>';
   }
-  svg.innerHTML = parts;
+  svg.innerHTML = paths + labels;
 }
 // 오늘 참여 횟수 + 보유 이벤트 티켓 반영. 버튼 문구는 시안 renderVals() 원본 그대로.
 function jpApplyState() {

@@ -10842,13 +10842,15 @@ var RLT_KINDS = {
   },
   jackpot: {
     p: 'jkr', name: '잭팟 룰렛', doc: 'jackpot_roulette', live: true, legacyWheel: false,
+    /* 슬롯 순서 = 앱 휠의 칸 배치 순서(12시부터 시계방향). 20260731 시안 휠 배치 그대로 —
+       금속(등급 티켓) 칸과 어두운 칸이 번갈아 오도록 짠 순서라 임의로 바꾸면 앱 휠 모양이 달라진다. */
     defaults: [                              /* 1회 기대값 40원 · 이벤트 티켓 1장 = 1회 */
       { type: 'gold_ticket',   qty: 1,    prob: 0.4  },
-      { type: 'silver_ticket', qty: 1,    prob: 1    },
       { type: 'point',         qty: 1000, prob: 5    },
       { type: 'bronze_ticket', qty: 1,    prob: 12   },
+      { type: 'miss',          qty: 0,    prob: 31.6 },
       { type: 'point',         qty: 100,  prob: 50   },
-      { type: 'miss',          qty: 0,    prob: 31.6 }
+      { type: 'silver_ticket', qty: 1,    prob: 1    }
     ]
   }
 };

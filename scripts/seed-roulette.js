@@ -56,13 +56,14 @@ const CONFIG = {
     name: '잭팟 룰렛',
     expect: 40,
     legacyWheel: false,
+    /* 순서 = 앱 휠 칸 배치(12시부터 시계방향) · 20260731 시안 휠 그대로 */
     slots: [
       { type: 'gold_ticket',   qty: 1,    prob: 0.4  },
-      { type: 'silver_ticket', qty: 1,    prob: 1    },
       { type: 'point',         qty: 1000, prob: 5    },
       { type: 'bronze_ticket', qty: 1,    prob: 12   },
-      { type: 'point',         qty: 100,  prob: 50   },
       { type: 'miss',          qty: 0,    prob: 31.6 },
+      { type: 'point',         qty: 100,  prob: 50   },
+      { type: 'silver_ticket', qty: 1,    prob: 1    },
     ],
     /* 악용 방지 3종 */
     limits: { daily_spin_cap: 10, require_confirmed_purchase: true, event_ticket_monthly_cap: 30 },
