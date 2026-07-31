@@ -918,9 +918,9 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
             <span class="sb-item-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13"/><path d="M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7"/><path d="M7.5 8a2.5 2.5 0 0 1 0-5A4.8 8 0 0 1 12 8a4.8 8 0 0 1 4.5-5 2.5 2.5 0 0 1 0 5"/></svg></span>
             <span class="sb-item-lbl" id="nav-label-weekly-draws">주간 이벤트 추첨 관리</span>
           </button>
-          <button class="sb-item" id="nav-roulette-settings" data-label="행운룰렛 설정" onclick="go('roulette-settings',this)">
+          <button class="sb-item" id="nav-roulette-settings" data-label="매일 행운 룰렛 설정" onclick="go('roulette-settings',this)">
             <span class="sb-item-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 3v9l6 3"/></svg></span>
-            <span class="sb-item-lbl" id="nav-label-roulette-settings">행운룰렛 설정</span>
+            <span class="sb-item-lbl" id="nav-label-roulette-settings">매일 행운 룰렛 설정</span>
           </button>
         </div>
       </div>
@@ -1169,7 +1169,7 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
         </div>
       </div>
       <div class="card">
-        <div class="card-header"><div class="card-title">최근 구매 현황 TOP 3</div><button class="btn btn-ghost btn-sm" onclick="go('postback',document.getElementById('nav-postback'))">포스트백 로그로</button></div>
+        <div class="card-header"><div class="card-title">최근 픽구매 현황 TOP 3</div><button class="btn btn-ghost btn-sm" onclick="go('postback',document.getElementById('nav-postback'))">포스트백 로그로</button></div>
         <table>
           <thead><tr><th>쇼핑몰</th><th>회원</th><th>구매금액</th><th>적립 티켓</th><th>구매일시</th></tr></thead>
           <tbody id="dash-recent-tbody">
@@ -1186,7 +1186,7 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
           </table>
         </div>
         <div class="card">
-          <div class="card-header"><div class="card-title">티켓 적립 TOP 회원</div><span style="font-size:11px;color:var(--text-3)">이번달 구매 적립 기준</span></div>
+          <div class="card-header"><div class="card-title">티켓 적립 TOP 회원</div><span style="font-size:11px;color:var(--text-3)">이번달 픽구매 적립 기준</span></div>
           <table>
             <thead><tr><th style="text-align:center">순위</th><th>닉네임 / 카카오톡 ID / 식별 아이디</th><th style="text-align:center">이번달 적립</th><th style="text-align:center">누적 적립</th></tr></thead>
             <tbody id="dash-top-tbody">
@@ -1388,18 +1388,68 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
       </div>
     </div>
 
-<!-- ── 행운룰렛 설정 (신규) ── -->
+<!-- ── 매일 행운 룰렛 설정 (신규) ── -->
     <div class="section" id="sec-roulette-settings">
-      <div class="info-box"><strong>행운룰렛 = 포인트·이벤트티켓을 확률로 지급</strong> — 확률·배분은 정책상 미결이라 운영자가 직접 정합니다. 룰렛은 6칸이며 각 칸을 균등 확률(1/6)로 추첨합니다. 여기서 저장한 설정을 앱이 그대로 읽어 룰렛을 렌더링하고 당첨 보상을 지급합니다.</div>
+      <div class="info-box"><strong>매일 행운 룰렛 = 출석(쿠팡 구경하기) 시 1일 1회 무료 룰렛</strong> — 슬롯별 보상 내용과 당첨 확률을 운영자가 직접 수정합니다. 확률 합계가 100%가 아니면 저장되지 않습니다. 슬롯은 6개가 기본이며 추가·삭제로 개수를 조정할 수 있습니다. 유료 룰렛(잭팟 룰렛)은 별도 화면으로 신설 예정이며 이 화면에서 관리하지 않습니다.</div>
+      <div class="stats-grid" style="grid-template-columns:repeat(3,1fr)">
+        <div class="stat-card purple"><div class="stat-label">이번 달 룰렛 실행</div><div class="stat-value" id="rlt-stat-spins">—</div><div class="stat-change neutral">roulette_spins 실집계</div></div>
+        <div class="stat-card green"><div class="stat-label">이번 달 지급 총액</div><div class="stat-value" id="rlt-stat-payout">—</div><div class="stat-change neutral">포인트·티켓 원장 원화 환산</div></div>
+        <div class="stat-card amber"><div class="stat-label">1회 기대값</div><div class="stat-value" id="rlt-stat-ev">—</div><div class="stat-change neutral">현재 설정 기준</div></div>
+      </div>
       <div class="card">
-        <div class="card-header"><div class="card-title">룰렛 6칸 설정</div><button class="btn btn-primary btn-sm" id="rlt-save-btn" onclick="rltSave()">저장</button></div>
-        <div style="padding:16px">
-          <div style="display:grid;grid-template-columns:56px 1fr 160px;gap:8px;font-size:12px;color:var(--text-3);margin-bottom:6px;padding:0 2px;">
-            <div>칸</div><div>유형</div><div>값</div>
+        <div class="card-header">
+          <div class="card-title">슬롯 구성 · 당첨 확률</div>
+          <div style="display:flex;gap:6px">
+            <button class="btn btn-ghost btn-sm" onclick="rltAddSlot()">+ 슬롯 추가</button>
+            <button class="btn btn-ghost btn-sm" onclick="rltReset()">기본값 복원</button>
+            <button class="btn btn-primary btn-sm" id="rlt-save-btn" onclick="rltSave()">저장</button>
           </div>
-          <div id="rlt-rows"></div>
-          <div style="font-size:12px;color:var(--text-3);margin-top:10px" id="rlt-status">불러오는 중…</div>
         </div>
+        <table id="rlt-table">
+          <thead>
+            <tr>
+              <th style="width:64px">슬롯</th>
+              <th style="width:150px">보상 유형</th>
+              <th style="width:150px">수량</th>
+              <th style="width:110px;text-align:right">가치(원)</th>
+              <th style="width:130px">확률(%)</th>
+              <th style="width:120px;text-align:right">기대값 기여</th>
+              <th style="width:60px;text-align:center">삭제</th>
+            </tr>
+          </thead>
+          <tbody id="rlt-tbody"></tbody>
+          <tfoot>
+            <tr>
+              <td colspan="4" style="font-weight:700">합계</td>
+              <td style="font-weight:800" id="rlt-sum-prob">—</td>
+              <td style="text-align:right;font-weight:800" id="rlt-sum-ev">—</td>
+              <td></td>
+            </tr>
+          </tfoot>
+        </table>
+        <div style="padding:12px 16px;font-size:12px;color:var(--text-3);border-top:1px solid var(--border)" id="rlt-status">불러오는 중…</div>
+        <div style="padding:0 16px 14px;font-size:12px;color:var(--text-3)">가치 환산 기준 — 포인트 10P = 1원 · 이벤트 티켓 40원 · 브론즈 티켓 100원 · 실버 티켓 1,000원 · 골드 티켓 2,000원. 기대값 기여 = 가치 × 확률.</div>
+        <div style="padding:0 16px 16px;font-size:12px;color:var(--warn,#B4791A)">데모 앱 룰렛 화면은 아직 구 구성(포인트·이벤트티켓·꽝)만 렌더링합니다. 등급 티켓 슬롯을 저장하면 앱은 기본값으로 대체해 표시합니다 — 앱 룰렛 이식은 별도 작업입니다.</div>
+      </div>
+
+      <div class="card" style="margin-top:16px">
+        <div class="card-header">
+          <div class="card-title">룰렛 실행 로그</div>
+          <span style="font-size:12px;color:var(--text-2)" id="rlt-log-count">—</span>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th style="width:150px">일시</th>
+              <th>닉네임 / 카카오톡 ID</th>
+              <th style="width:150px">룰렛 종류</th>
+              <th style="width:170px">결과</th>
+              <th style="width:110px;text-align:center">지급 상태</th>
+            </tr>
+          </thead>
+          <tbody id="rlt-log-tbody"></tbody>
+        </table>
+        <div class="pagination" id="rlt-log-pager"></div>
       </div>
     </div>
 
@@ -1517,7 +1567,7 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
         <div class="invite-card"><div class="invite-card-value" style="color:var(--amber)">—</div><div class="invite-card-label">초대 전환율</div></div>
         <div class="invite-card"><div class="invite-card-value" style="color:var(--info)">—</div><div class="invite-card-label">지급된 초대 포인트</div></div>
       </div>
-      <div class="info-box"><strong>친구초대 보상</strong> — 초대자·피초대자 양쪽 각 <strong>500P(포인트)</strong> · 성사 기준 피초대자 첫 구매 완료(성사 시점 양쪽 지급) · 초대자 월 최대 50명. 상세 정책은 <strong>운영 정책 &gt; 참여·이벤트</strong> 탭 참조.</div>
+      <div class="info-box"><strong>친구초대 보상</strong> — 초대자·피초대자 양쪽 각 <strong>500P(포인트)</strong> · 성사 기준 피초대자 첫 픽구매 완료(성사 시점 양쪽 지급) · 초대자 월 최대 50명. 상세 정책은 <strong>운영 정책 &gt; 참여·이벤트</strong> 탭 참조.</div>
       <div class="card">
         <div class="card-header"><div class="card-title">초대 현황 TOP 10</div></div>
         <table>
@@ -2132,17 +2182,17 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
               <thead><tr><th>경로</th><th>지급</th><th>조건</th></tr></thead>
               <tbody>
                 <tr><td>출석 체크</td><td>이벤트티켓 1장</td><td>5일 연속 출석 달성 시</td></tr>
-                <tr><td>행운룰렛</td><td>포인트·이벤트티켓(확률 미정)</td><td>하루 1회 / 확률 지급</td></tr>
+                <tr><td>매일 행운 룰렛</td><td>포인트·이벤트티켓(확률 미정)</td><td>하루 1회 / 확률 지급</td></tr>
                 <tr><td>온보딩 가입</td><td>+1장</td><td>신규 가입 시 (카카오 연동 후 지급)</td></tr>
               </tbody>
             </table>
             <div class="info-box" style="margin-top:12px">이벤트 티켓은 <strong>경품 응모 전용</strong>(상품 교환 불가)이며, 만료는 <strong>발급일+100일 고정 소멸</strong> 방식입니다 — 이월은 없으며 미응모해도 다음 회차로 넘어가지 않고 만료됩니다. 추첨 응모 마감 후 획득분은 다음 회차가 당회. <span style="color:var(--text-3)">(친구초대·광고시청은 포인트 경로로 이동)</span></div>
             <div class="card-header" style="margin-top:18px"><div class="card-title">친구초대 보상 <span style="font-size:11px;color:var(--success);font-weight:600">정책 확정</span></div></div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
-              <div class="policy-item"><div class="policy-label">초대 성사 기준</div><div class="policy-value">피초대자 첫 구매 완료</div><div class="policy-desc">가입만으로는 미성사. 첫 구매 완료 시점에 성사 처리.</div></div>
+              <div class="policy-item"><div class="policy-label">초대 성사 기준</div><div class="policy-value">피초대자 첫 픽구매 완료</div><div class="policy-desc">가입만으로는 미성사. 첫 픽구매 완료 시점에 성사 처리.</div></div>
               <div class="policy-item"><div class="policy-label">초대자 월 한도</div><div class="policy-value">월 최대 50명</div><div class="policy-desc">성사 기준. 자기 초대·동일 IP/기기 차단.</div></div>
               <div class="policy-item"><div class="policy-label">초대자 보상</div><div class="policy-value">성사 건당 500P (포인트)</div><div class="policy-desc">성사 시점에 지급. (이벤트 티켓 → 포인트로 변경)</div></div>
-              <div class="policy-item"><div class="policy-label">피초대자 보상</div><div class="policy-value">500P (포인트)</div><div class="policy-desc">성사(첫 구매 완료) 시점에 지급 — 가입 즉시 아님.</div></div>
+              <div class="policy-item"><div class="policy-label">피초대자 보상</div><div class="policy-value">500P (포인트)</div><div class="policy-desc">성사(첫 픽구매 완료) 시점에 지급 — 가입 즉시 아님.</div></div>
             </div>
             <div class="card-header" style="margin-top:18px"><div class="card-title">이벤트 티켓 발급·응모 한도 <span style="font-size:11px;color:var(--success);font-weight:600">정책 확정</span></div></div>
             <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px">
@@ -2155,7 +2205,7 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
               <div class="policy-item"><div class="policy-label">가입 즉시</div><div class="policy-value">이벤트 티켓 1장 + 200P</div><div class="policy-desc">어뷰징 방지 — 이벤트 티켓·브론즈 보너스는 카카오 연동 후 지급.</div></div>
               <div class="policy-item"><div class="policy-label">첫 쿠팡 구경하기</div><div class="policy-value">100P</div><div class="policy-desc">최초 쿠팡 경유 방문 시 지급.</div></div>
               <div class="policy-item"><div class="policy-label">첫 경유 구매 (가입 7일 내)</div><div class="policy-value">브론즈 티켓 1장</div><div class="policy-desc">구매 확정 후 지급 (연동 D+7 / 미연동 D+30, 취소 먹튀 방지).</div></div>
-              <div class="policy-item"><div class="policy-label">친구초대</div><div class="policy-value">양쪽 각 500P</div><div class="policy-desc">피초대자 첫 구매 성사 시 양쪽 지급.</div></div>
+              <div class="policy-item"><div class="policy-label">친구초대</div><div class="policy-value">양쪽 각 500P</div><div class="policy-desc">피초대자 첫 픽구매 성사 시 양쪽 지급.</div></div>
             </div>
             <div class="card-header" style="margin-top:18px"><div class="card-title">경품 응모 규칙</div></div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
@@ -2577,7 +2627,7 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
             <option value="attendance">출석(쿠팡 구경하기)</option>
             <option value="referral">친구초대 보상</option>
             <option value="onboarding">온보딩 보상</option>
-            <option value="roulette">행운룰렛 당첨</option>
+            <option value="roulette">매일 행운 룰렛 당첨</option>
             <option value="ticket_to_point">티켓→포인트 전환</option>
             <option value="admin_grant">관리자 지급</option>
           </optgroup>
@@ -3483,7 +3533,7 @@ const I18N = {
     'page.demo-mgmt.title': '데이터 관리(데모)', 'page.demo-mgmt.bc': '개발 · 데모',
     'nav.op-policy': '운영 정책', 'page.op-policy.title': '운영 정책', 'page.op-policy.bc': '운영',
     'page.clawback.title': '환수 이력', 'page.clawback.bc': '티켓 · 보상',
-    'nav.roulette-settings': '행운룰렛 설정', 'page.roulette-settings.title': '행운룰렛 설정', 'page.roulette-settings.bc': '티켓 · 보상',
+    'nav.roulette-settings': '매일 행운 룰렛 설정', 'page.roulette-settings.title': '매일 행운 룰렛 설정', 'page.roulette-settings.bc': '티켓 · 보상',
     'nav.group.points': '포인트 관리',
     'nav.points': '포인트 내역', 'page.points.title': '포인트 내역', 'page.points.bc': '포인트 관리',
     'nav.point-attendance': '출석체크 설정', 'page.point-attendance.title': '출석체크 설정', 'page.point-attendance.bc': '포인트 관리',
@@ -3716,7 +3766,7 @@ const PAGE_META = {
   members:       { title:'회원 목록',           bc:'회원 관리' },
   tickets:       { title:'티켓 내역',           bc:'티켓 · 보상' },
   'weekly-draws': { title:'주간 이벤트 추첨 관리', bc:'티켓 · 보상' },
-  'roulette-settings': { title:'행운룰렛 설정',    bc:'티켓 · 보상' },
+  'roulette-settings': { title:'매일 행운 룰렛 설정',    bc:'티켓 · 보상' },
   gifticons:     { title:'구매/사용 내역',        bc:'티켓 · 보상' },
   banners:       { title:'배너 관리',           bc:'콘텐츠' },
   invite:        { title:'친구초대 관리',        bc:'콘텐츠' },
@@ -4039,12 +4089,12 @@ function giSaveTicketEdit() {
     "클릭 → 구매 전환율":"Tỷ lệ chuyển đổi nhấp→mua","이탈율 (7일)":"Tỷ lệ thoát (7 ngày)",
     "이번달 신규 가입":"Thành viên mới tháng này",
     "일별 신규 회원 (최근 7일)":"Thành viên mới theo ngày (7 ngày gần nhất)",
-    "스케줄러 현황":"Trạng thái lịch trình","최근 구매 현황 TOP 3":"TOP 3 lượt mua gần nhất",
+    "스케줄러 현황":"Trạng thái lịch trình","최근 픽구매 현황 TOP 3":"TOP 3 Pick-mua gần nhất",
     "포스트백 로그로":"Đến nhật ký Postback","쇼핑몰":"Cửa hàng","구매금액":"Số tiền mua",
     "적립 티켓":"Vé tích lũy","구매일시":"Ngày/giờ mua","인기 제휴몰 TOP 5":"TOP 5 cửa hàng LK",
     "이번달 클릭·전환 기준":"Theo lượt nhấp và chuyển đổi tháng này","순위":"Xếp hạng",
     "클릭 수":"Lượt nhấp","구매 전환":"Chuyển đổi mua","티켓 적립 TOP 회원":"TOP thành viên tích lũy vé",
-    "이번달 구매 적립 기준":"Theo lượt mua tháng này","이번달 적립":"Tích lũy tháng này",
+    "이번달 픽구매 적립 기준":"Theo Pick-mua tháng này","이번달 적립":"Tích lũy tháng này",
     "누적 적립":"Tích lũy tổng cộng","닉네임(카카오톡 ID)":"Biệt danh (ID KakaoTalk)",
     /* Member section */
     "데이터 출처":"Nguồn dữ liệu","우리 DB · users 테이블 (PII 포함, 보안 1순위)":"DB nội bộ · bảng users (có PII, ưu tiên bảo mật)",
@@ -4270,14 +4320,14 @@ function giSaveTicketEdit() {
     "신규 가입 시 (카카오 연동 후 지급)":"Khi đăng ký mới (cấp sau liên kết Kakao)",
     "이벤트 티켓은":"Vé sự kiện là","경품 응모 전용":"chỉ dùng tham dự giải thưởng",
     "친구초대 보상":"Phần thưởng mời bạn",
-    "초대 성사 기준":"Tiêu chí mời thành công","피초대자 첫 구매 완료":"Người được mời hoàn thành lần mua đầu tiên",
-    "가입만으로는 미성사. 첫 구매 완료 시점에 성사 처리.":"Chỉ đăng ký chưa tính là thành công. Tính khi hoàn thành lần mua đầu tiên.",
+    "초대 성사 기준":"Tiêu chí mời thành công","피초대자 첫 픽구매 완료":"Người được mời hoàn thành Pick-mua đầu tiên",
+    "가입만으로는 미성사. 첫 픽구매 완료 시점에 성사 처리.":"Chỉ đăng ký chưa tính là thành công. Tính khi hoàn thành Pick-mua đầu tiên.",
     "초대자 월 한도":"Giới hạn mời/tháng","월 최대 50명":"Tối đa 50 người/tháng",
     "성사 기준. 자기 초대·동일 IP/기기 차단.":"Theo tiêu chí thành công. Chặn tự mời·IP/thiết bị trùng.",
     "초대자 보상":"Phần thưởng người mời","성사 건당 500P (포인트)":"500P (điểm)/lần thành công",
     "성사 시점에 지급. (이벤트 티켓 → 포인트로 변경)":"Cấp tại thời điểm thành công. (vé sự kiện → đổi thành điểm)",
     "피초대자 보상":"Phần thưởng người được mời","500P (포인트)":"500P (điểm)",
-    "성사(첫 구매 완료) 시점에 지급 — 가입 즉시 아님.":"Cấp khi thành công (hoàn thành lần mua đầu tiên) — không phải ngay khi đăng ký.",
+    "성사(첫 픽구매 완료) 시점에 지급 — 가입 즉시 아님.":"Cấp khi thành công (hoàn thành Pick-mua đầu tiên) — không phải ngay khi đăng ký.",
     "이벤트 티켓 발급·응모 한도":"Giới hạn phát hành·tham dự vé sự kiện",
     "1일 발급 한도":"Giới hạn phát hành/ngày","5장 / 일":"5 vé/ngày",
     "이벤트 티켓 신규 상한. (구매 적립 랜덤 티켓 1일 5/월 50과 별도)":"Giới hạn mới vé sự kiện. (Riêng biệt với vé ngẫu nhiên tích lũy mua 5/ngày 50/tháng)",
@@ -4292,7 +4342,7 @@ function giSaveTicketEdit() {
     "첫 경유 구매 (가입 7일 내)":"Mua qua LK lần đầu (trong 7 ngày đăng ký)","브론즈 티켓 1장":"1 vé Đồng",
     "구매 확정 후 지급 (연동 D+7 / 미연동 D+30, 취소 먹튀 방지).":"Cấp sau xác nhận mua (LK D+7 / Chưa LK D+30, chống hủy gian lận).",
     "친구초대":"Mời bạn","양쪽 각 500P":"Mỗi bên 500P",
-    "피초대자 첫 구매 성사 시 양쪽 지급.":"Cấp cho cả hai khi người được mời hoàn thành lần mua đầu tiên.",
+    "피초대자 첫 픽구매 성사 시 양쪽 지급.":"Cấp cho cả hai khi người được mời hoàn thành Pick-mua đầu tiên.",
     "경품 응모 규칙":"Quy tắc tham dự giải thưởng",
     "응모 조건":"Điều kiện tham dự","이벤트 티켓 1장 · 1회 추첨 최대 10장":"1 vé sự kiện · Tối đa 10 vé/lần rút",
     "추첨 회차 기준. 추첨 주기(월1/격주)는 미정 — 운영 회의 후 확정.":"Theo vòng rút thăm. Chu kỳ rút thăm (tháng 1/2 tuần) chưa xác định — sẽ xác nhận sau họp vận hành.",
@@ -4313,7 +4363,7 @@ function giSaveTicketEdit() {
     "전체 유형":"Tất cả loại","티켓 문의":"Hỏi đáp về vé","적립 문의":"Hỏi đáp về tích lũy",
     "계정 문의":"Hỏi đáp về tài khoản",
     "문의 목록":"Danh sách hỏi đáp","문의 상세 / 답변":"Chi tiết hỏi đáp / Trả lời",
-    "티켓이 적립되지 않았어요":"Vé chưa được tích lũy","구매했는데 티켓이 적립 안 됐어요":"Đã mua nhưng vé chưa tích lũy",
+    "티켓이 적립되지 않았어요":"Vé chưa được tích lũy","픽구매했는데 티켓이 적립 안 됐어요":"Đã Pick-mua nhưng vé chưa tích lũy",
     "카카오 연동 해제하고 싶어요":"Muốn hủy liên kết Kakao","기프티콘 발급이 안 됩니다":"Không thể phát hành Gifticon",
     "답변 대기":"Chờ trả lời","답변 작성":"Viết trả lời","처리 상태":"Trạng thái xử lý",
     "닫기":"Đóng","답변 발송":"Gửi trả lời",
@@ -4493,7 +4543,7 @@ function giSaveTicketEdit() {
   "알림톡":"Alimtalk",
   "주의:":"Lưu ý:",
   "적용.":"Áp dụng.",
-  "행운룰렛":"Vòng quay may mắn",
+  "매일 행운 룰렛": "Vòng quay may mắn hằng ngày",
   "핫딜탐정":"Thám tử deal hot",
   "처리일시":"Thời điểm xử lý",
   "집계 중":"Đang thống kê",
@@ -4954,7 +5004,7 @@ function giSaveTicketEdit() {
   "— 10P = 1원. 포인트는 티켓과 양방향 교환되며, 교환 비율은 환산가치 1:1 등가입니다.":"— 10P = 1 won. Điểm đổi hai chiều với vé, tỷ lệ đổi 1:1 ngang giá trị quy đổi.",
   ": 벤더사(Giftishow 등)와 사전 계약 + API 연동 필수. 마진 -10% 미만은 적자.":": Hợp đồng trước với nhà cung cấp (Giftishow v.v.) + Bắt buộc liên kết API. Biên dưới -10% là lỗ.",
   "— 약관 변경 시 법적 요건을 반드시 확인하고, 변경 30일 전 회원에게 사전 공지 후 적용하세요.":"— Khi thay đổi điều khoản, bắt buộc xác nhận yêu cầu pháp lý và thông báo trước cho thành viên 30 ngày trước khi áp dụng.",
-  "· 성사 기준 피초대자 첫 구매 완료(성사 시점 양쪽 지급) · 초대자 월 최대 50명. 상세 정책은":"· Tiêu chuẩn thành công: người được mời hoàn thành lần mua đầu tiên (cấp cả hai khi thành công) · Người mời tối đa 50 người/tháng. Chính sách chi tiết xem",
+  "· 성사 기준 피초대자 첫 픽구매 완료(성사 시점 양쪽 지급) · 초대자 월 최대 50명. 상세 정책은":"· Tiêu chuẩn thành công: người được mời hoàn thành mua Pick lần đầu (cấp cả hai khi thành công) · Người mời tối đa 50 người/tháng. Chính sách chi tiết xem",
   "제외 대상 카테고리·상품은 적립 계산에서 제외되며, 앱 10e 화면에 \"적립 제외 상품\"으로 안내됩니다.":"Danh mục·sản phẩm loại trừ không tính vào tích lũy, được thông báo là \"Sản phẩm loại trừ tích lũy\" trên màn hình 10e của ứng dụng.",
   "랜덤 티켓: 구매 후 연동 D+7 / 미연동 D+30 확정 시 등급 티켓으로 전환. 취소 시 자동 환수.":"Vé ngẫu nhiên: Sau mua, khi xác nhận liên kết D+7 / chưa LK D+30 chuyển thành vé hạng. Tự động thu hồi khi hủy.",
   "— 친구초대 보상 = 양쪽 각 500P(포인트), 초대자 월 최대 50명. (이벤트 티켓 → 포인트 변경)":"— Thưởng mời bạn = mỗi bên 500P (điểm), người mời tối đa 50 người/tháng. (Vé sự kiện → đổi thành Điểm)",
@@ -4968,7 +5018,7 @@ function giSaveTicketEdit() {
   "를 집계하며, 수수료율은 제휴몰·카테고리별로 다릅니다. 등급 티켓은 구매확정(연동 D+7 / 미연동 D+30) 후 지급됩니다.":"được tổng hợp, tỷ lệ hoa hồng khác nhau theo cửa hàng LK·danh mục. Vé hạng được cấp sau xác nhận mua (Liên kết D+7 / Chưa LK D+30).",
   "(회원이 티켓을 기프티콘으로 교환할 때 발생하는 마진). 두 수익에서 회원에게 적립해준 티켓의 환산가치(적립 비용)를 차감한 것이":"(Biên phát sinh khi thành viên đổi vé lấy Gifticon). Từ hai nguồn doanh thu trừ giá trị quy đổi (chi phí tích lũy) của vé đã tích lũy cho thành viên thì",
   "— API 키는 마스킹 처리됩니다. 키 노출 시 즉시 재발급 후 교체하세요. 키 교체 시 해당 제휴몰의 적립 추적이 일시 중단됩니다.":"— Khóa API được ẩn. Khi khóa bị lộ, cấp lại ngay và thay thế. Khi thay khóa, theo dõi tích lũy của cửa hàng LK đó tạm dừng.",
-  "을 지급합니다. 추첨이 이벤트 티켓을 새로 발급하지 않습니다. (이벤트 티켓 획득 경로는 출석 5연속·행운룰렛·이부장 패키지 5종 등 별도 경로)":"được cấp. Rút thăm không phát hành vé sự kiện mới. (Đường dẫn nhận vé sự kiện: điểm danh 5 lần liên tiếp·vòng quay·gói Trưởng phòng Lee 5 loại, v.v.)",
+  "을 지급합니다. 추첨이 이벤트 티켓을 새로 발급하지 않습니다. (이벤트 티켓 획득 경로는 출석 5연속·매일 행운 룰렛·이부장 패키지 5종 등 별도 경로)":"được cấp. Rút thăm không phát hành vé sự kiện mới. (Đường dẫn nhận vé sự kiện: điểm danh 5 lần liên tiếp·vòng quay·gói Trưởng phòng Lee 5 loại, v.v.)",
   "— 회원이 PricePick 경유 링크로 제휴몰에서 구매하면 해당 제휴몰이 우리 서버에 콜백을 보냅니다. 이 데이터로 가지급(적립예정) 처리와":"— Khi thành viên mua tại cửa hàng LK qua liên kết PricePick, cửa hàng LK đó gửi callback đến máy chủ. Dữ liệu này để xử lý tạm cấp (dự kiến tích lũy) và",
   "— 매주 월요일, 보유 이벤트 티켓으로 자동 응모된 회원 중 추첨하여 당첨자에게 경품(기프티콘·실물 등)을 지급합니다. 이벤트 티켓은 이 추첨의":"— Mỗi thứ Hai, rút thăm trong số thành viên đã tự động tham dự bằng vé sự kiện đang giữ và cấp giải thưởng (Gifticon·hiện vật v.v.) cho người trúng. Vé sự kiện là",
   "— ① 확정 후 환불은 미사용분만 회수 ② 포스트백 미수신 24h 후 영수증 인증으로 수동 지급 ③ 중복 포스트백은 주문번호 UNIQUE로 차단.":"— ① Hoàn tiền sau xác nhận chỉ thu hồi phần chưa dùng ② Cấp thủ công bằng xác thực hóa đơn sau 24h không nhận postback ③ Postback trùng bị chặn bằng UNIQUE mã đơn hàng.",
@@ -5115,9 +5165,9 @@ Object.assign(KO2VI,{"카카오 연동 회원과 미연동 회원이 모두 존�
 Object.assign(KO2VI,{"1단계 발송 채널은 ":"Kênh gửi giai đoạn 1 là ","앱 푸시 단일":"chỉ Push app","입니다 — 카카오 알림톡은 서드파티 비용이 발생해 도입하지 않습니다. 마케팅성 알림은 수신 동의 회원에게만 발송됩니다. 서비스 필수 알림(티켓 지급·기프티콘 발송·경품 당첨)은 동의 여부와 무관하게 발송됩니다. ":". Kakao AlimTalk phát sinh chi phí bên thứ ba nên chưa đưa vào áp dụng. Thông báo mang tính marketing chỉ gửi cho hội viên đã đồng ý nhận. Thông báo bắt buộc của dịch vụ (cấp vé·gửi Gifticon·trúng thưởng) được gửi bất kể có đồng ý hay không. "," — 실제 FCM 발송 연동은 없고, 발송 내역만 Firestore에 기록됩니다(대상 인원은 실집계).":" — chưa có tích hợp gửi FCM thực tế, chỉ ghi lại lịch sử gửi vào Firestore (số người nhận là số liệu thật).","앱 푸시":"Push app"});
 Object.assign(KO2VI, {"카카오 연동 회원과 미연동(게스트) 회원이 모두 존재(로그인 정책 변경). 미연동 회원은 적립 확정 대기": "Tồn tại cả thành viên đã liên kết Kakao và chưa liên kết (Guest) (thay đổi chính sách đăng nhập). Thành viên chưa liên kết phải chờ xác nhận tích lũy", "계정 모델:": "Mô hình tài khoản:", "게스트(닉네임)로 시작": "Bắt đầu bằng Guest (biệt danh)", "→ 앱 내": "→ trong ứng dụng", "카카오 연동": "Liên kết Kakao", "(애플·구글 로그인 폐지). 게스트는 적립만 누적, 사용·교환은 연동 후 가능.": "(bỏ đăng nhập Apple·Google). Guest chỉ tích lũy, việc sử dụng·đổi chỉ thực hiện được sau khi liên kết.", "전체 연동상태": "Tất cả trạng thái liên kết", "게스트(미연동)": "Guest (chưa liên kết)", "닉네임(카카오ID)": "Biệt danh (ID Kakao)", "연동 상태": "Trạng thái liên kết", "연동 2024/08/12": "Liên kết 2024/08/12", "연동 2024/11/03": "Liên kết 2024/11/03", "적립만 누적 · 사용 불가": "Chỉ tích lũy · không thể sử dụng", "연동 2025/05/14": "Liên kết 2025/05/14", "가지급(대기)": "Tạm cấp (chờ)", "좌측 메뉴 (1) 배지 = 관리자 처리 대기 추첨 건수": "Badge (1) ở menu trái = số đợt rút thăm đang chờ admin xử lý", "— 마감됐으나 아직 '당첨 처리(추첨 실행)'를 안 한 회차 수입니다. 해당 회차의 당첨 처리를 완료하면 카운트가 줄고, 0이 되면 배지가 사라집니다.": "— là số đợt đã đóng nhưng chưa thực hiện 'Xử lý trúng thưởng (chạy rút thăm)'. Hoàn tất xử lý trúng thưởng của đợt đó thì số đếm giảm, bằng 0 thì badge biến mất.", "추첨 방식: 매주 월요일 자동 발표 (자동/수동 전환 가능)": "Phương thức rút thăm: tự động công bố mỗi Thứ Hai (chuyển đổi tự động/thủ công được)", "마감 · 처리 대기": "Đã đóng · chờ xử lý", "당첨 처리(추첨 실행)": "Xử lý trúng thưởng (chạy rút thăm)", "✕ 닫기": "✕ Đóng", "· 등수당 1행(중복 등수 금지), 한 등수에 경품 여러 개 가능": "· Mỗi hạng 1 dòng (cấm trùng hạng), một hạng có thể nhiều quà", "경품 변경 이력": "Lịch sử thay đổi giải thưởng", "현재 버전 v4 · 변경·공표 추적(누가·언제·전후·공표 여부)": "Phiên bản hiện tại v4 · theo dõi thay đổi·công bố (ai·khi nào·trước-sau·đã công bố?)", "변경 내용 (전 → 후)": "Nội dung thay đổi (trước → sau)", "변경자": "Người thay đổi", "변경일시": "Thời điểm thay đổi", "공표": "Công bố", "2등 경품 '편의점 상품권 1만' → '편의점 아이스크림 교환권'": "Quà hạng 2 'Phiếu cửa hàng tiện lợi 10.000' → 'Phiếu đổi kem cửa hàng tiện lợi'", "공표됨 · 13회차~": "Đã công bố · từ đợt 13~", "1등 당첨 확률 3% → 5%": "Xác suất trúng hạng 1: 3% → 5%", "공표됨 · 11회차~": "Đã công bố · từ đợt 11~", "3등 '꽝(재도전)' 신설": "Lập mới hạng 3 'Trượt (thử lại)'", "공표됨 · 9회차~": "Đã công bố · từ đợt 9~", "최초 경품 구성 등록": "Đăng ký cấu hình quà ban đầu", "공표됨": "Đã công bố", "홈 상단 슬라이드 · 현재 2개 노출 · 카드 순서 드래그로 노출 순서 변경": "Slide đầu trang chủ · hiện hiển thị 2 cái · kéo thứ tự thẻ để đổi thứ tự hiển thị", "노출 전환": "Chuyển hiển thị", "— 온보딩·이벤트 보상 확정 적용. 이벤트 생성·수정 시": "— Áp dụng xác nhận thưởng onboarding·sự kiện. Khi tạo·sửa sự kiện", "운영정책과의 보상 정합 검증": "kiểm tra tính nhất quán thưởng với chính sách vận hành", "(중복 보상·만료 충돌 차단) 후 저장.": "(chặn trùng thưởng·xung đột hết hạn) rồi lưu.", "+ 이벤트 생성": "+ Tạo sự kiện", "발송 완료 건은 불변 로그 · '예약' 상태만 발송 전 취소·수정 가능": "Lượt đã gửi là log bất biến · chỉ trạng thái 'đặt trước' mới hủy·sửa được trước khi gửi", "상태 / 액션": "Trạng thái / Hành động", "10:00 예정": "Dự kiến 10:00", "6월 첫째주 추첨 안내": "Thông báo rút thăm tuần đầu tháng 6", "운영 정책은": "Chính sách vận hành là", "입니다 — 정책 수치·기준 변경은 별도 승인 절차로 반영되며 이 화면에서 직접 수정하지 않습니다.": "— việc thay đổi số liệu·tiêu chuẩn chính sách được phản ánh qua quy trình phê duyệt riêng và không sửa trực tiếp ở màn này.", "500P + 이벤트티켓 1장": "500P + 1 vé sự kiện", "1:1 문의 처리 — 수정에서": "Xử lý hỏi đáp 1:1 — ở phần sửa", "처리 상태는 '완료' 건도 변경(재오픈) 가능": "trạng thái xử lý của cả lượt 'hoàn tất' cũng có thể đổi (mở lại)", "합니다. 재오픈 시 변경 사유·이력(누가·언제)을 기록합니다.": ". Khi mở lại sẽ ghi lý do thay đổi·nhật ký (ai·khi nào).", "탈퇴 사유 분포": "Phân bố lý do hủy tài khoản", "이번 달": "Tháng này", "지난 달": "Tháng trước", "최근 3개월": "3 tháng gần đây", "사용자 지정": "Tùy chọn", "강제 업데이트 게이트": "Cổng ép cập nhật", "— '최소 지원 버전' 미만 사용자는 앱 진입 시 강제 업데이트로 차단합니다(결함·보안 패치 시 구버전 차단 필수).": "— người dùng dưới 'phiên bản hỗ trợ tối thiểu' bị chặn bằng ép cập nhật khi vào ứng dụng (bắt buộc chặn bản cũ khi vá lỗi·bảo mật).", "제휴몰 API 모니터링 — 키 상태·일일 호출 한도·장애를 추적합니다.": "Giám sát API cửa hàng LK — theo dõi trạng thái khóa·hạn mức gọi mỗi ngày·sự cố.", "쿠팡 파트너스 우선 연동": "Ưu tiên liên kết Coupang Partners", ", 나머지 제휴몰은 표시·추후 연동 단계.": ", các cửa hàng LK còn lại ở bước chỉ hiển thị·liên kết sau.", "시스템 정의 배치 — 생성·삭제 없음 · 활성/비활성 토글·주기 조정·즉시 실행만 제공": "Batch do hệ thống định nghĩa — không tạo·xóa · chỉ cung cấp toggle bật/tắt·điều chỉnh chu kỳ·chạy ngay", "IP 마스킹 저장 · 보존 90일 · 정책/계정/API키 변경은 별도 강조 로깅": "Lưu IP dạng ẩn · giữ 90 ngày · thay đổi chính sách/tài khoản/khóa API được log nổi bật riêng", "500P+이벤트티켓 지급": "Cấp 500P + vé sự kiện", "500P + 이벤트 티켓 1장": "500P + 1 vé sự kiện", "주간 이벤트 추첨 설정 수정": "Sửa cài đặt rút thăm sự kiện tuần", "당첨 확률 (%)": "Xác suất trúng (%)", "자동 (매주 월요일 00:00)": "Tự động (mỗi Thứ Hai 00:00)", "수동 (관리자 실행)": "Thủ công (admin chạy)", "추첨 요일": "Thứ rút thăm", "월요일": "Thứ Hai", "화요일": "Thứ Ba", "수요일": "Thứ Tư", "목요일": "Thứ Năm", "금요일": "Thứ Sáu", "추첨 시각": "Giờ rút thăm", "당첨 보상 구성": "Cấu hình quà trúng thưởng", "이벤트 티켓 만료 (발급일+100일 고정)": "Hết hạn vé sự kiện (cố định ngày phát hành+100 ngày)", "이월 없음 (당회 미응모 시 소멸)": "Không rollover (chưa dự thưởng đợt này thì tiêu hủy)", "변경 시 변경 이력(누가·언제·전후)이 기록됩니다.": "Khi thay đổi sẽ ghi nhật ký (ai·khi nào·trước-sau).", "포인트 정책 수정": "Sửa chính sách điểm", "교환 비율 (P = 원)": "Tỷ lệ đổi (P = won)", "적립일 + 1년 (FIFO 소멸)": "Ngày tích lũy + 1 năm (tiêu hủy FIFO)", "적립일 + 6개월": "Ngày tích lũy + 6 tháng", "만료 없음": "Không hết hạn", "양방향 (포인트 ↔ 티켓)": "Hai chiều (điểm ↔ vé)", "단방향 (포인트 → 티켓)": "Một chiều (điểm → vé)", "적용 시점": "Thời điểm áp dụng", "즉시 적용": "Áp dụng ngay", "예약 적용": "Áp dụng theo hẹn", "포인트 환율·만료는 비용·민원 직결. 저장 시 변경 전후 비교 + 변경 이력이 기록됩니다.": "Tỷ giá·hết hạn điểm liên quan trực tiếp chi phí·khiếu nại. Khi lưu sẽ ghi so sánh trước-sau + nhật ký thay đổi.", "유예 기간 (일)": "Thời gian gia hạn (ngày)", "재가입 쿨타임": "Thời gian chờ đăng ký lại", "없음 (즉시 재가입)": "Không có (đăng ký lại ngay)", "7일": "7 ngày", "유예 만료 시 회수": "Thu hồi khi hết gia hạn", "통계용 보존 항목 (익명화)": "Mục lưu giữ cho thống kê (ẩn danh)", "설정값이 바뀌면 탈퇴 처리 절차·D-day 계산이 이 값을 따라 동적으로 반영됩니다.": "Khi đổi giá trị cài đặt thì quy trình xử lý hủy·tính D-day sẽ tự động phản ánh theo giá trị này.", "티켓 회수·소멸 상세": "Chi tiết thu hồi·tiêu hủy vé", "원본 티켓": "Vé gốc", "회수 사유": "Lý do thu hồi", "반품 (구매 취소)": "Trả hàng (hủy mua)", "회수 전후 잔액": "Số dư trước-sau thu hồi","사용 가능 잔액에서 즉시 차감.": "Trừ ngay từ số dư khả dụng.", "관련 환수 부채": "Khoản nợ thu hồi liên quan", "없음 (잔액 충분, 즉시 회수)": "Không có (đủ số dư, thu hồi ngay)", "잔액 부족 시 음수 부채로 기록 후 다음 적립 시 자동 상계.": "Khi thiếu số dư thì ghi thành nợ âm rồi tự bù khi tích lũy lần sau."});
 /* ── i18n 보강 2차 (2026-07-21) — select 옵션 ── */
-Object.assign(KO2VI,{"전체 거래유형":"Tất cả loại giao dịch","구매 대기(등급 미정)":"Chờ mua (chưa định hạng)","출석 보너스":"Thưởng điểm danh","룰렛 당첨":"Trúng vòng quay","카카오 연동 보상":"Thưởng liên kết Kakao","기프티콘 사용":"Sử dụng Gifticon","경품 응모":"Dự thưởng quà","포인트 전환":"Chuyển đổi điểm","등급 전환":"Chuyển hạng","관리자 회수":"Admin thu hồi","환불(취소·반품)":"Hoàn tiền (hủy·trả hàng)","꽝":"Trượt","이벤트티켓":"Vé sự kiện","출석(쿠팡 구경하기)":"Điểm danh (Dạo Coupang)","행운룰렛 당첨":"Trúng vòng quay may mắn","티켓→포인트 전환":"Chuyển vé→điểm","포인트→티켓 전환":"Chuyển điểm→vé","전체 기간":"Toàn bộ thời gian","사용완료":"Đã sử dụng","취소됨":"Đã hủy","기프티콘 문의":"Hỏi đáp Gifticon","정상(확정)":"Bình thường (đã xác nhận)","대기":"Chờ","환불":"Hoàn tiền"});
+Object.assign(KO2VI,{"전체 거래유형":"Tất cả loại giao dịch","구매 대기(등급 미정)":"Chờ mua (chưa định hạng)","출석 보너스":"Thưởng điểm danh","룰렛 당첨":"Trúng vòng quay","카카오 연동 보상":"Thưởng liên kết Kakao","기프티콘 사용":"Sử dụng Gifticon","경품 응모":"Dự thưởng quà","포인트 전환":"Chuyển đổi điểm","등급 전환":"Chuyển hạng","관리자 회수":"Admin thu hồi","환불(취소·반품)":"Hoàn tiền (hủy·trả hàng)","꽝":"Trượt","이벤트티켓":"Vé sự kiện","출석(쿠팡 구경하기)":"Điểm danh (Dạo Coupang)","매일 행운 룰렛 당첨":"Trúng vòng quay may mắn hằng ngày","티켓→포인트 전환":"Chuyển vé→điểm","포인트→티켓 전환":"Chuyển điểm→vé","전체 기간":"Toàn bộ thời gian","사용완료":"Đã sử dụng","취소됨":"Đã hủy","기프티콘 문의":"Hỏi đáp Gifticon","정상(확정)":"Bình thường (đã xác nhận)","대기":"Chờ","환불":"Hoàn tiền"});
 /* ── i18n 보강 (2026-07-21) — VI 전환 시 한국어로 남던 문구 ── */
-Object.assign(KO2VI,{"행운룰렛 설정":"Cài đặt vòng quay may mắn","어뷰징 모니터링":"Giám sát lạm dụng","개발 · 데모":"Phát triển · Demo","데이터 관리(데모)":"Quản lý dữ liệu (Demo)","순수익 (추정)":"Lợi nhuận ròng (ước tính)","데모 Firestore 집계":"Tổng hợp Firestore Demo","포스트백 확정 기준":"Theo chuẩn postback đã xác nhận","교환 마진":"Biên đổi thưởng","데모 실데이터":"Dữ liệu thật của Demo","발행 티켓 (누적 적립)":"Vé đã phát hành (tích lũy)","적립 확정 기준":"Theo chuẩn tích lũy đã xác nhận","pending 상태":"Trạng thái pending","마감 후 미처리":"Đã đóng nhưng chưa xử lý","운영 데이터 없음":"Không có dữ liệu vận hành","운영 누적 데이터 없음 (시계열 집계는 실서비스 운영 후 표시)":"Không có dữ liệu vận hành tích lũy (tổng hợp theo chuỗi thời gian sẽ hiển thị sau khi vận hành dịch vụ thật)","실행 이력 없음 (배치 스케줄러 미가동)":"Không có lịch sử chạy (batch scheduler chưa hoạt động)","닉네임 / 카카오톡 ID / 식별 아이디":"Biệt danh / Kakao ID / ID định danh","총 매출":"Tổng doanh thu","포스트백 + 교환 마진":"Postback + biên đổi thưởng","확정 정산 (집계)":"Quyết toán đã xác nhận (tổng hợp)","데모 집계":"Tổng hợp Demo","포스트백 기준":"Theo chuẩn postback","누적 수익":"Doanh thu tích lũy","차액 사유":"Lý do chênh lệch","—  차이 발생 원인: 환불 누락 · 포스트백 미수신 · 제휴몰별 수수료율 변경 · 부정거래 검증 지연. (실제 차액 데이터는 제휴몰 정산 확정 후 표시)":"—  Nguyên nhân phát sinh chênh lệch: bỏ sót hoàn tiền · không nhận được postback · thay đổi tỷ lệ hoa hồng theo từng cửa hàng LK · chậm xác minh giao dịch gian lận. (Dữ liệu chênh lệch thật sẽ hiển thị sau khi chốt quyết toán với cửa hàng LK)","총":"Tổng","누적 발행 (적립)":"Tổng phát hành (tích lũy)","티켓 소모":"Tiêu dùng vé","전체 원장 레코드":"Toàn bộ bản ghi sổ cái","유효기간 경과":"Quá thời hạn sử dụng","취소·반품":"Hủy·Trả hàng","오늘 기준":"Tính đến hôm nay","행운룰렛 = 포인트·이벤트티켓을 확률로 지급":"Vòng quay may mắn = cấp điểm·vé sự kiện theo xác suất","— 확률·배분은 정책상 미결이라 운영자가 직접 정합니다. 룰렛은 6칸이며 각 칸을 균등 확률(1/6)로 추첨합니다. 여기서 저장한 설정을 앱이 그대로 읽어 룰렛을 렌더링하고 당첨 보상을 지급합니다.":"— Xác suất·phân bổ chưa chốt trong chính sách nên Vận hành viên tự quyết định. Vòng quay có 6 ô và mỗi ô được quay với xác suất đều nhau (1/6). App đọc nguyên cài đặt lưu ở đây để render vòng quay và cấp thưởng trúng.","룰렛 6칸 설정":"Cài đặt 6 ô vòng quay","칸":"Ô","값":"Giá trị","1칸":"Ô 1","2칸":"Ô 2","3칸":"Ô 3","4칸":"Ô 4","5칸":"Ô 5","6칸":"Ô 6","저장된 설정을 불러왔습니다.":"Đã tải cài đặt đã lưu.","장수":"Số vé","P 액수":"Số điểm P","누적 사용·차감":"Tích lũy sử dụng·trừ","닉네임 또는 취소사유 검색":"Tìm biệt danh hoặc lý do hủy","CSV 파일로 상품 설명을 일괄 등록·수정합니다. 상품코드가 일치하는 항목은 덮어쓰기됩니다.":"Đăng ký·sửa hàng loạt mô tả sản phẩm bằng file CSV. Mục có mã sản phẩm trùng khớp sẽ bị ghi đè.","(.xlsx는 데모 범위 밖 — CSV만 지원)":"(.xlsx nằm ngoài phạm vi demo — chỉ hỗ trợ CSV)","CSV 파일을 선택하세요":"Hãy chọn file CSV","지원 형식: .csv (헤더: 상품코드,브랜드,상품명,이모지,카테고리,등급,필요장수,유효일수)":"Định dạng hỗ trợ: .csv (header: mã sản phẩm, thương hiệu, tên sản phẩm, emoji, danh mục, hạng, số vé cần, số ngày hiệu lực)","홈 상단 슬라이드 · 카드 순서 드래그로 노출 순서 변경":"Slide đầu trang chủ · kéo thứ tự thẻ để đổi thứ tự hiển thị","전체 공지":"Thông báo toàn bộ","등록 누적":"Tổng đã đăng ký","데모 범위 밖(열람 추적 미구현)":"Ngoài phạm vi demo (chưa triển khai theo dõi lượt xem)","데모 범위 밖":"Ngoài phạm vi demo","— 실제 FCM/카카오 알림톡 발송 연동은 없고, 발송 내역만 Firestore에 기록됩니다(대상 인원은 실집계).":"— Không có kết nối gửi FCM/Kakao AlimTalk thật, chỉ ghi lịch sử gửi vào Firestore (số người nhận là số liệu tổng hợp thật).","답변 완료 기준":"Theo chuẩn đã trả lời xong","닉네임, 제목 검색...":"Tìm biệt danh, tiêu đề...","— 회원이 앱 \"마이 → 계정탈퇴\" 누르면":"— Khi hội viên bấm \"Của tôi → Hủy tài khoản\" trong app thì","그 자리에서 즉시 처리":"xử lý ngay tại chỗ","됩니다(유예·철회 기간 없음). 개인정보(PII)는 즉시 스크럽되고 회원 문서(레코드)는 유지됩니다. 처리 누락 시 개인정보보호법 위반 소지.":"(không có thời gian ân hạn·rút lại). Thông tin cá nhân (PII) được scrub ngay và document (bản ghi) hội viên vẫn được giữ. Bỏ sót xử lý có thể vi phạm Luật bảo vệ thông tin cá nhân.","0명":"0 người","누적 탈퇴 회원":"Tổng hội viên đã hủy","탈퇴 확인":"Xác nhận hủy","앱 마이탭 → 최종 확인":"Tab Của tôi trong app → xác nhận cuối","status 전환 · PII 스크럽 · 기기 로컬데이터 삭제":"Chuyển status · scrub PII · xóa dữ liệu local trên thiết bị","거래 기록 존치":"Giữ lại bản ghi giao dịch","티켓·결제 기록은 레코드 유지 · 5년 보관":"Bản ghi vé·thanh toán được giữ lại · lưu 5 năm","탈퇴 회원 목록":"Danh sách hội viên đã hủy","가입 유형(탈퇴 전)":"Loại đăng ký (trước khi hủy)","탈퇴일시":"Thời điểm hủy","처리 방식":"Cách xử lý","즉시 처리 (유예·철회 없음)":"Xử lý ngay (không ân hạn·không rút lại)","확인 즉시 status='withdrawn' 전환, 재로그인·복구 불가":"Xác nhận xong là chuyển ngay status='withdrawn', không thể đăng nhập lại·khôi phục","PII 스크럽 항목":"Mục scrub PII","닉네임, 카카오 닉네임, 카카오 로그인ID":"Biệt danh, biệt danh Kakao, ID đăng nhập Kakao","탈퇴 즉시 제거 (레코드는 유지)":"Xóa ngay khi hủy (bản ghi vẫn giữ)","거래·정산 기록":"Bản ghi giao dịch·quyết toán","DB에 그대로 존치":"Giữ nguyên trong DB","PII 없이 user_id로만 연결 · 전자상거래법 5년 보존":"Chỉ liên kết bằng user_id, không có PII · lưu 5 năm theo luật TMĐT","식별 아이디 검색...":"Tìm ID định danh...","어뷰징·이상적립 모니터링":"Giám sát lạm dụng·tích lũy bất thường","— 적립형 서비스 부정 사용(다계정·부정적립·환불 어뷰징)을 탐지합니다. 환불 포스트백·정지 계정·티켓 환수 기록을 실시간 집계합니다.":"— Phát hiện việc lạm dụng dịch vụ tích lũy (đa tài khoản·tích lũy gian lận·lạm dụng hoàn tiền). Tổng hợp thời gian thực các bản ghi postback hoàn tiền·tài khoản bị đình chỉ·thu hồi vé.","이상 징후 계정":"Tài khoản có dấu hiệu bất thường","중복 제거":"Đã khử trùng lặp","환불 어뷰징":"Lạm dụng hoàn tiền","환불 포스트백":"Postback hoàn tiền","정지 계정":"Tài khoản bị đình chỉ","운영자 차단":"Admin chặn","티켓 환수":"Thu hồi vé","탐지 케이스":"Trường hợp phát hiện","환불 어뷰징 · 정지 계정 · 티켓 환수 — 최신순":"Lạm dụng hoàn tiền · tài khoản bị đình chỉ · thu hồi vé — mới nhất trước","근거":"Căn cứ","닉네임, 주문번호 검색...":"Tìm biệt danh, mã đơn hàng...","배포 이력 없음":"Không có lịch sử phát hành","키/상태 수정":"Sửa khóa/trạng thái","운영자 수동 갱신 (데모 범위 밖: 실제 API 호출 없음)":"Vận hành viên cập nhật thủ công (ngoài phạm vi demo: không gọi API thật)","오늘 사용: 운영 데이터 없음":"Dùng hôm nay: không có dữ liệu vận hành","데모 범위 밖 — 실제 API 호출 로그 연동 없음":"Ngoài phạm vi demo — không kết nối log gọi API thật","— 실제 cron 실행 엔진은 없습니다. 일시정지/재시작/즉시 실행은 상태·로그를 Firestore(scheduler_jobs)에 실제로 기록하는 것까지만 동작합니다.":"— Không có engine chạy cron thật. Tạm dừng/khởi động lại/chạy ngay chỉ hoạt động đến mức ghi thật trạng thái·log vào Firestore (scheduler_jobs).","시스템 정의 배치 — 생성·삭제 없음 · 활성/비활성 토글·즉시 실행만 제공":"Batch do hệ thống định nghĩa — không tạo·xóa · chỉ cung cấp toggle bật/tắt·chạy ngay","실행 로그 없음 (배치 스케줄러 미가동)":"Không có log chạy (batch scheduler chưa hoạt động)","VIN 화면 구성예정":"VIN sẽ dựng màn hình","데이터 관리 (데모 전용)":"Quản lý dữ liệu (chỉ dành cho Demo)","문의":"Hỏi đáp","교환이력":"Lịch sử đổi","포인트원장":"Sổ cái điểm","클릭":"Click","티켓원장":"Sổ cái vé","초대":"Mời","방문":"Truy cập","시나리오 채우기":"Đổ dữ liệu kịch bản","새로고침":"Làm mới","전체 비우기":"Xóa toàn bộ","[시나리오 채우기]는":"[Đổ dữ liệu kịch bản] sẽ","(scripts/seed-demo.js로 등록)에 등록된 가상 손님대로 데이터를 생성합니다. [전체 비우기]는 가상 데이터만 삭제하고\n          운영 뼈대(관리자 계정 firstadmin · 마스터 데이터 · 기프티콘 상품 · 배너 · 공지 · 시나리오 정의)는 보존합니다.":"(đăng ký qua scripts/seed-demo.js) tạo dữ liệu đúng theo các khách ảo đã đăng ký. [Xóa toàn bộ] chỉ xóa dữ liệu ảo và\n          giữ lại bộ khung vận hành (tài khoản quản trị firstadmin · dữ liệu master · sản phẩm Gifticon · banner · thông báo · định nghĩa kịch bản).","문서 추가 — users":"Thêm document — users","카카오연동":"Liên kết Kakao","카카오 닉네임":"Biệt danh Kakao","카카오 로그인 ID":"ID đăng nhập Kakao","+ 추가":"+ Thêm","오류: Missing or insufficient permissions.":"Lỗi: Missing or insufficient permissions."});
+Object.assign(KO2VI,{"매일 행운 룰렛 설정":"Cài đặt vòng quay may mắn hằng ngày","어뷰징 모니터링":"Giám sát lạm dụng","개발 · 데모":"Phát triển · Demo","데이터 관리(데모)":"Quản lý dữ liệu (Demo)","순수익 (추정)":"Lợi nhuận ròng (ước tính)","데모 Firestore 집계":"Tổng hợp Firestore Demo","포스트백 확정 기준":"Theo chuẩn postback đã xác nhận","교환 마진":"Biên đổi thưởng","데모 실데이터":"Dữ liệu thật của Demo","발행 티켓 (누적 적립)":"Vé đã phát hành (tích lũy)","적립 확정 기준":"Theo chuẩn tích lũy đã xác nhận","pending 상태":"Trạng thái pending","마감 후 미처리":"Đã đóng nhưng chưa xử lý","운영 데이터 없음":"Không có dữ liệu vận hành","운영 누적 데이터 없음 (시계열 집계는 실서비스 운영 후 표시)":"Không có dữ liệu vận hành tích lũy (tổng hợp theo chuỗi thời gian sẽ hiển thị sau khi vận hành dịch vụ thật)","실행 이력 없음 (배치 스케줄러 미가동)":"Không có lịch sử chạy (batch scheduler chưa hoạt động)","닉네임 / 카카오톡 ID / 식별 아이디":"Biệt danh / Kakao ID / ID định danh","총 매출":"Tổng doanh thu","포스트백 + 교환 마진":"Postback + biên đổi thưởng","확정 정산 (집계)":"Quyết toán đã xác nhận (tổng hợp)","데모 집계":"Tổng hợp Demo","포스트백 기준":"Theo chuẩn postback","누적 수익":"Doanh thu tích lũy","차액 사유":"Lý do chênh lệch","—  차이 발생 원인: 환불 누락 · 포스트백 미수신 · 제휴몰별 수수료율 변경 · 부정거래 검증 지연. (실제 차액 데이터는 제휴몰 정산 확정 후 표시)":"—  Nguyên nhân phát sinh chênh lệch: bỏ sót hoàn tiền · không nhận được postback · thay đổi tỷ lệ hoa hồng theo từng cửa hàng LK · chậm xác minh giao dịch gian lận. (Dữ liệu chênh lệch thật sẽ hiển thị sau khi chốt quyết toán với cửa hàng LK)","총":"Tổng","누적 발행 (적립)":"Tổng phát hành (tích lũy)","티켓 소모":"Tiêu dùng vé","전체 원장 레코드":"Toàn bộ bản ghi sổ cái","유효기간 경과":"Quá thời hạn sử dụng","취소·반품":"Hủy·Trả hàng","오늘 기준":"Tính đến hôm nay","매일 행운 룰렛 = 포인트·이벤트티켓을 확률로 지급":"Vòng quay may mắn = cấp điểm·vé sự kiện theo xác suất","— 확률·배분은 정책상 미결이라 운영자가 직접 정합니다. 룰렛은 6칸이며 각 칸을 균등 확률(1/6)로 추첨합니다. 여기서 저장한 설정을 앱이 그대로 읽어 룰렛을 렌더링하고 당첨 보상을 지급합니다.":"— Xác suất·phân bổ chưa chốt trong chính sách nên Vận hành viên tự quyết định. Vòng quay có 6 ô và mỗi ô được quay với xác suất đều nhau (1/6). App đọc nguyên cài đặt lưu ở đây để render vòng quay và cấp thưởng trúng.","룰렛 6칸 설정":"Cài đặt 6 ô vòng quay","칸":"Ô","값":"Giá trị","1칸":"Ô 1","2칸":"Ô 2","3칸":"Ô 3","4칸":"Ô 4","5칸":"Ô 5","6칸":"Ô 6","저장된 설정을 불러왔습니다.":"Đã tải cài đặt đã lưu.","장수":"Số vé","P 액수":"Số điểm P","누적 사용·차감":"Tích lũy sử dụng·trừ","닉네임 또는 취소사유 검색":"Tìm biệt danh hoặc lý do hủy","CSV 파일로 상품 설명을 일괄 등록·수정합니다. 상품코드가 일치하는 항목은 덮어쓰기됩니다.":"Đăng ký·sửa hàng loạt mô tả sản phẩm bằng file CSV. Mục có mã sản phẩm trùng khớp sẽ bị ghi đè.","(.xlsx는 데모 범위 밖 — CSV만 지원)":"(.xlsx nằm ngoài phạm vi demo — chỉ hỗ trợ CSV)","CSV 파일을 선택하세요":"Hãy chọn file CSV","지원 형식: .csv (헤더: 상품코드,브랜드,상품명,이모지,카테고리,등급,필요장수,유효일수)":"Định dạng hỗ trợ: .csv (header: mã sản phẩm, thương hiệu, tên sản phẩm, emoji, danh mục, hạng, số vé cần, số ngày hiệu lực)","홈 상단 슬라이드 · 카드 순서 드래그로 노출 순서 변경":"Slide đầu trang chủ · kéo thứ tự thẻ để đổi thứ tự hiển thị","전체 공지":"Thông báo toàn bộ","등록 누적":"Tổng đã đăng ký","데모 범위 밖(열람 추적 미구현)":"Ngoài phạm vi demo (chưa triển khai theo dõi lượt xem)","데모 범위 밖":"Ngoài phạm vi demo","— 실제 FCM/카카오 알림톡 발송 연동은 없고, 발송 내역만 Firestore에 기록됩니다(대상 인원은 실집계).":"— Không có kết nối gửi FCM/Kakao AlimTalk thật, chỉ ghi lịch sử gửi vào Firestore (số người nhận là số liệu tổng hợp thật).","답변 완료 기준":"Theo chuẩn đã trả lời xong","닉네임, 제목 검색...":"Tìm biệt danh, tiêu đề...","— 회원이 앱 \"마이 → 계정탈퇴\" 누르면":"— Khi hội viên bấm \"Của tôi → Hủy tài khoản\" trong app thì","그 자리에서 즉시 처리":"xử lý ngay tại chỗ","됩니다(유예·철회 기간 없음). 개인정보(PII)는 즉시 스크럽되고 회원 문서(레코드)는 유지됩니다. 처리 누락 시 개인정보보호법 위반 소지.":"(không có thời gian ân hạn·rút lại). Thông tin cá nhân (PII) được scrub ngay và document (bản ghi) hội viên vẫn được giữ. Bỏ sót xử lý có thể vi phạm Luật bảo vệ thông tin cá nhân.","0명":"0 người","누적 탈퇴 회원":"Tổng hội viên đã hủy","탈퇴 확인":"Xác nhận hủy","앱 마이탭 → 최종 확인":"Tab Của tôi trong app → xác nhận cuối","status 전환 · PII 스크럽 · 기기 로컬데이터 삭제":"Chuyển status · scrub PII · xóa dữ liệu local trên thiết bị","거래 기록 존치":"Giữ lại bản ghi giao dịch","티켓·결제 기록은 레코드 유지 · 5년 보관":"Bản ghi vé·thanh toán được giữ lại · lưu 5 năm","탈퇴 회원 목록":"Danh sách hội viên đã hủy","가입 유형(탈퇴 전)":"Loại đăng ký (trước khi hủy)","탈퇴일시":"Thời điểm hủy","처리 방식":"Cách xử lý","즉시 처리 (유예·철회 없음)":"Xử lý ngay (không ân hạn·không rút lại)","확인 즉시 status='withdrawn' 전환, 재로그인·복구 불가":"Xác nhận xong là chuyển ngay status='withdrawn', không thể đăng nhập lại·khôi phục","PII 스크럽 항목":"Mục scrub PII","닉네임, 카카오 닉네임, 카카오 로그인ID":"Biệt danh, biệt danh Kakao, ID đăng nhập Kakao","탈퇴 즉시 제거 (레코드는 유지)":"Xóa ngay khi hủy (bản ghi vẫn giữ)","거래·정산 기록":"Bản ghi giao dịch·quyết toán","DB에 그대로 존치":"Giữ nguyên trong DB","PII 없이 user_id로만 연결 · 전자상거래법 5년 보존":"Chỉ liên kết bằng user_id, không có PII · lưu 5 năm theo luật TMĐT","식별 아이디 검색...":"Tìm ID định danh...","어뷰징·이상적립 모니터링":"Giám sát lạm dụng·tích lũy bất thường","— 적립형 서비스 부정 사용(다계정·부정적립·환불 어뷰징)을 탐지합니다. 환불 포스트백·정지 계정·티켓 환수 기록을 실시간 집계합니다.":"— Phát hiện việc lạm dụng dịch vụ tích lũy (đa tài khoản·tích lũy gian lận·lạm dụng hoàn tiền). Tổng hợp thời gian thực các bản ghi postback hoàn tiền·tài khoản bị đình chỉ·thu hồi vé.","이상 징후 계정":"Tài khoản có dấu hiệu bất thường","중복 제거":"Đã khử trùng lặp","환불 어뷰징":"Lạm dụng hoàn tiền","환불 포스트백":"Postback hoàn tiền","정지 계정":"Tài khoản bị đình chỉ","운영자 차단":"Admin chặn","티켓 환수":"Thu hồi vé","탐지 케이스":"Trường hợp phát hiện","환불 어뷰징 · 정지 계정 · 티켓 환수 — 최신순":"Lạm dụng hoàn tiền · tài khoản bị đình chỉ · thu hồi vé — mới nhất trước","근거":"Căn cứ","닉네임, 주문번호 검색...":"Tìm biệt danh, mã đơn hàng...","배포 이력 없음":"Không có lịch sử phát hành","키/상태 수정":"Sửa khóa/trạng thái","운영자 수동 갱신 (데모 범위 밖: 실제 API 호출 없음)":"Vận hành viên cập nhật thủ công (ngoài phạm vi demo: không gọi API thật)","오늘 사용: 운영 데이터 없음":"Dùng hôm nay: không có dữ liệu vận hành","데모 범위 밖 — 실제 API 호출 로그 연동 없음":"Ngoài phạm vi demo — không kết nối log gọi API thật","— 실제 cron 실행 엔진은 없습니다. 일시정지/재시작/즉시 실행은 상태·로그를 Firestore(scheduler_jobs)에 실제로 기록하는 것까지만 동작합니다.":"— Không có engine chạy cron thật. Tạm dừng/khởi động lại/chạy ngay chỉ hoạt động đến mức ghi thật trạng thái·log vào Firestore (scheduler_jobs).","시스템 정의 배치 — 생성·삭제 없음 · 활성/비활성 토글·즉시 실행만 제공":"Batch do hệ thống định nghĩa — không tạo·xóa · chỉ cung cấp toggle bật/tắt·chạy ngay","실행 로그 없음 (배치 스케줄러 미가동)":"Không có log chạy (batch scheduler chưa hoạt động)","VIN 화면 구성예정":"VIN sẽ dựng màn hình","데이터 관리 (데모 전용)":"Quản lý dữ liệu (chỉ dành cho Demo)","문의":"Hỏi đáp","교환이력":"Lịch sử đổi","포인트원장":"Sổ cái điểm","클릭":"Click","티켓원장":"Sổ cái vé","초대":"Mời","방문":"Truy cập","시나리오 채우기":"Đổ dữ liệu kịch bản","새로고침":"Làm mới","전체 비우기":"Xóa toàn bộ","[시나리오 채우기]는":"[Đổ dữ liệu kịch bản] sẽ","(scripts/seed-demo.js로 등록)에 등록된 가상 손님대로 데이터를 생성합니다. [전체 비우기]는 가상 데이터만 삭제하고\n          운영 뼈대(관리자 계정 firstadmin · 마스터 데이터 · 기프티콘 상품 · 배너 · 공지 · 시나리오 정의)는 보존합니다.":"(đăng ký qua scripts/seed-demo.js) tạo dữ liệu đúng theo các khách ảo đã đăng ký. [Xóa toàn bộ] chỉ xóa dữ liệu ảo và\n          giữ lại bộ khung vận hành (tài khoản quản trị firstadmin · dữ liệu master · sản phẩm Gifticon · banner · thông báo · định nghĩa kịch bản).","문서 추가 — users":"Thêm document — users","카카오연동":"Liên kết Kakao","카카오 닉네임":"Biệt danh Kakao","카카오 로그인 ID":"ID đăng nhập Kakao","+ 추가":"+ Thêm","오류: Missing or insufficient permissions.":"Lỗi: Missing or insufficient permissions."});
 /* ── i18n 보강 (2026-07-21 재질문 답변 반영) — 탈퇴 정책·탈퇴 상세·공지 관리 UI 변경 ── */
 Object.assign(KO2VI,{"안내":"Hướng dẫn","탈퇴 정책 안내":"Hướng dẫn chính sách hủy TK","고정 정책 — 운영자가 수정할 수 없습니다.":"Chính sách cố định — quản trị viên không thể sửa.","탈퇴 즉시 제거 (레코드는 유지, 고정 정책)":"Xóa ngay khi hủy (bản ghi vẫn giữ, chính sách cố định)","탈퇴 회원 상세":"Chi tiết hội viên đã hủy","식별 아이디":"ID định danh","탈퇴 완료 (즉시 처리 · 유예 없음)":"Đã hủy hoàn tất (xử lý ngay · không ân hạn)","PII 처리":"Xử lý PII","닉네임·카카오 식별값 스크럽됨":"Nickname·mã định danh Kakao đã được scrub","레코드는 유지, 거래 기록 참조 무결성 보호":"Bản ghi vẫn giữ, bảo vệ tính toàn vẹn tham chiếu lịch sử giao dịch","공지 수정":"Sửa thông báo"});
 Object.assign(KO2VI,{"답변하기":"Trả lời","답변 수정":"Sửa câu trả lời","작성자":"Người viết","문의를 삭제했습니다.":"Đã xóa hỏi đáp.","공지가 삭제되었습니다.":"Đã xóa thông báo.","공지가 수정되었습니다.":"Thông báo đã được sửa.","공지가 게시되었습니다.":"Thông báo đã được đăng.","제목과 내용을 입력하세요.":"Hãy nhập tiêu đề và nội dung.","작성일":"Ngày viết"});
@@ -5126,9 +5176,9 @@ Object.assign(KO2VI,{"확인중":"Đang kiểm tra","클릭해서 확인중/확�
 Object.assign(KO2VI,{"테스트 발송 미리보기":"Xem trước gửi thử","실제 수신 시 보이는 모습과 동일한 형태입니다. 본인 계정으로만 발송됩니다.":"Đây là hình thức giống hệt lúc nhận thực tế. Chỉ được gửi đến tài khoản của chính bạn.","지금":"Bây giờ"});
 
 
-Object.assign(KO2VI,{"자동 회차 등록":"Đăng ký đợt tự động","자동 회차 등록 사용":"Sử dụng đăng ký đợt tự động","켜두면 매주 월요일 0시 시작 ~ 일요일 마감 주기로, 마감된 회차 다음의 신규 회차가 아래 기본 경품 구성 템플릿을 복사해 자동 생성됩니다. 회차명은 자동 넘버링되며, 생성 후에도 개별 수정할 수 있습니다. 수동 등록·수정은 이 설정과 무관하게 항상 가능합니다.":"Khi bật, theo chu kỳ bắt đầu 0h Thứ Hai ~ đóng Chủ Nhật hàng tuần, đợt mới tiếp theo sau đợt đã đóng sẽ tự động được tạo bằng cách sao chép mẫu cấu hình quà mặc định bên dưới. Tên đợt được đánh số tự động, và có thể sửa riêng từng đợt sau khi tạo. Đăng ký·sửa thủ công luôn khả dụng bất kể cài đặt này.","마감 시각 (매주 일요일)":"Giờ đóng (Chủ Nhật hàng tuần)","기본 경품 구성 템플릿 편집":"Sửa mẫu cấu hình quà mặc định","마감 시각이 저장되었습니다.":"Đã lưu giờ đóng.","자동 회차 등록을 켰습니다.":"Đã bật đăng ký đợt tự động.","자동 회차 등록을 껐습니다.":"Đã tắt đăng ký đợt tự động.","기본 경품 구성 템플릿":"Mẫu cấu hình quà mặc định","자동 생성되는 회차는 이 템플릿을 그대로 복사해 만들어집니다. 생성된 개별 회차는 이후 따로 수정할 수 있습니다.":"Đợt được tạo tự động sẽ sao chép nguyên mẫu này. Từng đợt đã tạo có thể sửa riêng sau đó.","템플릿 저장":"Lưu mẫu","기본 경품 구성 템플릿이 저장되었습니다.":"Đã lưu mẫu cấu hình quà mặc định.","회차명을 입력해 주세요.":"Vui lòng nhập tên đợt.","시작일·마감일을 입력해 주세요.":"Vui lòng nhập ngày bắt đầu·ngày kết thúc.","마감일이 시작일보다 앞설 수 없습니다.":"Ngày kết thúc không được sớm hơn ngày bắt đầu.","등수별 경품 구성을 1개 이상 입력해 주세요.":"Vui lòng nhập ít nhất 1 cấu hình quà theo hạng.","경품명을 입력해 주세요.":"Vui lòng nhập tên quà.","당첨자 수는 1 이상이어야 합니다.":"Số người trúng thưởng phải từ 1 trở lên.","등수가 중복되었습니다. 등수당 1행만 가능합니다.":"Hạng bị trùng. Mỗi hạng chỉ được 1 dòng.","새 추첨 회차가 등록되었습니다.":"Đã đăng ký đợt rút thăm mới.","회차 정보가 수정되었습니다.":"Đã sửa thông tin đợt.","회차 수정 — ":"Sửa đợt — ","진행 중":"Đang diễn ra","자동 생성":"Tạo tự động","새 추첨 회차 등록":"Đăng ký đợt rút thăm mới","당첨 처리 완료.":"Đã xử lý trúng thưởng.","당첨 처리 — ":"Xử lý trúng thưởng — ","🎟 이벤트 티켓 자동 응모":"🎟 Tự động ứng tuyển bằng vé sự kiện","이벤트 티켓 자동 응모":"Tự động ứng tuyển bằng vé sự kiện","— 출석 5연속·행운룰렛·이부장 패키지 등으로 획득한 이벤트 티켓은 현재 진행 중인 추첨 회차에 자동 응모됩니다. 응모한 티켓 수에 비례해 당첨 확률이 높아지며, 당첨자 수만큼 비복원 추첨됩니다.":"— Vé sự kiện nhận được qua điểm danh 5 ngày liên tiếp·vòng quay may mắn·gói Trưởng phòng Lee v.v. sẽ tự động ứng tuyển vào đợt rút thăm đang diễn ra. Xác suất trúng tăng theo số vé đã ứng tuyển, và rút thăm không hoàn lại theo đúng số người trúng.","추첨 방식: 매주 월요일 0시 시작 ~ 일요일 21:00 마감 (자동/수동 전환 가능)":"Phương thức rút thăm: bắt đầu 0h Thứ Hai ~ đóng 21:00 Chủ Nhật hàng tuần (chuyển đổi tự động/thủ công được)","— 이벤트 티켓 획득 경로·만료·한도 확정 적용. 경품 추첨 주기는 매주(월요일 시작~일요일 마감)로 확정.":"— Áp dụng xác nhận đường dẫn·hết hạn·hạn mức vé sự kiện. Chu kỳ rút thăm quà tặng đã xác định là hàng tuần (bắt đầu Thứ Hai ~ đóng Chủ Nhật).","— 이벤트 티켓 획득 경로·만료·한도 및 친구초대·온보딩 보상 확정 적용. 경품 추첨 주기는 매주(월요일 시작~일요일 마감)로 확정.":"— Áp dụng xác nhận đường dẫn·hết hạn·hạn mức vé sự kiện và thưởng mời bạn·onboarding. Chu kỳ rút thăm quà tặng đã xác định là hàng tuần (bắt đầu Thứ Hai ~ đóng Chủ Nhật).","추첨 회차 기준. 추첨 주기는 매주(월요일 시작~일요일 마감)로 확정.":"Theo vòng rút thăm. Chu kỳ rút thăm đã xác định là hàng tuần (bắt đầu Thứ Hai ~ đóng Chủ Nhật).","등록된 추첨 회차가 없습니다. \"+ 회차 등록\" 버튼으로 추가하세요.":"Chưa có đợt rút thăm nào được đăng ký. Thêm bằng nút \"+ Đăng ký đợt\".","삭제":"Xóa","수정":"Sửa"});
+Object.assign(KO2VI,{"자동 회차 등록":"Đăng ký đợt tự động","자동 회차 등록 사용":"Sử dụng đăng ký đợt tự động","켜두면 매주 월요일 0시 시작 ~ 일요일 마감 주기로, 마감된 회차 다음의 신규 회차가 아래 기본 경품 구성 템플릿을 복사해 자동 생성됩니다. 회차명은 자동 넘버링되며, 생성 후에도 개별 수정할 수 있습니다. 수동 등록·수정은 이 설정과 무관하게 항상 가능합니다.":"Khi bật, theo chu kỳ bắt đầu 0h Thứ Hai ~ đóng Chủ Nhật hàng tuần, đợt mới tiếp theo sau đợt đã đóng sẽ tự động được tạo bằng cách sao chép mẫu cấu hình quà mặc định bên dưới. Tên đợt được đánh số tự động, và có thể sửa riêng từng đợt sau khi tạo. Đăng ký·sửa thủ công luôn khả dụng bất kể cài đặt này.","마감 시각 (매주 일요일)":"Giờ đóng (Chủ Nhật hàng tuần)","기본 경품 구성 템플릿 편집":"Sửa mẫu cấu hình quà mặc định","마감 시각이 저장되었습니다.":"Đã lưu giờ đóng.","자동 회차 등록을 켰습니다.":"Đã bật đăng ký đợt tự động.","자동 회차 등록을 껐습니다.":"Đã tắt đăng ký đợt tự động.","기본 경품 구성 템플릿":"Mẫu cấu hình quà mặc định","자동 생성되는 회차는 이 템플릿을 그대로 복사해 만들어집니다. 생성된 개별 회차는 이후 따로 수정할 수 있습니다.":"Đợt được tạo tự động sẽ sao chép nguyên mẫu này. Từng đợt đã tạo có thể sửa riêng sau đó.","템플릿 저장":"Lưu mẫu","기본 경품 구성 템플릿이 저장되었습니다.":"Đã lưu mẫu cấu hình quà mặc định.","회차명을 입력해 주세요.":"Vui lòng nhập tên đợt.","시작일·마감일을 입력해 주세요.":"Vui lòng nhập ngày bắt đầu·ngày kết thúc.","마감일이 시작일보다 앞설 수 없습니다.":"Ngày kết thúc không được sớm hơn ngày bắt đầu.","등수별 경품 구성을 1개 이상 입력해 주세요.":"Vui lòng nhập ít nhất 1 cấu hình quà theo hạng.","경품명을 입력해 주세요.":"Vui lòng nhập tên quà.","당첨자 수는 1 이상이어야 합니다.":"Số người trúng thưởng phải từ 1 trở lên.","등수가 중복되었습니다. 등수당 1행만 가능합니다.":"Hạng bị trùng. Mỗi hạng chỉ được 1 dòng.","새 추첨 회차가 등록되었습니다.":"Đã đăng ký đợt rút thăm mới.","회차 정보가 수정되었습니다.":"Đã sửa thông tin đợt.","회차 수정 — ":"Sửa đợt — ","진행 중":"Đang diễn ra","자동 생성":"Tạo tự động","새 추첨 회차 등록":"Đăng ký đợt rút thăm mới","당첨 처리 완료.":"Đã xử lý trúng thưởng.","당첨 처리 — ":"Xử lý trúng thưởng — ","🎟 이벤트 티켓 자동 응모":"🎟 Tự động ứng tuyển bằng vé sự kiện","이벤트 티켓 자동 응모":"Tự động ứng tuyển bằng vé sự kiện","— 출석 5연속·매일 행운 룰렛·이부장 패키지 등으로 획득한 이벤트 티켓은 현재 진행 중인 추첨 회차에 자동 응모됩니다. 응모한 티켓 수에 비례해 당첨 확률이 높아지며, 당첨자 수만큼 비복원 추첨됩니다.":"— Vé sự kiện nhận được qua điểm danh 5 ngày liên tiếp·vòng quay may mắn·gói Trưởng phòng Lee v.v. sẽ tự động ứng tuyển vào đợt rút thăm đang diễn ra. Xác suất trúng tăng theo số vé đã ứng tuyển, và rút thăm không hoàn lại theo đúng số người trúng.","추첨 방식: 매주 월요일 0시 시작 ~ 일요일 21:00 마감 (자동/수동 전환 가능)":"Phương thức rút thăm: bắt đầu 0h Thứ Hai ~ đóng 21:00 Chủ Nhật hàng tuần (chuyển đổi tự động/thủ công được)","— 이벤트 티켓 획득 경로·만료·한도 확정 적용. 경품 추첨 주기는 매주(월요일 시작~일요일 마감)로 확정.":"— Áp dụng xác nhận đường dẫn·hết hạn·hạn mức vé sự kiện. Chu kỳ rút thăm quà tặng đã xác định là hàng tuần (bắt đầu Thứ Hai ~ đóng Chủ Nhật).","— 이벤트 티켓 획득 경로·만료·한도 및 친구초대·온보딩 보상 확정 적용. 경품 추첨 주기는 매주(월요일 시작~일요일 마감)로 확정.":"— Áp dụng xác nhận đường dẫn·hết hạn·hạn mức vé sự kiện và thưởng mời bạn·onboarding. Chu kỳ rút thăm quà tặng đã xác định là hàng tuần (bắt đầu Thứ Hai ~ đóng Chủ Nhật).","추첨 회차 기준. 추첨 주기는 매주(월요일 시작~일요일 마감)로 확정.":"Theo vòng rút thăm. Chu kỳ rút thăm đã xác định là hàng tuần (bắt đầu Thứ Hai ~ đóng Chủ Nhật).","등록된 추첨 회차가 없습니다. \"+ 회차 등록\" 버튼으로 추가하세요.":"Chưa có đợt rút thăm nào được đăng ký. Thêm bằng nút \"+ Đăng ký đợt\".","삭제":"Xóa","수정":"Sửa"});
 Object.assign(KO2VI,{"경품 추첨 관리":"Quản lý bốc thăm quà","응모 현황":"Tình hình dự thưởng","회차 선택":"Chọn đợt","응모자 수":"Số người dự thưởng","선택 회차 기준":"Theo đợt đã chọn","완료된 회차 당첨 결과":"Kết quả trúng thưởng đợt đã hoàn tất","등수별 당첨자":"Người trúng theo hạng","완료된 회차가 없습니다.":"Chưa có đợt nào hoàn tất.","응모 내역이 없습니다.":"Chưa có lịch sử dự thưởng.","등록된 회차 없음":"Chưa có đợt nào","사용 티켓":"Vé đã dùng","응모일시":"Thời điểm dự thưởng","회차별 응모자·소모 이벤트 티켓 현황입니다. 회차를 선택하면 상세 응모 내역이 표시됩니다.":"Đây là tình hình người dự thưởng·vé sự kiện tiêu theo từng đợt. Chọn một đợt để xem chi tiết lịch sử dự thưởng.","마감된 회차의 당첨 처리(추첨 실행)는":"Xử lý trúng thưởng (thực hiện bốc thăm) của đợt đã đóng được thực hiện ở","탭의 해당 회차 행에서 진행합니다. 이 탭에서는 처리 완료된 회차의 당첨 결과와, 아직 발송하지 않은 경품을 확인·발송합니다.":"tab, tại dòng đợt tương ứng. Ở tab này, bạn xác nhận kết quả trúng thưởng của các đợt đã xử lý xong và xác nhận·gửi những phần quà chưa gửi."});
-Object.assign(KO2VI,{"이벤트 설정 관리":"Quản lý cài đặt sự kiện","이벤트 응모/추첨 관리":"Quản lý dự thưởng/bốc thăm sự kiện","— 출석 5연속·행운룰렛·이부장 패키지 등으로 획득한 이벤트 티켓은 현재 진행 중인 추첨 회차에 자동 응모됩니다. 응모한 티켓 수에 비례해 당첨 확률이 높아지며, 당첨자 수만큼 비복원 추첨됩니다. 회차 목록·응모 현황·당첨 처리는":"— Vé sự kiện nhận được qua điểm danh 5 ngày liên tiếp·vòng quay may mắn·gói Trưởng phòng Lee v.v. sẽ tự động ứng tuyển vào đợt rút thăm đang diễn ra. Xác suất trúng tăng theo số vé đã ứng tuyển, và rút thăm không hoàn lại theo đúng số người trúng. Danh sách đợt·tình hình dự thưởng·xử lý trúng thưởng được quản lý ở màn","화면에서 관리합니다.":"để quản lý.","자동 회차 등록 체크박스·마감 시각·기본 경품 구성 템플릿은":"Checkbox đăng ký đợt tự động·giờ đóng·mẫu cấu hình quà mặc định được quản lý ở màn","켜두면 매주 월요일 0시 시작 ~ 일요일 마감 주기로, 마감된 회차 다음의 신규 회차가 아래 기본 경품 구성 템플릿을 복사해 자동 생성됩니다. 회차명은 마감일(추첨일) 기준 \"N월 M주차\" 형식으로 자동 부여되며, 생성 후에도 개별 수정할 수 있습니다. 수동 등록·수정은 이 설정과 무관하게 항상 가능합니다.":"Khi bật, theo chu kỳ bắt đầu 0h Thứ Hai ~ đóng Chủ Nhật hàng tuần, đợt mới tiếp theo sau đợt đã đóng sẽ tự động được tạo bằng cách sao chép mẫu cấu hình quà mặc định bên dưới. Tên đợt được tự động đặt theo định dạng \"Tuần M tháng N\" dựa trên ngày đóng (ngày rút thăm), và có thể sửa riêng từng đợt sau khi tạo. Đăng ký·sửa thủ công luôn khả dụng bất kể cài đặt này."});
+Object.assign(KO2VI,{"이벤트 설정 관리":"Quản lý cài đặt sự kiện","이벤트 응모/추첨 관리":"Quản lý dự thưởng/bốc thăm sự kiện","— 출석 5연속·매일 행운 룰렛·이부장 패키지 등으로 획득한 이벤트 티켓은 현재 진행 중인 추첨 회차에 자동 응모됩니다. 응모한 티켓 수에 비례해 당첨 확률이 높아지며, 당첨자 수만큼 비복원 추첨됩니다. 회차 목록·응모 현황·당첨 처리는":"— Vé sự kiện nhận được qua điểm danh 5 ngày liên tiếp·vòng quay may mắn·gói Trưởng phòng Lee v.v. sẽ tự động ứng tuyển vào đợt rút thăm đang diễn ra. Xác suất trúng tăng theo số vé đã ứng tuyển, và rút thăm không hoàn lại theo đúng số người trúng. Danh sách đợt·tình hình dự thưởng·xử lý trúng thưởng được quản lý ở màn","화면에서 관리합니다.":"để quản lý.","자동 회차 등록 체크박스·마감 시각·기본 경품 구성 템플릿은":"Checkbox đăng ký đợt tự động·giờ đóng·mẫu cấu hình quà mặc định được quản lý ở màn","켜두면 매주 월요일 0시 시작 ~ 일요일 마감 주기로, 마감된 회차 다음의 신규 회차가 아래 기본 경품 구성 템플릿을 복사해 자동 생성됩니다. 회차명은 마감일(추첨일) 기준 \"N월 M주차\" 형식으로 자동 부여되며, 생성 후에도 개별 수정할 수 있습니다. 수동 등록·수정은 이 설정과 무관하게 항상 가능합니다.":"Khi bật, theo chu kỳ bắt đầu 0h Thứ Hai ~ đóng Chủ Nhật hàng tuần, đợt mới tiếp theo sau đợt đã đóng sẽ tự động được tạo bằng cách sao chép mẫu cấu hình quà mặc định bên dưới. Tên đợt được tự động đặt theo định dạng \"Tuần M tháng N\" dựa trên ngày đóng (ngày rút thăm), và có thể sửa riêng từng đợt sau khi tạo. Đăng ký·sửa thủ công luôn khả dụng bất kể cài đặt này."});
 Object.assign(KO2VI,{"예: 2026년 8월 1주차":"VD: Tuần 1 tháng 8 năm 2026"});
 Object.assign(KO2VI,{"주간 회차 리스트":"Danh sách đợt hàng tuần","기간":"Thời gian","미선정":"Chưa chọn","응모자 보기":"Xem người dự thưởng","응모자 리스트":"Danh sách người dự thưởng","당첨 등수":"Hạng trúng thưởng","자동 당첨자 선택":"Chọn người trúng tự động","적용됨":"Đã áp dụng","적용 전 (임시 선택)":"Trước khi áp dụng (chọn tạm)","선택된 당첨자가 없습니다.":"Chưa chọn người trúng thưởng nào.","당첨자가 적용되었습니다.":"Đã áp dụng người trúng thưởng.","자동으로 당첨자를 선택했습니다. 적용을 눌러야 확정됩니다.":"Đã tự động chọn người trúng thưởng. Phải bấm Áp dụng mới được xác nhận.","회차를 찾을 수 없습니다.":"Không tìm thấy đợt.","미선택":"Chưa chọn","등수별 구성:":"Cơ cấu theo hạng:","불러오는 중…":"Đang tải…","응모 건 단위 무작위 추첨 · 티켓을 많이 쓸수록 확률 상승 · 1인 1회 당첨 · 1등부터 정원만큼 선정":"Rút thăm ngẫu nhiên theo đơn vị lượt dự thưởng · Dùng càng nhiều vé thì xác suất trúng càng cao · Mỗi người chỉ trúng thưởng 1 lần · Chọn từ hạng 1 cho đến khi đủ số lượng"});
 Object.assign(KO2VI,{"예정":"Sắp diễn ra","종료":"Đã kết thúc","마감: 매주 일요일 23:59:59 (고정)":"Đóng: 23:59:59 Chủ Nhật hàng tuần (cố định)","켜두면 매월 초에 그 달의 전체 회차(주차별)가 미리 자동 생성됩니다. 회차명은 마감일(추첨일) 기준 \"YYYY년 N월 M주차\" 형식으로 자동 부여되며, 생성 후에도 개별 수정할 수 있습니다. 수동 등록·수정은 이 설정과 무관하게 항상 가능합니다.":"Khi bật, vào đầu mỗi tháng toàn bộ các đợt (theo tuần) của tháng đó sẽ được tạo tự động trước. Tên đợt được tự động đặt theo định dạng \"Tuần M tháng N năm YYYY\" dựa trên ngày đóng (ngày rút thăm), và có thể sửa riêng từng đợt sau khi tạo. Đăng ký·sửa thủ công luôn khả dụng bất kể cài đặt này.","추첨 방식: 매주 월요일 0시 시작 ~ 일요일 23:59:59 마감 (자동/수동 전환 가능)":"Phương thức rút thăm: bắt đầu 0h Thứ Hai ~ đóng 23:59:59 Chủ Nhật hàng tuần (chuyển đổi tự động/thủ công được)","경품 수정":"Chỉnh sửa giải thưởng","진행중인 주간 이벤트":"Sự kiện tuần đang diễn ra","진행예정 주간 이벤트":"Sự kiện tuần sắp diễn ra","종료된 주간 이벤트":"Sự kiện tuần đã kết thúc","진행 중인 회차가 없습니다.":"Không có đợt nào đang diễn ra.","예정된 회차가 없습니다.":"Không có đợt nào sắp diễn ra.","종료된 회차가 없습니다.":"Không có đợt nào đã kết thúc.","로드 오류":"Lỗi tải dữ liệu","켜두면 매월 초에 그 달의 전체 회차(주차별)가 자동 생성됩니다. 회차명은 마감일(추첨일) 기준 \"YYYY년 N월 M주차\" 형식으로 자동 부여됩니다. 회차는 자동 생성만 가능하며, 운영자는 생성된 회차의 경품 구성 수정과 당첨자 선정만 진행합니다.":"Khi bật, vào đầu mỗi tháng toàn bộ các đợt (theo tuần) của tháng đó sẽ được tạo tự động. Tên đợt được tự động đặt theo định dạng \"Tuần M tháng N năm YYYY\" dựa trên ngày đóng (ngày rút thăm). Đợt chỉ được tạo tự động — quản trị viên chỉ chỉnh sửa cấu hình quà và chọn người trúng của đợt đã tạo.","추첨 방식: 매주 월요일 0시 시작 ~ 일요일 23:59:59 마감 (자동 생성)":"Phương thức rút thăm: bắt đầu 0h Thứ Hai ~ đóng 23:59:59 Chủ Nhật hàng tuần (tạo tự động)","회차 등록 안내":"Hướng dẫn đăng ký đợt","회차는 매월 초 한 달치가 자동 등록됩니다 (매주 월요일 시작 ~ 일요일 23:59:59 마감). 회차명은 마감일(추첨일) 기준 \"YYYY년 N월 M주차\" 형식으로 자동 부여됩니다.":"Đợt được đăng ký tự động mỗi tháng, trọn một tháng (bắt đầu Thứ Hai ~ đóng 23:59:59 Chủ Nhật hàng tuần). Tên đợt được tự động đặt theo định dạng \"Tuần M tháng N năm YYYY\" dựa trên ngày đóng (ngày rút thăm).","응모건 수":"Số lượt dự thưởng","닉네임(카카오ID)":"Biệt danh (Kakao ID)","회차는 현재 시점 기준 4주치가 자동 등록됩니다 (매주 월요일 시작 ~ 일요일 23:59:59 마감). 회차명은 마감일(추첨일) 기준 \"YYYY년 N월 M주차\" 형식으로 자동 부여됩니다.":"Đợt được đăng ký tự động luôn có sẵn 4 tuần tính từ thời điểm hiện tại (bắt đầu Thứ Hai ~ đóng 23:59:59 Chủ Nhật hàng tuần). Tên đợt được tự động đặt theo định dạng \"Tuần M tháng N năm YYYY\" dựa trên ngày đóng (ngày rút thăm).","주간 이벤트 추첨 관리":"Quản lý rút thăm sự kiện tuần","당첨 ·":"Trúng thưởng ·","지급 대기":"Chờ gửi quà","지급 완료":"Đã gửi quà","메모(기프티콘 발송일·송장번호 등)":"Ghi chú (ngày gửi Gifticon · mã vận đơn v.v.)","지급 완료로 변경했습니다.":"Đã chuyển sang trạng thái đã gửi quà.","지급 대기로 되돌렸습니다.":"Đã chuyển lại về trạng thái chờ gửi quà.","메모가 저장되었습니다.":"Đã lưu ghi chú.","회차는 현재 시점 기준 4주치가 자동 등록됩니다 (매주 월요일~일요일 23:59:59 마감 · 회차명은 마감일 기준 자동 부여)":"Đợt được đăng ký tự động luôn có sẵn 4 tuần tính từ thời điểm hiện tại (đóng Chủ Nhật 23:59:59 hàng tuần · tên đợt tự động đặt theo ngày đóng)","당첨 경품 지급":"Trúng thưởng · Gửi quà","당첨자 확정":"Đã chốt người trúng","당첨자가 없는 회차입니다.":"Đợt này chưa có người trúng thưởng."});
@@ -5163,6 +5213,52 @@ Object.assign(KO2VI,{
   "전체 완료":"Hoàn tất toàn bộ",
   "일부 지급":"Gửi một phần",
   "미지급":"Chưa gửi"
+});
+/* 매일 행운 룰렛 설정 화면(2026-07-31 개편) — UI 문구만. 닉네임 등 데모 데이터는 한국어 원문 유지 */
+Object.assign(KO2VI,{
+  "매일 행운 룰렛 = 출석(쿠팡 구경하기) 시 1일 1회 무료 룰렛":"Vòng quay may mắn hằng ngày = vòng quay miễn phí 1 lần/ngày khi điểm danh (dạo Coupang)",
+  "— 슬롯별 보상 내용과 당첨 확률을 운영자가 직접 수정합니다. 확률 합계가 100%가 아니면 저장되지 않습니다. 슬롯은 6개가 기본이며 추가·삭제로 개수를 조정할 수 있습니다. 유료 룰렛(잭팟 룰렛)은 별도 화면으로 신설 예정이며 이 화면에서 관리하지 않습니다.":"— Vận hành viên trực tiếp sửa nội dung thưởng và xác suất trúng của từng ô. Nếu tổng xác suất không phải 100% thì không lưu được. Mặc định có 6 ô, có thể thêm·xóa để điều chỉnh số lượng. Vòng quay trả phí (vòng quay Jackpot) sẽ được tạo ở màn hình riêng và không quản lý tại đây.",
+  "이번 달 룰렛 실행":"Lượt quay tháng này",
+  "roulette_spins 실집계":"Tổng hợp thật từ roulette_spins",
+  "이번 달 지급 총액":"Tổng tiền cấp tháng này",
+  "포인트·티켓 원장 원화 환산":"Quy đổi sổ cái điểm·vé ra KRW",
+  "1회 기대값":"Giá trị kỳ vọng 1 lượt",
+  "현재 설정 기준":"Theo cài đặt hiện tại",
+  "슬롯 구성 · 당첨 확률":"Cấu hình ô · Xác suất trúng",
+  "+ 슬롯 추가":"+ Thêm ô",
+  "기본값 복원":"Khôi phục mặc định",
+  "슬롯":"Ô",
+  "보상 유형":"Loại thưởng",
+  "수량":"Số lượng",
+  "가치(원)":"Giá trị (KRW)",
+  "확률(%)":"Xác suất (%)",
+  "기대값 기여":"Đóng góp giá trị kỳ vọng",
+  "보상 없음":"Không có thưởng",
+  "가치 환산 기준 — 포인트 10P = 1원 · 이벤트 티켓 40원 · 브론즈 티켓 100원 · 실버 티켓 1,000원 · 골드 티켓 2,000원. 기대값 기여 = 가치 × 확률.":"Chuẩn quy đổi giá trị — Điểm 10P = 1₩ · Vé sự kiện 40₩ · Vé Đồng 100₩ · Vé Bạc 1.000₩ · Vé Vàng 2.000₩. Đóng góp giá trị kỳ vọng = giá trị × xác suất.",
+  "데모 앱 룰렛 화면은 아직 구 구성(포인트·이벤트티켓·꽝)만 렌더링합니다. 등급 티켓 슬롯을 저장하면 앱은 기본값으로 대체해 표시합니다 — 앱 룰렛 이식은 별도 작업입니다.":"Màn vòng quay của app demo hiện chỉ render cấu hình cũ (điểm·vé sự kiện·trượt). Nếu lưu ô vé theo hạng, app sẽ hiển thị bằng giá trị mặc định — việc chuyển vòng quay sang app là công việc riêng.",
+  "룰렛 실행 로그":"Log lượt quay",
+  "닉네임 / 카카오톡 ID":"Biệt danh / Kakao ID",
+  "룰렛 종류":"Loại vòng quay",
+  "결과":"Kết quả",
+  "지급 상태":"Trạng thái cấp",
+  "카카오 미연동":"Chưa liên kết Kakao",
+  "지급완료":"Đã cấp",
+  "한도초과":"Vượt hạn mức",
+  "해당없음":"Không áp dụng",
+  "룰렛 실행 로그가 없습니다.":"Chưa có log lượt quay.",
+  "포인트":"Điểm",
+  "이벤트 티켓":"Vé sự kiện",
+  "브론즈 티켓":"Vé Đồng",
+  "실버 티켓":"Vé Bạc",
+  "골드 티켓":"Vé Vàng",
+  "매일 행운 룰렛 설정이 저장되었습니다.":"Đã lưu cài đặt vòng quay may mắn hằng ngày.",
+  "확률 합계가 100%가 아니라 저장하지 않았습니다.":"Tổng xác suất không phải 100% nên chưa lưu.",
+  "수량이 0인 슬롯이 있어 저장하지 않았습니다.":"Có ô số lượng bằng 0 nên chưa lưu.",
+  "슬롯을 추가했습니다. 확률 합계를 100%로 다시 맞춰 주세요.":"Đã thêm ô. Hãy chỉnh lại tổng xác suất về 100%.",
+  "확정 기본값(6슬롯)으로 복원했습니다.":"Đã khôi phục về mặc định đã chốt (6 ô).",
+  "불러오는 중…":"Đang tải…",
+  "저장 중…":"Đang lưu…",
+  "저장에 실패했습니다.":"Lưu thất bại."
 });
   var _orig=new Map(), _tracked=new Set(), _applying=false;
   function hasKo(s){ return /[가-힯ᄀ-ᇿ㄰-㆏]/.test(s); }
@@ -8607,14 +8703,14 @@ window.pointAttendanceSubmitEdit = function() {
 
 /* ── sec-points ── point_transactions
    Harry 확정 답변(2026-07-14): 근거 없던 "기프티콘 교환 보너스"·"일일 방문 보상" 삭제,
-   "행운룰렛 당첨"·"포인트→티켓 전환" 추가. 실제 원장은 category 필드로 분류하고(레거시 시드
+   "매일 행운 룰렛 당첨"·"포인트→티켓 전환" 추가. 실제 원장은 category 필드로 분류하고(레거시 시드
    데이터는 category가 없어 type 필드를 그대로 분류값으로 재사용), 온보딩 보상만 분류는
    하나로 묶되 화면 문구는 각 보상의 개별 이름을 그대로 보여준다(보상이 늘어도 개발 수정 불필요). */
 var PT_CATEGORY_LABEL = {
   attendance:      '<span style="color:#c084fc">출석(쿠팡 구경하기)</span>',
   referral:        '<span style="color:var(--main)">친구초대 보상</span>',
   onboarding:      '<span style="color:var(--main)">온보딩 보상</span>',
-  roulette:        '<span style="color:#c084fc">행운룰렛 당첨</span>',
+  roulette:        '<span style="color:#c084fc">매일 행운 룰렛 당첨</span>',
   ticket_to_point: '<span style="color:var(--success)">티켓→포인트 전환</span>',
   point_to_ticket: '<span style="color:var(--danger)">포인트→티켓 전환</span>',
   expire:          '<span style="color:var(--text-2)">만료 소멸</span>',
@@ -10558,96 +10654,383 @@ window.dmFillFromScenarios = function() {
   }).catch(function(e){ if(btn){btn.textContent='시나리오 채우기';btn.disabled=false;} dmShowToast('채우기 실패: '+(e.message||e), true); });
 };
 
-/* ── 행운룰렛 설정 (settings/roulette) ──
-   type: 'miss' | 'event_ticket' | 'point'. 앱(app/index.html)이 같은 문서를 읽어
-   룰렛을 렌더링하고 당첨 지급에 그대로 사용한다. */
-var RLT_DEFAULT_WHEEL = [
-  { type: 'event_ticket', value: 1 },
-  { type: 'miss' },
-  { type: 'point', value: 100 },
-  { type: 'event_ticket', value: 2 },
-  { type: 'miss' },
-  { type: 'point', value: 200 },
-];
-function rltRenderRows(wheel) {
-  var wrap = document.getElementById('rlt-rows');
-  if (!wrap) return;
-  wrap.innerHTML = wheel.map(function(seg, i) {
-    var type = seg && seg.type ? seg.type : 'miss';
-    var value = (seg && seg.value != null) ? seg.value : '';
-    var disabled = type === 'miss' ? 'disabled' : '';
-    var placeholder = type === 'event_ticket' ? '장수' : (type === 'point' ? 'P 액수' : '-');
-    return '<div style="display:grid;grid-template-columns:56px 1fr 160px;gap:8px;align-items:center;margin-bottom:8px;">'
-      + '<div style="font-size:13px;font-weight:700;color:var(--text-2);">' + (i + 1) + '칸</div>'
-      + '<select class="form-select" data-rlt-type="' + i + '" onchange="rltOnTypeChange(' + i + ')">'
-      + '<option value="miss"' + (type === 'miss' ? ' selected' : '') + '>꽝</option>'
-      + '<option value="event_ticket"' + (type === 'event_ticket' ? ' selected' : '') + '>이벤트티켓</option>'
-      + '<option value="point"' + (type === 'point' ? ' selected' : '') + '>포인트</option>'
-      + '</select>'
-      + '<input class="form-input" type="number" min="1" step="1" data-rlt-value="' + i + '" value="' + value + '" placeholder="' + placeholder + '"' + (disabled ? ' disabled' : '') + '>'
-      + '</div>';
-  }).join('');
-}
-window.rltOnTypeChange = function(i) {
-  var sel = document.querySelector('[data-rlt-type="' + i + '"]');
-  var input = document.querySelector('[data-rlt-value="' + i + '"]');
-  if (!sel || !input) return;
-  if (sel.value === 'miss') {
-    input.value = '';
-    input.disabled = true;
-    input.placeholder = '-';
-  } else {
-    input.disabled = false;
-    input.placeholder = sel.value === 'event_ticket' ? '장수' : 'P 액수';
-    if (!input.value) input.value = sel.value === 'event_ticket' ? 1 : 100;
-  }
+/* ══ 매일 행운 룰렛 설정 (settings/roulette) ═══════════════════════════════
+   2026-07-31 이동영 부장 협의 확정 구성.
+   보상 유형별 원화 환산가치와 기본 슬롯 구성은 아래 상수 두 개에서만 관리한다 —
+   정책이 바뀌면 이 두 곳만 고치면 표·기대값·통계가 전부 따라온다.
+   슬롯 개수는 고정이 아니다(추가·삭제 가능). 유료 룰렛(잭팟)은 이 화면 범위 밖.
+
+   저장 문서 스키마 (settings/roulette)
+     slots: [{type, qty, prob}]  ← 정본. 슬롯 수 가변.
+     wheel: [{type, value}]      ← 레거시 호환. 데모 앱(app/index.html)이 아직 이 필드를 읽는다.
+                                   앱이 모르는 유형(등급 티켓)이 섞이면 앱은 기본값으로 대체한다. */
+var RLT_REWARD_TYPES = {
+  miss:          { label: '꽝',         unit: '',   unitValue: 0    },
+  point:         { label: '포인트',      unit: 'P',  unitValue: 0.1  },  /* 10P = 1원 */
+  event_ticket:  { label: '이벤트 티켓',  unit: '장', unitValue: 40   },  /* 잭팟 룰렛 1회 기대값 기준 */
+  bronze_ticket: { label: '브론즈 티켓',  unit: '장', unitValue: 100  },
+  silver_ticket: { label: '실버 티켓',    unit: '장', unitValue: 1000 },
+  gold_ticket:   { label: '골드 티켓',    unit: '장', unitValue: 2000 }
 };
-function rltReadRows() {
-  var wheel = [];
-  for (var i = 0; i < 6; i++) {
-    var sel = document.querySelector('[data-rlt-type="' + i + '"]');
-    var input = document.querySelector('[data-rlt-value="' + i + '"]');
-    var type = sel ? sel.value : 'miss';
-    if (type === 'miss') { wheel.push({ type: 'miss' }); continue; }
-    var value = input ? parseInt(input.value, 10) : 0;
-    wheel.push({ type: type, value: (value > 0 ? value : 1) });
+var RLT_DEFAULT_SLOTS = [
+  { type: 'silver_ticket', qty: 1,   prob: 0.2  },
+  { type: 'event_ticket',  qty: 1,   prob: 5    },
+  { type: 'bronze_ticket', qty: 1,   prob: 2    },
+  { type: 'point',         qty: 100, prob: 35   },
+  { type: 'point',         qty: 10,  prob: 40   },
+  { type: 'miss',          qty: 0,   prob: 17.8 }
+];
+var rltSlots = RLT_DEFAULT_SLOTS.map(function(s) { return { type: s.type, qty: s.qty, prob: s.prob }; });
+
+function rltFmt(n) { return Number(n).toLocaleString('ko-KR', { maximumFractionDigits: 2 }); }
+function rltSlotValue(s) {
+  var t = RLT_REWARD_TYPES[s.type] || RLT_REWARD_TYPES.miss;
+  return t.unitValue * (s.type === 'miss' ? 0 : (Number(s.qty) || 0));
+}
+function rltSlotEv(s) { return rltSlotValue(s) * (Number(s.prob) || 0) / 100; }
+/* 부동소수 오차 방지 — 확률은 소수점 1자리까지만 쓰므로 0.1 단위 정수로 환산해 합산한다 */
+function rltSumProb() {
+  return rltSlots.reduce(function(a, s) { return a + Math.round((Number(s.prob) || 0) * 10); }, 0) / 10;
+}
+function rltTotalEv() {
+  return rltSlots.reduce(function(a, s) { return a + rltSlotEv(s); }, 0);
+}
+function rltNormalizeSlot(s) {
+  var type = (s && RLT_REWARD_TYPES[s.type]) ? s.type : 'miss';
+  return {
+    type: type,
+    qty: type === 'miss' ? 0 : Math.max(0, Number(s && s.qty) || 0),
+    prob: Math.min(100, Math.max(0, Number(s && s.prob) || 0))
+  };
+}
+function rltRenderSlots() {
+  var tbody = document.getElementById('rlt-tbody');
+  if (!tbody) return;
+  tbody.innerHTML = rltSlots.map(function(s, i) {
+    var meta = RLT_REWARD_TYPES[s.type] || RLT_REWARD_TYPES.miss;
+    var isMiss = s.type === 'miss';
+    var opts = Object.keys(RLT_REWARD_TYPES).map(function(k) {
+      return '<option value="' + k + '"' + (k === s.type ? ' selected' : '') + '>' + RLT_REWARD_TYPES[k].label + '</option>';
+    }).join('');
+    return '<tr>'
+      + '<td style="font-weight:700;color:var(--text-2)">' + (i + 1) + '번</td>'
+      + '<td><select class="form-select" onchange="rltSetType(' + i + ', this.value)">' + opts + '</select></td>'
+      + '<td>' + (isMiss
+        ? '<span style="color:var(--text-3);font-size:12px">보상 없음</span>'
+        : '<div style="display:flex;align-items:center;gap:6px"><input class="form-input" type="number" min="1" step="1" value="' + s.qty + '" style="max-width:92px" oninput="rltSetQty(' + i + ', this.value)"><span style="font-size:12px;color:var(--text-2)">' + meta.unit + '</span></div>') + '</td>'
+      + '<td style="text-align:right;color:var(--text-2)">' + (isMiss ? '—' : rltFmt(rltSlotValue(s)) + '원') + '</td>'
+      + '<td><div style="display:flex;align-items:center;gap:6px"><input class="form-input" type="number" min="0" max="100" step="0.1" value="' + s.prob + '" style="max-width:88px" oninput="rltSetProb(' + i + ', this.value)"><span style="font-size:12px;color:var(--text-2)">%</span></div></td>'
+      + '<td style="text-align:right;font-weight:600">' + rltFmt(rltSlotEv(s)) + '원</td>'
+      + '<td style="text-align:center">' + (rltSlots.length > 2
+        ? '<button class="btn btn-ghost btn-sm" style="padding:2px 8px;font-size:11px" onclick="rltRemoveSlot(' + i + ')">삭제</button>'
+        : '<span style="color:var(--text-3);font-size:11px">—</span>') + '</td>'
+      + '</tr>';
+  }).join('');
+  rltRenderTotals();
+}
+function rltRenderTotals() {
+  var sum = rltSumProb();
+  var ok = Math.abs(sum - 100) < 0.001;
+  var sumEl = document.getElementById('rlt-sum-prob');
+  if (sumEl) {
+    sumEl.innerHTML = '<span style="color:' + (ok ? 'var(--success)' : 'var(--danger)') + '">' + rltFmt(sum) + '%</span>'
+      + (ok ? '' : '<div style="font-size:11px;font-weight:600;color:var(--danger);margin-top:2px">100% ' + (sum > 100 ? '초과' : '미달') + ' ' + rltFmt(Math.abs(sum - 100)) + '%p</div>');
   }
-  return wheel;
+  var evEl = document.getElementById('rlt-sum-ev');
+  if (evEl) evEl.textContent = rltFmt(rltTotalEv()) + '원';
+  var statEv = document.getElementById('rlt-stat-ev');
+  if (statEv) statEv.textContent = rltFmt(rltTotalEv()) + '원';
+}
+window.rltSetType = function(i, v) {
+  rltSlots[i].type = v;
+  if (v === 'miss') rltSlots[i].qty = 0;
+  else if (!rltSlots[i].qty) rltSlots[i].qty = (v === 'point') ? 100 : 1;
+  rltRenderSlots();
+};
+window.rltSetQty = function(i, v) {
+  rltSlots[i].qty = Math.max(0, Number(v) || 0);
+  var row = document.getElementById('rlt-tbody').rows[i];
+  if (row) {
+    row.cells[3].textContent = rltFmt(rltSlotValue(rltSlots[i])) + '원';
+    row.cells[5].textContent = rltFmt(rltSlotEv(rltSlots[i])) + '원';
+  }
+  rltRenderTotals();
+};
+window.rltSetProb = function(i, v) {
+  rltSlots[i].prob = Math.min(100, Math.max(0, Number(v) || 0));
+  var row = document.getElementById('rlt-tbody').rows[i];
+  if (row) row.cells[5].textContent = rltFmt(rltSlotEv(rltSlots[i])) + '원';
+  rltRenderTotals();
+};
+window.rltAddSlot = function() {
+  rltSlots.push({ type: 'miss', qty: 0, prob: 0 });
+  rltRenderSlots();
+  toast('슬롯을 추가했습니다. 확률 합계를 100%로 다시 맞춰 주세요.');
+};
+window.rltRemoveSlot = function(i) {
+  if (rltSlots.length <= 2) return;
+  rltSlots.splice(i, 1);
+  rltRenderSlots();
+};
+window.rltReset = function() {
+  rltSlots = RLT_DEFAULT_SLOTS.map(function(s) { return { type: s.type, qty: s.qty, prob: s.prob }; });
+  rltRenderSlots();
+  toast('확정 기본값(6슬롯)으로 복원했습니다.');
+};
+function rltSetStatus(html, isError) {
+  var el = document.getElementById('rlt-status');
+  if (!el) return;
+  el.innerHTML = isError ? '<span style="color:var(--danger);font-weight:600">' + html + '</span>' : html;
 }
 window.rltLoad = function() {
-  var status = document.getElementById('rlt-status');
-  rltRenderRows(RLT_DEFAULT_WHEEL);
-  if (status) status.textContent = '불러오는 중…';
+  rltRenderSlots();
+  rltSetStatus('불러오는 중…');
   db.collection('settings').doc('roulette').get().then(function(doc) {
     var data = doc.exists ? doc.data() : null;
-    var wheel = (data && Array.isArray(data.wheel) && data.wheel.length === 6) ? data.wheel : RLT_DEFAULT_WHEEL;
-    rltRenderRows(wheel);
-    if (status) status.textContent = doc.exists ? '저장된 설정을 불러왔습니다.' : '기본값(시드) 표시 중 · 저장하면 이 설정이 앱에 적용됩니다.';
+    if (data && Array.isArray(data.slots) && data.slots.length >= 2) {
+      rltSlots = data.slots.map(rltNormalizeSlot);
+      rltSetStatus('저장된 설정을 불러왔습니다 · 슬롯 ' + rltSlots.length + '개.');
+    } else if (data && Array.isArray(data.wheel) && data.wheel.length >= 2) {
+      /* 구 스키마(칸별 균등 확률)를 슬롯으로 승격 — 확률은 균등 배분해 두고 운영자가 조정한다 */
+      var n = data.wheel.length;
+      var even = Math.floor(1000 / n) / 10;
+      rltSlots = data.wheel.map(function(w) {
+        return rltNormalizeSlot({ type: w && w.type, qty: w && w.value, prob: even });
+      });
+      var gap = Math.round((100 - even * n) * 10) / 10;
+      if (gap) rltSlots[rltSlots.length - 1].prob = Math.round((rltSlots[rltSlots.length - 1].prob + gap) * 10) / 10;
+      rltSetStatus('구 설정(칸별 균등 확률)을 불러와 확률을 균등 배분했습니다 — 확정 구성으로 조정한 뒤 저장하세요.');
+    } else {
+      rltSlots = RLT_DEFAULT_SLOTS.map(function(s) { return { type: s.type, qty: s.qty, prob: s.prob }; });
+      rltSetStatus('확정 기본값(6슬롯) 표시 중 · 저장하면 이 설정이 앱에 적용됩니다.');
+    }
+    rltRenderSlots();
   }).catch(function(e) {
     console.error('rltLoad', e);
-    rltRenderRows(RLT_DEFAULT_WHEEL);
-    if (status) status.textContent = '불러오기 실패 — 기본값 표시 중';
+    rltRenderSlots();
+    rltSetStatus('불러오기 실패 — 기본값 표시 중', true);
   });
+  rltLoadStats();
+  rltLoadLog();
 };
+/* 저장 — 확률 합계 100% 검증을 통과하지 못하면 쓰지 않는다 */
 window.rltSave = function() {
-  var wheel = rltReadRows();
+  var sum = rltSumProb();
+  if (Math.abs(sum - 100) > 0.001) {
+    rltSetStatus('저장 차단 — 확률 합계가 ' + rltFmt(sum) + '%입니다. 100%가 되어야 저장할 수 있습니다 ('
+      + (sum > 100 ? '초과' : '부족') + ' ' + rltFmt(Math.abs(sum - 100)) + '%p).', true);
+    toast('확률 합계가 100%가 아니라 저장하지 않았습니다.');
+    return;
+  }
+  var badQty = -1;
+  rltSlots.forEach(function(s, i) { if (badQty < 0 && s.type !== 'miss' && (Number(s.qty) || 0) <= 0) badQty = i; });
+  if (badQty >= 0) {
+    rltSetStatus('저장 차단 — ' + (badQty + 1) + '번 슬롯의 수량이 0입니다. 꽝이 아닌 슬롯은 수량이 1 이상이어야 합니다.', true);
+    toast('수량이 0인 슬롯이 있어 저장하지 않았습니다.');
+    return;
+  }
   var btn = document.getElementById('rlt-save-btn');
-  var status = document.getElementById('rlt-status');
   if (btn) { btn.disabled = true; btn.textContent = '저장 중…'; }
   db.collection('settings').doc('roulette').set({
-    wheel: wheel,
-    updated_at: FS.FieldValue.serverTimestamp(),
+    slots: rltSlots.map(function(s) { return { type: s.type, qty: s.qty, prob: s.prob }; }),
+    /* 레거시 호환 — 데모 앱이 아직 wheel(type/value)을 읽는다 */
+    wheel: rltSlots.map(function(s) { return { type: s.type, value: s.qty }; }),
+    slot_count: rltSlots.length,
+    expected_value: Math.round(rltTotalEv() * 100) / 100,
+    updated_at: FS.FieldValue.serverTimestamp()
   }, { merge: true }).then(function() {
     if (btn) { btn.disabled = false; btn.textContent = '저장'; }
-    if (status) status.textContent = '저장 완료 · 앱에서 다음 진입 시 반영됩니다.';
-    toast('행운룰렛 설정이 저장되었습니다.');
+    rltSetStatus('저장 완료 — 슬롯 ' + rltSlots.length + '개 · 확률 합계 100% · 1회 기대값 ' + rltFmt(rltTotalEv()) + '원. 앱은 다음 진입 시 이 설정을 읽습니다.');
+    toast('매일 행운 룰렛 설정이 저장되었습니다.');
   }).catch(function(e) {
     console.error('rltSave', e);
     if (btn) { btn.disabled = false; btn.textContent = '저장'; }
-    if (status) status.textContent = '저장 실패: ' + (e.message || e);
+    rltSetStatus('저장 실패: ' + (e.message || e), true);
     toast('저장에 실패했습니다.');
   });
 };
+
+/* ── 월 지급 총액·실행 수 (실집계) ──
+   실행 수 = roulette_spins 이번 달 문서 수.
+   지급 총액 = 포인트 원장(category 'roulette') + 티켓 원장(category 'lucky_spin')을 원화 환산. */
+function rltYm(d) { return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0'); }
+function rltTsDate(ts) { return ts ? (ts.toDate ? ts.toDate() : new Date(ts)) : null; }
+function rltLoadStats() {
+  var thisYm = rltYm(new Date());
+  var spinsEl = document.getElementById('rlt-stat-spins');
+  var payEl = document.getElementById('rlt-stat-payout');
+  db.collection('roulette_spins').get().then(function(snap) {
+    var n = 0;
+    snap.forEach(function(doc) {
+      var d = doc.data();
+      var day = d.date || (rltTsDate(d.created_at) ? rltTsDate(d.created_at).toISOString().slice(0, 10) : '');
+      if (String(day).slice(0, 7) === thisYm) n++;
+    });
+    if (spinsEl) spinsEl.textContent = n.toLocaleString('ko-KR') + '회';
+  }).catch(function(e) { console.error('rltLoadStats spins', e); if (spinsEl) spinsEl.textContent = '—'; });
+
+  var won = 0;
+  db.collection('point_transactions').where('category', '==', 'roulette').get().then(function(snap) {
+    snap.forEach(function(doc) {
+      var d = doc.data(), dt = rltTsDate(d.created_at);
+      if (dt && rltYm(dt) === thisYm) won += (Number(d.amount) || 0) * RLT_REWARD_TYPES.point.unitValue;
+    });
+    return db.collection('ticket_transactions').where('category', '==', 'lucky_spin').get();
+  }).then(function(snap) {
+    snap.forEach(function(doc) {
+      var d = doc.data(), dt = rltTsDate(d.created_at);
+      if (dt && rltYm(dt) === thisYm) won += RLT_REWARD_TYPES.event_ticket.unitValue;
+    });
+    if (payEl) payEl.textContent = Math.round(won).toLocaleString('ko-KR') + '원';
+  }).catch(function(e) { console.error('rltLoadStats payout', e); if (payEl) payEl.textContent = '—'; });
+}
+
+/* ── 룰렛 실행 로그 (최신순 · 10건 단위) ──
+   roulette_spins에는 실행 사실만 남으므로(하루 1회 제한용 문서) 결과는 같은 유저·같은 날짜의
+   포인트/티켓 원장에서 되짚어 채운다. 실데이터가 아직 없으면 데모 행을 대신 보여준다. */
+var RLT_LOG_PAGE_SIZE = 10;
+var rltLogRows = [];
+var rltLogPage = 1;
+var rltLogIsDemo = false;
+/* [일시, 닉네임, 카카오ID(미연동은 빈 값), 결과 유형, 수량, 지급상태] */
+var RLT_LOG_DEMO = [
+  ['2026-07-31 13:04:22', '절약마스터',   'saving_master',  'point',         10,  'paid'],
+  ['2026-07-31 12:58:07', '알뜰한하루',   'thrifty_day',    'miss',          0,   'none'],
+  ['2026-07-31 12:41:55', '쿠폰헌터',     'coupon_hunter',  'point',         100, 'paid'],
+  ['2026-07-31 12:20:13', '최저가사냥꾼', '',               'point',         10,  'paid'],
+  ['2026-07-31 11:57:48', '무지출챌린지', 'nospend_ch',     'event_ticket',  1,   'paid'],
+  ['2026-07-31 11:33:02', '장바구니요정', 'cart_fairy',     'point',         10,  'paid'],
+  ['2026-07-31 11:12:36', '세일알람',     'sale_alarm',     'miss',          0,   'none'],
+  ['2026-07-31 10:49:19', '가성비대장',   'value_boss',     'point',         100, 'paid'],
+  ['2026-07-31 10:27:41', '반값사랑',     '',               'bronze_ticket', 1,   'paid'],
+  ['2026-07-31 10:05:58', '적립왕',       'point_king',     'point',         10,  'paid'],
+  ['2026-07-31 09:44:30', '지갑지킴이',   'wallet_guard',   'point',         10,  'paid'],
+  ['2026-07-31 09:21:07', '똑똑한소비',   'smart_spend',    'miss',          0,   'none'],
+  ['2026-07-31 09:02:52', '핫딜메이트',   'hotdeal_mate',   'point',         100, 'paid'],
+  ['2026-07-31 08:38:14', '새벽배송러',   '',               'point',         10,  'paid'],
+  ['2026-07-31 08:11:26', '생활비절약',   'save_living',    'event_ticket',  1,   'capped'],
+  ['2026-07-30 22:47:03', '체리피커',     'cherry_picker',  'point',         100, 'paid'],
+  ['2026-07-30 22:19:38', '월급방어전',   'salary_def',     'point',         10,  'paid'],
+  ['2026-07-30 21:55:12', '쟁여두기',     '',               'miss',          0,   'none'],
+  ['2026-07-30 21:30:44', '오늘도절약',   'today_save',     'point',         10,  'paid'],
+  ['2026-07-30 21:03:29', '포인트부자',   'point_rich',     'silver_ticket', 1,   'paid'],
+  ['2026-07-30 20:41:16', '알림설정중',   'noti_on',        'point',         100, 'paid'],
+  ['2026-07-30 20:18:53', '카트비우기',   'empty_cart',     'point',         10,  'paid'],
+  ['2026-07-30 19:52:31', '쿠팡순회중',   'cpang_round',    'miss',          0,   'none'],
+  ['2026-07-30 19:27:09', '주말장보기',   '',               'point',         10,  'paid'],
+  ['2026-07-30 19:04:47', '냉장고털이',   'fridge_clean',   'event_ticket',  1,   'paid'],
+  ['2026-07-30 18:39:22', '최저가비교',   'price_cmp',      'point',         100, 'paid'],
+  ['2026-07-30 18:15:58', '티켓모으기',   'ticket_collect', 'point',         10,  'paid'],
+  ['2026-07-30 17:48:33', '첫구매완료',   'first_buy',      'bronze_ticket', 1,   'paid'],
+  ['2026-07-30 17:22:05', '적립러버',     '',               'miss',          0,   'none'],
+  ['2026-07-30 16:57:41', '할인중독',     'sale_addict',    'point',         10,  'paid'],
+  ['2026-07-30 16:31:19', '깜짝세일',     'flash_sale',     'point',         100, 'paid'],
+  ['2026-07-30 16:08:54', '가계부쓰는중', 'ledger_on',      'point',         10,  'paid'],
+  ['2026-07-30 15:44:27', '소소한행복',   'small_joy',      'miss',          0,   'none'],
+  ['2026-07-30 15:19:02', '배송조회중',   'track_ship',     'point',         10,  'paid']
+];
+function rltLogResultText(type, qty) {
+  var meta = RLT_REWARD_TYPES[type];
+  if (!meta || type === 'miss') return '<span style="color:var(--text-3)">꽝</span>';
+  return '<span style="color:var(--success);font-weight:600">' + meta.label + ' ' + rltFmt(qty) + meta.unit + '</span>';
+}
+function rltLogStatusChip(st) {
+  if (st === 'paid') return '<span style="display:inline-block;font-size:11px;font-weight:700;color:#1f9d57;background:#e6f7ec;border:1px solid #b6e6c8;border-radius:20px;padding:3px 10px;white-space:nowrap">지급완료</span>';
+  if (st === 'capped') return '<span style="display:inline-block;font-size:11px;font-weight:700;color:#b4791a;background:#fdf3e2;border:1px solid #f2ddb4;border-radius:20px;padding:3px 10px;white-space:nowrap">한도초과</span>';
+  return '<span style="display:inline-block;font-size:11px;font-weight:700;color:#8a8a99;background:#f2f2f6;border:1px solid #e0e0e8;border-radius:20px;padding:3px 10px;white-space:nowrap">해당없음</span>';
+}
+window.rltLogGoPage = function(p) {
+  var total = Math.max(1, Math.ceil(rltLogRows.length / RLT_LOG_PAGE_SIZE));
+  if (p < 1 || p > total || p === rltLogPage) return;
+  rltLogPage = p;
+  rltRenderLog();
+};
+function rltRenderLog() {
+  var tbody = document.getElementById('rlt-log-tbody');
+  if (!tbody) return;
+  var total = Math.max(1, Math.ceil(rltLogRows.length / RLT_LOG_PAGE_SIZE));
+  if (rltLogPage > total) rltLogPage = total;
+  var from = (rltLogPage - 1) * RLT_LOG_PAGE_SIZE;
+  if (!rltLogRows.length) { tbody.innerHTML = ppEmpty(5, '룰렛 실행 로그가 없습니다.'); }
+  else {
+    tbody.innerHTML = rltLogRows.slice(from, from + RLT_LOG_PAGE_SIZE).map(function(r) {
+      var ts = r[0], nick = r[1], kakao = r[2], type = r[3], qty = r[4], st = r[5];
+      var parts = String(ts).split(' ');
+      return '<tr>'
+        + '<td style="white-space:nowrap;font-size:12px"><div style="font-weight:700;color:#333333">' + parts[0].replace(/-/g, '/') + '</div><div style="color:var(--text-3)">' + (parts[1] || '') + '</div></td>'
+        + '<td><div style="font-weight:500">' + ppEsc(nick) + '</div><div style="font-size:11px;color:var(--text-2);font-family:monospace">' + (kakao ? '(' + ppEsc(kakao) + ')' : '카카오 미연동') + '</div></td>'
+        + '<td style="color:var(--text-2)">매일 행운 룰렛</td>'
+        + '<td>' + rltLogResultText(type, qty) + '</td>'
+        + '<td style="text-align:center">' + rltLogStatusChip(st) + '</td>'
+        + '</tr>';
+    }).join('');
+  }
+  var cnt = document.getElementById('rlt-log-count');
+  if (cnt) cnt.textContent = (rltLogIsDemo ? '데모 표시 데이터 · ' : '') + '최근 ' + rltLogRows.length + '건 · ' + rltLogPage + ' / ' + total + ' 페이지';
+  var pager = document.getElementById('rlt-log-pager');
+  if (pager) {
+    if (total <= 1) { pager.innerHTML = ''; return; }
+    var dim = 'opacity:.35;cursor:default';
+    var html = '<button class="page-btn" onclick="rltLogGoPage(' + (rltLogPage - 1) + ')"' + (rltLogPage === 1 ? ' disabled style="' + dim + '"' : '') + '>‹</button>';
+    for (var p = 1; p <= total; p++) html += '<button class="page-btn' + (p === rltLogPage ? ' active' : '') + '" onclick="rltLogGoPage(' + p + ')">' + p + '</button>';
+    html += '<button class="page-btn" onclick="rltLogGoPage(' + (rltLogPage + 1) + ')"' + (rltLogPage === total ? ' disabled style="' + dim + '"' : '') + '>›</button>';
+    pager.innerHTML = html;
+  }
+}
+function rltLoadLog() {
+  var tbody = document.getElementById('rlt-log-tbody');
+  if (!tbody) return;
+  db.collection('roulette_spins').orderBy('created_at', 'desc').limit(200).get().then(function(snap) {
+    if (snap.empty) {
+      rltLogIsDemo = true;
+      rltLogRows = RLT_LOG_DEMO.slice();
+      rltLogPage = 1;
+      rltRenderLog();
+      return;
+    }
+    var spins = snap.docs.map(function(d) { return Object.assign({ _id: d.id }, d.data()); });
+    /* 결과 되짚기용 원장 — 유저+날짜 키로 묶는다 */
+    return Promise.all([
+      dmFetchUsersByIds(spins.map(function(s) { return s.user_id; })),
+      db.collection('point_transactions').where('category', '==', 'roulette').get(),
+      db.collection('ticket_transactions').where('category', '==', 'lucky_spin').get()
+    ]).then(function(res) {
+      var userMap = res[0], ptMap = {}, tkMap = {};
+      function key(uid, dt) { return uid + '|' + (dt ? ppFmtYMD(dt) : ''); }
+      res[1].forEach(function(doc) {
+        var d = doc.data(), dt = rltTsDate(d.created_at);
+        if (dt) ptMap[key(d.user_id, dt)] = (ptMap[key(d.user_id, dt)] || 0) + (Number(d.amount) || 0);
+      });
+      res[2].forEach(function(doc) {
+        var d = doc.data(), dt = rltTsDate(d.created_at);
+        if (dt) tkMap[key(d.user_id, dt)] = (tkMap[key(d.user_id, dt)] || 0) + 1;
+      });
+      rltLogIsDemo = false;
+      rltLogRows = spins.map(function(s) {
+        var dt = rltTsDate(s.created_at) || (s.date ? new Date(s.date + 'T00:00:00') : new Date());
+        var k = s.user_id + '|' + (s.date || ppFmtYMD(dt));
+        var u = userMap[s.user_id] || {};
+        var type = 'miss', qty = 0, st = 'none';
+        if (ptMap[k]) { type = 'point'; qty = ptMap[k]; st = 'paid'; }
+        else if (tkMap[k]) { type = 'event_ticket'; qty = tkMap[k]; st = 'paid'; }
+        return [
+          ppDt(s.created_at).replace(/\//g, '-') + ' ' + ppTm(s.created_at),
+          u.nickname || '(탈퇴·미상)',
+          (u.linked_kakao && u.kakao_login_id) ? u.kakao_login_id : '',
+          type, qty, st
+        ];
+      });
+      rltLogPage = 1;
+      rltRenderLog();
+    });
+  }).catch(function(e) {
+    console.error('rltLoadLog', e);
+    rltLogIsDemo = true;
+    rltLogRows = RLT_LOG_DEMO.slice();
+    rltLogPage = 1;
+    rltRenderLog();
+  });
+}
 
 /* ── 좌측 네비 메뉴 상태 태그 (확인중/확정) ──
    settings/menu_status 문서(statuses: {navId: 'confirmed'|'checking'})에 저장.
