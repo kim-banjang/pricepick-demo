@@ -19407,11 +19407,46 @@ function renderExchangePoint() {
   if (el) el.textContent = (PP.points || 0).toLocaleString('ko-KR') + 'P';
 }
 
+/* ── 티켓 전환 허용 방향 (단방향 강제) ─────────────────────────────────
+   전환은 아래 화이트리스트에 있는 방향만 실행된다. 여기 없는 조합은 UI가 어떤 상태든
+   ppSwapAllowed()에서 거부되므로, 버튼을 숨기거나 DOM/콘솔로 _swapState를 조작해도
+   실제 티켓 이동이 일어나지 않는다.
+
+     event  → bronze  (5:1)  허용 — 정상 전환 경로
+     bronze → silver  (10:1) 허용 — 등급 상향
+     silver → gold    (2:1)  허용 — 등급 상향
+
+   금지: 등급 티켓 → 이벤트 티켓 (역방향)
+     브론즈 1장(100원) → 이벤트 5장 → 잭팟 룰렛 5회(1회 40원 = 200원)로 가치가 2배
+     증식되는 취약점이라 차단한다. 이벤트 티켓은 어떤 전환으로도 발급되지 않는다
+     (획득 경로는 출석·룰렛·연속구매·온보딩·관리자 지급뿐).
+   금지: 등급 하향 (실버→브론즈, 골드→실버) — 앱이 원래 UI로만 막고 있던 "상향만 허용"
+     정책을 로직으로 옮긴 것이다(동작 변경 아님, 우회 구멍만 제거).
+     ※ CMS "티켓 등급 간 교환 정책" 카드는 브론즈10⇄실버1·실버2⇄골드1을 양방향 등가로
+       적어 두고 있어 앱 구현과 어긋난다. 어느 쪽이 정본인지 김반장 확정 대기 —
+       양방향으로 확정되면 아래 표에 'silver>bronze','gold>silver'를 추가하면 된다.
+       (이벤트 티켓 역방향은 확정 지시로 금지이므로 그 경우에도 열지 않는다.)
+
+   ※ event→bronze 는 정책상 허용이지만 현재 앱에 해당 UI가 없다(전환 화면은 등급 간 교환만).
+     나중에 UI가 생기면 이 표가 정본이 되고, 역방향은 계속 막힌다. */
+var TICKET_SWAP_ALLOWED = { 'event>bronze': true, 'bronze>silver': true, 'silver>gold': true };
+function ppSwapAllowed(from, to) {
+  if (!from || !to || from === to) return false;
+  if (to === 'event') return false;                 // 역방향 2차 가드 — 이벤트 티켓은 전환 결과가 될 수 없다
+  return TICKET_SWAP_ALLOWED[from + '>' + to] === true;
+}
+function ppSwapDenyReason(from, to) {
+  if (to === 'event') return '등급 티켓을 이벤트 티켓으로 되돌리는 교환은 지원하지 않아요';
+  return '등급 하향 교환은 지원하지 않아요';
+}
+window.ppSwapAllowed = ppSwapAllowed;
+
 /* ── pw-22 등급 티켓 교환 (실로직) ──
-   정책: 상향만 허용, 하향 불가(실버→브론즈·골드→실버 버튼은 클릭해도 토스트만 뜨고 선택 안 됨).
+   정책: 위 TICKET_SWAP_ALLOWED 화이트리스트에 있는 방향만. 하향·역방향은 방향 선택과
+   실행(CTA) 양쪽에서 거부한다(UI 차단만으로는 우회 가능하므로 실행 직전에도 재검사).
    합칠 때 만료 임박분(적립일이 오래된 티켓)부터 소진(FIFO) — 기프티콘 교환(bindExchangeBtn)과 동일 패턴.
    실제 user_tickets 문서를 소진(status:'used') + 신규 생성해야 새로고침 후에도 잔여 수량이 맞는다. */
-var GRADE_NAME = { bronze: '브론즈', silver: '실버', gold: '골드' };
+var GRADE_NAME = { bronze: '브론즈', silver: '실버', gold: '골드', event: '이벤트' };
 var _swapState = { from: 'bronze', to: 'silver', ratioFrom: 10, ratioTo: 1 };
 
 function renderGradeSwapScreen() {
@@ -19449,7 +19484,7 @@ function renderGradeSwapScreen() {
   });
 
   var cta = document.getElementById('swap-cta-btn');
-  if (cta) cta.disabled = (units < 1 || consume > have);
+  if (cta) cta.disabled = (units < 1 || consume > have || !ppSwapAllowed(from, to));
 }
 
 function bindGradeSwapScreen() {
@@ -19461,7 +19496,11 @@ function bindGradeSwapScreen() {
     btn.dataset.ipBound = '1'; // catch-all(bindCatchAll)의 가짜 토글 선점 방지
     btn.addEventListener('click', function(e) {
       e.stopPropagation();
-      if (btn.dataset.downgrade === '1') { showToast('등급 하향 교환은 지원하지 않아요'); return; }
+      // 허용 방향 화이트리스트로 판정 — data-downgrade 속성 누락에 의존하지 않는다
+      if (!ppSwapAllowed(btn.dataset.from, btn.dataset.to)) {
+        showToast(ppSwapDenyReason(btn.dataset.from, btn.dataset.to));
+        return;
+      }
       screen.querySelectorAll('.swap-dir-btn').forEach(function(b) { b.classList.remove('active'); });
       btn.classList.add('active');
       _swapState = {
@@ -19496,6 +19535,8 @@ function bindGradeSwapScreen() {
     var from = _swapState.from, to = _swapState.to, rf = _swapState.ratioFrom, rt = _swapState.ratioTo;
     var units = Math.floor(qty / rf);
     var consume = units * rf, receive = units * rt;
+    // 실행 직전 재검사 — 버튼을 숨기거나 _swapState/DOM을 조작해 들어와도 여기서 막힌다
+    if (!ppSwapAllowed(from, to)) { showToast(ppSwapDenyReason(from, to)); return; }
     if (units < 1 || consume > (PP.tickets[from] || 0)) { showToast('교환 수량을 확인해주세요'); return; }
     cta.disabled = true;
     db.collection('user_tickets').where('user_id', '==', PP.uid).where('grade', '==', from).where('status', '==', 'active').get()
@@ -19507,6 +19548,8 @@ function bindGradeSwapScreen() {
           return ta - tb;
         });
         if (docs.length < consume) { showToast('티켓이 부족합니다'); return null; }
+        // 쓰기 직전 최종 가드 — 이 지점을 통과하지 못하면 user_tickets 문서가 만들어지지 않는다
+        if (!ppSwapAllowed(from, to)) { console.error('blocked ticket swap', from, '→', to); showToast(ppSwapDenyReason(from, to)); return null; }
         var now = FS.FieldValue.serverTimestamp();
         var batch = db.batch();
         docs.slice(0, consume).forEach(function(doc) {

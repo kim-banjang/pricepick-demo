@@ -2170,6 +2170,9 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
           <div class="info-box" style="margin-bottom:16px">
             <strong>단일 등급 결제 + 양방향 교환</strong> — 기프티콘 교환은 단일 등급으로만 가능. 부족하거나 남는 등급은 자유롭게 교환할 수 있도록 허용. 환산가치가 동일하므로 운영 손익에 영향 없음.
           </div>
+          <div class="info-box" style="margin-bottom:16px;border-color:#f2ddb4;background:#fdf3e2;color:#8a5a12">
+            <strong>이벤트 티켓은 단방향 전환만</strong> — <strong>이벤트 티켓 5장 → 브론즈 티켓 1장</strong>은 허용하지만, <strong>브론즈 → 이벤트 티켓 역방향은 금지</strong>합니다. 브론즈 1장(100원)을 이벤트 5장으로 되돌리면 잭팟 룰렛 5회(1회 기대값 40원 = 200원)로 가치가 2배 증식되기 때문입니다. 앱에도 역방향 전환 기능이 없으며, 전환 실행 로직의 허용 방향 화이트리스트에서 차단됩니다(UI 우회 불가).
+          </div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
             <div style="background:var(--surface-2);border:1px solid var(--border);border-radius:10px;padding:16px">
               <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
@@ -5386,6 +5389,11 @@ Object.assign(KO2VI,{
   "현행 정책 그대로 30장. 회원 1명이 한 달에 모을 수 있는 이벤트 티켓 총량입니다.":"Giữ nguyên chính sách hiện hành 30 vé. Là tổng số vé sự kiện một hội viên gom được trong một tháng.",
   "저장된 제한 정책을 불러왔습니다.":"Đã tải chính sách giới hạn đã lưu.",
   "확정 기본값 표시 중 · 저장하면 이 정책이 적용됩니다.":"Đang hiển thị mặc định đã chốt · lưu là chính sách này được áp dụng.",
+  "이벤트 티켓은 단방향 전환만":"Vé sự kiện chỉ chuyển đổi một chiều",
+  "이벤트 티켓 5장 → 브론즈 티켓 1장":"5 vé sự kiện → 1 vé Đồng",
+  "브론즈 → 이벤트 티켓 역방향은 금지":"Cấm chiều ngược lại Đồng → vé sự kiện",
+  "은 허용하지만, ":" được phép, nhưng ",
+  "합니다. 브론즈 1장(100원)을 이벤트 5장으로 되돌리면 잭팟 룰렛 5회(1회 기대값 40원 = 200원)로 가치가 2배 증식되기 때문입니다. 앱에도 역방향 전환 기능이 없으며, 전환 실행 로직의 허용 방향 화이트리스트에서 차단됩니다(UI 우회 불가).":". Lý do: đổi ngược 1 vé Đồng (100 KRW) thành 5 vé sự kiện sẽ thành 5 lượt Vòng quay Jackpot (kỳ vọng 40 KRW/lượt = 200 KRW), giá trị tăng gấp đôi. App cũng không có chức năng chuyển đổi chiều ngược, và bị chặn bởi danh sách chiều được phép trong logic thực thi (không thể lách qua UI).",
   "룰렛 실행 로그":"Log lượt quay",
   "닉네임 / 카카오톡 ID":"Biệt danh / Kakao ID",
   "룰렛 종류":"Loại vòng quay",
