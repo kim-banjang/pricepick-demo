@@ -1429,7 +1429,7 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
       <div class="info-box"><strong>매일 행운 룰렛 = 출석(쿠팡 구경하기) 시 1일 1회 무료 룰렛</strong> — 슬롯별 보상 내용과 당첨 확률을 운영자가 직접 수정합니다. 확률 합계가 100%가 아니면 저장되지 않습니다. 슬롯은 6개가 기본이며 추가·삭제로 개수를 조정할 수 있습니다. 이벤트 티켓을 쓰는 유료 룰렛은 <strong>잭팟 룰렛</strong> 메뉴에서 따로 관리합니다.</div>
       <div class="stats-grid" style="grid-template-columns:repeat(3,1fr)">
         <div class="stat-card purple"><div class="stat-label">이번 달 룰렛 실행</div><div class="stat-value" id="rlt-stat-spins">—</div><div class="stat-change neutral" id="rlt-stat-spins-sub">roulette_spins 실집계</div></div>
-        <div class="stat-card green"><div class="stat-label">이번 달 지급 총액</div><div class="stat-value" id="rlt-stat-payout">—</div><div class="stat-change neutral" id="rlt-stat-payout-sub">포인트·티켓 원장 원화 환산</div></div>
+        <div class="stat-card green"><div class="stat-label">이번 달 지급 총액</div><div class="stat-value" id="rlt-stat-payout">—</div><div class="stat-change neutral" id="rlt-stat-payout-sub">지급완료 건 원화 환산</div></div>
         <div class="stat-card amber"><div class="stat-label">1회 기대값</div><div class="stat-value" id="rlt-stat-ev">—</div><div class="stat-change neutral">현재 구성 기준</div></div>
       </div>
       <div class="card">
@@ -1465,7 +1465,7 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
         </table>
         <div style="padding:12px 16px;font-size:12px;color:var(--text-3);border-top:1px solid var(--border)" id="rlt-status">불러오는 중…</div>
         <div style="padding:0 16px 14px;font-size:12px;color:var(--text-3)">가치 환산 기준 — 포인트 10P = 1원 · 이벤트 티켓 40원 · 브론즈 티켓 100원 · 실버 티켓 1,000원 · 골드 티켓 2,000원. 기대값 기여 = 가치 × 확률.</div>
-        <div style="padding:0 16px 16px;font-size:12px;color:#B4791A">데모 앱 룰렛 화면은 아직 구 구성(포인트·이벤트티켓·꽝)만 렌더링합니다. 등급 티켓 슬롯을 저장하면 앱은 기본값으로 대체해 표시합니다 — 앱 룰렛 이식은 별도 작업입니다.</div>
+        <div style="padding:0 16px 16px;font-size:12px;color:var(--text-3)">여기서 저장한 슬롯 구성·보상·확률을 데모 앱 룰렛 화면이 그대로 읽어 렌더링하고 추첨·지급합니다. 등급 티켓(브론즈·실버·골드) 슬롯도 앱에서 정상 표시·지급됩니다. 앱을 새로고침하면 반영됩니다.</div>
       </div>
 
       <div class="card" style="margin-top:16px">
@@ -1493,8 +1493,8 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
     <div class="section" id="sec-jackpot-roulette">
       <div class="info-box"><strong>잭팟 룰렛 = 이벤트 티켓 1장으로 1회 돌리는 유료 룰렛</strong> — 매일 행운 룰렛과 구조는 같고 보상 구성·확률만 다릅니다. 슬롯별 보상 내용과 당첨 확률을 운영자가 직접 수정하며, 확률 합계가 100%가 아니면 저장되지 않습니다. 악용 방지 제한(하루 참여 상한 · 구매 확정 전 티켓 사용 · 이벤트 티켓 월 획득 상한)도 아래에서 조정합니다.</div>
       <div class="stats-grid" style="grid-template-columns:repeat(3,1fr)">
-        <div class="stat-card purple"><div class="stat-label">이번 달 룰렛 실행</div><div class="stat-value" id="jkr-stat-spins">—</div><div class="stat-change neutral" id="jkr-stat-spins-sub">—</div></div>
-        <div class="stat-card green"><div class="stat-label">이번 달 지급 총액</div><div class="stat-value" id="jkr-stat-payout">—</div><div class="stat-change neutral" id="jkr-stat-payout-sub">—</div></div>
+        <div class="stat-card purple"><div class="stat-label">이번 달 룰렛 실행</div><div class="stat-value" id="jkr-stat-spins">—</div><div class="stat-change neutral" id="jkr-stat-spins-sub">roulette_spins 실집계</div></div>
+        <div class="stat-card green"><div class="stat-label">이번 달 지급 총액</div><div class="stat-value" id="jkr-stat-payout">—</div><div class="stat-change neutral" id="jkr-stat-payout-sub">지급완료 건 원화 환산</div></div>
         <div class="stat-card amber"><div class="stat-label">1회 기대값</div><div class="stat-value" id="jkr-stat-ev">—</div><div class="stat-change neutral">현재 구성 기준</div></div>
       </div>
       <div class="card">
@@ -1530,7 +1530,7 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
         </table>
         <div style="padding:12px 16px;font-size:12px;color:var(--text-3);border-top:1px solid var(--border)" id="jkr-status">불러오는 중…</div>
         <div style="padding:0 16px 14px;font-size:12px;color:var(--text-3)">가치 환산 기준 — 포인트 10P = 1원 · 이벤트 티켓 40원 · 브론즈 티켓 100원 · 실버 티켓 1,000원 · 골드 티켓 2,000원. 기대값 기여 = 가치 × 확률.</div>
-        <div style="padding:0 16px 16px;font-size:12px;color:#B4791A">잭팟 룰렛은 데모 앱에 아직 구현되지 않았습니다. 이 화면의 구성·제한 정책은 실제로 Firestore에 저장되지만, 실행 로그와 월 집계는 데모 표시 데이터입니다.</div>
+        <div style="padding:0 16px 16px;font-size:12px;color:var(--text-3)">여기서 저장한 슬롯 구성·보상·확률과 아래 참여 제한 정책을 데모 앱 잭팟 룰렛 화면(홈 하단 잭팟 배너로 진입)이 그대로 읽어 적용합니다. 실행 로그·월 집계도 앱 실행 기록 실집계입니다.</div>
       </div>
 
       <div class="card" style="margin-top:16px">
@@ -5368,8 +5368,10 @@ Object.assign(KO2VI,{
   "기대값 기여":"Đóng góp giá trị kỳ vọng",
   "보상 없음":"Không có thưởng",
   "가치 환산 기준 — 포인트 10P = 1원 · 이벤트 티켓 40원 · 브론즈 티켓 100원 · 실버 티켓 1,000원 · 골드 티켓 2,000원. 기대값 기여 = 가치 × 확률.":"Chuẩn quy đổi giá trị — Điểm 10P = 1₩ · Vé sự kiện 40₩ · Vé Đồng 100₩ · Vé Bạc 1.000₩ · Vé Vàng 2.000₩. Đóng góp giá trị kỳ vọng = giá trị × xác suất.",
-  "데모 앱 룰렛 화면은 아직 구 구성(포인트·이벤트티켓·꽝)만 렌더링합니다. 등급 티켓 슬롯을 저장하면 앱은 기본값으로 대체해 표시합니다 — 앱 룰렛 이식은 별도 작업입니다.":"Màn vòng quay của app demo hiện chỉ render cấu hình cũ (điểm·vé sự kiện·trượt). Nếu lưu ô vé theo hạng, app sẽ hiển thị bằng giá trị mặc định — việc chuyển vòng quay sang app là công việc riêng.",
-  "잭팟 룰렛은 데모 앱에 아직 구현되지 않았습니다. 이 화면의 구성·제한 정책은 실제로 Firestore에 저장되지만, 실행 로그와 월 집계는 데모 표시 데이터입니다.":"Vòng quay Jackpot chưa được triển khai trên app demo. Cơ cấu·chính sách giới hạn ở màn này được lưu thật vào Firestore, nhưng log lượt quay và tổng hợp theo tháng là dữ liệu hiển thị demo.",
+  "여기서 저장한 슬롯 구성·보상·확률을 데모 앱 룰렛 화면이 그대로 읽어 렌더링하고 추첨·지급합니다. 등급 티켓(브론즈·실버·골드) 슬롯도 앱에서 정상 표시·지급됩니다. 앱을 새로고침하면 반영됩니다.":"App demo đọc nguyên cơ cấu ô·thưởng·xác suất đã lưu ở đây để render vòng quay, quay số và cấp thưởng. Ô vé theo hạng (Đồng·Bạc·Vàng) cũng hiển thị·cấp phát bình thường trên app. Làm mới app là được áp dụng.",
+  "여기서 저장한 슬롯 구성·보상·확률과 아래 참여 제한 정책을 데모 앱 잭팟 룰렛 화면(홈 하단 잭팟 배너로 진입)이 그대로 읽어 적용합니다. 실행 로그·월 집계도 앱 실행 기록 실집계입니다.":"Màn Vòng quay Jackpot của app demo (vào từ banner Jackpot ở dưới trang chủ) đọc nguyên cơ cấu ô·thưởng·xác suất đã lưu ở đây cùng chính sách giới hạn tham gia bên dưới để áp dụng. Log lượt quay·tổng hợp theo tháng cũng là tổng hợp thật từ bản ghi lượt quay của app.",
+  "지급완료 건 원화 환산":"Quy đổi ra KRW các lượt đã cấp thưởng",
+  "실행 기록 없음 · 데모 표시 데이터":"Không có bản ghi lượt quay · dữ liệu hiển thị demo",
   "참여 제한 정책":"Chính sách giới hạn tham gia",
   "하루 최대 참여 횟수":"Số lượt tối đa mỗi ngày",
   "회 / 1일":"lượt / ngày",
@@ -10812,9 +10814,11 @@ window.dmFillFromScenarios = function() {
    슬롯 개수는 고정이 아니다(추가·삭제 가능, 최소 2).
 
    저장 문서
-     settings/roulette          — 매일 행운 룰렛. slots(정본) + wheel(레거시, 데모 앱이 아직 읽는다)
+     settings/roulette          — 매일 행운 룰렛. slots(정본) + wheel(레거시, 구버전 앱 호환용)
      settings/jackpot_roulette  — 잭팟 룰렛. slots + 참여 제한 정책(limits)
-   잭팟 룰렛은 데모 앱에 미구현이라 실행 로그·월 집계는 데모 표시 데이터다. */
+   2026-07-31: 데모 앱이 두 룰렛 모두 slots(보상 구성 + 확률)를 그대로 읽어 렌더·추첨·지급한다.
+   실행 로그·월 집계도 앱이 쓰는 roulette_spins(kind/result_type/result_qty/payout_status)를
+   직접 읽는 실집계다 — 실데이터가 하나도 없을 때만 아래 데모 행을 대신 보여준다. */
 var RLT_REWARD_TYPES = {
   miss:          { label: '꽝',         unit: '',   unitValue: 0    },
   point:         { label: '포인트',      unit: 'P',  unitValue: 0.1  },  /* 10P = 1원 */
@@ -10836,7 +10840,7 @@ var RLT_KINDS = {
     ]
   },
   jackpot: {
-    p: 'jkr', name: '잭팟 룰렛', doc: 'jackpot_roulette', live: false, legacyWheel: false,
+    p: 'jkr', name: '잭팟 룰렛', doc: 'jackpot_roulette', live: true, legacyWheel: false,
     defaults: [                              /* 1회 기대값 40원 · 이벤트 티켓 1장 = 1회 */
       { type: 'gold_ticket',   qty: 1,    prob: 0.4  },
       { type: 'silver_ticket', qty: 1,    prob: 1    },
@@ -10854,7 +10858,7 @@ function rltCloneSlots(list) {
 }
 var rltState = {
   daily:   { slots: rltCloneSlots(RLT_KINDS.daily.defaults),   logRows: [], logPage: 1, logIsDemo: false },
-  jackpot: { slots: rltCloneSlots(RLT_KINDS.jackpot.defaults), logRows: [], logPage: 1, logIsDemo: true  }
+  jackpot: { slots: rltCloneSlots(RLT_KINDS.jackpot.defaults), logRows: [], logPage: 1, logIsDemo: false }
 };
 
 function rltFmt(n) { return Number(n).toLocaleString('ko-KR', { maximumFractionDigits: 2 }); }
@@ -11102,42 +11106,39 @@ function rltDemoPayout(rows) {
     return a + rltSlotValue({ type: r[3], qty: r[4] });
   }, 0);
 }
+/* 실행 수·지급 총액 모두 roulette_spins 실집계.
+   앱이 실행 시점에 결과(result_type/result_qty)와 지급 상태(payout_status)를 문서에 함께
+   기록하므로 종류별 집계가 이 컬렉션 하나로 끝난다. 실행 기록이 하나도 없으면 데모 로그 환산. */
 function rltLoadStats(k) {
-  if (!RLT_KINDS[k].live) {
-    var rows = RLT_LOG_DEMO[k] || [];
-    rltSetStatCard(k, rows.length.toLocaleString('ko-KR') + '회',
-      Math.round(rltDemoPayout(rows)).toLocaleString('ko-KR') + '원',
-      '데모 표시 데이터 (앱 미구현)', '데모 로그 원화 환산');
-    return;
-  }
   var thisYm = rltYm(new Date());
   var p = RLT_KINDS[k].p;
   var spinsEl = document.getElementById(p + '-stat-spins');
   var payEl = document.getElementById(p + '-stat-payout');
   db.collection('roulette_spins').get().then(function(snap) {
-    var n = 0;
+    var n = 0, won = 0, any = false;
     snap.forEach(function(doc) {
       var d = doc.data();
-      var day = d.date || (rltTsDate(d.created_at) ? rltTsDate(d.created_at).toISOString().slice(0, 10) : '');
-      if (String(day).slice(0, 7) === thisYm) n++;
+      if (rltSpinKind(d) !== k) return;
+      any = true;
+      var day = d.date || (rltTsDate(d.created_at) ? ppFmtYMD(rltTsDate(d.created_at)) : '');
+      if (String(day).slice(0, 7) !== thisYm) return;
+      n++;
+      if (d.payout_status === 'paid') won += rltSlotValue({ type: d.result_type, qty: d.result_qty });
     });
-    if (spinsEl) spinsEl.textContent = n.toLocaleString('ko-KR') + '회';
-  }).catch(function(e) { console.error('rltLoadStats spins', e); if (spinsEl) spinsEl.textContent = '—'; });
-
-  var won = 0;
-  db.collection('point_transactions').where('category', '==', 'roulette').get().then(function(snap) {
-    snap.forEach(function(doc) {
-      var d = doc.data(), dt = rltTsDate(d.created_at);
-      if (dt && rltYm(dt) === thisYm) won += (Number(d.amount) || 0) * RLT_REWARD_TYPES.point.unitValue;
-    });
-    return db.collection('ticket_transactions').where('category', '==', 'lucky_spin').get();
-  }).then(function(snap) {
-    snap.forEach(function(doc) {
-      var d = doc.data(), dt = rltTsDate(d.created_at);
-      if (dt && rltYm(dt) === thisYm) won += RLT_REWARD_TYPES.event_ticket.unitValue;
-    });
-    if (payEl) payEl.textContent = Math.round(won).toLocaleString('ko-KR') + '원';
-  }).catch(function(e) { console.error('rltLoadStats payout', e); if (payEl) payEl.textContent = '—'; });
+    if (!any) {
+      var rows = RLT_LOG_DEMO[k] || [];
+      rltSetStatCard(k, rows.length.toLocaleString('ko-KR') + '회',
+        Math.round(rltDemoPayout(rows)).toLocaleString('ko-KR') + '원',
+        '실행 기록 없음 · 데모 표시 데이터', '데모 로그 원화 환산');
+      return;
+    }
+    rltSetStatCard(k, n.toLocaleString('ko-KR') + '회', Math.round(won).toLocaleString('ko-KR') + '원',
+      'roulette_spins 실집계', '지급완료 건 원화 환산');
+  }).catch(function(e) {
+    console.error('rltLoadStats', e);
+    if (spinsEl) spinsEl.textContent = '—';
+    if (payEl) payEl.textContent = '—';
+  });
 }
 
 /* ── 룰렛 실행 로그 (최신순 · 10건 단위) ──
@@ -11254,37 +11255,49 @@ function rltUseDemoLog(k) {
   rltState[k].logPage = 1;
   rltRenderLog(k);
 }
+/* 실행 기록 문서의 kind — 2026-07-31 이전에 앱이 남긴 문서엔 kind가 없다(전부 매일 행운 룰렛) */
+function rltSpinKind(d) { return d.kind === 'jackpot' ? 'jackpot' : 'daily'; }
 function rltLoadLog(k) {
   var tbody = document.getElementById(RLT_KINDS[k].p + '-log-tbody');
   if (!tbody) return;
-  if (!RLT_KINDS[k].live) { rltUseDemoLog(k); return; }
-  db.collection('roulette_spins').orderBy('created_at', 'desc').limit(200).get().then(function(snap) {
-    if (snap.empty) { rltUseDemoLog(k); return; }
-    var spins = snap.docs.map(function(d) { return Object.assign({ _id: d.id }, d.data()); });
-    /* 결과 되짚기용 원장 — 유저+날짜 키로 묶는다 */
+  db.collection('roulette_spins').orderBy('created_at', 'desc').limit(400).get().then(function(snap) {
+    var spins = snap.docs.map(function(d) { return Object.assign({ _id: d.id }, d.data()); })
+      .filter(function(s) { return rltSpinKind(s) === k; });
+    if (!spins.length) { rltUseDemoLog(k); return; }
+    /* 결과 되짚기용 원장 — 앱이 결과를 문서에 직접 쓰기 전(2026-07-31 이전) 기록에만 쓴다 */
+    var needBackfill = spins.some(function(s) { return !s.result_type; });
     return Promise.all([
       dmFetchUsersByIds(spins.map(function(s) { return s.user_id; })),
-      db.collection('point_transactions').where('category', '==', 'roulette').get(),
-      db.collection('ticket_transactions').where('category', '==', 'lucky_spin').get()
+      needBackfill ? db.collection('point_transactions').where('category', '==', 'roulette').get() : null,
+      needBackfill ? db.collection('ticket_transactions').where('category', '==', 'lucky_spin').get() : null
     ]).then(function(res) {
       var userMap = res[0], ptMap = {}, tkMap = {};
       function key(uid, dt) { return uid + '|' + (dt ? ppFmtYMD(dt) : ''); }
-      res[1].forEach(function(doc) {
+      if (res[1]) res[1].forEach(function(doc) {
         var d = doc.data(), dt = rltTsDate(d.created_at);
         if (dt) ptMap[key(d.user_id, dt)] = (ptMap[key(d.user_id, dt)] || 0) + (Number(d.amount) || 0);
       });
-      res[2].forEach(function(doc) {
+      if (res[2]) res[2].forEach(function(doc) {
         var d = doc.data(), dt = rltTsDate(d.created_at);
         if (dt) tkMap[key(d.user_id, dt)] = (tkMap[key(d.user_id, dt)] || 0) + 1;
       });
       rltState[k].logIsDemo = false;
       rltState[k].logRows = spins.map(function(s) {
         var dt = rltTsDate(s.created_at) || (s.date ? new Date(s.date + 'T00:00:00') : new Date());
-        var kk = s.user_id + '|' + (s.date || ppFmtYMD(dt));
         var u = userMap[s.user_id] || {};
-        var type = 'miss', qty = 0, st = 'none';
-        if (ptMap[kk]) { type = 'point'; qty = ptMap[kk]; st = 'paid'; }
-        else if (tkMap[kk]) { type = 'event_ticket'; qty = tkMap[kk]; st = 'paid'; }
+        var type, qty, st;
+        if (s.result_type) {
+          /* 앱이 실행 시점에 기록한 결과 그대로 */
+          type = RLT_REWARD_TYPES[s.result_type] ? s.result_type : 'miss';
+          qty = Number(s.result_qty) || 0;
+          st = s.payout_status || (type === 'miss' ? 'none' : 'paid');
+        } else {
+          /* 레거시 기록 — 같은 유저·같은 날짜 원장에서 되짚는다 */
+          var kk = s.user_id + '|' + (s.date || ppFmtYMD(dt));
+          type = 'miss'; qty = 0; st = 'none';
+          if (ptMap[kk]) { type = 'point'; qty = ptMap[kk]; st = 'paid'; }
+          else if (tkMap[kk]) { type = 'event_ticket'; qty = tkMap[kk]; st = 'paid'; }
+        }
         return [
           ppDt(s.created_at).replace(/\//g, '-') + ' ' + ppTm(s.created_at),
           u.nickname || '(탈퇴·미상)',
