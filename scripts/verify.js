@@ -127,9 +127,9 @@ async function testOnboarding() {
   rec('A1 user_points 생성', p.exists ? '✓' : '✗', `balance=${p.data()?.balance}`);
 }
 
-// ════════════ A2. 픽구매 시뮬 ════════════
-async function testPickPurchase() {
-  console.log('\n── A2. 픽구매 시뮬 (67,000원) ──');
+// ════════════ A2. 구매 시뮬 ════════════
+async function testPurchase() {
+  console.log('\n── A2. 구매 시뮬 (67,000원) ──');
 
   // click_log
   const clickRef = db.collection('click_logs').doc();
@@ -380,7 +380,7 @@ async function main() {
     beforeSnap = await before();
     await testGreedy();
     await testOnboarding();
-    await testPickPurchase();
+    await testPurchase();
     await testGifticonExchange();
     await testPoints();
     await testMemberSuspend();

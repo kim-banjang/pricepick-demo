@@ -477,10 +477,10 @@ const DAILY_VISITS = {
 // NOTICES (앱 공지 + CMS 공지 공용)
 // ═══════════════════════════════════════════════════════
 const NOTICES = {
-  'notice-launch': { id:'notice-launch', title:'프라이스픽 v1.0 정식 출시 안내', content:'안녕하세요, 프라이스픽 팀입니다.\n\n경유 쇼핑 리워드 앱 프라이스픽이 정식 출시되었습니다. 쿠팡·11번가·G마켓 등 주요 쇼핑몰에서 픽구매 링크를 통해 구매하시면 등급 티켓을 적립하실 수 있습니다.\n\n적립된 티켓으로 스타벅스, 배달의민족 등 인기 기프티콘을 교환해보세요!\n\n감사합니다.', is_pinned:true, published_at:ago(27), created_at:ago(27), updated_at:ago(27) },
+  'notice-launch': { id:'notice-launch', title:'프라이스픽 v1.0 정식 출시 안내', content:'안녕하세요, 프라이스픽 팀입니다.\n\n경유 쇼핑 리워드 앱 프라이스픽이 정식 출시되었습니다. 쿠팡·11번가·G마켓 등 주요 쇼핑몰에서 바로가기 링크를 통해 구매하시면 등급 티켓을 적립하실 수 있습니다.\n\n적립된 티켓으로 스타벅스, 배달의민족 등 인기 기프티콘을 교환해보세요!\n\n감사합니다.', is_pinned:true, published_at:ago(27), created_at:ago(27), updated_at:ago(27) },
   'notice-terms': { id:'notice-terms', title:'서비스 이용약관 개정 안내', content:'2026년 6월 1일부터 개정된 이용약관이 적용됩니다. 주요 변경 사항은 개인정보처리방침 항목 보완 및 티켓 만료 정책 명시입니다.\n\n변경 내용에 동의하지 않으실 경우 서비스 이용을 중단하시거나 탈퇴하실 수 있습니다.', is_pinned:false, published_at:ago(40), created_at:ago(40), updated_at:ago(40) },
   'notice-ticket-policy': { id:'notice-ticket-policy', title:'티켓 적립 정책 안내', content:'등급 티켓은 브론즈(5천원/장), 실버(5만원/장), 골드(10만원/장) 기준으로 적립됩니다.\n\n등급 티켓 유효기간은 등급 확정일로부터 1년이며, 만료 D-30·D-7에 알림을 발송합니다.', is_pinned:false, published_at:ago(54), created_at:ago(54), updated_at:ago(54) },
-  'notice-event-coupang': { id:'notice-event-coupang', title:'[이벤트] 쿠팡 픽구매 티켓 2배 적립', content:'이번 주 한정, 쿠팡 경유 픽구매 시 등급 티켓을 2배로 드립니다. 지금 픽하고 더 많은 티켓을 받아보세요!', is_pinned:false, published_at:ago(5), created_at:ago(5), updated_at:ago(5) },
+  'notice-event-coupang': { id:'notice-event-coupang', title:'[이벤트] 쿠팡 구매 티켓 2배 적립', content:'이번 주 한정, 쿠팡 경유 구매 시 등급 티켓을 2배로 드립니다. 지금 구매하고 더 많은 티켓을 받아보세요!', is_pinned:false, published_at:ago(5), created_at:ago(5), updated_at:ago(5) },
 };
 
 // ═══════════════════════════════════════════════════════
@@ -499,7 +499,7 @@ const ADMIN_LOGS = {
   'alog-002': { admin_username:'firstadmin', admin_name:'슈퍼어드민', action:'1:1 문의 답변 (티켓이 확정되지 않아요)', ip:'211.234.x.x', at:ago(1) },
   'alog-003': { admin_username:'firstadmin', admin_name:'슈퍼어드민', action:'회원 정지 (라이언)', ip:'211.234.x.x', at:ago(1) },
   'alog-004': { admin_username:'admin-markkim', admin_name:'김반장', action:'기프티콘 상품 등록 (이디야 아메리카노)', ip:'121.5.x.x', at:ago(3) },
-  'alog-005': { admin_username:'firstadmin', admin_name:'슈퍼어드민', action:'공지 발행 ([이벤트] 쿠팡 픽구매 티켓 2배)', ip:'211.234.x.x', at:ago(5) },
+  'alog-005': { admin_username:'firstadmin', admin_name:'슈퍼어드민', action:'공지 발행 ([이벤트] 쿠팡 구매 티켓 2배)', ip:'211.234.x.x', at:ago(5) },
   'alog-006': { admin_username:'admin-markkim', admin_name:'김반장', action:'로그인', ip:'121.5.x.x', at:ago(6) },
 };
 
