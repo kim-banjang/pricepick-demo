@@ -14374,17 +14374,18 @@ function rlBuildWheel() {
     var rw = rlSegDisplay(slot);
     var jackpot = rlIsJackpot(slot);
     if (rw.win) {
-      var lp1 = rlPolar(cx, cy, 104, mid), lp2 = rlPolar(cx, cy, 82, mid), lp3 = rlPolar(cx, cy, 62, mid);
+      var lp1 = rlPolar(cx, cy, 104, mid), lp2 = rlPolar(cx, cy, 82, mid), lp3 = rlPolar(cx, cy, 66, mid);
       parts += '<text x="' + lp1[0].toFixed(1) + '" y="' + lp1[1].toFixed(1) + '" font-size="12" font-weight="600" fill="#FFFFFF" opacity="0.9" text-anchor="middle" font-family="inherit" transform="rotate(' + mid.toFixed(1) + ' ' + lp1[0].toFixed(1) + ' ' + lp1[1].toFixed(1) + ')">' + rw.label + '</text>';
       parts += '<text x="' + lp2[0].toFixed(1) + '" y="' + lp2[1].toFixed(1) + '" font-size="19" font-weight="800" fill="#FFFFFF" text-anchor="middle" font-family="inherit" transform="rotate(' + mid.toFixed(1) + ' ' + lp2[0].toFixed(1) + ' ' + lp2[1].toFixed(1) + ')">' + rw.sub + '</text>';
       if (jackpot) parts += '<text x="' + lp3[0].toFixed(1) + '" y="' + lp3[1].toFixed(1) + '" font-size="10" font-weight="700" fill="#FFD7E5" text-anchor="middle" font-family="inherit" transform="rotate(' + mid.toFixed(1) + ' ' + lp3[0].toFixed(1) + ' ' + lp3[1].toFixed(1) + ')">JACKPOT</text>';
     } else {
-      var lp = rlPolar(cx, cy, 82, mid);
+      var lp = rlPolar(cx, cy, 88, mid);
       parts += '<text x="' + lp[0].toFixed(1) + '" y="' + lp[1].toFixed(1) + '" font-size="14" font-weight="700" fill="#1A1130" text-anchor="middle" font-family="inherit" transform="rotate(' + mid.toFixed(1) + ' ' + lp[0].toFixed(1) + ' ' + lp[1].toFixed(1) + ')">' + rw.label + '</text>';
     }
-    // 당첨 확률 표기 — CMS 확률 그대로. 20260731 시안 잭팟 휠과 같은 위치(중심에서 먼 쪽)
-    var pp = rlPolar(cx, cy, 44, mid);
-    parts += '<text x="' + pp[0].toFixed(1) + '" y="' + pp[1].toFixed(1) + '" font-size="10" font-weight="400" fill="' + (rw.win ? '#FFFFFF' : '#1A1130') + '" opacity="0.55" text-anchor="middle" font-family="inherit" transform="rotate(' + mid.toFixed(1) + ' ' + pp[0].toFixed(1) + ' ' + pp[1].toFixed(1) + ')">' + ppSlotProbText(slot) + '</text>';
+    // 확률 표기는 넣지 않는다 — 20260729 시안(매일 행운 룰렛)의 휠 라벨은
+    // "이벤트 티켓/포인트/꽝/N장/JACKPOT"뿐이고, "당첨 확률 N%"는 결과 모달 카탈로그의
+    // 문서용 칩이라 앱 화면 구성 요소가 아니다. (확률은 CMS 설정대로 추첨에만 반영된다.
+    //  잭팟 룰렛은 20260731 시안이 휠 SVG 안에 확률 텍스트를 직접 갖고 있어 그쪽만 표기한다.)
   }
   svg.innerHTML = parts;
 }
