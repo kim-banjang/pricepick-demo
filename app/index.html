@@ -8490,9 +8490,35 @@ body.interactive-mode #ip-nav { display: block; }
 @keyframes pt-up   { from { transform: translateY(100%); } to { transform: translateY(0); } }
 @keyframes C-rot { to { transform: rotate(360deg); } }
 /* ===== 이식 끝 ===== */
+
+/* ===== 기능 노출 플래그 (2026-07-31 확정 "3. 숨김") =====
+   data-pp-feature 가 붙은 요소는 PP_FEATURES 의 해당 값이 false 일 때만 숨는다.
+   요소·스타일·스크립트는 그대로 남아 있으므로 플래그만 true 로 되돌리면 복구된다. */
+body.pp-hide-weekly-raffle  [data-pp-feature="weekly-raffle"],
+body.pp-hide-exchange-entry [data-pp-feature="exchange-entry"],
+body.pp-hide-cs-kakao       [data-pp-feature="cs-kakao"] { display: none !important; }
+/* 이벤트 티켓 행: 잔량 표시는 유지하되 경품 응모로 가는 탭 어포던스만 제거 */
+body.pp-hide-weekly-raffle .mtc-event { cursor: default !important; }
 </style>
 
 <body>
+
+<!-- ===== 기능 노출 플래그 (2026-07-31 확정 "3. 숨김") =====
+     false = 숨김. 진입 경로와 노출만 차단하고 기능·화면·로직은 전부 보존한다.
+     되살리려면 해당 값을 true 로 바꾸기만 하면 원상 복구된다. -->
+<script>
+window.PP_FEATURES = {
+  weeklyRaffle:  false,  // 주간 경품 추첨 전체 (응모·당첨자 발표·당첨 알림·배너 2종) — 실사용자 1만 명 달성 시 부활
+  exchangeEntry: false,  // 티켓 교환소 진입 버튼 (내 보유티켓 상세 · 혜택 내 적립 티켓 상세 2곳)
+  csKakao:       false   // 고객센터 카카오채널 상담
+};
+(function () {
+  var f = window.PP_FEATURES, c = document.body.classList;
+  if (!f.weeklyRaffle)  c.add('pp-hide-weekly-raffle');
+  if (!f.exchangeEntry) c.add('pp-hide-exchange-entry');
+  if (!f.csKakao)       c.add('pp-hide-cs-kakao');
+})();
+</script>
 
 <!-- KO/VI 언어 토글 (좌측 세로 탭 / 우측 펼침 오버레이) -->
 <div id="ip-lang-fab" data-open="0">
@@ -8546,7 +8572,7 @@ body.interactive-mode #ip-nav { display: block; }
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#845EEE" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h16l-1 11a2 2 0 0 1-2 1.8H7A2 2 0 0 1 5 19L4 8Z"/><path d="M9 8V6.5a3 3 0 0 1 6 0V8"/></svg>
             <span class="i18n"><span class="ko">쇼핑 적립</span><span class="vi">Tích lũy khi mua sắm</span></span>
           </span>
-          <span style="display:inline-flex;align-items:center;gap:6px;padding:7px 13px;border-radius:999px;background:#fff;font-size:11px;font-weight:700;color:#B8437A;box-shadow:0 4px 12px rgba(255,111,168,0.16);">
+          <span data-pp-feature="weekly-raffle" style="display:inline-flex;align-items:center;gap:6px;padding:7px 13px;border-radius:999px;background:#fff;font-size:11px;font-weight:700;color:#B8437A;box-shadow:0 4px 12px rgba(255,111,168,0.16);">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FF6FA8" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="9" width="17" height="11.5" rx="2"/><path d="M3.5 13.5h17"/><path d="M12 9v11.5"/><path d="M12 9s-.9-3.2-3.2-3.2A2 2 0 0 0 8.8 9H12Zm0 0s.9-3.2 3.2-3.2A2 2 0 0 1 15.2 9H12Z"/></svg>
             <span class="i18n"><span class="ko">매주 추첨</span><span class="vi">Quay số hàng tuần</span></span>
           </span>
@@ -9319,7 +9345,7 @@ body.interactive-mode #ip-nav { display: block; }
           </div>
 
           <!-- 주간 추첨 배너 — 경품 응모(pw-26) 링크, 진행 중 회차 실데이터 연동(ppRenderHomeDrawBanner) -->
-          <div class="draw-mini">
+          <div class="draw-mini" data-pp-feature="weekly-raffle">
             <div class="draw-mini-ico">🎁</div>
             <div class="draw-mini-body">
               <div class="draw-mini-title">이번 주 행운의 추첨 <span class="draw-mini-pill" id="home-draw-dday">D-0</span></div>
@@ -10135,7 +10161,7 @@ body.interactive-mode #ip-nav { display: block; }
                   <span class="mtc-event-num">3</span>
                   <span class="mtc-event-unit">장</span>
                 </div>
-                <span class="mtc-event-arrow">›</span>
+                <span class="mtc-event-arrow" data-pp-feature="weekly-raffle">›</span>
               </div>
             </div>
 
@@ -10143,7 +10169,7 @@ body.interactive-mode #ip-nav { display: block; }
 
           <div class="mtc-cta-row">
             <button class="mtc-cta primary">기프티콘 교환</button>
-            <button class="mtc-cta secondary">경품 응모 <span class="mtc-cta-badge" id="badge-tip-btn">3</span></button>
+            <button class="mtc-cta secondary" data-pp-feature="weekly-raffle">경품 응모 <span class="mtc-cta-badge" id="badge-tip-btn">3</span></button>
           </div>
 
           <div class="coupang-card">
@@ -10230,7 +10256,7 @@ body.interactive-mode #ip-nav { display: block; }
             </div>
             <div class="event-list">
               <!-- 주간 추첨 이벤트: "이번 주 행운의 추첨" 배너가 여기로 이동해 경품 응모(pw-26) 링크를 대신 담당 -->
-              <div class="event-row draw-link">
+              <div class="event-row draw-link" data-pp-feature="weekly-raffle">
                 <div class="event-ico">📅</div>
                 <div class="event-body">
                   <div class="event-name">주간 추첨 이벤트</div>
@@ -10276,7 +10302,7 @@ body.interactive-mode #ip-nav { display: block; }
         </div><!-- /reward-scroll -->
 
         <!-- 배지 툴팁 -->
-        <div class="badge-tooltip" id="badge-tooltip">
+        <div class="badge-tooltip" id="badge-tooltip" data-pp-feature="weekly-raffle">
           이번 주 경품 응모 가능 횟수입니다. 티켓 소진 시 응모가 마감됩니다.
         </div>
 
@@ -10552,7 +10578,7 @@ body.interactive-mode #ip-nav { display: block; }
         </div>
 
         <!-- 하단 CTA -->
-        <div class="gd-bottom">
+        <div class="gd-bottom" data-pp-feature="exchange-entry">
           <button class="gd-cta">티켓 교환소로 가기</button>
         </div>
       </div>
@@ -11059,7 +11085,7 @@ body.interactive-mode #ip-nav { display: block; }
           <div class="filter-pill">사용</div>
           <div class="filter-pill">교환</div>
           <div class="filter-pill">환수</div>
-          <div class="filter-pill">응모</div>
+          <div class="filter-pill" data-pp-feature="weekly-raffle">응모</div>
           <div class="filter-pill">만료</div>
         </div>
         <div class="activity-list"><!-- PP: deprecated 화면 — 샘플 제거 --></div>
@@ -11378,7 +11404,7 @@ body.interactive-mode #ip-nav { display: block; }
                 <svg width="24" height="24" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="card_hdr2" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#C9AAFF"/><stop offset="100%" stop-color="#845EEE"/></linearGradient></defs><path d="M306.6,106.8l-49.5,49.5,2.4,2.4c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-2.4-2.4-138.6,138.6c-3.7,3.7-3.7,9.6,0,13.3l75.5,75.5c3.7,3.7,9.6,3.7,13.3,0l138.6-138.6-2.3-2.3c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l2.3,2.3,49.5-49.5c3.7-3.7,3.7-9.6,0-13.3l-75.5-75.5c-3.7-3.7-9.6-3.7-13.3,0Z" fill="url(#card_hdr2)"/><circle cx="428.9" cy="83.1" r="21.9" fill="rgba(255,255,255,0.95)"/><circle cx="83.1" cy="428.9" r="21.9" fill="rgba(255,255,255,0.95)"/></svg>
                 <span style="font-size:13px; font-weight:700; color:var(--main);">이벤트 티켓</span>
               </div>
-              <span style="font-size:11px; color:var(--main); background:var(--sub-3); font-weight:600; border-radius:20px; padding:2px 10px; margin-left:14px; flex-shrink:0;">경품 응모 전용</span>
+              <span data-pp-feature="weekly-raffle" style="font-size:11px; color:var(--main); background:var(--sub-3); font-weight:600; border-radius:20px; padding:2px 10px; margin-left:14px; flex-shrink:0;">경품 응모 전용</span>
             </div>
             <!-- 티켓 점선 구분자 -->
             <div style="display:flex; align-items:center; margin:0 -1px;">
@@ -11423,7 +11449,7 @@ body.interactive-mode #ip-nav { display: block; }
           </div>
         </div>
         <div class="ac-footer">
-          <button class="btn-primary" onclick="showScreen('pw-26')" style="cursor:pointer;">경품 응모 바로가기</button>
+          <button class="btn-primary" onclick="showScreen('pw-26')" data-pp-feature="weekly-raffle" style="cursor:pointer;">경품 응모 바로가기</button>
           <div class="ac-check-info">내일부터 다시 5일 연속 구경에 도전해보세요</div>
         </div>
 
@@ -11948,8 +11974,8 @@ body.interactive-mode #ip-nav { display: block; }
               </div>
             </div>
           </div>
-          <!-- 카카오채널 바로가기 -->
-          <div style="margin:12px 16px 0;">
+          <!-- 카카오채널 바로가기 (2026-07-31 숨김: PP_FEATURES.csKakao) -->
+          <div style="margin:12px 16px 0;" data-pp-feature="cs-kakao">
             <button data-jump="pw-30-cs-kakao"
               style="width:100%;padding:14px 16px;background:#FEE500;border:none;border-radius:14px;font-size:14px;font-weight:800;color:#3C1E1E;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:12px;">
               <div style="width:38px;height:38px;background:rgba(0,0,0,0.08);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
@@ -12611,7 +12637,7 @@ body.interactive-mode #ip-nav { display: block; }
         </div>
 
         <!-- 하단 CTA -->
-        <div class="gd-bottom">
+        <div class="gd-bottom" data-pp-feature="exchange-entry">
           <button class="gd-cta">티켓 교환소로 가기</button>
         </div>
       </div>
@@ -12999,7 +13025,7 @@ body.interactive-mode #ip-nav { display: block; }
           <div class="filter-pill">사용</div>
           <div class="filter-pill">교환</div>
           <div class="filter-pill">환수</div>
-          <div class="filter-pill">응모</div>
+          <div class="filter-pill" data-pp-feature="weekly-raffle">응모</div>
           <div class="filter-pill">만료</div>
         </div>
         <div style="display:flex;justify-content:flex-end;padding:4px 16px 2px;">
@@ -13857,7 +13883,18 @@ function updateSpecPanel(screenId) {
 let historyStack = [];
 let currentScreen = null;
 
+/* 숨김 기능 화면 게이트 — 플래그가 false면 어떤 경로(FLOW_MAP·data-jump·텍스트 바인딩·
+   인라인 onclick)로도 해당 화면에 진입할 수 없다. 화면 마크업과 로직은 그대로 보존된다. */
+function ppGateScreen(screenId) {
+  var f = window.PP_FEATURES || {};
+  if (!f.weeklyRaffle && screenId === 'pw-26') return null;          // 경품 응모
+  if (!f.csKakao && screenId === 'pw-30-cs-kakao') return null;      // 카카오채널 상담
+  return screenId;
+}
+
 function showScreen(screenId, pushHistory = true) {
+  screenId = ppGateScreen(screenId);
+  if (!screenId) return;
   if (!document.getElementById(screenId)) return;
 
   // 히스토리
@@ -18009,7 +18046,8 @@ function renderNotifications() {
       var amt = p.amount != null ? p.amount : (p.qty || 0);
       if (amt > 0) items.push({ key: 'pt:' + p._id, type: 'event', d: ppDate(p.created_at), tag: '이벤트', head: (p.reason || '포인트 적립'), desc: '+' + amt + 'P 적립' });
     });
-    pzw.forEach(function (w) {
+    /* 주간 경품 추첨 숨김 중에는 당첨 알림도 노출하지 않는다 (PP_FEATURES.weeklyRaffle) */
+    if ((window.PP_FEATURES || {}).weeklyRaffle) pzw.forEach(function (w) {
       items.push({ key: 'pw:' + w._id, type: 'event', d: ppDate(w.created_at), tag: '이벤트', head: '경품 추첨에 당첨되셨어요!', desc: '당첨을 축하해요! 경품 수령 정보를 1:1 문의로 보내주세요.' });
     });
     items = items.filter(function (i) { return i.d; }).sort(function (a, b) { return b.d - a.d; });
