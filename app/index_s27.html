@@ -14176,7 +14176,7 @@ function bindAttendanceScreen() {
 //   type: miss | point | event_ticket | bronze_ticket | silver_ticket | gold_ticket
 //   qty : 지급 수량(포인트는 P, 티켓은 장). miss는 0
 //   prob: 당첨 확률(%). CMS가 합계 100%를 강제해 저장한다
-// 슬롯은 6개 고정이다(2026-08-03 확정 — CMS에서 추가·삭제 불가). 앱은 6칸 휠을 그린다.
+// 슬롯 개수는 고정이 아니다(CMS에서 추가·삭제, 최소 2). 앱은 개수대로 휠을 그린다.
 var PP_SLOT_META = {
   miss:          { label: '꽝',          unit: ''   },
   point:         { label: '포인트',       unit: 'P'  },
@@ -14262,10 +14262,8 @@ var RL_DEFAULT_SLOTS = [
   { type:'point',         qty:10,  prob:40   },
   { type:'miss',          qty:0,   prob:17.8 }
 ];
-// 슬롯 6칸 고정 배분색(1번→6번). 인접 칸이 붙어 보이지 않게 명도를 교차시킨 순서다.
-var RL_COLORS = ['#845EEE', '#C6AFFF', '#6C4AB6', '#B79CFF', '#7C5BE0', '#D8CCFF'];
-// 잭팟 칸만 진한 색으로 구분한다(가치가 가장 높은 슬롯 — rlIsJackpot 참고)
-var RL_JACKPOT_COLOR = '#4A2E8F';
+var RL_COLORS = ['#6C4AB6', '#C6AFFF', '#845EEE', '#7C5BE0', '#C6AFFF', '#9B78FF'];
+// 등급 티켓 칸은 등급색으로 칠한다(휠에서 티켓 등급이 바로 읽히게)
 var RL_GRADE_COLORS = { bronze_ticket:'#B87333', silver_ticket:'#9AA3AE', gold_ticket:'#D8A93B' };
 var RL_ACTIVE_WHEEL = RL_DEFAULT_SLOTS;
 var RL_EVENT_TICKET_DAILY_CAP = 5;
@@ -14276,9 +14274,6 @@ function rlLoadWheelConfig() {
     RL_ACTIVE_WHEEL = (cfg && cfg.slots) || RL_DEFAULT_SLOTS;
     if (cfg && cfg.limits && cfg.limits.event_ticket_monthly_cap) {
       RL_EVENT_TICKET_MONTHLY_CAP = cfg.limits.event_ticket_monthly_cap;
-    }
-    if (cfg && cfg.limits && cfg.limits.event_ticket_daily_cap) {
-      RL_EVENT_TICKET_DAILY_CAP = cfg.limits.event_ticket_daily_cap;
     }
   }).catch(function(e) {
     console.error('roulette config', e);
@@ -14332,7 +14327,6 @@ function rlBuildWheel() {
   var svg = document.getElementById('rl-wheel');
   if (!svg) return;
   var cx = 150, cy = 150, R = 146, n = RL_ACTIVE_WHEEL.length, seg = 360 / n;
-  var rlJackpotSet = ppJackpotIdx(RL_ACTIVE_WHEEL);
   var parts = '';
   for (var i = 0; i < n; i++) {
     var a0 = i * seg, a1 = (i + 1) * seg;
@@ -14340,10 +14334,10 @@ function rlBuildWheel() {
     var slot = RL_ACTIVE_WHEEL[i];
     parts += '<path d="M' + cx + ',' + cy + ' L' + p0[0].toFixed(2) + ',' + p0[1].toFixed(2) +
       ' A' + R + ',' + R + ' 0 0 1 ' + p1[0].toFixed(2) + ',' + p1[1].toFixed(2) + ' Z" fill="' +
-      (rlJackpotSet.indexOf(i) >= 0 ? RL_JACKPOT_COLOR : RL_COLORS[i % RL_COLORS.length]) + '" stroke="#FFFFFF" stroke-width="2"/>';
+      (RL_GRADE_COLORS[slot.type] || RL_COLORS[i % RL_COLORS.length]) + '" stroke="#FFFFFF" stroke-width="2"/>';
     var mid = a0 + seg / 2;
     var rw = rlSegDisplay(slot);
-    var jackpot = rlJackpotSet.indexOf(i) >= 0;
+    var jackpot = rlIsJackpot(slot);
     if (rw.win) {
       var lp1 = rlPolar(cx, cy, 104, mid), lp2 = rlPolar(cx, cy, 82, mid), lp3 = rlPolar(cx, cy, 66, mid);
       parts += '<text x="' + lp1[0].toFixed(1) + '" y="' + lp1[1].toFixed(1) + '" font-size="12" font-weight="600" fill="#FFFFFF" opacity="0.9" text-anchor="middle" font-family="inherit" transform="rotate(' + mid.toFixed(1) + ' ' + lp1[0].toFixed(1) + ' ' + lp1[1].toFixed(1) + ')">' + rw.label + '</text>';
@@ -14369,25 +14363,10 @@ function rlGrantReward(seg, qty) {
   return ppApplySlotGrant(seg, qty, '매일 행운 룰렛 당첨', 'lucky_spin');
 }
 var RL_POINT_SVG = '<div style="width:100%;height:100%;border-radius:50%;background:linear-gradient(135deg,#FFD740,#FFB300);display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:900;color:#7A5600;">P</div>';
-// JACKPOT = 원화 환산 가치가 가장 높은 슬롯(확률 기준이 아니다 — 2026-08-03 확정).
-// 운영자가 확률만 바꿔도 "제일 좋은 상" 표기가 엉뚱한 칸으로 옮겨가지 않는다.
-// 동점이면 함께 표기하되 최대 2칸까지.
-var PP_SLOT_UNIT_VALUE = { miss: 0, point: 0.1, event_ticket: 40, bronze_ticket: 100, silver_ticket: 1000, gold_ticket: 2000 };
-function ppSlotValue(slot) {
-  if (!slot || slot.type === 'miss') return 0;
-  return (Number(slot.qty) || 0) * (PP_SLOT_UNIT_VALUE[slot.type] || 0);
-}
-function ppJackpotIdx(slots) {
-  if (!Array.isArray(slots)) return [];
-  var best = 0;
-  slots.forEach(function(s) { best = Math.max(best, ppSlotValue(s)); });
-  if (best <= 0) return [];
-  var idx = [];
-  slots.forEach(function(s, i) { if (ppSlotValue(s) === best) idx.push(i); });
-  return idx.slice(0, 2);
-}
+// 잭팟(희귀 보상) 강조 대상 — 확률 1% 미만 슬롯 또는 등급 티켓(실버·골드)
 function rlIsJackpot(seg) {
-  return ppJackpotIdx(RL_ACTIVE_WHEEL).indexOf(RL_ACTIVE_WHEEL.indexOf(seg)) >= 0;
+  if (seg.type === 'silver_ticket' || seg.type === 'gold_ticket') return true;
+  return (Number(seg.prob) || 0) > 0 && (Number(seg.prob) || 0) < 1;
 }
 var RL_POINT_ICO_ROW = '<svg width="60" height="60" viewBox="0 0 64 64" style="flex-shrink:0;"><defs><linearGradient id="pcoin_ms" x1="0" y1="0" x2="0.35" y2="1"><stop offset="49.9%" stop-color="#FFE066"/><stop offset="50%" stop-color="#F0AE00"/></linearGradient><linearGradient id="pcoin_ms_face" x1="0" y1="0" x2="0.35" y2="1"><stop offset="49.9%" stop-color="#FFDA3D"/><stop offset="50%" stop-color="#FFC400"/></linearGradient></defs><ellipse cx="32" cy="57" rx="17" ry="3" fill="#E6A800" opacity="0.16"/><circle cx="32" cy="30" r="27" fill="url(#pcoin_ms)"/><circle cx="32" cy="30" r="21.5" fill="url(#pcoin_ms_face)"/><text x="32" y="40.5" text-anchor="middle" font-family="inherit" font-size="30" font-weight="800" fill="#FFE477" stroke="#E0A600" stroke-width="1.2" paint-order="stroke" stroke-linejoin="round">P</text></svg>';
 var RL_MISS_ICO_ROW = "<svg width=\"64\" height=\"64\" viewBox=\"96 96 320 320\" style=\"flex-shrink:0;\"><path d=\"M306.6,106.8l-49.5,49.5,2.4,2.4c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-2.4,-2.4-138.6,138.6c-3.7,3.7-3.7,9.6,0,13.3l75.5,75.5c3.7,3.7,9.6,3.7,13.3,0l138.6-138.6-2.3-2.3c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l2.3,2.3,49.5-49.5c3.7-3.7,3.7,-9.6,0-13.3l-75.5-75.5c-3.7-3.7-9.6-3.7-13.3,0ZM335.6,234.8c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM322.9,222.1c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4,-1.4,3.5-1.4,4.9,0l4.7,4.7ZM310.2,209.4c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7,-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM297.6,196.7c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM284.9,184.1c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM272.2,171.4c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4,-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7Z\" fill=\"#C4BED0\"></path><path d=\"M316.2,155.8l12.1,6.2c.8.4,1.8.3,2.4-.4l9.6-9.6c1.4-1.4,3.8-.2,3.5,1.8l-2.1,13.5c-.1.9.3,1.8,1.1,2.2l12.1,6.2c1.8.9,1.4,3.6-.6,3.9l-13.5,2.1c-.9.1-1.6.8-1.7,1.7l-2.1,13.5c-.3,2-3,2.4-3.9.6l-6.2-12.1c-.4-.8-1.3-1.3-2.2-1.1l-13.5,2.1c-2,.3-3.2-2.1-1.8-3.5l9.6-9.6c.6-.6.8,-1.6.4-2.4l-6.2-12.1c-.9-1.8,1-3.7,2.8-2.8Z\" fill=\"rgba(255,255,255,0.95)\"></path><path d=\"M180.7,298.9l-5.2,5.2,27.4,27.4-4.7,4.7-27.4-27.4-5.2,5.2-4.2-4.2,15.1-15.1,4.2,4.2ZM215.3,319.1l-4.7,4.7-31.6-31.6,4.7-4.7,31.6,31.6ZM231.9,296.8c1.9,1.9,1.9,3.9,0,5.8l-9.9,9.9c-1.9,1.9-3.8,1.8-5.7,0l-25.8-25.8c-1.9-1.9-2-3.8-.1-5.7l9.9-9.9c1.9-1.9,3.9-1.9,5.8,0l7.4,7.4-4.7,4.7-6.2-6.2-6.1,6.1,23.5,23.5,6.1-6.1-6.6-6.6,4.7-4.7,7.8,7.8ZM254.4,280l-5.2,5.2-20.1-8.1,14.1,14.1-4.7,4.7-31.6-31.6,4.7-4.7,13.4,13.4-8.1-18.6,5.2-5.2.2.2,8.6,21.4,23.6,9.2ZM269.5,265l-13.1,13.1-31.6-31.6,13-13,4.2,4.2-8.3,8.3,9.2,9.2,7.1-7.1,4.1,4.1-7.1,7.1,9.9,9.9,8.4,-8.4,4.2,4.2ZM259,220.6l-5.2,5.2,27.4,27.4-4.7,4.7-27.4-27.4-5.2,5.2-4.2-4.2,15.1-15.1,4.2,4.2Z\" fill=\"rgba(255,255,255,0.95)\"></path></svg><div style=\"text-align:left;\"><div style=\"font-size:16px;font-weight:800;color:#1A1130;\">보상 없음</div><div style=\"font-size:12px;font-weight:500;color:#5A5370;margin-top:2px;\">다음 기회에!</div></div>";
@@ -14526,7 +14505,7 @@ function bindFortuneRoulette() {
       rlHideResult();
 
       // 시안 원본 스핀: transform 4.5s cubic-bezier(0.15,0.68,0.1,1) · 6바퀴 + 칸 내 미세 편차
-      // (시안은 jitter ±15도 고정 = 6칸(60도) 기준. 슬롯 6개 고정이므로 seg/4 = ±15도로 같다)
+      // (시안은 jitter ±15도 고정 = 6칸(60도) 기준. 데모는 칸 수가 CMS 가변이라 seg/4로 환산 — 6칸일 때 ±15도로 동일)
       // idx 슬라이스 중심이 상단 포인터(0도)에 오도록 회전
       var targetMod = ((360 - (idx * seg + seg / 2)) % 360 + 360) % 360;
       var current = ((_rlTotalRot % 360) + 360) % 360;
@@ -14560,7 +14539,7 @@ var JP_DEFAULT_SLOTS = [
   { type:'point',         qty:100,  prob:50   },
   { type:'miss',          qty:0,    prob:31.6 }
 ];
-var JP_DEFAULT_LIMITS = { daily_spin_cap: 10, require_confirmed_purchase: true, event_ticket_daily_cap: 5, event_ticket_monthly_cap: 30 };
+var JP_DEFAULT_LIMITS = { daily_spin_cap: 10, require_confirmed_purchase: true, event_ticket_monthly_cap: 30 };
 var JP_ACTIVE_SLOTS = JP_DEFAULT_SLOTS;
 var JP_ACTIVE_LIMITS = JP_DEFAULT_LIMITS;
 var JP_SPIN_SEC = 4.5;              // 시안 원본 spinDurationSec 기본값
@@ -14602,7 +14581,7 @@ function jpWheelTicketIcon(y, fill, ink) {
     + '<path d="' + PP_TICKET_PATH_TEXT + '" fill="' + ink + '"></path></g>';
 }
 /* 시안 원본은 슬롯별 확률 텍스트의 불투명도가 조금씩 다르다(등급이 높을수록 진하게).
-   확정 6칸 구성이 시안과 1:1로 같아지도록 타입별 값을 그대로 표로 둔다. */
+   가변 슬롯에서도 확정 6칸 구성이 시안과 1:1로 같아지도록 타입별 값을 그대로 표로 둔다. */
 var JP_PROB_OPACITY = { gold_ticket:'0.45', silver_ticket:'0.55', bronze_ticket:'0.5', miss:'0.4' };
 function jpBuildWheel() {
   var svg = document.getElementById('jp-wheel');
@@ -14611,7 +14590,6 @@ function jpBuildWheel() {
   /* 시안 원본 SVG는 6칸 path를 먼저 전부 그린 뒤 라벨 그룹 6개를 그린다 —
      라벨이 이웃 칸 path에 덮이지 않게 하는 순서라 그대로 따른다. */
   var paths = JP_DEFS, labels = '', pointN = 0;
-  var jpJackpotSet = ppJackpotIdx(JP_ACTIVE_SLOTS);
   /* 포인트가 여러 칸이면 최고액 칸을 시안 1,000P 칸과 같은 톤(연보라 라벨)으로 강조한다 */
   var maxPoint = JP_ACTIVE_SLOTS.reduce(function(m, s) {
     return (s.type === 'point' && (s.qty || 0) > m) ? (s.qty || 0) : m;
@@ -14630,12 +14608,10 @@ function jpBuildWheel() {
     var ink = JP_SEG_INK[slot.type] || '#FFFFFF';
     var probOp = JP_PROB_OPACITY[slot.type];
     var g = '<g transform="rotate(' + mid.toFixed(1) + ' 150 150)" text-anchor="middle" font-family="inherit">';
-    var isJp = jpJackpotSet.indexOf(i) >= 0;
-    if (isJp && PP_TICKET_SLOT_GRADE[slot.type]) {
-      // JACKPOT 칸 = 가치가 가장 높은 슬롯(확률 기준 아님). 시안 원본의 골드 칸 배치를 그대로 쓴다.
-      var tierJ = PP_TIER_STYLE[PP_TICKET_SLOT_GRADE[slot.type]];
-      g += '<text x="150" y="70" font-size="9" font-weight="800" fill="' + (slot.type === 'gold_ticket' ? '#7A5200' : '#FFFFFF') + '" letter-spacing="1.6">JACKPOT</text>';
-      g += jpWheelTicketIcon(40, slot.type === 'gold_ticket' ? '#B58400' : (slot.type === 'silver_ticket' ? '#6F6F6F' : '#7A4014'), slot.type === 'gold_ticket' ? '#FFF3D0' : '#FFFFFF');
+    if (slot.type === 'gold_ticket') {
+      // 시안 원본: JACKPOT 라벨 + 티켓 아트 + 등급명 + 확률
+      g += '<text x="150" y="70" font-size="9" font-weight="800" fill="#7A5200" letter-spacing="1.6">JACKPOT</text>';
+      g += jpWheelTicketIcon(40, '#B58400', '#FFF3D0');
       g += '<text x="150" y="90" font-size="15" font-weight="800" fill="' + ink + '">' + PP_SLOT_META[slot.type].label + '</text>';
     } else if (PP_TICKET_SLOT_GRADE[slot.type]) {
       var tier = PP_TIER_STYLE[PP_TICKET_SLOT_GRADE[slot.type]];
@@ -14720,7 +14696,7 @@ function jpShowResult(slot, grantedQty) {
       + '<div style="font-size:10px; font-weight:800; letter-spacing:1.6px; color:' + t.sub + ';">' + t.badge + '</div>'
       + '<div style="font-size:23px; font-weight:800; color:' + t.text + '; line-height:1.15; margin-top:2px;">' + t.name + (grantedQty > 1 ? ' ' + grantedQty + '장' : '') + '</div>'
       + '<div style="font-size:11px; font-weight:600; color:' + t.sub + '; margin-top:2px;">' + t.worth + '</div></div>';
-    title.textContent = ppJackpotIdx(JP_ACTIVE_SLOTS).indexOf(JP_ACTIVE_SLOTS.indexOf(slot)) >= 0 ? '잭팟 당첨!' : '축하해요!';
+    title.textContent = grade === 'gold' ? '잭팟 당첨!' : '축하해요!';
     desc.textContent = '마이페이지 > 내 티켓에 보관됐어요';
   } else if (slot.type === 'point' && grantedQty > 0) {
     ico.style.display = 'flex';
