@@ -5643,6 +5643,24 @@
     font-size: 11.5px;
     opacity: 0.85;
   }
+  .my-uid-row {
+    display: flex; align-items: center; gap: 6px;
+    margin-bottom: 5px;
+  }
+  .my-uid-label {
+    font-size: 10px; font-weight: 700; opacity: 0.65;
+  }
+  .my-uid-value {
+    font-size: 11.5px; font-weight: 400; opacity: 0.75;
+    letter-spacing: .02em;
+  }
+  .my-uid-copy {
+    flex-shrink: 0; border: 0; cursor: pointer;
+    background: rgba(255,255,255,0.18); color: #fff;
+    font-family: inherit; font-size: 10px; font-weight: 700;
+    padding: 3px 8px; border-radius: 8px;
+  }
+  .my-uid-copy:active { background: rgba(255,255,255,0.3); }
 
   /* 인사이트 카드 (3분할) */
   .insight-row {
@@ -11002,6 +11020,11 @@ window.PP_FEATURES = {
               <div class="my-avatar">🐶</div>
               <div class="my-info">
                 <div class="my-nickname">유저</div>
+                <div class="my-uid-row">
+                  <span class="my-uid-label">ID</span>
+                  <span class="my-uid-value" id="my-uid-value">――――――――</span>
+                  <button class="my-uid-copy" id="my-uid-copy-btn" data-ip-bound="1">복사</button>
+                </div>
                 <div class="my-meta">가입 1일째</div>
               </div>
             </div>
@@ -12301,6 +12324,11 @@ window.PP_FEATURES = {
           <div style="text-align:center;">
             <div style="font-size:13px;color:var(--text3);margin-bottom:6px;">현재 닉네임</div>
             <div style="font-size:22px;font-weight:800;color:var(--text1);" id="nick-big">유저</div>
+            <div style="display:flex;align-items:center;justify-content:center;gap:6px;margin-top:6px;">
+              <span style="font-size:10px;font-weight:700;color:var(--text3);">ID</span>
+              <span style="font-size:11.5px;font-weight:400;color:var(--text3);letter-spacing:.02em;" id="nick-uid-value">――――――――</span>
+              <button id="nick-uid-copy-btn" data-ip-bound="1" style="flex-shrink:0;border:0;cursor:pointer;background:#F1EDFF;color:#6247E8;font-family:inherit;font-size:10px;font-weight:700;padding:3px 8px;border-radius:8px;">복사</button>
+            </div>
           </div>
           <div>
             <div style="font-size:12px;font-weight:600;color:var(--text2);margin-bottom:8px;">새 닉네임</div>
@@ -17245,6 +17273,7 @@ function onScreenShown(id) {
   if (id === 'pw-30-nick') {
     var nick = (PP.user && PP.user.nickname) || '유저';
     var nb = document.getElementById('nick-big'); if (nb) nb.textContent = nick;
+    var nuv = document.getElementById('nick-uid-value'); if (nuv) nuv.textContent = ppShortUid(PP.uid);
     var ni = document.getElementById('nick-input'); if (ni) ni.value = nick;
     var ns = document.getElementById('nick-save'); if (ns) { ns.dataset.orig = nick; ns.disabled = true; ns.style.background = 'var(--text4)'; ns.style.cursor = 'not-allowed'; }
     var cnt = document.getElementById('nick-cnt'); if (cnt) cnt.textContent = nick.length + '/10';
@@ -17587,6 +17616,9 @@ function refreshMyData() {
   if (nickEl) nickEl.textContent = nick;
   var nv = document.getElementById('my-nick-value'); if (nv) nv.textContent = nick;
   var nb = document.getElementById('nick-big'); if (nb) nb.textContent = nick;
+  var uidShort = ppShortUid(PP.uid);
+  var muv = document.getElementById('my-uid-value'); if (muv) muv.textContent = uidShort;
+  var nuv = document.getElementById('nick-uid-value'); if (nuv) nuv.textContent = uidShort;
   var metaEl = document.querySelector('#pw-30 .my-meta');
   if (metaEl && PP.user.created_at) {
     var created;
@@ -18697,6 +18729,27 @@ function ppCopyText(text) {
 }
 function ppInviteLink(code) {
   return window.location.origin + window.location.pathname + '?invite=' + code;
+}
+
+/* ── 회원 식별 ID(UID) 표시 ──
+   닉네임 중복 허용 정책(2026-08-03)에 따라 회원 구분용으로 노출.
+   화면엔 앞 8자만 보여주고, 복사 버튼은 CS 조회용으로 전체 UID를 복사한다. */
+function ppShortUid(uid) {
+  return uid ? uid.slice(0, 8) + '…' : '――――――――';
+}
+function bindUidCopyBtn(id) {
+  var btn = document.getElementById(id);
+  if (!btn || btn.dataset.ppBound) return;
+  btn.dataset.ppBound = '1';
+  btn.addEventListener('click', function (e) {
+    e.stopPropagation();
+    if (!PP.uid) return;
+    ppCopyText(PP.uid).then(function () { showToast('ID가 복사됐어요'); }).catch(function () { showToast('복사에 실패했어요'); });
+  });
+}
+function bindUidCopyButtons() {
+  bindUidCopyBtn('my-uid-copy-btn');
+  bindUidCopyBtn('nick-uid-copy-btn');
 }
 
 /* ── 초대코드 등록(피초대자) ──
@@ -20212,6 +20265,7 @@ document.addEventListener('DOMContentLoaded', function() {
   hookSelectMall();
   bindNickname();
   bindNickSave();
+  bindUidCopyButtons();
   bindExchangeBtn();
   bindGradeSwapScreen();
   bindPointTicketExchange();
