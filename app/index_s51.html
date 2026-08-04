@@ -5643,6 +5643,24 @@
     font-size: 11.5px;
     opacity: 0.85;
   }
+  .my-uid-row {
+    display: flex; align-items: center; gap: 6px;
+    margin-bottom: 5px;
+  }
+  .my-uid-label {
+    font-size: 10px; font-weight: 700; opacity: 0.65;
+  }
+  .my-uid-value {
+    font-size: 11.5px; font-weight: 400; opacity: 0.75;
+    letter-spacing: .02em;
+  }
+  .my-uid-copy {
+    flex-shrink: 0; border: 0; cursor: pointer;
+    background: rgba(255,255,255,0.18); color: #fff;
+    font-family: inherit; font-size: 10px; font-weight: 700;
+    padding: 3px 8px; border-radius: 8px;
+  }
+  .my-uid-copy:active { background: rgba(255,255,255,0.3); }
 
   /* 인사이트 카드 (3분할) */
   .insight-row {
@@ -10175,7 +10193,7 @@ window.PP_FEATURES = {
           <div class="my-ticket-card">
             <div class="mtc-label">
               <span class="mtc-label-text"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--main)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/><path d="M13 5v2"/><path d="M13 17v2"/><path d="M13 11v2"/></svg> 내 티켓</span>
-              <button class="mtc-label-link grade-link" data-jump="pw-21">내 티켓 &amp; 포인트 자세히 보기 ›</button>
+              <button class="mtc-label-link grade-link" data-jump="pw-21">내 적립 티켓 자세히 보기 ›</button>
             </div>
 
             <!-- 랜덤 티켓 (대기 중) — 카드 스타일 -->
@@ -11002,6 +11020,11 @@ window.PP_FEATURES = {
               <div class="my-avatar">🐶</div>
               <div class="my-info">
                 <div class="my-nickname">유저</div>
+                <div class="my-uid-row">
+                  <span class="my-uid-label">ID</span>
+                  <span class="my-uid-value" id="my-uid-value">――――――――</span>
+                  <button class="my-uid-copy" id="my-uid-copy-btn" data-ip-bound="1">복사</button>
+                </div>
                 <div class="my-meta">가입 1일째</div>
               </div>
             </div>
@@ -11044,7 +11067,7 @@ window.PP_FEATURES = {
             <div class="my-row" data-jump="21">
               <div class="my-row-ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v2z"/><line x1="13" y1="5" x2="13" y2="19" stroke-dasharray="3 3"/></svg></div>
               <div class="my-row-body">
-                <div class="my-row-name">내 티켓 &amp; 포인트</div>
+                <div class="my-row-name">내 티켓 · 기프티콘</div>
               </div>
               <div class="my-row-right">›</div>
             </div>
@@ -12301,6 +12324,11 @@ window.PP_FEATURES = {
           <div style="text-align:center;">
             <div style="font-size:13px;color:var(--text3);margin-bottom:6px;">현재 닉네임</div>
             <div style="font-size:22px;font-weight:800;color:var(--text1);" id="nick-big">유저</div>
+            <div style="display:flex;align-items:center;justify-content:center;gap:6px;margin-top:6px;">
+              <span style="font-size:10px;font-weight:700;color:var(--text3);">ID</span>
+              <span style="font-size:11.5px;font-weight:400;color:var(--text3);letter-spacing:.02em;" id="nick-uid-value">――――――――</span>
+              <button id="nick-uid-copy-btn" data-ip-bound="1" style="flex-shrink:0;border:0;cursor:pointer;background:#F1EDFF;color:#6247E8;font-family:inherit;font-size:10px;font-weight:700;padding:3px 8px;border-radius:8px;">복사</button>
+            </div>
           </div>
           <div>
             <div style="font-size:12px;font-weight:600;color:var(--text2);margin-bottom:8px;">새 닉네임</div>
@@ -12742,7 +12770,7 @@ window.PP_FEATURES = {
           <button class="back-btn">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M15 5L8 12L15 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </button>
-          <div class="gd-top-title"><span class="i18n"><span class="ko">내 티켓 &amp; 포인트</span><span class="vi">Vé &amp; điểm của tôi</span></span></div>
+          <div class="gd-top-title">내 적립 티켓</div>
         </div>
 
         <div class="gd-scroll">
@@ -12759,21 +12787,6 @@ window.PP_FEATURES = {
             <div id="gd-holdings" style="display:flex;flex-direction:column;gap:6px;padding:0 2px;"><!-- PP: 실데이터 렌더 (등급별 보유) --></div>
             <button type="button" onclick="var p=this.nextElementSibling;p.style.display=(p.style.display==='block')?'none':'block';" style="margin-top:8px;width:100%;background:none;border:none;font-size:11px;font-weight:700;color:var(--main);cursor:pointer;text-align:left;padding:2px;">만료일 자세히 보기 ▾</button>
             <div id="gd-expiry-accordion" style="display:none;margin-top:6px;background:#fff;border:1px solid #EFEAF7;border-radius:8px;overflow:hidden;"><!-- PP: 실데이터 렌더 --></div>
-          </div>
-
-          <!-- 보유 포인트 — 티켓 보유 현황과 나란히 -->
-          <div class="gd-section">
-            <div class="gd-section-t">보유 포인트</div>
-            <div id="pt21-balance-row" style="display:flex;align-items:center;justify-content:space-between;background:#F8F7FC;border:1px solid #E4DFF0;border-radius:8px;padding:8px 10px;">
-              <div style="font-size:11px;font-weight:700;color:#5A5370;">사용 가능 포인트</div>
-              <div id="pt21-balance" style="font-size:13px;font-weight:800;color:var(--text1);">0P</div>
-            </div>
-          </div>
-
-          <!-- 만료 예정 포인트 + 만료일 상세 — 티켓 만료일 자세히 보기와 같은 패턴 -->
-          <div class="gd-section">
-            <div class="gd-section-t">만료 예정 포인트</div>
-            <div id="pt-expiring-21" style="background:#FFF8EE;border:1px solid #FFE2B8;border-radius:12px;padding:11px 13px;display:none;"><!-- PP: 실데이터 렌더 --></div>
           </div>
 
           <!-- 등급 간 교환 — 설명·교환비 걷어내고 버튼+안내 아이콘만 남김 -->
@@ -13141,7 +13154,7 @@ const SCREEN_MAP = {
   'pw-16':         { id:'16',           name:'친구초대' },
   'pw-17':         { id:'17',           name:'연속구매 미션' },
   'pw-20':          { id:'20',             name:'혜택 메인 — 티켓 시스템' },
-  'pw-21':          { id:'21',             name:'내 티켓 & 포인트' },
+  'pw-21':          { id:'21',             name:'적립 티켓 통합 상세' },
   'pw-22':          { id:'22',             name:'티켓 & 포인트 교환소' },
   'pw-23':          { id:'23',             name:'적립 조건 안내' },
   'pw-24':          { id:'24',             name:'티켓 교환소 (카탈로그)' },
@@ -15219,7 +15232,7 @@ function bindBenefitScreen() {
     el.addEventListener('click', function(e){ e.stopPropagation(); showScreen(target); });
   });
 
-  // "내 티켓 & 포인트 자세히 보기" → 05c
+  // "내 적립 티켓 자세히 보기" → 05c
   screen.querySelectorAll('.mtc-label-link, .grade-link').forEach(el => {
     if (el.dataset.ipBound) return;
     el.dataset.ipBound = '1';
@@ -16390,12 +16403,7 @@ Object.assign(KO2VI, {
     "연속 2일째 · 3일 더 구경하면 보상 지급": "Liên tục ngày thứ 2 · dạo thêm 3 ngày sẽ được thưởng",
     "연속 3일째 · 2일 더 구경하면 보상 지급": "Liên tục ngày thứ 3 · dạo thêm 2 ngày sẽ được thưởng",
     "연속 4일째 · 1일 더 구경하면 보상 지급": "Liên tục ngày thứ 4 · dạo thêm 1 ngày sẽ được thưởng",
-    "연속 5일째 · 0일 더 구경하면 보상 지급": "Liên tục ngày thứ 5 · dạo thêm 0 ngày sẽ được thưởng",
-    /* pw-21 개명(내 적립 티켓 → 내 티켓 & 포인트) 관련 진입점·섹션 라벨 */
-    "내 티켓 & 포인트 자세히 보기 ›": "Xem chi tiết vé & điểm ›",
-    "내 티켓 & 포인트": "Vé & điểm của tôi",
-    "보유 포인트": "Điểm hiện có",
-    "만료일 자세히 보기 ›": "Xem chi tiết ngày hết hạn ›"
+    "연속 5일째 · 0일 더 구경하면 보상 지급": "Liên tục ngày thứ 5 · dạo thêm 0 ngày sẽ được thưởng"
   });
   var IPLANG='ko';
   var KO_RE=/[\uac00-\ud7a3]/;
@@ -17263,7 +17271,6 @@ function onScreenShown(id) {
   if (id === 'pw-30-invite') { bindInviteCodeEntryScreen(); renderInviteCodeEntryScreen(); }
   if (id === 'pw-34') renderPurchaseHistory();
   if (id === 'pw-21' || id === 'phone19') renderTicketDetail();
-  if (id === 'pw-21') renderPointPanel();
   if (id === 'pw-24') renderGifticonHistory();
   if (id === 'pw-30-cs') renderInquiries();
   if (id === 'pw-22') { refreshHomeData(); renderGradeSwapScreen(); renderPointTicketExchange(); }
@@ -19323,10 +19330,9 @@ function ppGetPointPolicyExpiry() {
 }
 function renderPointExpiry(ptx, expiry) {
   var box = document.getElementById('pt-expiring');
-  var box21 = document.getElementById('pt-expiring-21');
-  if (!box && !box21) return;
+  if (!box) return;
   var days = ppPointExpiryDays(expiry);
-  if (days == null) { if (box) box.style.display = 'none'; if (box21) box21.style.display = 'none'; return; }
+  if (days == null) { box.style.display = 'none'; return; }
   var earns = ptx.filter(function (p) { return (p.amount != null ? p.amount : (p.qty || 0)) > 0; })
     .map(function (p) { return { amt: p.amount != null ? p.amount : (p.qty || 0), d: ppDate(p.created_at) }; })
     .sort(function (a, b) { return a.d - b.d; });
@@ -19343,7 +19349,8 @@ function renderPointExpiry(ptx, expiry) {
     var expiresAt = new Date(e.d.getTime() + days * 86400000);
     return { amt: e.amt, expiresAt: expiresAt, daysLeft: Math.ceil((expiresAt - now) / 86400000) };
   }).filter(function (r) { return r.daysLeft > 0; }).sort(function (a, b) { return a.expiresAt - b.expiresAt; });
-  if (!rows.length) { if (box) box.style.display = 'none'; if (box21) box21.style.display = 'none'; return; }
+  if (!rows.length) { box.style.display = 'none'; return; }
+  box.style.display = 'block';
 
   /* 만료일별로 묶어서(같은 날짜끼리 합산) 임박순 정렬 — 등급 티켓 만료일 아코디언과 동일 패턴 */
   var groups = {};
@@ -19359,46 +19366,31 @@ function renderPointExpiry(ptx, expiry) {
   var nearest = groupList[0];
   var nearWarn = nearest.daysLeft <= 30;
 
-  var summaryHtml = '<div style="display:flex;justify-content:space-between;align-items:center;">'
+  var acc = groupList.map(function (g) {
+    var near = g.daysLeft <= 30;
+    return '<div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;padding:8px 10px;border-top:1px solid #F6E9CE;' + (near ? 'background:#FFF3D6;' : '') + '">'
+      + '<span style="color:' + (near ? '#9A6A1E' : 'var(--text2)') + ';font-weight:' + (near ? '700' : '400') + ';">' + ppFmt(g.expiresAt) + ' · ' + g.amt.toLocaleString('ko-KR') + 'P</span>'
+      + (near ? '<span style="font-size:9.5px;font-weight:700;color:#9A6A1E;background:#fff;border:1px solid #FFE2B8;border-radius:4px;padding:2px 6px;flex-shrink:0;">D-' + g.daysLeft + '</span>' : '')
+      + '</div>';
+  }).join('');
+
+  box.innerHTML = '<div style="display:flex;justify-content:space-between;align-items:center;">'
     + '<span style="font-size:15px;font-weight:800;color:#9A6A1E;">' + total.toLocaleString('ko-KR') + 'P</span>'
     + (nearWarn ? '<span style="font-size:9.5px;font-weight:700;color:#DC2626;background:#FEF2F2;border:1px solid #FECACA;border-radius:4px;padding:2px 6px;flex-shrink:0;">⚠ D-' + nearest.daysLeft + ' 만료</span>' : '')
-    + '</div>';
-
-  /* pw-20 혜택 탭 — 요약만 보여주고 상세는 pw-21(내 티켓 & 포인트)로 연결. 티켓 "내 적립 티켓 자세히 보기 ›" 패턴과 동일 */
-  if (box) {
-    box.style.display = 'block';
-    box.innerHTML = summaryHtml
-      + '<button type="button" onclick="showScreen(\'pw-21\')" style="margin-top:8px;width:100%;background:none;border:none;font-size:11px;font-weight:700;color:var(--main);cursor:pointer;text-align:left;padding:2px;">만료일 자세히 보기 ›</button>';
-  }
-
-  /* pw-21 — 티켓 만료일 자세히 보기와 같은 패턴(요약+토글+아코디언) */
-  if (box21) {
-    var acc = groupList.map(function (g) {
-      var near = g.daysLeft <= 30;
-      return '<div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;padding:8px 10px;border-top:1px solid #F6E9CE;' + (near ? 'background:#FFF3D6;' : '') + '">'
-        + '<span style="color:' + (near ? '#9A6A1E' : 'var(--text2)') + ';font-weight:' + (near ? '700' : '400') + ';">' + ppFmt(g.expiresAt) + ' · ' + g.amt.toLocaleString('ko-KR') + 'P</span>'
-        + (near ? '<span style="font-size:9.5px;font-weight:700;color:#9A6A1E;background:#fff;border:1px solid #FFE2B8;border-radius:4px;padding:2px 6px;flex-shrink:0;">D-' + g.daysLeft + '</span>' : '')
-        + '</div>';
-    }).join('');
-    box21.style.display = 'block';
-    box21.innerHTML = summaryHtml
-      + '<button type="button" onclick="var p=this.nextElementSibling;var open=(p.style.display===\'block\');p.style.display=open?\'none\':\'block\';this.textContent=open?\'만료일 자세히 보기 ▾\':\'만료일 자세히 보기 ▴\';" style="margin-top:8px;width:100%;background:none;border:none;font-size:11px;font-weight:700;color:var(--main);cursor:pointer;text-align:left;padding:2px;">만료일 자세히 보기 ▾</button>'
-      + '<div style="display:none;margin-top:6px;background:#fff;border:1px solid #FFE2B8;border-radius:8px;overflow:hidden;">' + acc + '</div>'
-      + '<div style="font-size:10.5px;color:var(--text3);margin-top:7px;line-height:1.5;">포인트 유효기간 ' + (days === 365 ? '1년' : days + '일') + '(적립일 기준 · FIFO 소멸)</div>';
-  }
+    + '</div>'
+    + '<button type="button" onclick="var p=this.nextElementSibling;var open=(p.style.display===\'block\');p.style.display=open?\'none\':\'block\';this.textContent=open?\'만료일 자세히 보기 ▾\':\'만료일 자세히 보기 ▴\';" style="margin-top:8px;width:100%;background:none;border:none;font-size:11px;font-weight:700;color:var(--main);cursor:pointer;text-align:left;padding:2px;">만료일 자세히 보기 ▾</button>'
+    + '<div style="display:none;margin-top:6px;background:#fff;border:1px solid #FFE2B8;border-radius:8px;overflow:hidden;">' + acc + '</div>'
+    + '<div style="font-size:10.5px;color:var(--text3);margin-top:7px;line-height:1.5;">포인트 유효기간 ' + (days === 365 ? '1년' : days + '일') + '(적립일 기준 · FIFO 소멸)</div>';
 }
 function renderPointPanel() {
   if (!PP.uid) return;
-  var balText = (PP.points || 0).toLocaleString('ko-KR');
   var balEl = document.getElementById('pt-balance');
-  if (balEl) balEl.textContent = balText;
-  var bal21El = document.getElementById('pt21-balance');
-  if (bal21El) bal21El.textContent = balText + 'P';
+  if (balEl) balEl.textContent = (PP.points || 0).toLocaleString('ko-KR');
   var rec = document.getElementById('pt-recent');
+  if (!rec) return;
   ppQuery('point_transactions', 'user_id', PP.uid).then(function (ptx) {
     ptx = ptx.filter(function (p) { return ppDate(p.created_at); }).sort(function (a, b) { return ppDate(b.created_at) - ppDate(a.created_at); });
     ppGetPointPolicyExpiry().then(function (expiry) { renderPointExpiry(ptx, expiry); });
-    if (!rec) return;
     if (!ptx.length) {
       rec.innerHTML = '<div style="font-size:12px;color:var(--text3);padding:14px 2px;text-align:center;">아직 포인트 적립·사용 내역이 없어요</div>';
       return;
