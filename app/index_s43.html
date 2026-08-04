@@ -7669,7 +7669,6 @@ body.interactive-mode #ip-nav { display: block; }
 .ip-nav-sep { height: 1px; background: #F0F0F0; margin: 4px 6px; }
 .ip-nav-section { }
 .dead-screen{opacity:.5;}
-.pp-clickable{cursor:pointer;}
 
 .ip-nav-grouplbl {
   cursor: pointer;
@@ -8998,11 +8997,11 @@ window.PP_FEATURES = {
     </div>
   </div>
 
-  <!-- 03b-A 기존 계정 발견 (2026-08-04: 자동 합산 정책 폐지 — 이전/현재 데이터 비교 후 사용자 선택으로 변경) -->
+  <!-- 03b-A 기존 계정 발견 -->
   <div class="phone-wrap" id="pw-02-K-existing" data-screen="03b-A">
     <div class="phone-meta">
-      <div class="pm-row"><span class="pm-key">진입</span><span class="pm-val">연동 이력이 있는 카카오 계정으로 연동 시 — 이전 카카오 계정과 현재 기기(닉네임) 계정 양쪽 보유 현황을 보여주고 선택받는다. 어떤 경우에도 자동 합산하지 않는다</span></div>
-      <div class="pm-row"><span class="pm-key">다음</span><span class="pm-val"><code>04</code> 홈 ("연동하기" 탭)</span></div>
+      <div class="pm-row"><span class="pm-key">진입</span><span class="pm-val">다른 기기 또는 장기 미사용 후 카카오 직접 재로그인 → 기존 계정 정보 (티켓 잔량) 확인 단계</span></div>
+      <div class="pm-row"><span class="pm-key">다음</span><span class="pm-val"><code>04</code> 홈 (사용자가 "시작하기" 탭)</span></div>
     </div>
     <div class="phone">
       <div class="login-screen">
@@ -9013,71 +9012,40 @@ window.PP_FEATURES = {
         <div class="login-content">
           <div class="login-hero" style="padding-bottom:8px;">
             <div class="login-title" style="font-size:22px;"><span class="lt-bold">이미 사용하신<br>계정이 있어요</span></div>
-            <div class="login-sub" style="margin-top:6px;color:rgba(255,255,255,0.7);font-size:13px;"><span class="i18n"><span class="ko">두 계정에 각각 적립이 있어요</span><span class="vi">Cả hai tài khoản đều có tích lũy</span></span></div>
+            <div class="login-sub" style="margin-top:6px;color:rgba(255,255,255,0.7);font-size:13px;">카카오 계정에 연결된 프라이스픽 정보를 불러왔어요</div>
           </div>
-          <div style="margin:0 20px 10px;background:white;border-radius:16px;padding:16px;box-shadow:0 2px 12px rgba(132,94,238,0.1);">
-            <div style="font-size:11px;font-weight:700;color:var(--main);margin-bottom:10px;letter-spacing:0.3px;"><span class="i18n"><span class="ko">이전 카카오 계정</span><span class="vi">Tài khoản Kakao trước đây</span></span></div>
-            <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;">
-              <div style="width:44px;height:44px;background:var(--sub-3);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;">😊</div>
-              <div style="flex:1;">
-                <div style="font-size:15px;font-weight:800;color:var(--text1);letter-spacing:-0.3px;" class="my-nickname-alt">유저</div>
-                <div style="font-size:11px;color:var(--text3);margin-top:2px;">가입 2025.12.01</div>
-              </div>
-              <div style="text-align:right;">
-                <div style="font-size:10px;color:var(--text3);font-weight:600;">포인트</div>
-                <div style="font-size:15px;font-weight:800;color:var(--text1);">1,200P</div>
+          <div style="margin:0 20px 20px;background:white;border-radius:16px;padding:20px;box-shadow:0 2px 12px rgba(132,94,238,0.1);">
+            <div style="display:flex;align-items:center;gap:14px;margin-bottom:16px;">
+              <div style="width:52px;height:52px;background:var(--sub-3);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0;">😊</div>
+              <div>
+                <div style="font-size:17px;font-weight:800;color:var(--text1);letter-spacing:-0.5px;" class="my-nickname-alt">유저</div>
+                <div style="font-size:12px;color:var(--text3);margin-top:2px;">가입 2025.12.01</div>
               </div>
             </div>
-            <div style="font-size:10px;font-weight:700;color:var(--text3);margin-bottom:8px;letter-spacing:0.3px;">티켓 내역</div>
-            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;">
-              <div style="background:#FFF8EC;border-radius:10px;padding:10px;text-align:center;">
-                <div style="font-size:9.5px;color:#B45309;font-weight:600;margin-bottom:3px;">브론즈</div>
-                <div style="font-size:16px;font-weight:800;color:#92400E;">12장</div>
+            <div style="font-size:11px;font-weight:700;color:var(--text3);margin-bottom:10px;letter-spacing:0.3px;">티켓 내역</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">
+              <div style="background:#FFF8EC;border-radius:10px;padding:12px;text-align:center;">
+                <div style="font-size:10px;color:#B45309;font-weight:600;margin-bottom:4px;">브론즈</div>
+                <div style="font-size:18px;font-weight:800;color:#92400E;">12장</div>
               </div>
-              <div style="background:#F3F3F3;border-radius:10px;padding:10px;text-align:center;">
-                <div style="font-size:9.5px;color:#6B7280;font-weight:600;margin-bottom:3px;">실버</div>
-                <div style="font-size:16px;font-weight:800;color:#374151;">5장</div>
+              <div style="background:#F3F3F3;border-radius:10px;padding:12px;text-align:center;">
+                <div style="font-size:10px;color:#6B7280;font-weight:600;margin-bottom:4px;">실버</div>
+                <div style="font-size:18px;font-weight:800;color:#374151;">5장</div>
               </div>
-              <div style="background:#FFFBEB;border-radius:10px;padding:10px;text-align:center;">
-                <div style="font-size:9.5px;color:#92400E;font-weight:600;margin-bottom:3px;">골드</div>
-                <div style="font-size:16px;font-weight:800;color:#D97706;">1장</div>
+              <div style="background:#FFFBEB;border-radius:10px;padding:12px;text-align:center;">
+                <div style="font-size:10px;color:#92400E;font-weight:600;margin-bottom:4px;">골드</div>
+                <div style="font-size:18px;font-weight:800;color:#D97706;">1장</div>
               </div>
             </div>
           </div>
-          <div style="margin:0 20px 14px;background:var(--bg);border:1px solid var(--border);border-radius:16px;padding:16px;">
-            <div style="font-size:11px;font-weight:700;color:var(--text2);margin-bottom:10px;letter-spacing:0.3px;"><span class="i18n"><span class="ko">현재 이 기기 계정</span><span class="vi">Tài khoản trên thiết bị này</span></span></div>
-            <div style="display:flex;align-items:center;margin-bottom:14px;">
-              <div style="font-size:10px;color:var(--text3);font-weight:600;">포인트</div>
-              <div style="font-size:15px;font-weight:800;color:var(--text1);margin-left:8px;">350P</div>
-            </div>
-            <div style="font-size:10px;font-weight:700;color:var(--text3);margin-bottom:8px;letter-spacing:0.3px;">티켓 내역</div>
-            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;">
-              <div style="background:#FFF8EC;border-radius:10px;padding:10px;text-align:center;">
-                <div style="font-size:9.5px;color:#B45309;font-weight:600;margin-bottom:3px;">브론즈</div>
-                <div style="font-size:16px;font-weight:800;color:#92400E;">2장</div>
-              </div>
-              <div style="background:#F3F3F3;border-radius:10px;padding:10px;text-align:center;">
-                <div style="font-size:9.5px;color:#6B7280;font-weight:600;margin-bottom:3px;">실버</div>
-                <div style="font-size:16px;font-weight:800;color:#374151;">0장</div>
-              </div>
-              <div style="background:#FFFBEB;border-radius:10px;padding:10px;text-align:center;">
-                <div style="font-size:9.5px;color:#92400E;font-weight:600;margin-bottom:3px;">골드</div>
-                <div style="font-size:16px;font-weight:800;color:#D97706;">0장</div>
-              </div>
-            </div>
-          </div>
-          <div style="margin:0 20px 6px;display:flex;align-items:center;gap:8px;">
-            <input type="checkbox" id="kakao-use-prev-data" checked class="pp-clickable" style="width:18px;height:18px;accent-color:var(--main);flex-shrink:0;">
-            <label for="kakao-use-prev-data" class="pp-clickable" style="font-size:13.5px;font-weight:700;color:var(--text1);"><span class="i18n"><span class="ko">이전 데이터 사용</span><span class="vi">Dùng dữ liệu trước đây</span></span></label>
-          </div>
-          <div id="kakao-merge-notice" style="margin:0 20px 16px;"></div>
           <div class="login-buttons">
             <button class="login-btn" style="background:var(--main);color:white;font-size:15px;height:54px;">
-              연동하기
+              프라이스픽 시작하기
             </button>
           </div>
-          <div style="text-align:center;margin-top:12px;font-size:11px;color:var(--text3);">
-            <span data-jump="02-K-new" style="text-decoration:underline;font-weight:600;"><span class="i18n"><span class="ko">신규 카카오 계정으로 연동한 경우 보기</span><span class="vi">Xem trường hợp liên kết tài khoản Kakao mới</span></span></span>
+          <div style="text-align:center;margin-top:14px;font-size:12px;color:var(--text3);line-height:1.6;">
+            이 카카오 계정은 다른 프로필과 이미 연결되어 있어요.<br>
+            <span style="text-decoration:underline;color:var(--text2);font-weight:600;">새 계정으로 시작할게요</span>
           </div>
           <div class="login-terms" style="margin-top:16px;">
             계속 진행하면 <b>이용약관</b> 및 <b>개인정보처리방침</b>에<br>동의하는 것으로 간주됩니다.
@@ -9090,7 +9058,7 @@ window.PP_FEATURES = {
   <!-- 03b-B 신규 연결 완료 -->
   <div class="phone-wrap" id="pw-02-K-new" data-screen="03b-B">
     <div class="phone-meta">
-      <div class="pm-row"><span class="pm-key">진입</span><span class="pm-val">연동 이력 없는(신규) 카카오 계정으로 연동 — 현재 닉네임 계정 데이터를 그대로 유지, 합산·리셋 없음 (데모에서는 <code>02-K-existing</code> 하단 링크로 미리보기)</span></div>
+      <div class="pm-row"><span class="pm-key">진입</span><span class="pm-val"><code>03-conflict</code>에서 "기존 연결 해제 후 연동" 선택 → 기존 계정 카카오 연결 해제 + 현재 계정으로 신규 연결 완료</span></div>
       <div class="pm-row"><span class="pm-key">다음</span><span class="pm-val"><code>04</code> 홈</span></div>
     </div>
     <div class="phone">
@@ -9144,10 +9112,10 @@ window.PP_FEATURES = {
     </div>
   </div>
 
-  <!-- 03b-merge 계정 통합 완료 (v8 폐지 · pw-DEAD — 2026-08-04 정책 변경: 자동 합산 폐지, 항상 양쪽 중 한쪽만 남기고 다른 쪽은 리셋. 대체 화면 = pw-02-K-existing) -->
-  <div class="phone-wrap dead-screen" id="pw-DEAD-02-K-merge" data-screen="DEAD-03b-merge">
+  <!-- 03b-merge 계정 통합 완료 -->
+  <div class="phone-wrap" id="pw-02-K-merge" data-screen="03b-merge">
     <div class="phone-meta">
-      <div class="pm-row"><span class="pm-key">진입</span><span class="pm-val">(폐지됨) 닉네임 계정에 적립이 있는 상태에서 카카오 연동 시, 해당 카카오 계정에도 기존 데이터가 있어 양쪽 모두 적립을 보유한 경우 (자동 합산)</span></div>
+      <div class="pm-row"><span class="pm-key">진입</span><span class="pm-val">닉네임 계정에 적립이 있는 상태에서 카카오 연동 시, 해당 카카오 계정에도 기존 데이터가 있어 양쪽 모두 적립을 보유한 경우 (자동 합산)</span></div>
       <div class="pm-row"><span class="pm-key">다음</span><span class="pm-val"><code>04</code> 홈 ("홈으로 가기" 탭)</span></div>
     </div>
     <div class="phone">
@@ -13106,8 +13074,9 @@ const SCREEN_MAP = {
   'pw-01b':         { id:'01b',            name:'ATT 권한 (iOS)' },
   'pw-02':          { id:'02',             name:'소셜 로그인 진입' },
   'pw-02-K':        { id:'02-K',           name:'카카오 인증 중' },
-  'pw-02-K-existing': { id:'02-K-existing', name:'기존 계정 발견 · 데이터 선택' },
+  'pw-02-K-existing': { id:'02-K-existing', name:'기존 계정 발견' },
   'pw-02-K-new':    { id:'02-K-new',       name:'신규 카카오 연결 완료' },
+  'pw-02-K-merge':  { id:'03b-merge',      name:'계정 통합 완료' },
   'pw-02-conflict': { id:'02-conflict',    name:'카카오 계정 충돌' },
   'pw-02-withdraw': { id:'02-withdraw',    name:'탈퇴 최종 확인' },
   'pw-02-withdraw-done': { id:'02-withdraw-done', name:'탈퇴 완료' },
@@ -13153,8 +13122,9 @@ const FLOW_MAP = [
   ['pw-02-K', '.kakao-app-allow', 'pw-02-K-existing', '허용 → 기존 계정 발견 (기본)'],
   // 취소: 'pw-02'(소셜 로그인 진입) 화면은 v5.5에서 제거돼 실제 마크업이 없음 — 진입 지점(홈/마이)으로 되돌아가야 하므로 null(ipGoBack)
   ['pw-02-K', '.kakao-app-cancel', null, '취소 → 이전 화면으로'],
-  ['pw-02-K-existing', 'button, .btn-primary, [style*="cursor"]', 'pw-10', '연동하기 → 홈'],
+  ['pw-02-K-existing', 'button, .btn-primary, [style*="cursor"]', 'pw-10', '시작하기 → 홈'],
   ['pw-02-K-new', 'button, .btn-primary', 'pw-10', '시작하기 → 홈'],
+  ['pw-02-K-merge', 'button, .btn-primary', 'pw-10', '홈으로 가기 → 홈'],
   // pw-02-withdraw: 탈퇴/취소 버튼 실핸들러 = bindWithdrawConfirmScreen() (FLOW_MAP 범용 라우팅 제외 — 실지급/세션종료 로직 우회 방지)
   ['pw-02-withdraw-done', 'button, .btn-primary', 'pw-02-nick', '닉네임 설정으로'],
   ['pw-02-err-network',   'button, .btn-primary', null,                  '재시도'],
@@ -13326,34 +13296,30 @@ const SB_SPECS = {
     ]
   },
   "02-K-existing": {
-    "title": "기존 계정 발견 · 데이터 선택",
-    "purpose": "연동 이력이 있는 카카오 계정으로 연동 시, 이전 카카오 계정과 현재 기기 계정 양쪽 보유 현황을 보여주고 사용할 데이터를 선택받는다. 어떤 경우에도 자동 합산하지 않는다.",
+    "title": "기존 계정 발견",
+    "purpose": "동일 카카오 ID 기존 계정 안내.",
     "specs": [
       {
         "h": "핵심 컨텐츠",
         "items": [
           "\"이미 사용하신 계정이 있어요\"",
-          "이전 카카오 계정 카드 (닉네임·가입일·포인트·티켓 3분할)",
-          "현재 이 기기 계정 카드 (포인트·티켓 3분할)",
-          "\"이전 데이터 사용\" 체크박스 (기본 체크됨)",
-          "체크 해제 시 경고 문구 (이전 카카오 데이터 소실 안내)",
-          "\"연동하기\" CTA",
+          "기존 프로필 카드 (닉네임, 가입일)",
+          "티켓 보유 현황 3분할",
+          "\"프라이스픽 시작하기\" CTA",
           "약관 동의 안내"
         ]
       },
       {
         "h": "인터랙션",
         "items": [
-          "체크(기본): 연동 시 이전 카카오 계정 데이터 사용, 현재 기기 데이터는 사라짐",
-          "체크 해제: 연동 시 현재 기기 데이터로 대체, 이전 카카오 계정 데이터는 리셋",
-          "\"연동하기\" → 10 홈"
+          "\"프라이스픽 시작하기\" → 10 홈"
         ]
       }
     ]
   },
   "02-K-new": {
     "title": "신규 카카오 연결 완료",
-    "purpose": "신규(연동 이력 없는) 카카오 계정 연동 — 현재 닉네임 계정 데이터를 그대로 유지, 합산·리셋 없음.",
+    "purpose": "신규 환영 + 구매 적립 시스템 안내.",
     "specs": [
       {
         "h": "핵심 컨텐츠",
@@ -13366,6 +13332,34 @@ const SB_SPECS = {
         "h": "인터랙션",
         "items": [
           "\"쇼핑 시작하기\" → 10 홈"
+        ]
+      }
+    ]
+  },
+  "03b-merge": {
+    "title": "계정 통합 완료",
+    "purpose": "닉네임 계정과 카카오 계정이 모두 적립을 보유한 경우 자동 합산 결과 안내.",
+    "specs": [
+      {
+        "h": "핵심 컨텐츠",
+        "items": [
+          "\"계정을 합쳤어요\" 타이틀 + 합산 완료 안내",
+          "적립 합산 요약 (예: 포인트 1,200P + 350P → 1,550P)",
+          "정상 적립 포인트·티켓은 합산 반영",
+          "이벤트 무상 지급 적립(출석·룰렛·온보딩 등)은 중복 방지 위해 합산 제외",
+          "\"홈으로 가기\" CTA"
+        ]
+      },
+      {
+        "h": "진입 조건",
+        "items": [
+          "닉네임 계정에 적립 보유 + 연동한 카카오에도 기존 데이터 보유 → 양쪽 모두 적립 보유 시"
+        ]
+      },
+      {
+        "h": "인터랙션",
+        "items": [
+          "\"홈으로 가기\" → 04 홈"
         ]
       }
     ]
@@ -15440,26 +15434,32 @@ function bindHomeScreen() {
   });
 }
 
-// 03b-A 기존 계정 발견 — "이전 데이터 사용" 체크박스에 따라 경고 문구 갱신
-// (실제 Kakao SDK 없이는 데이터 소실을 진짜로 시뮬레이션할 수 없어 정적 미리보기로 유지 —
-//  체크박스는 화면 표시만 바꾸는 데모용이고, 카카오 연동 자체는 bindKakaoComplete()에서 실제 처리)
-function updateKakaoMergeNotice() {
-  const box = document.getElementById('kakao-merge-notice');
-  const cb = document.getElementById('kakao-use-prev-data');
-  if (!box || !cb) return;
-  box.innerHTML = cb.checked
-    ? '<div style="font-size:11.5px;color:var(--text3);text-align:center;"><span class="i18n"><span class="ko">현재 이 기기 데이터는 사라져요</span><span class="vi">Dữ liệu trên thiết bị này sẽ bị xóa</span></span></div>'
-    : '<div style="background:#FFF5F5;border:1px solid #FFC9C9;border-radius:10px;padding:10px 12px;font-size:11.5px;color:var(--red);font-weight:600;text-align:center;line-height:1.5;"><span class="i18n"><span class="ko">이전 카카오 계정 데이터가 사라져요. 되돌릴 수 없어요.</span><span class="vi">Dữ liệu tài khoản Kakao trước đây sẽ bị xóa. Không thể khôi phục.</span></span></div>';
-}
+// 03b-A 기존 계정 발견 바인딩
 function bindExistingAccountScreen() {
   const screen = document.getElementById('pw-02-K-existing');
   if (!screen) return;
-  const cb = screen.querySelector('#kakao-use-prev-data');
-  if (cb && !cb.dataset.ipBound) {
-    cb.dataset.ipBound = '1';
-    cb.addEventListener('change', updateKakaoMergeNotice);
+
+  // "기존 계정으로 시작하기" 버튼 → pw-04
+  const startBtn = screen.querySelector('.login-btn');
+  if (startBtn && !startBtn.dataset.ipBound) {
+    startBtn.dataset.ipBound = '1';
+    startBtn.style.cursor = 'pointer';
+    startBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      showScreen('pw-10');
+    });
   }
-  updateKakaoMergeNotice();
+
+  // "새 계정으로 시작할게요" span → pw-03bB
+  const newAccLink = screen.querySelector('span[style*="underline"]');
+  if (newAccLink && !newAccLink.dataset.ipBound) {
+    newAccLink.dataset.ipBound = '1';
+    newAccLink.style.cursor = 'pointer';
+    newAccLink.addEventListener('click', function(e) {
+      e.stopPropagation();
+      showScreen('pw-02-K-new');
+    });
+  }
 }
 
 // 03b 로그인 방식 선택 — v5.5에서 제거됨 (3-button 03이 직접 분기 처리)
