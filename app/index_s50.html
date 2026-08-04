@@ -18410,7 +18410,7 @@ function ppRenderActListHtml(ev, filter) {
       ? '<div class="ai-balance">' + (GRADE_KO[e.grade] || '') + ' 잔여 ' + e.balanceAfter + '장</div>' : '';
     parts.push('<div class="activity-item">'
       + '<div class="ai-ico ' + e.ico + '">' + ppActIcon(e.ico) + '</div>'
-      + '<div class="ai-info"><div class="ai-title">' + ppEsc(e.title) + (e.badge ? ' <span class="ai-badge"' + (e.badgeStyle ? ' style="' + e.badgeStyle + '"' : '') + '>' + ppEsc(e.badge) + '</span>' : '') + '</div><div class="ai-detail">' + ppEsc(e.detail) + ' · ' + ppFmt(e.d) + '</div></div>'
+      + '<div class="ai-info"><div class="ai-title">' + ppEsc(e.title) + (e.badge ? ' <span class="ai-badge">' + ppEsc(e.badge) + '</span>' : '') + '</div><div class="ai-detail">' + ppEsc(e.detail) + ' · ' + ppFmt(e.d) + '</div></div>'
       + '<div class="ai-amount"><div class="ai-ticket ' + e.cls + '">' + ppEsc(e.amt) + '</div>' + balanceHtml + '</div></div>');
   });
   return parts.join('');
@@ -18428,9 +18428,8 @@ function renderActivity(filter) {
     ppQuery('ticket_transactions', 'user_id', PP.uid),
     ppQuery('gifticon_exchanges', 'user_id', PP.uid),
     ppQuery('point_transactions', 'user_id', PP.uid),
-    ppGetPointPolicyExpiry(),
   ]).then(function (res) {
-    var ttx = res[0], gex = res[1], ptx = res[2], pointExpiryDays = ppPointExpiryDays(res[3]), ev = [];
+    var ttx = res[0], gex = res[1], ptx = res[2], ev = [];
     ttx.forEach(function (t) {
       var grade = t.ticket_grade, g = GRADE_KO[grade] || '티켓', type = t.type || 'earn', d = ppDate(t.created_at);
       var badge = t.manual ? (type === 'clawback' ? '관리자 회수' : '관리자 지급') : null;
@@ -18456,20 +18455,7 @@ function renderActivity(filter) {
         ev.push({ d: ppDate(p.created_at), ft: 'swap', ico: amt >= 0 ? 'earn' : 'return', title: p.reason || '포인트 교환', detail: '포인트 교환', amt: (amt >= 0 ? '+' : '') + amt + 'P', cls: amt >= 0 ? 'earn' : 'return', badge: badge });
         return;
       }
-      /* 적립 건(amt>0)에 만료일 배지 — 정책(적립일+1년) 그대로, D-30 이내·이미 만료는 시각적으로 구분 */
-      var badgeStyle = null;
-      var earnedAt = ppDate(p.created_at);
-      if (amt > 0 && pointExpiryDays != null && earnedAt) {
-        var expiresAt = new Date(earnedAt.getTime() + pointExpiryDays * 86400000);
-        var daysLeft = Math.ceil((expiresAt - Date.now()) / 86400000);
-        var expiryText, expiryStyle;
-        if (daysLeft <= 0) { expiryText = '만료 처리됨'; expiryStyle = 'background:#F3F4F6;color:#9CA3AF;'; }
-        else if (daysLeft <= 30) { expiryText = ppFmt(expiresAt) + ' 만료 (D-' + daysLeft + ')'; expiryStyle = 'background:#FFF3D6;color:#9A6A1E;border:1px solid #FFE2B8;'; }
-        else { expiryText = ppFmt(expiresAt) + ' 만료'; expiryStyle = null; }
-        badge = badge ? (badge + ' · ' + expiryText) : expiryText;
-        badgeStyle = expiryStyle;
-      }
-      ev.push({ d: earnedAt, ft: 'event', ico: amt >= 0 ? 'earn' : 'return', title: p.reason || (p.type || '포인트'), detail: '포인트', amt: (amt >= 0 ? '+' : '') + amt + 'P', cls: amt >= 0 ? 'earn' : 'return', badge: badge, badgeStyle: badgeStyle });
+      ev.push({ d: ppDate(p.created_at), ft: 'event', ico: amt >= 0 ? 'earn' : 'return', title: p.reason || (p.type || '포인트'), detail: '포인트', amt: (amt >= 0 ? '+' : '') + amt + 'P', cls: amt >= 0 ? 'earn' : 'return', badge: badge });
     });
     var validEv = ev.filter(function (e) { return e.d; });
     /* 등급별 잔여 수량 — 현재 보유량(PP.tickets)에서 최신 이벤트부터 거꾸로 되감아
@@ -19323,36 +19309,12 @@ function renderPointExpiry(ptx, expiry) {
   }).filter(function (r) { return r.daysLeft > 0; }).sort(function (a, b) { return a.expiresAt - b.expiresAt; });
   if (!rows.length) { box.style.display = 'none'; return; }
   box.style.display = 'block';
-
-  /* 만료일별로 묶어서(같은 날짜끼리 합산) 임박순 정렬 — 등급 티켓 만료일 아코디언과 동일 패턴 */
-  var groups = {};
-  rows.forEach(function (r) {
-    var key = ppFmt(r.expiresAt);
-    if (!groups[key]) groups[key] = { amt: 0, expiresAt: r.expiresAt, daysLeft: r.daysLeft };
-    groups[key].amt += r.amt;
-    if (r.expiresAt < groups[key].expiresAt) { groups[key].expiresAt = r.expiresAt; groups[key].daysLeft = r.daysLeft; }
-  });
-  var groupList = Object.keys(groups).map(function (k) { return groups[k]; })
-    .sort(function (a, b) { return a.expiresAt - b.expiresAt; });
-  var total = groupList.reduce(function (s, g) { return s + g.amt; }, 0);
-  var nearest = groupList[0];
-  var nearWarn = nearest.daysLeft <= 30;
-
-  var acc = groupList.map(function (g) {
-    var near = g.daysLeft <= 30;
-    return '<div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;padding:8px 10px;border-top:1px solid #F6E9CE;' + (near ? 'background:#FFF3D6;' : '') + '">'
-      + '<span style="color:' + (near ? '#9A6A1E' : 'var(--text2)') + ';font-weight:' + (near ? '700' : '400') + ';">' + ppFmt(g.expiresAt) + ' · ' + g.amt.toLocaleString('ko-KR') + 'P</span>'
-      + (near ? '<span style="font-size:9.5px;font-weight:700;color:#9A6A1E;background:#fff;border:1px solid #FFE2B8;border-radius:4px;padding:2px 6px;flex-shrink:0;">D-' + g.daysLeft + '</span>' : '')
-      + '</div>';
-  }).join('');
-
-  box.innerHTML = '<div style="display:flex;justify-content:space-between;align-items:center;">'
-    + '<span style="font-size:15px;font-weight:800;color:#9A6A1E;">' + total.toLocaleString('ko-KR') + 'P</span>'
-    + (nearWarn ? '<span style="font-size:9.5px;font-weight:700;color:#DC2626;background:#FEF2F2;border:1px solid #FECACA;border-radius:4px;padding:2px 6px;flex-shrink:0;">⚠ D-' + nearest.daysLeft + ' 만료</span>' : '')
-    + '</div>'
-    + '<button type="button" onclick="var p=this.nextElementSibling;var open=(p.style.display===\'block\');p.style.display=open?\'none\':\'block\';this.textContent=open?\'만료일 자세히 보기 ▾\':\'만료일 자세히 보기 ▴\';" style="margin-top:8px;width:100%;background:none;border:none;font-size:11px;font-weight:700;color:var(--main);cursor:pointer;text-align:left;padding:2px;">만료일 자세히 보기 ▾</button>'
-    + '<div style="display:none;margin-top:6px;background:#fff;border:1px solid #FFE2B8;border-radius:8px;overflow:hidden;">' + acc + '</div>'
-    + '<div style="font-size:10.5px;color:var(--text3);margin-top:7px;line-height:1.5;">포인트 유효기간 ' + (days === 365 ? '1년' : days + '일') + '(적립일 기준 · FIFO 소멸)</div>';
+  box.innerHTML = rows.map(function (r) {
+    var near = r.daysLeft <= 30;
+    return '<div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px;">'
+      + '<span style="color:' + (near ? '#9A6A1E' : 'var(--text2)') + ';font-weight:' + (near ? '800' : '700') + ';">' + r.amt.toLocaleString('ko-KR') + 'P</span>'
+      + '<span style="color:' + (near ? '#9A6A1E' : 'var(--text3)') + ';font-weight:600;">' + ppFmt(r.expiresAt) + ' 만료' + (near ? ' (D-' + r.daysLeft + ')' : '') + '</span></div>';
+  }).join('') + '<div style="font-size:10.5px;color:var(--text3);margin-top:7px;line-height:1.5;">포인트 유효기간 ' + (days === 365 ? '1년' : days + '일') + '(적립일 기준 · FIFO 소멸)</div>';
 }
 function renderPointPanel() {
   if (!PP.uid) return;
