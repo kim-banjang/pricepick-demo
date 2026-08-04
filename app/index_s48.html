@@ -12855,7 +12855,7 @@ window.PP_FEATURES = {
             </div>
 
             <div class="tx-qty">
-              <span class="tx-qty-input" id="swap-input">0</span>
+              <input class="tx-qty-input" id="swap-input" type="number" min="0" value="0" inputmode="numeric">
               <span class="tx-qty-unit" id="swap-qty-unit"></span>
             </div>
             <div class="tx-quick">
@@ -12878,7 +12878,7 @@ window.PP_FEATURES = {
             </div>
             <div class="tx-dirs" id="pt-rate-rows"></div>
             <div class="tx-qty">
-              <span class="tx-qty-input" id="pt-input">0</span>
+              <input class="tx-qty-input" id="pt-input" type="number" min="0" value="0" inputmode="numeric">
               <span class="tx-qty-unit" id="pt-qty-unit">포인트</span>
             </div>
             <div class="tx-quick">
@@ -12901,11 +12901,11 @@ window.PP_FEATURES = {
             <div class="tx-oneway">되돌릴 수 없어요</div>
 
             <div class="tx-qty">
-              <span class="tx-qty-input" id="ev-input">0</span>
+              <input class="tx-qty-input" id="ev-input" type="number" min="0" step="5" value="0" inputmode="numeric">
               <span class="tx-qty-unit">이벤트 장</span>
             </div>
             <div class="tx-quick">
-              <button class="swap-quick-btn" data-ev-add="5">+5장</button>
+              <button class="swap-quick-btn" data-ev-add="5">+5</button>
               <button class="swap-quick-btn" data-ev-set="max">최대</button>
               <button class="swap-quick-btn" data-ev-set="0">초기화</button>
             </div>
@@ -19559,17 +19559,13 @@ window.ppSwapAllowed = ppSwapAllowed;
    실제 user_tickets 문서를 소진(status:'used') + 신규 생성해야 새로고침 후에도 잔여 수량이 맞는다. */
 var GRADE_NAME = { bronze: '브론즈', silver: '실버', gold: '골드', event: '이벤트' };
 var _swapState = { from: 'bronze', to: 'silver', ratioFrom: 10, ratioTo: 1 };
-/* 수량은 자유 입력을 허용하지 않는다 — [+N장]/[최대]/[초기화] 버튼으로만 바뀌고
-   항상 ratioFrom의 배수로만 존재한다. 표시는 순수 텍스트(span#swap-input)다. */
-var _swapQty = 0;
 
 function renderGradeSwapScreen() {
   var screen = document.getElementById('pw-22');
   if (!screen) return;
   // 상단 보유 카드는 renderTicketExchangeHome()이 그린다 — 여기서 덮어쓰지 않는다
-  var qtyDisplay = document.getElementById('swap-input');
-  var qty = _swapQty;
-  if (qtyDisplay) qtyDisplay.textContent = qty;
+  var input = document.getElementById('swap-input');
+  var qty = input ? (parseInt(input.value, 10) || 0) : 0;
   var from = _swapState.from, to = _swapState.to, rf = _swapState.ratioFrom, rt = _swapState.ratioTo;
   var units = Math.floor(qty / rf);
   var consume = units * rf;
@@ -19635,20 +19631,21 @@ function bindGradeSwapScreen() {
         from: btn.dataset.from, to: btn.dataset.to,
         ratioFrom: parseInt(btn.dataset.ratioFrom, 10) || 1, ratioTo: parseInt(btn.dataset.ratioTo, 10) || 1,
       };
-      _swapQty = 0; // 방향이 바뀌면 이전 배수는 새 비율에 안 맞을 수 있어 초기화
       renderGradeSwapScreen();
     });
   });
+
+  var input = document.getElementById('swap-input');
+  if (input) input.addEventListener('input', function() { renderGradeSwapScreen(); });
 
   screen.querySelectorAll('.swap-quick-btn').forEach(function(btn) {
     btn.dataset.ipBound = '1';
     btn.addEventListener('click', function(e) {
       e.stopPropagation();
-      var rf = _swapState.ratioFrom;
-      var maxQty = Math.floor((PP.tickets[_swapState.from] || 0) / rf) * rf;
-      if (btn.dataset.add) _swapQty = Math.min(_swapQty + (parseInt(btn.dataset.add, 10) || 0), maxQty);
-      else if (btn.dataset.set === 'max') _swapQty = maxQty;
-      else if (btn.dataset.set === '0') _swapQty = 0;
+      if (!input) return;
+      if (btn.dataset.add) input.value = (parseInt(input.value, 10) || 0) + parseInt(btn.dataset.add, 10);
+      else if (btn.dataset.set === 'max') input.value = PP.tickets[_swapState.from] || 0;
+      else if (btn.dataset.set === '0') input.value = 0;
       renderGradeSwapScreen();
     });
   });
@@ -19657,7 +19654,8 @@ function bindGradeSwapScreen() {
   if (cta) { cta.dataset.ipBound = '1'; cta.addEventListener('click', function(e) {
     e.stopPropagation();
     if (cta.disabled || !PP.uid) return;
-    var qty = _swapQty;
+    var qtyInput = document.getElementById('swap-input');
+    var qty = qtyInput ? (parseInt(qtyInput.value, 10) || 0) : 0;
     var from = _swapState.from, to = _swapState.to, rf = _swapState.ratioFrom, rt = _swapState.ratioTo;
     var units = Math.floor(qty / rf);
     var consume = units * rf, receive = units * rt;
@@ -19668,7 +19666,6 @@ function bindGradeSwapScreen() {
     ppExecuteTicketSwap(from, to, consume, receive).then(function(ok) {
       cta.disabled = false;
       if (!ok) return;
-      _swapQty = 0;
       renderGradeSwapScreen();
       showToast(GRADE_NAME[from] + ' ' + consume + '장 → ' + GRADE_NAME[to] + ' ' + receive + '장 교환 완료');
     });
@@ -19765,22 +19762,19 @@ function renderPtRateRows() {
     btn.addEventListener('click', function(e) {
       e.stopPropagation();
       _ptSwap.grade = btn.dataset.ptGrade;
-      _ptQty = 0;
+      var input = document.getElementById('pt-input');
+      if (input) input.value = 0;
       renderPtRateRows();
       renderPointTicketExchange();
     });
   });
 }
 
-/* 수량은 자유 입력 불허 — [+N]/[최대]/[초기화] 버튼으로만 바뀐다. 표시는 순수 텍스트(span#pt-input). */
-var _ptQty = 0;
-
 function renderPointTicketExchange() {
   var screen = document.getElementById('pw-22');
   if (!screen) return;
-  var qtyDisplay = document.getElementById('pt-input');
-  var qty = _ptQty;
-  if (qtyDisplay) qtyDisplay.textContent = qty;
+  var input = document.getElementById('pt-input');
+  var qty = input ? (parseInt(input.value, 10) || 0) : 0;
   var dir = _ptSwap.dir, grade = _ptSwap.grade, rate = PT_TICKET_RATE[grade];
   var units, consume, receive, have;
 
@@ -19804,7 +19798,7 @@ function renderPointTicketExchange() {
 
   var quickBtn = document.getElementById('pt-quick-add');
   if (quickBtn) {
-    if (dir === 'buy') { quickBtn.textContent = '+' + rate.toLocaleString('ko-KR') + 'P'; quickBtn.dataset.ptAdd = rate; }
+    if (dir === 'buy') { quickBtn.textContent = '+' + PT_TICKET_RATE.bronze.toLocaleString('ko-KR') + 'P'; quickBtn.dataset.ptAdd = PT_TICKET_RATE.bronze; }
     else { quickBtn.innerHTML = '+1<span class="i18n"><span class="ko">장</span><span class="vi">vé</span></span>'; quickBtn.dataset.ptAdd = 1; }
   }
 
@@ -19902,23 +19896,24 @@ function bindPointTicketExchange() {
       _ptSwap.dir = btn.dataset.ptDir;
       _ptSwap.grade = 'bronze';
       screen.querySelectorAll('[data-pt-dir]').forEach(function(b) { b.classList.toggle('on', b === btn); });
-      _ptQty = 0;
+      var input = document.getElementById('pt-input');
+      if (input) input.value = 0;
       renderPtRateRows();
       renderPointTicketExchange();
     });
   });
 
+  var input = document.getElementById('pt-input');
+  if (input) { input.dataset.ipBound = '1'; input.addEventListener('input', function() { renderPointTicketExchange(); }); }
+
   screen.querySelectorAll('[data-tx-panel="point"] .swap-quick-btn').forEach(function(btn) {
     btn.dataset.ipBound = '1';
     btn.addEventListener('click', function(e) {
       e.stopPropagation();
-      var dir = _ptSwap.dir, rate = PT_TICKET_RATE[_ptSwap.grade];
-      var maxQty = (dir === 'buy')
-        ? Math.floor((PP.points || 0) / rate) * rate
-        : (PP.tickets[_ptSwap.grade] || 0);
-      if (btn.dataset.ptSet === 'max') _ptQty = maxQty;
-      else if (btn.dataset.ptSet === '0') _ptQty = 0;
-      else _ptQty = Math.min(_ptQty + (parseInt(btn.dataset.ptAdd, 10) || 0), maxQty);
+      if (!input) return;
+      if (btn.dataset.ptSet === 'max') input.value = (_ptSwap.dir === 'buy') ? (PP.points || 0) : (PP.tickets[_ptSwap.grade] || 0);
+      else if (btn.dataset.ptSet === '0') input.value = 0;
+      else input.value = (parseInt(input.value, 10) || 0) + (parseInt(btn.dataset.ptAdd, 10) || 0);
       renderPointTicketExchange();
     });
   });
@@ -19927,7 +19922,7 @@ function bindPointTicketExchange() {
   if (cta) { cta.dataset.ipBound = '1'; cta.addEventListener('click', function(e) {
     e.stopPropagation();
     if (cta.disabled || !PP.uid) return;
-    var qty = _ptQty;
+    var qty = input ? (parseInt(input.value, 10) || 0) : 0;
     var dir = _ptSwap.dir, grade = _ptSwap.grade, rate = PT_TICKET_RATE[grade];
     var units, consume, receive;
     if (dir === 'buy') { units = Math.floor(qty / rate); consume = units * rate; receive = units; }
@@ -19938,7 +19933,7 @@ function bindPointTicketExchange() {
     ppExecutePointTicketSwap(dir, grade, consume, receive).then(function(ok) {
       cta.disabled = false;
       if (!ok) return;
-      _ptQty = 0;
+      if (input) input.value = 0;
       renderPtRateRows();
       renderPointTicketExchange();
       var msg = (dir === 'buy')
@@ -19969,15 +19964,12 @@ function renderTicketExchangeHome() {
    역방향(브론즈→이벤트)은 진입 경로를 만들지 않았고, ppSwapAllowed/ppExecuteTicketSwap에서도
    차단된다. 비율 5:1은 김반장 확정값. */
 var EV_SWAP_RATIO = { from: 5, to: 1 };
-/* 수량은 자유 입력 불허 — [+5장]/[최대]/[초기화] 버튼으로만 바뀐다. 표시는 순수 텍스트(span#ev-input). */
-var _evQty = 0;
 
 function renderEventSwapScreen() {
   var input = document.getElementById('ev-input');
   if (!input) return;
   var have = PP.tickets.event || 0;
-  var qty = _evQty;
-  input.textContent = qty;
+  var qty = parseInt(input.value, 10) || 0;
   var units = Math.floor(qty / EV_SWAP_RATIO.from);
   var consume = units * EV_SWAP_RATIO.from;
   var receive = units * EV_SWAP_RATIO.to;
@@ -20002,14 +19994,20 @@ function bindEventSwapScreen() {
   if (!screen || screen.dataset.ppEvBound) return;
   screen.dataset.ppEvBound = '1';
 
+  var input = document.getElementById('ev-input');
+  if (input) { input.dataset.ipBound = '1'; input.addEventListener('input', function() { renderEventSwapScreen(); }); }
+
   screen.querySelectorAll('[data-ev-add], [data-ev-set]').forEach(function(btn) {
     btn.dataset.ipBound = '1';
     btn.addEventListener('click', function(e) {
       e.stopPropagation();
-      var maxQty = Math.floor((PP.tickets.event || 0) / EV_SWAP_RATIO.from) * EV_SWAP_RATIO.from;
-      if (btn.dataset.evAdd) _evQty = Math.min(_evQty + parseInt(btn.dataset.evAdd, 10), maxQty);
-      else if (btn.dataset.evSet === 'max') _evQty = maxQty;
-      else if (btn.dataset.evSet === '0') _evQty = 0;
+      if (!input) return;
+      if (btn.dataset.evAdd) input.value = (parseInt(input.value, 10) || 0) + parseInt(btn.dataset.evAdd, 10);
+      else if (btn.dataset.evSet === 'max') {
+        // 5장 단위로만 교환되므로 보유량을 5의 배수로 내림
+        var have = PP.tickets.event || 0;
+        input.value = Math.floor(have / EV_SWAP_RATIO.from) * EV_SWAP_RATIO.from;
+      } else if (btn.dataset.evSet === '0') input.value = 0;
       renderEventSwapScreen();
     });
   });
@@ -20018,7 +20016,7 @@ function bindEventSwapScreen() {
   if (cta) { cta.dataset.ipBound = '1'; cta.addEventListener('click', function(e) {
     e.stopPropagation();
     if (cta.disabled || !PP.uid) return;
-    var qty = _evQty;
+    var qty = parseInt((input || {}).value, 10) || 0;
     var units = Math.floor(qty / EV_SWAP_RATIO.from);
     var consume = units * EV_SWAP_RATIO.from, receive = units * EV_SWAP_RATIO.to;
     if (units < 1 || consume > (PP.tickets.event || 0)) { showToast('교환 수량을 확인해주세요'); return; }
@@ -20026,7 +20024,7 @@ function bindEventSwapScreen() {
     ppExecuteTicketSwap('event', 'bronze', consume, receive).then(function(ok) {
       cta.disabled = false;
       if (!ok) return;
-      _evQty = 0;
+      if (input) input.value = 0;
       renderEventSwapScreen();
       showToast('이벤트 티켓 ' + consume + '장 → 브론즈 티켓 ' + receive + '장 교환 완료');
     });
