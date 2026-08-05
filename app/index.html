@@ -19440,7 +19440,12 @@ function renderTicketDetail() {
       if (!act.hasOwnProperty(g)) return;
       act[g]++;
       activeByGrade[g].push(t);
-      var key = t.postback_id || t._id;
+      /* "랜덤 티켓 전환 현황"은 구매로 받은 랜덤 티켓이 등급으로 전환된 이력만 보여준다.
+         이벤트/포인트 교환·관리자 지급·출석 등 구매 아닌 경로는 postback_id가 항상 null
+         (ppGrantGradeTicket/ppExecuteTicketSwap/포인트↔티켓 교환 전부 postback_id:null로 저장)
+         — 구매 건이 아니면 이 목록에서 제외한다(김반장 2026-08-05 확정). */
+      if (!t.postback_id) return;
+      var key = t.postback_id;
       if (!done[key]) done[key] = { grades: {}, earnedAt: null };
       done[key].grades[g] = (done[key].grades[g] || 0) + 1;
       var ea = ppDate(t.earned_at);
