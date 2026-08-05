@@ -19251,10 +19251,10 @@ function mt21RenderGrid(byGrade) {
       var nearest = info.groups[0];
       /* 카드 하단 4칸 요약은 라벨/부연 정보다 — 볼드·경고색은 아래 D-알림 한 줄에만 남긴다(김반장 2026-08-05 지시) */
       sub = mt21I18n(
-        '<span style="display:block;color:#5A5370;font-size:var(--fs-caption);font-weight:400;">' + mt21ShortDate(nearest.d) + ' · ' + nearest.n + '장</span>'
-          + '<span style="display:block;color:#9B93B0;font-size:var(--fs-caption);font-weight:400;">만료일 ' + info.groups.length + '개</span>',
-        '<span style="display:block;color:#5A5370;font-size:var(--fs-caption);font-weight:400;">' + mt21ShortDate(nearest.d) + ' · ' + nearest.n + ' vé</span>'
-          + '<span style="display:block;color:#9B93B0;font-size:var(--fs-caption);font-weight:400;">' + info.groups.length + ' hạn dùng</span>'
+        '<span style="display:block;color:#5A5370;font-size:11px;font-weight:400;">' + mt21ShortDate(nearest.d) + ' · ' + nearest.n + '장</span>'
+          + '<span style="display:block;color:#9B93B0;font-size:11px;font-weight:400;">만료일 ' + info.groups.length + '개</span>',
+        '<span style="display:block;color:#5A5370;font-size:11px;font-weight:400;">' + mt21ShortDate(nearest.d) + ' · ' + nearest.n + ' vé</span>'
+          + '<span style="display:block;color:#9B93B0;font-size:11px;font-weight:400;">' + info.groups.length + ' hạn dùng</span>'
       );
     }
     var sufHtml = mt21I18n(
@@ -19620,7 +19620,7 @@ function mt21RenderPointsRow(balance, res) {
       var nearest = res.groupList[0];
       var subKo = mt21ShortDate(nearest.expiresAt) + ' · ' + nearest.amt.toLocaleString('ko-KR') + 'P · 만료일 ' + res.groupList.length + '개';
       var subVi = mt21ShortDate(nearest.expiresAt) + ' · ' + nearest.amt.toLocaleString('ko-KR') + 'P · ' + res.groupList.length + ' hạn dùng';
-      sub = '<span style="display:block;color:#5A5370;font-size:var(--fs-caption);font-weight:400;">' + mt21I18n(subKo, subVi) + '</span>';
+      sub = '<span style="display:block;color:#5A5370;font-size:11px;font-weight:400;">' + mt21I18n(subKo, subVi) + '</span>';
     }
     row.innerHTML = pointCoinIcon(30, 'mt21ptsrow')
       + '<div style="display:flex;flex-direction:column;gap:2px;"><span style="color:#9B93B0;font-size:var(--fs-caption);font-weight:400;">포인트</span>' + sub + '</div>'
