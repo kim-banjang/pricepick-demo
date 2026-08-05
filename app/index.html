@@ -19386,13 +19386,22 @@ function mt21RenderPending(doneItems, pendItems, waitDays) {
       + ddayHtml + '</div>' + barHtml + mt21PurchaseLine(it.pb) + '</div></div>');
   });
   doneItems.forEach(function (it) {
-    rows.push('<div style="display:flex;align-items:center;gap:12px;padding:16px 18px;opacity:0.75;">'
-      + ticketIcon(it.grade, 34)
-      + '<div style="display:flex;flex-direction:column;gap:6px;flex:1;">'
-      + '<div style="display:flex;align-items:center;gap:8px;">'
-      + '<span style="color:#1A1130;font-size:var(--fs-body);font-weight:700;">' + mt21I18n(it.label, it.labelVi) + '</span>'
-      + '<span style="padding:3px 8px;border-radius:7px;background:#F0FDF4;color:#16A34A;font-size:var(--fs-caption);font-weight:400;">완료</span>'
-      + '</div>' + mt21PurchaseLine(it.pb) + '</div></div>');
+    /* 등급 3종을 "브론즈 13장 + 실버 6장 + 골드 4장" 한 줄로 이어붙이면 줄바꿈돼서 읽기 어렵다 —
+       등급마다 아이콘+행을 따로 그리고(순서 고정: 브론즈→실버→골드), 완료 배지·날짜·구매금액은
+       묶음당 한 번만(김반장 2026-08-05 확정). ticketIcon()이 호출마다 gradient id를 자동 증가시켜서
+       한 화면에 같은 등급 아이콘이 여러 번 나와도 색이 안 깨진다. */
+    var gradeRows = ['bronze', 'silver', 'gold'].filter(function (g) { return it.grades[g]; })
+      .map(function (g) {
+        return '<div style="display:flex;align-items:center;gap:10px;">'
+          + ticketIcon(g, 24)
+          + '<span style="color:#1A1130;font-size:var(--fs-body);font-weight:700;">' + mt21I18n(GRADE_KO[g] + ' ' + it.grades[g] + '장', it.grades[g] + ' vé ' + MT21_GRADE_VI[g]) + '</span>'
+          + '</div>';
+      }).join('');
+    rows.push('<div style="display:flex;flex-direction:column;gap:6px;padding:16px 18px;opacity:0.75;">'
+      + '<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;">'
+      + '<div style="display:flex;flex-direction:column;gap:6px;">' + gradeRows + '</div>'
+      + '<span style="padding:3px 8px;border-radius:7px;background:#F0FDF4;color:#16A34A;font-size:var(--fs-caption);font-weight:400;flex-shrink:0;">완료</span>'
+      + '</div><div style="padding-left:34px;">' + mt21PurchaseLine(it.pb) + '</div></div>');
   });
   if (!rows.length) {
     return '<div class="i18n"><span class="ko"><span style="display:block;padding:26px 20px;border-radius:16px;background:#fff;box-shadow:0 0 0 1px rgba(132,94,238,0.1);color:#9B93B0;font-size:var(--fs-body);font-weight:400;text-align:center;">대기 중이거나 최근 전환된 랜덤 티켓이 없어요.</span></span><span class="vi"><span style="display:block;padding:26px 20px;border-radius:16px;background:#fff;box-shadow:0 0 0 1px rgba(132,94,238,0.1);color:#9B93B0;font-size:var(--fs-body);font-weight:400;text-align:center;">Không có vé ngẫu nhiên đang chờ hoặc vừa đổi gần đây.</span></span></div>';
@@ -19494,7 +19503,7 @@ function renderTicketDetail() {
         .map(function (g) { return GRADE_KO[g] + ' ' + b.grades[g] + '장'; }).join(' + ');
       var labelVi = ['bronze', 'silver', 'gold'].filter(function (g) { return b.grades[g]; })
         .map(function (g) { return b.grades[g] + ' vé ' + MT21_GRADE_VI[g]; }).join(' + ');
-      return { earnedAt: b.earnedAt, label: label, labelVi: labelVi, grade: mainGrade, pb: pbMap[key] };
+      return { earnedAt: b.earnedAt, label: label, labelVi: labelVi, grade: mainGrade, grades: b.grades, pb: pbMap[key] };
     }).sort(function (a, b) { return (b.earnedAt ? b.earnedAt.getTime() : 0) - (a.earnedAt ? a.earnedAt.getTime() : 0); });
 
     /* 대기중 랜덤 티켓 = "아직 안 깐 뽑기권" — 구매(포스트백) 1건당 1장이다.
