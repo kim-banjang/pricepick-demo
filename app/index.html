@@ -10336,7 +10336,7 @@ window.PP_FEATURES = {
             <div class="cpg-body">
               <div class="cpg-title">쿠팡 쇼핑 적립 <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
             </div>
-            <button class="cpg-go">구매하러 가기</button>
+            <button class="cpg-go" onclick="selectMall('쿠팡','coupang.com','pw-13')">구매하러 가기</button>
           </div>
 
           <!-- 대기 → 활성화 타임라인 -->
@@ -10442,7 +10442,7 @@ window.PP_FEATURES = {
                 <span id="pt-balance" style="font-size:var(--fs-number);font-weight:700;letter-spacing:-0.5px;">0</span><span style="font-size:var(--fs-label);font-weight:700;">P</span>
               </div>
               <div style="margin-top:13px;display:flex;gap:8px;">
-                <button type="button" style="flex:1;background:#fff;border:none;color:var(--main);font-size:var(--fs-body);font-weight:700;border-radius:10px;padding:10px;cursor:pointer;">티켓으로 전환</button>
+                <button type="button" onclick="mt20GoToPointExchange()" style="flex:1;background:#fff;border:none;color:var(--main);font-size:var(--fs-body);font-weight:700;border-radius:10px;padding:10px;cursor:pointer;">티켓으로 전환</button>
               </div>
             </div>
             <!-- 안내 -->
@@ -20372,6 +20372,21 @@ function txShowTab(tab) {
   if (scroll) scroll.scrollTop = 0;
   renderTicketExchange();
 }
+/* pw-20 포인트 탭 "티켓으로 전환" 버튼 → pw-22 교환소를 포인트 교환 탭·포인트→티켓(buy)
+   방향으로 진입시킨다. 시안 마크업만 옮기고 onclick 연결을 빼먹은 죽은 버튼이었다
+   (히어로 카드 때와 같은 사고, 2026-08-05). onclick 인라인 핸들러는 전역에서 찾으므로
+   IIFE 내부 함수는 window에 노출해야 한다. */
+function mt20GoToPointExchange() {
+  showScreen('pw-22');
+  _ptSwap.dir = 'buy';
+  _ptSwap.grade = 'bronze';
+  _ptQty = 0;
+  var screen = document.getElementById('pw-22');
+  if (screen) screen.querySelectorAll('[data-pt-dir]').forEach(function (b) { b.classList.toggle('on', b.dataset.ptDir === 'buy'); });
+  txShowTab('point');
+  renderPtRateRows();
+}
+window.mt20GoToPointExchange = mt20GoToPointExchange;
 /* 상단 보유 카드 + 현재 탭 패널을 함께 갱신 */
 function renderTicketExchange() {
   renderTicketExchangeHome();
