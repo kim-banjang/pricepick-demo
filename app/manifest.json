@@ -1,0 +1,30 @@
+{
+  "name": "프라이스픽 앱 데모",
+  "short_name": "프라이스픽 데모",
+  "description": "쇼핑하면 티켓, 티켓으로 기프티콘",
+  "start_url": "/app",
+  "display": "standalone",
+  "background_color": "#845EEE",
+  "theme_color": "#845EEE",
+  "lang": "ko",
+  "icons": [
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
