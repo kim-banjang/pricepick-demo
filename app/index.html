@@ -7323,11 +7323,11 @@
   .ai-ico.exchange { background: rgba(59,130,246,0.12); color: #3B82F6; }
   .ai-ico.return { background: rgba(255,68,82,0.12); color: #FF4452; }
   .ai-info { flex: 1; }
-  .ai-title { font-size: var(--fs-body); font-weight: 600; color: var(--text1); margin-bottom: 2px; }
-  .ai-badge { display: inline-block; font-size: var(--fs-caption); font-weight: 700; padding: 1px 6px; border-radius: 5px; margin-left: 5px; vertical-align: 1px; background: #EEF0F4; color: #5B6478; }
+  .ai-title { font-size: var(--fs-body); font-weight: 400; color: var(--text1); margin-bottom: 2px; }
+  .ai-badge { display: inline-block; font-size: var(--fs-caption); font-weight: 400; padding: 1px 6px; border-radius: 5px; margin-left: 5px; vertical-align: 1px; background: #EEF0F4; color: #5B6478; }
   .ai-detail { font-size: var(--fs-caption); color: var(--text3); }
   .ai-amount { text-align: right; }
-  .ai-ticket { font-size: var(--fs-body); font-weight: 800; }
+  .ai-ticket { font-size: var(--fs-body); font-weight: 400; }
   .ai-ticket.earn { color: var(--green); }
   .ai-ticket.use { color: var(--main); }
   .ai-ticket.return { color: var(--red); }
@@ -7979,21 +7979,21 @@ body.interactive-mode #ip-nav { display: block; }
     font-size: var(--fs-caption); color: rgba(255,255,255,0.85); margin-bottom: 6px;
   }
 .htc-head .htc-more {
-    font-size: var(--fs-caption); color: rgba(255,255,255,0.45); font-weight: 500;
+    font-size: var(--fs-caption); color: rgba(255,255,255,0.45); font-weight: 400;
   }
 .htc-total {
-    font-size: var(--fs-number); font-weight: 800; letter-spacing: -0.5px;
+    font-size: var(--fs-number); font-weight: 700; letter-spacing: -0.5px;
     margin-bottom: 14px;
     display: flex; align-items: center; justify-content: space-between;
   }
-.htc-total b { color: #fff; font-weight: 800; }
-.htc-total span { font-size: var(--fs-body); font-weight: 500; color: rgba(255,255,255,0.7); margin-left: 4px; }
+.htc-total b { color: #fff; font-weight: 700; }
+.htc-total span { font-size: var(--fs-body); font-weight: 700; color: rgba(255,255,255,0.7); margin-left: 4px; }
 .htc-total .htc-tickets-grp { display: flex; align-items: baseline; }
 .htc-total .htc-point {
     display: inline-flex; align-items: center; gap: 6px;
     background: rgba(255,255,255,0.12); border-radius: 999px;
     padding: 5px 12px 5px 5px; margin: 0;
-    font-size: var(--fs-label); font-weight: 800; color: #fff; letter-spacing: -0.3px;
+    font-size: var(--fs-label); font-weight: 700; color: #fff; letter-spacing: -0.3px;
   }
 .htc-total .htc-point-ico {
     width: 22px; height: 22px; margin: 0;
@@ -8392,8 +8392,8 @@ body.interactive-mode #ip-nav { display: block; }
 .home-mission-card.hmc-roulette .hmc-title { color: #6E2247; }
 .home-mission-card.hmc-invite .hmc-title { color: #1D3F66; }
 .home-mission-card.hmc-streak .hmc-title { color: #3B2570; }
-.hmc-reward { font-size: var(--fs-caption); font-weight: 700; background: rgba(255,255,255,.85); border-radius: 999px; padding: 3px 9px; }
-.hmc-reward b { font-weight: 800; }
+.hmc-reward { font-size: var(--fs-caption); font-weight: 400; background: rgba(255,255,255,.85); border-radius: 999px; padding: 3px 9px; }
+.hmc-reward b { font-weight: 400; }
 .home-mission-card.hmc-attend .hmc-reward { color: #C77F00; }
 .home-mission-card.hmc-roulette .hmc-reward { color: #E0509B; }
 .home-mission-card.hmc-invite .hmc-reward { color: #2E86E8; }
@@ -8404,7 +8404,7 @@ body.interactive-mode #ip-nav { display: block; }
     align-items: flex-start; margin-bottom: 4px;
   }
 .hms-title { font-size: var(--fs-label); font-weight: 700; color: var(--text1); letter-spacing: -0.3px; }
-.hms-all { font-size: var(--fs-caption); color: var(--text3); font-weight: 600; }
+.hms-all { font-size: var(--fs-caption); color: var(--text3); font-weight: 400; }
 .home-mall-desc {
     padding: 0 16px 12px; font-size: var(--fs-caption); color: var(--text3);
   }
@@ -8435,7 +8435,7 @@ body.interactive-mode #ip-nav { display: block; }
   }
 .hmc-name { font-size: var(--fs-body); font-weight: 700; color: var(--text1); }
 .hmc-badge {
-    font-size: var(--fs-caption); font-weight: 800; padding: 2px 6px;
+    font-size: var(--fs-caption); font-weight: 400; padding: 2px 6px;
     border-radius: 4px; letter-spacing: 0.3px;
   }
 .hmc-badge.best { background: var(--main); color: #fff; }
@@ -10209,7 +10209,6 @@ window.PP_FEATURES = {
                   <span class="mtc-grade-num">3</span>
                   <span class="mtc-grade-unit">장</span>
                 </div>
-                <div style="font-size:var(--fs-caption);color:#C0291A;opacity:0.8;margin-top:2px;">대기 기간 후 실제 티켓으로 전환</div>
               </div>
               <div class="mtc-random-badge">대기중</div>
             </div>
@@ -10230,7 +10229,7 @@ window.PP_FEATURES = {
                   <span class="mtc-grade-num">12</span>
                   <span class="mtc-grade-unit">장</span>
                 </div>
-                <div class="mtc-grade-expiry-badge" style="display:none;font-size:var(--fs-caption);color:#DC2626;background:#FEF2F2;border:1px solid #FECACA;border-radius:4px;padding:2px 5px;margin-top:3px;font-weight:700;text-align:center;line-height:1.3;"></div>
+                <div class="mtc-grade-expiry-badge" style="display:none;font-size:11px;color:#DC2626;background:#FEF2F2;border:1px solid #FECACA;border-radius:4px;padding:2px 5px;margin-top:3px;font-weight:400;text-align:center;line-height:1.3;white-space:nowrap;"></div>
               </div>
               <div class="mtc-grade-item" data-ip-bound="1" data-grade="silver">
                 <div class="mtc-grade-medal"><svg width="60" height="60" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="gv62_1" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#D8D8D8"/><stop offset="100%" stop-color="#999999"/></linearGradient></defs><path d="M306.6,106.8l-49.5,49.5,2.4,2.4c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-2.4-2.4-138.6,138.6c-3.7,3.7-3.7,9.6,0,13.3l75.5,75.5c3.7,3.7,9.6,3.7,13.3,0l138.6-138.6-2.3-2.3c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l2.3,2.3,49.5-49.5c3.7-3.7,3.7-9.6,0-13.3l-75.5-75.5c-3.7-3.7-9.6-3.7-13.3,0ZM335.6,234.8c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM322.9,222.1c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM310.2,209.4c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM297.6,196.7c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM284.9,184.1c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM272.2,171.4c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7Z" fill="url(#gv62_1)"/><path d="M316.2,155.8l12.1,6.2c.8.4,1.8.3,2.4-.4l9.6-9.6c1.4-1.4,3.8-.2,3.5,1.8l-2.1,13.5c-.1.9.3,1.8,1.1,2.2l12.1,6.2c1.8.9,1.4,3.6-.6,3.9l-13.5,2.1c-.9.1-1.6.8-1.7,1.7l-2.1,13.5c-.3,2-3,2.4-3.9.6l-6.2-12.1c-.4-.8-1.3-1.3-2.2-1.1l-13.5,2.1c-2,.3-3.2-2.1-1.8-3.5l9.6-9.6c.6-.6.8-1.6.4-2.4l-6.2-12.1c-.9-1.8,1-3.7,2.8-2.8Z" fill="rgba(50,50,50,0.75)"/><path d="M180.7,298.9l-5.2,5.2,27.4,27.4-4.7,4.7-27.4-27.4-5.2,5.2-4.2-4.2,15.1-15.1,4.2,4.2ZM215.3,319.1l-4.7,4.7-31.6-31.6,4.7-4.7,31.6,31.6ZM231.9,296.8c1.9,1.9,1.9,3.9,0,5.8l-9.9,9.9c-1.9,1.9-3.8,1.8-5.7,0l-25.8-25.8c-1.9-1.9-2-3.8-.1-5.7l9.9-9.9c1.9-1.9,3.9-1.9,5.8,0l7.4,7.4-4.7,4.7-6.2-6.2-6.1,6.1,23.5,23.5,6.1-6.1-6.6-6.6,4.7-4.7,7.8,7.8ZM254.4,280l-5.2,5.2-20.1-8.1,14.1,14.1-4.7,4.7-31.6-31.6,4.7-4.7,13.4,13.4-8.1-18.6,5.2-5.2.2.2,8.6,21.4,23.6,9.2ZM269.5,265l-13.1,13.1-31.6-31.6,13-13,4.2,4.2-8.3,8.3,9.2,9.2,7.1-7.1,4.1,4.1-7.1,7.1,9.9,9.9,8.4-8.4,4.2,4.2ZM259,220.6l-5.2,5.2,27.4,27.4-4.7,4.7-27.4-27.4-5.2,5.2-4.2-4.2,15.1-15.1,4.2,4.2Z" fill="rgba(50,50,50,0.75)"/></svg></div>
@@ -10239,7 +10238,7 @@ window.PP_FEATURES = {
                   <span class="mtc-grade-num">4</span>
                   <span class="mtc-grade-unit">장</span>
                 </div>
-                <div class="mtc-grade-expiry-badge" style="display:none;font-size:var(--fs-caption);color:#DC2626;background:#FEF2F2;border:1px solid #FECACA;border-radius:4px;padding:2px 5px;margin-top:3px;font-weight:700;text-align:center;line-height:1.3;"></div>
+                <div class="mtc-grade-expiry-badge" style="display:none;font-size:11px;color:#DC2626;background:#FEF2F2;border:1px solid #FECACA;border-radius:4px;padding:2px 5px;margin-top:3px;font-weight:400;text-align:center;line-height:1.3;white-space:nowrap;"></div>
               </div>
               <div class="mtc-grade-item" data-ip-bound="1" data-grade="gold">
                 <div class="mtc-grade-medal"><svg width="60" height="60" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="gv62_2" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#FFD93B"/><stop offset="100%" stop-color="#E6A800"/></linearGradient></defs><path d="M306.6,106.8l-49.5,49.5,2.4,2.4c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-2.4-2.4-138.6,138.6c-3.7,3.7-3.7,9.6,0,13.3l75.5,75.5c3.7,3.7,9.6,3.7,13.3,0l138.6-138.6-2.3-2.3c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l2.3,2.3,49.5-49.5c3.7-3.7,3.7-9.6,0-13.3l-75.5-75.5c-3.7-3.7-9.6-3.7-13.3,0ZM335.6,234.8c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM322.9,222.1c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM310.2,209.4c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM297.6,196.7c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM284.9,184.1c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM272.2,171.4c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7Z" fill="url(#gv62_2)"/><path d="M316.2,155.8l12.1,6.2c.8.4,1.8.3,2.4-.4l9.6-9.6c1.4-1.4,3.8-.2,3.5,1.8l-2.1,13.5c-.1.9.3,1.8,1.1,2.2l12.1,6.2c1.8.9,1.4,3.6-.6,3.9l-13.5,2.1c-.9.1-1.6.8-1.7,1.7l-2.1,13.5c-.3,2-3,2.4-3.9.6l-6.2-12.1c-.4-.8-1.3-1.3-2.2-1.1l-13.5,2.1c-2,.3-3.2-2.1-1.8-3.5l9.6-9.6c.6-.6.8-1.6.4-2.4l-6.2-12.1c-.9-1.8,1-3.7,2.8-2.8Z" fill="rgba(255,255,255,0.95)"/><path d="M180.7,298.9l-5.2,5.2,27.4,27.4-4.7,4.7-27.4-27.4-5.2,5.2-4.2-4.2,15.1-15.1,4.2,4.2ZM215.3,319.1l-4.7,4.7-31.6-31.6,4.7-4.7,31.6,31.6ZM231.9,296.8c1.9,1.9,1.9,3.9,0,5.8l-9.9,9.9c-1.9,1.9-3.8,1.8-5.7,0l-25.8-25.8c-1.9-1.9-2-3.8-.1-5.7l9.9-9.9c1.9-1.9,3.9-1.9,5.8,0l7.4,7.4-4.7,4.7-6.2-6.2-6.1,6.1,23.5,23.5,6.1-6.1-6.6-6.6,4.7-4.7,7.8,7.8ZM254.4,280l-5.2,5.2-20.1-8.1,14.1,14.1-4.7,4.7-31.6-31.6,4.7-4.7,13.4,13.4-8.1-18.6,5.2-5.2.2.2,8.6,21.4,23.6,9.2ZM269.5,265l-13.1,13.1-31.6-31.6,13-13,4.2,4.2-8.3,8.3,9.2,9.2,7.1-7.1,4.1,4.1-7.1,7.1,9.9,9.9,8.4-8.4,4.2,4.2ZM259,220.6l-5.2,5.2,27.4,27.4-4.7,4.7-27.4-27.4-5.2,5.2-4.2-4.2,15.1-15.1,4.2,4.2Z" fill="rgba(255,255,255,0.95)"/></svg></div>
@@ -10248,7 +10247,7 @@ window.PP_FEATURES = {
                   <span class="mtc-grade-num">2</span>
                   <span class="mtc-grade-unit">장</span>
                 </div>
-                <div class="mtc-grade-expiry-badge" style="display:none;font-size:var(--fs-caption);color:#DC2626;background:#FEF2F2;border:1px solid #FECACA;border-radius:4px;padding:2px 5px;margin-top:3px;font-weight:700;text-align:center;line-height:1.3;"></div>
+                <div class="mtc-grade-expiry-badge" style="display:none;font-size:11px;color:#DC2626;background:#FEF2F2;border:1px solid #FECACA;border-radius:4px;padding:2px 5px;margin-top:3px;font-weight:400;text-align:center;line-height:1.3;white-space:nowrap;"></div>
               </div>
             </div>
 
@@ -10312,7 +10311,6 @@ window.PP_FEATURES = {
                 <span class="mtc-event-medal"><svg width="60" height="60" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="gv62_3" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#C9AAFF"/><stop offset="100%" stop-color="#845EEE"/></linearGradient></defs><path d="M306.6,106.8l-49.5,49.5,2.4,2.4c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-2.4-2.4-138.6,138.6c-3.7,3.7-3.7,9.6,0,13.3l75.5,75.5c3.7,3.7,9.6,3.7,13.3,0l138.6-138.6-2.3-2.3c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l2.3,2.3,49.5-49.5c3.7-3.7,3.7-9.6,0-13.3l-75.5-75.5c-3.7-3.7-9.6-3.7-13.3,0ZM335.6,234.8c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM322.9,222.1c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM310.2,209.4c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM297.6,196.7c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM284.9,184.1c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM272.2,171.4c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7Z" fill="url(#gv62_3)"/><path d="M316.2,155.8l12.1,6.2c.8.4,1.8.3,2.4-.4l9.6-9.6c1.4-1.4,3.8-.2,3.5,1.8l-2.1,13.5c-.1.9.3,1.8,1.1,2.2l12.1,6.2c1.8.9,1.4,3.6-.6,3.9l-13.5,2.1c-.9.1-1.6.8-1.7,1.7l-2.1,13.5c-.3,2-3,2.4-3.9.6l-6.2-12.1c-.4-.8-1.3-1.3-2.2-1.1l-13.5,2.1c-2,.3-3.2-2.1-1.8-3.5l9.6-9.6c.6-.6.8-1.6.4-2.4l-6.2-12.1c-.9-1.8,1-3.7,2.8-2.8Z" fill="rgba(255,255,255,0.95)"/><path d="M180.7,298.9l-5.2,5.2,27.4,27.4-4.7,4.7-27.4-27.4-5.2,5.2-4.2-4.2,15.1-15.1,4.2,4.2ZM215.3,319.1l-4.7,4.7-31.6-31.6,4.7-4.7,31.6,31.6ZM231.9,296.8c1.9,1.9,1.9,3.9,0,5.8l-9.9,9.9c-1.9,1.9-3.8,1.8-5.7,0l-25.8-25.8c-1.9-1.9-2-3.8-.1-5.7l9.9-9.9c1.9-1.9,3.9-1.9,5.8,0l7.4,7.4-4.7,4.7-6.2-6.2-6.1,6.1,23.5,23.5,6.1-6.1-6.6-6.6,4.7-4.7,7.8,7.8ZM254.4,280l-5.2,5.2-20.1-8.1,14.1,14.1-4.7,4.7-31.6-31.6,4.7-4.7,13.4,13.4-8.1-18.6,5.2-5.2.2.2,8.6,21.4,23.6,9.2ZM269.5,265l-13.1,13.1-31.6-31.6,13-13,4.2,4.2-8.3,8.3,9.2,9.2,7.1-7.1,4.1,4.1-7.1,7.1,9.9,9.9,8.4-8.4,4.2,4.2ZM259,220.6l-5.2,5.2,27.4,27.4-4.7,4.7-27.4-27.4-5.2,5.2-4.2-4.2,15.1-15.1,4.2,4.2Z" fill="rgba(255,255,255,0.95)"/></svg></span>
                 <div class="mtc-event-info">
                   <span class="mtc-event-name">이벤트 티켓</span>
-                  <span class="mtc-event-desc">출석 5일·매일 행운 룰렛·온보딩 가입으로 모아 경품 응모</span>
                 </div>
               </div>
               <div class="mtc-event-r">
@@ -10337,7 +10335,6 @@ window.PP_FEATURES = {
             </div>
             <div class="cpg-body">
               <div class="cpg-title">쿠팡 쇼핑 적립 <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-              <div class="cpg-sub">쇼핑 금액에 따른 랜덤 티켓 지급</div>
             </div>
             <button class="cpg-go">구매하러 가기</button>
           </div>
@@ -10353,12 +10350,10 @@ window.PP_FEATURES = {
                 <div class="ac-row-mark">✓</div>
                 <div class="ac-row-body">
                   <div class="ac-row-t">구매 확정 후 7일 사용 가능</div>
-                  <div class="ac-row-s">취소·환불 시 즉시 환수</div>
                 </div>
                 <div class="ac-row-days">7<small>일</small></div>
               </div>
             </div>
-            <div class="ac-warn">대기 기간 중 취소·환불 발생 시 지급 티켓은 환수됩니다.</div>
           </div>
 
           <!-- 티켓 적립 방법 3단계 -->
@@ -10444,7 +10439,7 @@ window.PP_FEATURES = {
             <div style="background:linear-gradient(135deg,#7B52E1,#9D7BF0);border-radius:16px;padding:18px 18px 16px;color:#fff;margin-bottom:14px;">
               <div style="font-size:var(--fs-caption);opacity:0.85;">사용 가능 포인트</div>
               <div style="display:flex;align-items:baseline;gap:4px;margin-top:4px;">
-                <span id="pt-balance" style="font-size:var(--fs-number);font-weight:800;letter-spacing:-0.5px;">0</span><span style="font-size:var(--fs-label);font-weight:700;">P</span>
+                <span id="pt-balance" style="font-size:var(--fs-number);font-weight:700;letter-spacing:-0.5px;">0</span><span style="font-size:var(--fs-label);font-weight:700;">P</span>
               </div>
               <div style="margin-top:13px;display:flex;gap:8px;">
                 <button type="button" style="flex:1;background:#fff;border:none;color:var(--main);font-size:var(--fs-body);font-weight:700;border-radius:10px;padding:10px;cursor:pointer;">티켓으로 전환</button>
@@ -10453,9 +10448,9 @@ window.PP_FEATURES = {
             <!-- 안내 -->
             <div style="background:#F7F4FF;border:1px solid #E4DBFF;border-radius:12px;padding:11px 13px;font-size:var(--fs-caption);color:var(--text2);line-height:1.5;margin-bottom:16px;">10P = 1원 · 친구 초대·출석·이벤트로 모은 포인트는 티켓으로 전환해서 쓸 수 있어요.</div>
             <!-- 내역 -->
-            <div style="font-size:var(--fs-body);font-weight:800;color:var(--text1);margin-bottom:6px;padding:0 2px;">만료 예정 포인트</div>
+            <div style="font-size:var(--fs-body);font-weight:700;color:var(--text1);margin-bottom:6px;padding:0 2px;">만료 예정 포인트</div>
             <div id="pt-expiring" style="background:#FFF8EE;border:1px solid #FFE2B8;border-radius:12px;padding:11px 13px;margin-bottom:16px;display:none;"><!-- PP --></div>
-            <div style="font-size:var(--fs-body);font-weight:800;color:var(--text1);margin-bottom:6px;padding:0 2px;">최근 적립·사용</div>
+            <div style="font-size:var(--fs-body);font-weight:700;color:var(--text1);margin-bottom:6px;padding:0 2px;">최근 적립·사용</div>
               <div id="pt-recent" style="display:flex;flex-direction:column;"><!-- PP: 실데이터 (point_transactions) --></div>
           </div><!-- /rwd-pane-point -->
 
@@ -19064,12 +19059,12 @@ function renderPurchaseHistory() {
       return '<div style="margin:8px 16px;background:#fff;border:1px solid var(--border);border-radius:14px;overflow:hidden;">'
         + '<div style="display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border-bottom:1px solid var(--border);">'
         + '<div style="display:flex;align-items:center;gap:7px;">' + (dom ? '<img src="https://www.google.com/s2/favicons?domain=' + ppEsc(dom) + '&sz=64" width="16" height="16" style="border-radius:4px;" onerror="this.remove()">' : '')
-        + '<span style="font-size:var(--fs-caption);font-weight:700;color:var(--text1);">' + ppEsc(mall) + '</span></div>'
-        + '<span style="font-size:var(--fs-caption);font-weight:700;color:' + st.c + ';background:' + st.bg + ';padding:3px 9px;border-radius:20px;">' + st.t + '</span></div>'
+        + '<span style="font-size:var(--fs-caption);font-weight:400;color:var(--text1);">' + ppEsc(mall) + '</span></div>'
+        + '<span style="font-size:var(--fs-caption);font-weight:400;color:' + st.c + ';background:' + st.bg + ';padding:3px 9px;border-radius:20px;">' + st.t + '</span></div>'
         + '<div style="padding:12px 14px;">'
-        + '<div style="display:flex;justify-content:space-between;font-size:var(--fs-caption);color:var(--text3);margin-bottom:5px;"><span>주문일</span><span style="color:var(--text2);font-weight:600;">' + ppFmt(ppDate(p.created_at)) + '</span></div>'
-        + '<div style="display:flex;justify-content:space-between;font-size:var(--fs-caption);color:var(--text3);margin-bottom:5px;"><span>결제금액</span><span style="color:var(--text2);font-weight:600;">' + amt + '</span></div>'
-        + (cd ? '<div style="display:flex;justify-content:space-between;font-size:var(--fs-caption);color:var(--text3);margin-bottom:5px;"><span>구매확정</span><span style="color:var(--text2);font-weight:600;">' + ppFmt(cd) + '</span></div>' : '')
+        + '<div style="display:flex;justify-content:space-between;font-size:var(--fs-caption);color:var(--text3);margin-bottom:5px;"><span>주문일</span><span style="color:var(--text2);font-weight:400;">' + ppFmt(ppDate(p.created_at)) + '</span></div>'
+        + '<div style="display:flex;justify-content:space-between;font-size:var(--fs-caption);color:var(--text3);margin-bottom:5px;"><span>결제금액</span><span style="color:var(--text2);font-weight:400;">' + amt + '</span></div>'
+        + (cd ? '<div style="display:flex;justify-content:space-between;font-size:var(--fs-caption);color:var(--text3);margin-bottom:5px;"><span>구매확정</span><span style="color:var(--text2);font-weight:400;">' + ppFmt(cd) + '</span></div>' : '')
         + '</div></div>';
     }).join('');
   });
@@ -19470,7 +19465,7 @@ function renderTicketDetail() {
       var right = '';
       if (near.length) {
         var minDays = Math.max(0, Math.ceil((near[0] - now) / 86400000));
-        right = '<div style="font-size:var(--fs-caption);color:#DC2626;background:#FEF2F2;border:1px solid #FECACA;border-radius:4px;padding:2px 6px;font-weight:700;">⚠ ' + near.length + '장 D-' + minDays + ' 만료</div>';
+        right = '<div style="font-size:11px;color:#DC2626;background:#FEF2F2;border:1px solid #FECACA;border-radius:4px;padding:2px 6px;font-weight:400;white-space:nowrap;">⚠ ' + near.length + '장 D-' + minDays + ' 만료</div>';
       } else if (expiries.length) {
         right = '<div style="font-size:var(--fs-caption);color:#9B93B0;">만료 ' + ppFmt(expiries[0]) + '</div>';
       }
@@ -19649,8 +19644,8 @@ function renderPointExpiry(ptx, expiry) {
   var nearest = res.groupList[0];
   var nearWarn = nearest.daysLeft <= 30;
   var summaryHtml = '<div style="display:flex;justify-content:space-between;align-items:center;">'
-    + '<span style="font-size:var(--fs-label);font-weight:800;color:#9A6A1E;">' + res.total.toLocaleString('ko-KR') + 'P</span>'
-    + (nearWarn ? '<span style="font-size:var(--fs-caption);font-weight:700;color:#DC2626;background:#FEF2F2;border:1px solid #FECACA;border-radius:4px;padding:2px 6px;flex-shrink:0;">⚠ D-' + nearest.daysLeft + ' 만료</span>' : '')
+    + '<span style="font-size:var(--fs-label);font-weight:700;color:#9A6A1E;">' + res.total.toLocaleString('ko-KR') + 'P</span>'
+    + (nearWarn ? '<span style="font-size:11px;font-weight:400;color:#DC2626;background:#FEF2F2;border:1px solid #FECACA;border-radius:4px;padding:2px 6px;flex-shrink:0;white-space:nowrap;">⚠ D-' + nearest.daysLeft + ' 만료</span>' : '')
     + '</div>';
   /* pw-20 혜택 탭 — 요약만 보여주고 상세는 pw-21(내 티켓 & 포인트)로 연결 */
   box.style.display = 'block';
@@ -19675,9 +19670,9 @@ function renderPointPanel() {
       var amt = p.amount != null ? p.amount : (p.qty || 0);
       var pos = amt >= 0;
       return '<div style="display:flex;align-items:center;justify-content:space-between;padding:13px 2px;border-bottom:1px solid #EFEAF7;">'
-        + '<div><div style="font-size:var(--fs-body);font-weight:600;color:var(--text1);">' + ppEsc(p.reason || p.type || '포인트') + '</div>'
+        + '<div><div style="font-size:var(--fs-body);font-weight:400;color:var(--text1);">' + ppEsc(p.reason || p.type || '포인트') + '</div>'
         + '<div style="font-size:var(--fs-caption);color:var(--text3);margin-top:2px;">' + ppFmt(ppDate(p.created_at)) + '</div></div>'
-        + '<div style="font-size:var(--fs-body);font-weight:800;color:' + (pos ? 'var(--main)' : '#E03E3E') + ';">' + (pos ? '+' : '') + amt + 'P</div></div>';
+        + '<div style="font-size:var(--fs-body);font-weight:400;color:' + (pos ? 'var(--main)' : '#E03E3E') + ';">' + (pos ? '+' : '') + amt + 'P</div></div>';
     }).join('');
   });
 }
@@ -19701,8 +19696,8 @@ function renderGifticonHistory() {
       }
       var done = (x.status === 'completed' || x.status === 'issued');
       return '<div data-gx="' + i + '" style="padding:10px 12px;border-top:1px solid #F3EFFA;cursor:' + (x.code ? 'pointer' : 'default') + ';"><div style="display:flex;justify-content:space-between;align-items:center;font-size:var(--fs-caption);">'
-        + '<span style="font-weight:600;">' + ppEsc((brand ? brand + ' ' : '') + nm) + '</span>'
-        + '<span style="font-size:var(--fs-caption);font-weight:700;color:' + (done ? '#1f9d57' : '#6b7280') + ';background:' + (done ? '#e6f7ec' : '#f3f4f6') + ';border-radius:8px;padding:2px 7px;">' + (done ? '발급완료' : '처리중') + '</span></div>'
+        + '<span style="font-weight:400;">' + ppEsc((brand ? brand + ' ' : '') + nm) + '</span>'
+        + '<span style="font-size:var(--fs-caption);font-weight:400;color:' + (done ? '#1f9d57' : '#6b7280') + ';background:' + (done ? '#e6f7ec' : '#f3f4f6') + ';border-radius:8px;padding:2px 7px;">' + (done ? '발급완료' : '처리중') + '</span></div>'
         + '<div style="font-size:var(--fs-caption);color:var(--text3);margin-top:3px;">' + (GRADE_KO[x.grade_used] || '') + ' ' + (x.count_used || 1) + '장 사용 · ' + ppFmt(ppDate(x.exchanged_at)) + ' 교환' + (x.code ? ' · 코드 보기 ›' : '') + '</div></div>';
     }).join('');
     box.querySelectorAll('[data-gx]').forEach(function (row) {
