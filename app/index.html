@@ -12797,32 +12797,16 @@ window.PP_FEATURES = {
             <div id="mt21-pending"><!-- PP: 실데이터 렌더 --></div>
           </div>
 
-          <!-- 티켓 보유 현황 + 포인트 — 시안 통합 카드 그대로 이식 -->
+          <!-- 티켓 보유 현황 + 포인트 — 등급별 줄 토글(김반장 2026-08-06, devqa Q1 답변). 상위 토글 없이 5줄 바로 노출, 초기 전부 접힘 -->
           <div class="gd-section">
             <div class="gd-section-t"><span class="i18n"><span class="ko">티켓 보유 현황</span><span class="vi">Tình trạng sở hữu vé</span></span></div>
-            <div style="padding:20px;border-radius:16px;background:#fff;box-shadow:0 0 0 1px rgba(132,94,238,0.1);display:flex;flex-direction:column;gap:18px;">
-              <div id="mt21-grid" style="display:grid;grid-template-columns:1fr 1px 1fr 1px 1fr 1px 1fr;"><!-- PP: 실데이터 렌더 --></div>
+            <div style="border-radius:16px;background:#fff;box-shadow:0 0 0 1px rgba(132,94,238,0.1);overflow:hidden;">
+              <div id="mt21-hold-tickets"><!-- PP: 실데이터 렌더(등급 4줄) --></div>
               <div style="height:1px;background:#F1EFF6;"></div>
-              <div id="mt21-points-row" style="display:flex;align-items:center;gap:10px;padding:0 2px;"><!-- PP: 실데이터 렌더 --></div>
-              <div id="mt21-footer-slot"><!-- PP: 실데이터 렌더 (구분선 + D-알림/빈 상태) --></div>
+              <div id="mt21-hold-point"><!-- PP: 실데이터 렌더(포인트 1줄) --></div>
             </div>
-          </div>
-
-          <!-- 만료일 자세히 보기 -->
-          <div class="gd-section" id="mt21-expiry-section" style="display:none;">
-            <div id="mt21-expiry-card" style="display:flex;flex-direction:column;gap:14px;padding:15px;border-radius:14px;background:#fff;box-shadow:0 0 0 1px rgba(132,94,238,0.1);">
-              <button type="button" id="mt21-expiry-toggle" onclick="mt21ToggleExpiry()" style="background:none;border:none;padding:0;margin:0;font:inherit;display:flex;align-items:center;justify-content:center;gap:6px;color:#845EEE;font-size:var(--fs-body);font-weight:700;cursor:pointer;">
-                <span class="i18n"><span class="ko">만료일 자세히 보기</span><span class="vi">Xem chi tiết hạn dùng theo hạng</span></span>
-                <svg id="mt21-expiry-chevron" width="11" height="11" viewBox="0 0 10 10" fill="none" style="transition:transform .2s;flex-shrink:0;"><path d="M1.5 3.5L5 7l3.5-3.5" stroke="#845EEE" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              </button>
-              <div id="mt21-expiry-body" style="display:none;flex-direction:column;gap:14px;">
-                <div style="height:1px;background:#F1EFF6;"></div>
-                <div id="mt21-expiry-tickets" style="display:flex;flex-direction:column;gap:16px;"><!-- PP --></div>
-                <div id="mt21-expiry-points" style="display:flex;flex-direction:column;gap:6px;"><!-- PP --></div>
-                <div style="padding-top:2px;">
-                  <span class="i18n"><span class="ko"><span style="display:block;color:#9B93B0;font-size:var(--fs-caption);font-weight:400;line-height:1.55;">만료가 임박한(적립일이 오래된) 티켓부터 자동 사용되고, 등급을 바꿔도 만료일은 늘어나지 않아요.</span></span><span class="vi"><span style="display:block;color:#9B93B0;font-size:var(--fs-caption);font-weight:400;line-height:1.55;">Vé sắp hết hạn (tích lũy lâu nhất) được dùng trước, và đổi hạng không kéo dài thêm hạn dùng.</span></span></span>
-                </div>
-              </div>
+            <div style="padding:10px 4px 0;">
+              <span class="i18n"><span class="ko"><span style="display:block;color:#9B93B0;font-size:var(--fs-caption);font-weight:400;line-height:1.55;">만료가 임박한(적립일이 오래된) 티켓부터 자동 사용되고, 등급을 바꿔도 만료일은 늘어나지 않아요.</span></span><span class="vi"><span style="display:block;color:#9B93B0;font-size:var(--fs-caption);font-weight:400;line-height:1.55;">Vé sắp hết hạn (tích lũy lâu nhất) được dùng trước, và đổi hạng không kéo dài thêm hạn dùng.</span></span></span>
             </div>
           </div>
 
@@ -19221,11 +19205,7 @@ var GRADE_ROW_STYLE = {
 /* ══ pw-21 「내 티켓 & 포인트」 — 20260804_NewDesign_mytickets.html 통합 카드 그대로 이식 ══
    phone19("내 적립 티켓", 레거시 화면)는 gd-holdings-19 / gd-pending-multi-19 id로 별도 렌더 경로를 유지한다. */
 var MT21_GRADES = ['bronze', 'silver', 'gold', 'event'];
-var MT21_ALERT_DAYS = 30; /* 시안 예시(브론즈 08.19 · D-15)가 30일 임박 규칙과 일치 */
-function mt21ShortDate(d) { return ('0' + (d.getMonth() + 1)).slice(-2) + '.' + ('0' + d.getDate()).slice(-2); }
-function mt21KoDate(d) { return (d.getMonth() + 1) + '월 ' + d.getDate() + '일'; }
-/* 전역 KO2VI 사전의 "월"/"일"은 요일(Monday/Sunday) 번역용이라 날짜에 그대로 쓰면 깨진다 — 날짜용 VI는 직접 조합 */
-function mt21ViDate(d) { return 'ngày ' + d.getDate() + ' tháng ' + (d.getMonth() + 1); }
+var MT21_ALERT_DAYS = 7; /* 임박 기준 D-7 — 알림 설정(D-30·D-7) 중 최종 단계와 통일(김반장 2026-08-06, devqa Q2 답변) */
 var MT21_GRADE_VI = { bronze: 'Bronze', silver: 'Silver', gold: 'Gold', event: 'Sự kiện' };
 function mt21I18n(ko, vi) { return '<span class="i18n"><span class="ko">' + ko + '</span><span class="vi">' + vi + '</span></span>'; }
 function mt21GroupExpiries(dates) {
@@ -19238,119 +19218,58 @@ function mt21GroupExpiries(dates) {
   });
   return Object.keys(groups).map(function (k) { return groups[k]; }).sort(function (a, b) { return a.d - b.d; });
 }
-var MT21_TK = null; /* { byGrade, totalCount } — renderTicketDetail이 채움 */
-var MT21_PT = null; /* { groupList, total } — renderPointExpiry가 채움 */
-
-function mt21RenderGrid(byGrade) {
-  var cells = MT21_GRADES.map(function (g) {
-    var info = byGrade[g];
-    var zero = info.count === 0;
-    var numColor = zero ? '#C4BED0' : '#1A1130';
-    var sufColor = zero ? '#C4BED0' : '#5A5370';
-    var sub = '';
-    if (info.groups.length) {
-      var nearest = info.groups[0];
-      /* 카드 하단 4칸 요약은 라벨/부연 정보다 — 볼드·경고색은 아래 D-알림 한 줄에만 남긴다(김반장 2026-08-05 지시) */
-      sub = mt21I18n(
-        '<span style="display:block;color:#5A5370;font-size:11px;font-weight:400;">' + mt21ShortDate(nearest.d) + ' · ' + nearest.n + '장</span>'
-          + '<span style="display:block;color:#9B93B0;font-size:11px;font-weight:400;">만료일 ' + info.groups.length + '개</span>',
-        '<span style="display:block;color:#5A5370;font-size:11px;font-weight:400;">' + mt21ShortDate(nearest.d) + ' · ' + nearest.n + ' vé</span>'
-          + '<span style="display:block;color:#9B93B0;font-size:11px;font-weight:400;">' + info.groups.length + ' hạn dùng</span>'
-      );
-    }
-    var sufHtml = mt21I18n(
-      '<span style="font-size:var(--fs-caption);font-weight:700;color:' + sufColor + ';margin-left:1px;">장</span>',
-      '<span style="font-size:var(--fs-caption);font-weight:700;color:' + sufColor + ';margin-left:2px;"> vé</span>'
-    );
-    return '<div style="display:flex;flex-direction:column;align-items:center;gap:6px;">'
-      + '<span style="display:inline-flex;' + (zero ? 'opacity:0.35;' : '') + '">' + ticketIcon(g, 40) + '</span>'
-      + '<span style="color:' + numColor + ';font-size:var(--fs-title);font-weight:700;letter-spacing:-0.03em;">' + info.count + sufHtml + '</span>'
-      + '<span style="color:#9B93B0;font-size:var(--fs-caption);font-weight:400;">' + GRADE_KO[g] + '</span>'
-      + sub + '</div>';
-  });
-  var out = '';
-  cells.forEach(function (c, i) { if (i > 0) out += '<div style="background:#F1EFF6;"></div>'; out += c; });
-  return out;
-}
-
-function mt21RenderExpiryTickets(byGrade) {
-  var out = '';
-  MT21_GRADES.forEach(function (g) {
-    var info = byGrade[g];
-    if (!info.count) return;
-    out += '<div style="display:flex;flex-direction:column;gap:6px;">'
-      + '<div style="display:flex;align-items:center;gap:8px;padding:0 2px;">' + ticketIcon(g, 24)
-      + '<span style="color:#1A1130;font-size:var(--fs-body);font-weight:700;">' + GRADE_KO[g] + '</span>'
-      + '<span style="color:#9B93B0;font-size:var(--fs-caption);font-weight:400;">' + mt21I18n('총 ' + info.count + '장 · 만료일 ' + info.groups.length + '개', 'Tổng ' + info.count + ' vé · ' + info.groups.length + ' hạn dùng') + '</span></div>';
-    info.groups.forEach(function (grp) {
-      var daysLeft = Math.ceil((grp.d - Date.now()) / 86400000);
-      var near = daysLeft <= MT21_ALERT_DAYS;
-      var c = near ? '#D4661E' : '#5A5370';
-      /* 날짜·수량은 라벨 취급(400) — 임박 경고만 D-배지로 볼드 유지(김반장 2026-08-05 지시) */
-      out += '<div style="display:flex;align-items:center;gap:8px;padding:10px 13px;border-radius:10px;background:' + (near ? '#FFF4EC' : '#F8F6FE') + ';">'
-        + '<span style="color:' + c + ';font-size:var(--fs-caption);font-weight:400;">' + mt21I18n(grp.n + '장', grp.n + ' vé') + '</span>'
-        + '<span style="margin-left:auto;color:' + c + ';font-size:var(--fs-caption);font-weight:400;">' + ppFmt(grp.d) + '</span>'
-        + (near ? '<span style="color:' + c + ';font-size:var(--fs-caption);font-weight:700;margin-left:4px;">D-' + Math.max(0, daysLeft) + '</span>' : '')
-        + '</div>';
-    });
-    out += '</div>';
-  });
-  return out;
-}
-
-/* 두 비동기 소스(티켓/포인트)가 다 준비돼야 그릴 수 있는 맨 아래 칸 — 전부 0이면 빈 상태 문구, 아니면 가장 임박한 만료 1건만 D-알림으로 */
-function mt21RenderFooterSlot() {
-  var slot = document.getElementById('mt21-footer-slot');
-  var expirySection = document.getElementById('mt21-expiry-section');
-  if (!slot || !MT21_TK || !MT21_PT) return;
-  var hasAny = MT21_TK.totalCount > 0 || MT21_PT.total > 0;
-  if (expirySection) expirySection.style.display = hasAny ? '' : 'none';
-  if (!hasAny) {
-    slot.innerHTML = '<div style="height:1px;background:#F1EFF6;"></div>'
-      + '<div class="i18n"><span class="ko"><span style="display:block;color:#9B93B0;font-size:var(--fs-caption);font-weight:400;text-align:center;line-height:1.5;">보유한 티켓과 포인트가 없어요.<br>쇼핑몰 구매로 티켓을 적립해 보세요.</span></span><span class="vi"><span style="display:block;color:#9B93B0;font-size:var(--fs-caption);font-weight:400;text-align:center;line-height:1.5;">Bạn chưa có vé và điểm nào.<br>Mua sắm qua liên kết để tích lũy vé.</span></span></div>';
-    return;
-  }
-  var best = null;
-  MT21_GRADES.forEach(function (g) {
-    var info = MT21_TK.byGrade[g];
-    if (!info.groups.length) return;
-    var n = info.groups[0];
-    if (!best || n.d < best.d) best = { type: 'ticket', grade: g, d: n.d, n: n.n };
-  });
-  if (MT21_PT.groupList.length) {
-    var pn = MT21_PT.groupList[0];
-    if (!best || pn.expiresAt < best.d) best = { type: 'point', d: pn.expiresAt, amt: pn.amt };
-  }
-  if (best) {
-    var daysLeft = Math.max(0, Math.ceil((best.d - Date.now()) / 86400000));
-    if (daysLeft <= MT21_ALERT_DAYS) {
-      var msgKo = (best.type === 'ticket')
-        ? (GRADE_KO[best.grade] + ' ' + best.n + '장이 ' + mt21KoDate(best.d) + ' 만료돼요')
-        : (best.amt.toLocaleString('ko-KR') + 'P가 ' + mt21KoDate(best.d) + ' 만료돼요');
-      var msgVi = (best.type === 'ticket')
-        ? (best.n + ' vé ' + MT21_GRADE_VI[best.grade] + ' sẽ hết hạn vào ' + mt21ViDate(best.d))
-        : (best.amt.toLocaleString('ko-KR') + 'P sẽ hết hạn vào ' + mt21ViDate(best.d));
-      slot.innerHTML = '<div style="height:1px;background:#F1EFF6;"></div>'
-        + '<div style="display:flex;align-items:center;gap:7px;padding:11px 13px;border-radius:12px;background:#FFF4EC;">'
-        + '<span style="color:#D4661E;font-size:var(--fs-caption);font-weight:700;">D-' + daysLeft + '</span>'
-        + '<span style="color:#8A5A3B;font-size:var(--fs-caption);font-weight:400;">' + mt21I18n(msgKo, msgVi) + '</span></div>';
-      return;
-    }
-  }
-  slot.innerHTML = '';
-}
-
-function mt21ToggleExpiry() {
-  var body = document.getElementById('mt21-expiry-body');
-  var chev = document.getElementById('mt21-expiry-chevron');
-  var card = document.getElementById('mt21-expiry-card');
+/* 등급 줄 토글 — 클릭한 줄만 펼침/접힘(김반장 2026-08-06, devqa Q1 답변). onclick 인라인 핸들러는 전역에서 찾는다 */
+function mt21ToggleHold(key) {
+  var body = document.getElementById('mt21-hold-body-' + key);
+  var chev = document.getElementById('mt21-hold-chevron-' + key);
   if (!body) return;
   var open = body.style.display === 'flex';
   body.style.display = open ? 'none' : 'flex';
   if (chev) chev.style.transform = open ? '' : 'rotate(180deg)';
-  if (card) card.style.padding = open ? '15px' : '18px 16px 16px';
 }
-window.mt21ToggleExpiry = mt21ToggleExpiry; // onclick 인라인 핸들러는 전역에서 찾는다 — IIFE 내부 함수라 노출 필요 (bindGdSwapHelp와 동일 사유)
+window.mt21ToggleHold = mt21ToggleHold;
+
+/* 등급 줄 1개 — 헤더(요약, 클릭시 토글) + 접힌 본문(만료일 그룹, D-7 이내 임박은 주황 강조).
+   groups가 없으면(무보유, 또는 만료일 미추적 정책) 펼칠 내용이 없으므로 토글 없이 정적으로만 표시. */
+function mt21RenderHoldRow(key, iconHtml, nameKo, nameVi, count, unitKo, unitVi, groups, groupRowFn) {
+  var zero = count === 0;
+  var head = '<div style="display:flex;align-items:center;gap:8px;">' + iconHtml
+    + '<span style="color:' + (zero ? '#C4BED0' : '#1A1130') + ';font-size:var(--fs-body);font-weight:700;">' + mt21I18n(nameKo, nameVi) + '</span>'
+    + '<span style="color:#9B93B0;font-size:var(--fs-caption);font-weight:400;">' + (groups.length
+      ? mt21I18n(count + unitKo + ' · 만료일 ' + groups.length + '개', count + ' ' + unitVi + ' · ' + groups.length + ' hạn dùng')
+      : mt21I18n(count + unitKo, count + ' ' + unitVi)) + '</span></div>';
+  if (!groups.length) {
+    return '<div style="padding:14px 16px;">' + head + '</div>';
+  }
+  var chevron = '<svg id="mt21-hold-chevron-' + key + '" width="11" height="11" viewBox="0 0 10 10" fill="none" style="transition:transform .2s;flex-shrink:0;margin-left:auto;"><path d="M1.5 3.5L5 7l3.5-3.5" stroke="#845EEE" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  var bodyRows = groups.map(groupRowFn).join('');
+  return '<button type="button" onclick="mt21ToggleHold(\'' + key + '\')" style="width:100%;background:none;border:none;padding:14px 16px;margin:0;font:inherit;display:flex;align-items:center;gap:8px;cursor:pointer;text-align:left;">' + head + chevron + '</button>'
+    + '<div id="mt21-hold-body-' + key + '" style="display:none;flex-direction:column;gap:8px;padding:0 16px 14px;">' + bodyRows + '</div>';
+}
+function mt21GroupRow(unitLabelFn) {
+  return function (grp) {
+    var d = grp.d || grp.expiresAt;
+    var daysLeft = Math.ceil((d - Date.now()) / 86400000);
+    var near = daysLeft <= MT21_ALERT_DAYS;
+    var c = near ? '#D4661E' : '#5A5370';
+    /* 임박(D-7 이내) 항목만 배경·글자를 주황으로 강조 — 별도 D-day 안내 줄 없이 이 강조로 대체(김반장 2026-08-06, devqa Q2 답변) */
+    return '<div style="display:flex;align-items:center;gap:8px;padding:10px 13px;border-radius:10px;background:' + (near ? '#FFF4EC' : '#F8F6FE') + ';">'
+      + '<span style="color:' + c + ';font-size:var(--fs-caption);font-weight:400;">' + unitLabelFn(grp) + '</span>'
+      + '<span style="margin-left:auto;color:' + c + ';font-size:var(--fs-caption);font-weight:400;">' + ppFmt(d) + '</span>'
+      + (near ? '<span style="color:' + c + ';font-size:var(--fs-caption);font-weight:700;margin-left:4px;">D-' + Math.max(0, daysLeft) + '</span>' : '')
+      + '</div>';
+  };
+}
+function mt21RenderHoldTickets(byGrade) {
+  var out = '';
+  MT21_GRADES.forEach(function (g, i) {
+    var info = byGrade[g];
+    if (i > 0) out += '<div style="height:1px;background:#F1EFF6;"></div>';
+    out += mt21RenderHoldRow(g, ticketIcon(g, 24), GRADE_KO[g], MT21_GRADE_VI[g], info.count, '장', 'vé', info.groups,
+      mt21GroupRow(function (grp) { return mt21I18n(grp.n + '장', grp.n + ' vé'); }));
+  });
+  return out;
+}
 
 function mt21PurchaseLine(pb) {
   if (!pb) return '';
@@ -19462,13 +19381,8 @@ function renderTicketDetail() {
       if (ea && (!done[key].earnedAt || ea < done[key].earnedAt)) done[key].earnedAt = ea;
     });
     MT21_GRADES.forEach(function (g) { mt21ByGrade[g].groups = mt21GroupExpiries(mt21Expiries[g]); });
-    var mt21TotalCount = MT21_GRADES.reduce(function (s, g) { return s + mt21ByGrade[g].count; }, 0);
-    MT21_TK = { byGrade: mt21ByGrade, totalCount: mt21TotalCount };
-    var gridEl = document.getElementById('mt21-grid');
-    if (gridEl) gridEl.innerHTML = mt21RenderGrid(mt21ByGrade);
-    var expTkEl = document.getElementById('mt21-expiry-tickets');
-    if (expTkEl) expTkEl.innerHTML = mt21RenderExpiryTickets(mt21ByGrade);
-    mt21RenderFooterSlot();
+    var holdTkEl = document.getElementById('mt21-hold-tickets');
+    if (holdTkEl) holdTkEl.innerHTML = mt21RenderHoldTickets(mt21ByGrade);
 
     /* 보유 현황 — 등급색 + 임박(D-7 이내) 경고뱃지 / 만료일 (phone19 레거시 화면 전용) */
     var now = Date.now();
@@ -19609,48 +19523,13 @@ function ppComputePointGroups(ptx, days) {
   var total = groupList.reduce(function (s, g) { return s + g.amt; }, 0);
   return { groupList: groupList, total: total };
 }
-/* pw-21 통합 카드 — 시안(20260804_NewDesign_mytickets.html) 포인트 행 그대로: 코인+라벨+다음만료 서브라인, 우측 잔액 */
+/* pw-21 통합 카드 — 포인트도 등급 줄과 동일한 토글 1줄로(김반장 2026-08-06, devqa Q1 답변) */
 function mt21RenderPointsRow(balance, res) {
-  var row = document.getElementById('mt21-points-row');
+  var row = document.getElementById('mt21-hold-point');
   if (row) {
-    var zero = !balance;
-    var valColor = zero ? '#C4BED0' : '#1A1130';
-    var sufColor = zero ? '#C4BED0' : '#5A5370';
-    var sub = '';
-    if (res.groupList.length) {
-      var nearest = res.groupList[0];
-      var subKo = mt21ShortDate(nearest.expiresAt) + ' · ' + nearest.amt.toLocaleString('ko-KR') + 'P · 만료일 ' + res.groupList.length + '개';
-      var subVi = mt21ShortDate(nearest.expiresAt) + ' · ' + nearest.amt.toLocaleString('ko-KR') + 'P · ' + res.groupList.length + ' hạn dùng';
-      sub = '<span style="display:block;color:#5A5370;font-size:11px;font-weight:400;">' + mt21I18n(subKo, subVi) + '</span>';
-    }
-    row.innerHTML = pointCoinIcon(30, 'mt21ptsrow')
-      + '<div style="display:flex;flex-direction:column;gap:2px;"><span style="color:#9B93B0;font-size:var(--fs-caption);font-weight:400;">포인트</span>' + sub + '</div>'
-      + '<span style="margin-left:auto;color:' + valColor + ';font-size:var(--fs-title);font-weight:700;letter-spacing:-0.03em;">' + (balance || 0).toLocaleString('ko-KR') + '<span style="font-size:var(--fs-body);font-weight:700;color:' + sufColor + ';margin-left:2px;">P</span></span>';
+    row.innerHTML = mt21RenderHoldRow('point', pointCoinIcon(24, 'mt21ptsrow'), '포인트', 'Điểm', balance || 0, 'P', 'P', res.groupList,
+      mt21GroupRow(function (g) { return g.amt.toLocaleString('ko-KR') + 'P'; }));
   }
-  var expPtEl = document.getElementById('mt21-expiry-points');
-  if (expPtEl) {
-    if (!res.groupList.length) {
-      expPtEl.innerHTML = '';
-    } else {
-      var out = '<div style="display:flex;align-items:center;gap:8px;padding:0 2px;">' + pointCoinIcon(24, 'mt21ptsexp')
-        + '<span style="color:#1A1130;font-size:var(--fs-body);font-weight:700;">포인트</span>'
-        + '<span style="color:#9B93B0;font-size:var(--fs-caption);font-weight:400;">' + mt21I18n('총 ' + res.total.toLocaleString('ko-KR') + 'P · 만료일 ' + res.groupList.length + '개', 'Tổng ' + res.total.toLocaleString('ko-KR') + 'P · ' + res.groupList.length + ' hạn dùng') + '</span></div>';
-      res.groupList.forEach(function (g) {
-        var daysLeft = Math.ceil((g.expiresAt - Date.now()) / 86400000);
-        var near = daysLeft <= MT21_ALERT_DAYS;
-        var c = near ? '#D4661E' : '#5A5370';
-        /* 날짜·금액은 라벨 취급(400) — 임박 경고만 D-배지로 볼드 유지(김반장 2026-08-05 지시) */
-        out += '<div style="display:flex;align-items:center;gap:8px;padding:10px 13px;border-radius:10px;background:' + (near ? '#FFF4EC' : '#F8F6FE') + ';">'
-          + '<span style="color:' + c + ';font-size:var(--fs-caption);font-weight:400;">' + g.amt.toLocaleString('ko-KR') + 'P</span>'
-          + '<span style="margin-left:auto;color:' + c + ';font-size:var(--fs-caption);font-weight:400;">' + ppFmt(g.expiresAt) + '</span>'
-          + (near ? '<span style="color:' + c + ';font-size:var(--fs-caption);font-weight:700;margin-left:4px;">D-' + Math.max(0, daysLeft) + '</span>' : '')
-          + '</div>';
-      });
-      expPtEl.innerHTML = out;
-    }
-  }
-  MT21_PT = res;
-  mt21RenderFooterSlot();
 }
 function renderPointExpiry(ptx, expiry) {
   var box = document.getElementById('pt-expiring');
