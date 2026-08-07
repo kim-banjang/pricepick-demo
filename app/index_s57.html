@@ -11850,8 +11850,7 @@ window.PP_FEATURES = {
         </div>
         <div style="padding:24px 20px 10px;display:flex;flex-direction:column;gap:10px;">
           <button id="rl-spin-btn" style="width:100%;border:none;cursor:pointer;padding:16px 0;border-radius:12px;font-family:inherit;font-size:var(--fs-label);font-weight:700;color:#fff;background:#845EEE;"><span class="i18n"><span class="ko">돌리기</span><span class="vi">Quay</span></span></button>
-          <div class="rl-spin-info" style="text-align:center;font-size:var(--fs-caption);font-weight:500;color:#9B93B0;line-height:1.6;"><span class="i18n"><span class="ko">룰렛은 매일 자정 초기화 · 당첨 보상(포인트·티켓) 자동 지급</span><span class="vi">Vòng quay đặt lại vào 0h mỗi ngày · Thưởng trúng (điểm·vé) được cấp tự động</span></span></div>
-          <button id="rl-prob-btn" type="button" style="display:block;margin:2px auto 22px;padding:4px 6px;border:none;background:none;cursor:pointer;font-family:inherit;font-size:var(--fs-caption);font-weight:500;color:#9B93B0;text-decoration:underline;text-underline-offset:3px;"><span class="i18n"><span class="ko">확률</span><span class="vi">Xác suất</span></span></button>
+          <div class="rl-spin-info" style="text-align:center;font-size:var(--fs-caption);font-weight:500;color:#9B93B0;line-height:1.6;padding-bottom:28px;"><span class="i18n"><span class="ko">룰렛은 매일 자정 초기화 · 당첨 보상(포인트·티켓) 자동 지급</span><span class="vi">Vòng quay đặt lại vào 0h mỗi ngày · Thưởng trúng (điểm·vé) được cấp tự động</span></span></div>
         </div>
 
         <!-- 룰렛 결과 모달 — 시안 "룰렛 페이지 v2"의 실제 앱 구조: 화면 딤 + 흰 카드만.
@@ -11864,16 +11863,6 @@ window.PP_FEATURES = {
             <button id="rl-result-confirm" style="width:100%;margin-top:18px;border:none;cursor:pointer;padding:14px 0;border-radius:12px;font-family:inherit;font-size:var(--fs-body);font-weight:700;color:#fff;background:#845EEE;"><span class="i18n"><span class="ko">확인</span><span class="vi">Xác nhận</span></span></button>
           </div>
         </div>
-
-        <!-- 확률 모달 (법적 고지 — 화면 직접 노출 대신 "확률" 버튼을 눌러야 보이는 방식. 2026-08 확정) -->
-        <div id="rl-prob-overlay" style="position:absolute;inset:0;background:rgba(26,17,48,0.55);display:none;align-items:center;justify-content:center;z-index:55;padding:32px;">
-          <div style="background:#FFFFFF;border-radius:20px;padding:26px 22px 20px;width:100%;max-width:296px;color:#1A1130;animation:popIn .3s cubic-bezier(.2,1.4,.4,1);">
-            <div style="font-size:var(--fs-label);font-weight:800;"><span class="i18n"><span class="ko">당첨 확률</span><span class="vi">Xác suất trúng thưởng</span></span></div>
-            <div style="font-size:var(--fs-caption);font-weight:500;color:#5A5370;margin-top:4px;"><span class="i18n"><span class="ko">슬롯별 당첨 확률입니다</span><span class="vi">Đây là xác suất trúng thưởng theo từng ô</span></span></div>
-            <div id="rl-prob-list" style="margin-top:14px;"></div>
-            <button id="rl-prob-confirm" style="width:100%;margin-top:16px;border:none;cursor:pointer;padding:14px 0;border-radius:12px;font-family:inherit;font-size:var(--fs-body);font-weight:700;color:#fff;background:#845EEE;"><span class="i18n"><span class="ko">확인</span><span class="vi">Xác nhận</span></span></button>
-          </div>
-        </div>
       </div>
     </div>
   </div>
@@ -11882,7 +11871,7 @@ window.PP_FEATURES = {
        시안 마크업/인라인 스타일/키프레임을 그대로 옮기고 {{ }} 바인딩만 DOM id + JS 훅으로 교체했다.
        (카탈로그 문서용 요소 — "00 · 홈 진입 배너"/"01 · 잭팟 룰렛 화면"/"02 · 결과 모달 6종" 라벨,
         모달 카탈로그의 태그 칩·"당첨 확률 N%" 칩·설명 note 문단 — 은 전부 제외했다.
-        휠 안 확률 직접 노출은 법적 이슈로 제거하고 "확률" 버튼 → 확률 모달로 대체했다. 2026-08 확정) -->
+        휠 안의 확률 표기는 시안 앱 화면 자체의 구성 요소라 유지하되 CMS 확률로 렌더한다.) -->
   <div class="phone-wrap" id="pw-15b" data-screen="15b">
     <div class="phone">
       <div class="jp-screen">
@@ -11942,7 +11931,7 @@ window.PP_FEATURES = {
         </div>
         <div style="padding:14px 20px 10px; display:flex; flex-direction:column; gap:10px;">
           <button id="jp-spin-btn" class="jp-spin-btn" style="width:100%; border:1px solid rgba(255,214,94,0.55); cursor:pointer; padding:18px 0; border-radius:14px; font-family:inherit; font-size:var(--fs-label); font-weight:700; letter-spacing:0.6px; color:#FFD75E; background:linear-gradient(180deg,rgba(255,214,94,0.14),rgba(255,214,94,0.04));">이벤트 티켓 1장으로 돌리기</button>
-          <button id="jp-prob-btn" type="button" style="display:block;margin:0 auto;padding:4px 6px;border:none;background:none;cursor:pointer;font-family:inherit;font-size:var(--fs-caption);font-weight:500;color:#8E85AE;text-decoration:underline;text-underline-offset:3px;"><span class="i18n"><span class="ko">확률</span><span class="vi">Xác suất</span></span></button>
+          <div style="height:20px;"></div>
         </div>
         <div id="jp-result-overlay" style="position:absolute; inset:0; background:rgba(8,4,20,0.78); display:none; align-items:center; justify-content:center; z-index:50; padding:32px;">
           <div style="background:#1C1140; border:1px solid rgba(255,255,255,0.12); border-radius:20px; padding:30px 22px 20px; width:100%; max-width:296px; text-align:center; color:#FFFFFF; animation:jpPop .3s cubic-bezier(.2,1.4,.4,1);">
@@ -11951,17 +11940,6 @@ window.PP_FEATURES = {
             <div id="jp-result-title" style="font-size:var(--fs-section); font-weight:700;"></div>
             <div id="jp-result-desc" style="font-size:var(--fs-caption); font-weight:500; color:#B9AEE0; margin-top:6px; line-height:1.55;"></div>
             <button id="jp-result-confirm" class="jp-spin-btn" style="width:100%; margin-top:18px; border:1px solid rgba(255,214,94,0.55); cursor:pointer; padding:15px 0; border-radius:14px; font-family:inherit; font-size:var(--fs-body); font-weight:700; letter-spacing:0.6px; color:#FFD75E; background:linear-gradient(180deg,rgba(255,214,94,0.14),rgba(255,214,94,0.04));"><span class="i18n"><span class="ko">확인</span><span class="vi">Xác nhận</span></span></button>
-          </div>
-        </div>
-
-        <!-- 확률 모달 (법적 고지 — 화면 직접 노출 대신 "확률" 버튼을 눌러야 보이는 방식. 매일 행운 룰렛(pw-15)과 동일한
-             흰 카드 스타일로 통일한다 — 잭팟 룰렛 화면 자체는 다크 테마지만 법적 고지 모달은 두 룰렛 공통 스타일. 2026-08 확정) -->
-        <div id="jp-prob-overlay" style="position:absolute;inset:0;background:rgba(8,4,20,0.78);display:none;align-items:center;justify-content:center;z-index:55;padding:32px;">
-          <div style="background:#FFFFFF;border-radius:20px;padding:26px 22px 20px;width:100%;max-width:296px;color:#1A1130;animation:jpPop .3s cubic-bezier(.2,1.4,.4,1);">
-            <div style="font-size:var(--fs-label);font-weight:800;"><span class="i18n"><span class="ko">당첨 확률</span><span class="vi">Xác suất trúng thưởng</span></span></div>
-            <div style="font-size:var(--fs-caption);font-weight:500;color:#5A5370;margin-top:4px;"><span class="i18n"><span class="ko">슬롯별 당첨 확률입니다</span><span class="vi">Đây là xác suất trúng thưởng theo từng ô</span></span></div>
-            <div id="jp-prob-list" style="margin-top:14px;"></div>
-            <button id="jp-prob-confirm" style="width:100%;margin-top:16px;border:none;cursor:pointer;padding:14px 0;border-radius:12px;font-family:inherit;font-size:var(--fs-body);font-weight:700;color:#fff;background:#845EEE;"><span class="i18n"><span class="ko">확인</span><span class="vi">Xác nhận</span></span></button>
           </div>
         </div>
       </div>
@@ -14297,22 +14275,6 @@ function ppSlotProbText(slot) {
   var p = Number(slot.prob) || 0;
   return (Math.round(p * 10) / 10) + '%';
 }
-// 확률 모달(매일 행운 룰렛 · 잭팟 룰렛 공용) — 슬롯 구성을 "라벨 N장/P — 확률%" 행 목록으로 렌더
-function ppProbRowsHtml(slots) {
-  var html = '';
-  slots.forEach(function(slot, i) {
-    var meta = PP_SLOT_META[slot.type] || PP_SLOT_META.miss;
-    var last = i === slots.length - 1;
-    var labelHtml = slot.type === 'miss'
-      ? '<span>' + meta.label + '</span>'
-      : '<span>' + meta.label + '</span> <span>' + (slot.qty || 0) + '</span><span>' + meta.unit + '</span>';
-    html += '<div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:11px 1px;' + (last ? '' : 'border-bottom:1px solid #F1EEFC;') + '">'
-      + '<div style="font-size:var(--fs-body);font-weight:600;color:#1A1130;">' + labelHtml + '</div>'
-      + '<div style="font-size:var(--fs-body);font-weight:700;color:#845EEE;flex-shrink:0;">' + ppSlotProbText(slot) + '</div>'
-      + '</div>';
-  });
-  return html;
-}
 // 슬롯 보상 지급은 2단계다 — 실행 기록(roulette_spins)은 create만 허용돼(firestore.rules)
 // 나중에 지급 상태를 덧붙일 수 없으므로, 회전 전에 "얼마를 줄지"를 먼저 확정(ppResolveSlotGrant)해
 // 기록에 같이 쓰고, 회전이 끝난 뒤 그 수량을 실제로 지급(ppApplySlotGrant)한다.
@@ -14445,8 +14407,10 @@ function rlBuildWheel() {
       var lp = rlPolar(cx, cy, 88, mid);
       parts += '<text x="' + lp[0].toFixed(1) + '" y="' + lp[1].toFixed(1) + '" font-size="14" font-weight="700" fill="#1A1130" text-anchor="middle" font-family="inherit" transform="rotate(' + mid.toFixed(1) + ' ' + lp[0].toFixed(1) + ' ' + lp[1].toFixed(1) + ')">' + rw.label + '</text>';
     }
-    // 휠에는 확률 표기를 넣지 않는다 — 법적 고지 의무는 "확률" 버튼 → 확률 모달(rl-prob-overlay)로
-    // 대체한다(2026-08 확정, 잭팟 룰렛도 동일). 확률은 CMS 설정대로 추첨에만 반영된다.
+    // 확률 표기는 넣지 않는다 — 20260729 시안(매일 행운 룰렛)의 휠 라벨은
+    // "이벤트 티켓/포인트/꽝/N장/JACKPOT"뿐이고, "당첨 확률 N%"는 결과 모달 카탈로그의
+    // 문서용 칩이라 앱 화면 구성 요소가 아니다. (확률은 CMS 설정대로 추첨에만 반영된다.
+    //  잭팟 룰렛은 20260731 시안이 휠 SVG 안에 확률 텍스트를 직접 갖고 있어 그쪽만 표기한다.)
   }
   svg.innerHTML = parts;
 }
@@ -14527,16 +14491,6 @@ function rlHideResult() {
   var overlay = document.getElementById('rl-result-overlay');
   if (overlay) { overlay.style.display = 'none'; overlay.classList.remove('show'); }
 }
-function rlOpenProbModal() {
-  var list = document.getElementById('rl-prob-list');
-  if (list) list.innerHTML = ppProbRowsHtml(RL_ACTIVE_WHEEL);
-  var overlay = document.getElementById('rl-prob-overlay');
-  if (overlay) overlay.style.display = 'flex';
-}
-function rlCloseProbModal() {
-  var overlay = document.getElementById('rl-prob-overlay');
-  if (overlay) overlay.style.display = 'none';
-}
 // 오늘 이미 참여한 경우 잠금 UI 반영 (localStorage는 즉시 반영용 캐시일 뿐 — 실제 판정은 서버 기록)
 function rlApplyDailyLock() {
   var btn = document.getElementById('rl-spin-btn');
@@ -14586,21 +14540,6 @@ function bindFortuneRoulette() {
   if (confirmBtn && !confirmBtn.dataset.ipBound) {
     confirmBtn.dataset.ipBound = '1';
     confirmBtn.addEventListener('click', function(e) { e.stopPropagation(); rlHideResult(); });
-  }
-  var probBtn = document.getElementById('rl-prob-btn');
-  var probOverlay = document.getElementById('rl-prob-overlay');
-  var probConfirm = document.getElementById('rl-prob-confirm');
-  if (probBtn && !probBtn.dataset.ipBound) {
-    probBtn.dataset.ipBound = '1';
-    probBtn.addEventListener('click', function(e) { e.stopPropagation(); rlOpenProbModal(); });
-  }
-  if (probOverlay && !probOverlay.dataset.ipBound) {
-    probOverlay.dataset.ipBound = '1';
-    probOverlay.addEventListener('click', function(e) { if (e.target === probOverlay) rlCloseProbModal(); });
-  }
-  if (probConfirm && !probConfirm.dataset.ipBound) {
-    probConfirm.dataset.ipBound = '1';
-    probConfirm.addEventListener('click', function(e) { e.stopPropagation(); rlCloseProbModal(); });
   }
   if (btn.dataset.ipBound) return;
   btn.dataset.ipBound = '1';
@@ -14716,6 +14655,9 @@ function jpWheelTicketIcon(y, fill, ink) {
     + '<path d="' + PP_TICKET_PATH_STAR + '" fill="' + ink + '"></path>'
     + '<path d="' + PP_TICKET_PATH_TEXT + '" fill="' + ink + '"></path></g>';
 }
+/* 시안 원본은 슬롯별 확률 텍스트의 불투명도가 조금씩 다르다(등급이 높을수록 진하게).
+   확정 6칸 구성이 시안과 1:1로 같아지도록 타입별 값을 그대로 표로 둔다. */
+var JP_PROB_OPACITY = { gold_ticket:'0.45', silver_ticket:'0.55', bronze_ticket:'0.5', miss:'0.4' };
 function jpBuildWheel() {
   var svg = document.getElementById('jp-wheel');
   if (!svg) return;
@@ -14740,6 +14682,7 @@ function jpBuildWheel() {
 
     var mid = a0 + seg / 2;
     var ink = JP_SEG_INK[slot.type] || '#FFFFFF';
+    var probOp = JP_PROB_OPACITY[slot.type];
     var g = '<g transform="rotate(' + mid.toFixed(1) + ' 150 150)" text-anchor="middle" font-family="inherit">';
     var isJp = jpJackpotSet.indexOf(i) >= 0;
     if (isJp && PP_TICKET_SLOT_GRADE[slot.type]) {
@@ -14758,9 +14701,11 @@ function jpBuildWheel() {
         ? '<text x="150" y="50" font-size="11" font-weight="600" fill="#B9AEE0">포인트</text>'
         : '<text x="150" y="50" font-size="11" font-weight="600" fill="#FFFFFF" opacity="0.85">포인트</text>';
       g += '<text x="150" y="72" font-size="19" font-weight="800" fill="#FFFFFF">' + (slot.qty || 0).toLocaleString('ko-KR') + 'P</text>';
+      if (!probOp) probOp = top ? '0.4' : '0.45';
     } else {
       g += '<text x="150" y="62" font-size="21" font-weight="800" fill="#FFFFFF">꽝</text>';
     }
+    g += '<text x="150" y="108" font-size="11" font-weight="400" fill="' + ink + '" opacity="' + (probOp || '0.4') + '">' + ppSlotProbText(slot) + '</text>';
     labels += g + '</g>';
   }
   svg.innerHTML = paths + labels;
@@ -14811,16 +14756,6 @@ function jpRefresh() {
 function jpHideResult() {
   var o = document.getElementById('jp-result-overlay');
   if (o) o.style.display = 'none';
-}
-function jpOpenProbModal() {
-  var list = document.getElementById('jp-prob-list');
-  if (list) list.innerHTML = ppProbRowsHtml(JP_ACTIVE_SLOTS);
-  var overlay = document.getElementById('jp-prob-overlay');
-  if (overlay) overlay.style.display = 'flex';
-}
-function jpCloseProbModal() {
-  var overlay = document.getElementById('jp-prob-overlay');
-  if (overlay) overlay.style.display = 'none';
 }
 // 결과 모달 — 시안 "잭팟 룰렛 페이지"의 sc-if 3분기(티켓/포인트/꽝) 그대로
 var JP_POINT_COIN = '<svg width="60" height="60" viewBox="0 0 64 64" style="flex-shrink:0;"><defs><linearGradient id="pcoin_jp" x1="0" y1="0" x2="0.35" y2="1"><stop offset="49.9%" stop-color="#FFE066"></stop><stop offset="50%" stop-color="#F0AE00"></stop></linearGradient><linearGradient id="pcoin_jp_face" x1="0" y1="0" x2="0.35" y2="1"><stop offset="49.9%" stop-color="#FFDA3D"></stop><stop offset="50%" stop-color="#FFC400"></stop></linearGradient></defs><ellipse cx="32" cy="57" rx="17" ry="3" fill="#E6A800" opacity="0.16"></ellipse><circle cx="32" cy="30" r="27" fill="url(#pcoin_jp)"></circle><circle cx="32" cy="30" r="21.5" fill="url(#pcoin_jp_face)"></circle><path d="M23.35 42.37H29.16V34.61H33.29C38.97 34.61 42.45 31.26 42.45 26.14C42.45 21.11 39.04 17.63 33.46 17.63H23.35ZM29.16 30.00V22.34H32.23C34.97 22.34 36.44 23.81 36.44 26.14C36.44 28.46 34.97 30.00 32.23 30.00Z" fill="#FFE477" stroke="#E0A600" stroke-width="0.6" paint-order="stroke" stroke-linejoin="round"/></svg>';
@@ -14877,21 +14812,6 @@ function bindJackpotRoulette() {
   if (confirmBtn && !confirmBtn.dataset.ipBound) {
     confirmBtn.dataset.ipBound = '1';
     confirmBtn.addEventListener('click', function(e) { e.stopPropagation(); jpHideResult(); });
-  }
-  var probBtn = document.getElementById('jp-prob-btn');
-  var probOverlay = document.getElementById('jp-prob-overlay');
-  var probConfirm = document.getElementById('jp-prob-confirm');
-  if (probBtn && !probBtn.dataset.ipBound) {
-    probBtn.dataset.ipBound = '1';
-    probBtn.addEventListener('click', function(e) { e.stopPropagation(); jpOpenProbModal(); });
-  }
-  if (probOverlay && !probOverlay.dataset.ipBound) {
-    probOverlay.dataset.ipBound = '1';
-    probOverlay.addEventListener('click', function(e) { if (e.target === probOverlay) jpCloseProbModal(); });
-  }
-  if (probConfirm && !probConfirm.dataset.ipBound) {
-    probConfirm.dataset.ipBound = '1';
-    probConfirm.addEventListener('click', function(e) { e.stopPropagation(); jpCloseProbModal(); });
   }
   if (btn.dataset.ipBound) return;
   btn.dataset.ipBound = '1';
@@ -16493,13 +16413,6 @@ Object.assign(KO2VI, {
     "내 티켓 & 포인트": "Vé & điểm của tôi",
     "보유 포인트": "Điểm hiện có",
     "만료일 자세히 보기 ›": "Xem chi tiết ngày hết hạn ›"
-  });
-  /* 룰렛 확률 모달(매일 행운 룰렛·잭팟 룰렛 공용) — 슬롯 라벨 사전 보강 + 모달 문구 */
-  Object.assign(KO2VI, {
-    "골드 티켓": "Vé Gold",
-    "실버 티켓": "Vé Silver",
-    "당첨 확률": "Xác suất trúng thưởng",
-    "슬롯별 당첨 확률입니다": "Đây là xác suất trúng thưởng theo từng ô"
   });
   var IPLANG='ko';
   var KO_RE=/[\uac00-\ud7a3]/;
