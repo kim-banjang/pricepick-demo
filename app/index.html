@@ -12922,9 +12922,11 @@ window.PP_FEATURES = {
 
           <!-- 포인트 교환 -->
           <div class="tx-panel" data-tx-panel="point" style="display:none">
-            <div class="tx-pt-dirs">
+            <!-- 방향이 하나(포인트→티켓)뿐이라 방향 전환 필 자체가 의미 없음 — 2026-08 확정, 통째로 숨김(삭제 아님).
+                 되돌릴 때는 PP_FEATURES.ticketToPoint 하나로 이 필과 "티켓→포인트" 버튼이 함께 살아난다. -->
+            <div class="tx-pt-dirs" data-pp-feature="ticket-to-point">
               <button class="tx-pt-dir-btn on" id="pt-dir-buy" data-pt-dir="buy"><span class="i18n"><span class="ko">포인트 → 티켓</span><span class="vi">Điểm → Vé</span></span></button>
-              <button class="tx-pt-dir-btn" id="pt-dir-sell" data-pt-dir="sell" data-pp-feature="ticket-to-point"><span class="i18n"><span class="ko">티켓 → 포인트</span><span class="vi">Vé → Điểm</span></span></button>
+              <button class="tx-pt-dir-btn" id="pt-dir-sell" data-pt-dir="sell"><span class="i18n"><span class="ko">티켓 → 포인트</span><span class="vi">Vé → Điểm</span></span></button>
             </div>
             <div class="tx-dirs" id="pt-rate-rows"></div>
             <div class="tx-spacer"></div>
