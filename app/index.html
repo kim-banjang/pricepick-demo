@@ -8242,8 +8242,11 @@ body.interactive-mode #ip-nav { display: block; }
   .tx-dir-side { display:flex; align-items:center; justify-content:flex-end; gap:7px; }
   .tx-dir-side.to { justify-content:flex-start; }
   .tx-dir-side svg { flex-shrink:0; }
-  .tx-dir-label { font-size: var(--fs-caption); font-weight:600; color:var(--text3); }
-  .tx-dir-val { font-size: var(--fs-label); font-weight:800; color:var(--text1); letter-spacing:-0.02em; }
+  /* 라벨·값도 아이콘(위 줄)과 동일하게 flex-shrink:0 — 안 붙어 있으면 브라우저가 숫자(줄바꿈 불가)는 안 줄이고
+     한글 라벨(글자 사이 줄바꿈 가능)만 줄여서, 값 텍스트가 근소하게 더 넓은 행에서만 라벨이 2줄로 깨진다.
+     (2026-08 발견 — 포인트 교환 탭 골드 행: "10,000P"(50.1px)·"20,000P"(51.9px) 단 1.8px 차이로 골드만 깨졌었음) */
+  .tx-dir-label { font-size: var(--fs-caption); font-weight:600; color:var(--text3); white-space:nowrap; flex-shrink:0; }
+  .tx-dir-val { font-size: var(--fs-label); font-weight:800; color:var(--text1); letter-spacing:-0.02em; white-space:nowrap; flex-shrink:0; }
   .tx-dir-arrow { justify-self:center; color:#C4BED0; }
   .tx-dirs .swap-dir-btn.active .tx-dir-arrow, .tx-ev-fixed .tx-dir-arrow { color:var(--main); }
 
