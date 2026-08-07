@@ -11961,14 +11961,17 @@ window.PP_FEATURES = {
           </div>
         </div>
 
-        <!-- 확률 모달 (법적 고지 — 화면 직접 노출 대신 "확률" 버튼을 눌러야 보이는 방식. 매일 행운 룰렛(pw-15)과 동일한
-             흰 카드 스타일로 통일한다 — 잭팟 룰렛 화면 자체는 다크 테마지만 법적 고지 모달은 두 룰렛 공통 스타일. 2026-08 확정) -->
-        <div id="jp-prob-overlay" style="position:absolute;inset:0;background:rgba(8,4,20,0.78);display:none;align-items:center;justify-content:center;z-index:55;padding:32px;">
-          <div style="background:#FFFFFF;border-radius:20px;padding:26px 22px 20px;width:100%;max-width:296px;color:#1A1130;animation:jpPop .3s cubic-bezier(.2,1.4,.4,1);">
-            <div style="font-size:var(--fs-label);font-weight:800;"><span class="i18n"><span class="ko">당첨 확률</span><span class="vi">Xác suất trúng thưởng</span></span></div>
-            <div style="font-size:var(--fs-caption);font-weight:500;color:#5A5370;margin-top:4px;"><span class="i18n"><span class="ko">슬롯별 당첨 확률입니다</span><span class="vi">Đây là xác suất trúng thưởng theo từng ô</span></span></div>
-            <div id="jp-prob-list" style="margin-top:14px;"></div>
-            <button id="jp-prob-confirm" style="width:100%;margin-top:16px;border:none;cursor:pointer;padding:14px 0;border-radius:12px;font-family:inherit;font-size:var(--fs-body);font-weight:700;color:#fff;background:#845EEE;"><span class="i18n"><span class="ko">확인</span><span class="vi">Xác nhận</span></span></button>
+        <!-- 확률 모달 (법적 고지 — 화면 직접 노출 대신 "확률" 버튼을 눌러야 보이는 방식). 스타일은 이 화면의
+             당첨 결과 모달(#jp-result-overlay, 위)을 정본으로 그대로 재사용한다 — 카드 배경·테두리·반경·글자색·
+             구분선·버튼(jp-spin-btn 클래스 + 골드 확인 버튼)까지 전부 동일값. 새 색 정의 없음. 2026-08 확정.
+             매일 행운 룰렛(pw-15, rl-prob-overlay)은 라이트 톤 화면이라 별개 — 손대지 않음. -->
+        <div id="jp-prob-overlay" style="position:absolute; inset:0; background:rgba(8,4,20,0.78); display:none; align-items:center; justify-content:center; z-index:55; padding:32px;">
+          <div style="background:#1C1140; border:1px solid rgba(255,255,255,0.12); border-radius:20px; padding:30px 22px 20px; width:100%; max-width:296px; text-align:center; color:#FFFFFF; animation:jpPop .3s cubic-bezier(.2,1.4,.4,1);">
+            <div style="font-size:var(--fs-section); font-weight:700;"><span class="i18n"><span class="ko">당첨 확률</span><span class="vi">Xác suất trúng thưởng</span></span></div>
+            <div style="font-size:var(--fs-caption); font-weight:500; color:#B9AEE0; margin-top:6px; line-height:1.55;"><span class="i18n"><span class="ko">슬롯별 당첨 확률입니다</span><span class="vi">Đây là xác suất trúng thưởng theo từng ô</span></span></div>
+            <div style="height:1px; margin:16px 4px 4px; background:linear-gradient(90deg,rgba(255,255,255,0),rgba(255,255,255,0.16) 50%,rgba(255,255,255,0));"></div>
+            <div id="jp-prob-list" style="margin-top:10px; text-align:left;"></div>
+            <button id="jp-prob-confirm" class="jp-spin-btn" style="width:100%; margin-top:18px; border:1px solid rgba(255,214,94,0.55); cursor:pointer; padding:15px 0; border-radius:14px; font-family:inherit; font-size:var(--fs-body); font-weight:700; letter-spacing:0.6px; color:#FFD75E; background:linear-gradient(180deg,rgba(255,214,94,0.14),rgba(255,214,94,0.04));"><span class="i18n"><span class="ko">확인</span><span class="vi">Xác nhận</span></span></button>
           </div>
         </div>
       </div>
@@ -14307,7 +14310,13 @@ function ppSlotProbText(slot) {
   return (Math.round(p * 10) / 10) + '%';
 }
 // 확률 모달(매일 행운 룰렛 · 잭팟 룰렛 공용) — 슬롯 구성을 "라벨 N장/P — 확률%" 행 목록으로 렌더
-function ppProbRowsHtml(slots) {
+function ppProbRowsHtml(slots, dark) {
+  // dark=true: 잭팟 룰렛 당첨 결과 모달(#jp-result-overlay)에서 그대로 가져온 값 —
+  // 카드 텍스트 흰색(#FFFFFF), 강조색은 골드(#FFD75E, jp-result-confirm과 동일),
+  // 구분선은 카드 테두리와 같은 rgba(255,255,255,.12). 매일 행운 룰렛(라이트)은 기존 그대로.
+  var labelColor = dark ? '#FFFFFF' : '#1A1130';
+  var valColor = dark ? '#FFD75E' : '#845EEE';
+  var borderColor = dark ? 'rgba(255,255,255,.12)' : '#F1EEFC';
   var html = '';
   slots.forEach(function(slot, i) {
     var meta = PP_SLOT_META[slot.type] || PP_SLOT_META.miss;
@@ -14315,9 +14324,9 @@ function ppProbRowsHtml(slots) {
     var labelHtml = slot.type === 'miss'
       ? '<span>' + meta.label + '</span>'
       : '<span>' + meta.label + '</span> <span>' + (slot.qty || 0) + '</span><span>' + meta.unit + '</span>';
-    html += '<div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:11px 1px;' + (last ? '' : 'border-bottom:1px solid #F1EEFC;') + '">'
-      + '<div style="font-size:var(--fs-body);font-weight:600;color:#1A1130;">' + labelHtml + '</div>'
-      + '<div style="font-size:var(--fs-body);font-weight:700;color:#845EEE;flex-shrink:0;">' + ppSlotProbText(slot) + '</div>'
+    html += '<div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:11px 1px;' + (last ? '' : 'border-bottom:1px solid ' + borderColor + ';') + '">'
+      + '<div style="font-size:var(--fs-body);font-weight:600;color:' + labelColor + ';">' + labelHtml + '</div>'
+      + '<div style="font-size:var(--fs-body);font-weight:700;color:' + valColor + ';flex-shrink:0;">' + ppSlotProbText(slot) + '</div>'
       + '</div>';
   });
   return html;
@@ -14823,7 +14832,7 @@ function jpHideResult() {
 }
 function jpOpenProbModal() {
   var list = document.getElementById('jp-prob-list');
-  if (list) list.innerHTML = ppProbRowsHtml(JP_ACTIVE_SLOTS);
+  if (list) list.innerHTML = ppProbRowsHtml(JP_ACTIVE_SLOTS, true);
   var overlay = document.getElementById('jp-prob-overlay');
   if (overlay) overlay.style.display = 'flex';
 }
