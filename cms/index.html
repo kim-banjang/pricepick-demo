@@ -2170,7 +2170,7 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
             <strong>단일 등급 결제 + 상향 단방향 교환</strong> — 기프티콘 교환은 단일 등급으로만 가능. 등급 교환은 <strong>상향(브론즈→실버→골드)만</strong> 허용하며 하향 교환은 지원하지 않습니다. 환산가치가 1:1 등가라 등급을 올려도 보유 가치는 그대로이고, 하향을 열면 등가 왕복이 생겨 관리 포인트만 늘고 회원 이득은 없기 때문입니다. (2026-07-31 확정)
           </div>
           <div class="info-box" style="margin-bottom:16px">
-            <strong>포인트 ↔ 티켓 교환은 양방향 · 등가 · 수수료 없음 (의도된 설계)</strong> — 브론즈 1,000P / 실버 10,000P / 골드 20,000P로 사거나 팔 수 있고, 사고파는 값이 같아 <strong>무한 왕복이 가능합니다.</strong> 왕복해도 보유 가치가 변하지 않아(손익 중립) 악용 이득이 없고, 이벤트 티켓은 이 경로에 없어 가치 증식 우회도 불가능합니다. 수수료를 붙이면 회원만 손해라 현행을 유지합니다. (2026-07-31 확정 — 나중에 이상해 보여도 의도된 설계입니다)
+            <strong>포인트 → 티켓 교환은 단방향 · 등가 · 수수료 없음</strong> — 브론즈 1,000P / 실버 10,000P / 골드 20,000P로 포인트를 티켓으로 바꿀 수 있습니다. <strong>티켓 → 포인트 역방향은 2026-08 확정으로 중단</strong>했습니다 — 앱에서는 숨김 처리만 했을 뿐 로직·데이터는 그대로라 필요 시 복구할 수 있습니다.
           </div>
           <div class="info-box" style="margin-bottom:16px;border-color:#f2ddb4;background:#fdf3e2;color:#8a5a12">
             <strong>이벤트 티켓은 단방향 전환만</strong> — <strong>이벤트 티켓 5장 → 브론즈 티켓 1장</strong>은 허용하지만, <strong>브론즈 → 이벤트 티켓 역방향은 금지</strong>합니다. 브론즈 1장(100원)을 이벤트 5장으로 되돌리면 잭팟 룰렛 5회(1회 기대값 40원 = 200원)로 가치가 2배 증식되기 때문입니다. 앱에도 역방향 전환 기능이 없으며, 전환 실행 로직의 허용 방향 화이트리스트에서 차단됩니다(UI 우회 불가).
@@ -2824,7 +2824,7 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
 
     <!-- ── 포인트 정책 ── -->
     <div class="section" id="sec-point-policy">
-      <div class="info-box"><strong>포인트 기준 환율</strong> — 10P = 1원. 포인트는 티켓과 양방향 교환되며, 교환 비율은 환산가치 1:1 등가입니다. 사고파는 값이 같아 <strong>무한 왕복이 가능하지만 의도된 설계</strong>입니다 — 왕복해도 보유 가치가 변하지 않아(손익 중립) 악용 이득이 없고, 이벤트 티켓은 이 경로에 없어 가치 증식 우회도 불가능합니다. 수수료를 붙이면 회원만 손해라 현행을 유지합니다. (2026-07-31 확정)</div>
+      <div class="info-box"><strong>포인트 기준 환율</strong> — 10P = 1원. 포인트 → 티켓 단방향 교환이며, 교환 비율은 환산가치 1:1 등가입니다. <strong>티켓 → 포인트 역방향은 2026-08 확정으로 중단</strong>했습니다 — 앱은 숨김 처리만 했고 로직은 남아 있어 필요 시 복구할 수 있습니다.</div>
       <div class="card">
         <div class="card-header"><div class="card-title">포인트 ↔ 티켓 교환 비율</div></div>
         <table>
@@ -2842,7 +2842,7 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
             <div class="policy-item"><div class="policy-label">기준 환율</div><div class="policy-value" id="pp-disp-rate">10P = 1원</div></div>
             <div class="policy-item"><div class="policy-label">만료 기간</div><div class="policy-value" id="pp-disp-expiry">적립일로부터 1년</div><div class="policy-desc">먼저 적립된 것부터 소멸. 매일 04:00 만료 배치 실행</div></div>
             <div class="policy-item"><div class="policy-label">일일 적립 한도</div><div class="policy-value" id="pp-disp-limit">없음</div></div>
-            <div class="policy-item"><div class="policy-label">교환 방향</div><div class="policy-value" id="pp-disp-direction">포인트 ↔ 티켓 쌍방 교환</div><div class="policy-desc">어느 방향으로 바꿔도 보유 가치는 동일 — 무한 왕복 가능하나 손익 중립이라 의도된 설계 (2026-07-31 확정)</div></div>
+            <div class="policy-item"><div class="policy-label">교환 방향</div><div class="policy-value" id="pp-disp-direction">단방향 (포인트 → 티켓)</div><div class="policy-desc">티켓 → 포인트 역방향은 2026-08 확정으로 중단 — 앱은 숨김 처리만 했고 로직은 남아 있어 필요 시 복구 가능</div></div>
             <div class="policy-item"><div class="policy-label">주 적립 경로</div><div class="policy-value">출석체크 (일 100P)</div></div>
             <div class="policy-item"><div class="policy-label">적용 시점</div><div class="policy-value" id="pp-disp-apply">즉시 적용</div><div class="policy-desc" id="pp-disp-apply-sub" style="display:none"></div></div>
           </div>
@@ -3400,7 +3400,7 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
       </div>
       <div class="form-row">
         <div class="form-group"><label class="form-label">일일 적립 한도</label><input class="form-input" id="pp-limit" value="없음"></div>
-        <div class="form-group"><label class="form-label">교환 방향</label><select class="form-select" id="pp-direction"><option value="포인트 ↔ 티켓 쌍방 교환" selected>양방향 (포인트 ↔ 티켓)</option><option value="포인트 → 티켓 단방향">단방향 (포인트 → 티켓)</option></select></div>
+        <div class="form-group"><label class="form-label">교환 방향</label><select class="form-select" id="pp-direction"><option value="포인트 ↔ 티켓 쌍방 교환">양방향 (포인트 ↔ 티켓)</option><option value="포인트 → 티켓 단방향" selected>단방향 (포인트 → 티켓)</option></select></div>
       </div>
       <div class="form-group"><label class="form-label">적용 시점</label><select class="form-select" id="pp-apply" onchange="ppToggleScheduleField()"><option>즉시 적용</option><option>예약 적용</option></select></div>
       <div class="form-group" id="pp-schedule-group" style="display:none"><label class="form-label">예약 적용 시각</label><input class="form-input" type="datetime-local" id="pp-schedule-at"></div>

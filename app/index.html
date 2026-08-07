@@ -8264,7 +8264,8 @@ body.interactive-mode #ip-nav { display: block; }
   .tx-out-sub { display:block; margin-top:5px; font-size: var(--fs-body); font-weight:600; color:var(--text3); }
   .tx-out-sub b { font-size: var(--fs-label); color:var(--text2); }
 
-  /* 포인트 교환 — 방향 전환 필(포인트→티켓 / 티켓→포인트), 시안 실측값 */
+  /* 포인트 교환 — 방향 전환 필(포인트→티켓 / 티켓→포인트, 시안 실측값).
+     2026-08 확정으로 단방향(포인트→티켓)만 노출 — "티켓→포인트" 필은 PP_FEATURES.ticketToPoint로 숨김(삭제 아님). */
   .tx-pt-dirs { display:flex; gap:8px; margin-top:16px; }
   .tx-pt-dir-btn { flex:1; text-align:center; padding:9px 0; border-radius:999px; font-size: var(--fs-caption); font-weight:700; cursor:pointer; font-family:inherit; background:#fff; color:#9B93B0; border:1.5px solid #EDEAF5; transition:.18s; }
   .tx-pt-dir-btn.on { background:#F1ECFF; color:#845EEE; border-color:#845EEE; }
@@ -8620,7 +8621,8 @@ body.interactive-mode #ip-nav { display: block; }
    요소·스타일·스크립트는 그대로 남아 있으므로 플래그만 true 로 되돌리면 복구된다. */
 body.pp-hide-weekly-raffle  [data-pp-feature="weekly-raffle"],
 body.pp-hide-exchange-entry [data-pp-feature="exchange-entry"],
-body.pp-hide-cs-kakao       [data-pp-feature="cs-kakao"] { display: none !important; }
+body.pp-hide-cs-kakao       [data-pp-feature="cs-kakao"],
+body.pp-hide-ticket-to-point [data-pp-feature="ticket-to-point"] { display: none !important; }
 /* 이벤트 티켓 행: 잔량 표시는 유지하되 경품 응모로 가는 탭 어포던스만 제거 */
 body.pp-hide-weekly-raffle .mtc-event { cursor: default !important; }
 /* 홈 보유 카드: 기프티콘 교환 행이 숨으면 등급 행의 하단 마진을 걷어 카드 높이를 자연스럽게 줄인다 */
@@ -8638,13 +8640,15 @@ body.pp-hide-exchange-entry.pp-hide-weekly-raffle .mtc-cta-row { display: none !
 window.PP_FEATURES = {
   weeklyRaffle:  false,  // 주간 경품 추첨 전체 (응모·당첨자 발표·당첨 알림·배너 2종) — 실사용자 1만 명 달성 시 부활
   exchangeEntry: false,  // 기프티샵 진입 (내 보유티켓 상세 · 혜택 내 적립 티켓 상세 · 혜택 탭 기프티샵 프리뷰 섹션 · 홈 보유 카드 기프티콘 교환 행 · 혜택 탭 내 티켓 카드 기프티콘 교환 CTA)
-  csKakao:       false   // 고객센터 카카오채널 상담
+  csKakao:       false,  // 고객센터 카카오채널 상담
+  ticketToPoint: false   // 티켓 & 포인트 교환소 — "티켓 → 포인트" 방향 (2026-08 확정: 단방향 전환. 포인트 → 티켓만 유지, 역방향은 숨김)
 };
 (function () {
   var f = window.PP_FEATURES, c = document.body.classList;
   if (!f.weeklyRaffle)  c.add('pp-hide-weekly-raffle');
   if (!f.exchangeEntry) c.add('pp-hide-exchange-entry');
   if (!f.csKakao)       c.add('pp-hide-cs-kakao');
+  if (!f.ticketToPoint) c.add('pp-hide-ticket-to-point');
 })();
 </script>
 
@@ -12803,7 +12807,7 @@ window.PP_FEATURES = {
                 <div style="display:flex;align-items:center;" id="mt21-hero-icons"><!-- PP: ticketIcon/pointCoinIcon 삽입 --></div>
                 <div style="display:flex;flex-direction:column;gap:3px;">
                   <span class="i18n"><span class="ko"><span style="display:block;color:#fff;font-size:var(--fs-section);font-weight:700;letter-spacing:-0.02em;">티켓 &amp; 포인트 교환소</span></span><span class="vi"><span style="display:block;color:#fff;font-size:var(--fs-section);font-weight:700;letter-spacing:-0.02em;">Quầy đổi vé &amp; điểm</span></span></span>
-                  <span class="i18n"><span class="ko"><span style="display:block;color:rgba(255,255,255,0.78);font-size:var(--fs-caption);font-weight:400;">등급 교환 · 포인트로 바꾸기</span></span><span class="vi"><span style="display:block;color:rgba(255,255,255,0.78);font-size:var(--fs-caption);font-weight:400;">Đổi hạng · Đổi thành điểm</span></span></span>
+                  <span class="i18n"><span class="ko"><span style="display:block;color:rgba(255,255,255,0.78);font-size:var(--fs-caption);font-weight:400;">등급 교환 · 포인트 교환</span></span><span class="vi"><span style="display:block;color:rgba(255,255,255,0.78);font-size:var(--fs-caption);font-weight:400;">Đổi hạng · Đổi điểm</span></span></span>
                 </div>
                 <svg width="9" height="16" viewBox="0 0 9 16" fill="none" style="margin-left:auto;flex-shrink:0;"><path d="M1.5 1.5L7 8l-5.5 6.5" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
               </div>
@@ -12917,7 +12921,7 @@ window.PP_FEATURES = {
           <div class="tx-panel" data-tx-panel="point" style="display:none">
             <div class="tx-pt-dirs">
               <button class="tx-pt-dir-btn on" id="pt-dir-buy" data-pt-dir="buy"><span class="i18n"><span class="ko">포인트 → 티켓</span><span class="vi">Điểm → Vé</span></span></button>
-              <button class="tx-pt-dir-btn" id="pt-dir-sell" data-pt-dir="sell"><span class="i18n"><span class="ko">티켓 → 포인트</span><span class="vi">Vé → Điểm</span></span></button>
+              <button class="tx-pt-dir-btn" id="pt-dir-sell" data-pt-dir="sell" data-pp-feature="ticket-to-point"><span class="i18n"><span class="ko">티켓 → 포인트</span><span class="vi">Vé → Điểm</span></span></button>
             </div>
             <div class="tx-dirs" id="pt-rate-rows"></div>
             <div class="tx-spacer"></div>
@@ -12973,7 +12977,7 @@ window.PP_FEATURES = {
             <div class="tx-sheet-title">교환 안내</div>
             <ul class="tx-sheet-list">
               <li><span class="i18n"><span class="ko"><b>등급</b> — 브론즈 10장 ⇄ 실버 1장, 실버 2장 ⇄ 골드 1장으로 양방향 교환돼요.</span><span class="vi"><b>Hạng</b> — Bronze 10 vé ⇄ Silver 1 vé, Silver 2 vé ⇄ Gold 1 vé, đổi được cả hai chiều.</span></span></li>
-              <li><span class="i18n"><span class="ko"><b>포인트</b> — 1,000P·10,000P·20,000P로 브론즈·실버·골드와 양방향 교환됩니다.</span><span class="vi"><b>Điểm</b> — Đổi hai chiều với Bronze·Silver·Gold bằng 1.000P·10.000P·20.000P.</span></span></li>
+              <li><span class="i18n"><span class="ko"><b>포인트</b> — 1,000P·10,000P·20,000P로 브론즈·실버·골드 티켓을 받아요. 포인트 → 티켓 한 방향만 가능해요.</span><span class="vi"><b>Điểm</b> — Đổi 1.000P·10.000P·20.000P thành vé Bronze·Silver·Gold. Chỉ đổi một chiều Điểm → Vé.</span></span></li>
               <li><span class="i18n"><span class="ko"><b>이벤트</b> — 이벤트 티켓 5장 → 브론즈 1장. 한 방향만 가능하며 되돌릴 수 없어요.</span><span class="vi"><b>Sự kiện</b> — Vé sự kiện 5 vé → Bronze 1 vé. Chỉ đổi một chiều, không thể hoàn tác.</span></span></li>
               <li><span class="i18n"><span class="ko"><b>유의</b> — 교환은 즉시 반영되며 대기 중인 티켓은 교환에 사용할 수 없습니다.</span><span class="vi"><b>Lưu ý</b> — Đổi được áp dụng ngay, vé đang chờ duyệt không dùng để đổi được.</span></span></li>
             </ul>
@@ -13656,7 +13660,7 @@ const SB_SPECS = {
         "items": [
           "상단 고정: 등급 티켓 3종(브론즈·실버·골드) + 이벤트 티켓 + 포인트를 한 카드에",
           "등급 교환(상향 단방향): 브론즈 10 → 실버 1 / 실버 2 → 골드 1. 하향 교환 없음",
-          "포인트 교환(양방향·등가): 브론즈 1,000P / 실버 10,000P / 골드 20,000P. 수수료 없음",
+          "포인트 교환(단방향·포인트→티켓·등가, 2026-08 확정): 브론즈 1,000P / 실버 10,000P / 골드 20,000P. 수수료 없음. 티켓→포인트 역방향은 숨김(로직 보존)",
           "이벤트티켓 교환(단방향): 이벤트 티켓 5 → 브론즈 1. 역방향 없음"
         ]
       },
@@ -20018,8 +20022,10 @@ function ppExecuteTicketSwap(from, to, consume, receive) {
     }).catch(function(e) { console.error('ppExecuteTicketSwap', e); showToast('교환 중 오류가 발생했어요'); return false; });
 }
 
-/* ── pw-22 포인트 교환 탭 (실로직) ── 정책: 쌍방 허용, 10P=1원, 브1,000P·실10,000P·골20,000P
-   비율은 2026-07-31 기준 현행값 그대로다(임의 변경 없음). */
+/* ── pw-22 포인트 교환 탭 (실로직) ── 정책: 10P=1원, 브1,000P·실10,000P·골20,000P.
+   비율은 2026-07-31 기준 현행값 그대로다(임의 변경 없음).
+   2026-08 확정: 쌍방 → 단방향(포인트→티켓)으로 변경. sell(티켓→포인트) 로직은 아래 그대로 남겨두되
+   UI 진입(pt-dir-sell 버튼)만 PP_FEATURES.ticketToPoint로 숨겨 실행되지 않게 막는다. */
 var PT_TICKET_RATE = { bronze: 1000, silver: 10000, gold: 20000 };
 var _tkiSeq2 = 0;
 /* 정본 골드 그라데이션 포인트 코인(pw-22 상단 보유 카드와 동일 path) — 인스턴스마다 gradient id 고유화 */
