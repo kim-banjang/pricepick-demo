@@ -671,7 +671,7 @@ textarea.form-input{resize:vertical;min-height:80px;height:auto;}
 
 /* ── 토글 ── */
 .toggle-row{display:flex;align-items:center;gap:10px;}
-.toggle{width:36px;height:20px;border-radius:10px;background:var(--border);position:relative;cursor:pointer;transition:background .2s;flex-shrink:0;}
+.toggle{width:36px;height:20px;border-radius:10px;background:var(--border);position:relative;cursor:pointer;transition:background .2s;flex-shrink:0;display:inline-block;}
 .toggle.on{background:var(--main);}
 .toggle::after{content:'';position:absolute;top:3px;left:3px;width:14px;height:14px;border-radius:50%;background:white;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.3);}
 .toggle.on::after{transform:translateX(16px);}
@@ -1398,14 +1398,22 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
               <option value="0">미적용</option>
             </select>
             <span style="width:1px;height:22px;background:var(--border)"></span>
-            <button class="btn btn-ghost btn-sm" id="ta-select-toggle-btn" onclick="taToggleSelectMode()"
-              title="선택 후 몰을 체크하고 일괄 적용/적용으로/미적용으로 버튼을 누르세요. 저장 버튼을 눌러야 반영됩니다.">선택</button>
-            <span style="font-size:13px;color:var(--text-2)">적립률=수수료×</span>
-            <input class="form-input" type="number" id="ta-bulk-ratio" min="0" max="100" step="1" value="60" style="width:60px;text-align:right">
-            <span style="font-size:13px;color:var(--text-2)">%</span>
-            <button class="btn btn-ghost btn-sm" id="ta-bulk-apply-btn" onclick="taBulkApplyRatio()">일괄 적용</button>
-            <button class="btn btn-ghost btn-sm" id="ta-bulk-on-btn" onclick="taBulkSetApplied(true)">적용으로</button>
-            <button class="btn btn-ghost btn-sm" id="ta-bulk-off-btn" onclick="taBulkSetApplied(false)">미적용으로</button>
+            <!-- 평소엔 「선택」 하나만 — 나머지 조작 버튼은 선택 모드에서만 나타난다
+                 (2026-08-11 재설계, 김반장 지시 — "아무것도 선택 안 했는데 버튼 3개가
+                 다 나와 있어 뭘 하는 건지 모르겠다"). -->
+            <span id="ta-normal-controls">
+              <button class="btn btn-ghost btn-sm" id="ta-select-toggle-btn" onclick="taToggleSelectMode()"
+                title="눌러서 몰을 체크한 뒤 일괄 조작하세요.">선택</button>
+            </span>
+            <span id="ta-select-controls" style="display:none;align-items:center;gap:8px;flex-wrap:wrap">
+              <span class="badge badge-purple" id="ta-select-count">0개 선택</span>
+              <input class="form-input" type="number" id="ta-bulk-ratio" min="0" max="100" step="1" value="60" style="width:55px;text-align:right" oninput="taBulkRatioLabelUpdate()">
+              <span style="font-size:13px;color:var(--text-2)">%</span>
+              <button class="btn btn-ghost btn-sm" id="ta-bulk-apply-btn" onclick="taBulkApplyRatio()">적립률 60% 적용</button>
+              <button class="btn btn-ghost btn-sm" id="ta-bulk-on-btn" onclick="taBulkSetApplied(true)">적용으로</button>
+              <button class="btn btn-ghost btn-sm" id="ta-bulk-off-btn" onclick="taBulkSetApplied(false)">미적용으로</button>
+              <button class="btn btn-ghost btn-sm" onclick="taToggleSelectMode()">취소</button>
+            </span>
             <span style="width:1px;height:22px;background:var(--border)"></span>
             <button class="btn btn-ghost btn-sm" onclick="taOpenAddMall()">제휴몰 추가</button>
           </div>
@@ -9766,8 +9774,13 @@ window.taToggleSelectMode = function() {
   if (!TA_SELECT_MODE) TA_SELECTED = {};
   var sec = document.getElementById('sec-ticket-accrual');
   if (sec) sec.classList.toggle('ta-select-active', TA_SELECT_MODE);
-  var btn = document.getElementById('ta-select-toggle-btn');
-  if (btn) btn.textContent = TA_SELECT_MODE ? '선택 취소' : '선택';
+  // 평소엔 「선택」 하나만, 선택 모드에선 그 자리가 개수·비율·조작 버튼들로
+  // 바뀐다(2026-08-11 재설계) — 같은 onclick(taToggleSelectMode)을 「취소」
+  // 버튼도 그대로 쓴다(꺼지는 동작은 똑같다).
+  var normal = document.getElementById('ta-normal-controls');
+  var sel = document.getElementById('ta-select-controls');
+  if (normal) normal.style.display = TA_SELECT_MODE ? 'none' : '';
+  if (sel) sel.style.display = TA_SELECT_MODE ? 'inline-flex' : 'none';
   if (!TA_SELECT_MODE) {
     Array.prototype.forEach.call(document.querySelectorAll('.ta-select-cb'), function(cb) { cb.checked = false; });
     var allCb = document.getElementById('ta-select-all');
@@ -9799,15 +9812,27 @@ window.taToggleSelectAll = function(checked) {
   taSelectionChanged();
 };
 
+// 「N개 선택」 표시 + 아무것도 안 골랐으면 조작 버튼 3개를 비활성화한다
+// (2026-08-11 — 선택 전엔 눌러도 되는 버튼처럼 보이면 안 된다는 지적).
 function taUpdateBulkBtnLabel() {
   var n = Object.keys(TA_SELECTED).length;
-  var btn = document.getElementById('ta-bulk-apply-btn');
-  if (btn) btn.textContent = n > 0 ? '일괄 적용 (' + n + '개)' : '일괄 적용';
-  var onBtn = document.getElementById('ta-bulk-on-btn');
-  if (onBtn) onBtn.textContent = n > 0 ? '적용으로 (' + n + '개)' : '적용으로';
-  var offBtn = document.getElementById('ta-bulk-off-btn');
-  if (offBtn) offBtn.textContent = n > 0 ? '미적용으로 (' + n + '개)' : '미적용으로';
+  var countEl = document.getElementById('ta-select-count');
+  if (countEl) countEl.textContent = n + '개 선택';
+  var disabled = n === 0;
+  ['ta-bulk-apply-btn', 'ta-bulk-on-btn', 'ta-bulk-off-btn'].forEach(function(id) {
+    var btn = document.getElementById(id);
+    if (btn) btn.classList.toggle('btn-disabled', disabled);
+  });
+  taBulkRatioLabelUpdate();
 }
+
+// 비율 입력칸을 고칠 때마다 버튼 글자도 같이 바뀐다 — 「일괄 적용」처럼 뭘 하는지
+// 모호한 말 대신 "적립률 50% 적용"처럼 눌렀을 때 뭐가 되는지 그대로 보여준다.
+window.taBulkRatioLabelUpdate = function() {
+  var ratio = (document.getElementById('ta-bulk-ratio') || {}).value;
+  var btn = document.getElementById('ta-bulk-apply-btn');
+  if (btn) btn.textContent = '적립률 ' + (ratio === '' ? '?' : ratio) + '% 적용';
+};
 
 window.taBulkApplyRatio = function() {
   var ratio = parseFloat((document.getElementById('ta-bulk-ratio') || {}).value);
