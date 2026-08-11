@@ -287,6 +287,8 @@ tr:hover td{background:var(--surface-2);}
 /* 저장 전 변경 표시 — 기존 warning 토큰 그대로 재사용(새 색 안 만듦) */
 #sec-ticket-accrual .ta-fee.ta-changed,#sec-ticket-accrual .ta-rate.ta-changed{
   border-color:var(--warning)!important;background:var(--warning-soft)!important;}
+#sec-ticket-accrual select[id^="ta-status-select-"].ta-changed{
+  box-shadow:0 0 0 2px var(--warning)!important;}
 #sec-ticket-accrual .ta-dirty-banner{display:none;background:var(--warning-soft);
   border:1px solid var(--warning);border-radius:var(--r-md);padding:10px 16px;
   font-size:12px;color:var(--warning);margin-bottom:14px;font-weight:700;}
@@ -299,7 +301,6 @@ tr:hover td{background:var(--surface-2);}
 #sec-ticket-accrual.ta-select-active .ta-select-col{display:table-cell;}
 .ta-name-link{background:none;border:none;padding:0;margin:0;font:inherit;font-weight:700;color:var(--main);cursor:pointer;text-decoration:underline;text-decoration-color:transparent;}
 .ta-name-link:hover{text-decoration-color:var(--main);}
-.ta-badge.ta-changed{box-shadow:0 0 0 2px var(--warning);}
 #ta-tbody-secondary .toggle.ta-changed{box-shadow:0 0 0 2px var(--warning);}
 #ta-info-body .policy-item{padding:10px 0;}
 #ta-info-body .ta-pre{white-space:pre-wrap;font-size:13px;color:var(--text);line-height:1.5;}
@@ -1384,8 +1385,8 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
               <option value="종합쇼핑몰">종합쇼핑몰</option>
               <option value="패션">패션</option>
             </select>
-            <select class="form-input" id="ta-filter-status" style="width:105px" onchange="taApplyFilters()">
-              <option value="">승인상태 전체</option>
+            <select class="form-input" id="ta-filter-status" style="width:110px" onchange="taApplyFilters()" title="링크프라이스 상태로 거르기">
+              <option value="">LP상태 전체</option>
               <option value="승인">승인</option>
               <option value="승인대기">승인대기</option>
               <option value="거부">거부</option>
@@ -1414,11 +1415,12 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
             <thead>
               <tr>
                 <th class="ta-select-col" style="width:5%"><input type="checkbox" id="ta-select-all" onchange="taToggleSelectAll(this.checked)" title="보이는 몰 전체 선택"></th>
-                <th style="width:21%">제휴몰</th>
-                <th style="width:10%">수수료</th>
-                <th style="width:13%">적립률</th>
-                <th style="width:10%">수익</th>
-                <th style="width:26%">시뮬레이터</th>
+                <th style="width:15%">제휴몰</th>
+                <th style="width:12%">링크프라이스 상태</th>
+                <th style="width:9%">수수료</th>
+                <th style="width:11%">적립률</th>
+                <th style="width:9%">수익</th>
+                <th style="width:24%">시뮬레이터</th>
                 <th style="width:15%">적용</th>
               </tr>
             </thead>
@@ -9408,8 +9410,8 @@ function taCheckDirty() {
 
     if (typeof orig.status === 'string') {
       var statusChanged = TA_APPROVAL[tr.dataset.code] !== orig.status;
-      var badgeEl = document.getElementById('ta-badge-' + tr.dataset.code);
-      if (badgeEl) badgeEl.classList.toggle('ta-changed', statusChanged);
+      var statusSelEl = document.getElementById('ta-status-select-' + tr.dataset.code);
+      if (statusSelEl) statusSelEl.classList.toggle('ta-changed', statusChanged);
       if (statusChanged) changed++;
     }
 
@@ -9445,12 +9447,27 @@ function taEsc(s) {
   return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 
-// 승인 상태 4종 → 기존 배지 색 토큰 재사용(새 색 안 만듦)
+// 링크프라이스 상태 4종 → 기존 배지 색 토큰 재사용(새 색 안 만듦)
 function taStatusBadgeClass(status) {
   if (status === '승인') return 'badge-green';
   if (status === '승인대기') return 'badge-amber';
   if (status === '거부') return 'badge-red';
   return 'badge-gray'; // 미신청 포함
+}
+// 「링크프라이스 상태」 컬럼의 select 테두리·글자색 — 배지와 같은 토큰, 새 색 안 만듦.
+function taStatusColor(status) {
+  if (status === '승인') return 'var(--success)';
+  if (status === '승인대기') return 'var(--amber)';
+  if (status === '거부') return 'var(--danger)';
+  return 'var(--text-3)'; // 미신청 포함
+}
+var TA_STATUS_OPTIONS = ['승인', '승인대기', '거부', '미신청'];
+function taStatusSelectHtml(code, status) {
+  var color = taStatusColor(status);
+  var opts = TA_STATUS_OPTIONS.map(function(s) {
+    return '<option value="' + s + '"' + (s === status ? ' selected' : '') + '>' + s + '</option>';
+  }).join('');
+  return '<select class="form-input" id="ta-status-select-' + code + '" style="max-width:110px;border-color:' + color + ';color:' + color + '" onchange="taApprovalChange(\'' + code + '\', this.value)">' + opts + '</select>';
 }
 
 // 행 하나의 <tr> HTML. 대표/제휴몰 두 표가 같은 컬럼·계산·저장 로직을 쓰게
@@ -9464,18 +9481,21 @@ function taRenderRow(m, showHideCol) {
   var appliedCell = !showHideCol ? '' : (
     '<td><div class="toggle' + (m.isApplied ? ' on' : '') + '" id="ta-toggle-' + m.code + '" onclick="taApplyToggle(\'' + m.code + '\')" title="' + (m.isApplied ? '적용됨 — 클릭하면 미적용으로' : '미적용 — 클릭하면 적용으로') + '"></div></td>'
   );
-  // 링크프라이스 카탈로그 행(status 있음)은 이름 클릭→상세모달+배지. 운영자가 수동으로
+  // 링크프라이스 카탈로그 행(status 있음)은 이름 클릭→상세모달. 운영자가 수동으로
   // 추가한 몰(status 없음)은 24개 필드 원본이 없어 모달을 못 띄우니 이름만 표시한다.
   var isCatalogRow = showHideCol && typeof m.status === 'string';
-  var nameCell = !showHideCol
-    ? '<td style="font-weight:700"><span class="ta-name-text">' + taEsc(m.name) + '</span></td>'
-    : (!isCatalogRow
-      ? '<td style="font-weight:700"><span class="ta-name-text">' + taEsc(m.name) + '</span></td>'
-      : '<td data-category="' + taEsc(m.category || '') + '">'
-        + '<button type="button" class="ta-name-link" onclick="taOpenMerchantInfo(\'' + m.code + '\')">'
-        +   '<span class="ta-name-text">' + taEsc(m.name) + '</span></button> '
-        + '<span class="badge ' + taStatusBadgeClass(m.status) + ' ta-badge" id="ta-badge-' + m.code + '">' + taEsc(m.status) + '</span>'
-        + '</td>');
+  var nameCell = '<td' + (isCatalogRow ? ' data-category="' + taEsc(m.category || '') + '"' : '') + '>'
+    + (isCatalogRow
+      ? '<button type="button" class="ta-name-link" onclick="taOpenMerchantInfo(\'' + m.code + '\')"><span class="ta-name-text" style="font-weight:700">' + taEsc(m.name) + '</span></button>'
+      : '<span class="ta-name-text" style="font-weight:700">' + taEsc(m.name) + '</span>')
+    + '</td>';
+  // 「링크프라이스 상태」— 링크프라이스가 정하는 값(승인/승인대기/거부/미신청).
+  // 오른쪽 「적용」(우리가 정하는 값)과 성격이 달라 이름 옆 칩이 아니라 별도 컬럼으로
+  // 뺐다(2026-08-11, 김반장 지시). 드롭다운으로 직접 바꿀 수 있고, 저장 전 변경
+  // 표시 대상이다 — 다만 바꿔도 「적용」 여부가 자동으로 따라가지는 않는다(별개).
+  var statusCell = !showHideCol ? '' : (
+    !isCatalogRow ? '<td>—</td>' : '<td>' + taStatusSelectHtml(m.code, m.status) + '</td>'
+  );
   var dimStyle = (showHideCol && !m.isApplied) ? ' style="opacity:.5"' : '';
   // 선택 체크박스는 링크프라이스(showHideCol=true) 행에만 — 대표 쿠팡은 직접 제휴라
   // 일괄 적용·선택 대상에서 뺀다(김반장 확정, 2026-08-11). 쿠팡 값은 그 줄에서 직접 고친다.
@@ -9486,6 +9506,7 @@ function taRenderRow(m, showHideCol) {
   return '<tr data-code="' + m.code + '"' + (showHideCol ? ' data-applied="' + (m.isApplied ? '1' : '0') + '"' : '') + dimStyle + '>'
     + selectCell
     + nameCell
+    + statusCell
     + '<td><span style="display:inline-flex;align-items:center;gap:6px">'
     +   '<input class="form-input ta-fee" type="number" min="0" max="100" step="0.1" value="' + m.fee + '" style="max-width:88px;text-align:right">%</span></td>'
     + '<td><span style="display:inline-flex;align-items:center;gap:6px">'
@@ -9525,7 +9546,7 @@ window.taLoad = function() {
   // 첫 진입 시 즉시 "불러오는 중" 을 눈에 보이게 그린다 — 조회가 끝날 때까지 표를
   // 안 건드리면 로딩 중과 실제로 텅 빈 상태가 화면에서 구분이 안 간다.
   tbodyPrimary.innerHTML = ppEmpty(5, '불러오는 중…');
-  tbodySecondary.innerHTML = ppEmpty(7, '불러오는 중…');
+  tbodySecondary.innerHTML = ppEmpty(8, '불러오는 중…');
   if (st) st.textContent = '불러오는 중…';
 
   // 링크프라이스 카탈로그는 별도 정적 파일(linkprice_merchants.js) 대신 Firestore
@@ -9639,7 +9660,7 @@ window.taLoad = function() {
 
     tbodySecondary.innerHTML = secondary.length
       ? secondary.map(function(m) { return taRenderRow(m, true); }).join('')
-      : ppEmpty(7, catalogLoadFailed ? '카탈로그 데이터를 불러오지 못했습니다 — 새로고침 해주세요.' : '등록된 제휴몰이 없습니다.');
+      : ppEmpty(8, catalogLoadFailed ? '카탈로그 데이터를 불러오지 못했습니다 — 새로고침 해주세요.' : '등록된 제휴몰이 없습니다.');
 
     var allRows = document.querySelectorAll('#ta-tbody-primary tr[data-code], #ta-tbody-secondary tr[data-code]');
     Array.prototype.forEach.call(allRows, function(tr) {
@@ -9880,7 +9901,7 @@ window.taOpenMerchantInfo = function(code) {
     + taInfoRow('머천트ID', taEsc(x['머천트ID']))
     + taInfoRow('머천트명', taEsc(x['머천트명']))
     + taInfoRow('카테고리', taEsc(x['카테고리']))
-    + taInfoRow('승인 상태', '<select class="form-input" id="ta-info-status-select" style="max-width:160px" onchange="taApprovalChange(\'' + code + '\', this.value)">' + statusOptions + '</select>')
+    + taInfoRow('링크프라이스 상태', '<select class="form-input" id="ta-info-status-select" data-code="' + code + '" style="max-width:160px" onchange="taApprovalChange(\'' + code + '\', this.value)">' + statusOptions + '</select>')
     + taInfoRow('리워드 가능 여부', taYn(x['리워드 가능 여부']))
     + taInfoRow('PC웹 지원 여부', taYn(x['PC웹 지원 여부']))
     + taInfoRow('모바일 웹 지원 여부', taYn(x['모바일 웹 지원 여부']))
@@ -9906,13 +9927,16 @@ window.taOpenMerchantInfo = function(code) {
 };
 
 // 모달의 승인 상태 select 변경 — 표 배지·저장 전 변경 카운트에 바로 반영한다.
+// 링크프라이스 상태 변경 — 표의 「링크프라이스 상태」 드롭다운과 상세정보 모달의
+// 드롭다운, 둘 중 어느 쪽에서 바꿔도 이 함수로 들어온다. 서로 다른 곳에서 열려
+// 있어도 값이 어긋나지 않게 양쪽 다 갱신한다.
 window.taApprovalChange = function(code, value) {
   TA_APPROVAL[code] = value;
-  var badgeEl = document.getElementById('ta-badge-' + code);
-  if (badgeEl) {
-    badgeEl.textContent = value;
-    badgeEl.className = 'badge ' + taStatusBadgeClass(value) + ' ta-badge';
-  }
+  var color = taStatusColor(value);
+  var tableSel = document.getElementById('ta-status-select-' + code);
+  if (tableSel) { tableSel.value = value; tableSel.style.borderColor = color; tableSel.style.color = color; }
+  var modalSel = document.getElementById('ta-info-status-select');
+  if (modalSel && modalSel.dataset.code === code) modalSel.value = value;
   taCheckDirty();
   taApplyFilters();
 };
