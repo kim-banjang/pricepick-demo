@@ -278,6 +278,13 @@ td{padding:12px 18px;font-size:13px;border-bottom:1px solid var(--border);white-
 tr:last-child td{border-bottom:none;}
 tr:hover td{background:var(--surface-2);}
 
+/* 티켓 적립 관리 — 폰트 규정(13px 이상 · 굵기 400/700)을 이 화면에서만 적용.
+   전역 th/btn/info-box 는 다른 화면에 영향이 가므로 건드리지 않는다. */
+#sec-ticket-accrual th{font-size:13px;font-weight:700;text-transform:none;letter-spacing:0;}
+#sec-ticket-accrual .btn{font-size:13px;font-weight:700;padding:7px 14px;}
+#sec-ticket-accrual .info-box{font-size:13px;}
+#sec-ticket-accrual .ta-rate{height:36px;padding:6px 10px;}
+
 /* ── 배지 ── */
 .badge{display:inline-flex;align-items:center;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600;white-space:nowrap;}
 .badge-purple{background:var(--main-soft);color:var(--main-hover);}
@@ -943,6 +950,10 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
           <span class="sb-chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></span>
         </div>
         <div class="sb-grp-items">
+          <button class="sb-item" id="nav-ticket-accrual" data-label="티켓 적립 관리" onclick="go('ticket-accrual',this)">
+            <span class="sb-item-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M3 17 9 11l4 4 8-8"/><path d="M17 7h4v4"/></svg></span>
+            <span class="sb-item-lbl" id="nav-label-ticket-accrual">티켓 적립 관리</span>
+          </button>
           <button class="sb-item" id="nav-tickets" data-label="티켓 내역" onclick="go('tickets',this)">
             <span class="sb-item-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/><path d="M13 5v2"/><path d="M13 17v2"/><path d="M13 11v2"/></svg></span>
             <span class="sb-item-lbl" id="nav-label-tickets">티켓 내역</span>
@@ -1271,6 +1282,30 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
           </tbody>
         </table>
         <div id="members-pagination"></div>
+      </div>
+    </div>
+
+    <!-- ── 티켓 적립 관리 ── -->
+    <div class="section" id="sec-ticket-accrual">
+      <div class="info-box">제휴몰별로 사용자에게 돌려줄 적립률을 정합니다. 등급 환산은 큰 단위부터 채우는 기존 방식 그대로입니다.</div>
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">제휴몰별 적립률</div>
+          <button class="btn btn-primary btn-sm" id="ta-save-btn" onclick="taSave()">저장</button>
+        </div>
+        <table id="ta-table">
+          <thead>
+            <tr>
+              <th style="width:20%">제휴몰</th>
+              <th style="width:14%">수수료</th>
+              <th style="width:17%">적립률</th>
+              <th style="width:14%">남는 몫</th>
+              <th style="width:35%">10만원 구매 시 지급</th>
+            </tr>
+          </thead>
+          <tbody id="ta-tbody"></tbody>
+        </table>
+        <div id="ta-status" style="padding:12px 18px;font-size:13px;color:var(--text-3);border-top:1px solid var(--border)">불러오는 중…</div>
       </div>
     </div>
 
@@ -3661,6 +3696,7 @@ const I18N = {
     'page.demo-mgmt.title': '데이터 관리(데모)', 'page.demo-mgmt.bc': '개발 · 데모',
     'nav.op-policy': '운영 정책', 'page.op-policy.title': '운영 정책', 'page.op-policy.bc': '운영',
     'page.clawback.title': '환수 이력', 'page.clawback.bc': '티켓 · 보상',
+    'nav.ticket-accrual': '티켓 적립 관리', 'page.ticket-accrual.title': '티켓 적립 관리', 'page.ticket-accrual.bc': '티켓 · 보상',
     'nav.roulette-settings': '매일 행운 룰렛', 'page.roulette-settings.title': '매일 행운 룰렛', 'page.roulette-settings.bc': '티켓 · 보상',
     'nav.jackpot-roulette': '잭팟 룰렛', 'page.jackpot-roulette.title': '잭팟 룰렛', 'page.jackpot-roulette.bc': '티켓 · 보상',
     'nav.group.points': '포인트 관리',
@@ -3703,6 +3739,7 @@ function applyLang() {
     'nav-group-label-members': 'nav.group.members',
     'nav-label-members': 'nav.members',
     'nav-group-label-ticket': 'nav.group.ticket',
+    'nav-label-ticket-accrual': 'nav.ticket-accrual',
     'nav-label-tickets': 'nav.tickets',
     'nav-label-weekly-draws': 'nav.weekly-draws',
     'nav-group-label-points': 'nav.group.points',
@@ -3893,6 +3930,7 @@ function applyRole(role) {
 const PAGE_META = {
   dashboard:     { title:'대시보드',           bc:'개요' },
   members:       { title:'회원 목록',           bc:'회원 관리' },
+  'ticket-accrual': { title:'티켓 적립 관리',    bc:'티켓 · 보상' },
   tickets:       { title:'티켓 내역',           bc:'티켓 · 보상' },
   'weekly-draws': { title:'주간 이벤트 추첨 관리', bc:'티켓 · 보상' },
   'roulette-settings': { title:'매일 행운 룰렛',      bc:'티켓 · 보상' },
@@ -3935,6 +3973,7 @@ function go(id, navEl) {
      회차명만 한국어로 남으므로 진입할 때 현재 언어로 다시 그린다. */
   if (id === 'weekly-draws' && typeof loadDraws === 'function') loadDraws();
   if (id === 'demo-mgmt' && window.dmLoadStats) window.dmLoadStats();
+  if (id === 'ticket-accrual' && window.taLoad) window.taLoad();
   if (id === 'roulette-settings' && window.rltLoad) window.rltLoad('daily');
   if (id === 'jackpot-roulette' && window.rltLoad) window.rltLoad('jackpot');
   // 모바일: 메뉴 항목 선택 시 드로어 닫기
@@ -5426,6 +5465,23 @@ Object.assign(KO2VI,{
   "저장에 실패했습니다.":"Lưu thất bại."
 });
 Object.assign(KO2VI,{"저장된 구성 기준":"Theo cấu hình đã lưu","저장 전 미리보기":"Xem trước khi lưu","미저장":"Chưa lưu","변경사항 저장":"Lưu thay đổi"});
+/* 티켓 적립 관리 */
+Object.assign(KO2VI,{
+  "티켓 적립 관리":"Quản lý tích lũy vé",
+  "제휴몰별 적립률":"Tỷ lệ tích lũy theo cửa hàng",
+  "제휴몰별로 사용자에게 돌려줄 적립률을 정합니다. 등급 환산은 큰 단위부터 채우는 기존 방식 그대로입니다.":"Đặt tỷ lệ tích lũy hoàn lại cho người dùng theo từng cửa hàng liên kết. Cách quy đổi sang hạng vé giữ nguyên như hiện tại — lấp từ đơn vị lớn trước.",
+  "수수료":"Hoa hồng",
+  "적립률":"Tỷ lệ tích lũy",
+  "남는 몫":"Phần còn lại",
+  "10만원 구매 시 지급":"Cấp khi mua 100.000 won",
+  "지급 없음":"Không cấp",
+  "저장된 값 기준":"Theo giá trị đã lưu",
+  "아직 저장한 적이 없어 현재 고정값 2%를 보여줍니다.":"Chưa từng lưu nên đang hiển thị giá trị cố định hiện tại là 2%.",
+  "제휴몰별 적립률을 저장했습니다.":"Đã lưu tỷ lệ tích lũy theo cửa hàng.",
+  "적립률은 0에서 20 사이 숫자로 입력하세요.":"Vui lòng nhập tỷ lệ tích lũy trong khoảng 0 đến 20.",
+  "등록된 제휴몰이 없습니다.":"Chưa có cửa hàng liên kết nào.",
+  "티켓 적립률 수정":"Sửa tỷ lệ tích lũy vé",
+});
   var _orig=new Map(), _tracked=new Set(), _applying=false;
   function hasKo(s){ return /[가-힯ᄀ-ᇿ㄰-㆏]/.test(s); }
   function tcore(s){
@@ -9031,6 +9087,111 @@ window.pointPolicySubmitEdit = function() {
     loadPointPolicy();
   }).catch(function(e) {
     toast('저장 실패: ' + (e.message||e));
+  }).finally(function() {
+    if (btn) { btn.disabled = false; btn.textContent = '저장'; }
+  });
+};
+
+/* ── sec-ticket-accrual ── 제휴몰별 티켓 적립률 (settings/ticket_accrual)
+   지금까지 코드에 박혀 있던 "모든 제휴몰 일률 2%"를 운영자가 몰별로 고칠 수 있게 한다.
+   등급 환산은 기존 방식 그대로 — 적립액을 큰 단위(골드)부터 채우는 Greedy. */
+var TA_DEFAULT_RATE = 2;                                   // 현재 고정값 2%를 그대로 초기값으로
+var TA_UNITS = [                                           // ticket_grades 시드의 환산가치와 동일
+  { name: '골드',   value: 2000 },
+  { name: '실버',   value: 1000 },
+  { name: '브론즈', value: 100  },
+];
+var TA_PREVIEW_KRW = 100000;
+
+function taGreedy(amountKrw, ratePct) {
+  var budget = Math.floor(amountKrw * ratePct / 100);
+  var parts = [];
+  for (var i = 0; i < TA_UNITS.length; i++) {
+    var n = Math.floor(budget / TA_UNITS[i].value);
+    if (n > 0) {
+      // 번역 엔진이 텍스트 노드 단위로 치환하므로 '골드'·'장'을 각각 분리해 담는다
+      parts.push('<span>' + TA_UNITS[i].name + '</span> ' + n + '<span>장</span>');
+      budget -= n * TA_UNITS[i].value;
+    }
+  }
+  return parts.length ? parts.join(' · ') : '<span>지급 없음</span>';
+}
+
+function taRowRefresh(tr) {
+  var fee = parseFloat(tr.dataset.fee) || 0;
+  var rate = parseFloat((tr.querySelector('.ta-rate') || {}).value);
+  if (!isFinite(rate) || rate < 0) rate = 0;
+  var margin = fee - rate;
+  var mEl = tr.querySelector('.ta-margin');
+  mEl.textContent = margin.toFixed(2) + '%p';
+  mEl.style.color = margin < 0 ? 'var(--danger)' : 'var(--text)';
+  tr.querySelector('.ta-preview').innerHTML = taGreedy(TA_PREVIEW_KRW, rate);
+}
+
+window.taLoad = function() {
+  var tbody = document.getElementById('ta-tbody');
+  var st = document.getElementById('ta-status');
+  if (!tbody) return;
+  Promise.all([
+    db.collection('affiliate_malls').get(),
+    db.collection('settings').doc('ticket_accrual').get(),
+  ]).then(function(res) {
+    var saved = (res[1].exists && res[1].data().rates) || {};
+    var malls = res[0].docs.map(function(doc) {
+      var d = doc.data();
+      return {
+        code: doc.id,
+        name: d.name || doc.id,
+        fee: typeof d.commission_rate === 'number' ? d.commission_rate * 100 : 0,
+        rate: typeof saved[doc.id] === 'number' ? saved[doc.id] : TA_DEFAULT_RATE,
+      };
+    }).sort(function(a, b) { return a.name.localeCompare(b.name, 'ko'); });
+
+    if (!malls.length) { tbody.innerHTML = ppEmpty(5, '등록된 제휴몰이 없습니다.'); if (st) st.textContent = ''; return; }
+
+    tbody.innerHTML = malls.map(function(m) {
+      return '<tr data-code="' + m.code + '" data-fee="' + m.fee + '">'
+        + '<td style="font-weight:700">' + m.name + '</td>'
+        + '<td>' + m.fee.toFixed(2) + '%</td>'
+        + '<td><span style="display:inline-flex;align-items:center;gap:6px">'
+        +   '<input class="form-input ta-rate" type="number" min="0" max="20" step="0.1" value="' + m.rate + '" style="max-width:88px;text-align:right">%</span></td>'
+        + '<td class="ta-margin">—</td>'
+        + '<td class="ta-preview">—</td></tr>';
+    }).join('');
+
+    Array.prototype.forEach.call(tbody.querySelectorAll('tr[data-code]'), function(tr) {
+      tr.querySelector('.ta-rate').addEventListener('input', function() { taRowRefresh(tr); });
+      taRowRefresh(tr);
+    });
+    if (st) st.textContent = res[1].exists ? '저장된 값 기준' : '아직 저장한 적이 없어 현재 고정값 2%를 보여줍니다.';
+  }).catch(function(e) {
+    console.error('taLoad', e);
+    tbody.innerHTML = ppEmpty(5, '로드 오류');
+    if (st) st.textContent = '';
+  });
+};
+
+window.taSave = function() {
+  var rows = document.querySelectorAll('#ta-tbody tr[data-code]');
+  if (!rows.length) return;
+  var rates = {}, bad = false;
+  Array.prototype.forEach.call(rows, function(tr) {
+    var v = parseFloat(tr.querySelector('.ta-rate').value);
+    if (!isFinite(v) || v < 0 || v > 20) { bad = true; return; }
+    rates[tr.dataset.code] = Math.round(v * 100) / 100;
+  });
+  if (bad) { toast('적립률은 0에서 20 사이 숫자로 입력하세요.'); return; }
+  var btn = document.getElementById('ta-save-btn');
+  if (btn) { btn.disabled = true; btn.textContent = '저장 중…'; }
+  db.collection('settings').doc('ticket_accrual').set({
+    rates: rates,
+    updated_at: FS.FieldValue.serverTimestamp(),
+  }, { merge: true }).then(function() {
+    toast('제휴몰별 적립률을 저장했습니다.');
+    logAdmin('티켓 적립률 수정');
+    window.taLoad();
+  }).catch(function(e) {
+    toast('저장 실패: ' + (e.message || e));
   }).finally(function() {
     if (btn) { btn.disabled = false; btn.textContent = '저장'; }
   });
