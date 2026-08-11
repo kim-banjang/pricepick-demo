@@ -3271,7 +3271,7 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
       <div class="form-group">
         <label class="form-label">구매 금액</label>
         <div class="ta-sim-amount-box">
-          <input type="number" id="ta-sim-amount" min="0" step="1000" value="100000" oninput="taSimRefresh()">
+          <input type="text" inputmode="numeric" id="ta-sim-amount" value="100,000" oninput="taSimRefresh()">
           <span class="ta-sim-amount-unit">원</span>
         </div>
       </div>
@@ -9947,14 +9947,21 @@ window.taOpenSim = function(code) {
   var nameSrc = tr.querySelector('.ta-name-text') || tr.querySelector('td');
   if (nameEl) nameEl.textContent = nameSrc.textContent;
   var amtEl = document.getElementById('ta-sim-amount');
-  if (amtEl) amtEl.value = TA_PREVIEW_KRW;
+  if (amtEl) amtEl.value = TA_PREVIEW_KRW.toLocaleString();
   taSimRefresh();
   openModal('m-ta-sim');
 };
 
+// 구매 금액 입력칸은 text — 시안처럼 천단위 콤마를 보여주려고(number 인풋은 콤마를
+// 못 보여준다). 콤마는 표시만이고 계산은 항상 숫자만 파싱해서 쓴다.
+function taSimParseAmount() {
+  var raw = ((document.getElementById('ta-sim-amount') || {}).value || '').replace(/[^0-9]/g, '');
+  return raw ? parseInt(raw, 10) : 0;
+}
+
 window.taSimSetAmount = function(v) {
   var amtEl = document.getElementById('ta-sim-amount');
-  if (amtEl) amtEl.value = v;
+  if (amtEl) amtEl.value = v.toLocaleString();
   taSimRefresh();
 };
 
@@ -9975,8 +9982,9 @@ window.taSimRefresh = function() {
   if (!isFinite(fee) || fee < 0) fee = 0;
   var rate = parseFloat((tr.querySelector('.ta-rate') || {}).value);
   if (!isFinite(rate) || rate < 0) rate = 0;
-  var amount = parseFloat((document.getElementById('ta-sim-amount') || {}).value);
-  if (!isFinite(amount) || amount < 0) amount = 0;
+  var amount = taSimParseAmount();
+  var amtEl = document.getElementById('ta-sim-amount');
+  if (amtEl && amtEl.value !== amount.toLocaleString()) amtEl.value = amount.toLocaleString();
 
   var earn = Math.floor(amount * rate / 100);       // 티켓 구성(taGreedy)이 쓰는 것과 같은 예산
   var revenue = Math.floor(amount * fee / 100);
