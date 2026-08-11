@@ -9463,11 +9463,21 @@ window.taLoad = function(retryOpts) {
   var st = document.getElementById('ta-status');
   if (!tbodyPrimary || !tbodySecondary) return;
 
+  var tries = (retryOpts && retryOpts.tries) || 0;
+
+  // 첫 진입 시 즉시 "불러오는 중" 을 눈에 보이게 그린다(2026-08-11) — 그 전엔 표가
+  // 그냥 빈 채로 있다가 나중에 "없습니다"/데이터로 바뀌었는데, 로딩 중과 실제로
+  // 텅 빈 상태가 화면에서 구분이 안 갔다(김반장 실측 — 기다리는데 안 뜬다고 오인).
+  if (tries === 0) {
+    tbodyPrimary.innerHTML = ppEmpty(6, '불러오는 중…');
+    tbodySecondary.innerHTML = ppEmpty(7, '불러오는 중…');
+    if (st) st.textContent = '불러오는 중…';
+  }
+
   // 방어: linkprice_merchants.js 가 아직 실행 전일 수 있는 드문 타이밍/네트워크
   // 상황을 대비한다(2026-08-11 실측 사고 — 화면·필터·저장값은 멀쩡한데 목록만
   // 0개로 떴다. Firestore 는 정상이었고 window.LINKPRICE_MERCHANTS 만 비어 있었다).
   // 최대 10회(3초) 재시도 후에도 안 잡히면 진짜 실패로 보고 아래에서 명확히 알린다.
-  var tries = (retryOpts && retryOpts.tries) || 0;
   if (!(window.LINKPRICE_MERCHANTS && window.LINKPRICE_MERCHANTS.length) && tries < 10) {
     setTimeout(function() { window.taLoad({ tries: tries + 1 }); }, 300);
     return;
