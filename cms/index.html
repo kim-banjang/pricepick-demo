@@ -1361,9 +1361,11 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
               <option value="거부">거부</option>
               <option value="미신청">미신청</option>
             </select>
-            <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text-2);cursor:pointer">
-              <input type="checkbox" id="ta-show-hidden" onchange="window.taLoad()"> 숨김 포함 보기
-            </label>
+            <select class="form-input" id="ta-filter-applied" style="width:100px" onchange="taApplyFilters()">
+              <option value="">적용 전체</option>
+              <option value="1">적용</option>
+              <option value="0">미적용</option>
+            </select>
             <button class="btn btn-ghost btn-sm" onclick="taOpenAddMall()">제휴몰 추가</button>
           </div>
         </div>
@@ -1376,7 +1378,7 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
                 <th style="width:14%">적립률</th>
                 <th style="width:11%">수익</th>
                 <th style="width:26%">시뮬레이터</th>
-                <th style="width:15%">숨김</th>
+                <th style="width:15%">적용</th>
               </tr>
             </thead>
             <tbody id="ta-tbody-secondary"></tbody>
@@ -9383,10 +9385,13 @@ function taStatusBadgeClass(status) {
 // 공용으로 뺐다(showHideCol 이 곧 "링크프라이스 카탈로그 행"이다 — 대표=쿠팡만
 // showHideCol=false 로 넘어오고, 이때는 숨김 기능도 머천트 상세 모달도 없다).
 function taRenderRow(m, showHideCol) {
-  var hideCell = !showHideCol ? '' : (
-    '<td>' + (m.isHidden
-      ? '<button type="button" class="btn btn-ghost btn-sm" onclick="taToggleHide(\'' + m.code + '\', false)">숨김 해제</button>'
-      : '<button type="button" class="btn btn-ghost btn-sm" onclick="taToggleHide(\'' + m.code + '\', true)">숨김</button>'
+  // 「적용/미적용」— 실제 서비스에 이 몰을 쓸지 말지(링크프라이스 승인과는 별개 개념,
+  // 2026-08-11). 미적용이어도 행은 계속 보인다(나중에 다시 켜야 하니) — 흐림 표시만
+  // 한다. 대표 제휴몰(showHideCol=false)엔 이 컬럼 자체가 없다.
+  var appliedCell = !showHideCol ? '' : (
+    '<td>' + (m.isApplied
+      ? '<button type="button" class="btn btn-ghost btn-sm" onclick="taToggleApply(\'' + m.code + '\', false)">미적용</button>'
+      : '<button type="button" class="btn btn-ghost btn-sm" onclick="taToggleApply(\'' + m.code + '\', true)">적용</button>'
     ) + '</td>'
   );
   // 링크프라이스 카탈로그 행(status 있음)은 이름 클릭→상세모달+배지. 운영자가 수동으로
@@ -9401,7 +9406,8 @@ function taRenderRow(m, showHideCol) {
         +   '<span class="ta-name-text">' + taEsc(m.name) + '</span></button> '
         + '<span class="badge ' + taStatusBadgeClass(m.status) + ' ta-badge" id="ta-badge-' + m.code + '">' + taEsc(m.status) + '</span>'
         + '</td>');
-  return '<tr data-code="' + m.code + '"' + (m.isHidden ? ' style="opacity:.5"' : '') + '>'
+  var dimStyle = (showHideCol && !m.isApplied) ? ' style="opacity:.5"' : '';
+  return '<tr data-code="' + m.code + '"' + (showHideCol ? ' data-applied="' + (m.isApplied ? '1' : '0') + '"' : '') + dimStyle + '>'
     + nameCell
     + '<td><span style="display:inline-flex;align-items:center;gap:6px">'
     +   '<input class="form-input ta-fee" type="number" min="0" max="100" step="0.1" value="' + m.fee + '" style="max-width:88px;text-align:right">%</span></td>'
@@ -9409,7 +9415,7 @@ function taRenderRow(m, showHideCol) {
     +   '<input class="form-input ta-rate" type="number" min="0" max="20" step="0.1" value="' + m.rate + '" style="max-width:88px;text-align:right">%</span></td>'
     + '<td class="ta-margin">—</td>'
     + '<td><button type="button" class="btn btn-ghost btn-sm" onclick="taOpenSim(\'' + m.code + '\')">시뮬레이터</button></td>'
-    + hideCell
+    + appliedCell
     + '</tr>';
 }
 
@@ -9437,7 +9443,6 @@ window.taLoad = function() {
   var tbodySecondary = document.getElementById('ta-tbody-secondary');
   var st = document.getElementById('ta-status');
   if (!tbodyPrimary || !tbodySecondary) return;
-  var showHidden = !!(document.getElementById('ta-show-hidden') || {}).checked;
 
   Promise.all([
     db.collection('affiliate_malls').get(),
@@ -9446,55 +9451,64 @@ window.taLoad = function() {
     var data = (res[1].exists && res[1].data()) || {};
     var saved = data.rates || {};
     var savedFees = data.fees || {};
-    var hidden = data.hidden || {};
+    var savedApplied = data.applied || {};
     var savedApproval = data.approval || {};
 
-    // 대표 제휴몰: 쿠팡 하나만, affiliate_malls 그대로(김반장 확정, 2026-08-11 —
-    // 「최상단 정렬」에서 「구획 분리」로 대체됐다. 대표를 바꾸는 기능은 없다). 손대지 않는다.
+    // 대표 제휴몰: 쿠팡 하나만. affiliate_malls 문서 자체는 'coupang'(다른 화면과
+    // 공유하는 실제 문서, 손대지 않는다) 그대로 읽되, settings/ticket_accrual 의
+    // 저장 키(코드)는 'coupang_direct' 를 쓴다(김반장 확정, 2026-08-11) — 쿠팡은
+    // 링크프라이스를 거치지 않는 직접 제휴라 링크프라이스 카탈로그의 별도 쿠팡
+    // 항목(lp:coupang, 승인 상태 「거부」)과 저장 키가 절대 겹치면 안 된다. 대표는
+    // 적용/미적용 개념이 없다(끌 일이 없는 앱의 중심) — showHideCol=false 라 그
+    // 컬럼 자체가 안 그려진다.
     var coupangDoc = res[0].docs.filter(function(doc) { return doc.id === 'coupang'; })[0];
     var primary = [];
     if (coupangDoc) {
       var cd = coupangDoc.data();
+      var pCode = 'coupang_direct';
       var cFee = typeof cd.commission_rate === 'number' ? taFmt(cd.commission_rate * 100) : 0;
-      var cFeeFinal = typeof savedFees[coupangDoc.id] === 'number' ? taFmt(savedFees[coupangDoc.id]) : cFee;
+      var cFeeFinal = typeof savedFees[pCode] === 'number' ? taFmt(savedFees[pCode]) : cFee;
       primary.push({
-        code: coupangDoc.id,
+        code: pCode,
         name: cd.name || coupangDoc.id,
         fee: cFeeFinal,
-        rate: typeof saved[coupangDoc.id] === 'number' ? taFmt(saved[coupangDoc.id]) : taDefaultRate(cFeeFinal),
+        rate: typeof saved[pCode] === 'number' ? taFmt(saved[pCode]) : taDefaultRate(cFeeFinal),
         isHidden: false,
       });
     }
 
     // 제휴몰(링크프라이스): 실제 링크프라이스 제휴 카탈로그 110개가 소스다(정적,
-    // linkprice_merchants.js). 수수료 기본값은 「최저커미션」— 최저값을 쓰면 어느
-    // 상품군에서도 역마진이 안 난다(김반장 확정, 2026-08-11). 적립률 기본값은 수수료의
-    // 60%(taDefaultRate) — 남는 40%가 우리 수익. 운영자가 고친 값(수수료/적립률/숨김/
-    // 승인상태)만 settings/ticket_accrual 에 덮어쓰기로 저장된다 — 카탈로그 원본은 안 건드린다.
+    // linkprice_merchants.js, 원본 그대로 — 나중에 목록을 갱신해도 매번 손댈 게
+    // 없어야 하니 쿠팡 항목도 지우지 않는다). 수수료 기본값은 「최저커미션」— 최저값을
+    // 쓰면 어느 상품군에서도 역마진이 안 난다. 적립률 기본값은 수수료의 60%(남는 40%가
+    // 우리 수익). 적용 여부 기본값은 승인 상태가 「승인」인 것만 적용, 나머지(승인대기·
+    // 거부·미신청)는 미적용 — 링크프라이스 승인이 나도 우리가 실제로 안 붙일 수 있다.
     var catalog = window.LINKPRICE_MERCHANTS || [];
-    // 'lp:' 네임스페이스 — 링크프라이스 카탈로그에 머천트ID가 실제로 "coupang"인
-    // 항목이 있다(대표 제휴몰과 다른 별도 제휴 건, 2026-08-11 실측). 접두사 없이
-    // 코드를 그대로 쓰면 대표 제휴몰의 data-code·저장 키와 충돌해 값이 서로 덮어써진다
-    // — 그래서 카탈로그 쪽만 항상 'lp:' 를 붙여 완전히 분리한다.
+    // 'lp:' 네임스페이스 — 링크프라이스 원본에 머천트ID가 그대로 "coupang"인 항목이
+    // 있다(대표와는 별개의, 링크프라이스 경유 제휴 건). 대표는 위에서 'coupang_direct'
+    // 를 쓰므로 이미 안 겹치지만, 카탈로그 쪽도 항상 'lp:' 를 붙여 이중으로 분리해둔다.
     var secondaryAll = catalog.map(function(x) {
       var rawId = x['머천트ID'];
       var code = 'lp:' + rawId;
       var defaultFee = taFmt(typeof x['최저커미션'] === 'number' ? x['최저커미션'] : 0);
       var feeFinal = typeof savedFees[code] === 'number' ? taFmt(savedFees[code]) : defaultFee;
+      var status = typeof savedApproval[code] === 'string' ? savedApproval[code] : (x['승인 상태'] || '미신청');
       return {
         code: code,
         name: x['머천트명'] || rawId,
         category: x['카테고리'] || '',
         fee: feeFinal,
         rate: typeof saved[code] === 'number' ? taFmt(saved[code]) : taDefaultRate(feeFinal),
-        isHidden: !!hidden[code],
-        status: typeof savedApproval[code] === 'string' ? savedApproval[code] : (x['승인 상태'] || '미신청'),
+        isApplied: typeof savedApplied[code] === 'boolean' ? savedApplied[code] : (status === '승인'),
+        status: status,
       };
     });
 
     // 운영자가 수동으로 추가한 몰(카탈로그에 없는 것) — settings/ticket_accrual 을
     // 그대로 확장(customMalls 맵)한 것뿐, 새 컬렉션·구조 안 만든다. 카탈로그 원본이
     // 없어 category/status 는 안 채운다(taRenderRow 가 이걸로 카탈로그 행과 구분한다).
+    // 승인 워크플로 대상이 아니므로 적용 기본값은 true(운영자가 직접 등록한 것이라
+    // 바로 쓰겠다는 의도로 본다).
     var customMalls = data.customMalls || {};
     Object.keys(customMalls).forEach(function(code) {
       var c = customMalls[code] || {};
@@ -9505,7 +9519,7 @@ window.taLoad = function() {
         name: c.name || code,
         fee: feeFinal,
         rate: typeof saved[code] === 'number' ? taFmt(saved[code]) : taDefaultRate(feeFinal),
-        isHidden: !!hidden[code],
+        isApplied: typeof savedApplied[code] === 'boolean' ? savedApplied[code] : true,
       });
     });
 
@@ -9518,10 +9532,9 @@ window.taLoad = function() {
       TA_APPROVAL[m.code] = m.status;
     });
 
-    // 숨김은 기본으로 안 보이고, 「숨김 포함 보기」때만 같이 뜬다.
-    var secondary = secondaryAll.filter(function(m) {
-      return showHidden || !m.isHidden;
-    }).sort(function(a, b) { return a.name.localeCompare(b.name, 'ko'); });
+    // 미적용이어도 목록에서 사라지면 안 된다(나중에 다시 켜야 하니) — 전부 그린다.
+    // 적용/미적용 구분은 흐림 표시 + 「전체/적용/미적용」 필터로만 한다(taApplyFilters).
+    var secondary = secondaryAll.slice().sort(function(a, b) { return a.name.localeCompare(b.name, 'ko'); });
 
     tbodyPrimary.innerHTML = primary.length
       ? primary.map(function(m) { return taRenderRow(m, false); }).join('')
@@ -9573,20 +9586,23 @@ window.taSave = function() {
 // 추가·제거한다(fees/rates 와 같은 패턴). affiliate_malls.active 는 건드리지 않는다
 // — 그 필드는 「제휴몰 API 관리」화면이 API 연동 상태로 이미 쓰고 있어서(2026-08-11
 // 확인), 여기서 같이 쓰면 그 화면과 뜻이 부딪힌다.
-window.taToggleHide = function(code, hide) {
-  if (code === 'coupang') return; // 대표는 숨길 수 없다
+// 적용/미적용 — 삭제가 아니다(링크프라이스 승인과 별개로 「우리가 실제로 붙일지」).
+// settings/ticket_accrual 의 applied 맵에 코드만 추가·갱신한다(rates/fees/approval
+// 과 같은 패턴). taCollectFromDom 을 같이 써서, 이 버튼을 눌러도 다른 행에서
+// 편집 중이던 수수료·적립률·승인상태가 안 날아간다.
+window.taToggleApply = function(code, apply) {
   var c = taCollectFromDom();
   if (c.bad) { toast('수수료는 0~100, 적립률은 0~20 사이 숫자로 먼저 고친 뒤 다시 시도하세요.'); return; }
   db.collection('settings').doc('ticket_accrual').get().then(function(doc) {
-    var hidden = (doc.exists && doc.data().hidden) || {};
-    hidden[code] = hide;
+    var applied = (doc.exists && doc.data().applied) || {};
+    applied[code] = apply;
     return db.collection('settings').doc('ticket_accrual').set({
-      rates: c.rates, fees: c.fees, approval: c.approval, hidden: hidden,
+      rates: c.rates, fees: c.fees, approval: c.approval, applied: applied,
       updated_at: FS.FieldValue.serverTimestamp(),
     }, { merge: true });
   }).then(function() {
-    toast(hide ? '제휴몰을 숨겼습니다.' : '숨김을 해제했습니다.');
-    logAdmin('제휴몰 ' + (hide ? '숨김' : '숨김 해제') + ': ' + code);
+    toast(apply ? '제휴몰을 적용했습니다.' : '제휴몰을 미적용으로 전환했습니다.');
+    logAdmin('제휴몰 ' + (apply ? '적용' : '미적용') + ': ' + code);
     window.taLoad();
   }).catch(function(e) {
     toast('처리 실패: ' + (e.message || e));
@@ -9619,6 +9635,7 @@ window.taApplyFilters = function() {
   var q = ((document.getElementById('ta-filter-search') || {}).value || '').trim().toLowerCase();
   var cat = (document.getElementById('ta-filter-category') || {}).value || '';
   var status = (document.getElementById('ta-filter-status') || {}).value || '';
+  var applied = (document.getElementById('ta-filter-applied') || {}).value || '';
   var rows = document.querySelectorAll('#ta-tbody-secondary tr[data-code]');
   Array.prototype.forEach.call(rows, function(tr) {
     var code = tr.dataset.code;
@@ -9629,7 +9646,8 @@ window.taApplyFilters = function() {
     var okName = !q || name.toLowerCase().indexOf(q) !== -1;
     var okCat = !cat || rowCat === cat;
     var okStatus = !status || TA_APPROVAL[code] === status;
-    tr.style.display = (okName && okCat && okStatus) ? '' : 'none';
+    var okApplied = !applied || tr.dataset.applied === applied;
+    tr.style.display = (okName && okCat && okStatus && okApplied) ? '' : 'none';
   });
 };
 
