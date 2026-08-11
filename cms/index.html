@@ -9438,11 +9438,22 @@ function taCollectFromDom() {
   return { rates: rates, fees: fees, approval: approval, bad: bad };
 }
 
-window.taLoad = function() {
+window.taLoad = function(retryOpts) {
   var tbodyPrimary = document.getElementById('ta-tbody-primary');
   var tbodySecondary = document.getElementById('ta-tbody-secondary');
   var st = document.getElementById('ta-status');
   if (!tbodyPrimary || !tbodySecondary) return;
+
+  // 방어: linkprice_merchants.js 가 아직 실행 전일 수 있는 드문 타이밍/네트워크
+  // 상황을 대비한다(2026-08-11 실측 사고 — 화면·필터·저장값은 멀쩡한데 목록만
+  // 0개로 떴다. Firestore 는 정상이었고 window.LINKPRICE_MERCHANTS 만 비어 있었다).
+  // 최대 10회(3초) 재시도 후에도 안 잡히면 진짜 실패로 보고 아래에서 명확히 알린다.
+  var tries = (retryOpts && retryOpts.tries) || 0;
+  if (!(window.LINKPRICE_MERCHANTS && window.LINKPRICE_MERCHANTS.length) && tries < 10) {
+    setTimeout(function() { window.taLoad({ tries: tries + 1 }); }, 300);
+    return;
+  }
+  var catalogLoadFailed = !(window.LINKPRICE_MERCHANTS && window.LINKPRICE_MERCHANTS.length);
 
   Promise.all([
     db.collection('affiliate_malls').get(),
@@ -9542,7 +9553,7 @@ window.taLoad = function() {
 
     tbodySecondary.innerHTML = secondary.length
       ? secondary.map(function(m) { return taRenderRow(m, true); }).join('')
-      : ppEmpty(6, '등록된 제휴몰이 없습니다.');
+      : ppEmpty(6, catalogLoadFailed ? '카탈로그 데이터를 불러오지 못했습니다 — 새로고침 해주세요.' : '등록된 제휴몰이 없습니다.');
 
     var allRows = document.querySelectorAll('#ta-tbody-primary tr[data-code], #ta-tbody-secondary tr[data-code]');
     Array.prototype.forEach.call(allRows, function(tr) {
@@ -9551,7 +9562,9 @@ window.taLoad = function() {
       taRowRefresh(tr);
     });
     taApplyFilters();
-    if (st) st.textContent = (res[1].exists ? '저장된 값 기준' : '아직 저장한 적이 없어 초기값 기준') + ' · 총 ' + secondaryAll.length + '개(표시 ' + secondary.length + '개)';
+    if (st) st.textContent = catalogLoadFailed
+      ? '⚠ 카탈로그 로드 실패 — 새로고침 필요'
+      : (res[1].exists ? '저장된 값 기준' : '아직 저장한 적이 없어 초기값 기준') + ' · 총 ' + secondaryAll.length + '개(표시 ' + secondary.length + '개)';
   }).catch(function(e) {
     console.error('taLoad', e);
     tbodyPrimary.innerHTML = ppEmpty(5, '로드 오류');
