@@ -1303,8 +1303,16 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
 
     <!-- ── 티켓 적립 관리 ── -->
     <div class="section" id="sec-ticket-accrual">
-      <div class="info-box">제휴몰별 수수료와 사용자에게 돌려줄 적립률을 정합니다(계약이 바뀌면 수수료도 여기서 바로 반영). 등급 환산은 큰 단위부터 채우는 기존 방식 그대로입니다. 쿠팡은 대표 제휴몰로 항상 별도 표시됩니다.</div>
+      <div class="info-box">제휴몰별 수수료와 사용자에게 돌려줄 적립률을 정합니다(계약이 바뀌면 수수료도 여기서 바로 반영). 등급 환산은 큰 단위부터 채우는 기존 방식 그대로입니다. 쿠팡은 대표 제휴몰로 항상 별도 표시됩니다. 적립률 기본값은 수수료의 60%이며, 나머지 40%가 우리 수익입니다.</div>
       <div class="ta-dirty-banner" id="ta-dirty-banner"></div>
+
+      <div class="card" style="padding:14px 18px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+        <span style="font-size:13px;color:var(--text-2)">적립률 = 수수료 ×</span>
+        <input class="form-input" type="number" id="ta-bulk-ratio" min="0" max="100" step="1" value="60" style="width:70px;text-align:right">
+        <span style="font-size:13px;color:var(--text-2)">% 로</span>
+        <button class="btn btn-ghost btn-sm" onclick="taBulkApplyRatio()">일괄 적용</button>
+        <span style="font-size:12px;color:var(--text-3)">(대표 제휴몰 + 링크프라이스 전체. 저장 버튼을 눌러야 반영됩니다)</span>
+      </div>
 
       <div class="card">
         <div class="card-header">
@@ -9230,7 +9238,17 @@ window.pointPolicySubmitEdit = function() {
 /* ── sec-ticket-accrual ── 제휴몰별 티켓 적립률 (settings/ticket_accrual)
    지금까지 코드에 박혀 있던 "모든 제휴몰 일률 2%"를 운영자가 몰별로 고칠 수 있게 한다.
    등급 환산은 기존 방식 그대로 — 적립액을 큰 단위(골드)부터 채우는 Greedy. */
-var TA_DEFAULT_RATE = 2;                                   // 현재 고정값 2%를 그대로 초기값으로
+// 적립률 초기값 = 수수료 × 60%(김반장 확정, 2026-08-11) — 실제 링크프라이스 커미션이
+// 0.6~0.7% 수준이라 고정 2% 초기값을 쓰면 전 몰이 역마진이었다. 나머지 40%가 우리 수익.
+// 「일괄 적용」 버튼의 비율 입력칸 기본값도 이 상수를 그대로 쓴다.
+var TA_DEFAULT_RATE_RATIO = 60;
+// 적립률 인풋 자체가 0~20%로 상한이 걸려 있다(저장 시 taCollectFromDom 이 20 초과를
+// bad 로 막는다). 수수료가 높은 몰(숨고 44.1%, Surfshark 42.0%) 은 ×60% 하면 20%를
+// 넘어가서 그대로 두면 저장이 통째로 막힌다 — 계산값이 20을 넘으면 20으로 자른다.
+function taDefaultRate(fee, ratio) {
+  var r = taFmt(fee * (typeof ratio === 'number' ? ratio : TA_DEFAULT_RATE_RATIO) / 100);
+  return r > 20 ? 20 : r;
+}
 var TA_UNITS = [                                           // ticket_grades 시드의 환산가치와 동일
   { name: '골드',   value: 2000 },
   { name: '실버',   value: 1000 },
@@ -9410,20 +9428,21 @@ window.taLoad = function() {
     if (coupangDoc) {
       var cd = coupangDoc.data();
       var cFee = typeof cd.commission_rate === 'number' ? taFmt(cd.commission_rate * 100) : 0;
+      var cFeeFinal = typeof savedFees[coupangDoc.id] === 'number' ? taFmt(savedFees[coupangDoc.id]) : cFee;
       primary.push({
         code: coupangDoc.id,
         name: cd.name || coupangDoc.id,
-        fee: typeof savedFees[coupangDoc.id] === 'number' ? taFmt(savedFees[coupangDoc.id]) : cFee,
-        rate: typeof saved[coupangDoc.id] === 'number' ? taFmt(saved[coupangDoc.id]) : TA_DEFAULT_RATE,
+        fee: cFeeFinal,
+        rate: typeof saved[coupangDoc.id] === 'number' ? taFmt(saved[coupangDoc.id]) : taDefaultRate(cFeeFinal),
         isHidden: false,
       });
     }
 
     // 제휴몰(링크프라이스): 실제 링크프라이스 제휴 카탈로그 110개가 소스다(정적,
     // linkprice_merchants.js). 수수료 기본값은 「최저커미션」— 최저값을 쓰면 어느
-    // 상품군에서도 역마진이 안 난다(김반장 확정, 2026-08-11). 적립률 기본값은 기존과
-    // 같은 2%. 운영자가 고친 값(수수료/적립률/숨김/승인상태)만 settings/ticket_accrual
-    // 에 덮어쓰기로 저장된다 — 카탈로그 원본은 안 건드린다.
+    // 상품군에서도 역마진이 안 난다(김반장 확정, 2026-08-11). 적립률 기본값은 수수료의
+    // 60%(taDefaultRate) — 남는 40%가 우리 수익. 운영자가 고친 값(수수료/적립률/숨김/
+    // 승인상태)만 settings/ticket_accrual 에 덮어쓰기로 저장된다 — 카탈로그 원본은 안 건드린다.
     var catalog = window.LINKPRICE_MERCHANTS || [];
     // 'lp:' 네임스페이스 — 링크프라이스 카탈로그에 머천트ID가 실제로 "coupang"인
     // 항목이 있다(대표 제휴몰과 다른 별도 제휴 건, 2026-08-11 실측). 접두사 없이
@@ -9433,12 +9452,13 @@ window.taLoad = function() {
       var rawId = x['머천트ID'];
       var code = 'lp:' + rawId;
       var defaultFee = taFmt(typeof x['최저커미션'] === 'number' ? x['최저커미션'] : 0);
+      var feeFinal = typeof savedFees[code] === 'number' ? taFmt(savedFees[code]) : defaultFee;
       return {
         code: code,
         name: x['머천트명'] || rawId,
         category: x['카테고리'] || '',
-        fee: typeof savedFees[code] === 'number' ? taFmt(savedFees[code]) : defaultFee,
-        rate: typeof saved[code] === 'number' ? taFmt(saved[code]) : TA_DEFAULT_RATE,
+        fee: feeFinal,
+        rate: typeof saved[code] === 'number' ? taFmt(saved[code]) : taDefaultRate(feeFinal),
         isHidden: !!hidden[code],
         status: typeof savedApproval[code] === 'string' ? savedApproval[code] : (x['승인 상태'] || '미신청'),
       };
@@ -9526,6 +9546,26 @@ window.taToggleHide = function(code, hide) {
   }).catch(function(e) {
     toast('처리 실패: ' + (e.message || e));
   });
+};
+
+// ── 「수수료의 N%로 일괄 적용」 (2026-08-11 신설) — 표 인풋만 다시 계산한다.
+// 저장은 별도(저장 버튼) — 여기서 db 를 안 건드리는 게 핵심이라, 취소해도(리로드)
+// 원래 저장된 값으로 돌아간다. 되돌릴 수 없는 일괄 덮어쓰기라 실행 전 확인을 받는다.
+window.taBulkApplyRatio = function() {
+  var ratio = parseFloat((document.getElementById('ta-bulk-ratio') || {}).value);
+  if (!isFinite(ratio) || ratio < 0 || ratio > 100) { toast('비율은 0~100 사이 숫자로 입력하세요.'); return; }
+  var rows = document.querySelectorAll('#ta-tbody-primary tr[data-code], #ta-tbody-secondary tr[data-code]');
+  if (!rows.length) return;
+  if (!confirm(rows.length + '개 제휴몰의 적립률을 모두 수수료 × ' + ratio + '% 로 다시 계산해 덮어씁니다. 계속할까요?')) return;
+  Array.prototype.forEach.call(rows, function(tr) {
+    var feeEl = tr.querySelector('.ta-fee');
+    var rateEl = tr.querySelector('.ta-rate');
+    var fee = parseFloat(feeEl.value);
+    if (!isFinite(fee) || fee < 0) fee = 0;
+    rateEl.value = taDefaultRate(fee, ratio);
+    taRowRefresh(tr);
+  });
+  toast('적립률을 수수료 × ' + ratio + '% 로 다시 계산했습니다. 저장 버튼을 눌러야 반영됩니다.');
 };
 
 // ── 링크프라이스 카탈로그 필터(카테고리/승인상태) + 검색 (2026-08-11 신설)
