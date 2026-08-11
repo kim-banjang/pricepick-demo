@@ -14382,7 +14382,9 @@ var RL_EVENT_TICKET_DAILY_CAP = 5;
 var RL_EVENT_TICKET_MONTHLY_CAP = 30;
 function rlLoadWheelConfig() {
   if (!window.ppLoadRouletteSlots) { RL_ACTIVE_WHEEL = RL_DEFAULT_SLOTS; return Promise.resolve(); }
-  return window.ppLoadRouletteSlots('roulette').then(function(cfg) {
+  var ticketValueP = window.ppLoadTicketValue ? window.ppLoadTicketValue() : Promise.resolve();
+  return Promise.all([window.ppLoadRouletteSlots('roulette'), ticketValueP]).then(function(res) {
+    var cfg = res[0];
     RL_ACTIVE_WHEEL = (cfg && cfg.slots) || RL_DEFAULT_SLOTS;
     if (cfg && cfg.limits && cfg.limits.event_ticket_monthly_cap) {
       RL_EVENT_TICKET_MONTHLY_CAP = cfg.limits.event_ticket_monthly_cap;
@@ -14718,7 +14720,9 @@ var JP_DEFS = '<defs>'
 
 function jpLoadConfig() {
   if (!window.ppLoadRouletteSlots) return Promise.resolve();
-  return window.ppLoadRouletteSlots('jackpot_roulette').then(function(cfg) {
+  var ticketValueP = window.ppLoadTicketValue ? window.ppLoadTicketValue() : Promise.resolve();
+  return Promise.all([window.ppLoadRouletteSlots('jackpot_roulette'), ticketValueP]).then(function(res) {
+    var cfg = res[0];
     JP_ACTIVE_SLOTS = (cfg && cfg.slots) || JP_DEFAULT_SLOTS;
     JP_ACTIVE_LIMITS = Object.assign({}, JP_DEFAULT_LIMITS, (cfg && cfg.limits) || {});
   }).catch(function(e) {
@@ -17187,6 +17191,46 @@ window.ppEventTicketBalance = function() { return (PP.tickets && PP.tickets.even
 /* ── 매일 행운 룰렛: CMS 설정(settings/roulette) 조회 + 이벤트 티켓 일/월 한도 조회 ──
    매일 행운 룰렛 화면(인터랙티브 프로토타입 스크립트, 이 IIFE 밖)이 db/PP/ppQuery/ppDate에
    직접 접근할 수 없어 window 경유로 노출한다(ppGrantPoints 등과 동일한 패턴). */
+/* CMS 티켓 가치 설정(settings/ticket_value) 조회 — 브론즈·실버·골드·이벤트 티켓의
+   원화 환산가치. 여기서 읽은 값이 PP_SLOT_UNIT_VALUE(룰렛 잭팟 판정)·PT_TICKET_RATE
+   (포인트↔티켓 교환)·등급 교환(pw-22) 표시 비율에 전부 반영된다(ppApplyTicketValue).
+   문서가 없거나 조회 실패 시 지금까지 코드에 박혀 있던 값을 그대로 기본값으로 쓴다. */
+var PP_TICKET_VALUE_DEFAULT = { bronze: 100, silver: 1000, gold: 2000, event: 40 };
+var PP_TICKET_VALUE_CACHE = null;
+window.ppLoadTicketValue = function() {
+  if (PP_TICKET_VALUE_CACHE) return Promise.resolve(PP_TICKET_VALUE_CACHE);
+  return db.collection('settings').doc('ticket_value').get().then(function(doc) {
+    var d = (doc.exists && doc.data()) || {};
+    var v = {
+      bronze: typeof d.bronze === 'number' ? d.bronze : PP_TICKET_VALUE_DEFAULT.bronze,
+      silver: typeof d.silver === 'number' ? d.silver : PP_TICKET_VALUE_DEFAULT.silver,
+      gold: typeof d.gold === 'number' ? d.gold : PP_TICKET_VALUE_DEFAULT.gold,
+      event: typeof d.event === 'number' ? d.event : PP_TICKET_VALUE_DEFAULT.event,
+    };
+    PP_TICKET_VALUE_CACHE = v;
+    if (typeof ppApplyTicketValue === 'function') ppApplyTicketValue(v);
+    return v;
+  }).catch(function(e) {
+    console.error('ppLoadTicketValue', e);
+    var v = PP_TICKET_VALUE_DEFAULT;
+    if (typeof ppApplyTicketValue === 'function') ppApplyTicketValue(v);
+    return v;
+  });
+};
+/* settings/point_policy.rate("10P = 1원") 에서 "1원당 몇 포인트인지"를 읽는다 —
+   CMS 저장 포맷은 pointPolicySubmitEdit()과 같은 정규식으로 파싱. 실패 시 10(기존 하드코딩값). */
+var PP_POINTS_PER_WON_CACHE = null;
+function ppGetPointsPerWon() {
+  if (PP_POINTS_PER_WON_CACHE !== null) return Promise.resolve(PP_POINTS_PER_WON_CACHE);
+  return db.collection('settings').doc('point_policy').get().then(function(doc) {
+    var rate = (doc.exists && doc.data().rate) || '';
+    var m = /^(\d+)P\s*=\s*(\d+)원$/.exec(rate);
+    var perWon = (m && Number(m[2]) > 0) ? Number(m[1]) / Number(m[2]) : 10;
+    PP_POINTS_PER_WON_CACHE = perWon;
+    return perWon;
+  }).catch(function() { return 10; });
+}
+
 /* CMS 룰렛 설정 조회 — docId: 'roulette'(매일 행운 룰렛) | 'jackpot_roulette'(잭팟 룰렛).
    정본은 slots(type/qty/prob). 매일 행운 룰렛은 구 스키마 wheel(type/value, 칸별 균등 확률)도
    아직 남아 있을 수 있어 slots가 없을 때만 균등 확률로 승격해 읽는다.
@@ -19837,6 +19881,48 @@ var TICKET_SWAP_ALLOWED = {
   'bronze>silver': true, 'silver>gold': true,
   'silver>bronze': true, 'gold>silver': true,
 };
+/* CMS 티켓 가치 설정이 실제로 반영되는 지점 (2026-08-11 연동).
+   이벤트 티켓 비율(5:1)은 여기서 다루지 않는다 — 등급 체계와 별개인 "가치 증식 방지"용
+   고정 정책값이라(위 19832줄 주석) 티켓 가치 비율을 따라가면 안 된다. */
+function ppApplyTicketValue(v) {
+  if (!v) return;
+  PP_SLOT_UNIT_VALUE.bronze_ticket = v.bronze;
+  PP_SLOT_UNIT_VALUE.silver_ticket = v.silver;
+  PP_SLOT_UNIT_VALUE.gold_ticket = v.gold;
+  PP_SLOT_UNIT_VALUE.event_ticket = v.event;
+
+  ppGetPointsPerWon().then(function(perWon) {
+    if (!(perWon > 0)) return;
+    if (v.bronze > 0) PT_TICKET_RATE.bronze = Math.round(v.bronze * perWon);
+    if (v.silver > 0) PT_TICKET_RATE.silver = Math.round(v.silver * perWon);
+    if (v.gold > 0) PT_TICKET_RATE.gold = Math.round(v.gold * perWon);
+  });
+
+  // 등급 교환(pw-22) 표시 비율 — 정수 배수일 때만 갱신(비정수면 기존 하드코딩 비율 유지)
+  var patchBtn = function(id, ratioFrom, ratioTo) {
+    var btn = document.getElementById(id);
+    if (!btn) return;
+    btn.dataset.ratioFrom = ratioFrom;
+    btn.dataset.ratioTo = ratioTo;
+    var vals = btn.querySelectorAll('.tx-dir-val');
+    if (vals[0]) vals[0].textContent = ratioFrom + '장';
+    if (vals[1]) vals[1].textContent = ratioTo + '장';
+  };
+  var bs = v.silver / v.bronze, sg = v.gold / v.silver;
+  if (Number.isFinite(bs) && bs > 0 && Number.isInteger(bs)) {
+    patchBtn('swap-dir-b2s', bs, 1);
+    patchBtn('swap-dir-s2b', 1, bs);
+  }
+  if (Number.isFinite(sg) && sg > 0 && Number.isInteger(sg)) {
+    patchBtn('swap-dir-s2g', sg, 1);
+    patchBtn('swap-dir-g2s', 1, sg);
+  }
+  var activeBtn = document.querySelector('#pw-22 .swap-dir-btn.active[data-from]');
+  if (activeBtn) {
+    _swapState.ratioFrom = parseInt(activeBtn.dataset.ratioFrom, 10) || _swapState.ratioFrom;
+    _swapState.ratioTo = parseInt(activeBtn.dataset.ratioTo, 10) || _swapState.ratioTo;
+  }
+}
 function ppSwapAllowed(from, to) {
   if (!from || !to || from === to) return false;
   if (to === 'event') return false;                 // 역방향 2차 가드 — 이벤트 티켓은 전환 결과가 될 수 없다
@@ -20492,6 +20578,7 @@ window.ppConfirmClearCache = ppConfirmClearCache;
 
 /* ── Init ── */
 document.addEventListener('DOMContentLoaded', function() {
+  window.ppLoadTicketValue();
   hookShowScreen();
   hookSplashTimer();
   hookSelectMall();
