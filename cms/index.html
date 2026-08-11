@@ -9425,12 +9425,17 @@ window.taLoad = function() {
     // 같은 2%. 운영자가 고친 값(수수료/적립률/숨김/승인상태)만 settings/ticket_accrual
     // 에 덮어쓰기로 저장된다 — 카탈로그 원본은 안 건드린다.
     var catalog = window.LINKPRICE_MERCHANTS || [];
+    // 'lp:' 네임스페이스 — 링크프라이스 카탈로그에 머천트ID가 실제로 "coupang"인
+    // 항목이 있다(대표 제휴몰과 다른 별도 제휴 건, 2026-08-11 실측). 접두사 없이
+    // 코드를 그대로 쓰면 대표 제휴몰의 data-code·저장 키와 충돌해 값이 서로 덮어써진다
+    // — 그래서 카탈로그 쪽만 항상 'lp:' 를 붙여 완전히 분리한다.
     var secondaryAll = catalog.map(function(x) {
-      var code = x['머천트ID'];
+      var rawId = x['머천트ID'];
+      var code = 'lp:' + rawId;
       var defaultFee = taFmt(typeof x['최저커미션'] === 'number' ? x['최저커미션'] : 0);
       return {
         code: code,
-        name: x['머천트명'] || code,
+        name: x['머천트명'] || rawId,
         category: x['카테고리'] || '',
         fee: typeof savedFees[code] === 'number' ? taFmt(savedFees[code]) : defaultFee,
         rate: typeof saved[code] === 'number' ? taFmt(saved[code]) : TA_DEFAULT_RATE,
@@ -9568,7 +9573,8 @@ function taInfoLink(label, url) {
 function taYn(v) { return v === 'Y' ? '지원(Y)' : (v === 'N' ? '미지원(N)' : taEsc(v)); }
 
 window.taOpenMerchantInfo = function(code) {
-  var x = taLpByCode()[code];
+  var rawId = code.indexOf('lp:') === 0 ? code.slice(3) : code;
+  var x = taLpByCode()[rawId];
   if (!x) return;
   var status = TA_APPROVAL[code] || x['승인 상태'];
 
