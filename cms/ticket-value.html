@@ -338,6 +338,10 @@ body.dark .sidebar.sb-mini .sb-item::after{background:#1F2937;}
 #sec-ticket-value .tv-impact-badge{margin-left:8px;}
 #sec-ticket-value .tv-rounded-note{display:none;font-size:11px;color:var(--warning);margin-top:4px;font-weight:600;}
 #sec-ticket-value .tv-rounded-note.show{display:block;}
+#sec-ticket-value .tv-sim-line{display:none;font-size:12px;color:var(--main-hover);margin-top:8px;
+  padding:8px 10px;background:var(--main-soft);border-radius:var(--r-sm);line-height:1.5;}
+#sec-ticket-value .tv-sim-line.show{display:block;}
+#sec-ticket-value .tv-sim-line strong{font-weight:800;}
 </style>
 </head>
 <body>
@@ -674,26 +678,25 @@ body.dark .sidebar.sb-mini .sb-item::after{background:#1F2937;}
           <div class="policy-label">매일 행운 룰렛 보상 구성</div>
           <div class="policy-value">보상 슬롯별 티켓 종류·수량<span class="badge badge-gray tv-impact-badge">티켓 · 보상 &gt; 매일 행운 룰렛</span></div>
           <div class="policy-desc">티켓 1장의 가치가 바뀌면 슬롯별 기대값(원화)이 그대로 따라 움직입니다.</div>
+          <div class="tv-sim-line" id="tv-sim-roulette-daily"></div>
         </div>
         <div class="policy-item">
           <div class="policy-label">잭팟 룰렛 보상 구성</div>
           <div class="policy-value">잭팟 당첨 보상·확률 테이블<span class="badge badge-gray tv-impact-badge">티켓 · 보상 &gt; 잭팟 룰렛</span></div>
           <div class="policy-desc">잭팟 1회 기대비용이 티켓 가치에 비례해 변합니다.</div>
-        </div>
-        <div class="policy-item">
-          <div class="policy-label">기프티콘 교환 필요 티켓 수</div>
-          <div class="policy-value">455개 상품 전체<span class="badge badge-gray tv-impact-badge">기프티콘 관리 &gt; 상품 목록</span></div>
-          <div class="policy-desc">상품 정가 대비 필요 티켓 수를 다시 산정해야 합니다. 상품 수가 많아 일괄 재계산이 필요합니다.</div>
+          <div class="tv-sim-line" id="tv-sim-roulette-jackpot"></div>
         </div>
         <div class="policy-item">
           <div class="policy-label">포인트 → 티켓 교환 비율</div>
           <div class="policy-value">브론즈 1,000P / 실버 10,000P / 골드 20,000P<span class="badge badge-gray tv-impact-badge">포인트 관리 &gt; 포인트 정책</span></div>
           <div class="policy-desc">현재 비율은 브론즈 100원 기준(10P = 1원)으로 잡혀 있습니다. 티켓 가치가 바뀌면 포인트 환산도 어긋납니다.</div>
+          <div class="tv-sim-line" id="tv-sim-points"></div>
         </div>
         <div class="policy-item">
           <div class="policy-label">등급별 적립 기준</div>
-          <div class="policy-value">브론즈 5,000원당 1장 등<span class="badge badge-gray tv-impact-badge">티켓 · 보상 &gt; 티켓 적립 관리</span></div>
+          <div class="policy-value">브론즈 5,000원당 1장 등<span class="badge badge-gray tv-impact-badge">티켓 · 보상 &gt; 티켓 적립 설정</span></div>
           <div class="policy-desc">적립 기준 금액은 제휴 수수료와 티켓 가치를 함께 보고 정해야 합니다. 티켓 가치만 낮추면 실질 적립률이 그만큼 떨어집니다.</div>
+          <div class="tv-sim-line" id="tv-sim-accrual"></div>
         </div>
       </div>
 
@@ -895,6 +898,61 @@ function tvRecalc(){
     banner.innerHTML = '';
     saveBtn.classList.remove('tv-highlight');
   }
+
+  tvUpdateImpactSim(changed.length > 0);
+}
+
+/* 「영향 범위 안내」 지금→바뀌면 시뮬 (2026-08-11 신설) — 실제 반영은 안 하고
+   숫자만 보여준다("안내만·자동 반영 없음" 유지). 기프티콘은 김반장 확정으로 제외.
+   근거 상수는 기존 정적 문구에서 그대로 가져왔다(브론즈 100원=1,000P → 10P=1원,
+   브론즈 100원=5,000원당 1장 → 50배) — 새로 지어내지 않았다. */
+const TV_POINTS_PER_WON = 10;      // "10P = 1원" (기존 정적 문구 그대로)
+const TV_ACCRUAL_MULT = 50;        // "브론즈 5,000원당 1장" ÷ 브론즈 100원 = 50배
+
+function tvSimEl(id){ return document.getElementById('tv-sim-' + id); }
+function tvSetSim(id, html){
+  const el = tvSimEl(id);
+  if(!el) return;
+  el.innerHTML = html;
+  el.classList.add('show');
+}
+function tvHideSim(id){
+  const el = tvSimEl(id);
+  if(!el) return;
+  el.classList.remove('show');
+  el.innerHTML = '';
+}
+
+function tvUpdateImpactSim(anyChanged){
+  const ids = ['roulette-daily','roulette-jackpot','points','accrual'];
+  const b = tvRead('bronze'), s = tvRead('silver'), g = tvRead('gold');
+  if(!anyChanged || !b.valid || !s.valid || !g.valid || b.value <= 0){
+    ids.forEach(tvHideSim);
+    return;
+  }
+
+  /* 룰렛 — 실제 슬롯을 읽지 않는다. 브론즈 하나로 "같은 기대값을 유지하려면
+     장수가 몇 배 필요한가"만 대표로 보여준다(김반장 지시 — 대표 예시 한두 줄). */
+  const scale = b.orig / b.value;
+  const scaleTxt = tvFmtRatio(scale);
+  const scaleBasis = '브론즈 ' + won(b.orig) + ' ÷ ' + won(b.value);
+  tvSetSim('roulette-daily',
+    '예: 브론즈 1장 → 바뀌면 <strong>' + scaleTxt + '장</strong> — 같은 기대값을 유지하려면 (' + scaleBasis + ')');
+  tvSetSim('roulette-jackpot',
+    '예: 브론즈 1장 → 바뀌면 <strong>' + scaleTxt + '장</strong> — 같은 기대비용을 유지하려면 (' + scaleBasis + ')');
+
+  /* 포인트 → 티켓 — 10P = 1원 고정, 원화값만 바뀐 만큼 그대로 곱한다 */
+  tvSetSim('points',
+    '브론즈 ' + (b.orig*TV_POINTS_PER_WON).toLocaleString('ko-KR') + 'P → <strong>' + (b.value*TV_POINTS_PER_WON).toLocaleString('ko-KR') + 'P</strong>' +
+    ' · 실버 ' + (s.orig*TV_POINTS_PER_WON).toLocaleString('ko-KR') + 'P → <strong>' + (s.value*TV_POINTS_PER_WON).toLocaleString('ko-KR') + 'P</strong>' +
+    ' · 골드 ' + (g.orig*TV_POINTS_PER_WON).toLocaleString('ko-KR') + 'P → <strong>' + (g.value*TV_POINTS_PER_WON).toLocaleString('ko-KR') + 'P</strong>' +
+    ' (' + TV_POINTS_PER_WON + 'P = 1원 고정)');
+
+  /* 등급별 적립 기준 — 티켓 가치의 50배가 적립 기준 금액(브론즈 100원↔5,000원당 1장) */
+  tvSetSim('accrual',
+    '브론즈 ' + won(b.orig*TV_ACCRUAL_MULT) + '당 1장 → <strong>' + won(b.value*TV_ACCRUAL_MULT) + '당 1장</strong>' +
+    ' · 실버 ' + won(s.orig*TV_ACCRUAL_MULT) + '당 → <strong>' + won(s.value*TV_ACCRUAL_MULT) + '당</strong>' +
+    ' · 골드 ' + won(g.orig*TV_ACCRUAL_MULT) + '당 → <strong>' + won(g.value*TV_ACCRUAL_MULT) + '당</strong>');
 }
 
 function tvOnInput(anchorKey){
