@@ -300,6 +300,7 @@ tr:hover td{background:var(--surface-2);}
 .ta-name-link{background:none;border:none;padding:0;margin:0;font:inherit;font-weight:700;color:var(--main);cursor:pointer;text-decoration:underline;text-decoration-color:transparent;}
 .ta-name-link:hover{text-decoration-color:var(--main);}
 .ta-badge.ta-changed{box-shadow:0 0 0 2px var(--warning);}
+#ta-tbody-secondary .toggle.ta-changed{box-shadow:0 0 0 2px var(--warning);}
 #ta-info-body .policy-item{padding:10px 0;}
 #ta-info-body .ta-pre{white-space:pre-wrap;font-size:13px;color:var(--text);line-height:1.5;}
 #ta-info-body table{margin-top:6px;}
@@ -1343,15 +1344,6 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
       <div class="info-box">제휴몰별 수수료와 사용자에게 돌려줄 적립률을 정합니다(계약이 바뀌면 수수료도 여기서 바로 반영). 등급 환산은 큰 단위부터 채우는 기존 방식 그대로입니다. 쿠팡은 대표 제휴몰로 항상 별도 표시됩니다. 적립률 기본값은 수수료의 60%이며, 나머지 40%가 우리 수익입니다.</div>
       <div class="ta-dirty-banner" id="ta-dirty-banner"></div>
 
-      <div class="card" style="padding:14px 18px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-        <button class="btn btn-ghost btn-sm" id="ta-select-toggle-btn" onclick="taToggleSelectMode()">선택</button>
-        <span style="font-size:13px;color:var(--text-2)">적립률 = 수수료 ×</span>
-        <input class="form-input" type="number" id="ta-bulk-ratio" min="0" max="100" step="1" value="60" style="width:70px;text-align:right">
-        <span style="font-size:13px;color:var(--text-2)">% 로</span>
-        <button class="btn btn-ghost btn-sm" id="ta-bulk-apply-btn" onclick="taBulkApplyRatio()">일괄 적용</button>
-        <span style="font-size:12px;color:var(--text-3)" id="ta-bulk-hint">「선택」을 눌러 몰을 체크한 뒤 일괄 적용하세요. 저장 버튼을 눌러야 반영됩니다.</span>
-      </div>
-
       <div class="card">
         <div class="card-header">
           <div class="card-title">대표 제휴몰</div>
@@ -1360,12 +1352,11 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
         <table id="ta-table-primary">
           <thead>
             <tr>
-              <th class="ta-select-col" style="width:6%"></th>
-              <th style="width:18%">제휴몰</th>
-              <th style="width:13%">수수료</th>
-              <th style="width:16%">적립률</th>
-              <th style="width:13%">수익</th>
-              <th style="width:34%">시뮬레이터</th>
+              <th style="width:20%">제휴몰</th>
+              <th style="width:14%">수수료</th>
+              <th style="width:17%">적립률</th>
+              <th style="width:14%">수익</th>
+              <th style="width:35%">시뮬레이터</th>
             </tr>
           </thead>
           <tbody id="ta-tbody-primary"></tbody>
@@ -1373,11 +1364,11 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
       </div>
 
       <div class="card">
-        <div class="card-header" style="flex-wrap:wrap;gap:10px">
-          <div class="card-title">제휴몰(링크프라이스)</div>
-          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-            <input class="form-input" type="text" id="ta-filter-search" placeholder="머천트명 검색" style="width:150px" oninput="taApplyFilters()">
-            <select class="form-input" id="ta-filter-category" style="width:130px" onchange="taApplyFilters()">
+        <div class="card-header" style="flex-wrap:wrap;gap:10px;align-items:flex-start">
+          <div class="card-title" style="padding-top:6px">제휴몰(링크프라이스)</div>
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end">
+            <input class="form-input" type="text" id="ta-filter-search" placeholder="머천트명 검색" style="width:140px" oninput="taApplyFilters()">
+            <select class="form-input" id="ta-filter-category" style="width:120px" onchange="taApplyFilters()">
               <option value="">카테고리 전체</option>
               <option value="가전/디지털/IT">가전/디지털/IT</option>
               <option value="건강">건강</option>
@@ -1393,18 +1384,28 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
               <option value="종합쇼핑몰">종합쇼핑몰</option>
               <option value="패션">패션</option>
             </select>
-            <select class="form-input" id="ta-filter-status" style="width:110px" onchange="taApplyFilters()">
+            <select class="form-input" id="ta-filter-status" style="width:105px" onchange="taApplyFilters()">
               <option value="">승인상태 전체</option>
               <option value="승인">승인</option>
               <option value="승인대기">승인대기</option>
               <option value="거부">거부</option>
               <option value="미신청">미신청</option>
             </select>
-            <select class="form-input" id="ta-filter-applied" style="width:100px" onchange="taApplyFilters()">
+            <select class="form-input" id="ta-filter-applied" style="width:95px" onchange="taApplyFilters()">
               <option value="">적용 전체</option>
               <option value="1">적용</option>
               <option value="0">미적용</option>
             </select>
+            <span style="width:1px;height:22px;background:var(--border)"></span>
+            <button class="btn btn-ghost btn-sm" id="ta-select-toggle-btn" onclick="taToggleSelectMode()"
+              title="선택 후 몰을 체크하고 일괄 적용/적용으로/미적용으로 버튼을 누르세요. 저장 버튼을 눌러야 반영됩니다.">선택</button>
+            <span style="font-size:13px;color:var(--text-2)">적립률=수수료×</span>
+            <input class="form-input" type="number" id="ta-bulk-ratio" min="0" max="100" step="1" value="60" style="width:60px;text-align:right">
+            <span style="font-size:13px;color:var(--text-2)">%</span>
+            <button class="btn btn-ghost btn-sm" id="ta-bulk-apply-btn" onclick="taBulkApplyRatio()">일괄 적용</button>
+            <button class="btn btn-ghost btn-sm" id="ta-bulk-on-btn" onclick="taBulkSetApplied(true)">적용으로</button>
+            <button class="btn btn-ghost btn-sm" id="ta-bulk-off-btn" onclick="taBulkSetApplied(false)">미적용으로</button>
+            <span style="width:1px;height:22px;background:var(--border)"></span>
             <button class="btn btn-ghost btn-sm" onclick="taOpenAddMall()">제휴몰 추가</button>
           </div>
         </div>
@@ -9369,9 +9370,13 @@ function taRowRefresh(tr) {
 // 불러온 시점 값(TA_ORIGINAL)과 지금 인풋 값을 비교해서만 판단한다 — 고쳤다가
 // 원래 값으로 되돌리면 "변경 없음"으로 다시 잡혀야 하기 때문에, "손댄 적 있는가"가
 // 아니라 "지금 값이 원본과 다른가"로 매번 다시 계산한다.
-var TA_ORIGINAL = {};   // { code: {fee, rate, status?} } — taLoad 가 매번 새로 채운다
+var TA_ORIGINAL = {};   // { code: {fee, rate, status?, applied?} } — taLoad 가 매번 새로 채운다
 var TA_DIRTY_COUNT = 0;
 var TA_APPROVAL = {};   // { code: 현재(저장 전 포함) 승인 상태 } — 링크프라이스 몰만 채워진다
+// 적용/미적용 — 토글 클릭은 여기(메모리)만 바꾼다. Firestore 에는 저장 버튼을 눌러야
+// 쓰인다(2026-08-11 — 이전엔 토글이 즉시 db.set 을 했는데, 다른 값들과 저장 방식이
+// 달라 혼란스럽다는 지적으로 fee/rate/승인상태와 같은 "저장 전 변경 표시" 방식으로 통일).
+var TA_APPLIED = {};    // { code: boolean } — 링크프라이스 몰만 채워진다
 
 // ── 선택 후 일괄 적용 (2026-08-11 신설) — 「무조건 전체」였던 걸 체크한 몰만으로
 // 제한한다. TA_SELECTED 는 taLoad() 가 다시 그려도(적용 토글 등) 유지된다 —
@@ -9406,6 +9411,13 @@ function taCheckDirty() {
       var badgeEl = document.getElementById('ta-badge-' + tr.dataset.code);
       if (badgeEl) badgeEl.classList.toggle('ta-changed', statusChanged);
       if (statusChanged) changed++;
+    }
+
+    if (typeof orig.applied === 'boolean') {
+      var appliedChanged = TA_APPLIED[tr.dataset.code] !== orig.applied;
+      var toggleEl = document.getElementById('ta-toggle-' + tr.dataset.code);
+      if (toggleEl) toggleEl.classList.toggle('ta-changed', appliedChanged);
+      if (appliedChanged) changed++;
     }
   });
 
@@ -9445,14 +9457,12 @@ function taStatusBadgeClass(status) {
 // 공용으로 뺐다(showHideCol 이 곧 "링크프라이스 카탈로그 행"이다 — 대표=쿠팡만
 // showHideCol=false 로 넘어오고, 이때는 숨김 기능도 머천트 상세 모달도 없다).
 function taRenderRow(m, showHideCol) {
-  // 「적용/미적용」— 실제 서비스에 이 몰을 쓸지 말지(링크프라이스 승인과는 별개 개념,
-  // 2026-08-11). 미적용이어도 행은 계속 보인다(나중에 다시 켜야 하니) — 흐림 표시만
-  // 한다. 대표 제휴몰(showHideCol=false)엔 이 컬럼 자체가 없다.
+  // 「적용/미적용」— 실제 서비스에 이 몰을 쓸지 말지(링크프라이스 승인과는 별개 개념).
+  // 켜짐(on)=적용=정상 밝기, 꺼짐=미적용=흐리게(2026-08-11 토글 스위치로 교체 —
+  // 기존 .toggle 컴포넌트 재사용, 새 색 안 만듦). 대표 제휴몰(showHideCol=false)엔
+  // 이 컬럼 자체가 없다 — 직접 제휴라 적용/미적용 개념이 없다.
   var appliedCell = !showHideCol ? '' : (
-    '<td>' + (m.isApplied
-      ? '<button type="button" class="btn btn-ghost btn-sm" onclick="taToggleApply(\'' + m.code + '\', false)">미적용</button>'
-      : '<button type="button" class="btn btn-ghost btn-sm" onclick="taToggleApply(\'' + m.code + '\', true)">적용</button>'
-    ) + '</td>'
+    '<td><div class="toggle' + (m.isApplied ? ' on' : '') + '" id="ta-toggle-' + m.code + '" onclick="taApplyToggle(\'' + m.code + '\')" title="' + (m.isApplied ? '적용됨 — 클릭하면 미적용으로' : '미적용 — 클릭하면 적용으로') + '"></div></td>'
   );
   // 링크프라이스 카탈로그 행(status 있음)은 이름 클릭→상세모달+배지. 운영자가 수동으로
   // 추가한 몰(status 없음)은 24개 필드 원본이 없어 모달을 못 띄우니 이름만 표시한다.
@@ -9467,8 +9477,12 @@ function taRenderRow(m, showHideCol) {
         + '<span class="badge ' + taStatusBadgeClass(m.status) + ' ta-badge" id="ta-badge-' + m.code + '">' + taEsc(m.status) + '</span>'
         + '</td>');
   var dimStyle = (showHideCol && !m.isApplied) ? ' style="opacity:.5"' : '';
-  var selectCell = '<td class="ta-select-col"><input type="checkbox" class="ta-select-cb" data-code="' + m.code + '" onchange="taSelectionChanged()"'
-    + (TA_SELECTED[m.code] ? ' checked' : '') + '></td>';
+  // 선택 체크박스는 링크프라이스(showHideCol=true) 행에만 — 대표 쿠팡은 직접 제휴라
+  // 일괄 적용·선택 대상에서 뺀다(김반장 확정, 2026-08-11). 쿠팡 값은 그 줄에서 직접 고친다.
+  var selectCell = !showHideCol ? '' : (
+    '<td class="ta-select-col"><input type="checkbox" class="ta-select-cb" data-code="' + m.code + '" onchange="taSelectionChanged()"'
+    + (TA_SELECTED[m.code] ? ' checked' : '') + '></td>'
+  );
   return '<tr data-code="' + m.code + '"' + (showHideCol ? ' data-applied="' + (m.isApplied ? '1' : '0') + '"' : '') + dimStyle + '>'
     + selectCell
     + nameCell
@@ -9487,7 +9501,7 @@ function taRenderRow(m, showHideCol) {
 // 값이 안 날아간다. 승인 상태는 표 인풋이 아니라 모달에서 고치므로 TA_APPROVAL(메모리)에서 읽는다.
 function taCollectFromDom() {
   var rows = document.querySelectorAll('#ta-tbody-primary tr[data-code], #ta-tbody-secondary tr[data-code]');
-  var rates = {}, fees = {}, approval = {}, bad = false;
+  var rates = {}, fees = {}, approval = {}, applied = {}, bad = false;
   Array.prototype.forEach.call(rows, function(tr) {
     var code = tr.dataset.code;
     var v = parseFloat(tr.querySelector('.ta-rate').value);
@@ -9497,8 +9511,9 @@ function taCollectFromDom() {
     if (!isFinite(f) || f < 0 || f > 100) { bad = true; return; }
     fees[code] = Math.round(f * 100) / 100;
     if (typeof TA_APPROVAL[code] === 'string') approval[code] = TA_APPROVAL[code];
+    if (typeof TA_APPLIED[code] === 'boolean') applied[code] = TA_APPLIED[code];
   });
-  return { rates: rates, fees: fees, approval: approval, bad: bad };
+  return { rates: rates, fees: fees, approval: approval, applied: applied, bad: bad };
 }
 
 window.taLoad = function() {
@@ -9509,7 +9524,7 @@ window.taLoad = function() {
 
   // 첫 진입 시 즉시 "불러오는 중" 을 눈에 보이게 그린다 — 조회가 끝날 때까지 표를
   // 안 건드리면 로딩 중과 실제로 텅 빈 상태가 화면에서 구분이 안 간다.
-  tbodyPrimary.innerHTML = ppEmpty(6, '불러오는 중…');
+  tbodyPrimary.innerHTML = ppEmpty(5, '불러오는 중…');
   tbodySecondary.innerHTML = ppEmpty(7, '불러오는 중…');
   if (st) st.textContent = '불러오는 중…';
 
@@ -9606,10 +9621,12 @@ window.taLoad = function() {
     // 저장 전 변경 표시 기준값 — 지금 막 불러온 값이 "원본"이다. 새로 불러올 때마다 갱신.
     TA_ORIGINAL = {};
     TA_APPROVAL = {};
+    TA_APPLIED = {};
     primary.forEach(function(m) { TA_ORIGINAL[m.code] = { fee: m.fee, rate: m.rate }; });
     secondaryAll.forEach(function(m) {
-      TA_ORIGINAL[m.code] = { fee: m.fee, rate: m.rate, status: m.status };
+      TA_ORIGINAL[m.code] = { fee: m.fee, rate: m.rate, status: m.status, applied: m.isApplied };
       TA_APPROVAL[m.code] = m.status;
+      TA_APPLIED[m.code] = m.isApplied;
     });
 
     // 미적용이어도 목록에서 사라지면 안 된다(나중에 다시 켜야 하니) — 전부 그린다.
@@ -9618,7 +9635,7 @@ window.taLoad = function() {
 
     tbodyPrimary.innerHTML = primary.length
       ? primary.map(function(m) { return taRenderRow(m, false); }).join('')
-      : ppEmpty(6, '대표 제휴몰이 없습니다.');
+      : ppEmpty(5, '대표 제휴몰이 없습니다.');
 
     tbodySecondary.innerHTML = secondary.length
       ? secondary.map(function(m) { return taRenderRow(m, true); }).join('')
@@ -9636,7 +9653,7 @@ window.taLoad = function() {
       : (res[1].exists ? '저장된 값 기준' : '아직 저장한 적이 없어 초기값 기준') + ' · 총 ' + secondaryAll.length + '개(표시 ' + secondary.length + '개)';
   }).catch(function(e) {
     console.error('taLoad', e);
-    tbodyPrimary.innerHTML = ppEmpty(6, '로드 오류');
+    tbodyPrimary.innerHTML = ppEmpty(5, '로드 오류');
     tbodySecondary.innerHTML = '';
     if (st) st.textContent = '';
   });
@@ -9658,11 +9675,12 @@ window.taSave = function() {
       rates: Object.assign({}, data.rates || {}, c.rates),
       fees: Object.assign({}, data.fees || {}, c.fees),
       approval: Object.assign({}, data.approval || {}, c.approval),
+      applied: Object.assign({}, data.applied || {}, c.applied),
       updated_at: FS.FieldValue.serverTimestamp(),
     }, { merge: true });
   }).then(function() {
-    toast('제휴몰별 수수료·적립률·승인상태를 저장했습니다.');
-    logAdmin('티켓 수수료·적립률·승인상태 수정');
+    toast('제휴몰별 수수료·적립률·승인상태·적용여부를 저장했습니다.');
+    logAdmin('티켓 수수료·적립률·승인상태·적용여부 수정');
     window.taLoad();
   }).catch(function(e) {
     toast('저장 실패: ' + (e.message || e));
@@ -9679,30 +9697,42 @@ window.taSave = function() {
 // settings/ticket_accrual 의 applied 맵에 코드만 추가·갱신한다(rates/fees/approval
 // 과 같은 패턴). taCollectFromDom 을 같이 써서, 이 버튼을 눌러도 다른 행에서
 // 편집 중이던 수수료·적립률·승인상태가 안 날아간다.
-window.taToggleApply = function(code, apply) {
-  var c = taCollectFromDom();
-  if (c.bad) { toast('수수료는 0~100, 적립률은 0~20 사이 숫자로 먼저 고친 뒤 다시 시도하세요.'); return; }
-  var ref = db.collection('settings').doc('ticket_accrual');
-  // 저장 직전에 최신 문서를 다시 읽는다 — 다른 세션이 그 사이 고친 다른 코드의
-  // 값을 덮어쓰지 않기 위함(2026-08-11, 김반장 확정. taSave 와 같은 원칙).
-  ref.get().then(function(doc) {
-    var data = (doc.exists && doc.data()) || {};
-    var applied = Object.assign({}, data.applied || {});
-    applied[code] = apply;
-    return ref.set({
-      rates: Object.assign({}, data.rates || {}, c.rates),
-      fees: Object.assign({}, data.fees || {}, c.fees),
-      approval: Object.assign({}, data.approval || {}, c.approval),
-      applied: applied,
-      updated_at: FS.FieldValue.serverTimestamp(),
-    }, { merge: true });
-  }).then(function() {
-    toast(apply ? '제휴몰을 적용했습니다.' : '제휴몰을 미적용으로 전환했습니다.');
-    logAdmin('제휴몰 ' + (apply ? '적용' : '미적용') + ': ' + code);
-    window.taLoad();
-  }).catch(function(e) {
-    toast('처리 실패: ' + (e.message || e));
+// 적용/미적용 토글 — 클릭 즉시 화면(TA_APPLIED)만 바뀐다. Firestore 는 안 건드린다
+// (2026-08-11, 김반장 확정 — fee/rate/승인상태와 같은 "저장 전 변경 표시" 로 통일).
+window.taApplyToggle = function(code) {
+  TA_APPLIED[code] = !TA_APPLIED[code];
+  taApplyPaintToggle(code, TA_APPLIED[code]);
+  taCheckDirty();
+  taApplyFilters();
+};
+
+function taApplyPaintToggle(code, applied) {
+  var tr = document.querySelector('#ta-tbody-secondary tr[data-code="' + code + '"]');
+  if (tr) {
+    tr.style.opacity = applied ? '' : '.5';
+    tr.dataset.applied = applied ? '1' : '0';
+  }
+  var sw = document.getElementById('ta-toggle-' + code);
+  if (sw) {
+    sw.classList.toggle('on', applied);
+    sw.title = applied ? '적용됨 — 클릭하면 미적용으로' : '미적용 — 클릭하면 적용으로';
+  }
+}
+
+// 선택 모드에서 체크한 몰들을 한 번에 적용/미적용으로 바꾼다(2026-08-11 신설).
+// 필터가 걸려 있으면 「보이는 것만」이 대상이라는 규칙은 taToggleSelectAll 이 이미
+// 지킨다 — TA_SELECTED 는 그렇게 골라진 코드만 담고 있다. 대표 쿠팡은 애초에
+// 체크박스가 없어(showHideCol=false) 대상에 들어올 수 없다.
+window.taBulkSetApplied = function(applied) {
+  var codes = Object.keys(TA_SELECTED);
+  if (!codes.length) { toast('선택된 몰이 없습니다. 「선택」을 눌러 몰을 체크하세요.'); return; }
+  codes.forEach(function(code) {
+    TA_APPLIED[code] = applied;
+    taApplyPaintToggle(code, applied);
   });
+  taCheckDirty();
+  taApplyFilters();
+  toast('선택한 ' + codes.length + '개 몰을 ' + (applied ? '적용' : '미적용') + '으로 표시했습니다. 저장 버튼을 눌러야 반영됩니다.');
 };
 
 // ── 「수수료의 N%로 일괄 적용」 (2026-08-11 신설) — 표 인풋만 다시 계산한다.
@@ -9749,9 +9779,13 @@ window.taToggleSelectAll = function(checked) {
 };
 
 function taUpdateBulkBtnLabel() {
-  var btn = document.getElementById('ta-bulk-apply-btn');
   var n = Object.keys(TA_SELECTED).length;
-  if (btn) btn.textContent = n > 0 ? '일괄 적용 (' + n + '개 선택)' : '일괄 적용';
+  var btn = document.getElementById('ta-bulk-apply-btn');
+  if (btn) btn.textContent = n > 0 ? '일괄 적용 (' + n + '개)' : '일괄 적용';
+  var onBtn = document.getElementById('ta-bulk-on-btn');
+  if (onBtn) onBtn.textContent = n > 0 ? '적용으로 (' + n + '개)' : '적용으로';
+  var offBtn = document.getElementById('ta-bulk-off-btn');
+  if (offBtn) offBtn.textContent = n > 0 ? '미적용으로 (' + n + '개)' : '미적용으로';
 }
 
 window.taBulkApplyRatio = function() {
@@ -9790,7 +9824,7 @@ window.taApplyFilters = function() {
     var okName = !q || name.toLowerCase().indexOf(q) !== -1;
     var okCat = !cat || rowCat === cat;
     var okStatus = !status || TA_APPROVAL[code] === status;
-    var okApplied = !applied || tr.dataset.applied === applied;
+    var okApplied = !applied || (TA_APPLIED[code] ? '1' : '0') === applied;
     tr.style.display = (okName && okCat && okStatus && okApplied) ? '' : 'none';
   });
 };
