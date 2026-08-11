@@ -1300,7 +1300,7 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
               <th style="width:14%">수수료</th>
               <th style="width:17%">적립률</th>
               <th style="width:14%">남는 몫</th>
-              <th style="width:35%">10만원 구매 시 지급</th>
+              <th style="width:35%">시뮬레이터</th>
             </tr>
           </thead>
           <tbody id="ta-tbody"></tbody>
@@ -3134,6 +3134,37 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
     </div>
     <div class="modal-footer">
       <button class="btn btn-primary" onclick="closeModal('m-noti-preview')">확인</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── 모달: 티켓 적립 시뮬레이터 (2026-08-11 신설) ── -->
+<div class="modal-overlay" id="m-ta-sim">
+  <div class="modal" style="width:420px">
+    <div class="modal-header">
+      <div class="modal-title">적립 시뮬레이터 — <span id="ta-sim-mall">-</span></div>
+      <button class="modal-close" onclick="closeModal('m-ta-sim')"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">구매 금액</label>
+        <input class="form-input" type="number" id="ta-sim-amount" min="0" step="1000" value="100000" oninput="taSimRefresh()">
+      </div>
+      <div style="display:flex;gap:6px;margin:-6px 0 16px">
+        <button type="button" class="btn btn-ghost btn-sm" onclick="taSimSetAmount(50000)">5만</button>
+        <button type="button" class="btn btn-ghost btn-sm" onclick="taSimSetAmount(100000)">10만</button>
+        <button type="button" class="btn btn-ghost btn-sm" onclick="taSimSetAmount(300000)">30만</button>
+        <button type="button" class="btn btn-ghost btn-sm" onclick="taSimSetAmount(500000)">50만</button>
+      </div>
+      <div class="card" style="margin-bottom:0">
+        <div class="policy-item"><div class="policy-label">적립액</div><div class="policy-value" id="ta-sim-earn">—</div></div>
+        <div class="policy-item"><div class="policy-label">티켓 구성</div><div class="policy-value" id="ta-sim-tickets">—</div></div>
+        <div class="policy-item"><div class="policy-label">우리 수입</div><div class="policy-value" id="ta-sim-revenue">—</div></div>
+        <div class="policy-item"><div class="policy-label">남는 몫</div><div class="policy-value" id="ta-sim-margin">—</div></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('m-ta-sim')">닫기</button>
     </div>
   </div>
 </div>
@@ -5473,7 +5504,16 @@ Object.assign(KO2VI,{
   "수수료":"Hoa hồng",
   "적립률":"Tỷ lệ tích lũy",
   "남는 몫":"Phần còn lại",
-  "10만원 구매 시 지급":"Cấp khi mua 100.000 won",
+  "시뮬레이터":"Mô phỏng",
+  "적립 시뮬레이터":"Mô phỏng tích lũy",
+  "구매 금액":"Số tiền mua",
+  "적립액":"Số tiền tích lũy",
+  "티켓 구성":"Cấu thành vé",
+  "우리 수입":"Doanh thu của chúng tôi",
+  "5만":"50 nghìn",
+  "10만":"100 nghìn",
+  "30만":"300 nghìn",
+  "50만":"500 nghìn",
   "지급 없음":"Không cấp",
   "저장된 값 기준":"Theo giá trị đã lưu",
   "아직 저장한 적이 없어 현재 고정값 2%를 보여줍니다.":"Chưa từng lưu nên đang hiển thị giá trị cố định hiện tại là 2%.",
@@ -9132,7 +9172,6 @@ function taRowRefresh(tr) {
   var mEl = tr.querySelector('.ta-margin');
   mEl.textContent = margin.toFixed(2) + '%p';
   mEl.style.color = margin < 0 ? 'var(--danger)' : 'var(--text)';
-  tr.querySelector('.ta-preview').innerHTML = taGreedy(TA_PREVIEW_KRW, rate);
 }
 
 window.taLoad = function() {
@@ -9172,7 +9211,7 @@ window.taLoad = function() {
         + '<td><span style="display:inline-flex;align-items:center;gap:6px">'
         +   '<input class="form-input ta-rate" type="number" min="0" max="20" step="0.1" value="' + m.rate + '" style="max-width:88px;text-align:right">%</span></td>'
         + '<td class="ta-margin">—</td>'
-        + '<td class="ta-preview">—</td></tr>';
+        + '<td><button type="button" class="btn btn-ghost btn-sm" onclick="taOpenSim(\'' + m.code + '\')">시뮬레이터</button></td></tr>';
     }).join('');
 
     Array.prototype.forEach.call(tbody.querySelectorAll('tr[data-code]'), function(tr) {
@@ -9217,6 +9256,57 @@ window.taSave = function() {
   }).finally(function() {
     if (btn) { btn.disabled = false; btn.textContent = '저장'; }
   });
+};
+
+/* ── 적립 시뮬레이터 (2026-08-11 신설, 예전 것 무시하고 새로 만듦)
+   ⚠️ 핵심: 저장된 값이 아니라 표에서 지금 편집 중인(저장 전) 수수료·적립률을 그대로 쓴다.
+   저장을 거치면 이 목적이 사라진다 — db 를 다시 안 읽고 테이블 입력칸에서 바로 읽는다. */
+var TA_SIM_CODE = null;
+
+window.taOpenSim = function(code) {
+  TA_SIM_CODE = code;
+  var tr = document.querySelector('#ta-tbody tr[data-code="' + code + '"]');
+  if (!tr) return;
+  var nameEl = document.getElementById('ta-sim-mall');
+  if (nameEl) nameEl.textContent = tr.querySelector('td').textContent;
+  var amtEl = document.getElementById('ta-sim-amount');
+  if (amtEl) amtEl.value = TA_PREVIEW_KRW;
+  taSimRefresh();
+  openModal('m-ta-sim');
+};
+
+window.taSimSetAmount = function(v) {
+  var amtEl = document.getElementById('ta-sim-amount');
+  if (amtEl) amtEl.value = v;
+  taSimRefresh();
+};
+
+window.taSimRefresh = function() {
+  var tr = document.querySelector('#ta-tbody tr[data-code="' + TA_SIM_CODE + '"]');
+  if (!tr) return;
+  // 표의 입력칸에서 지금 이 순간 값을 직접 읽는다 — 저장 여부와 무관하다.
+  var fee = parseFloat((tr.querySelector('.ta-fee') || {}).value);
+  if (!isFinite(fee) || fee < 0) fee = 0;
+  var rate = parseFloat((tr.querySelector('.ta-rate') || {}).value);
+  if (!isFinite(rate) || rate < 0) rate = 0;
+  var amount = parseFloat((document.getElementById('ta-sim-amount') || {}).value);
+  if (!isFinite(amount) || amount < 0) amount = 0;
+
+  var earn = Math.floor(amount * rate / 100);       // 티켓 구성(taGreedy)이 쓰는 것과 같은 예산
+  var revenue = Math.floor(amount * fee / 100);
+  var margin = revenue - earn;
+
+  var earnEl = document.getElementById('ta-sim-earn');
+  if (earnEl) earnEl.textContent = earn.toLocaleString() + '원';
+  var tkEl = document.getElementById('ta-sim-tickets');
+  if (tkEl) tkEl.innerHTML = taGreedy(amount, rate);
+  var revEl = document.getElementById('ta-sim-revenue');
+  if (revEl) revEl.textContent = revenue.toLocaleString() + '원';
+  var mEl = document.getElementById('ta-sim-margin');
+  if (mEl) {
+    mEl.textContent = (margin < 0 ? '-' : '') + Math.abs(margin).toLocaleString() + '원';
+    mEl.style.color = margin < 0 ? 'var(--danger)' : 'var(--text)';
+  }
 };
 
 /* ── sec-revenue: 제휴 수수료 / 기프티콘 판매 매출 내역 리스트 컨트롤러 ── */
