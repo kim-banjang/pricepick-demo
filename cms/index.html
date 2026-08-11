@@ -304,6 +304,36 @@ tr:hover td{background:var(--surface-2);}
 #ta-info-body .ta-pre{white-space:pre-wrap;font-size:13px;color:var(--text);line-height:1.5;}
 #ta-info-body table{margin-top:6px;}
 
+/* ── 적립 시뮬레이터 모달 — 시안 그대로 (2026-08-11 재디자인, 계산 로직은 그대로 두고
+   보이는 것만 바꿨다) ── */
+#m-ta-sim .ta-sim-amount-box{display:flex;align-items:center;justify-content:space-between;
+  border:1.5px solid var(--border);border-radius:var(--r-md);padding:14px 16px;background:var(--surface);}
+#m-ta-sim .ta-sim-amount-box input{border:none;outline:none;background:transparent;
+  font-size:28px;font-weight:700;color:var(--text);width:100%;font-family:var(--font);}
+#m-ta-sim .ta-sim-amount-box input::-webkit-outer-spin-button,
+#m-ta-sim .ta-sim-amount-box input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
+#m-ta-sim .ta-sim-amount-box input[type=number]{-moz-appearance:textfield;}
+#m-ta-sim .ta-sim-amount-unit{color:var(--text-3);font-size:14px;font-weight:500;margin-left:8px;white-space:nowrap;}
+#m-ta-sim .ta-sim-quick-row{display:flex;gap:8px;margin:10px 0 18px;}
+#m-ta-sim .ta-sim-quick-btn{flex:1;padding:8px 0;border:1.5px solid var(--border);border-radius:999px;
+  background:var(--surface);color:var(--text-2);font-size:13px;font-weight:600;cursor:pointer;
+  transition:all .12s;font-family:var(--font);}
+#m-ta-sim .ta-sim-quick-btn:hover{border-color:var(--main-line);}
+#m-ta-sim .ta-sim-quick-btn.active{border-color:var(--main);color:var(--main);}
+#m-ta-sim .ta-sim-result-card{padding:16px 18px;}
+#m-ta-sim .ta-sim-row{display:flex;justify-content:space-between;align-items:baseline;}
+#m-ta-sim .ta-sim-row-label{font-size:13px;color:var(--text-2);}
+#m-ta-sim .ta-sim-row-value{font-size:15px;font-weight:700;color:var(--text);}
+#m-ta-sim .ta-sim-row-value .ta-sim-pct{font-size:12px;font-weight:500;color:var(--text-3);margin-left:2px;}
+#m-ta-sim .ta-sim-row-value-sm{font-size:14px;font-weight:600;}
+#m-ta-sim .ta-sim-bar{height:8px;border-radius:999px;background:var(--main);overflow:hidden;margin:12px 0 6px;}
+#m-ta-sim .ta-sim-bar-fill{height:100%;background:var(--main-line);border-radius:999px;}
+#m-ta-sim .ta-sim-margin-card{background:var(--main-soft);border-radius:var(--r-lg);padding:16px 18px;
+  display:flex;justify-content:space-between;align-items:center;}
+#m-ta-sim .ta-sim-margin-label{font-size:13px;font-weight:600;color:var(--text);}
+#m-ta-sim .ta-sim-margin-value{font-size:20px;font-weight:800;color:var(--main);}
+#m-ta-sim .ta-sim-margin-pct{font-size:13px;font-weight:600;color:var(--main);margin-left:4px;}
+
 /* ── 배지 ── */
 .badge{display:inline-flex;align-items:center;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600;white-space:nowrap;}
 .badge-purple{background:var(--main-soft);color:var(--main-hover);}
@@ -3229,27 +3259,37 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
 
 <!-- ── 모달: 티켓 적립 시뮬레이터 (2026-08-11 신설) ── -->
 <div class="modal-overlay" id="m-ta-sim">
-  <div class="modal" style="width:420px">
+  <div class="modal" style="width:460px">
     <div class="modal-header">
-      <div class="modal-title">적립 시뮬레이터 — <span id="ta-sim-mall">-</span></div>
+      <div class="modal-title" style="display:flex;align-items:center;gap:8px">
+        적립 시뮬레이터
+        <span class="badge badge-purple" id="ta-sim-mall">-</span>
+      </div>
       <button class="modal-close" onclick="closeModal('m-ta-sim')"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     </div>
     <div class="modal-body">
       <div class="form-group">
         <label class="form-label">구매 금액</label>
-        <input class="form-input" type="number" id="ta-sim-amount" min="0" step="1000" value="100000" oninput="taSimRefresh()">
+        <div class="ta-sim-amount-box">
+          <input type="number" id="ta-sim-amount" min="0" step="1000" value="100000" oninput="taSimRefresh()">
+          <span class="ta-sim-amount-unit">원</span>
+        </div>
       </div>
-      <div style="display:flex;gap:6px;margin:-6px 0 16px">
-        <button type="button" class="btn btn-ghost btn-sm" onclick="taSimSetAmount(50000)">5만</button>
-        <button type="button" class="btn btn-ghost btn-sm" onclick="taSimSetAmount(100000)">10만</button>
-        <button type="button" class="btn btn-ghost btn-sm" onclick="taSimSetAmount(300000)">30만</button>
-        <button type="button" class="btn btn-ghost btn-sm" onclick="taSimSetAmount(500000)">50만</button>
+      <div class="ta-sim-quick-row">
+        <button type="button" class="ta-sim-quick-btn" id="ta-sim-quick-50000" onclick="taSimSetAmount(50000)">5만</button>
+        <button type="button" class="ta-sim-quick-btn" id="ta-sim-quick-100000" onclick="taSimSetAmount(100000)">10만</button>
+        <button type="button" class="ta-sim-quick-btn" id="ta-sim-quick-300000" onclick="taSimSetAmount(300000)">30만</button>
+        <button type="button" class="ta-sim-quick-btn" id="ta-sim-quick-500000" onclick="taSimSetAmount(500000)">50만</button>
       </div>
-      <div class="card" style="margin-bottom:0">
-        <div class="policy-item"><div class="policy-label">매출(수수료)</div><div class="policy-value" id="ta-sim-revenue">—</div></div>
-        <div class="policy-item"><div class="policy-label">적립 비용(지급액)</div><div class="policy-value" id="ta-sim-earn">—</div></div>
-        <div class="policy-item"><div class="policy-label">티켓 구성</div><div class="policy-value" id="ta-sim-tickets">—</div></div>
-        <div class="policy-item"><div class="policy-label">수익(매출-적립)</div><div class="policy-value" id="ta-sim-margin">—</div></div>
+      <div class="card ta-sim-result-card" style="margin-bottom:12px">
+        <div class="ta-sim-row"><span class="ta-sim-row-label">매출(수수료)</span><span class="ta-sim-row-value" id="ta-sim-revenue">—</span></div>
+        <div class="ta-sim-row"><span class="ta-sim-row-label">적립 비용(지급액)</span><span class="ta-sim-row-value" id="ta-sim-earn">—</span></div>
+        <div class="ta-sim-bar"><div class="ta-sim-bar-fill" id="ta-sim-bar-fill"></div></div>
+        <div class="ta-sim-row" style="margin-top:12px"><span class="ta-sim-row-label">티켓 구성</span><span class="ta-sim-row-value ta-sim-row-value-sm" id="ta-sim-tickets">—</span></div>
+      </div>
+      <div class="ta-sim-margin-card" id="ta-sim-margin-card">
+        <span class="ta-sim-margin-label">수익(매출-적립)</span>
+        <span><span class="ta-sim-margin-value" id="ta-sim-margin-amt">—</span><span class="ta-sim-margin-pct" id="ta-sim-margin-pct"></span></span>
       </div>
     </div>
     <div class="modal-footer">
@@ -9918,6 +9958,15 @@ window.taSimSetAmount = function(v) {
   taSimRefresh();
 };
 
+// 5만/10만/30만/50만 중 지금 금액과 정확히 일치하는 버튼만 보라 테두리로 표시한다
+// (시안 — 직접 입력해서 프리셋과 안 맞으면 전부 꺼진다, 그게 맞는 동작이다).
+function taSimSyncQuickButtons(amount) {
+  [50000, 100000, 300000, 500000].forEach(function(v) {
+    var btn = document.getElementById('ta-sim-quick-' + v);
+    if (btn) btn.classList.toggle('active', amount === v);
+  });
+}
+
 window.taSimRefresh = function() {
   var tr = document.querySelector('#ta-tbody-primary tr[data-code="' + TA_SIM_CODE + '"], #ta-tbody-secondary tr[data-code="' + TA_SIM_CODE + '"]');
   if (!tr) return;
@@ -9934,16 +9983,33 @@ window.taSimRefresh = function() {
   var margin = revenue - earn;
 
   var earnEl = document.getElementById('ta-sim-earn');
-  if (earnEl) earnEl.textContent = earn.toLocaleString() + '원 (' + taFmt(rate) + '%)';
+  if (earnEl) earnEl.innerHTML = earn.toLocaleString() + '원<span class="ta-sim-pct">(' + taFmt(rate) + '%)</span>';
   var tkEl = document.getElementById('ta-sim-tickets');
   if (tkEl) tkEl.innerHTML = taGreedy(amount, rate);
   var revEl = document.getElementById('ta-sim-revenue');
-  if (revEl) revEl.textContent = revenue.toLocaleString() + '원 (' + taFmt(fee) + '%)';
-  var mEl = document.getElementById('ta-sim-margin');
-  if (mEl) {
-    mEl.textContent = (margin < 0 ? '-' : '') + Math.abs(margin).toLocaleString() + '원 (' + taFmt(fee - rate) + '%p)';
-    mEl.style.color = margin < 0 ? 'var(--danger)' : 'var(--text)';
+  if (revEl) revEl.innerHTML = revenue.toLocaleString() + '원<span class="ta-sim-pct">(' + taFmt(fee) + '%)</span>';
+
+  // 막대 — 매출을 100으로 봤을 때 그중 적립이 차지하는 비율(연보라)과 나머지(진보라,
+  // 곧 수익)로 나눈다. 역마진이면(적립>매출) 연보라가 100%까지 차서 "전부 비용"으로 보인다.
+  var barFill = document.getElementById('ta-sim-bar-fill');
+  if (barFill) {
+    var ratio = revenue > 0 ? Math.max(0, Math.min(1, earn / revenue)) : (earn > 0 ? 1 : 0);
+    barFill.style.width = (ratio * 100) + '%';
   }
+
+  var mAmtEl = document.getElementById('ta-sim-margin-amt');
+  var mPctEl = document.getElementById('ta-sim-margin-pct');
+  var mCardEl = document.getElementById('ta-sim-margin-card');
+  if (mAmtEl && mPctEl) {
+    var color = margin < 0 ? 'var(--danger)' : 'var(--main)';
+    mAmtEl.textContent = (margin < 0 ? '-' : '') + Math.abs(margin).toLocaleString() + '원';
+    mPctEl.textContent = '(' + taFmt(fee - rate) + '%p)';
+    mAmtEl.style.color = color;
+    mPctEl.style.color = color;
+    if (mCardEl) mCardEl.style.background = margin < 0 ? 'var(--danger-soft)' : 'var(--main-soft)';
+  }
+
+  taSimSyncQuickButtons(amount);
 };
 
 /* ── sec-revenue: 제휴 수수료 / 기프티콘 판매 매출 내역 리스트 컨트롤러 ── */
