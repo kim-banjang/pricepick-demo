@@ -292,6 +292,14 @@ tr:hover td{background:var(--surface-2);}
   font-size:12px;color:var(--warning);margin-bottom:14px;font-weight:700;}
 #sec-ticket-accrual .ta-dirty-banner.show{display:block;}
 #sec-ticket-accrual #ta-save-btn.ta-highlight{box-shadow:0 0 0 3px var(--warning-soft);}
+/* 링크프라이스 110개 — 표 헤더 고정, 머천트명 링크, 승인상태 배지 (2026-08-11 신설) */
+#ta-table-secondary thead th{position:sticky;top:0;background:var(--surface);z-index:1;}
+.ta-name-link{background:none;border:none;padding:0;margin:0;font:inherit;font-weight:700;color:var(--main);cursor:pointer;text-decoration:underline;text-decoration-color:transparent;}
+.ta-name-link:hover{text-decoration-color:var(--main);}
+.ta-badge.ta-changed{box-shadow:0 0 0 2px var(--warning);}
+#ta-info-body .policy-item{padding:10px 0;}
+#ta-info-body .ta-pre{white-space:pre-wrap;font-size:13px;color:var(--text);line-height:1.5;}
+#ta-info-body table{margin-top:6px;}
 
 /* ── 배지 ── */
 .badge{display:inline-flex;align-items:center;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600;white-space:nowrap;}
@@ -1318,28 +1326,53 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
       </div>
 
       <div class="card">
-        <div class="card-header">
+        <div class="card-header" style="flex-wrap:wrap;gap:10px">
           <div class="card-title">제휴몰(링크프라이스)</div>
-          <div style="display:flex;align-items:center;gap:14px">
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+            <input class="form-input" type="text" id="ta-filter-search" placeholder="머천트명 검색" style="width:150px" oninput="taApplyFilters()">
+            <select class="form-input" id="ta-filter-category" style="width:130px" onchange="taApplyFilters()">
+              <option value="">카테고리 전체</option>
+              <option value="가전/디지털/IT">가전/디지털/IT</option>
+              <option value="건강">건강</option>
+              <option value="교육">교육</option>
+              <option value="금융">금융</option>
+              <option value="기타">기타</option>
+              <option value="도서/문화">도서/문화</option>
+              <option value="뷰티">뷰티</option>
+              <option value="생활/인테리어">생활/인테리어</option>
+              <option value="식품">식품</option>
+              <option value="여행/티켓">여행/티켓</option>
+              <option value="유아/아동">유아/아동</option>
+              <option value="종합쇼핑몰">종합쇼핑몰</option>
+              <option value="패션">패션</option>
+            </select>
+            <select class="form-input" id="ta-filter-status" style="width:110px" onchange="taApplyFilters()">
+              <option value="">승인상태 전체</option>
+              <option value="승인">승인</option>
+              <option value="승인대기">승인대기</option>
+              <option value="거부">거부</option>
+              <option value="미신청">미신청</option>
+            </select>
             <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text-2);cursor:pointer">
               <input type="checkbox" id="ta-show-hidden" onchange="window.taLoad()"> 숨김 포함 보기
             </label>
-            <button class="btn btn-ghost btn-sm" onclick="taOpenAddMall()">제휴몰 추가</button>
           </div>
         </div>
-        <table id="ta-table-secondary">
-          <thead>
-            <tr>
-              <th style="width:18%">제휴몰</th>
-              <th style="width:12%">수수료</th>
-              <th style="width:15%">적립률</th>
-              <th style="width:12%">수익</th>
-              <th style="width:28%">시뮬레이터</th>
-              <th style="width:15%">숨김</th>
-            </tr>
-          </thead>
-          <tbody id="ta-tbody-secondary"></tbody>
-        </table>
+        <div style="max-height:640px;overflow-y:auto;overflow-x:auto">
+          <table id="ta-table-secondary">
+            <thead>
+              <tr>
+                <th style="width:23%">제휴몰</th>
+                <th style="width:11%">수수료</th>
+                <th style="width:14%">적립률</th>
+                <th style="width:11%">수익</th>
+                <th style="width:26%">시뮬레이터</th>
+                <th style="width:15%">숨김</th>
+              </tr>
+            </thead>
+            <tbody id="ta-tbody-secondary"></tbody>
+          </table>
+        </div>
         <div id="ta-status" style="padding:12px 18px;font-size:13px;color:var(--text-3);border-top:1px solid var(--border)">불러오는 중…</div>
       </div>
     </div>
@@ -3204,23 +3237,16 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
   </div>
 </div>
 
-<!-- ── 모달: 제휴몰 추가 (2026-08-11 신설) ── -->
-<div class="modal-overlay" id="m-ta-add">
-  <div class="modal">
+<!-- ── 모달: 제휴몰(링크프라이스) 상세정보 (2026-08-11 신설) — 본문은 taOpenMerchantInfo 가 매번 새로 그린다 ── -->
+<div class="modal-overlay" id="m-ta-merchant">
+  <div class="modal" style="width:720px;max-width:94vw">
     <div class="modal-header">
-      <div class="modal-title">제휴몰 추가</div>
-      <button class="modal-close" onclick="closeModal('m-ta-add')"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+      <div class="modal-title">제휴몰 정보 — <span id="ta-info-name">-</span></div>
+      <button class="modal-close" onclick="closeModal('m-ta-merchant')"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     </div>
-    <div class="modal-body">
-      <div class="form-group"><label class="form-label">몰 이름</label><input class="form-input" type="text" id="ta-add-name" placeholder="예: 티몬"></div>
-      <div class="form-row">
-        <div class="form-group"><label class="form-label">수수료 %</label><input class="form-input" type="number" id="ta-add-fee" min="0" max="100" step="0.1" value="0"></div>
-        <div class="form-group"><label class="form-label">적립률 %</label><input class="form-input" type="number" id="ta-add-rate" min="0" max="20" step="0.1" value="2"></div>
-      </div>
-    </div>
+    <div class="modal-body" style="max-height:70vh;overflow-y:auto" id="ta-info-body"></div>
     <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="closeModal('m-ta-add')">취소</button>
-      <button class="btn btn-primary" id="ta-add-submit-btn" onclick="taAddMallSubmit()">추가</button>
+      <button class="btn btn-ghost" onclick="closeModal('m-ta-merchant')">닫기</button>
     </div>
   </div>
 </div>
@@ -5785,6 +5811,8 @@ Object.assign(KO2VI,{
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<!-- 링크프라이스 제휴몰 카탈로그(110개, 정적 데모 데이터) — settings/ticket_accrual 은 이 중 override(수수료/적립률/숨김/승인상태)만 저장한다 -->
+<script src="linkprice_merchants.js"></script>
 <script>
 (function() {
 'use strict';
@@ -9246,8 +9274,9 @@ function taRowRefresh(tr) {
 // 불러온 시점 값(TA_ORIGINAL)과 지금 인풋 값을 비교해서만 판단한다 — 고쳤다가
 // 원래 값으로 되돌리면 "변경 없음"으로 다시 잡혀야 하기 때문에, "손댄 적 있는가"가
 // 아니라 "지금 값이 원본과 다른가"로 매번 다시 계산한다.
-var TA_ORIGINAL = {};   // { code: {fee, rate} } — taLoad 가 매번 새로 채운다
+var TA_ORIGINAL = {};   // { code: {fee, rate, status?} } — taLoad 가 매번 새로 채운다
 var TA_DIRTY_COUNT = 0;
+var TA_APPROVAL = {};   // { code: 현재(저장 전 포함) 승인 상태 } — 링크프라이스 몰만 채워진다
 
 window.taHasUnsavedChanges = function() { return TA_DIRTY_COUNT > 0; };
 window.taResetDirty = function() { TA_DIRTY_COUNT = 0; }; // go() 가드에서 "그래도 나간다" 선택 시 사용
@@ -9268,6 +9297,13 @@ function taCheckDirty() {
     rateEl.classList.toggle('ta-changed', rateChanged);
     if (feeChanged) changed++;
     if (rateChanged) changed++;
+
+    if (typeof orig.status === 'string') {
+      var statusChanged = TA_APPROVAL[tr.dataset.code] !== orig.status;
+      var badgeEl = document.getElementById('ta-badge-' + tr.dataset.code);
+      if (badgeEl) badgeEl.classList.toggle('ta-changed', statusChanged);
+      if (statusChanged) changed++;
+    }
   });
 
   TA_DIRTY_COUNT = changed;
@@ -9290,8 +9326,21 @@ window.addEventListener('beforeunload', function(e) {
   if (TA_DIRTY_COUNT > 0) { e.preventDefault(); e.returnValue = ''; }
 });
 
-// 행 하나의 <tr> HTML. 대표/제휴몰 두 표가 완전히 같은 컬럼·계산·저장 로직을
-// 쓰게 공용으로 뺐다(showHideCol 만 다르다 — 대표=쿠팡은 숨김 기능 자체가 없다).
+function taEsc(s) {
+  return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+// 승인 상태 4종 → 기존 배지 색 토큰 재사용(새 색 안 만듦)
+function taStatusBadgeClass(status) {
+  if (status === '승인') return 'badge-green';
+  if (status === '승인대기') return 'badge-amber';
+  if (status === '거부') return 'badge-red';
+  return 'badge-gray'; // 미신청 포함
+}
+
+// 행 하나의 <tr> HTML. 대표/제휴몰 두 표가 같은 컬럼·계산·저장 로직을 쓰게
+// 공용으로 뺐다(showHideCol 이 곧 "링크프라이스 카탈로그 행"이다 — 대표=쿠팡만
+// showHideCol=false 로 넘어오고, 이때는 숨김 기능도 머천트 상세 모달도 없다).
 function taRenderRow(m, showHideCol) {
   var hideCell = !showHideCol ? '' : (
     '<td>' + (m.isHidden
@@ -9299,8 +9348,15 @@ function taRenderRow(m, showHideCol) {
       : '<button type="button" class="btn btn-ghost btn-sm" onclick="taToggleHide(\'' + m.code + '\', true)">숨김</button>'
     ) + '</td>'
   );
+  var nameCell = !showHideCol
+    ? '<td style="font-weight:700">' + taEsc(m.name) + '</td>'
+    : '<td data-category="' + taEsc(m.category || '') + '">'
+      + '<button type="button" class="ta-name-link" onclick="taOpenMerchantInfo(\'' + m.code + '\')">'
+      +   '<span class="ta-name-text">' + taEsc(m.name) + '</span></button> '
+      + '<span class="badge ' + taStatusBadgeClass(m.status) + ' ta-badge" id="ta-badge-' + m.code + '">' + taEsc(m.status) + '</span>'
+      + '</td>';
   return '<tr data-code="' + m.code + '"' + (m.isHidden ? ' style="opacity:.5"' : '') + '>'
-    + '<td style="font-weight:700">' + m.name + '</td>'
+    + nameCell
     + '<td><span style="display:inline-flex;align-items:center;gap:6px">'
     +   '<input class="form-input ta-fee" type="number" min="0" max="100" step="0.1" value="' + m.fee + '" style="max-width:88px;text-align:right">%</span></td>'
     + '<td><span style="display:inline-flex;align-items:center;gap:6px">'
@@ -9311,12 +9367,12 @@ function taRenderRow(m, showHideCol) {
     + '</tr>';
 }
 
-// 지금 화면(저장 안 한 편집분 포함) 에서 rates/fees 를 읽는다. 저장(taSave)과
+// 지금 화면(저장 안 한 편집분 포함) 에서 rates/fees/승인상태 를 읽는다. 저장(taSave)과
 // 숨김 토글(taToggleHide) 둘 다 이걸 써서, 숨김을 눌러도 다른 행에서 편집 중이던
-// 값이 안 날아간다.
+// 값이 안 날아간다. 승인 상태는 표 인풋이 아니라 모달에서 고치므로 TA_APPROVAL(메모리)에서 읽는다.
 function taCollectFromDom() {
   var rows = document.querySelectorAll('#ta-tbody-primary tr[data-code], #ta-tbody-secondary tr[data-code]');
-  var rates = {}, fees = {}, bad = false;
+  var rates = {}, fees = {}, approval = {}, bad = false;
   Array.prototype.forEach.call(rows, function(tr) {
     var code = tr.dataset.code;
     var v = parseFloat(tr.querySelector('.ta-rate').value);
@@ -9325,8 +9381,9 @@ function taCollectFromDom() {
     var f = parseFloat(tr.querySelector('.ta-fee').value);
     if (!isFinite(f) || f < 0 || f > 100) { bad = true; return; }
     fees[code] = Math.round(f * 100) / 100;
+    if (typeof TA_APPROVAL[code] === 'string') approval[code] = TA_APPROVAL[code];
   });
-  return { rates: rates, fees: fees, bad: bad };
+  return { rates: rates, fees: fees, approval: approval, bad: bad };
 }
 
 window.taLoad = function() {
@@ -9344,28 +9401,56 @@ window.taLoad = function() {
     var saved = data.rates || {};
     var savedFees = data.fees || {};
     var hidden = data.hidden || {};
-    var malls = res[0].docs.map(function(doc) {
-      var d = doc.data();
-      var defaultFee = typeof d.commission_rate === 'number' ? taFmt(d.commission_rate * 100) : 0;
+    var savedApproval = data.approval || {};
+
+    // 대표 제휴몰: 쿠팡 하나만, affiliate_malls 그대로(김반장 확정, 2026-08-11 —
+    // 「최상단 정렬」에서 「구획 분리」로 대체됐다. 대표를 바꾸는 기능은 없다). 손대지 않는다.
+    var coupangDoc = res[0].docs.filter(function(doc) { return doc.id === 'coupang'; })[0];
+    var primary = [];
+    if (coupangDoc) {
+      var cd = coupangDoc.data();
+      var cFee = typeof cd.commission_rate === 'number' ? taFmt(cd.commission_rate * 100) : 0;
+      primary.push({
+        code: coupangDoc.id,
+        name: cd.name || coupangDoc.id,
+        fee: typeof savedFees[coupangDoc.id] === 'number' ? taFmt(savedFees[coupangDoc.id]) : cFee,
+        rate: typeof saved[coupangDoc.id] === 'number' ? taFmt(saved[coupangDoc.id]) : TA_DEFAULT_RATE,
+        isHidden: false,
+      });
+    }
+
+    // 제휴몰(링크프라이스): 실제 링크프라이스 제휴 카탈로그 110개가 소스다(정적,
+    // linkprice_merchants.js). 수수료 기본값은 「최저커미션」— 최저값을 쓰면 어느
+    // 상품군에서도 역마진이 안 난다(김반장 확정, 2026-08-11). 적립률 기본값은 기존과
+    // 같은 2%. 운영자가 고친 값(수수료/적립률/숨김/승인상태)만 settings/ticket_accrual
+    // 에 덮어쓰기로 저장된다 — 카탈로그 원본은 안 건드린다.
+    var catalog = window.LINKPRICE_MERCHANTS || [];
+    var secondaryAll = catalog.map(function(x) {
+      var code = x['머천트ID'];
+      var defaultFee = taFmt(typeof x['최저커미션'] === 'number' ? x['최저커미션'] : 0);
       return {
-        code: doc.id,
-        name: d.name || doc.id,
-        fee: typeof savedFees[doc.id] === 'number' ? taFmt(savedFees[doc.id]) : defaultFee,
-        rate: typeof saved[doc.id] === 'number' ? taFmt(saved[doc.id]) : TA_DEFAULT_RATE,
-        isHidden: !!hidden[doc.id],
+        code: code,
+        name: x['머천트명'] || code,
+        category: x['카테고리'] || '',
+        fee: typeof savedFees[code] === 'number' ? taFmt(savedFees[code]) : defaultFee,
+        rate: typeof saved[code] === 'number' ? taFmt(saved[code]) : TA_DEFAULT_RATE,
+        isHidden: !!hidden[code],
+        status: typeof savedApproval[code] === 'string' ? savedApproval[code] : (x['승인 상태'] || '미신청'),
       };
     });
 
     // 저장 전 변경 표시 기준값 — 지금 막 불러온 값이 "원본"이다. 새로 불러올 때마다 갱신.
     TA_ORIGINAL = {};
-    malls.forEach(function(m) { TA_ORIGINAL[m.code] = { fee: m.fee, rate: m.rate }; });
+    TA_APPROVAL = {};
+    primary.forEach(function(m) { TA_ORIGINAL[m.code] = { fee: m.fee, rate: m.rate }; });
+    secondaryAll.forEach(function(m) {
+      TA_ORIGINAL[m.code] = { fee: m.fee, rate: m.rate, status: m.status };
+      TA_APPROVAL[m.code] = m.status;
+    });
 
-    // 대표 제휴몰: 쿠팡 하나만, 항상 고정(김반장 확정, 2026-08-11 — 「최상단 정렬」에서
-    // 「구획 분리」로 대체됐다. 대표를 바꾸는 기능은 없다).
-    var primary = malls.filter(function(m) { return m.code === 'coupang'; });
-    // 제휴몰: 나머지 전부. 숨김은 기본으로 안 보이고, 「숨김 포함 보기」때만 같이 뜬다.
-    var secondary = malls.filter(function(m) {
-      return m.code !== 'coupang' && (showHidden || !m.isHidden);
+    // 숨김은 기본으로 안 보이고, 「숨김 포함 보기」때만 같이 뜬다.
+    var secondary = secondaryAll.filter(function(m) {
+      return showHidden || !m.isHidden;
     }).sort(function(a, b) { return a.name.localeCompare(b.name, 'ko'); });
 
     tbodyPrimary.innerHTML = primary.length
@@ -9382,7 +9467,8 @@ window.taLoad = function() {
       tr.querySelector('.ta-rate').addEventListener('input', function() { taRowRefresh(tr); });
       taRowRefresh(tr);
     });
-    if (st) st.textContent = res[1].exists ? '저장된 값 기준' : '아직 저장한 적이 없어 현재 고정값 2%를 보여줍니다.';
+    taApplyFilters();
+    if (st) st.textContent = (res[1].exists ? '저장된 값 기준' : '아직 저장한 적이 없어 초기값 기준') + ' · 총 ' + secondaryAll.length + '개(표시 ' + secondary.length + '개)';
   }).catch(function(e) {
     console.error('taLoad', e);
     tbodyPrimary.innerHTML = ppEmpty(5, '로드 오류');
@@ -9400,10 +9486,11 @@ window.taSave = function() {
   db.collection('settings').doc('ticket_accrual').set({
     rates: c.rates,
     fees: c.fees,
+    approval: c.approval,
     updated_at: FS.FieldValue.serverTimestamp(),
   }, { merge: true }).then(function() {
-    toast('제휴몰별 수수료·적립률을 저장했습니다.');
-    logAdmin('티켓 수수료·적립률 수정');
+    toast('제휴몰별 수수료·적립률·승인상태를 저장했습니다.');
+    logAdmin('티켓 수수료·적립률·승인상태 수정');
     window.taLoad();
   }).catch(function(e) {
     toast('저장 실패: ' + (e.message || e));
@@ -9424,7 +9511,7 @@ window.taToggleHide = function(code, hide) {
     var hidden = (doc.exists && doc.data().hidden) || {};
     hidden[code] = hide;
     return db.collection('settings').doc('ticket_accrual').set({
-      rates: c.rates, fees: c.fees, hidden: hidden,
+      rates: c.rates, fees: c.fees, approval: c.approval, hidden: hidden,
       updated_at: FS.FieldValue.serverTimestamp(),
     }, { merge: true });
   }).then(function() {
@@ -9436,52 +9523,111 @@ window.taToggleHide = function(code, hide) {
   });
 };
 
-// 제휴몰 추가 — affiliate_malls 에 새 문서를 만든다(기존 시드와 같은 필드).
-// 새 컬렉션·새 구조를 안 만든다.
-window.taOpenAddMall = function() {
-  document.getElementById('ta-add-name').value = '';
-  document.getElementById('ta-add-fee').value = 0;
-  document.getElementById('ta-add-rate').value = TA_DEFAULT_RATE;
-  openModal('m-ta-add');
+// ── 링크프라이스 카탈로그 필터(카테고리/승인상태) + 검색 (2026-08-11 신설)
+// Firestore 재조회 없이 이미 그려진 행을 보이기/숨기기만 한다.
+window.taApplyFilters = function() {
+  var q = ((document.getElementById('ta-filter-search') || {}).value || '').trim().toLowerCase();
+  var cat = (document.getElementById('ta-filter-category') || {}).value || '';
+  var status = (document.getElementById('ta-filter-status') || {}).value || '';
+  var rows = document.querySelectorAll('#ta-tbody-secondary tr[data-code]');
+  Array.prototype.forEach.call(rows, function(tr) {
+    var code = tr.dataset.code;
+    var nameEl = tr.querySelector('.ta-name-text');
+    var name = nameEl ? nameEl.textContent : '';
+    var catCell = tr.querySelector('td[data-category]');
+    var rowCat = catCell ? catCell.dataset.category : '';
+    var okName = !q || name.toLowerCase().indexOf(q) !== -1;
+    var okCat = !cat || rowCat === cat;
+    var okStatus = !status || TA_APPROVAL[code] === status;
+    tr.style.display = (okName && okCat && okStatus) ? '' : 'none';
+  });
 };
 
-window.taAddMallSubmit = function() {
-  var name = (document.getElementById('ta-add-name').value || '').trim();
-  if (!name) { toast('몰 이름을 입력하세요.'); return; }
-  var fee = parseFloat(document.getElementById('ta-add-fee').value);
-  if (!isFinite(fee) || fee < 0 || fee > 100) { toast('수수료는 0~100 사이 숫자로 입력하세요.'); return; }
-  var rate = parseFloat(document.getElementById('ta-add-rate').value);
-  if (!isFinite(rate) || rate < 0 || rate > 20) { toast('적립률은 0~20 사이 숫자로 입력하세요.'); return; }
+// ── 머천트 상세정보 모달 (2026-08-11 신설) — 엑셀 24개 컬럼 전부 + 커미션 목록 전체.
+// 승인 상태는 여기서 바꾸며, 표 인풋과 마찬가지로 저장 전엔 TA_APPROVAL(메모리)에만
+// 반영되고 배지가 강조 표시된다 — 저장 버튼을 눌러야 실제로 반영된다.
+var LP_BY_CODE = null;
+function taLpByCode() {
+  if (!LP_BY_CODE) {
+    LP_BY_CODE = {};
+    (window.LINKPRICE_MERCHANTS || []).forEach(function(x) { LP_BY_CODE[x['머천트ID']] = x; });
+  }
+  return LP_BY_CODE;
+}
 
-  var code = 'custom-' + Date.now();
-  var btn = document.getElementById('ta-add-submit-btn');
-  if (btn) { btn.disabled = true; btn.textContent = '추가 중…'; }
-  db.collection('affiliate_malls').doc(code).set({
-    mall_code: code,
-    name: name,
-    commission_rate: taFmt(fee) / 100,
-    domain: '',
-    active: true,
-    created_at: FS.FieldValue.serverTimestamp(),
-  }).then(function() {
-    return db.collection('settings').doc('ticket_accrual').get();
-  }).then(function(doc) {
-    var data = (doc.exists && doc.data()) || {};
-    var rates = data.rates || {};
-    rates[code] = taFmt(rate);
-    return db.collection('settings').doc('ticket_accrual').set({
-      rates: rates, updated_at: FS.FieldValue.serverTimestamp(),
-    }, { merge: true });
-  }).then(function() {
-    toast('제휴몰을 추가했습니다.');
-    logAdmin('제휴몰 추가: ' + name);
-    closeModal('m-ta-add');
-    window.taLoad();
-  }).catch(function(e) {
-    toast('추가 실패: ' + (e.message || e));
-  }).finally(function() {
-    if (btn) { btn.disabled = false; btn.textContent = '추가'; }
-  });
+function taInfoRow(label, valueHtml) {
+  return '<div class="policy-item"><div class="policy-label">' + taEsc(label) + '</div><div class="policy-value">' + valueHtml + '</div></div>';
+}
+function taInfoPre(label, text) {
+  return taInfoRow(label, '<div class="ta-pre">' + taEsc(text || '—') + '</div>');
+}
+function taInfoLink(label, url) {
+  if (!url) return taInfoRow(label, '—');
+  return taInfoRow(label, '<a href="' + taEsc(url) + '" target="_blank" rel="noopener noreferrer">' + taEsc(url) + '</a>');
+}
+function taYn(v) { return v === 'Y' ? '지원(Y)' : (v === 'N' ? '미지원(N)' : taEsc(v)); }
+
+window.taOpenMerchantInfo = function(code) {
+  var x = taLpByCode()[code];
+  if (!x) return;
+  var status = TA_APPROVAL[code] || x['승인 상태'];
+
+  var nameEl = document.getElementById('ta-info-name');
+  if (nameEl) nameEl.textContent = x['머천트명'] + ' (' + x['머천트ID'] + ')';
+
+  var statusOptions = ['승인', '승인대기', '거부', '미신청'].map(function(s) {
+    return '<option value="' + s + '"' + (s === status ? ' selected' : '') + '>' + s + '</option>';
+  }).join('');
+
+  var commRows = (x['커미션목록'] || []).map(function(c) {
+    return '<tr>'
+      + '<td>' + taEsc(c['구분']) + '</td>'
+      + '<td>' + taEsc(c['PC웹'] == null ? '—' : c['PC웹']) + '</td>'
+      + '<td>' + taEsc(c['모바일웹'] == null ? '—' : c['모바일웹']) + '</td>'
+      + '<td>' + taEsc(c['APP'] == null ? '—' : c['APP']) + '</td>'
+      + '<td>' + taEsc(c['종료일'] == null ? '—' : c['종료일']) + '</td>'
+      + '</tr>';
+  }).join('');
+
+  var html = ''
+    + taInfoRow('머천트ID', taEsc(x['머천트ID']))
+    + taInfoRow('머천트명', taEsc(x['머천트명']))
+    + taInfoRow('카테고리', taEsc(x['카테고리']))
+    + taInfoRow('승인 상태', '<select class="form-input" id="ta-info-status-select" style="max-width:160px" onchange="taApprovalChange(\'' + code + '\', this.value)">' + statusOptions + '</select>')
+    + taInfoRow('리워드 가능 여부', taYn(x['리워드 가능 여부']))
+    + taInfoRow('PC웹 지원 여부', taYn(x['PC웹 지원 여부']))
+    + taInfoRow('모바일 웹 지원 여부', taYn(x['모바일 웹 지원 여부']))
+    + taInfoRow('APP(AOS) 지원 여부', taYn(x['APP(AOS) 지원 여부']))
+    + taInfoRow('APP(IOS) 지원 여부', taYn(x['APP(IOS) 지원 여부']))
+    + taInfoLink('기본링크', x['기본링크'])
+    + taInfoLink('사이트 URL', x['사이트 URL'])
+    + taInfoRow('광고 효과 인정 기간', taEsc(x['광고 효과 인정 기간']))
+    + taInfoRow('실시간 커미션 전송', taEsc(x['실시간 커미션 전송']))
+    + taInfoPre('커미션 정산 방법 및 금액', x['커미션 정산 방법 및 금액'])
+    + taInfoPre('커미션 지급 일정', x['커미션 지급 일정'])
+    + taInfoPre('활동 불가 방식', x['활동 불가 방식'])
+    + taInfoPre('커미션 미인정 상품', x['커미션 미인정 상품'])
+    + taInfoPre('유의사항', x['유의사항'])
+    + '<div class="policy-item"><div class="policy-label" style="margin-bottom:8px">커미션 목록 (' + (x['커미션목록'] || []).length + '건)</div>'
+    +   '<table><thead><tr><th>구분</th><th>PC웹</th><th>모바일웹</th><th>APP</th><th>종료일</th></tr></thead>'
+    +   '<tbody>' + (commRows || '<tr><td colspan="5">커미션 정보 없음</td></tr>') + '</tbody></table>'
+    + '</div>';
+
+  var body = document.getElementById('ta-info-body');
+  if (body) body.innerHTML = html;
+  openModal('m-ta-merchant');
+};
+
+// 모달의 승인 상태 select 변경 — 표 배지·저장 전 변경 카운트에 바로 반영한다.
+window.taApprovalChange = function(code, value) {
+  TA_APPROVAL[code] = value;
+  var badgeEl = document.getElementById('ta-badge-' + code);
+  if (badgeEl) {
+    badgeEl.textContent = value;
+    badgeEl.className = 'badge ' + taStatusBadgeClass(value) + ' ta-badge';
+  }
+  taCheckDirty();
+  taApplyFilters();
 };
 
 /* ── 적립 시뮬레이터 (2026-08-11 신설, 예전 것 무시하고 새로 만듦)
@@ -9494,7 +9640,8 @@ window.taOpenSim = function(code) {
   var tr = document.querySelector('#ta-tbody-primary tr[data-code="' + code + '"], #ta-tbody-secondary tr[data-code="' + code + '"]');
   if (!tr) return;
   var nameEl = document.getElementById('ta-sim-mall');
-  if (nameEl) nameEl.textContent = tr.querySelector('td').textContent;
+  var nameSrc = tr.querySelector('.ta-name-text') || tr.querySelector('td');
+  if (nameEl) nameEl.textContent = nameSrc.textContent;
   var amtEl = document.getElementById('ta-sim-amount');
   if (amtEl) amtEl.value = TA_PREVIEW_KRW;
   taSimRefresh();
