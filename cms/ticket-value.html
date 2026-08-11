@@ -336,6 +336,8 @@ body.dark .sidebar.sb-mini .sb-item::after{background:#1F2937;}
 #sec-ticket-value .tv-ratio-formula .tv-n.tv-n-warn{color:var(--warning);}
 #sec-ticket-value .tv-ratio-desc{font-size:12px;color:var(--text-2);margin-left:auto;}
 #sec-ticket-value .tv-impact-badge{margin-left:8px;}
+#sec-ticket-value .tv-rounded-note{display:none;font-size:11px;color:var(--warning);margin-top:4px;font-weight:600;}
+#sec-ticket-value .tv-rounded-note.show{display:block;}
 </style>
 </head>
 <body>
@@ -413,9 +415,9 @@ body.dark .sidebar.sb-mini .sb-item::after{background:#1F2937;}
             <span class="sb-item-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v10"/><path d="M14.5 9.5A2.5 2.5 0 0 0 12 8.5h-.5a2 2 0 0 0 0 4h1a2 2 0 0 1 0 4H12a2.5 2.5 0 0 1-2.5-1"/></svg></span>
             <span class="sb-item-lbl">티켓 가치 설정</span>
           </button>
-          <button class="sb-item" data-label="티켓 적립 관리" onclick="goIndex('ticket-accrual')">
+          <button class="sb-item" data-label="티켓 적립 설정" onclick="goIndex('ticket-accrual')">
             <span class="sb-item-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M3 17 9 11l4 4 8-8"/><path d="M17 7h4v4"/></svg></span>
-            <span class="sb-item-lbl">티켓 적립 관리</span>
+            <span class="sb-item-lbl">티켓 적립 설정</span>
           </button>
           <button class="sb-item" data-label="티켓 내역" onclick="goIndex('tickets')">
             <span class="sb-item-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/><path d="M13 5v2"/><path d="M13 17v2"/><path d="M13 11v2"/></svg></span>
@@ -563,7 +565,7 @@ body.dark .sidebar.sb-mini .sb-item::after{background:#1F2937;}
         <div class="card-header">
           <div>
             <div class="card-title">등급별 환산가치</div>
-            <div class="card-sub">티켓 1장 = 원화 얼마로 볼 것인지 (0 이상 정수)</div>
+            <div class="card-sub">티켓 1장 = 원화 얼마로 볼 것인지 (0 이상 정수) · 하나를 바꾸면 나머지 셋이 비율(1:10:20:0.4)대로 자동 조정됩니다</div>
           </div>
           <button class="btn btn-primary btn-sm" id="tv-save-btn" onclick="tvSave()">저장</button>
         </div>
@@ -581,8 +583,9 @@ body.dark .sidebar.sb-mini .sb-item::after{background:#1F2937;}
               <td><span class="tk-bronze">브론즈</span></td>
               <td id="tv-cur-bronze">100원</td>
               <td>
-                <input class="form-input tv-input" type="number" id="tv-bronze" min="0" step="1" value="100" data-orig="100" data-name="브론즈" oninput="tvOnInput()">
+                <input class="form-input tv-input" type="number" id="tv-bronze" min="0" step="1" value="100" data-orig="100" data-name="브론즈" oninput="tvOnInput('bronze')">
                 <span class="tv-unit">원</span>
+                <div class="tv-rounded-note" id="tv-rounded-bronze"></div>
               </td>
               <td id="tv-diff-bronze"><span class="badge badge-gray">변경 없음</span></td>
             </tr>
@@ -590,8 +593,9 @@ body.dark .sidebar.sb-mini .sb-item::after{background:#1F2937;}
               <td><span class="tk-silver">실버</span></td>
               <td id="tv-cur-silver">1,000원</td>
               <td>
-                <input class="form-input tv-input" type="number" id="tv-silver" min="0" step="1" value="1000" data-orig="1000" data-name="실버" oninput="tvOnInput()">
+                <input class="form-input tv-input" type="number" id="tv-silver" min="0" step="1" value="1000" data-orig="1000" data-name="실버" oninput="tvOnInput('silver')">
                 <span class="tv-unit">원</span>
+                <div class="tv-rounded-note" id="tv-rounded-silver"></div>
               </td>
               <td id="tv-diff-silver"><span class="badge badge-gray">변경 없음</span></td>
             </tr>
@@ -599,8 +603,9 @@ body.dark .sidebar.sb-mini .sb-item::after{background:#1F2937;}
               <td><span class="tk-gold">골드</span></td>
               <td id="tv-cur-gold">2,000원</td>
               <td>
-                <input class="form-input tv-input" type="number" id="tv-gold" min="0" step="1" value="2000" data-orig="2000" data-name="골드" oninput="tvOnInput()">
+                <input class="form-input tv-input" type="number" id="tv-gold" min="0" step="1" value="2000" data-orig="2000" data-name="골드" oninput="tvOnInput('gold')">
                 <span class="tv-unit">원</span>
+                <div class="tv-rounded-note" id="tv-rounded-gold"></div>
               </td>
               <td id="tv-diff-gold"><span class="badge badge-gray">변경 없음</span></td>
             </tr>
@@ -608,8 +613,9 @@ body.dark .sidebar.sb-mini .sb-item::after{background:#1F2937;}
               <td><span class="tk-event">이벤트 티켓</span></td>
               <td id="tv-cur-event">40원</td>
               <td>
-                <input class="form-input tv-input" type="number" id="tv-event" min="0" step="1" value="40" data-orig="40" data-name="이벤트 티켓" oninput="tvOnInput()">
+                <input class="form-input tv-input" type="number" id="tv-event" min="0" step="1" value="40" data-orig="40" data-name="이벤트 티켓" oninput="tvOnInput('event')">
                 <span class="tv-unit">원</span>
+                <div class="tv-rounded-note" id="tv-rounded-event"></div>
               </td>
               <td id="tv-diff-event"><span class="badge badge-gray">변경 없음</span></td>
             </tr>
@@ -719,7 +725,7 @@ function toggleTheme(){
   document.getElementById('theme-label').textContent = dark ? '라이트 모드' : '다크 모드';
   try{ localStorage.setItem('pp_cms_theme', dark ? 'dark' : 'light'); }catch(e){}
 }
-function goIndex(id){ location.href = 'index.html#' + id; }
+function goIndex(id){ location.href = '/cms/index.html#' + id; }
 
 (function initChrome(){
   try{
@@ -737,7 +743,37 @@ function goIndex(id){ location.href = 'index.html#' + id; }
 const TV_KEYS = ['bronze','silver','gold','event'];
 const won = n => n.toLocaleString('ko-KR') + '원';
 
+/* 등급 간 비율은 고정이다(김반장 확정) — 이 상수를 바꾸는 UI는 만들지 않는다.
+   100:1000:2000:40 을 브론즈=1 기준으로 정리한 값. */
+const TV_RATIOS = { bronze:1, silver:10, gold:20, event:0.4 };
+
 function tvEl(k){ return document.getElementById('tv-' + k); }
+
+/* 하나를 고치면 나머지 셋을 같은 비율로 맞춘다(2026-08-11 신설) — 개별로 두면
+   등급 체계가 깨진다는 지적. 방금 타이핑한 칸(anchorKey)은 그대로 두고, 나머지
+   셋만 anchorKey 기준 배수로 다시 계산해 채운다. 소수점이 나오면 반올림하고
+   그 칸에 표시(tv-rounded-*)한다 — 반올림을 감춘 채 조용히 값만 바꾸지 않는다. */
+function tvSyncRatios(anchorKey){
+  const anchorEl = tvEl(anchorKey);
+  const raw = Number(anchorEl.value);
+  if(anchorEl.value.trim() === '' || !Number.isFinite(raw) || raw < 0) return; // 무효값은 무효 처리에 맡기고 연동 안 함
+  const unit = raw / TV_RATIOS[anchorKey];
+  TV_KEYS.forEach(k => {
+    const note = document.getElementById('tv-rounded-' + k);
+    if(k === anchorKey){ note.classList.remove('show'); note.textContent = ''; return; }
+    const exact = unit * TV_RATIOS[k];
+    const rounded = Math.round(exact);
+    const wasRounded = Math.abs(exact - rounded) > 1e-9;
+    tvEl(k).value = rounded;
+    if(wasRounded){
+      note.textContent = '정확히는 ' + tvFmtRatio(exact) + '원 — 반올림됨';
+      note.classList.add('show');
+    }else{
+      note.textContent = '';
+      note.classList.remove('show');
+    }
+  });
+}
 
 /* 입력값 읽기: 숫자·0 이상만 유효 (검증은 최소한만) */
 function tvRead(k){
@@ -861,7 +897,10 @@ function tvRecalc(){
   }
 }
 
-function tvOnInput(){ tvRecalc(); }
+function tvOnInput(anchorKey){
+  if(anchorKey) tvSyncRatios(anchorKey);
+  tvRecalc();
+}
 
 function tvSave(){
   const invalid = TV_KEYS.map(tvRead).filter(r => !r.valid);
