@@ -5894,8 +5894,10 @@ Object.assign(KO2VI,{
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-<!-- 링크프라이스 제휴몰 카탈로그(110개, 정적 데모 데이터) — settings/ticket_accrual 은 이 중 override(수수료/적립률/숨김/승인상태)만 저장한다 -->
-<script src="linkprice_merchants.js"></script>
+<!-- 링크프라이스 제휴몰 카탈로그(110개)는 정적 파일이 아니라 Firestore
+     settings/linkprice_catalog 문서에서 읽는다(2026-08-11, 정적 <script src> 로드가
+     실제 사용 환경에서 계속 막혀서 전환 — 광고/추적 차단 확장이 "merchants" 가 든
+     스크립트를 차단했을 가능성이 유력. 자세한 경위는 taLoad() 주석 참고). -->
 <script>
 (function() {
 'use strict';
@@ -9376,6 +9378,8 @@ var TA_APPROVAL = {};   // { code: 현재(저장 전 포함) 승인 상태 } —
 // 선택 모드를 끄거나(taToggleSelectMode) 사용자가 직접 체크를 풀 때만 비운다.
 var TA_SELECT_MODE = false;
 var TA_SELECTED = {};   // { code: true }
+var TA_CATALOG = [];    // 링크프라이스 카탈로그(settings/linkprice_catalog) — taLoad 가 채운다.
+                         // 상세정보 모달(taOpenMerchantInfo)이 같은 배열을 재사용한다.
 
 window.taHasUnsavedChanges = function() { return TA_DIRTY_COUNT > 0; };
 window.taResetDirty = function() { TA_DIRTY_COUNT = 0; }; // go() 가드에서 "그래도 나간다" 선택 시 사용
@@ -9497,38 +9501,32 @@ function taCollectFromDom() {
   return { rates: rates, fees: fees, approval: approval, bad: bad };
 }
 
-window.taLoad = function(retryOpts) {
+window.taLoad = function() {
   var tbodyPrimary = document.getElementById('ta-tbody-primary');
   var tbodySecondary = document.getElementById('ta-tbody-secondary');
   var st = document.getElementById('ta-status');
   if (!tbodyPrimary || !tbodySecondary) return;
 
-  var tries = (retryOpts && retryOpts.tries) || 0;
+  // 첫 진입 시 즉시 "불러오는 중" 을 눈에 보이게 그린다 — 조회가 끝날 때까지 표를
+  // 안 건드리면 로딩 중과 실제로 텅 빈 상태가 화면에서 구분이 안 간다.
+  tbodyPrimary.innerHTML = ppEmpty(6, '불러오는 중…');
+  tbodySecondary.innerHTML = ppEmpty(7, '불러오는 중…');
+  if (st) st.textContent = '불러오는 중…';
 
-  // 첫 진입 시 즉시 "불러오는 중" 을 눈에 보이게 그린다(2026-08-11) — 그 전엔 표가
-  // 그냥 빈 채로 있다가 나중에 "없습니다"/데이터로 바뀌었는데, 로딩 중과 실제로
-  // 텅 빈 상태가 화면에서 구분이 안 갔다(김반장 실측 — 기다리는데 안 뜬다고 오인).
-  if (tries === 0) {
-    tbodyPrimary.innerHTML = ppEmpty(6, '불러오는 중…');
-    tbodySecondary.innerHTML = ppEmpty(7, '불러오는 중…');
-    if (st) st.textContent = '불러오는 중…';
-  }
-
-  // 방어: linkprice_merchants.js 가 아직 실행 전일 수 있는 드문 타이밍/네트워크
-  // 상황을 대비한다(2026-08-11 실측 사고 — 화면·필터·저장값은 멀쩡한데 목록만
-  // 0개로 떴다. Firestore 는 정상이었고 window.LINKPRICE_MERCHANTS 만 비어 있었다).
-  // 최대 10회(3초) 재시도 후에도 안 잡히면 진짜 실패로 보고 아래에서 명확히 알린다.
-  if (!(window.LINKPRICE_MERCHANTS && window.LINKPRICE_MERCHANTS.length) && tries < 10) {
-    setTimeout(function() { window.taLoad({ tries: tries + 1 }); }, 300);
-    return;
-  }
-  var catalogLoadFailed = !(window.LINKPRICE_MERCHANTS && window.LINKPRICE_MERCHANTS.length);
-
+  // 링크프라이스 카탈로그는 별도 정적 파일(linkprice_merchants.js) 대신 Firestore
+  // settings/linkprice_catalog 문서에서 읽는다(2026-08-11 전환) — 정적 <script src>
+  // 방식은 김반장 실제 환경에서 계속 로드가 막혔다(파일 자체는 200으로 정상 서빙됨이
+  // 확인됨 — 광고/추적 차단 확장이 "merchants" 가 든 스크립트를 차단했을 가능성이
+  // 가장 유력하다). 이미 페이지의 다른 모든 데이터가 Firestore 로 정상 로드되고
+  // 있으므로 같은 경로로 통일하면 이 실패 유형 자체가 사라진다.
   Promise.all([
     db.collection('affiliate_malls').get(),
     db.collection('settings').doc('ticket_accrual').get(),
+    db.collection('settings').doc('linkprice_catalog').get(),
   ]).then(function(res) {
     var data = (res[1].exists && res[1].data()) || {};
+    var catalogDoc = (res[2].exists && res[2].data()) || {};
+    var catalogLoadFailed = !(Array.isArray(catalogDoc.merchants) && catalogDoc.merchants.length);
     var saved = data.rates || {};
     var savedFees = data.fees || {};
     var savedApplied = data.applied || {};
@@ -9558,12 +9556,14 @@ window.taLoad = function(retryOpts) {
     }
 
     // 제휴몰(링크프라이스): 실제 링크프라이스 제휴 카탈로그 110개가 소스다(정적,
-    // linkprice_merchants.js, 원본 그대로 — 나중에 목록을 갱신해도 매번 손댈 게
-    // 없어야 하니 쿠팡 항목도 지우지 않는다). 수수료 기본값은 「최저커미션」— 최저값을
-    // 쓰면 어느 상품군에서도 역마진이 안 난다. 적립률 기본값은 수수료의 60%(남는 40%가
-    // 우리 수익). 적용 여부 기본값은 승인 상태가 「승인」인 것만 적용, 나머지(승인대기·
-    // 거부·미신청)는 미적용 — 링크프라이스 승인이 나도 우리가 실제로 안 붙일 수 있다.
-    var catalog = window.LINKPRICE_MERCHANTS || [];
+    // settings/linkprice_catalog 문서, 원본 그대로 — 나중에 목록을 갱신해도 매번
+    // 손댈 게 없어야 하니 쿠팡 항목도 지우지 않는다). 수수료 기본값은 「최저커미션」
+    // — 최저값을 쓰면 어느 상품군에서도 역마진이 안 난다. 적립률 기본값은 수수료의
+    // 60%(남는 40%가 우리 수익). 적용 여부 기본값은 승인 상태가 「승인」인 것만
+    // 적용, 나머지(승인대기·거부·미신청)는 미적용 — 링크프라이스 승인이 나도 우리가
+    // 실제로 안 붙일 수 있다.
+    var catalog = catalogDoc.merchants || [];
+    TA_CATALOG = catalog;   // taOpenMerchantInfo(상세정보 모달)도 같은 배열을 쓴다
     // 'lp:' 네임스페이스 — 링크프라이스 원본에 머천트ID가 그대로 "coupang"인 항목이
     // 있다(대표와는 별개의, 링크프라이스 경유 제휴 건). 대표는 위에서 'coupang_direct'
     // 를 쓰므로 이미 안 겹치지만, 카탈로그 쪽도 항상 'lp:' 를 붙여 이중으로 분리해둔다.
@@ -9802,7 +9802,7 @@ var LP_BY_CODE = null;
 function taLpByCode() {
   if (!LP_BY_CODE) {
     LP_BY_CODE = {};
-    (window.LINKPRICE_MERCHANTS || []).forEach(function(x) { LP_BY_CODE[x['머천트ID']] = x; });
+    (TA_CATALOG || []).forEach(function(x) { LP_BY_CODE[x['머천트ID']] = x; });
   }
   return LP_BY_CODE;
 }
@@ -9883,7 +9883,7 @@ window.taApprovalChange = function(code, value) {
   taApplyFilters();
 };
 
-// 제휴몰(링크프라이스) 추가 — 카탈로그(linkprice_merchants.js)엔 없는 몰을 운영자가
+// 제휴몰(링크프라이스) 추가 — 카탈로그(settings/linkprice_catalog)엔 없는 몰을 운영자가
 // 수동 등록한다. settings/ticket_accrual 을 그대로 확장(customMalls 맵)한 것뿐,
 // 새 컬렉션·구조를 안 만든다. 적립률 기본값은 수수료 × 60%(taDefaultRate) 그대로.
 window.taOpenAddMall = function() {
