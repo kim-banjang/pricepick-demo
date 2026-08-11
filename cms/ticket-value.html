@@ -569,7 +569,7 @@ body.dark .sidebar.sb-mini .sb-item::after{background:#1F2937;}
         <div class="card-header">
           <div>
             <div class="card-title">등급별 환산가치</div>
-            <div class="card-sub">티켓 1장 = 원화 얼마로 볼 것인지 (0 이상 정수) · 하나를 바꾸면 나머지 셋이 비율(1:10:20:0.4)대로 자동 조정됩니다</div>
+            <div class="card-sub">티켓 1장 = 원화 얼마로 볼 것인지 (0 이상 정수) · 하나를 바꾸면 나머지 둘이 비율(1:10:20)대로 자동 조정됩니다</div>
           </div>
           <button class="btn btn-primary btn-sm" id="tv-save-btn" onclick="tvSave()">저장</button>
         </div>
@@ -613,13 +613,35 @@ body.dark .sidebar.sb-mini .sb-item::after{background:#1F2937;}
               </td>
               <td id="tv-diff-gold"><span class="badge badge-gray">변경 없음</span></td>
             </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- 이벤트 티켓 가치 — 등급 체계와 별개(2026-08-11 분리, 김반장 지시).
+           경품 응모 전용이라 브론즈·실버·골드 비율 연동에서 완전히 뺐다. -->
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">이벤트 티켓 가치</div>
+            <div class="card-sub">이벤트 티켓은 경품 응모 전용이라 등급 티켓과 별개로 정합니다 · 등급 값을 바꿔도 따라 움직이지 않습니다</div>
+          </div>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th style="width:26%">종류</th>
+              <th style="width:22%">현재 적용값</th>
+              <th style="width:30%">변경할 값</th>
+              <th style="width:22%">변동</th>
+            </tr>
+          </thead>
+          <tbody>
             <tr>
               <td><span class="tk-event">이벤트 티켓</span></td>
               <td id="tv-cur-event">40원</td>
               <td>
-                <input class="form-input tv-input" type="number" id="tv-event" min="0" step="1" value="40" data-orig="40" data-name="이벤트 티켓" oninput="tvOnInput('event')">
+                <input class="form-input tv-input" type="number" id="tv-event" min="0" step="1" value="40" data-orig="40" data-name="이벤트 티켓" oninput="tvOnInput()">
                 <span class="tv-unit">원</span>
-                <div class="tv-rounded-note" id="tv-rounded-event"></div>
               </td>
               <td id="tv-diff-event"><span class="badge badge-gray">변경 없음</span></td>
             </tr>
@@ -743,12 +765,15 @@ function goIndex(id){ location.href = '/cms/index.html#' + id; }
 })();
 
 /* ── 티켓 가치 설정 ── */
-const TV_KEYS = ['bronze','silver','gold','event'];
+// 이벤트 티켓은 경품 응모 전용이라 등급 체계와 별개다(2026-08-11 분리, 김반장 지시)
+// — TV_KEYS(비율 연동 대상)엔 안 넣고, TV_ALL_KEYS(변경표시·저장 대상)에만 넣는다.
+const TV_KEYS = ['bronze','silver','gold'];
+const TV_ALL_KEYS = ['bronze','silver','gold','event'];
 const won = n => n.toLocaleString('ko-KR') + '원';
 
 /* 등급 간 비율은 고정이다(김반장 확정) — 이 상수를 바꾸는 UI는 만들지 않는다.
-   100:1000:2000:40 을 브론즈=1 기준으로 정리한 값. */
-const TV_RATIOS = { bronze:1, silver:10, gold:20, event:0.4 };
+   100:1000:2000 을 브론즈=1 기준으로 정리한 값. */
+const TV_RATIOS = { bronze:1, silver:10, gold:20 };
 
 function tvEl(k){ return document.getElementById('tv-' + k); }
 
@@ -802,7 +827,7 @@ function tvRecalc(){
   const invalid = [];
   const changed = [];
 
-  TV_KEYS.forEach(k => {
+  TV_ALL_KEYS.forEach(k => {
     const r = tvRead(k);
     v[k] = r;
     r.el.classList.toggle('tv-invalid', !r.valid);
@@ -961,12 +986,12 @@ function tvOnInput(anchorKey){
 }
 
 function tvSave(){
-  const invalid = TV_KEYS.map(tvRead).filter(r => !r.valid);
+  const invalid = TV_ALL_KEYS.map(tvRead).filter(r => !r.valid);
   if(invalid.length){
     alert('입력값을 확인하세요. 0 이상의 숫자만 입력할 수 있습니다.\n(' + invalid.map(r => r.name).join(', ') + ')');
     return;
   }
-  const changed = TV_KEYS.map(tvRead).filter(r => r.value !== r.orig);
+  const changed = TV_ALL_KEYS.map(tvRead).filter(r => r.value !== r.orig);
   if(!changed.length){
     alert('변경된 값이 없습니다.');
     return;
