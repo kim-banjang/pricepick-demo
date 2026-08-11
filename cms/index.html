@@ -278,7 +278,7 @@ td{padding:12px 18px;font-size:13px;border-bottom:1px solid var(--border);white-
 tr:last-child td{border-bottom:none;}
 tr:hover td{background:var(--surface-2);}
 
-/* 티켓 적립 관리 — 폰트 규정(13px 이상 · 굵기 400/700)을 이 화면에서만 적용.
+/* 티켓 적립 설정 — 폰트 규정(13px 이상 · 굵기 400/700)을 이 화면에서만 적용.
    전역 th/btn/info-box 는 다른 화면에 영향이 가므로 건드리지 않는다. */
 #sec-ticket-accrual th{font-size:13px;font-weight:700;text-transform:none;letter-spacing:0;}
 #sec-ticket-accrual .btn{font-size:13px;font-weight:700;padding:7px 14px;}
@@ -969,9 +969,13 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
           <span class="sb-chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></span>
         </div>
         <div class="sb-grp-items">
-          <button class="sb-item" id="nav-ticket-accrual" data-label="티켓 적립 관리" onclick="go('ticket-accrual',this)">
+          <a class="sb-item" id="nav-ticket-value" href="ticket-value.html" data-label="티켓 가치 설정" style="text-decoration:none">
+            <span class="sb-item-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></span>
+            <span class="sb-item-lbl">티켓 가치 설정</span>
+          </a>
+          <button class="sb-item" id="nav-ticket-accrual" data-label="티켓 적립 설정" onclick="go('ticket-accrual',this)">
             <span class="sb-item-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M3 17 9 11l4 4 8-8"/><path d="M17 7h4v4"/></svg></span>
-            <span class="sb-item-lbl" id="nav-label-ticket-accrual">티켓 적립 관리</span>
+            <span class="sb-item-lbl" id="nav-label-ticket-accrual">티켓 적립 설정</span>
           </button>
           <button class="sb-item" id="nav-tickets" data-label="티켓 내역" onclick="go('tickets',this)">
             <span class="sb-item-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/><path d="M13 5v2"/><path d="M13 17v2"/><path d="M13 11v2"/></svg></span>
@@ -1304,7 +1308,7 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
       </div>
     </div>
 
-    <!-- ── 티켓 적립 관리 ── -->
+    <!-- ── 티켓 적립 설정 ── -->
     <div class="section" id="sec-ticket-accrual">
       <div class="info-box">제휴몰별 수수료와 사용자에게 돌려줄 적립률을 정합니다(계약이 바뀌면 수수료도 여기서 바로 반영). 등급 환산은 큰 단위부터 채우는 기존 방식 그대로입니다. 쿠팡은 대표 제휴몰로 항상 별도 표시됩니다. 적립률 기본값은 수수료의 60%이며, 나머지 40%가 우리 수익입니다.</div>
       <div class="ta-dirty-banner" id="ta-dirty-banner"></div>
@@ -3848,7 +3852,7 @@ const I18N = {
     'page.demo-mgmt.title': '데이터 관리(데모)', 'page.demo-mgmt.bc': '개발 · 데모',
     'nav.op-policy': '운영 정책', 'page.op-policy.title': '운영 정책', 'page.op-policy.bc': '운영',
     'page.clawback.title': '환수 이력', 'page.clawback.bc': '티켓 · 보상',
-    'nav.ticket-accrual': '티켓 적립 관리', 'page.ticket-accrual.title': '티켓 적립 관리', 'page.ticket-accrual.bc': '티켓 · 보상',
+    'nav.ticket-accrual': '티켓 적립 설정', 'page.ticket-accrual.title': '티켓 적립 설정', 'page.ticket-accrual.bc': '티켓 · 보상',
     'nav.roulette-settings': '매일 행운 룰렛', 'page.roulette-settings.title': '매일 행운 룰렛', 'page.roulette-settings.bc': '티켓 · 보상',
     'nav.jackpot-roulette': '잭팟 룰렛', 'page.jackpot-roulette.title': '잭팟 룰렛', 'page.jackpot-roulette.bc': '티켓 · 보상',
     'nav.group.points': '포인트 관리',
@@ -4082,7 +4086,7 @@ function applyRole(role) {
 const PAGE_META = {
   dashboard:     { title:'대시보드',           bc:'개요' },
   members:       { title:'회원 목록',           bc:'회원 관리' },
-  'ticket-accrual': { title:'티켓 적립 관리',    bc:'티켓 · 보상' },
+  'ticket-accrual': { title:'티켓 적립 설정',    bc:'티켓 · 보상' },
   tickets:       { title:'티켓 내역',           bc:'티켓 · 보상' },
   'weekly-draws': { title:'주간 이벤트 추첨 관리', bc:'티켓 · 보상' },
   'roulette-settings': { title:'매일 행운 룰렛',      bc:'티켓 · 보상' },
@@ -5626,9 +5630,9 @@ Object.assign(KO2VI,{
   "저장에 실패했습니다.":"Lưu thất bại."
 });
 Object.assign(KO2VI,{"저장된 구성 기준":"Theo cấu hình đã lưu","저장 전 미리보기":"Xem trước khi lưu","미저장":"Chưa lưu","변경사항 저장":"Lưu thay đổi"});
-/* 티켓 적립 관리 */
+/* 티켓 적립 설정 */
 Object.assign(KO2VI,{
-  "티켓 적립 관리":"Quản lý tích lũy vé",
+  "티켓 적립 설정":"Cài đặt tích lũy vé",
   "제휴몰(링크프라이스)":"Cửa hàng liên kết (Linkprice)",
   "제휴몰별 적립률":"Tỷ lệ tích lũy theo cửa hàng",
   "제휴몰별로 사용자에게 돌려줄 적립률을 정합니다. 등급 환산은 큰 단위부터 채우는 기존 방식 그대로입니다.":"Đặt tỷ lệ tích lũy hoàn lại cho người dùng theo từng cửa hàng liên kết. Cách quy đổi sang hạng vé giữ nguyên như hiện tại — lấp từ đơn vị lớn trước.",
@@ -9594,12 +9598,19 @@ window.taSave = function() {
   if (c.bad) { toast('수수료는 0~100, 적립률은 0~20 사이 숫자로 입력하세요.'); return; }
   var btn = document.getElementById('ta-save-btn');
   if (btn) { btn.disabled = true; btn.textContent = '저장 중…'; }
-  db.collection('settings').doc('ticket_accrual').set({
-    rates: c.rates,
-    fees: c.fees,
-    approval: c.approval,
-    updated_at: FS.FieldValue.serverTimestamp(),
-  }, { merge: true }).then(function() {
+  var ref = db.collection('settings').doc('ticket_accrual');
+  // 저장 직전에 최신 문서를 다시 읽어 그 위에 얹는다(2026-08-11, 김반장 확정) — 다른
+  // 세션(ticket-value.html 등)이 같은 문서의 다른 코드를 그 사이에 고쳤을 수 있다.
+  // rates:c.rates 처럼 맵을 통째로 덮어쓰면 그 변경이 사라진다.
+  ref.get().then(function(doc) {
+    var data = (doc.exists && doc.data()) || {};
+    return ref.set({
+      rates: Object.assign({}, data.rates || {}, c.rates),
+      fees: Object.assign({}, data.fees || {}, c.fees),
+      approval: Object.assign({}, data.approval || {}, c.approval),
+      updated_at: FS.FieldValue.serverTimestamp(),
+    }, { merge: true });
+  }).then(function() {
     toast('제휴몰별 수수료·적립률·승인상태를 저장했습니다.');
     logAdmin('티켓 수수료·적립률·승인상태 수정');
     window.taLoad();
@@ -9621,11 +9632,18 @@ window.taSave = function() {
 window.taToggleApply = function(code, apply) {
   var c = taCollectFromDom();
   if (c.bad) { toast('수수료는 0~100, 적립률은 0~20 사이 숫자로 먼저 고친 뒤 다시 시도하세요.'); return; }
-  db.collection('settings').doc('ticket_accrual').get().then(function(doc) {
-    var applied = (doc.exists && doc.data().applied) || {};
+  var ref = db.collection('settings').doc('ticket_accrual');
+  // 저장 직전에 최신 문서를 다시 읽는다 — 다른 세션이 그 사이 고친 다른 코드의
+  // 값을 덮어쓰지 않기 위함(2026-08-11, 김반장 확정. taSave 와 같은 원칙).
+  ref.get().then(function(doc) {
+    var data = (doc.exists && doc.data()) || {};
+    var applied = Object.assign({}, data.applied || {});
     applied[code] = apply;
-    return db.collection('settings').doc('ticket_accrual').set({
-      rates: c.rates, fees: c.fees, approval: c.approval, applied: applied,
+    return ref.set({
+      rates: Object.assign({}, data.rates || {}, c.rates),
+      fees: Object.assign({}, data.fees || {}, c.fees),
+      approval: Object.assign({}, data.approval || {}, c.approval),
+      applied: applied,
       updated_at: FS.FieldValue.serverTimestamp(),
     }, { merge: true });
   }).then(function() {
