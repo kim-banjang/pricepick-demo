@@ -557,9 +557,8 @@ body.dark .sidebar.sb-mini .sb-item::after{background:#1F2937;}
     <div class="section" id="sec-ticket-value">
 
       <div class="info-box">
-        티켓 1장의 <strong>원화 환산가치</strong>를 정합니다. 이 값이 룰렛 보상 구성·기프티콘 교환 필요 티켓 수·포인트 교환 비율의 기준이 됩니다.
-        현재는 코드에 고정되어 있는 값을 운영자가 직접 조정할 수 있게 하는 화면입니다.<br>
-        <strong>이 화면은 UI 초안입니다.</strong> 저장을 눌러도 실제 서비스 값은 바뀌지 않습니다(연동 없음).
+        티켓 1장의 <strong>원화 환산가치</strong>를 정합니다. 이 값이 룰렛 잭팟 판정·포인트 교환 비율·등급 교환 비율의 기준이 됩니다.
+        저장하면 앱이 실제로 이 값을 읽어 씁니다.
       </div>
 
       <div class="tv-dirty-banner" id="tv-dirty-banner"></div>
@@ -723,7 +722,7 @@ body.dark .sidebar.sb-mini .sb-item::after{background:#1F2937;}
       </div>
 
       <div class="card" style="padding:14px 18px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-        <span style="font-size:13px;color:var(--text-2)">입력한 값은 <strong style="color:var(--text)">저장 버튼을 눌러야 적용됩니다.</strong> (현재는 연동 전 화면이라 실제 반영되지 않습니다)</span>
+        <span style="font-size:13px;color:var(--text-2)">입력한 값은 <strong style="color:var(--text)">저장 버튼을 눌러야 적용됩니다.</strong></span>
         <div style="margin-left:auto"><button class="btn btn-primary btn-sm" onclick="tvSave()">저장</button></div>
       </div>
 
@@ -731,6 +730,23 @@ body.dark .sidebar.sb-mini .sb-item::after{background:#1F2937;}
   </main>
 </div>
 
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script>
+(function() {
+'use strict';
+firebase.initializeApp({
+  apiKey: "AIzaSyCElUPJAitnMZxttVYjboV0j4s_qpErAgA",
+  authDomain: "pricepick-demo.firebaseapp.com",
+  projectId: "pricepick-demo",
+  storageBucket: "pricepick-demo.firebasestorage.app",
+  messagingSenderId: "505137396208",
+  appId: "1:505137396208:web:cea9d208c7745854e14535"
+});
+window.db = firebase.firestore();
+window.FS = firebase.firestore;
+})();
+</script>
 <script>
 /* ── 사이드바·테마 (index.html 동작 그대로) ── */
 function toggleGroup(id){ document.getElementById(id).classList.toggle('collapsed'); }
@@ -985,6 +1001,27 @@ function tvOnInput(anchorKey){
   tvRecalc();
 }
 
+/* settings/ticket_value 조회 — cms/index.html의 taLoad() 패턴 그대로.
+   문서가 없으면 화면에 이미 박혀 있는 현행값(100/1000/2000/40)을 그대로 쓴다. */
+function tvLoad(){
+  db.collection('settings').doc('ticket_value').get().then(function(doc){
+    const d = (doc.exists && doc.data()) || {};
+    TV_ALL_KEYS.forEach(function(k){
+      if(typeof d[k] !== 'number') return;
+      const el = tvEl(k);
+      el.value = d[k];
+      el.dataset.orig = d[k];
+      const cur = document.getElementById('tv-cur-' + k);
+      if(cur) cur.textContent = won(d[k]);
+    });
+    tvRecalc();
+  }).catch(function(e){
+    console.error('tvLoad', e);
+    tvRecalc();
+  });
+}
+
+/* 저장 — cms/index.html taSave()와 같은 방식: 직전 값을 다시 읽고 병합해서 쓴다(통째 덮어쓰기 금지). */
 function tvSave(){
   const invalid = TV_ALL_KEYS.map(tvRead).filter(r => !r.valid);
   if(invalid.length){
@@ -996,14 +1033,28 @@ function tvSave(){
     alert('변경된 값이 없습니다.');
     return;
   }
-  alert(
-    '저장 요청 (UI 초안 — 실제로는 아무 데도 반영되지 않습니다)\n\n' +
-    changed.map(r => '· ' + r.name + ': ' + won(r.orig) + ' → ' + won(r.value)).join('\n') +
-    '\n\n입력값과 변경 표시는 그대로 유지됩니다.'
-  );
+  const payload = {};
+  TV_ALL_KEYS.forEach(function(k){ payload[k] = tvRead(k).value; });
+  const btns = Array.prototype.slice.call(document.querySelectorAll('#sec-ticket-value button.btn-primary'));
+  btns.forEach(function(b){ b.disabled = true; b.textContent = '저장 중…'; });
+  const ref = db.collection('settings').doc('ticket_value');
+  ref.get().then(function(doc){
+    const data = (doc.exists && doc.data()) || {};
+    return ref.set(Object.assign({}, data, payload, { updated_at: FS.FieldValue.serverTimestamp() }), { merge: true });
+  }).then(function(){
+    alert(
+      '저장했습니다.\n\n' +
+      changed.map(r => '· ' + r.name + ': ' + won(r.orig) + ' → ' + won(r.value)).join('\n')
+    );
+    tvLoad();
+  }).catch(function(e){
+    alert('저장 실패: ' + (e.message || e));
+  }).finally(function(){
+    btns.forEach(function(b){ b.disabled = false; b.textContent = '저장'; });
+  });
 }
 
-tvRecalc();
+tvLoad();
 </script>
 </body>
 </html>
