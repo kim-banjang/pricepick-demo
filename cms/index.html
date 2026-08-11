@@ -294,6 +294,9 @@ tr:hover td{background:var(--surface-2);}
 #sec-ticket-accrual #ta-save-btn.ta-highlight{box-shadow:0 0 0 3px var(--warning-soft);}
 /* 링크프라이스 110개 — 표 헤더 고정, 머천트명 링크, 승인상태 배지 (2026-08-11 신설) */
 #ta-table-secondary thead th{position:sticky;top:0;background:var(--surface);z-index:1;}
+/* 선택 후 일괄 적용 — 선택 모드일 때만 체크박스 열을 보인다 (2026-08-11 신설) */
+#sec-ticket-accrual .ta-select-col{display:none;}
+#sec-ticket-accrual.ta-select-active .ta-select-col{display:table-cell;}
 .ta-name-link{background:none;border:none;padding:0;margin:0;font:inherit;font-weight:700;color:var(--main);cursor:pointer;text-decoration:underline;text-decoration-color:transparent;}
 .ta-name-link:hover{text-decoration-color:var(--main);}
 .ta-badge.ta-changed{box-shadow:0 0 0 2px var(--warning);}
@@ -1307,11 +1310,12 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
       <div class="ta-dirty-banner" id="ta-dirty-banner"></div>
 
       <div class="card" style="padding:14px 18px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+        <button class="btn btn-ghost btn-sm" id="ta-select-toggle-btn" onclick="taToggleSelectMode()">선택</button>
         <span style="font-size:13px;color:var(--text-2)">적립률 = 수수료 ×</span>
         <input class="form-input" type="number" id="ta-bulk-ratio" min="0" max="100" step="1" value="60" style="width:70px;text-align:right">
         <span style="font-size:13px;color:var(--text-2)">% 로</span>
-        <button class="btn btn-ghost btn-sm" onclick="taBulkApplyRatio()">일괄 적용</button>
-        <span style="font-size:12px;color:var(--text-3)">(대표 제휴몰 + 링크프라이스 전체. 저장 버튼을 눌러야 반영됩니다)</span>
+        <button class="btn btn-ghost btn-sm" id="ta-bulk-apply-btn" onclick="taBulkApplyRatio()">일괄 적용</button>
+        <span style="font-size:12px;color:var(--text-3)" id="ta-bulk-hint">「선택」을 눌러 몰을 체크한 뒤 일괄 적용하세요. 저장 버튼을 눌러야 반영됩니다.</span>
       </div>
 
       <div class="card">
@@ -1322,11 +1326,12 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
         <table id="ta-table-primary">
           <thead>
             <tr>
-              <th style="width:20%">제휴몰</th>
-              <th style="width:14%">수수료</th>
-              <th style="width:17%">적립률</th>
-              <th style="width:14%">수익</th>
-              <th style="width:35%">시뮬레이터</th>
+              <th class="ta-select-col" style="width:6%"></th>
+              <th style="width:18%">제휴몰</th>
+              <th style="width:13%">수수료</th>
+              <th style="width:16%">적립률</th>
+              <th style="width:13%">수익</th>
+              <th style="width:34%">시뮬레이터</th>
             </tr>
           </thead>
           <tbody id="ta-tbody-primary"></tbody>
@@ -1373,10 +1378,11 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
           <table id="ta-table-secondary">
             <thead>
               <tr>
-                <th style="width:23%">제휴몰</th>
-                <th style="width:11%">수수료</th>
-                <th style="width:14%">적립률</th>
-                <th style="width:11%">수익</th>
+                <th class="ta-select-col" style="width:5%"><input type="checkbox" id="ta-select-all" onchange="taToggleSelectAll(this.checked)" title="보이는 몰 전체 선택"></th>
+                <th style="width:21%">제휴몰</th>
+                <th style="width:10%">수수료</th>
+                <th style="width:13%">적립률</th>
+                <th style="width:10%">수익</th>
                 <th style="width:26%">시뮬레이터</th>
                 <th style="width:15%">적용</th>
               </tr>
@@ -9321,6 +9327,12 @@ var TA_ORIGINAL = {};   // { code: {fee, rate, status?} } — taLoad 가 매번 
 var TA_DIRTY_COUNT = 0;
 var TA_APPROVAL = {};   // { code: 현재(저장 전 포함) 승인 상태 } — 링크프라이스 몰만 채워진다
 
+// ── 선택 후 일괄 적용 (2026-08-11 신설) — 「무조건 전체」였던 걸 체크한 몰만으로
+// 제한한다. TA_SELECTED 는 taLoad() 가 다시 그려도(적용 토글 등) 유지된다 —
+// 선택 모드를 끄거나(taToggleSelectMode) 사용자가 직접 체크를 풀 때만 비운다.
+var TA_SELECT_MODE = false;
+var TA_SELECTED = {};   // { code: true }
+
 window.taHasUnsavedChanges = function() { return TA_DIRTY_COUNT > 0; };
 window.taResetDirty = function() { TA_DIRTY_COUNT = 0; }; // go() 가드에서 "그래도 나간다" 선택 시 사용
 
@@ -9398,7 +9410,7 @@ function taRenderRow(m, showHideCol) {
   // 추가한 몰(status 없음)은 24개 필드 원본이 없어 모달을 못 띄우니 이름만 표시한다.
   var isCatalogRow = showHideCol && typeof m.status === 'string';
   var nameCell = !showHideCol
-    ? '<td style="font-weight:700">' + taEsc(m.name) + '</td>'
+    ? '<td style="font-weight:700"><span class="ta-name-text">' + taEsc(m.name) + '</span></td>'
     : (!isCatalogRow
       ? '<td style="font-weight:700"><span class="ta-name-text">' + taEsc(m.name) + '</span></td>'
       : '<td data-category="' + taEsc(m.category || '') + '">'
@@ -9407,7 +9419,10 @@ function taRenderRow(m, showHideCol) {
         + '<span class="badge ' + taStatusBadgeClass(m.status) + ' ta-badge" id="ta-badge-' + m.code + '">' + taEsc(m.status) + '</span>'
         + '</td>');
   var dimStyle = (showHideCol && !m.isApplied) ? ' style="opacity:.5"' : '';
+  var selectCell = '<td class="ta-select-col"><input type="checkbox" class="ta-select-cb" data-code="' + m.code + '" onchange="taSelectionChanged()"'
+    + (TA_SELECTED[m.code] ? ' checked' : '') + '></td>';
   return '<tr data-code="' + m.code + '"' + (showHideCol ? ' data-applied="' + (m.isApplied ? '1' : '0') + '"' : '') + dimStyle + '>'
+    + selectCell
     + nameCell
     + '<td><span style="display:inline-flex;align-items:center;gap:6px">'
     +   '<input class="form-input ta-fee" type="number" min="0" max="100" step="0.1" value="' + m.fee + '" style="max-width:88px;text-align:right">%</span></td>'
@@ -9549,11 +9564,11 @@ window.taLoad = function(retryOpts) {
 
     tbodyPrimary.innerHTML = primary.length
       ? primary.map(function(m) { return taRenderRow(m, false); }).join('')
-      : ppEmpty(5, '대표 제휴몰이 없습니다.');
+      : ppEmpty(6, '대표 제휴몰이 없습니다.');
 
     tbodySecondary.innerHTML = secondary.length
       ? secondary.map(function(m) { return taRenderRow(m, true); }).join('')
-      : ppEmpty(6, catalogLoadFailed ? '카탈로그 데이터를 불러오지 못했습니다 — 새로고침 해주세요.' : '등록된 제휴몰이 없습니다.');
+      : ppEmpty(7, catalogLoadFailed ? '카탈로그 데이터를 불러오지 못했습니다 — 새로고침 해주세요.' : '등록된 제휴몰이 없습니다.');
 
     var allRows = document.querySelectorAll('#ta-tbody-primary tr[data-code], #ta-tbody-secondary tr[data-code]');
     Array.prototype.forEach.call(allRows, function(tr) {
@@ -9567,7 +9582,7 @@ window.taLoad = function(retryOpts) {
       : (res[1].exists ? '저장된 값 기준' : '아직 저장한 적이 없어 초기값 기준') + ' · 총 ' + secondaryAll.length + '개(표시 ' + secondary.length + '개)';
   }).catch(function(e) {
     console.error('taLoad', e);
-    tbodyPrimary.innerHTML = ppEmpty(5, '로드 오류');
+    tbodyPrimary.innerHTML = ppEmpty(6, '로드 오류');
     tbodySecondary.innerHTML = '';
     if (st) st.textContent = '';
   });
@@ -9625,13 +9640,61 @@ window.taToggleApply = function(code, apply) {
 // ── 「수수료의 N%로 일괄 적용」 (2026-08-11 신설) — 표 인풋만 다시 계산한다.
 // 저장은 별도(저장 버튼) — 여기서 db 를 안 건드리는 게 핵심이라, 취소해도(리로드)
 // 원래 저장된 값으로 돌아간다. 되돌릴 수 없는 일괄 덮어쓰기라 실행 전 확인을 받는다.
+// 선택 모드 on/off. 끌 때는 선택도 같이 비운다(다시 켜면 빈 상태로 시작) — 프리셋
+// 같은 건 초안 범위 밖(김반장 지시).
+window.taToggleSelectMode = function() {
+  TA_SELECT_MODE = !TA_SELECT_MODE;
+  if (!TA_SELECT_MODE) TA_SELECTED = {};
+  var sec = document.getElementById('sec-ticket-accrual');
+  if (sec) sec.classList.toggle('ta-select-active', TA_SELECT_MODE);
+  var btn = document.getElementById('ta-select-toggle-btn');
+  if (btn) btn.textContent = TA_SELECT_MODE ? '선택 취소' : '선택';
+  if (!TA_SELECT_MODE) {
+    Array.prototype.forEach.call(document.querySelectorAll('.ta-select-cb'), function(cb) { cb.checked = false; });
+    var allCb = document.getElementById('ta-select-all');
+    if (allCb) allCb.checked = false;
+  }
+  taUpdateBulkBtnLabel();
+};
+
+// 체크박스 하나가 바뀔 때마다 DOM 에서 다시 읽어 TA_SELECTED 를 갱신한다 —
+// 필터로 화면에서 사라진 행의 체크 상태는(DOM 에 남아 있으므로) 그대로 유지된다.
+window.taSelectionChanged = function() {
+  TA_SELECTED = {};
+  Array.prototype.forEach.call(document.querySelectorAll('.ta-select-cb:checked'), function(cb) {
+    TA_SELECTED[cb.dataset.code] = true;
+  });
+  taUpdateBulkBtnLabel();
+};
+
+// 「전체 선택」— 링크프라이스 표에서 지금 필터로 걸러져 화면에 안 보이는(display:none)
+// 행은 절대 건드리지 않는다. 이게 핵심이다(김반장 확정, 2026-08-11) — 카테고리 필터
+// 걸고 전체 선택하면 그 카테고리만 잡혀야 한다.
+window.taToggleSelectAll = function(checked) {
+  var rows = document.querySelectorAll('#ta-tbody-secondary tr[data-code]');
+  Array.prototype.forEach.call(rows, function(tr) {
+    if (tr.style.display === 'none') return;
+    var cb = tr.querySelector('.ta-select-cb');
+    if (cb) cb.checked = checked;
+  });
+  taSelectionChanged();
+};
+
+function taUpdateBulkBtnLabel() {
+  var btn = document.getElementById('ta-bulk-apply-btn');
+  var n = Object.keys(TA_SELECTED).length;
+  if (btn) btn.textContent = n > 0 ? '일괄 적용 (' + n + '개 선택)' : '일괄 적용';
+}
+
 window.taBulkApplyRatio = function() {
   var ratio = parseFloat((document.getElementById('ta-bulk-ratio') || {}).value);
   if (!isFinite(ratio) || ratio < 0 || ratio > 100) { toast('비율은 0~100 사이 숫자로 입력하세요.'); return; }
-  var rows = document.querySelectorAll('#ta-tbody-primary tr[data-code], #ta-tbody-secondary tr[data-code]');
-  if (!rows.length) return;
-  if (!confirm(rows.length + '개 제휴몰의 적립률을 모두 수수료 × ' + ratio + '% 로 다시 계산해 덮어씁니다. 계속할까요?')) return;
-  Array.prototype.forEach.call(rows, function(tr) {
+  var codes = Object.keys(TA_SELECTED);
+  if (!codes.length) { toast('선택된 몰이 없습니다. 「선택」을 눌러 몰을 체크하세요.'); return; }
+  if (!confirm('선택한 ' + codes.length + '개 몰의 적립률을 덮어씁니다. 계속할까요?')) return;
+  codes.forEach(function(code) {
+    var tr = document.querySelector('#ta-tbody-primary tr[data-code="' + code + '"], #ta-tbody-secondary tr[data-code="' + code + '"]');
+    if (!tr) return;
     var feeEl = tr.querySelector('.ta-fee');
     var rateEl = tr.querySelector('.ta-rate');
     var fee = parseFloat(feeEl.value);
@@ -9639,7 +9702,7 @@ window.taBulkApplyRatio = function() {
     rateEl.value = taDefaultRate(fee, ratio);
     taRowRefresh(tr);
   });
-  toast('적립률을 수수료 × ' + ratio + '% 로 다시 계산했습니다. 저장 버튼을 눌러야 반영됩니다.');
+  toast('선택한 ' + codes.length + '개 몰의 적립률을 수수료 × ' + ratio + '% 로 다시 계산했습니다. 저장 버튼을 눌러야 반영됩니다.');
 };
 
 // ── 링크프라이스 카탈로그 필터(카테고리/승인상태) + 검색 (2026-08-11 신설)
