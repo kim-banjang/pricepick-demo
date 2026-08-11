@@ -1368,7 +1368,6 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
         <div class="card-header" style="flex-wrap:wrap;gap:10px;align-items:flex-start">
           <div class="card-title" style="padding-top:6px">제휴몰(링크프라이스)</div>
           <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end">
-            <input class="form-input" type="text" id="ta-filter-search" placeholder="머천트명 검색" style="width:140px" oninput="taApplyFilters()">
             <select class="form-input" id="ta-filter-category" style="width:120px" onchange="taApplyFilters()">
               <option value="">카테고리 전체</option>
               <option value="가전/디지털/IT">가전/디지털/IT</option>
@@ -9856,22 +9855,18 @@ window.taBulkApplyRatio = function() {
 // ── 링크프라이스 카탈로그 필터(카테고리/승인상태) + 검색 (2026-08-11 신설)
 // Firestore 재조회 없이 이미 그려진 행을 보이기/숨기기만 한다.
 window.taApplyFilters = function() {
-  var q = ((document.getElementById('ta-filter-search') || {}).value || '').trim().toLowerCase();
   var cat = (document.getElementById('ta-filter-category') || {}).value || '';
   var status = (document.getElementById('ta-filter-status') || {}).value || '';
   var applied = (document.getElementById('ta-filter-applied') || {}).value || '';
   var rows = document.querySelectorAll('#ta-tbody-secondary tr[data-code]');
   Array.prototype.forEach.call(rows, function(tr) {
     var code = tr.dataset.code;
-    var nameEl = tr.querySelector('.ta-name-text');
-    var name = nameEl ? nameEl.textContent : '';
     var catCell = tr.querySelector('td[data-category]');
     var rowCat = catCell ? catCell.dataset.category : '';
-    var okName = !q || name.toLowerCase().indexOf(q) !== -1;
     var okCat = !cat || rowCat === cat;
     var okStatus = !status || TA_APPROVAL[code] === status;
     var okApplied = !applied || (TA_APPLIED[code] ? '1' : '0') === applied;
-    tr.style.display = (okName && okCat && okStatus && okApplied) ? '' : 'none';
+    tr.style.display = (okCat && okStatus && okApplied) ? '' : 'none';
   });
 };
 
