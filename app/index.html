@@ -19896,6 +19896,10 @@ function ppApplyTicketValue(v) {
     if (v.bronze > 0) PT_TICKET_RATE.bronze = Math.round(v.bronze * perWon);
     if (v.silver > 0) PT_TICKET_RATE.silver = Math.round(v.silver * perWon);
     if (v.gold > 0) PT_TICKET_RATE.gold = Math.round(v.gold * perWon);
+    // pw-22 포인트 교환 탭이 이 값을 로드 완료 전에 먼저 그렸을 수 있어 다시 그린다
+    // (컨테이너가 화면에 없어도 함수 자체는 null 가드 후 조용히 리턴하므로 항상 호출해도 안전).
+    if (typeof renderPtRateRows === 'function') renderPtRateRows();
+    if (typeof renderPointTicketExchange === 'function') renderPointTicketExchange();
   });
 
   // 등급 교환(pw-22) 표시 비율 — 정수 배수일 때만 갱신(비정수면 기존 하드코딩 비율 유지)
@@ -19922,6 +19926,8 @@ function ppApplyTicketValue(v) {
     _swapState.ratioFrom = parseInt(activeBtn.dataset.ratioFrom, 10) || _swapState.ratioFrom;
     _swapState.ratioTo = parseInt(activeBtn.dataset.ratioTo, 10) || _swapState.ratioTo;
   }
+  // 등급 교환 화면도 첫 렌더가 로드 완료 전에 끝났을 수 있어 다시 그린다(같은 이유).
+  if (typeof renderGradeSwapScreen === 'function') renderGradeSwapScreen();
 }
 function ppSwapAllowed(from, to) {
   if (!from || !to || from === to) return false;
