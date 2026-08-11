@@ -9145,7 +9145,13 @@ window.taLoad = function() {
         fee: typeof d.commission_rate === 'number' ? d.commission_rate * 100 : 0,
         rate: typeof saved[doc.id] === 'number' ? saved[doc.id] : TA_DEFAULT_RATE,
       };
-    }).sort(function(a, b) { return a.name.localeCompare(b.name, 'ko'); });
+    }).sort(function(a, b) {
+      // 쿠팡은 대표 제휴몰이라 항상 맨 위로 고정한다(김반장 확정, 2026-08-11).
+      // 나머지는 기존 그대로 한글 이름 정렬.
+      if (a.code === 'coupang') return -1;
+      if (b.code === 'coupang') return 1;
+      return a.name.localeCompare(b.name, 'ko');
+    });
 
     if (!malls.length) { tbody.innerHTML = ppEmpty(5, '등록된 제휴몰이 없습니다.'); if (st) st.textContent = ''; return; }
 
