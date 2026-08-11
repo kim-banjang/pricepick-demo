@@ -9103,6 +9103,12 @@ var TA_UNITS = [                                           // ticket_grades 시�
 ];
 var TA_PREVIEW_KRW = 100000;
 
+// commission_rate(예: 0.035)에 *100 을 하면 부동소수점 오차로 3.5000000000000004
+// 같은 값이 그대로 입력칸에 찍힌다(2026-08-11 실측). 소수 둘째 자리로 반올림해서
+// 없앤다 — 정수는 3.0 이 아니라 3으로, 3.5 는 3.5 로 그대로 남는다(표시만 손봄,
+// 저장·계산 값은 그대로).
+function taFmt(n) { return Math.round(n * 100) / 100; }
+
 function taGreedy(amountKrw, ratePct) {
   var budget = Math.floor(amountKrw * ratePct / 100);
   var parts = [];
@@ -9141,12 +9147,12 @@ window.taLoad = function() {
     var savedFees = (res[1].exists && res[1].data().fees) || {};
     var malls = res[0].docs.map(function(doc) {
       var d = doc.data();
-      var defaultFee = typeof d.commission_rate === 'number' ? d.commission_rate * 100 : 0;
+      var defaultFee = typeof d.commission_rate === 'number' ? taFmt(d.commission_rate * 100) : 0;
       return {
         code: doc.id,
         name: d.name || doc.id,
-        fee: typeof savedFees[doc.id] === 'number' ? savedFees[doc.id] : defaultFee,
-        rate: typeof saved[doc.id] === 'number' ? saved[doc.id] : TA_DEFAULT_RATE,
+        fee: typeof savedFees[doc.id] === 'number' ? taFmt(savedFees[doc.id]) : defaultFee,
+        rate: typeof saved[doc.id] === 'number' ? taFmt(saved[doc.id]) : TA_DEFAULT_RATE,
       };
     }).sort(function(a, b) {
       // 쿠팡은 대표 제휴몰이라 항상 맨 위로 고정한다(김반장 확정, 2026-08-11).
