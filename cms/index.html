@@ -1309,7 +1309,7 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
               <th style="width:20%">제휴몰</th>
               <th style="width:14%">수수료</th>
               <th style="width:17%">적립률</th>
-              <th style="width:14%">남는 몫</th>
+              <th style="width:14%">수익</th>
               <th style="width:35%">시뮬레이터</th>
             </tr>
           </thead>
@@ -1333,7 +1333,7 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
               <th style="width:18%">제휴몰</th>
               <th style="width:12%">수수료</th>
               <th style="width:15%">적립률</th>
-              <th style="width:12%">남는 몫</th>
+              <th style="width:12%">수익</th>
               <th style="width:28%">시뮬레이터</th>
               <th style="width:15%">숨김</th>
             </tr>
@@ -3192,10 +3192,10 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
         <button type="button" class="btn btn-ghost btn-sm" onclick="taSimSetAmount(500000)">50만</button>
       </div>
       <div class="card" style="margin-bottom:0">
-        <div class="policy-item"><div class="policy-label">적립액</div><div class="policy-value" id="ta-sim-earn">—</div></div>
+        <div class="policy-item"><div class="policy-label">매출(수수료)</div><div class="policy-value" id="ta-sim-revenue">—</div></div>
+        <div class="policy-item"><div class="policy-label">적립 비용(지급액)</div><div class="policy-value" id="ta-sim-earn">—</div></div>
         <div class="policy-item"><div class="policy-label">티켓 구성</div><div class="policy-value" id="ta-sim-tickets">—</div></div>
-        <div class="policy-item"><div class="policy-label">우리 수입</div><div class="policy-value" id="ta-sim-revenue">—</div></div>
-        <div class="policy-item"><div class="policy-label">남는 몫</div><div class="policy-value" id="ta-sim-margin">—</div></div>
+        <div class="policy-item"><div class="policy-label">수익(매출-적립)</div><div class="policy-value" id="ta-sim-margin">—</div></div>
       </div>
     </div>
     <div class="modal-footer">
@@ -5568,13 +5568,14 @@ Object.assign(KO2VI,{
   "제휴몰별로 사용자에게 돌려줄 적립률을 정합니다. 등급 환산은 큰 단위부터 채우는 기존 방식 그대로입니다.":"Đặt tỷ lệ tích lũy hoàn lại cho người dùng theo từng cửa hàng liên kết. Cách quy đổi sang hạng vé giữ nguyên như hiện tại — lấp từ đơn vị lớn trước.",
   "수수료":"Hoa hồng",
   "적립률":"Tỷ lệ tích lũy",
-  "남는 몫":"Phần còn lại",
+  "수익":"Lợi nhuận",
   "시뮬레이터":"Mô phỏng",
   "적립 시뮬레이터":"Mô phỏng tích lũy",
   "구매 금액":"Số tiền mua",
-  "적립액":"Số tiền tích lũy",
+  "적립 비용(지급액)":"Chi phí tích lũy (số tiền chi trả)",
   "티켓 구성":"Cấu thành vé",
-  "우리 수입":"Doanh thu của chúng tôi",
+  "매출(수수료)":"Doanh thu (hoa hồng)",
+  "수익(매출-적립)":"Lợi nhuận (doanh thu - tích lũy)",
   "5만":"50 nghìn",
   "10만":"100 nghìn",
   "30만":"300 nghìn",
@@ -9521,14 +9522,14 @@ window.taSimRefresh = function() {
   var margin = revenue - earn;
 
   var earnEl = document.getElementById('ta-sim-earn');
-  if (earnEl) earnEl.textContent = earn.toLocaleString() + '원';
+  if (earnEl) earnEl.textContent = earn.toLocaleString() + '원 (' + taFmt(rate) + '%)';
   var tkEl = document.getElementById('ta-sim-tickets');
   if (tkEl) tkEl.innerHTML = taGreedy(amount, rate);
   var revEl = document.getElementById('ta-sim-revenue');
-  if (revEl) revEl.textContent = revenue.toLocaleString() + '원';
+  if (revEl) revEl.textContent = revenue.toLocaleString() + '원 (' + taFmt(fee) + '%)';
   var mEl = document.getElementById('ta-sim-margin');
   if (mEl) {
-    mEl.textContent = (margin < 0 ? '-' : '') + Math.abs(margin).toLocaleString() + '원';
+    mEl.textContent = (margin < 0 ? '-' : '') + Math.abs(margin).toLocaleString() + '원 (' + taFmt(fee - rate) + '%p)';
     mEl.style.color = margin < 0 ? 'var(--danger)' : 'var(--text)';
   }
 };
