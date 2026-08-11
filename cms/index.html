@@ -1287,7 +1287,7 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
 
     <!-- ── 티켓 적립 관리 ── -->
     <div class="section" id="sec-ticket-accrual">
-      <div class="info-box">제휴몰별로 사용자에게 돌려줄 적립률을 정합니다. 등급 환산은 큰 단위부터 채우는 기존 방식 그대로입니다.</div>
+      <div class="info-box">제휴몰별 수수료와 사용자에게 돌려줄 적립률을 정합니다(계약이 바뀌면 수수료도 여기서 바로 반영). 등급 환산은 큰 단위부터 채우는 기존 방식 그대로입니다.</div>
       <div class="card">
         <div class="card-header">
           <div class="card-title">제휴몰별 적립률</div>
@@ -9118,7 +9118,8 @@ function taGreedy(amountKrw, ratePct) {
 }
 
 function taRowRefresh(tr) {
-  var fee = parseFloat(tr.dataset.fee) || 0;
+  var fee = parseFloat((tr.querySelector('.ta-fee') || {}).value);
+  if (!isFinite(fee) || fee < 0) fee = 0;
   var rate = parseFloat((tr.querySelector('.ta-rate') || {}).value);
   if (!isFinite(rate) || rate < 0) rate = 0;
   var margin = fee - rate;
@@ -9137,12 +9138,14 @@ window.taLoad = function() {
     db.collection('settings').doc('ticket_accrual').get(),
   ]).then(function(res) {
     var saved = (res[1].exists && res[1].data().rates) || {};
+    var savedFees = (res[1].exists && res[1].data().fees) || {};
     var malls = res[0].docs.map(function(doc) {
       var d = doc.data();
+      var defaultFee = typeof d.commission_rate === 'number' ? d.commission_rate * 100 : 0;
       return {
         code: doc.id,
         name: d.name || doc.id,
-        fee: typeof d.commission_rate === 'number' ? d.commission_rate * 100 : 0,
+        fee: typeof savedFees[doc.id] === 'number' ? savedFees[doc.id] : defaultFee,
         rate: typeof saved[doc.id] === 'number' ? saved[doc.id] : TA_DEFAULT_RATE,
       };
     }).sort(function(a, b) {
@@ -9156,9 +9159,10 @@ window.taLoad = function() {
     if (!malls.length) { tbody.innerHTML = ppEmpty(5, '등록된 제휴몰이 없습니다.'); if (st) st.textContent = ''; return; }
 
     tbody.innerHTML = malls.map(function(m) {
-      return '<tr data-code="' + m.code + '" data-fee="' + m.fee + '">'
+      return '<tr data-code="' + m.code + '">'
         + '<td style="font-weight:700">' + m.name + '</td>'
-        + '<td>' + m.fee.toFixed(2) + '%</td>'
+        + '<td><span style="display:inline-flex;align-items:center;gap:6px">'
+        +   '<input class="form-input ta-fee" type="number" min="0" max="100" step="0.1" value="' + m.fee + '" style="max-width:88px;text-align:right">%</span></td>'
         + '<td><span style="display:inline-flex;align-items:center;gap:6px">'
         +   '<input class="form-input ta-rate" type="number" min="0" max="20" step="0.1" value="' + m.rate + '" style="max-width:88px;text-align:right">%</span></td>'
         + '<td class="ta-margin">—</td>'
@@ -9166,6 +9170,7 @@ window.taLoad = function() {
     }).join('');
 
     Array.prototype.forEach.call(tbody.querySelectorAll('tr[data-code]'), function(tr) {
+      tr.querySelector('.ta-fee').addEventListener('input', function() { taRowRefresh(tr); });
       tr.querySelector('.ta-rate').addEventListener('input', function() { taRowRefresh(tr); });
       taRowRefresh(tr);
     });
@@ -9180,21 +9185,26 @@ window.taLoad = function() {
 window.taSave = function() {
   var rows = document.querySelectorAll('#ta-tbody tr[data-code]');
   if (!rows.length) return;
-  var rates = {}, bad = false;
+  var rates = {}, fees = {}, bad = false;
   Array.prototype.forEach.call(rows, function(tr) {
+    var code = tr.dataset.code;
     var v = parseFloat(tr.querySelector('.ta-rate').value);
     if (!isFinite(v) || v < 0 || v > 20) { bad = true; return; }
-    rates[tr.dataset.code] = Math.round(v * 100) / 100;
+    rates[code] = Math.round(v * 100) / 100;
+    var f = parseFloat(tr.querySelector('.ta-fee').value);
+    if (!isFinite(f) || f < 0 || f > 100) { bad = true; return; }
+    fees[code] = Math.round(f * 100) / 100;
   });
-  if (bad) { toast('적립률은 0에서 20 사이 숫자로 입력하세요.'); return; }
+  if (bad) { toast('수수료는 0~100, 적립률은 0~20 사이 숫자로 입력하세요.'); return; }
   var btn = document.getElementById('ta-save-btn');
   if (btn) { btn.disabled = true; btn.textContent = '저장 중…'; }
   db.collection('settings').doc('ticket_accrual').set({
     rates: rates,
+    fees: fees,
     updated_at: FS.FieldValue.serverTimestamp(),
   }, { merge: true }).then(function() {
-    toast('제휴몰별 적립률을 저장했습니다.');
-    logAdmin('티켓 적립률 수정');
+    toast('제휴몰별 수수료·적립률을 저장했습니다.');
+    logAdmin('티켓 수수료·적립률 수정');
     window.taLoad();
   }).catch(function(e) {
     toast('저장 실패: ' + (e.message || e));
