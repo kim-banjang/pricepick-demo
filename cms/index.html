@@ -12662,6 +12662,7 @@ window.rltSave = function(k) {
     rltSetDirty(k, false);
     rltSetStatus(k, '저장 완료 — 슬롯 ' + rltState[k].slots.length + '개 · 확률 합계 100% · 1회 기대값 ' + rltFmt(rltTotalEv(k)) + '원.');
     toast(kind.name + ' 구성을 저장했습니다.');
+    logAdmin(kind.name + ' 구성 저장');
   }).catch(function(e) {
     console.error('rltSave', e);
     if (btn) { btn.disabled = false; btn.textContent = '저장'; }
