@@ -2548,7 +2548,7 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
             <strong>포인트 → 티켓 교환은 단방향 · 등가 · 수수료 없음</strong> — 브론즈 1,000P / 실버 10,000P / 골드 20,000P로 포인트를 티켓으로 바꿀 수 있습니다. <strong>티켓 → 포인트 역방향은 2026-08 확정으로 중단</strong>했습니다 — 앱에서는 숨김 처리만 했을 뿐 로직·데이터는 그대로라 필요 시 복구할 수 있습니다.
           </div>
           <div class="info-box" style="margin-bottom:16px;border-color:#f2ddb4;background:#fdf3e2;color:#8a5a12">
-            <strong>이벤트 티켓은 단방향 전환만</strong> — <strong>이벤트 티켓 5장 → 브론즈 티켓 1장</strong>은 허용하지만, <strong>브론즈 → 이벤트 티켓 역방향은 금지</strong>합니다. 브론즈 1장(100원)을 이벤트 5장으로 되돌리면 잭팟 룰렛 5회(1회 기대값 40원 = 200원)로 가치가 2배 증식되기 때문입니다. 앱에도 역방향 전환 기능이 없으며, 전환 실행 로직의 허용 방향 화이트리스트에서 차단됩니다(UI 우회 불가).
+            <strong>이벤트 티켓은 단방향 전환만</strong> — <strong>이벤트 티켓 5장 → 실버 티켓 1장</strong>은 허용하지만, <strong>실버 → 이벤트 티켓 역방향은 금지</strong>합니다. 실버 1장(100원)을 이벤트 5장으로 되돌리면 잭팟 룰렛 5회(1회 기대값 40원 = 200원)로 가치가 2배 증식되기 때문입니다. 앱에도 역방향 전환 기능이 없으며, 전환 실행 로직의 허용 방향 화이트리스트에서 차단됩니다(UI 우회 불가). (2026-08-12: 티켓 가치 1/10 반영으로 교환 대상이 브론즈→실버로 변경. 비율 5:1은 그대로.)
           </div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
             <div style="background:var(--surface-2);border:1px solid var(--border);border-radius:10px;padding:16px">
@@ -5849,10 +5849,10 @@ Object.assign(KO2VI,{
   "포인트 ↔ 티켓 교환은 양방향 · 등가 · 수수료 없음 (의도된 설계)":"Đổi Điểm ↔ Vé là hai chiều · ngang giá · không phí (thiết kế có chủ đích)",
   "무한 왕복이 가능합니다.":"có thể đổi qua đổi lại vô hạn.",
   "이벤트 티켓은 단방향 전환만":"Vé sự kiện chỉ chuyển đổi một chiều",
-  "이벤트 티켓 5장 → 브론즈 티켓 1장":"5 vé sự kiện → 1 vé Đồng",
-  "브론즈 → 이벤트 티켓 역방향은 금지":"Cấm chiều ngược lại Đồng → vé sự kiện",
+  "이벤트 티켓 5장 → 실버 티켓 1장":"5 vé sự kiện → 1 vé Bạc",
+  "실버 → 이벤트 티켓 역방향은 금지":"Cấm chiều ngược lại Bạc → vé sự kiện",
   "은 허용하지만, ":" được phép, nhưng ",
-  "합니다. 브론즈 1장(100원)을 이벤트 5장으로 되돌리면 잭팟 룰렛 5회(1회 기대값 40원 = 200원)로 가치가 2배 증식되기 때문입니다. 앱에도 역방향 전환 기능이 없으며, 전환 실행 로직의 허용 방향 화이트리스트에서 차단됩니다(UI 우회 불가).":". Lý do: đổi ngược 1 vé Đồng (100 KRW) thành 5 vé sự kiện sẽ thành 5 lượt Vòng quay Jackpot (kỳ vọng 40 KRW/lượt = 200 KRW), giá trị tăng gấp đôi. App cũng không có chức năng chuyển đổi chiều ngược, và bị chặn bởi danh sách chiều được phép trong logic thực thi (không thể lách qua UI).",
+  "합니다. 실버 1장(100원)을 이벤트 5장으로 되돌리면 잭팟 룰렛 5회(1회 기대값 40원 = 200원)로 가치가 2배 증식되기 때문입니다. 앱에도 역방향 전환 기능이 없으며, 전환 실행 로직의 허용 방향 화이트리스트에서 차단됩니다(UI 우회 불가). (2026-08-12: 티켓 가치 1/10 반영으로 교환 대상이 브론즈→실버로 변경. 비율 5:1은 그대로.)":". Lý do: đổi ngược 1 vé Bạc (100 KRW) thành 5 vé sự kiện sẽ thành 5 lượt Vòng quay Jackpot (kỳ vọng 40 KRW/lượt = 200 KRW), giá trị tăng gấp đôi. App cũng không có chức năng chuyển đổi chiều ngược, và bị chặn bởi danh sách chiều được phép trong logic thực thi (không thể lách qua UI). (2026-08-12: Sau khi giá trị vé giảm còn 1/10, đối tượng đổi chuyển từ Đồng sang Bạc. Tỷ lệ 5:1 giữ nguyên.)",
   "룰렛 실행 로그":"Log lượt quay",
   "닉네임 / 카카오톡 ID":"Biệt danh / Kakao ID",
   "룰렛 종류":"Loại vòng quay",
