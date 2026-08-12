@@ -6103,16 +6103,16 @@ function recompNet(){
   setKpi('kpi-net', kpiWon(window.__ppCommission + window.__ppGifticonRev - window.__ppTicketCost));
 }
 function loadDashboardStats() {
-  var GRADE_VAL = { bronze:100, silver:1000, gold:2000 };
   /* 전체 회원 */
   db.collection('users').get().then(function(snap) {
     setKpi('kpi-users', snap.size.toLocaleString('ko-KR'));
   }).catch(function(){});
-  /* 발행 티켓(누적 적립) + 티켓 적립 비용 */
-  db.collection('ticket_transactions').where('type','==','earn').get().then(function(snap) {
+  /* 발행 티켓(누적 적립) + 티켓 적립 비용 — settings/ticket_value 반영(2026-08-12) */
+  Promise.all([taLoadTicketValue(), db.collection('ticket_transactions').where('type','==','earn').get()]).then(function(res) {
+    var snap = res[1];
     setKpi('kpi-tickets', snap.size.toLocaleString('ko-KR'));
     var cost = 0;
-    snap.docs.forEach(function(d){ cost += (GRADE_VAL[d.data().ticket_grade]||0); });
+    snap.docs.forEach(function(d){ cost += (TA_TICKET_VALUE[d.data().ticket_grade]||0); });
     setKpi('kpi-ticket-cost', kpiWon(cost));
     window.__ppTicketCost = cost; recompNet();
   }).catch(function(){});
@@ -9344,6 +9344,39 @@ var TA_UNITS = [                                           // ticket_grades 시�
 ];
 var TA_PREVIEW_KRW = 100000;
 
+/* settings/ticket_value 조회 — 「티켓 가치 설정」에서 저장한 값이 실제로 쓰이는 자리들
+   (2026-08-12 신설, 「1/10로 저장했는데 적립 설정에 반영이 안 된다」 긴급 보고로 추가).
+   문서가 없거나 조회 실패 시 지금까지 코드에 박혀 있던 값을 그대로 기본값으로 쓴다.
+   로드되면 TA_UNITS·RLT_REWARD_TYPES를 같은 객체 참조를 유지한 채 그 자리에서 갱신한다 —
+   이미 다른 곳에서 이 배열/객체를 들고 있어도(참조) 새로 만들 필요 없이 값만 바뀐다. */
+var TA_TICKET_VALUE = { bronze: 100, silver: 1000, gold: 2000, event: 40 };
+var TA_TICKET_VALUE_CACHE = null;
+function taLoadTicketValue() {
+  if (TA_TICKET_VALUE_CACHE) return TA_TICKET_VALUE_CACHE;
+  TA_TICKET_VALUE_CACHE = db.collection('settings').doc('ticket_value').get().then(function(doc) {
+    var d = (doc.exists && doc.data()) || {};
+    if (typeof d.bronze === 'number') TA_TICKET_VALUE.bronze = d.bronze;
+    if (typeof d.silver === 'number') TA_TICKET_VALUE.silver = d.silver;
+    if (typeof d.gold === 'number') TA_TICKET_VALUE.gold = d.gold;
+    if (typeof d.event === 'number') TA_TICKET_VALUE.event = d.event;
+    TA_UNITS[0].value = TA_TICKET_VALUE.gold;
+    TA_UNITS[1].value = TA_TICKET_VALUE.silver;
+    TA_UNITS[2].value = TA_TICKET_VALUE.bronze;
+    if (typeof RLT_REWARD_TYPES !== 'undefined') {
+      RLT_REWARD_TYPES.bronze_ticket.unitValue = TA_TICKET_VALUE.bronze;
+      RLT_REWARD_TYPES.silver_ticket.unitValue = TA_TICKET_VALUE.silver;
+      RLT_REWARD_TYPES.gold_ticket.unitValue = TA_TICKET_VALUE.gold;
+      RLT_REWARD_TYPES.event_ticket.unitValue = TA_TICKET_VALUE.event;
+    }
+    return TA_TICKET_VALUE;
+  }).catch(function(e) {
+    console.error('taLoadTicketValue', e);
+    return TA_TICKET_VALUE;
+  });
+  return TA_TICKET_VALUE_CACHE;
+}
+taLoadTicketValue();
+
 // commission_rate(예: 0.035)에 *100 을 하면 부동소수점 오차로 3.5000000000000004
 // 같은 값이 그대로 입력칸에 찍힌다(2026-08-11 실측). 소수 둘째 자리로 반올림해서
 // 없앤다 — 정수는 3.0 이 아니라 3으로, 3.5 는 3.5 로 그대로 남는다(표시만 손봄,
@@ -10029,6 +10062,7 @@ window.taOpenSim = function(code) {
   if (amtEl) amtEl.value = TA_PREVIEW_KRW.toLocaleString();
   taSimRefresh();
   openModal('m-ta-sim');
+  taLoadTicketValue().then(taSimRefresh);   // 티켓 가치 로드가 늦게 끝났을 수 있어 다시 계산
 };
 
 // 구매 금액 입력칸은 text — 시안처럼 천단위 콤마를 보여주려고(number 인풋은 콤마를
@@ -10156,14 +10190,15 @@ window.revGiApplyFilters = function() {
 
 /* ── sec-stats / sec-revenue / sec-settlement ── computed from real data */
 function loadRevenueStats() {
-  var GRADE_VAL = { bronze:100, silver:1000, gold:2000 };
   function setTxt(id, t){ var e=document.getElementById(id); if(e) e.textContent=t; }
   Promise.all([
     db.collection('postbacks').get(),
     db.collection('gifticon_exchanges').get(),
-    db.collection('ticket_transactions').where('type','==','earn').get()
+    db.collection('ticket_transactions').where('type','==','earn').get(),
+    taLoadTicketValue()   // settings/ticket_value 반영(2026-08-12)
   ]).then(function(res) {
     var pbSnap = res[0], giSnap = res[1], tkSnap = res[2];
+    var GRADE_VAL = res[3];
     var byMall = {}, totalGMV = 0, totalCommission = 0, totalSettled = 0;
     var D30 = 30 * 24 * 60 * 60 * 1000;
     var nowMs = Date.now();
@@ -12073,7 +12108,8 @@ window.rltLoad = function(k) {
   var kind = RLT_KINDS[k];
   rltRenderSlots(k);
   rltSetStatus(k, '불러오는 중…');
-  db.collection('settings').doc(kind.doc).get().then(function(doc) {
+  Promise.all([taLoadTicketValue(), db.collection('settings').doc(kind.doc).get()]).then(function(res) {
+    var doc = res[1];
     var data = doc.exists ? doc.data() : null;
     if (data && Array.isArray(data.slots) && data.slots.length >= 2) {
       rltState[k].slots = data.slots.map(rltNormalizeSlot);
