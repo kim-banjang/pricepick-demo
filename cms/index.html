@@ -9181,6 +9181,7 @@ function logAdmin(action) {
     });
   } catch (e) { console.error('logAdmin', e); }
 }
+window.logAdmin = logAdmin; // giSaveTicketEdit(더 이른 별도 script 블록)이 참조 — window.db/FS와 같은 이유로 노출
 
 /* ── sec-abuse ── 어뷰징·이상적립 모니터링 (postbacks/users/ticket_transactions 집계) */
 function loadAbuse() {
