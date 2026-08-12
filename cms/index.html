@@ -3791,6 +3791,10 @@ document.addEventListener('DOMContentLoaded', applyTicketIcons);
 let currentRole = 'superadmin';
 
 // ── 티켓 시뮬레이터 (Greedy 알고리즘) ──
+// ⚠️ 정책 문서 문구·표(등급별 적립 기준)는 그대로 두고, 이 실계산 위젯만
+// settings/ticket_value를 따라가게 한다(2026-08-12, 정책 확정 전 구현용 —
+// 확정은 김반장·이부장 상의 후). 기준 배수(×50)는 기존 정책값(브론즈 100원↔5,000원)에서 그대로 가져왔다.
+const TK_ACCRUAL_MULT = 50;
 function tkSimulate() {
   const input = document.getElementById('tk-sim-input');
   const result = document.getElementById('tk-sim-result');
@@ -3798,18 +3802,20 @@ function tkSimulate() {
   let amount = parseInt(input.value) || 0;
   if (amount < 1) { result.style.display = 'none'; return; }
   const orig = amount;
-  const gold   = Math.floor(amount / 100000); amount -= gold * 100000;
-  const silver = Math.floor(amount / 50000);  amount -= silver * 50000;
-  const bronze = Math.floor(amount / 5000);   amount -= bronze * 5000;
+  const v = (typeof TA_TICKET_VALUE !== 'undefined') ? TA_TICKET_VALUE : { bronze:100, silver:1000, gold:2000 };
+  const goldUnit = v.gold * TK_ACCRUAL_MULT, silverUnit = v.silver * TK_ACCRUAL_MULT, bronzeUnit = v.bronze * TK_ACCRUAL_MULT;
+  const gold   = Math.floor(amount / goldUnit);   amount -= gold * goldUnit;
+  const silver = Math.floor(amount / silverUnit); amount -= silver * silverUnit;
+  const bronze = Math.floor(amount / bronzeUnit); amount -= bronze * bronzeUnit;
   const remainder = amount;
-  const reward = gold * 2000 + silver * 1000 + bronze * 100;
+  const reward = gold * v.gold + silver * v.silver + bronze * v.bronze;
   const rate = orig > 0 ? (reward / orig * 100).toFixed(2) : '0.00';
 
   let html = '';
   if (gold > 0)   html += `<span class="tk-gold" style="margin-right:6px">골드 ${gold}장</span>`;
   if (silver > 0) html += `<span class="tk-silver" style="margin-right:6px">실버 ${silver}장</span>`;
   if (bronze > 0) html += `<span class="tk-bronze" style="margin-right:6px">브론즈 ${bronze}장</span>`;
-  if (!html)      html = '<span style="color:var(--text-2)">지급 티켓 없음 (5,000원 미만)</span>';
+  if (!html)      html = '<span style="color:var(--text-2)">지급 티켓 없음 (' + bronzeUnit.toLocaleString() + '원 미만)</span>';
 
   result.innerHTML = `
     <div style="font-size:11px;color:var(--text-2);margin-bottom:8px">${orig.toLocaleString()}원 구매 시 지급</div>
