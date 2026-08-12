@@ -9846,9 +9846,6 @@ function taLoadTicketValue() {
       RLT_REWARD_TYPES.silver_ticket.unitValue = TA_TICKET_VALUE.silver;
       RLT_REWARD_TYPES.gold_ticket.unitValue = TA_TICKET_VALUE.gold;
       RLT_REWARD_TYPES.event_ticket.unitValue = TA_TICKET_VALUE.event;
-      console.log('DIAG_RLT_MUTATE', JSON.stringify({bronze: RLT_REWARD_TYPES.bronze_ticket.unitValue, silver: RLT_REWARD_TYPES.silver_ticket.unitValue, gold: RLT_REWARD_TYPES.gold_ticket.unitValue}));
-    } else {
-      console.log('DIAG_RLT_UNDEFINED_AT_MUTATE_TIME');
     }
     return TA_TICKET_VALUE;
   }).catch(function(e) {
@@ -12459,9 +12456,16 @@ var rltState = {
 };
 
 function rltFmt(n) { return Number(n).toLocaleString('ko-KR', { maximumFractionDigits: 2 }); }
+/* 티켓 종류(브론즈·실버·골드·이벤트)는 RLT_REWARD_TYPES.unitValue 사본이 아니라
+   TA_TICKET_VALUE에서 직접 읽는다 — taLoadTicketValue()의 최초 실행 타이밍에 따라
+   RLT_REWARD_TYPES가 아직 정의되기 전이라 사본 갱신이 조용히 스킵될 수 있어서다
+   (2026-08-12 발견 — 룰렛 화면 "가치(원)" 컬럼이 티켓 가치 변경을 못 따라가던 버그). */
+var RLT_TICKET_VALUE_KEY = { bronze_ticket: 'bronze', silver_ticket: 'silver', gold_ticket: 'gold', event_ticket: 'event' };
 function rltSlotValue(s) {
   var t = RLT_REWARD_TYPES[s.type] || RLT_REWARD_TYPES.miss;
-  return t.unitValue * (s.type === 'miss' ? 0 : (Number(s.qty) || 0));
+  var key = RLT_TICKET_VALUE_KEY[s.type];
+  var unitValue = key ? TA_TICKET_VALUE[key] : t.unitValue;
+  return unitValue * (s.type === 'miss' ? 0 : (Number(s.qty) || 0));
 }
 function rltSlotEv(s) { return rltSlotValue(s) * (Number(s.prob) || 0) / 100; }
 /* 부동소수 오차 방지 — 확률은 소수점 1자리까지만 쓰므로 0.1 단위 정수로 환산해 합산한다 */
@@ -12483,7 +12487,6 @@ function rltRenderSlots(k) {
   var p = RLT_KINDS[k].p;
   var tbody = document.getElementById(p + '-tbody');
   if (!tbody) return;
-  console.log('DIAG_RLT_RENDER', k, JSON.stringify({bronze: RLT_REWARD_TYPES.bronze_ticket.unitValue, silver: RLT_REWARD_TYPES.silver_ticket.unitValue, gold: RLT_REWARD_TYPES.gold_ticket.unitValue}));
   var jackpotIdx = rltJackpotIdx(k);
   tbody.innerHTML = rltState[k].slots.map(function(s, i) {
     var meta = RLT_REWARD_TYPES[s.type] || RLT_REWARD_TYPES.miss;
