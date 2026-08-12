@@ -3802,7 +3802,7 @@ function tkSimulate() {
   let amount = parseInt(input.value) || 0;
   if (amount < 1) { result.style.display = 'none'; return; }
   const orig = amount;
-  const v = (typeof TA_TICKET_VALUE !== 'undefined') ? TA_TICKET_VALUE : { bronze:100, silver:1000, gold:2000 };
+  const v = window.TA_TICKET_VALUE || { bronze:100, silver:1000, gold:2000 };
   const goldUnit = v.gold * TK_ACCRUAL_MULT, silverUnit = v.silver * TK_ACCRUAL_MULT, bronzeUnit = v.bronze * TK_ACCRUAL_MULT;
   const gold   = Math.floor(amount / goldUnit);   amount -= gold * goldUnit;
   const silver = Math.floor(amount / silverUnit); amount -= silver * silverUnit;
@@ -9356,6 +9356,7 @@ var TA_PREVIEW_KRW = 100000;
    로드되면 TA_UNITS·RLT_REWARD_TYPES를 같은 객체 참조를 유지한 채 그 자리에서 갱신한다 —
    이미 다른 곳에서 이 배열/객체를 들고 있어도(참조) 새로 만들 필요 없이 값만 바뀐다. */
 var TA_TICKET_VALUE = { bronze: 100, silver: 1000, gold: 2000, event: 40 };
+window.TA_TICKET_VALUE = TA_TICKET_VALUE; // 다른 <script> 블록(tkSimulate 등)에서도 참조 — 이 객체는 그 자리에서 값만 갱신되므로 재노출 불필요
 var TA_TICKET_VALUE_CACHE = null;
 function taLoadTicketValue() {
   if (TA_TICKET_VALUE_CACHE) return TA_TICKET_VALUE_CACHE;
