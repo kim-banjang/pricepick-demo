@@ -4533,10 +4533,10 @@ function giSaveTicketEdit() {
   var qty = parseInt(document.getElementById('te-qty-input').value, 10);
   if (isNaN(qty) || qty < 1) { toast('수량을 올바르게 입력해주세요.'); return; }
   var grade = document.getElementById('te-grade-select').value;
-  db.collection('gifticons').doc(id).update({
+  window.db.collection('gifticons').doc(id).update({
     required_grade: grade,
     required_count: qty,
-    updated_at: FS.FieldValue.serverTimestamp(),
+    updated_at: window.FS.FieldValue.serverTimestamp(),
   }).then(function() {
     toast('저장되었습니다.');
     logAdmin('기프티콘 교환 티켓 수정: ' + id + ' → ' + grade + ' ' + qty + '장');
@@ -6124,6 +6124,7 @@ var fbApp = firebase.initializeApp({
 var auth = firebase.auth();
 var db = firebase.firestore();
 var FS = firebase.firestore;
+window.db = db; window.FS = FS; // giSaveTicketEdit(더 이른 별도 script 블록)이 참조 — 2026-08-12 발견, 여태 저장 시 "db is not defined"로 조용히 실패하던 버그
 var ADMIN_EMAIL = 'sgkim.mixit@gmail.com';
 var _authed = false;
 
