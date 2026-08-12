@@ -4347,33 +4347,12 @@ function applyRole(role) {
   if (pEdit) pEdit.innerHTML = canWrite ? `<button class="btn btn-ghost btn-sm">수정</button>` : '';
 }
 
-const PAGE_META = {
-  dashboard:     { title:'대시보드',           bc:'개요' },
-  members:       { title:'회원 목록',           bc:'회원 관리' },
-  'ticket-value': { title:'티켓 가치 설정',    bc:'티켓 · 보상' },
-  'ticket-accrual': { title:'티켓 적립 설정',    bc:'티켓 · 보상' },
-  tickets:       { title:'티켓 내역',           bc:'티켓 · 보상' },
-  'weekly-draws': { title:'주간 이벤트 추첨 관리', bc:'티켓 · 보상' },
-  'roulette-settings': { title:'매일 행운 룰렛',      bc:'티켓 · 보상' },
-  'jackpot-roulette':  { title:'잭팟 룰렛',          bc:'티켓 · 보상' },
-  gifticons:     { title:'구매/사용 내역',        bc:'티켓 · 보상' },
-  banners:       { title:'배너 관리',           bc:'콘텐츠' },
-  invite:        { title:'친구초대 관리',        bc:'콘텐츠' },
-  terms:         { title:'약관 관리',           bc:'운영' },
-  notice:        { title:'공지사항 관리',       bc:'콘텐츠' },
-  notifications: { title:'알림 관리',           bc:'콘텐츠' },
-  inquiries:     { title:'1:1 문의',            bc:'운영' },
-  withdrawal:    { title:'계정 탈퇴 처리',       bc:'운영' },
-  'op-policy':   { title:'운영 정책',           bc:'운영' },
-  stats:         { title:'수익 분석',           bc:'매출 · 수익' },
-  revenue:       { title:'매출 내역',           bc:'매출 · 수익' },
-  settlement:    { title:'정산 내역',           bc:'매출 · 수익' },
-  postback:      { title:'포스트백 로그',        bc:'시스템' },
-  appver:        { title:'앱 버전 관리',         bc:'시스템' },
-  apikeys:       { title:'제휴몰 API 관리',     bc:'시스템' },
-  scheduler:     { title:'스케줄러',            bc:'시스템' },
-  accounts:      { title:'관리자 계정',          bc:'계정 관리' },
-};
+// 화면 제목·breadcrumb의 실제 출처는 I18N.ko의 'page.<id>.title'/'page.<id>.bc'
+// (go()가 t('page.'+id+'.title')로 읽는다) 하나뿐이다. 예전엔 PAGE_META라는
+// 객체가 같은 데이터를 중복으로 들고 있었는데 아무 데서도 참조되지 않는 죽은
+// 코드였다 — 새 화면 추가할 때 두 곳을 다 채워야 하는 착각을 주므로 삭제했다
+// (2026-08-12). 화면을 새로 추가할 때는 I18N.ko에 'page.<id>.title'/'page.<id>.bc'
+// 한 곳만 채우면 된다.
 
 function go(id, navEl) {
   // 저장 안 한 변경이 있는 채로 다른 메뉴로 이동하려 하면 한 번 물어본다(2026-08-11).
