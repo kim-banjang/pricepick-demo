@@ -12985,7 +12985,7 @@ window.PP_FEATURES = {
             <div class="tx-sheet-title">교환 안내</div>
             <ul class="tx-sheet-list">
               <li><span class="i18n"><span class="ko"><b>등급</b> — 브론즈 10장 ⇄ 실버 1장, 실버 2장 ⇄ 골드 1장으로 양방향 교환돼요.</span><span class="vi"><b>Hạng</b> — Bronze 10 vé ⇄ Silver 1 vé, Silver 2 vé ⇄ Gold 1 vé, đổi được cả hai chiều.</span></span></li>
-              <li><span class="i18n"><span class="ko"><b>포인트</b> — 1,000P·10,000P·20,000P로 브론즈·실버·골드 티켓을 받아요. 포인트 → 티켓 한 방향만 가능해요.</span><span class="vi"><b>Điểm</b> — Đổi 1.000P·10.000P·20.000P thành vé Bronze·Silver·Gold. Chỉ đổi một chiều Điểm → Vé.</span></span></li>
+              <li><span class="i18n"><span class="ko"><b>포인트</b> — 100P·1,000P·2,000P로 브론즈·실버·골드 티켓을 받아요. 포인트 → 티켓 한 방향만 가능해요.</span><span class="vi"><b>Điểm</b> — Đổi 100P·1.000P·2.000P thành vé Bronze·Silver·Gold. Chỉ đổi một chiều Điểm → Vé.</span></span></li>
               <li><span class="i18n"><span class="ko"><b>이벤트</b> — 이벤트 티켓 5장 → 실버 1장. 한 방향만 가능하며 되돌릴 수 없어요.</span><span class="vi"><b>Sự kiện</b> — Vé sự kiện 5 vé → Silver 1 vé. Chỉ đổi một chiều, không thể hoàn tác.</span></span></li>
               <li><span class="i18n"><span class="ko"><b>유의</b> — 교환은 즉시 반영되며 대기 중인 티켓은 교환에 사용할 수 없습니다.</span><span class="vi"><b>Lưu ý</b> — Đổi được áp dụng ngay, vé đang chờ duyệt không dùng để đổi được.</span></span></li>
             </ul>
@@ -13668,7 +13668,7 @@ const SB_SPECS = {
         "items": [
           "상단 고정: 등급 티켓 3종(브론즈·실버·골드) + 이벤트 티켓 + 포인트를 한 카드에",
           "등급 교환(상향 단방향): 브론즈 10 → 실버 1 / 실버 2 → 골드 1. 하향 교환 없음",
-          "포인트 교환(단방향·포인트→티켓·등가, 2026-08 확정): 브론즈 1,000P / 실버 10,000P / 골드 20,000P. 수수료 없음. 티켓→포인트 역방향은 숨김(로직 보존)",
+          "포인트 교환(단방향·포인트→티켓·등가, 2026-08 확정): 브론즈 100P / 실버 1,000P / 골드 2,000P. 수수료 없음. 티켓→포인트 역방향은 숨김(로직 보존)",
           "이벤트티켓 교환(단방향): 이벤트 티켓 5 → 실버 1. 역방향 없음"
         ]
       },
@@ -20131,8 +20131,9 @@ function ppExecuteTicketSwap(from, to, consume, receive) {
     }).catch(function(e) { console.error('ppExecuteTicketSwap', e); showToast('교환 중 오류가 발생했어요'); return false; });
 }
 
-/* ── pw-22 포인트 교환 탭 (실로직) ── 정책: 10P=1원, 브1,000P·실10,000P·골20,000P.
-   비율은 2026-07-31 기준 현행값 그대로다(임의 변경 없음).
+/* ── pw-22 포인트 교환 탭 (실로직) ── 정책: 10P=1원(환산율 불변), 브100P·실1,000P·골2,000P
+   (2026-08-12: 티켓 가치 1/10 반영으로 비율도 1/10). PT_TICKET_RATE 실값은 ppApplyTicketValue()가
+   settings/ticket_value를 읽어 갱신하므로 위 숫자는 참고용 기본값이다.
    2026-08 확정: 쌍방 → 단방향(포인트→티켓)으로 변경. sell(티켓→포인트) 로직은 아래 그대로 남겨두되
    UI 진입(pt-dir-sell 버튼)만 PP_FEATURES.ticketToPoint로 숨겨 실행되지 않게 막는다. */
 var PT_TICKET_RATE = { bronze: 1000, silver: 10000, gold: 20000 };

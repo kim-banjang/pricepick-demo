@@ -1527,8 +1527,8 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
         </div>
         <div class="policy-item">
           <div class="policy-label">포인트 → 티켓 교환 비율</div>
-          <div class="policy-value">브론즈 1,000P / 실버 10,000P / 골드 20,000P<span class="badge badge-gray tv-impact-badge">포인트 관리 &gt; 포인트 정책</span></div>
-          <div class="policy-desc">현재 비율은 브론즈 100원 기준(10P = 1원)으로 잡혀 있습니다. 티켓 가치가 바뀌면 포인트 환산도 어긋납니다.</div>
+          <div class="policy-value">브론즈 100P / 실버 1,000P / 골드 2,000P<span class="badge badge-gray tv-impact-badge">포인트 관리 &gt; 포인트 정책</span></div>
+          <div class="policy-desc">현재 비율은 브론즈 10원 기준(10P = 1원)으로 잡혀 있습니다. 티켓 가치가 바뀌면 포인트 환산도 어긋납니다.</div>
           <div class="tv-sim-line" id="tv-sim-points"></div>
         </div>
         <div class="policy-item">
@@ -2545,7 +2545,7 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
             <strong>단일 등급 결제 + 상향 단방향 교환</strong> — 기프티콘 교환은 단일 등급으로만 가능. 등급 교환은 <strong>상향(브론즈→실버→골드)만</strong> 허용하며 하향 교환은 지원하지 않습니다. 환산가치가 1:1 등가라 등급을 올려도 보유 가치는 그대로이고, 하향을 열면 등가 왕복이 생겨 관리 포인트만 늘고 회원 이득은 없기 때문입니다. (2026-07-31 확정)
           </div>
           <div class="info-box" style="margin-bottom:16px">
-            <strong>포인트 → 티켓 교환은 단방향 · 등가 · 수수료 없음</strong> — 브론즈 1,000P / 실버 10,000P / 골드 20,000P로 포인트를 티켓으로 바꿀 수 있습니다. <strong>티켓 → 포인트 역방향은 2026-08 확정으로 중단</strong>했습니다 — 앱에서는 숨김 처리만 했을 뿐 로직·데이터는 그대로라 필요 시 복구할 수 있습니다.
+            <strong>포인트 → 티켓 교환은 단방향 · 등가 · 수수료 없음</strong> — 브론즈 100P / 실버 1,000P / 골드 2,000P로 포인트를 티켓으로 바꿀 수 있습니다. <strong>티켓 → 포인트 역방향은 2026-08 확정으로 중단</strong>했습니다 — 앱에서는 숨김 처리만 했을 뿐 로직·데이터는 그대로라 필요 시 복구할 수 있습니다.
           </div>
           <div class="info-box" style="margin-bottom:16px;border-color:#f2ddb4;background:#fdf3e2;color:#8a5a12">
             <strong>이벤트 티켓은 단방향 전환만</strong> — <strong>이벤트 티켓 5장 → 실버 티켓 1장</strong>은 허용하지만, <strong>실버 → 이벤트 티켓 역방향은 금지</strong>합니다. 실버 1장(100원)을 이벤트 5장으로 되돌리면 잭팟 룰렛 5회(1회 기대값 40원 = 200원)로 가치가 2배 증식되기 때문입니다. 앱에도 역방향 전환 기능이 없으며, 전환 실행 로직의 허용 방향 화이트리스트에서 차단됩니다(UI 우회 불가). (2026-08-12: 티켓 가치 1/10 반영으로 교환 대상이 브론즈→실버로 변경. 비율 5:1은 그대로.)
@@ -3205,9 +3205,9 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
         <table>
           <thead><tr><th>등급</th><th>포인트 → 티켓</th><th>티켓 → 포인트</th><th>원화 환산</th></tr></thead>
           <tbody>
-            <tr><td><span class="tk-chip bronze bare">브론즈</span></td><td style="text-align:center">1,000P → 1장</td><td style="text-align:center">1장 → 1,000P</td><td style="text-align:center;color:var(--text-2)">100원</td></tr>
-            <tr><td><span class="tk-chip silver bare">실버</span></td><td style="text-align:center">10,000P → 1장</td><td style="text-align:center">1장 → 10,000P</td><td style="text-align:center;color:var(--text-2)">1,000원</td></tr>
-            <tr><td><span class="tk-chip gold bare">골드</span></td><td style="text-align:center">20,000P → 1장</td><td style="text-align:center">1장 → 20,000P</td><td style="text-align:center;color:var(--text-2)">2,000원</td></tr>
+            <tr><td><span class="tk-chip bronze bare">브론즈</span></td><td style="text-align:center">100P → 1장</td><td style="text-align:center">1장 → 100P</td><td style="text-align:center;color:var(--text-2)">10원</td></tr>
+            <tr><td><span class="tk-chip silver bare">실버</span></td><td style="text-align:center">1,000P → 1장</td><td style="text-align:center">1장 → 1,000P</td><td style="text-align:center;color:var(--text-2)">100원</td></tr>
+            <tr><td><span class="tk-chip gold bare">골드</span></td><td style="text-align:center">2,000P → 1장</td><td style="text-align:center">1장 → 2,000P</td><td style="text-align:center;color:var(--text-2)">200원</td></tr>
           </tbody>
         </table>
       </div>
@@ -5641,12 +5641,12 @@ function giSaveTicketEdit() {
   "🥉 편의점 상품권 1만원 ×5":"🥉 Voucher cửa hàng tiện lợi 10.000 won ×5",
   "🥇 삼성 갤럭시 버즈":"🥇 Samsung Galaxy Buds",
   "🥇 에어팟 프로 2세대":"🥇 AirPods Pro Gen 2",
+  "100P → 1장":"100P → 1 vé",
   "1,000P → 1장":"1.000P → 1 vé",
-  "10,000P → 1장":"10.000P → 1 vé",
-  "20,000P → 1장":"20.000P → 1 vé",
+  "2,000P → 1장":"2.000P → 1 vé",
+  "1장 → 100P":"1 vé → 100P",
   "1장 → 1,000P":"1 vé → 1.000P",
-  "1장 → 10,000P":"1 vé → 10.000P",
-  "1장 → 20,000P":"1 vé → 20.000P",
+  "1장 → 2,000P":"1 vé → 2.000P",
   "적립 수량 × 환산가치":"Số lượng tích lũy × Giá trị quy đổi",
   "포인트 ↔ 티켓 쌍방 교환":"Trao đổi hai chiều Điểm ↔ Vé",
   "포인트 ↔ 티켓 교환 비율":"Tỷ lệ đổi Điểm ↔ Vé",
