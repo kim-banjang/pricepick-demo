@@ -14769,11 +14769,13 @@ function jpBuildWheel() {
       var tierJ = PP_TIER_STYLE[PP_TICKET_SLOT_GRADE[slot.type]];
       g += '<text x="150" y="70" font-size="9" font-weight="800" fill="' + (slot.type === 'gold_ticket' ? '#7A5200' : '#FFFFFF') + '" letter-spacing="1.6">JACKPOT</text>';
       g += jpWheelTicketIcon(40, slot.type === 'gold_ticket' ? '#B58400' : (slot.type === 'silver_ticket' ? '#6F6F6F' : '#7A4014'), slot.type === 'gold_ticket' ? '#FFF3D0' : '#FFFFFF');
-      g += '<text x="150" y="90" font-size="15" font-weight="800" fill="' + ink + '">' + PP_SLOT_META[slot.type].label + '</text>';
+      g += '<text x="150" y="90" font-size="14" font-weight="800" fill="' + ink + '">' + PP_SLOT_META[slot.type].label + '</text>';
+      g += '<text x="150" y="106" font-size="13" font-weight="700" fill="' + ink + '">' + (slot.qty || 0) + '장</text>';
     } else if (PP_TICKET_SLOT_GRADE[slot.type]) {
       var tier = PP_TIER_STYLE[PP_TICKET_SLOT_GRADE[slot.type]];
       g += jpWheelTicketIcon(32, slot.type === 'silver_ticket' ? '#6F6F6F' : (slot.type === 'bronze_ticket' ? '#7A4014' : tier.icon), '#FFFFFF');
-      g += '<text x="150" y="73" font-size="15" font-weight="800" fill="' + ink + '">' + PP_SLOT_META[slot.type].label + '</text>';
+      g += '<text x="150" y="73" font-size="14" font-weight="800" fill="' + ink + '">' + PP_SLOT_META[slot.type].label + '</text>';
+      g += '<text x="150" y="89" font-size="13" font-weight="700" fill="' + ink + '">' + (slot.qty || 0) + '장</text>';
     } else if (slot.type === 'point') {
       var top = (slot.qty || 0) === maxPoint;
       g += top
