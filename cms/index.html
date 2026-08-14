@@ -906,7 +906,7 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
   border:1px solid var(--warning);border-radius:var(--r-md);padding:10px 16px;
   font-size:13px;color:var(--warning);margin-bottom:14px;font-weight:700;}
 #sec-ticket-value .tv-dirty-banner.show{display:block;}
-#sec-ticket-value #tv-save-btn.tv-highlight{box-shadow:0 0 0 3px var(--warning-soft);}
+#sec-ticket-value #tv-save-btn.tv-highlight,#sec-ticket-value #tv-save-btn-event.tv-highlight{box-shadow:0 0 0 3px var(--warning-soft);}
 #sec-ticket-value .tv-unit{font-size:13px;color:var(--text-2);margin-left:6px;}
 #sec-ticket-value .tv-ratio-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;
   padding:14px 18px;border-bottom:1px solid var(--border);}
@@ -1379,8 +1379,6 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
         저장하면 앱이 실제로 이 값을 읽어 씁니다.
       </div>
 
-      <div class="tv-dirty-banner" id="tv-dirty-banner"></div>
-
       <!-- ① 등급별 환산가치 설정 -->
       <div class="card">
         <div class="card-header">
@@ -1388,8 +1386,9 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
             <div class="card-title">등급별 환산가치</div>
             <div class="card-sub">티켓 1장 = 원화 얼마로 볼 것인지 (0 이상 정수) · 하나를 바꾸면 나머지 둘이 비율(1:10:20)대로 자동 조정됩니다</div>
           </div>
-          <button class="btn btn-primary btn-sm" id="tv-save-btn" onclick="tvSave()">저장</button>
+          <button class="btn btn-primary btn-sm" id="tv-save-btn" onclick="tvSaveTier()">저장</button>
         </div>
+        <div class="tv-dirty-banner" id="tv-dirty-banner-tier"></div>
         <table>
           <thead>
             <tr>
@@ -1435,14 +1434,19 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
       </div>
 
       <!-- 이벤트 티켓 가치 — 등급 체계와 별개(2026-08-11 분리, 김반장 지시).
-           경품 응모 전용이라 브론즈·실버·골드 비율 연동에서 완전히 뺐다. -->
+           경품 응모 전용이라 브론즈·실버·골드 비율 연동에서 완전히 뺐다.
+           저장 버튼도 별도(2026-08-14, Vin 지적 — 버튼이 등급 카드 안에만 있어서
+           "등급값만 저장되는 줄 알았다". 실제로는 저장 시 이벤트 값도 같이 Firestore에
+           쓰이고 있었는데 버튼 위치 때문에 그렇게 안 보였다. 김반장·Vin 합의로 분리). -->
       <div class="card">
         <div class="card-header">
           <div>
             <div class="card-title">이벤트 티켓 가치</div>
             <div class="card-sub">이벤트 티켓은 경품 응모 전용이라 등급 티켓과 별개로 정합니다 · 등급 값을 바꿔도 따라 움직이지 않습니다</div>
           </div>
+          <button class="btn btn-primary btn-sm" id="tv-save-btn-event" onclick="tvSaveEvent()">저장</button>
         </div>
+        <div class="tv-dirty-banner" id="tv-dirty-banner-event"></div>
         <table>
           <thead>
             <tr>
@@ -9569,7 +9573,7 @@ function tvRecalc(){
     const isChanged = r.valid && r.value !== r.orig;
     r.el.classList.toggle('tv-changed', isChanged);
     if(!r.valid) invalid.push('<span>' + r.name + '</span>');
-    if(isChanged) changed.push('<span>' + r.name + '</span> ' + tvWon(r.orig) + ' → ' + tvWon(r.value));
+    if(isChanged) changed.push({ key:k, html:'<span>' + r.name + '</span> ' + tvWon(r.orig) + ' → ' + tvWon(r.value) });
 
     const diff = document.getElementById('tv-diff-' + k);
     if(!r.valid){
@@ -9644,12 +9648,25 @@ function tvRecalc(){
     rw.style.display = 'none';
   }
 
-  /* 변경 표시 배너 + 저장 버튼 강조 */
-  const banner = document.getElementById('tv-dirty-banner');
-  const saveBtn = document.getElementById('tv-save-btn');
-  if(changed.length){
-    banner.innerHTML = '<span>저장하지 않은 변경</span> ' + changed.length + '<span>건</span> — ' + changed.join(' · ') +
-      '<br><span>저장 버튼을 눌러야 적용됩니다.</span>';
+  /* 변경 표시 배너 + 저장 버튼 강조 — 카드별로 분리(2026-08-14, Vin 지적 + 김반장 확정).
+     예전엔 배너 하나로 4개 값을 합쳐서 세서 "등급별 환산가치" 버튼 하나가 이벤트 티켓
+     값까지 같이 저장한다는 걸 admin이 알기 어려웠다. 등급(브론즈·실버·골드)과 이벤트는
+     서로 독립된 값이니 배너도 카드별로 나눠서 "어느 카드 것인지" 바로 보이게 한다. */
+  const tierChanged = changed.filter(c => TV_KEYS.indexOf(c.key) !== -1);
+  const eventChanged = changed.filter(c => c.key === 'event');
+  tvRenderDirtyBanner('tv-dirty-banner-tier', 'tv-save-btn', tierChanged);
+  tvRenderDirtyBanner('tv-dirty-banner-event', 'tv-save-btn-event', eventChanged);
+
+  tvUpdateImpactSim(tierChanged.length > 0);
+}
+
+function tvRenderDirtyBanner(bannerId, btnId, changedList){
+  const banner = document.getElementById(bannerId);
+  const saveBtn = document.getElementById(btnId);
+  if(!banner || !saveBtn) return;
+  if(changedList.length){
+    banner.innerHTML = '<span>저장하지 않은 변경</span> ' + changedList.length + '<span>건</span> — ' +
+      changedList.map(c => c.html).join(' · ') + '<br><span>저장 버튼을 눌러야 적용됩니다.</span>';
     banner.classList.add('show');
     saveBtn.classList.add('tv-highlight');
   }else{
@@ -9657,8 +9674,6 @@ function tvRecalc(){
     banner.innerHTML = '';
     saveBtn.classList.remove('tv-highlight');
   }
-
-  tvUpdateImpactSim(changed.length > 0);
 }
 
 /* 「영향 범위 안내」 지금→바뀌면 시뮬 — 실제 반영은 안 하고 숫자만 보여준다
@@ -9731,21 +9746,30 @@ window.tvLoad = function(){
   });
 };
 
-/* 저장 — taSave()와 같은 방식: 직전 값을 다시 읽고 병합해서 쓴다(통째 덮어쓰기 금지). */
-window.tvSave = function(){
-  const invalid = TV_ALL_KEYS.map(tvRead).filter(r => !r.valid);
+/* 저장 — 등급(브론즈·실버·골드)과 이벤트 티켓은 서로 독립된 값이라 카드별로 따로
+   저장한다(2026-08-14, Vin 지적 + 김반장 확정 — 버튼이 등급 카드 안에만 있어서
+   "등급값만 저장된다"고 오해하기 쉬웠다. 실제로는 저장 시 4개 값이 한 번에 Firestore에
+   쓰이고 있었는데 버튼 위치 때문에 그렇게 안 보였다). taSaveScope()와 같은 방식:
+   직전 값을 다시 읽고 병합해서 쓴다(통째 덮어쓰기 금지).
+   저장 후 window.tvLoad()로 전체를 다시 불러오면 안 된다 — 그러면 지금 막 편집
+   중이던 다른 카드(예: 등급 저장 시 이벤트 카드)의 미저장 입력값이 Firestore의
+   옛 값으로 덮어써진다(ta-save-btn-secondary 분리 때 겪은 것과 같은 문제). 대신
+   방금 저장한 키만 dataset.orig를 갱신한다. */
+function tvSaveScope(keys, btnIds, label){
+  const rows = keys.map(tvRead);
+  const invalid = rows.filter(r => !r.valid);
   if(invalid.length){
     alert('입력값을 확인하세요. 0 이상의 숫자만 입력할 수 있습니다.\n(' + invalid.map(r => r.name).join(', ') + ')');
     return;
   }
-  const changed = TV_ALL_KEYS.map(tvRead).filter(r => r.value !== r.orig);
+  const changed = rows.filter(r => r.value !== r.orig);
   if(!changed.length){
     alert('변경된 값이 없습니다.');
     return;
   }
   const payload = {};
-  TV_ALL_KEYS.forEach(function(k){ payload[k] = tvRead(k).value; });
-  const btns = Array.prototype.slice.call(document.querySelectorAll('#sec-ticket-value button.btn-primary'));
+  keys.forEach(function(k){ payload[k] = tvRead(k).value; });
+  const btns = btnIds.map(function(id){ return document.getElementById(id); }).filter(Boolean);
   btns.forEach(function(b){ b.disabled = true; b.textContent = '저장 중…'; });
   const ref = db.collection('settings').doc('ticket_value');
   ref.get().then(function(doc){
@@ -9753,20 +9777,29 @@ window.tvSave = function(){
     return ref.set(Object.assign({}, data, payload, { updated_at: FS.FieldValue.serverTimestamp() }), { merge: true });
   }).then(function(){
     alert(
-      '저장했습니다.\n\n' +
+      '저장했습니다. (' + label + ')\n\n' +
       changed.map(r => '· ' + r.name + ': ' + tvWonText(r.orig) + ' → ' + tvWonText(r.value)).join('\n')
     );
+    keys.forEach(function(k){
+      const newVal = tvRead(k).value;
+      tvEl(k).dataset.orig = String(newVal);
+      const cur = document.getElementById('tv-cur-' + k);
+      if(cur) cur.innerHTML = tvWon(newVal);
+    });
     // 티켓 적립 설정 화면이 캐시해 둔 티켓 가치(TA_TICKET_VALUE)도 갱신 —
     // 안 하면 저장 직후 다른 메뉴로 넘어가도 옛 값이 그대로 남는다(SPA로 합치며 새로 생긴 문제).
     if (typeof TA_TICKET_VALUE_CACHE !== 'undefined') TA_TICKET_VALUE_CACHE = null;
     if (typeof taLoadTicketValue === 'function') taLoadTicketValue();
-    window.tvLoad();
+    tvRecalc();
   }).catch(function(e){
     alert('저장 실패: ' + (e.message || e));
   }).finally(function(){
     btns.forEach(function(b){ b.disabled = false; b.textContent = '저장'; });
   });
-};
+}
+
+window.tvSaveTier = function(){ tvSaveScope(TV_KEYS, ['tv-save-btn'], '등급별 환산가치'); };
+window.tvSaveEvent = function(){ tvSaveScope(['event'], ['tv-save-btn-event'], '이벤트 티켓 가치'); };
 
 /* ── sec-ticket-accrual ── 제휴몰별 티켓 적립률 (settings/ticket_accrual)
    지금까지 코드에 박혀 있던 "모든 제휴몰 일률 2%"를 운영자가 몰별로 고칠 수 있게 한다.
