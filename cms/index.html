@@ -1516,13 +1516,13 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
         <div class="policy-item">
           <div class="policy-label">매일 행운 룰렛 보상 구성</div>
           <div class="policy-value">보상 슬롯별 티켓 종류·수량<span class="badge badge-gray tv-impact-badge">티켓 · 보상 &gt; 매일 행운 룰렛</span></div>
-          <div class="policy-desc">티켓 1장의 가치가 바뀌면 슬롯별 기대값(원화)이 그대로 따라 움직입니다.</div>
+          <div class="policy-desc">룰렛 보상 슬롯은 운영자가 CMS에서 직접 정하는 값입니다(자동 계산 대상 아님). 티켓 가치를 바꾸면 슬롯 구성도 다시 정해야 합니다.</div>
           <div class="tv-sim-line" id="tv-sim-roulette-daily"></div>
         </div>
         <div class="policy-item">
           <div class="policy-label">잭팟 룰렛 보상 구성</div>
           <div class="policy-value">잭팟 당첨 보상·확률 테이블<span class="badge badge-gray tv-impact-badge">티켓 · 보상 &gt; 잭팟 룰렛</span></div>
-          <div class="policy-desc">잭팟 1회 기대비용이 티켓 가치에 비례해 변합니다.</div>
+          <div class="policy-desc">잭팟 보상 슬롯도 운영자가 CMS에서 직접 정하는 값입니다(자동 계산 대상 아님). 티켓 가치를 바꾸면 슬롯 구성도 다시 정해야 합니다.</div>
           <div class="tv-sim-line" id="tv-sim-roulette-jackpot"></div>
         </div>
         <div class="policy-item">
@@ -5878,6 +5878,10 @@ Object.assign(KO2VI,{"기존의":"so với trước","40원":"40 won"});
 Object.assign(KO2VI,{"저장하지 않은 변경":"Thay đổi chưa lưu","저장 버튼을 눌러야 적용됩니다":"chỉ được áp dụng khi bấm nút Lưu"});
 Object.assign(KO2VI,{"적용으로":"Chuyển sang áp dụng","미적용으로":"Chuyển sang chưa áp dụng","건강":"Sức khỏe","교육":"Giáo dục","금융":"Tài chính","도서/문화":"Sách/Văn hóa","뷰티":"Làm đẹp","생활/인테리어":"Sinh hoạt/Nội thất","식품":"Thực phẩm","여행/티켓":"Du lịch/Vé","유아/아동":"Trẻ sơ sinh/Trẻ em","종합쇼핑몰":"Trung tâm mua sắm tổng hợp"});
 Object.assign(KO2VI,{"티켓 1장의":"Của 1 vé","원화 환산가치":"giá trị quy đổi ra won","를 정합니다. 이 값이 룰렛 잭팟 판정·포인트 교환 비율·등급 교환 비율의 기준이 됩니다.\n        저장하면 앱이 실제로 이 값을 읽어 씁니다.":"sẽ được thiết lập. Giá trị này là chuẩn cho phán định jackpot vòng quay · tỷ lệ đổi Điểm · tỷ lệ đổi hạng.\n        Khi lưu, app sẽ đọc và dùng ngay giá trị này.","등급별 환산가치":"Giá trị quy đổi theo hạng","티켓 1장 = 원화 얼마로 볼 것인지 (0 이상 정수) · 하나를 바꾸면 나머지 둘이 비율(1:10:20)대로 자동 조정됩니다":"Xem 1 vé tương ứng bao nhiêu won (số nguyên từ 0 trở lên) · Đổi 1 giá trị thì 2 giá trị còn lại tự động điều chỉnh theo tỷ lệ (1:10:20)","현재 적용값":"Giá trị đang áp dụng","변경할 값":"Giá trị sẽ đổi","변동":"Thay đổi","변경 없음":"Không thay đổi","이벤트 티켓 가치":"Giá trị vé Sự kiện","이벤트 티켓은 경품 응모 전용이라 등급 티켓과 별개로 정합니다 · 등급 값을 바꿔도 따라 움직이지 않습니다":"Vé sự kiện chỉ dùng để dự thưởng nên được đặt riêng, tách biệt với vé hạng · Dù đổi giá trị hạng cũng không thay đổi theo","종류":"Loại","등급 간 교환 비율":"Tỷ lệ đổi giữa các hạng","위 입력값으로 자동 계산됩니다 (입력 즉시 갱신)":"Tự động tính theo giá trị nhập ở trên (cập nhật ngay khi nhập)","정수 배수":"Bội số nguyên","교환 비율이 나누어떨어지지 않습니다.":"Tỷ lệ đổi không chia hết.","소수점 교환은 앱에서 처리가 애매해집니다. 등급 값을 배수 관계로 맞추는 것을 권장합니다.":"Đổi có số thập phân sẽ khó xử lý trên app. Khuyến nghị đặt giá trị hạng theo quan hệ bội số.","입력값을 확인하세요.":"Vui lòng kiểm tra giá trị đã nhập.","영향 범위 안내":"Thông báo phạm vi ảnh hưởng","티켓 가치를 바꾸면 아래 항목들도 같이 조정해야 합니다":"Nếu đổi giá trị vé thì các mục dưới đây cũng cần được điều chỉnh theo","안내만 · 자동 반영 없음":"Chỉ thông báo · không tự động áp dụng","이 화면은":"Màn hình này","티켓 환산가치만":"chỉ giá trị quy đổi vé","다룹니다. 아래 항목은":"được xử lý ở đây. Các mục dưới đây","각자 담당 화면에서 별도로":"cần được sửa riêng ở từng màn hình phụ trách","수정해야 하며,\n          여기서 값을 바꿔도 자동으로 바뀌지 않습니다.":",\n          đổi giá trị ở đây sẽ không tự động thay đổi các mục đó.","매일 행운 룰렛 보상 구성":"Cấu hình phần thưởng Vòng quay may mắn hằng ngày","보상 슬롯별 티켓 종류·수량":"Loại · số lượng vé theo từng ô thưởng","티켓 · 보상 > 매일 행운 룰렛":"Vé · Thưởng > Vòng quay may mắn hằng ngày","티켓 1장의 가치가 바뀌면 슬롯별 기대값(원화)이 그대로 따라 움직입니다.":"Nếu giá trị 1 vé thay đổi, giá trị kỳ vọng (won) của từng ô sẽ thay đổi theo.","잭팟 룰렛 보상 구성":"Cấu hình phần thưởng Vòng quay Jackpot","잭팟 당첨 보상·확률 테이블":"Bảng phần thưởng · xác suất trúng Jackpot","티켓 · 보상 > 잭팟 룰렛":"Vé · Thưởng > Vòng quay Jackpot","잭팟 1회 기대비용이 티켓 가치에 비례해 변합니다.":"Chi phí kỳ vọng mỗi lượt Jackpot thay đổi tỷ lệ thuận với giá trị vé.","포인트 → 티켓 교환 비율":"Tỷ lệ đổi Điểm → Vé","브론즈 100P / 실버 1,000P / 골드 2,000P":"Đồng 100P / Bạc 1.000P / Vàng 2.000P","포인트 관리 > 포인트 정책":"Quản lý điểm > Chính sách điểm","현재 비율은 브론즈 10원 기준(10P = 1원)으로 잡혀 있습니다. 티켓 가치가 바뀌면 포인트 환산도 어긋납니다.":"Tỷ lệ hiện tại đang đặt theo chuẩn Đồng 10 won (10P = 1 won). Nếu giá trị vé thay đổi, quy đổi điểm cũng sẽ lệch.","브론즈 5,000원당 1장 등":"Đồng cứ 5.000 won 1 vé, v.v.","티켓 · 보상 > 티켓 적립 설정":"Vé · Thưởng > Cài đặt tích lũy vé","적립 기준 금액은 제휴 수수료와 티켓 가치를 함께 보고 정해야 합니다. 티켓 가치만 낮추면 실질 적립률이 그만큼 떨어집니다.":"Số tiền chuẩn để tích lũy cần được quyết định dựa trên cả hoa hồng liên kết lẫn giá trị vé. Nếu chỉ hạ giá trị vé, tỷ lệ tích lũy thực tế sẽ giảm tương ứng.","입력한 값은":"Giá trị đã nhập","저장 버튼을 눌러야 적용됩니다.":"chỉ được áp dụng khi bấm nút Lưu.","티켓 가치 설정":"Cài đặt giá trị vé","제휴몰별 수수료와 사용자에게 돌려줄 적립률을 정합니다(계약이 바뀌면 수수료도 여기서 바로 반영). 등급 환산은 큰 단위부터 채우는 기존 방식 그대로입니다. 쿠팡은 대표 제휴몰로 항상 별도 표시됩니다. 적립률 기본값은 수수료의 60%이며, 나머지 40%가 우리 수익입니다.":"Đặt hoa hồng theo từng sàn liên kết và tỷ lệ tích lũy trả lại cho người dùng (nếu hợp đồng thay đổi thì cập nhật hoa hồng ngay tại đây). Quy đổi hạng vẫn theo cách cũ — điền từ đơn vị lớn trước. Coupang luôn hiển thị riêng vì là sàn liên kết đại diện. Tỷ lệ tích lũy mặc định là 60% hoa hồng, 40% còn lại là lợi nhuận của chúng ta.","카테고리 전체":"Toàn bộ danh mục","가전/디지털/IT":"Điện tử/Kỹ thuật số/IT","LP상태 전체":"Toàn bộ trạng thái LP","적용 전체":"Toàn bộ áp dụng","미적용":"Chưa áp dụng","링크프라이스 상태":"Trạng thái Linkprice","링크프라이스 상태로 거르기":"Lọc theo trạng thái Linkprice","눌러서 몰을 체크한 뒤 일괄 조작하세요.":"Bấm để chọn các cửa hàng rồi thao tác hàng loạt.","보이는 몰 전체 선택":"Chọn toàn bộ cửa hàng đang hiển thị","미적용 — 클릭하면 적용으로":"Chưa áp dụng — bấm để chuyển sang áp dụng","적용됨 — 클릭하면 미적용으로":"Đã áp dụng — bấm để chuyển sang chưa áp dụng","승인":"Đã duyệt","승인대기":"Chờ duyệt","거부":"Từ chối","미신청":"Chưa đăng ký","제휴몰 정보 —":"Thông tin cửa hàng liên kết —","머천트ID":"ID merchant","머천트명":"Tên merchant","리워드 가능 여부":"Có hỗ trợ Reward","지원(Y)":"Hỗ trợ (Y)","PC웹 지원 여부":"Có hỗ trợ PC web","미지원(N)":"Không hỗ trợ (N)","모바일 웹 지원 여부":"Có hỗ trợ Mobile web","APP(AOS) 지원 여부":"Có hỗ trợ APP(AOS)","APP(IOS) 지원 여부":"Có hỗ trợ APP(IOS)","기본링크":"Link cơ bản","사이트 URL":"URL trang web","광고 효과 인정 기간":"Thời gian công nhận hiệu quả quảng cáo","실시간 커미션 전송":"Gửi hoa hồng thời gian thực","실시간 실적 전송":"Gửi thực tích thời gian thực","커미션 정산 방법 및 금액":"Cách quyết toán và số tiền hoa hồng","커미션 지급 일정":"Lịch chi trả hoa hồng","활동 불가 방식":"Hình thức không được phép hoạt động","커미션 미인정 상품":"Sản phẩm không công nhận hoa hồng","유의사항":"Lưu ý","커미션 목록":"Danh sách hoa hồng","구분":"Phân loại","PC웹":"PC web","모바일웹":"Mobile web","실시간 실적 - 정가상품":"Thực tích thời gian thực - Sản phẩm giá gốc","실시간 실적 - 세일상품":"Thực tích thời gian thực - Sản phẩm giảm giá","확정 실적 - 정가상품":"Thực tích đã xác nhận - Sản phẩm giá gốc","확정 실적 - 세일상품":"Thực tích đã xác nhận - Sản phẩm giảm giá","제휴몰(링크프라이스) 추가":"Thêm cửa hàng liên kết (Linkprice)","수수료 %":"Hoa hồng %","적립률 % (기본값 = 수수료 × 60%)":"Tỷ lệ tích lũy % (mặc định = hoa hồng × 60%)","개 선택":"mục đã chọn","1원 고정":"cố định 1 won","당":"mỗi","당 1장":"mỗi 1 vé","예: 브론즈 1장 → 바뀌면":"VD: Đồng 1 vé → nếu đổi thành","— 같은 기대값을 유지하려면":"— để giữ nguyên giá trị kỳ vọng thì","— 같은 기대비용을 유지하려면":"— để giữ nguyên chi phí kỳ vọng thì","입력값 오류":"Lỗi giá trị nhập","브론즈 값이 0이라 비율을 계산할 수 없습니다":"Giá trị Đồng bằng 0 nên không thể tính tỷ lệ","실버 값이 0이라 비율을 계산할 수 없습니다":"Giá trị Bạc bằng 0 nên không thể tính tỷ lệ","몰 이름을 입력하세요.":"Vui lòng nhập tên cửa hàng.","수수료는 0~100 사이 숫자로 입력하세요.":"Vui lòng nhập hoa hồng trong khoảng 0~100.","적립률은 0~20 사이 숫자로 입력하세요.":"Vui lòng nhập tỷ lệ tích lũy trong khoảng 0~20.","추가 중…":"Đang thêm…","⚠ 카탈로그 로드 실패 — 새로고침 필요":"⚠ Tải catalog thất bại — cần tải lại trang","카탈로그 데이터를 불러오지 못했습니다 — 새로고침 해주세요.":"Không tải được dữ liệu catalog — vui lòng tải lại trang.","대표 제휴몰이 없습니다.":"Không có cửa hàng liên kết đại diện.","표시":"hiển thị"});
+Object.assign(KO2VI,{"룰렛 보상 슬롯은 운영자가 CMS에서 직접 정하는 값입니다(자동 계산 대상 아님). 티켓 가치를 바꾸면 슬롯 구성도 다시 정해야 합니다.":"Ô thưởng vòng quay là giá trị do quản trị viên tự đặt trực tiếp trong CMS (không phải đối tượng tự động tính toán). Nếu đổi giá trị vé thì cấu hình ô thưởng cũng cần được đặt lại."});
+Object.assign(KO2VI,{"잭팟 보상 슬롯도 운영자가 CMS에서 직접 정하는 값입니다(자동 계산 대상 아님). 티켓 가치를 바꾸면 슬롯 구성도 다시 정해야 합니다.":"Ô thưởng Jackpot cũng là giá trị do quản trị viên tự đặt trực tiếp trong CMS (không phải đối tượng tự động tính toán). Nếu đổi giá trị vé thì cấu hình ô thưởng cũng cần được đặt lại."});
+
+
   var _orig=new Map(), _tracked=new Set(), _applying=false;
   function hasKo(s){ return /[가-힯ᄀ-ᇿ㄰-㆏]/.test(s); }
   function tcore(s){
@@ -9680,22 +9684,16 @@ function tvHideSim(id){
 }
 
 function tvUpdateImpactSim(anyChanged){
-  const ids = ['roulette-daily','roulette-jackpot','points','accrual'];
+  const ids = ['points','accrual'];
   const b = tvRead('bronze'), s = tvRead('silver'), g = tvRead('gold');
   if(!anyChanged || !b.valid || !s.valid || !g.valid || b.value <= 0){
     ids.forEach(tvHideSim);
     return;
   }
 
-  /* 룰렛 — 실제 슬롯을 읽지 않는다. 브론즈 하나로 "같은 기대값을 유지하려면
-     장수가 몇 배 필요한가"만 대표로 보여준다(김반장 지시 — 대표 예시 한두 줄). */
-  const scale = b.orig / b.value;
-  const scaleTxt = tvFmtRatio(scale);
-  const scaleBasis = '<span>브론즈</span> ' + tvWon(b.orig) + ' ÷ ' + tvWon(b.value);
-  tvSetSim('roulette-daily',
-    '<span>예: 브론즈 1장 → 바뀌면</span> <strong>' + scaleTxt + '<span>장</span></strong> <span>— 같은 기대값을 유지하려면</span> (' + scaleBasis + ')');
-  tvSetSim('roulette-jackpot',
-    '<span>예: 브론즈 1장 → 바뀌면</span> <strong>' + scaleTxt + '<span>장</span></strong> <span>— 같은 기대비용을 유지하려면</span> (' + scaleBasis + ')');
+  /* 룰렛 슬롯은 운영자가 CMS에서 직접 정하는 값이라(자동 계산 대상 아님) 숫자
+     시뮬레이션을 보여주지 않는다 — Vin 질문 답변 + 김반장 확정(2026-08-14).
+     정책 문구(policy-desc)로만 재설정 필요를 안내한다. */
 
   /* 포인트 → 티켓 — 10P = 1원 고정, 원화값만 바뀐 만큼 그대로 곱한다 */
   tvSetSim('points',
