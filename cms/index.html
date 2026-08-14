@@ -1538,9 +1538,11 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
         </div>
       </div>
 
-      <div class="card" style="padding:14px 18px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+      <!-- 하단 저장 버튼 제거(2026-08-14, Vin 지적 — 상단 「등급별 환산가치」 카드 저장
+           버튼과 완전히 같은 tvSave() 를 호출하는 중복 버튼이었다. 안내 문구만 남긴다,
+           김반장 확정). -->
+      <div class="card" style="padding:14px 18px">
         <span style="font-size:13px;color:var(--text-2)">입력한 값은 <strong style="color:var(--text)">저장 버튼을 눌러야 적용됩니다.</strong></span>
-        <div style="margin-left:auto"><button class="btn btn-primary btn-sm" onclick="tvSave()">저장</button></div>
       </div>
 
     </div>
