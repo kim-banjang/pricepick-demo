@@ -294,6 +294,26 @@ tr:hover td{background:var(--surface-2);}
   font-size:12px;color:var(--warning);margin-bottom:14px;font-weight:700;}
 #sec-ticket-accrual .ta-dirty-banner.show{display:block;}
 #sec-ticket-accrual #ta-save-btn.ta-highlight,#sec-ticket-accrual #ta-save-btn-secondary.ta-highlight{box-shadow:0 0 0 3px var(--warning-soft);}
+/* 제휴몰 로고 등록 (2026-08-14, 켈빈 질문 — 앱 「적립 가능 쇼핑몰」 화면에 로고를
+   표시해야 하는데 CMS에 그 데이터가 없었다. 구글 파비콘 서비스는 안 쓰고, 로고
+   파일(김반장 제공)의 URL을 여기서 등록한다. 저장은 그 구획 저장 버튼을 눌러야
+   반영된다 — 수수료·적립률과 같은 "저장 전 변경" 취급(즉시 Firestore 쓰기 아님). */
+#sec-ticket-accrual .ta-logo-cell{display:flex;align-items:center;justify-content:center;gap:6px;}
+#sec-ticket-accrual .ta-logo-thumb{width:26px;height:26px;border-radius:50%;object-fit:cover;
+  background:var(--surface-2);border:1px solid var(--border);display:block;flex:none;}
+#sec-ticket-accrual .ta-logo-fallback{width:26px;height:26px;border-radius:50%;background:var(--main-soft);
+  color:var(--main-hover);font-size:11px;font-weight:800;display:flex;align-items:center;
+  justify-content:center;flex:none;}
+#sec-ticket-accrual .ta-logo-edit-btn{font-size:11px;color:var(--main-hover);font-weight:700;
+  cursor:pointer;background:none;border:none;padding:0;white-space:nowrap;}
+#sec-ticket-accrual .ta-logo-thumb.ta-changed,#sec-ticket-accrual .ta-logo-fallback.ta-changed{
+  box-shadow:0 0 0 2px var(--warning);}
+#m-ta-logo .ta-logo-preview-row{display:flex;align-items:center;gap:14px;margin-bottom:14px;}
+#m-ta-logo .ta-logo-preview{width:56px;height:56px;border-radius:50%;object-fit:cover;
+  background:var(--surface-2);border:1px solid var(--border);display:block;flex:none;}
+#m-ta-logo .ta-logo-preview-fallback{width:56px;height:56px;border-radius:50%;background:var(--main-soft);
+  color:var(--main-hover);font-size:20px;font-weight:800;display:flex;align-items:center;
+  justify-content:center;flex:none;}
 /* 링크프라이스 110개 — 표 헤더 고정, 머천트명 링크, 승인상태 배지 (2026-08-11 신설) */
 #ta-table-secondary thead th{position:sticky;top:0;background:var(--surface);z-index:1;}
 /* 선택 후 일괄 적용 — 선택 모드일 때만 체크박스 열을 보인다 (2026-08-11 신설) */
@@ -1556,11 +1576,12 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
         <table id="ta-table-primary">
           <thead>
             <tr>
-              <th style="width:20%">제휴몰</th>
-              <th style="width:14%">수수료</th>
-              <th style="width:17%">적립률</th>
-              <th style="width:14%">수익</th>
-              <th style="width:35%">시뮬레이터</th>
+              <th style="width:10%">로고</th>
+              <th style="width:16%">제휴몰</th>
+              <th style="width:13%">수수료</th>
+              <th style="width:15%">적립률</th>
+              <th style="width:13%">수익</th>
+              <th style="width:33%">시뮬레이터</th>
             </tr>
           </thead>
           <tbody id="ta-tbody-primary"></tbody>
@@ -1634,11 +1655,12 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
             <thead>
               <tr>
                 <th class="ta-select-col" style="width:5%"><input type="checkbox" id="ta-select-all" onchange="taToggleSelectAll(this.checked)" title="보이는 몰 전체 선택"></th>
-                <th style="width:15%">제휴몰</th>
-                <th style="width:12%">링크프라이스 상태</th>
-                <th style="width:9%">수수료</th>
-                <th style="width:11%">적립률</th>
-                <th style="width:9%">수익</th>
+                <th style="width:7%">로고</th>
+                <th style="width:12%">제휴몰</th>
+                <th style="width:11%">링크프라이스 상태</th>
+                <th style="width:8%">수수료</th>
+                <th style="width:10%">적립률</th>
+                <th style="width:8%">수익</th>
                 <th style="width:24%">시뮬레이터</th>
                 <th style="width:15%">적용</th>
               </tr>
@@ -3552,6 +3574,33 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModal('m-ta-add')">취소</button>
       <button class="btn btn-primary" id="ta-add-submit-btn" onclick="taAddMallSubmit()">추가</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── 모달: 제휴몰 로고 등록 (2026-08-14, 켈빈 질문 답변 — 구글 파비콘 대신 CMS에서
+     로고 URL을 등록한다. 여기서 "적용"을 눌러도 Firestore엔 안 쓴다 — 표에 있는
+     그 구획의 저장 버튼을 눌러야 다른 수수료·적립률 변경과 같이 반영된다. ── -->
+<div class="modal-overlay" id="m-ta-logo">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">로고 등록</div>
+      <button class="modal-close" onclick="closeModal('m-ta-logo')"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="ta-logo-code">
+      <div class="ta-logo-preview-row">
+        <img class="ta-logo-preview" id="ta-logo-preview-img" src="" alt="" style="display:none" onerror="this.style.display='none';var f=document.getElementById('ta-logo-preview-fallback');if(f)f.style.display='flex';">
+        <div class="ta-logo-preview-fallback" id="ta-logo-preview-fallback">?</div>
+        <div style="font-size:14px;font-weight:700" id="ta-logo-modal-name">—</div>
+      </div>
+      <div class="form-group"><label class="form-label">로고 이미지 주소 (URL)</label><input class="form-input" type="text" id="ta-logo-url" placeholder="https://..." oninput="taLogoPreviewUpdate()"></div>
+      <div class="icon-note">구글 파비콘 서비스는 쓰지 않습니다 — 김반장이 제공하는 로고 파일을 이미지 호스팅에 올린 뒤 그 주소를 여기 붙여넣으세요. 비워두면 앱에서 몰 이름 첫 글자 배지로 대신 표시됩니다.</div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="taLogoClear()">삭제</button>
+      <button class="btn btn-ghost" onclick="closeModal('m-ta-logo')">취소</button>
+      <button class="btn btn-primary" onclick="taLogoApply()">적용</button>
     </div>
   </div>
 </div>
@@ -9892,7 +9941,13 @@ function taRowRefresh(tr) {
 // 불러온 시점 값(TA_ORIGINAL)과 지금 인풋 값을 비교해서만 판단한다 — 고쳤다가
 // 원래 값으로 되돌리면 "변경 없음"으로 다시 잡혀야 하기 때문에, "손댄 적 있는가"가
 // 아니라 "지금 값이 원본과 다른가"로 매번 다시 계산한다.
-var TA_ORIGINAL = {};   // { code: {fee, rate, status?, applied?} } — taLoad 가 매번 새로 채운다
+var TA_ORIGINAL = {};   // { code: {fee, rate, status?, applied?, logo} } — taLoad 가 매번 새로 채운다
+// 제휴몰 로고(2026-08-14, 켈빈 질문 — 앱 「적립 가능 쇼핑몰」이 CMS 로고를 읽게 하려면
+// 여기서 등록할 자리가 있어야 한다. 구글 파비콘 서비스는 안 쓴다 — 로고 파일은 김반장이
+// 별도 제공. fee/rate 와 같은 "저장 전 변경" 방식 — 등록 즉시 Firestore에 쓰지 않고
+// 그 구획의 저장 버튼을 눌러야 반영된다. { code: url } — url 이 빈 문자열이면 미등록
+// (앱은 몰 이름 첫 글자 배지로 대체 표시).
+var TA_LOGO = {};
 // 대표 제휴몰과 제휴몰(링크프라이스)은 저장 버튼이 분리돼 있다(2026-08-14, Vin 요청 —
 // 링크프라이스 구획엔 저장 버튼 자체가 없었다). 각자 자기 구획 행만 저장하므로
 // dirty count·배너도 구획별로 따로 센다 — 하나로 합쳐 세면 "N건" 이 어느 구획
@@ -9947,6 +10002,15 @@ function taCheckDirtySection(tbodySel) {
       if (toggleEl) toggleEl.classList.toggle('ta-changed', appliedChanged);
       if (appliedChanged) changed++;
     }
+
+    var logoOrig = orig.logo || '';
+    var logoCur = TA_LOGO[tr.dataset.code] || '';
+    var logoChanged = logoCur !== logoOrig;
+    var logoThumbEl = document.getElementById('ta-logo-thumb-' + tr.dataset.code);
+    var logoFallbackEl = document.getElementById('ta-logo-fallback-' + tr.dataset.code);
+    if (logoThumbEl) logoThumbEl.classList.toggle('ta-changed', logoChanged);
+    if (logoFallbackEl) logoFallbackEl.classList.toggle('ta-changed', logoChanged);
+    if (logoChanged) changed++;
   });
   return changed;
 }
@@ -9980,6 +10044,22 @@ window.addEventListener('beforeunload', function(e) {
 
 function taEsc(s) {
   return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+// 제휴몰 로고 셀 — img/fallback 배지를 둘 다 DOM에 그려두고 onerror 로 전환한다
+// (attribute 안에 함수 호출을 심는 방식은 코드에 특수문자가 있을 때 깨지기 쉬워 피함).
+// TA_LOGO 값이 바뀔 때(taLogoApply)도 이 함수로 셀 전체를 다시 그려서 재사용한다.
+function taLogoCellHtml(code, name) {
+  var url = TA_LOGO[code] || '';
+  var orig = TA_ORIGINAL[code] ? (TA_ORIGINAL[code].logo || '') : '';
+  var changed = url !== orig;
+  var initial = taEsc((String(name || '?').trim().charAt(0) || '?').toUpperCase());
+  return '<div class="ta-logo-cell" id="ta-logo-cell-' + code + '">'
+    + '<img class="ta-logo-thumb' + (changed ? ' ta-changed' : '') + '" id="ta-logo-thumb-' + code + '" src="' + taEsc(url) + '" alt=""'
+    +   ' style="' + (url ? '' : 'display:none') + '" onerror="this.style.display=\'none\';var f=document.getElementById(\'ta-logo-fallback-' + code + '\');if(f)f.style.display=\'flex\';">'
+    + '<span class="ta-logo-fallback' + (changed ? ' ta-changed' : '') + '" id="ta-logo-fallback-' + code + '" style="' + (url ? 'display:none' : '') + '">' + initial + '</span>'
+    + '<button type="button" class="ta-logo-edit-btn" onclick="taOpenLogoModal(\'' + code + '\')">' + (url ? '변경' : '등록') + '</button>'
+    + '</div>';
 }
 
 // 링크프라이스 상태 4종 → 기존 배지 색 토큰 재사용(새 색 안 만듦)
@@ -10040,6 +10120,7 @@ function taRenderRow(m, showHideCol) {
   );
   return '<tr data-code="' + m.code + '"' + (showHideCol ? ' data-applied="' + (m.isApplied ? '1' : '0') + '"' : '') + dimStyle + '>'
     + selectCell
+    + '<td>' + taLogoCellHtml(m.code, m.name) + '</td>'
     + nameCell
     + statusCell
     + '<td><span style="display:inline-flex;align-items:center;gap:6px">'
@@ -10062,7 +10143,7 @@ function taCollectFromDom(scope) {
     : scope === 'secondary' ? '#ta-tbody-secondary'
     : '#ta-tbody-primary, #ta-tbody-secondary';
   var rows = document.querySelectorAll(tbodySel.split(',').map(function(s){return s.trim()+' tr[data-code]';}).join(', '));
-  var rates = {}, fees = {}, approval = {}, applied = {}, bad = false;
+  var rates = {}, fees = {}, approval = {}, applied = {}, logos = {}, bad = false;
   Array.prototype.forEach.call(rows, function(tr) {
     var code = tr.dataset.code;
     var v = parseFloat(tr.querySelector('.ta-rate').value);
@@ -10073,8 +10154,9 @@ function taCollectFromDom(scope) {
     fees[code] = Math.round(f * 100) / 100;
     if (typeof TA_APPROVAL[code] === 'string') approval[code] = TA_APPROVAL[code];
     if (typeof TA_APPLIED[code] === 'boolean') applied[code] = TA_APPLIED[code];
+    logos[code] = TA_LOGO[code] || '';
   });
-  return { rates: rates, fees: fees, approval: approval, applied: applied, bad: bad };
+  return { rates: rates, fees: fees, approval: approval, applied: applied, logos: logos, bad: bad };
 }
 
 window.taLoad = function() {
@@ -10107,6 +10189,7 @@ window.taLoad = function() {
     var savedFees = data.fees || {};
     var savedApplied = data.applied || {};
     var savedApproval = data.approval || {};
+    var savedLogos = data.logos || {};
 
     // 대표 제휴몰: 쿠팡 하나만. affiliate_malls 문서 자체는 'coupang'(다른 화면과
     // 공유하는 실제 문서, 손대지 않는다) 그대로 읽되, settings/ticket_accrual 의
@@ -10128,6 +10211,7 @@ window.taLoad = function() {
         fee: cFeeFinal,
         rate: typeof saved[pCode] === 'number' ? taFmt(saved[pCode]) : taDefaultRate(cFeeFinal),
         isHidden: false,
+        logo: typeof savedLogos[pCode] === 'string' ? savedLogos[pCode] : '',
       });
     }
 
@@ -10157,6 +10241,7 @@ window.taLoad = function() {
         rate: typeof saved[code] === 'number' ? taFmt(saved[code]) : taDefaultRate(feeFinal),
         isApplied: typeof savedApplied[code] === 'boolean' ? savedApplied[code] : (status === '승인'),
         status: status,
+        logo: typeof savedLogos[code] === 'string' ? savedLogos[code] : '',
       };
     });
 
@@ -10176,6 +10261,7 @@ window.taLoad = function() {
         fee: feeFinal,
         rate: typeof saved[code] === 'number' ? taFmt(saved[code]) : taDefaultRate(feeFinal),
         isApplied: typeof savedApplied[code] === 'boolean' ? savedApplied[code] : true,
+        logo: typeof savedLogos[code] === 'string' ? savedLogos[code] : '',
       });
     });
 
@@ -10183,11 +10269,13 @@ window.taLoad = function() {
     TA_ORIGINAL = {};
     TA_APPROVAL = {};
     TA_APPLIED = {};
-    primary.forEach(function(m) { TA_ORIGINAL[m.code] = { fee: m.fee, rate: m.rate }; });
+    TA_LOGO = {};
+    primary.forEach(function(m) { TA_ORIGINAL[m.code] = { fee: m.fee, rate: m.rate, logo: m.logo }; TA_LOGO[m.code] = m.logo; });
     secondaryAll.forEach(function(m) {
-      TA_ORIGINAL[m.code] = { fee: m.fee, rate: m.rate, status: m.status, applied: m.isApplied };
+      TA_ORIGINAL[m.code] = { fee: m.fee, rate: m.rate, status: m.status, applied: m.isApplied, logo: m.logo };
       TA_APPROVAL[m.code] = m.status;
       TA_APPLIED[m.code] = m.isApplied;
+      TA_LOGO[m.code] = m.logo;
     });
 
     // 미적용이어도 목록에서 사라지면 안 된다(나중에 다시 켜야 하니) — 전부 그린다.
@@ -10242,11 +10330,12 @@ function taSaveScope(scope, btnId, bannerLabel, logLabel) {
       fees: Object.assign({}, data.fees || {}, c.fees),
       approval: Object.assign({}, data.approval || {}, c.approval),
       applied: Object.assign({}, data.applied || {}, c.applied),
+      logos: Object.assign({}, data.logos || {}, c.logos),
       updated_at: FS.FieldValue.serverTimestamp(),
     }, { merge: true });
   }).then(function() {
-    toast(bannerLabel + ' 수수료·적립률·승인상태·적용여부를 저장했습니다.');
-    logAdmin(logLabel + ' 수수료·적립률·승인상태·적용여부 수정');
+    toast(bannerLabel + ' 수수료·적립률·승인상태·적용여부·로고를 저장했습니다.');
+    logAdmin(logLabel + ' 수수료·적립률·승인상태·적용여부·로고 수정');
     // 방금 저장한 코드만 "원본" 기준값을 갱신 — 다른 구획(아직 저장 안 한 입력값)은
     // 안 건드린다. taLoad() 를 다시 부르면 그 구획의 입력 중이던 값이 지워진다.
     Object.keys(c.rates).forEach(function(code) {
@@ -10255,6 +10344,7 @@ function taSaveScope(scope, btnId, bannerLabel, logLabel) {
       TA_ORIGINAL[code].fee = c.fees[code];
       if (Object.prototype.hasOwnProperty.call(c.approval, code)) TA_ORIGINAL[code].status = c.approval[code];
       if (Object.prototype.hasOwnProperty.call(c.applied, code)) TA_ORIGINAL[code].applied = c.applied[code];
+      if (Object.prototype.hasOwnProperty.call(c.logos, code)) TA_ORIGINAL[code].logo = c.logos[code];
     });
     taCheckDirty();
   }).catch(function(e) {
@@ -10565,6 +10655,55 @@ window.taAddMallSubmit = function() {
   }).finally(function() {
     if (btn) { btn.disabled = false; btn.textContent = '추가'; }
   });
+};
+
+// 제휴몰 로고 등록(2026-08-14, 켈빈 질문 답변) — 「적용」을 눌러도 Firestore엔 안 쓴다.
+// TA_LOGO(메모리)만 바꾸고 그 행의 셀을 다시 그린 뒤 taCheckDirty() 로 변경 표시만
+// 갱신한다 — 실제 저장은 fee/rate 와 똑같이 그 구획의 저장 버튼을 눌러야 된다.
+window.taOpenLogoModal = function(code) {
+  var tr = document.querySelector('tr[data-code="' + code + '"]');
+  var nameEl = tr ? tr.querySelector('.ta-name-text') : null;
+  var name = nameEl ? nameEl.textContent : code;
+  document.getElementById('ta-logo-code').value = code;
+  document.getElementById('ta-logo-modal-name').textContent = name;
+  document.getElementById('ta-logo-url').value = TA_LOGO[code] || '';
+  taLogoPreviewUpdate();
+  openModal('m-ta-logo');
+};
+
+window.taLogoPreviewUpdate = function() {
+  var url = document.getElementById('ta-logo-url').value.trim();
+  var img = document.getElementById('ta-logo-preview-img');
+  var fb = document.getElementById('ta-logo-preview-fallback');
+  var name = document.getElementById('ta-logo-modal-name').textContent;
+  fb.textContent = (String(name || '?').trim().charAt(0) || '?').toUpperCase();
+  if (url) {
+    img.src = url;
+    img.style.display = '';
+    fb.style.display = 'none';
+  } else {
+    img.removeAttribute('src');
+    img.style.display = 'none';
+    fb.style.display = 'flex';
+  }
+};
+
+window.taLogoClear = function() {
+  document.getElementById('ta-logo-url').value = '';
+  taLogoApply();
+};
+
+window.taLogoApply = function() {
+  var code = document.getElementById('ta-logo-code').value;
+  var url = document.getElementById('ta-logo-url').value.trim();
+  TA_LOGO[code] = url;
+  var tr = document.querySelector('tr[data-code="' + code + '"]');
+  var nameEl = tr ? tr.querySelector('.ta-name-text') : null;
+  var name = nameEl ? nameEl.textContent : code;
+  var cell = document.getElementById('ta-logo-cell-' + code);
+  if (cell) cell.outerHTML = taLogoCellHtml(code, name);
+  closeModal('m-ta-logo');
+  taCheckDirty();
 };
 
 /* ── 적립 시뮬레이터 (2026-08-11 신설, 예전 것 무시하고 새로 만듦)
