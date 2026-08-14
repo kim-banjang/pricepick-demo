@@ -293,7 +293,7 @@ tr:hover td{background:var(--surface-2);}
   border:1px solid var(--warning);border-radius:var(--r-md);padding:10px 16px;
   font-size:12px;color:var(--warning);margin-bottom:14px;font-weight:700;}
 #sec-ticket-accrual .ta-dirty-banner.show{display:block;}
-#sec-ticket-accrual #ta-save-btn.ta-highlight{box-shadow:0 0 0 3px var(--warning-soft);}
+#sec-ticket-accrual #ta-save-btn.ta-highlight,#sec-ticket-accrual #ta-save-btn-secondary.ta-highlight{box-shadow:0 0 0 3px var(--warning-soft);}
 /* 링크프라이스 110개 — 표 헤더 고정, 머천트명 링크, 승인상태 배지 (2026-08-11 신설) */
 #ta-table-secondary thead th{position:sticky;top:0;background:var(--surface);z-index:1;}
 /* 선택 후 일괄 적용 — 선택 모드일 때만 체크박스 열을 보인다 (2026-08-11 신설) */
@@ -1547,13 +1547,13 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
 
     <div class="section" id="sec-ticket-accrual">
       <div class="info-box">제휴몰별 수수료와 사용자에게 돌려줄 적립률을 정합니다(계약이 바뀌면 수수료도 여기서 바로 반영). 등급 환산은 큰 단위부터 채우는 기존 방식 그대로입니다. 쿠팡은 대표 제휴몰로 항상 별도 표시됩니다. 적립률 기본값은 수수료의 60%이며, 나머지 40%가 우리 수익입니다.</div>
-      <div class="ta-dirty-banner" id="ta-dirty-banner"></div>
 
       <div class="card">
         <div class="card-header">
           <div class="card-title">대표 제휴몰</div>
           <button class="btn btn-primary btn-sm" id="ta-save-btn" onclick="taSave()">저장</button>
         </div>
+        <div class="ta-dirty-banner" id="ta-dirty-banner-primary"></div>
         <table id="ta-table-primary">
           <thead>
             <tr>
@@ -1620,8 +1620,11 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
             </span>
             <span style="width:1px;height:22px;background:var(--border)"></span>
             <button class="btn btn-ghost btn-sm" onclick="taOpenAddMall()">제휴몰 추가</button>
+            <span style="width:1px;height:22px;background:var(--border)"></span>
+            <button class="btn btn-primary btn-sm" id="ta-save-btn-secondary" onclick="taSaveSecondary()">저장</button>
           </div>
         </div>
+        <div class="ta-dirty-banner" id="ta-dirty-banner-secondary"></div>
         <div style="padding:8px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:11.5px;color:var(--text-3)">
           <span>이 목록의 원본 자료</span>
           <a class="btn btn-ghost btn-sm" href="https://pricepick.vercel.app/devqa/linkprice-merchants-20260811.html" target="_blank" rel="noopener" style="text-decoration:none">📋 HTML로 보기</a>
@@ -9862,7 +9865,12 @@ function taRowRefresh(tr) {
 // 원래 값으로 되돌리면 "변경 없음"으로 다시 잡혀야 하기 때문에, "손댄 적 있는가"가
 // 아니라 "지금 값이 원본과 다른가"로 매번 다시 계산한다.
 var TA_ORIGINAL = {};   // { code: {fee, rate, status?, applied?} } — taLoad 가 매번 새로 채운다
-var TA_DIRTY_COUNT = 0;
+// 대표 제휴몰과 제휴몰(링크프라이스)은 저장 버튼이 분리돼 있다(2026-08-14, Vin 요청 —
+// 링크프라이스 구획엔 저장 버튼 자체가 없었다). 각자 자기 구획 행만 저장하므로
+// dirty count·배너도 구획별로 따로 센다 — 하나로 합쳐 세면 "N건" 이 어느 구획
+// 것인지 알 수 없다.
+var TA_DIRTY_PRIMARY = 0;
+var TA_DIRTY_SECONDARY = 0;
 var TA_APPROVAL = {};   // { code: 현재(저장 전 포함) 승인 상태 } — 링크프라이스 몰만 채워진다
 // 적용/미적용 — 토글 클릭은 여기(메모리)만 바꾼다. Firestore 에는 저장 버튼을 눌러야
 // 쓰인다(2026-08-11 — 이전엔 토글이 즉시 db.set 을 했는데, 다른 값들과 저장 방식이
@@ -9877,11 +9885,12 @@ var TA_SELECTED = {};   // { code: true }
 var TA_CATALOG = [];    // 링크프라이스 카탈로그(settings/linkprice_catalog) — taLoad 가 채운다.
                          // 상세정보 모달(taOpenMerchantInfo)이 같은 배열을 재사용한다.
 
-window.taHasUnsavedChanges = function() { return TA_DIRTY_COUNT > 0; };
-window.taResetDirty = function() { TA_DIRTY_COUNT = 0; }; // go() 가드에서 "그래도 나간다" 선택 시 사용
+window.taHasUnsavedChanges = function() { return TA_DIRTY_PRIMARY > 0 || TA_DIRTY_SECONDARY > 0; };
+window.taResetDirty = function() { TA_DIRTY_PRIMARY = 0; TA_DIRTY_SECONDARY = 0; }; // go() 가드에서 "그래도 나간다" 선택 시 사용
 
-function taCheckDirty() {
-  var rows = document.querySelectorAll('#ta-tbody-primary tr[data-code], #ta-tbody-secondary tr[data-code]');
+// 한 구획(대표/링크프라이스) 안의 행만 훑어서 변경 건수를 세고 .ta-changed 표시를 갱신한다.
+function taCheckDirtySection(tbodySel) {
+  var rows = document.querySelectorAll(tbodySel + ' tr[data-code]');
   var changed = 0;
   Array.prototype.forEach.call(rows, function(tr) {
     var orig = TA_ORIGINAL[tr.dataset.code];
@@ -9911,10 +9920,12 @@ function taCheckDirty() {
       if (appliedChanged) changed++;
     }
   });
+  return changed;
+}
 
-  TA_DIRTY_COUNT = changed;
-  var banner = document.getElementById('ta-dirty-banner');
-  var saveBtn = document.getElementById('ta-save-btn');
+function taRenderDirtyBanner(bannerId, btnId, changed) {
+  var banner = document.getElementById(bannerId);
+  var saveBtn = document.getElementById(btnId);
   if (changed > 0) {
     if (banner) {
       banner.innerHTML = '<span>저장하지 않은 변경</span> ' + changed + '<span>건</span> — <span>저장 버튼을 눌러야 적용됩니다</span>';
@@ -9927,9 +9938,16 @@ function taCheckDirty() {
   }
 }
 
+function taCheckDirty() {
+  TA_DIRTY_PRIMARY = taCheckDirtySection('#ta-tbody-primary');
+  TA_DIRTY_SECONDARY = taCheckDirtySection('#ta-tbody-secondary');
+  taRenderDirtyBanner('ta-dirty-banner-primary', 'ta-save-btn', TA_DIRTY_PRIMARY);
+  taRenderDirtyBanner('ta-dirty-banner-secondary', 'ta-save-btn-secondary', TA_DIRTY_SECONDARY);
+}
+
 // 새로고침·탭 닫기 — 브라우저 기본 확인창(문구는 브라우저가 정함, 커스텀 불가).
 window.addEventListener('beforeunload', function(e) {
-  if (TA_DIRTY_COUNT > 0) { e.preventDefault(); e.returnValue = ''; }
+  if (TA_DIRTY_PRIMARY > 0 || TA_DIRTY_SECONDARY > 0) { e.preventDefault(); e.returnValue = ''; }
 });
 
 function taEsc(s) {
@@ -10009,8 +10027,13 @@ function taRenderRow(m, showHideCol) {
 // 지금 화면(저장 안 한 편집분 포함) 에서 rates/fees/승인상태 를 읽는다. 저장(taSave)과
 // 숨김 토글(taToggleHide) 둘 다 이걸 써서, 숨김을 눌러도 다른 행에서 편집 중이던
 // 값이 안 날아간다. 승인 상태는 표 인풋이 아니라 모달에서 고치므로 TA_APPROVAL(메모리)에서 읽는다.
-function taCollectFromDom() {
-  var rows = document.querySelectorAll('#ta-tbody-primary tr[data-code], #ta-tbody-secondary tr[data-code]');
+function taCollectFromDom(scope) {
+  // scope: 'primary' | 'secondary' — 각자 자기 구획 행만 모은다(2026-08-14, 구획별
+  // 저장 분리). scope 를 안 주면(내부 재사용 대비) 기존처럼 전체를 모은다.
+  var tbodySel = scope === 'primary' ? '#ta-tbody-primary'
+    : scope === 'secondary' ? '#ta-tbody-secondary'
+    : '#ta-tbody-primary, #ta-tbody-secondary';
+  var rows = document.querySelectorAll(tbodySel.split(',').map(function(s){return s.trim()+' tr[data-code]';}).join(', '));
   var rates = {}, fees = {}, approval = {}, applied = {}, bad = false;
   Array.prototype.forEach.call(rows, function(tr) {
     var code = tr.dataset.code;
@@ -10169,11 +10192,16 @@ window.taLoad = function() {
   });
 };
 
-window.taSave = function() {
-  var c = taCollectFromDom();
+// 대표 제휴몰·제휴몰(링크프라이스) 저장 공용 로직 — scope 로 자기 구획 행만 모아서
+// 쓴다(2026-08-14, Vin 요청으로 구획 분리). merge:true 라 다른 구획 코드는 안 건드리지만,
+// taLoad() 로 전체를 다시 그리면 "저장 안 한 다른 구획의 입력 중이던 값"까지 지워지므로
+// (2026-08-14, 실측으로 확인) 전체 재로드 대신 방금 저장한 코드만 TA_ORIGINAL 기준값을
+// 갱신하고 taCheckDirty() 로 배너·강조만 다시 계산한다 — 화면 전체를 다시 그리지 않는다.
+function taSaveScope(scope, btnId, bannerLabel, logLabel) {
+  var c = taCollectFromDom(scope);
   if (!Object.keys(c.rates).length) return;
   if (c.bad) { toast('수수료는 0~100, 적립률은 0~20 사이 숫자로 입력하세요.'); return; }
-  var btn = document.getElementById('ta-save-btn');
+  var btn = document.getElementById(btnId);
   if (btn) { btn.disabled = true; btn.textContent = '저장 중…'; }
   var ref = db.collection('settings').doc('ticket_accrual');
   // 저장 직전에 최신 문서를 다시 읽어 그 위에 얹는다(2026-08-11, 김반장 확정) — 다른
@@ -10189,14 +10217,31 @@ window.taSave = function() {
       updated_at: FS.FieldValue.serverTimestamp(),
     }, { merge: true });
   }).then(function() {
-    toast('제휴몰별 수수료·적립률·승인상태·적용여부를 저장했습니다.');
-    logAdmin('티켓 수수료·적립률·승인상태·적용여부 수정');
-    window.taLoad();
+    toast(bannerLabel + ' 수수료·적립률·승인상태·적용여부를 저장했습니다.');
+    logAdmin(logLabel + ' 수수료·적립률·승인상태·적용여부 수정');
+    // 방금 저장한 코드만 "원본" 기준값을 갱신 — 다른 구획(아직 저장 안 한 입력값)은
+    // 안 건드린다. taLoad() 를 다시 부르면 그 구획의 입력 중이던 값이 지워진다.
+    Object.keys(c.rates).forEach(function(code) {
+      if (!TA_ORIGINAL[code]) TA_ORIGINAL[code] = {};
+      TA_ORIGINAL[code].rate = c.rates[code];
+      TA_ORIGINAL[code].fee = c.fees[code];
+      if (Object.prototype.hasOwnProperty.call(c.approval, code)) TA_ORIGINAL[code].status = c.approval[code];
+      if (Object.prototype.hasOwnProperty.call(c.applied, code)) TA_ORIGINAL[code].applied = c.applied[code];
+    });
+    taCheckDirty();
   }).catch(function(e) {
     toast('저장 실패: ' + (e.message || e));
   }).finally(function() {
     if (btn) { btn.disabled = false; btn.textContent = '저장'; }
   });
+}
+
+window.taSave = function() {
+  taSaveScope('primary', 'ta-save-btn', '대표 제휴몰', '대표 제휴몰');
+};
+
+window.taSaveSecondary = function() {
+  taSaveScope('secondary', 'ta-save-btn-secondary', '제휴몰(링크프라이스)', '제휴몰(링크프라이스)');
 };
 
 // 숨김/숨김 해제. 삭제가 아니다 — settings/ticket_accrual 의 hidden 맵에 코드만
