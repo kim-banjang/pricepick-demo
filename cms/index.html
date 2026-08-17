@@ -314,6 +314,9 @@ tr:hover td{background:var(--surface-2);}
 #m-ta-logo .ta-logo-preview-fallback{width:56px;height:56px;border-radius:50%;background:var(--main-soft);
   color:var(--main-hover);font-size:20px;font-weight:800;display:flex;align-items:center;
   justify-content:center;flex:none;}
+.ta-logo-dropzone{border:1.5px dashed var(--border);border-radius:10px;padding:14px;text-align:center;
+  font-size:12px;color:var(--text-2);cursor:pointer;transition:border-color .15s,background-color .15s;}
+.ta-logo-dropzone:hover,.ta-logo-dropzone.drag{border-color:var(--main);background:var(--main-soft);}
 /* 링크프라이스 110개 — 표 헤더 고정, 머천트명 링크, 승인상태 배지 (2026-08-11 신설) */
 #ta-table-secondary thead th{position:sticky;top:0;background:var(--surface);z-index:1;}
 /* 선택 후 일괄 적용 — 선택 모드일 때만 체크박스 열을 보인다 (2026-08-11 신설) */
@@ -3594,8 +3597,19 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
         <div class="ta-logo-preview-fallback" id="ta-logo-preview-fallback">?</div>
         <div style="font-size:14px;font-weight:700" id="ta-logo-modal-name">—</div>
       </div>
-      <div class="form-group"><label class="form-label">로고 이미지 주소 (URL)</label><input class="form-input" type="text" id="ta-logo-url" placeholder="https://..." oninput="taLogoPreviewUpdate()"></div>
-      <div class="form-hint">로고 이미지 주소를 입력하세요. 비워두면 몰 이름 첫 글자가 표시됩니다.</div>
+      <div class="form-group">
+        <label class="form-label">로고 파일 업로드</label>
+        <div id="ta-logo-dropzone" class="ta-logo-dropzone" onclick="document.getElementById('ta-logo-file').click()"
+             ondragover="event.preventDefault();this.classList.add('drag')"
+             ondragleave="this.classList.remove('drag')"
+             ondrop="event.preventDefault();this.classList.remove('drag');if(event.dataTransfer.files[0])taLogoFileSelected(event.dataTransfer.files[0]);">
+          <input type="file" id="ta-logo-file" accept="image/*" style="display:none" onchange="taLogoFileSelected(this.files[0])">
+          <span>파일 선택 또는 끌어다 놓기</span>
+        </div>
+        <div class="form-hint" id="ta-logo-upload-status"></div>
+      </div>
+      <div class="form-group"><label class="form-label">또는 이미지 주소 (URL)</label><input class="form-input" type="text" id="ta-logo-url" placeholder="https://..." oninput="taLogoPreviewUpdate()"></div>
+      <div class="form-hint">로고 파일을 올리거나 이미지 주소를 입력하세요. 비워두면 몰 이름 첫 글자가 표시됩니다.</div>
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="taLogoClear()">삭제</button>
@@ -10657,28 +10671,38 @@ window.taAddMallSubmit = function() {
   });
 };
 
-// 제휴몰 로고 등록(2026-08-14, 켈빈 질문 답변) — 「적용」을 눌러도 Firestore엔 안 쓴다.
-// TA_LOGO(메모리)만 바꾸고 그 행의 셀을 다시 그린 뒤 taCheckDirty() 로 변경 표시만
-// 갱신한다 — 실제 저장은 fee/rate 와 똑같이 그 구획의 저장 버튼을 눌러야 된다.
+// 제휴몰 로고 등록(2026-08-14 신설, 2026-08-17 파일 업로드 추가) — 「적용」을 눌러도
+// Firestore엔 안 쓴다. TA_LOGO(메모리)만 바꾸고 그 행의 셀을 다시 그린 뒤 taCheckDirty()
+// 로 변경 표시만 갱신한다 — 실제 저장은 fee/rate 와 똑같이 그 구획의 저장 버튼을 눌러야
+// 된다. 저장되는 값은 URL 문자열이든 업로드한 파일을 옮긴 data: URL이든 똑같이 TA_LOGO
+// 하나에 문자열로 들어간다 — <img src>도, settings/ticket_accrual의 logos 맵(문자열)도
+// 둘을 구분할 필요가 없어서 기존 구조를 그대로 재사용할 수 있다.
+var ta_logoPendingUpload = null; // 방금 올린 파일(data: URL) — "적용"을 누르기 전까지의 임시값
+
 window.taOpenLogoModal = function(code) {
   var tr = document.querySelector('tr[data-code="' + code + '"]');
   var nameEl = tr ? tr.querySelector('.ta-name-text') : null;
   var name = nameEl ? nameEl.textContent : code;
   document.getElementById('ta-logo-code').value = code;
   document.getElementById('ta-logo-modal-name').textContent = name;
-  document.getElementById('ta-logo-url').value = TA_LOGO[code] || '';
-  taLogoPreviewUpdate();
+  ta_logoPendingUpload = null;
+  var cur = TA_LOGO[code] || '';
+  // 업로드해서 저장된 값(data: URL)은 URL 입력칸에 그대로 채우지 않는다 — 수만 자짜리
+  // 문자열이 입력칸에 그대로 보이면 알아볼 수도, 고칠 수도 없다. 미리보기로만 보여준다.
+  document.getElementById('ta-logo-url').value = /^data:/.test(cur) ? '' : cur;
+  document.getElementById('ta-logo-upload-status').textContent = /^data:/.test(cur) ? '지금 파일이 등록돼 있습니다.' : '';
+  if (/^data:/.test(cur)) ta_logoPendingUpload = cur;
+  taLogoRenderPreview(cur);
   openModal('m-ta-logo');
 };
 
-window.taLogoPreviewUpdate = function() {
-  var url = document.getElementById('ta-logo-url').value.trim();
+function taLogoRenderPreview(src) {
   var img = document.getElementById('ta-logo-preview-img');
   var fb = document.getElementById('ta-logo-preview-fallback');
   var name = document.getElementById('ta-logo-modal-name').textContent;
   fb.textContent = (String(name || '?').trim().charAt(0) || '?').toUpperCase();
-  if (url) {
-    img.src = url;
+  if (src) {
+    img.src = src;
     img.style.display = '';
     fb.style.display = 'none';
   } else {
@@ -10686,17 +10710,74 @@ window.taLogoPreviewUpdate = function() {
     img.style.display = 'none';
     fb.style.display = 'flex';
   }
+}
+
+// URL 입력칸에 직접 타이핑하면 그게 우선이다 — 방금 올려둔 파일(있었다면)은 버린다.
+window.taLogoPreviewUpdate = function() {
+  ta_logoPendingUpload = null;
+  document.getElementById('ta-logo-upload-status').textContent = '';
+  taLogoRenderPreview(document.getElementById('ta-logo-url').value.trim());
+};
+
+// 올린 파일을 로고 카드 크기(원형 26~56px)에 맞춰 축소·재인코딩한다. 원본 해상도를 그대로
+// 들고 있을 이유가 없고, 로고는 여러 개 모여 하나의 Firestore 문서(settings/ticket_accrual
+// 의 logos 맵)에 함께 저장되므로 장당 용량을 작게 유지해야 그 문서가 안 커진다(문서당
+// 1MB 제한). 240px면 원형 배지에서 흐려 보이지 않으면서도 대부분 수십 KB 안쪽으로 나온다.
+// 큰 파일(8MB 초과)은 안내하고 거절한다 — 그 이상은 브라우저에서 디코딩만으로도 느려진다.
+var TA_LOGO_MAX_SRC_BYTES = 8 * 1024 * 1024;
+var TA_LOGO_MAX_DIM = 240;
+
+function taLogoProcessFile(file) {
+  return new Promise(function(resolve, reject) {
+    if (!file || !file.type || file.type.indexOf('image/') !== 0) { reject(new Error('이미지 파일만 올릴 수 있습니다.')); return; }
+    if (file.size > TA_LOGO_MAX_SRC_BYTES) { reject(new Error('파일이 너무 큽니다 — 8MB 이하로 올려주세요.')); return; }
+    var reader = new FileReader();
+    reader.onerror = function() { reject(new Error('파일을 읽을 수 없습니다.')); };
+    reader.onload = function() {
+      var img = new Image();
+      img.onerror = function() { reject(new Error('이미지를 열 수 없습니다.')); };
+      img.onload = function() {
+        var w = img.naturalWidth || 1, h = img.naturalHeight || 1;
+        var scale = Math.min(1, TA_LOGO_MAX_DIM / Math.max(w, h));
+        var cw = Math.max(1, Math.round(w * scale)), ch = Math.max(1, Math.round(h * scale));
+        var canvas = document.createElement('canvas');
+        canvas.width = cw; canvas.height = ch;
+        canvas.getContext('2d').drawImage(img, 0, 0, cw, ch);
+        resolve(canvas.toDataURL('image/png')); // PNG로 — 로고는 투명 배경인 경우가 많다
+      };
+      img.src = reader.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+window.taLogoFileSelected = function(file) {
+  if (!file) return;
+  var statusEl = document.getElementById('ta-logo-upload-status');
+  statusEl.textContent = '처리 중…'; statusEl.style.color = '';
+  taLogoProcessFile(file).then(function(dataUrl) {
+    ta_logoPendingUpload = dataUrl;
+    document.getElementById('ta-logo-url').value = '';
+    taLogoRenderPreview(dataUrl);
+    var kb = Math.round(dataUrl.length * 0.75 / 1024);
+    statusEl.textContent = '업로드됨(약 ' + kb + 'KB) — 적용을 눌러 반영하세요.'; statusEl.style.color = '';
+  }).catch(function(err) {
+    statusEl.textContent = err.message; statusEl.style.color = 'var(--danger)';
+  });
 };
 
 window.taLogoClear = function() {
+  ta_logoPendingUpload = null;
   document.getElementById('ta-logo-url').value = '';
+  document.getElementById('ta-logo-upload-status').textContent = '';
   taLogoApply();
 };
 
 window.taLogoApply = function() {
   var code = document.getElementById('ta-logo-code').value;
-  var url = document.getElementById('ta-logo-url').value.trim();
+  var url = ta_logoPendingUpload || document.getElementById('ta-logo-url').value.trim();
   TA_LOGO[code] = url;
+  ta_logoPendingUpload = null;
   var tr = document.querySelector('tr[data-code="' + code + '"]');
   var nameEl = tr ? tr.querySelector('.ta-name-text') : null;
   var name = nameEl ? nameEl.textContent : code;
