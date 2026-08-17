@@ -309,10 +309,10 @@ tr:hover td{background:var(--surface-2);}
 #sec-ticket-accrual .ta-logo-thumb.ta-changed,#sec-ticket-accrual .ta-logo-fallback.ta-changed{
   box-shadow:0 0 0 2px var(--warning);}
 #m-ta-logo .ta-logo-preview-row{display:flex;align-items:center;gap:14px;margin-bottom:14px;}
-#m-ta-logo .ta-logo-preview{width:56px;height:56px;border-radius:50%;object-fit:cover;
+#m-ta-logo .ta-logo-preview{width:128px;height:128px;border-radius:12px;object-fit:contain;
   background:var(--surface-2);border:1px solid var(--border);display:block;flex:none;}
-#m-ta-logo .ta-logo-preview-fallback{width:56px;height:56px;border-radius:50%;background:var(--main-soft);
-  color:var(--main-hover);font-size:20px;font-weight:800;display:flex;align-items:center;
+#m-ta-logo .ta-logo-preview-fallback{width:128px;height:128px;border-radius:12px;background:var(--main-soft);
+  color:var(--main-hover);font-size:36px;font-weight:800;display:flex;align-items:center;
   justify-content:center;flex:none;}
 .ta-logo-dropzone{border:1.5px dashed var(--border);border-radius:10px;padding:14px;text-align:center;
   font-size:12px;color:var(--text-2);cursor:pointer;transition:border-color .15s,background-color .15s;}
@@ -3603,13 +3603,14 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
              ondragover="event.preventDefault();this.classList.add('drag')"
              ondragleave="this.classList.remove('drag')"
              ondrop="event.preventDefault();this.classList.remove('drag');if(event.dataTransfer.files[0])taLogoFileSelected(event.dataTransfer.files[0]);">
-          <input type="file" id="ta-logo-file" accept="image/*" style="display:none" onchange="taLogoFileSelected(this.files[0])">
+          <input type="file" id="ta-logo-file" accept="image/png,image/jpeg" style="display:none" onchange="taLogoFileSelected(this.files[0])">
           <span>파일 선택 또는 끌어다 놓기</span>
         </div>
+        <div class="form-hint">128×128 정사각형 · PNG 또는 JPG</div>
         <div class="form-hint" id="ta-logo-upload-status"></div>
       </div>
       <div class="form-group"><label class="form-label">또는 이미지 주소 (URL)</label><input class="form-input" type="text" id="ta-logo-url" placeholder="https://..." oninput="taLogoPreviewUpdate()"></div>
-      <div class="form-hint">로고 파일을 올리거나 이미지 주소를 입력하세요. 비워두면 몰 이름 첫 글자가 표시됩니다.</div>
+      <div class="form-hint">로고 파일을 올리거나 이미지 주소를 입력하세요. 비워두면 몰 이름 글자로 표시됩니다.</div>
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="taLogoClear()">삭제</button>
@@ -9960,7 +9961,7 @@ var TA_ORIGINAL = {};   // { code: {fee, rate, status?, applied?, logo} } — ta
 // 여기서 등록할 자리가 있어야 한다. 구글 파비콘 서비스는 안 쓴다 — 로고 파일은 김반장이
 // 별도 제공. fee/rate 와 같은 "저장 전 변경" 방식 — 등록 즉시 Firestore에 쓰지 않고
 // 그 구획의 저장 버튼을 눌러야 반영된다. { code: url } — url 이 빈 문자열이면 미등록
-// (앱은 몰 이름 첫 글자 배지로 대체 표시).
+// (앱은 몰 이름 글자 배지로 대체 표시).
 var TA_LOGO = {};
 // 대표 제휴몰과 제휴몰(링크프라이스)은 저장 버튼이 분리돼 있다(2026-08-14, Vin 요청 —
 // 링크프라이스 구획엔 저장 버튼 자체가 없었다). 각자 자기 구획 행만 저장하므로
@@ -10719,17 +10720,19 @@ window.taLogoPreviewUpdate = function() {
   taLogoRenderPreview(document.getElementById('ta-logo-url').value.trim());
 };
 
-// 올린 파일을 로고 카드 크기(원형 26~56px)에 맞춰 축소·재인코딩한다. 원본 해상도를 그대로
-// 들고 있을 이유가 없고, 로고는 여러 개 모여 하나의 Firestore 문서(settings/ticket_accrual
-// 의 logos 맵)에 함께 저장되므로 장당 용량을 작게 유지해야 그 문서가 안 커진다(문서당
-// 1MB 제한). 240px면 원형 배지에서 흐려 보이지 않으면서도 대부분 수십 KB 안쪽으로 나온다.
+// 로고 규격(김반장 확정, 2026-08-17): 128×128 정사각형, PNG 또는 JPG. 형식은 검사해서
+// 거절하고, 정사각형이 아니면 거절하지 않고 경고만 한다 — 급할 때 못 올리면 더 답답하다.
+// 128px보다 크면 자동으로 줄인다(운영자가 포토샵을 열 이유가 없다). 배경색은 검사하지 않는다.
+// 로고는 여러 개 모여 하나의 Firestore 문서(settings/ticket_accrual 의 logos 맵)에 함께
+// 저장되므로 장당 용량을 작게 유지해야 그 문서가 안 커진다(문서당 1MB 제한).
 // 큰 파일(8MB 초과)은 안내하고 거절한다 — 그 이상은 브라우저에서 디코딩만으로도 느려진다.
 var TA_LOGO_MAX_SRC_BYTES = 8 * 1024 * 1024;
-var TA_LOGO_MAX_DIM = 240;
+var TA_LOGO_MAX_DIM = 128;
+var TA_LOGO_ALLOWED_TYPES = { 'image/png': 1, 'image/jpeg': 1 };
 
 function taLogoProcessFile(file) {
   return new Promise(function(resolve, reject) {
-    if (!file || !file.type || file.type.indexOf('image/') !== 0) { reject(new Error('이미지 파일만 올릴 수 있습니다.')); return; }
+    if (!file || !TA_LOGO_ALLOWED_TYPES[file.type]) { reject(new Error('PNG 또는 JPG만 올릴 수 있습니다.')); return; }
     if (file.size > TA_LOGO_MAX_SRC_BYTES) { reject(new Error('파일이 너무 큽니다 — 8MB 이하로 올려주세요.')); return; }
     var reader = new FileReader();
     reader.onerror = function() { reject(new Error('파일을 읽을 수 없습니다.')); };
@@ -10743,7 +10746,7 @@ function taLogoProcessFile(file) {
         var canvas = document.createElement('canvas');
         canvas.width = cw; canvas.height = ch;
         canvas.getContext('2d').drawImage(img, 0, 0, cw, ch);
-        resolve(canvas.toDataURL('image/png')); // PNG로 — 로고는 투명 배경인 경우가 많다
+        resolve({ dataUrl: canvas.toDataURL(file.type), square: w === h });
       };
       img.src = reader.result;
     };
@@ -10755,12 +10758,17 @@ window.taLogoFileSelected = function(file) {
   if (!file) return;
   var statusEl = document.getElementById('ta-logo-upload-status');
   statusEl.textContent = '처리 중…'; statusEl.style.color = '';
-  taLogoProcessFile(file).then(function(dataUrl) {
-    ta_logoPendingUpload = dataUrl;
+  taLogoProcessFile(file).then(function(result) {
+    ta_logoPendingUpload = result.dataUrl;
     document.getElementById('ta-logo-url').value = '';
-    taLogoRenderPreview(dataUrl);
-    var kb = Math.round(dataUrl.length * 0.75 / 1024);
-    statusEl.textContent = '업로드됨(약 ' + kb + 'KB) — 적용을 눌러 반영하세요.'; statusEl.style.color = '';
+    taLogoRenderPreview(result.dataUrl);
+    var kb = Math.round(result.dataUrl.length * 0.75 / 1024);
+    if (!result.square) {
+      statusEl.textContent = '정사각형이 아닙니다 — 그래도 올릴 수 있습니다(약 ' + kb + 'KB). 적용을 눌러 반영하세요.';
+      statusEl.style.color = 'var(--warning)';
+    } else {
+      statusEl.textContent = '업로드됨(약 ' + kb + 'KB) — 적용을 눌러 반영하세요.'; statusEl.style.color = '';
+    }
   }).catch(function(err) {
     statusEl.textContent = err.message; statusEl.style.color = 'var(--danger)';
   });
