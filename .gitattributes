@@ -1,0 +1,26 @@
+# 줄바꿈(개행) 통일 규칙
+#
+# 저장소 안에서도, 작업 폴더에서도 줄바꿈을 LF 하나로 고정합니다.
+# 맥미니와 윈도우 PC의 파일이 바이트 단위로 똑같아지므로,
+# 내용을 고치지 않았는데 "수정됨"으로 뜨는 일이 사라집니다.
+#
+# 이 파일은 저장소에 함께 올라가므로 어느 PC에서 받아도 똑같이 적용되며,
+# 각 PC의 core.autocrlf 설정보다 우선합니다.
+
+* text=auto eol=lf
+
+# 이진 파일 — 어떤 변환도 하지 않습니다.
+*.png  binary
+*.webp binary
+*.jpg  binary
+*.jpeg binary
+*.gif  binary
+*.ico  binary
+*.zip  binary
+*.pdf  binary
+*.wasm binary
+*.bin  binary
+*.otf  binary
+*.ttf  binary
+*.woff binary
+*.woff2 binary
