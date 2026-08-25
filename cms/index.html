@@ -4586,6 +4586,8 @@ function go(id, navEl) {
   if (id === 'ticket-accrual' && window.taLoad) window.taLoad();
   if (id === 'roulette-settings' && window.rltLoad) window.rltLoad('daily');
   if (id === 'jackpot-roulette' && window.rltLoad) window.rltLoad('jackpot');
+  if (id === 'giftbox-daily' && window.rltLoad) window.rltLoad('giftDaily');
+  if (id === 'giftbox-random' && window.rltLoad) window.rltLoad('giftRandom');
   // 모바일: 메뉴 항목 선택 시 드로어 닫기
   if (window.innerWidth <= 768) closeMobileSidebar();
   // 새로고침/뒤로가기 복원을 위해 현재 섹션을 URL 해시에 반영
