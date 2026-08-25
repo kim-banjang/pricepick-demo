@@ -1021,9 +1021,13 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
             <span class="sb-item-lbl" id="nav-label-stats">수익 분석</span>
             
           </button>
-          <button class="sb-item" id="nav-revenue" data-label="매출 내역" onclick="go('revenue',this)">
+          <button class="sb-item" id="nav-revenue-fee" data-label="제휴 수수료 매출" onclick="go('revenue-fee',this)">
             <span class="sb-item-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span>
-            <span class="sb-item-lbl" id="nav-label-revenue">매출 내역</span>
+            <span class="sb-item-lbl" id="nav-label-revenue-fee">제휴 수수료 매출</span>
+          </button>
+          <button class="sb-item" id="nav-revenue-gifticon" data-label="기프티콘 판매 매출" onclick="go('revenue-gifticon',this)">
+            <span class="sb-item-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z"/><circle cx="7.5" cy="7.5" r="1.5"/></svg></span>
+            <span class="sb-item-lbl" id="nav-label-revenue-gifticon">기프티콘 판매 매출</span>
           </button>
           <button class="sb-item" id="nav-settlement" data-label="정산 내역" onclick="go('settlement',this)">
             <span class="sb-item-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><line x1="12" y1="2" x2="12" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span>
@@ -3074,24 +3078,18 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
 
     </div>
 
-    <!-- ── 매출 내역 (신규 · 건별, 유형별 분리) ── -->
-    <div class="section" id="sec-revenue">
+    <!-- ── 제휴 수수료 매출 (신규 · 건별, 매출 내역에서 메뉴 분리) ── -->
+    <div class="section" id="sec-revenue-fee">
       <div class="data-source-bar">
         <span class="ds-label">데이터 출처</span>
         <span class="ds-tag ours">우리 DB · 수익 기록</span>
       </div>
-      <div class="info-box"><strong>매출 내역</strong> — 매출 발생 건별 기록입니다. <strong>제휴 수수료</strong>(제휴몰 D+30 정산)와 <strong>기프티콘 판매</strong>(교환 시 즉시 발생 마진)는 정산 주체·시점이 달라 유형별로 분리해 관리합니다. 합산 지표는 <strong>수익 분석</strong> 페이지 참고.</div>
-      <div class="stats-grid">
+      <div class="info-box"><strong>제휴 수수료 매출</strong> — 제휴몰 포스트백 기준으로 구매확정 후 정산되는 매출입니다(제휴몰 D+30). 합산 지표는 <strong>수익 분석</strong> 페이지 참고.</div>
+      <div class="stats-grid" style="grid-template-columns:minmax(0,320px)">
         <div class="stat-card purple"><div class="stat-label">제휴 수수료 매출</div><div class="stat-value" id="rev-commission">—</div><div class="stat-change neutral">제휴몰 D+30 정산</div></div>
-        <div class="stat-card amber"><div class="stat-label">기프티콘 판매 매출</div><div class="stat-value" id="rev-gifticon-val">—</div><div class="stat-change neutral">교환 마진 · 즉시</div></div>
-        <div class="stat-card green"><div class="stat-label">총 매출</div><div class="stat-value" id="rev-total">—</div><div class="stat-change neutral">포스트백 + 교환 마진</div></div>
       </div>
       <div class="card">
         <div style="padding:18px;">
-          <div class="terms-nav">
-            <div class="terms-tab active" onclick="switchRev(this,'rev-fee')">제휴 수수료 매출</div>
-            <div class="terms-tab" onclick="switchRev(this,'rev-gifticon')">기프티콘 판매 매출</div>
-          </div>
           <div id="rev-fee">
             <div class="toolbar">
               <input class="search-box" id="revfee-search" placeholder="회원, 주문번호 검색..." onkeydown="if(event.key==='Enter')revFeeApplyFilters()">
@@ -3106,7 +3104,23 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
             </table>
             <div id="revfee-pagination"></div>
           </div>
-          <div id="rev-gifticon" style="display:none">
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 기프티콘 판매 매출 (신규 · 건별, 매출 내역에서 메뉴 분리) ── -->
+    <div class="section" id="sec-revenue-gifticon">
+      <div class="data-source-bar">
+        <span class="ds-label">데이터 출처</span>
+        <span class="ds-tag ours">우리 DB · 수익 기록</span>
+      </div>
+      <div class="info-box"><strong>기프티콘 판매 매출</strong> — 기프티콘 교환 시 즉시 발생하는 판매 마진입니다. 합산 지표는 <strong>수익 분석</strong> 페이지 참고.</div>
+      <div class="stats-grid" style="grid-template-columns:minmax(0,320px)">
+        <div class="stat-card amber"><div class="stat-label">기프티콘 판매 매출</div><div class="stat-value" id="rev-gifticon-val">—</div><div class="stat-change neutral">교환 마진 · 즉시</div></div>
+      </div>
+      <div class="card">
+        <div style="padding:18px;">
+          <div id="rev-gifticon">
             <div class="toolbar">
               <input class="search-box" id="revgi-search" placeholder="회원, 상품 검색..." onkeydown="if(event.key==='Enter')revGiApplyFilters()">
               <button class="btn btn-primary btn-sm" onclick="revGiApplyFilters()">검색</button>
@@ -4304,7 +4318,8 @@ const I18N = {
     'page.withdrawal.title': '계정 탈퇴 처리', 'page.withdrawal.bc': '운영',
     'page.abuse.title': '어뷰징·이상적립 모니터링', 'page.abuse.bc': '운영',
     'page.stats.title': '수익 분석', 'page.stats.bc': '매출 · 수익',
-    'nav.revenue': '매출 내역', 'page.revenue.title': '매출 내역', 'page.revenue.bc': '매출 · 수익',
+    'nav.revenue-fee': '제휴 수수료 매출', 'page.revenue-fee.title': '제휴 수수료 매출', 'page.revenue-fee.bc': '매출 · 수익',
+    'nav.revenue-gifticon': '기프티콘 판매 매출', 'page.revenue-gifticon.title': '기프티콘 판매 매출', 'page.revenue-gifticon.bc': '매출 · 수익',
     'page.settlement.title': '정산 내역', 'page.settlement.bc': '매출 · 수익',
     'page.postback.title': '포스트백 로그', 'page.postback.bc': '시스템',
     'page.appver.title': '앱 버전 관리', 'page.appver.bc': '시스템',
@@ -4383,7 +4398,8 @@ function applyLang() {
     'nav-group-label-revenue': 'nav.group.revenue',
     'nav-group-label-system': 'nav.group.system',
     'nav-label-stats': 'nav.stats',
-    'nav-label-revenue': 'nav.revenue',
+    'nav-label-revenue-fee': 'nav.revenue-fee',
+    'nav-label-revenue-gifticon': 'nav.revenue-gifticon',
     'nav-label-settlement': 'nav.settlement',
     'nav-label-postback': 'nav.postback',
     'nav-label-appver': 'nav.appver',
@@ -4815,7 +4831,10 @@ function giSaveTicketEdit() {
 
 <script id="ip-i18n-engine">
 (function(){
-  var KO2VI={"30일 이내 재가입이 제한됩니다":"Đăng ký lại ngay lập tức sau khi hủy tài khoản là có thể","즉시 재가입이 가능합니다":"Đăng ký lại ngay lập tức là có thể","쿨타임 없음":"Không có thời gian chờ","1단계 확정":"Xác nhận giai đoạn 1",
+  var KO2VI={
+    "— 제휴몰 포스트백 기준으로 구매확정 후 정산되는 매출입니다(제휴몰 D+30). 합산 지표는":"— Là doanh thu được quyết toán sau khi xác nhận mua dựa trên postback của sàn liên kết (D+30 theo từng sàn). Chỉ số tổng hợp thì",
+    "— 기프티콘 교환 시 즉시 발생하는 판매 마진입니다. 합산 지표는":"— Là biên lợi nhuận bán hàng phát sinh ngay khi đổi Gifticon. Chỉ số tổng hợp thì",
+    "30일 이내 재가입이 제한됩니다":"Đăng ký lại ngay lập tức sau khi hủy tài khoản là có thể","즉시 재가입이 가능합니다":"Đăng ký lại ngay lập tức là có thể","쿨타임 없음":"Không có thời gian chờ","1단계 확정":"Xác nhận giai đoạn 1",
     /* 1-char / 2-char common */
     "장":"vé","명":"người","건":"trường hợp","원":"won","회":"lần","개":"mục","일":"ngày",
     /* Core domain terms */
