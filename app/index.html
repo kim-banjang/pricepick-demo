@@ -14729,10 +14729,15 @@ function gbMarkPlayed() { try { localStorage.setItem(GB_LS_KEY, gbTodayStr()); }
    그대로 쓴다 — 「보상 값은 대응 룰렛과 동일」이라는 확정에 맞춘 기본값이다. */
 var GB_ACTIVE = { gb1: null, gb2: null };
 var GB_DOC = { gb1: 'giftbox_daily', gb2: 'giftbox_random' };
+var GB_FALLBACK_DOC = { gb1: 'roulette', gb2: 'jackpot_roulette' };
 function gbLoadConfig(kind) {
   if (!window.ppLoadRouletteSlots) return Promise.resolve();
   return window.ppLoadRouletteSlots(GB_DOC[kind]).then(function (cfg) {
-    if (cfg && cfg.slots && cfg.slots.length) GB_ACTIVE[kind] = cfg.slots;
+    if (cfg && cfg.slots && cfg.slots.length) { GB_ACTIVE[kind] = cfg.slots; return; }
+    /* 아직 CMS에서 저장한 적이 없으면 대응하는 룰렛 구성을 그대로 쓴다 — CMS 화면과 같은 규칙 */
+    return window.ppLoadRouletteSlots(GB_FALLBACK_DOC[kind]).then(function (f) {
+      if (f && f.slots && f.slots.length) GB_ACTIVE[kind] = f.slots;
+    });
   })['catch'](function () {});
 }
 function gbSlots(kind) {

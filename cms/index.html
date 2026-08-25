@@ -13025,7 +13025,7 @@ var RLT_KINDS = {
     ]
   },
   giftDaily: {
-    p: 'gbd', name: '매일 선물 상자 열기', doc: 'giftbox_daily', live: true, legacyWheel: false,
+    p: 'gbd', name: '매일 선물 상자 열기', doc: 'giftbox_daily', fallbackDoc: 'roulette', live: true, legacyWheel: false,
     defaults: [                              /* 매일 행운 룰렛과 동일 — 1회 기대값 9.9원 */
       { type: 'silver_ticket', qty: 1,   prob: 0.2  },
       { type: 'event_ticket',  qty: 1,   prob: 5    },
@@ -13036,7 +13036,7 @@ var RLT_KINDS = {
     ]
   },
   giftRandom: {
-    p: 'gbr', name: '랜덤 선물 상자 열기', doc: 'giftbox_random', live: true, legacyWheel: false,
+    p: 'gbr', name: '랜덤 선물 상자 열기', doc: 'giftbox_random', fallbackDoc: 'jackpot_roulette', live: true, legacyWheel: false,
     defaults: [                              /* 잭팟 룰렛과 동일 — 1회 기대값 40원 */
       { type: 'gold_ticket',   qty: 1,    prob: 0.4  },
       { type: 'point',         qty: 1000, prob: 5    },
@@ -13240,6 +13240,26 @@ window.rltLoad = function(k) {
         last.prob = Math.round((last.prob + gap) * 10) / 10;
       }
       rltSetStatus(k, '구 설정(칸별 균등 확률)을 불러와 확률을 균등 배분했습니다 — 확정 구성으로 조정한 뒤 저장하세요.');
+    } else if (kind.fallbackDoc) {
+      /* 아직 저장한 적이 없는 화면이다. 「보상 구성·값은 대응하는 룰렛과 동일」이라는
+         확정에 맞춰, 대응 룰렛에 저장돼 있는 구성을 그대로 물려받아 보여준다.
+         여기서 저장하면 이 화면 전용 문서로 갈라져 따로 운영된다. */
+      rltState[k].slots = rltCloneSlots(kind.defaults);
+      rltSetStatus(k, '대응하는 룰렛 구성을 불러오는 중…');
+      db.collection('settings').doc(kind.fallbackDoc).get().then(function(fd) {
+        var fdata = fd.exists ? fd.data() : null;
+        if (fdata && Array.isArray(fdata.slots) && fdata.slots.length >= 2) {
+          rltState[k].slots = fdata.slots.map(rltNormalizeSlot);
+          rltSetStatus(k, '대응하는 룰렛과 같은 구성으로 표시 중 · 저장하면 이 화면 전용 구성이 됩니다.');
+        } else {
+          rltSetStatus(k, '확정 기본값(6보상칸) 표시 중 · 저장하면 이 구성이 앱에 적용됩니다.');
+        }
+        rltSetDirty(k, false);
+        rltRenderSlots(k);
+      })['catch'](function() {
+        rltSetStatus(k, '확정 기본값(6보상칸) 표시 중 · 저장하면 이 구성이 앱에 적용됩니다.');
+        rltRenderSlots(k);
+      });
     } else {
       rltState[k].slots = rltCloneSlots(kind.defaults);
       rltSetStatus(k, '확정 기본값(6슬롯) 표시 중 · 저장하면 이 구성이 앱에 적용됩니다.');
