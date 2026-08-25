@@ -1569,6 +1569,8 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
 
     <div class="section" id="sec-ticket-accrual">
       <div class="info-box">제휴몰별 수수료와 사용자에게 돌려줄 적립률을 정합니다(계약이 바뀌면 수수료도 여기서 바로 반영). 등급 환산은 큰 단위부터 채우는 기존 방식 그대로입니다. 쿠팡은 대표 제휴몰로 항상 별도 표시됩니다. 적립률 기본값은 수수료의 60%이며, 나머지 40%가 우리 수익입니다.</div>
+      <div class="info-box"><strong>전환 일수 = 랜덤 티켓이 등급 티켓으로 바뀌기까지의 대기 일수</strong> — 제휴몰마다 다르게 정할 수 있고 기본값은 30일입니다. <strong>카카오 연동 여부와 무관합니다</strong> — 예전의 연동 D+7 / 미연동 D+30 이원 기준은 폐지되었고, 연동 회원이든 미연동 회원이든 그 구매가 발생한 제휴몰의 전환 일수 하나로만 정해집니다.</div>
+      <div class="warn-box"><strong>전환 일수를 줄이면 이미 발급된 랜덤 티켓도 앞당겨 전환됩니다</strong> — 저장하는 순간 대기 중인 가지급 티켓을 새 기준으로 다시 재서, 이미 기간이 지난 티켓은 그 자리에서 등급 티켓으로 확정합니다. 늘리는 경우 이미 확정된 티켓을 되돌리지는 않습니다.</div>
 
       <div class="card">
         <div class="card-header">
@@ -1579,12 +1581,13 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
         <table id="ta-table-primary">
           <thead>
             <tr>
-              <th style="width:10%">로고</th>
-              <th style="width:16%">제휴몰</th>
-              <th style="width:13%">수수료</th>
-              <th style="width:15%">적립률</th>
-              <th style="width:13%">수익</th>
-              <th style="width:33%">시뮬레이터</th>
+              <th style="width:9%">로고</th>
+              <th style="width:14%">제휴몰</th>
+              <th style="width:12%">수수료</th>
+              <th style="width:13%">적립률</th>
+              <th style="width:11%">수익</th>
+              <th style="width:14%">전환 일수</th>
+              <th style="width:27%">시뮬레이터</th>
             </tr>
           </thead>
           <tbody id="ta-tbody-primary"></tbody>
@@ -1637,6 +1640,9 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
               <input class="form-input" type="number" id="ta-bulk-ratio" min="0" max="100" step="1" value="60" style="width:55px;text-align:right" oninput="taBulkRatioLabelUpdate()">
               <span style="font-size:13px;color:var(--text-2)">%</span>
               <button class="btn btn-ghost btn-sm" id="ta-bulk-apply-btn" onclick="taBulkApplyRatio()">적립률 60% 적용</button>
+              <input class="form-input" type="number" id="ta-bulk-days" min="1" max="365" step="1" value="30" style="width:60px;text-align:right" title="선택한 몰에 한꺼번에 적용할 전환 일수">
+              <span style="font-size:13px;color:var(--text-2)">일</span>
+              <button class="btn btn-ghost btn-sm" onclick="taBulkSetConvertDays()">전환 일수 적용</button>
               <button class="btn btn-ghost btn-sm" id="ta-bulk-on-btn" onclick="taBulkSetApplied(true)">적용으로</button>
               <button class="btn btn-ghost btn-sm" id="ta-bulk-off-btn" onclick="taBulkSetApplied(false)">미적용으로</button>
               <button class="btn btn-ghost btn-sm" onclick="taToggleSelectMode()">취소</button>
@@ -1658,14 +1664,15 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
             <thead>
               <tr>
                 <th class="ta-select-col" style="width:5%"><input type="checkbox" id="ta-select-all" onchange="taToggleSelectAll(this.checked)" title="보이는 몰 전체 선택"></th>
-                <th style="width:7%">로고</th>
-                <th style="width:12%">제휴몰</th>
-                <th style="width:11%">링크프라이스 상태</th>
-                <th style="width:8%">수수료</th>
-                <th style="width:10%">적립률</th>
-                <th style="width:8%">수익</th>
-                <th style="width:24%">시뮬레이터</th>
-                <th style="width:15%">적용</th>
+                <th style="width:6%">로고</th>
+                <th style="width:11%">제휴몰</th>
+                <th style="width:10%">링크프라이스 상태</th>
+                <th style="width:7%">수수료</th>
+                <th style="width:9%">적립률</th>
+                <th style="width:7%">수익</th>
+                <th style="width:11%">전환 일수</th>
+                <th style="width:20%">시뮬레이터</th>
+                <th style="width:14%">적용</th>
               </tr>
             </thead>
             <tbody id="ta-tbody-secondary"></tbody>
@@ -9879,6 +9886,13 @@ function taDefaultRate(fee, ratio) {
   var r = taFmt(fee * (typeof ratio === 'number' ? ratio : TA_DEFAULT_RATE_RATIO) / 100);
   return r > 20 ? 20 : r;
 }
+// 「전환 일수」— 랜덤(가지급) 티켓이 등급 티켓으로 확정되기까지의 대기 일수.
+// 카카오 연동 여부로 D+7 / D+30 을 가르던 기존 기준은 폐지하고(김반장 확정 2026-08-24)
+// 제휴몰마다 정하는 이 값 하나로만 정한다. settings/ticket_accrual.convertDays 에
+// { code: 일수 } 맵으로 저장한다 — rates/fees/applied 와 같은 패턴이라 새 문서를 안 만든다.
+var TA_DEFAULT_CONVERT_DAYS = 30;
+var TA_CONVERT_DAYS = {};   // { code: 일수 } — 화면(저장 전 편집분 포함) 값
+
 var TA_UNITS = [                                           // ticket_grades 시드의 환산가치와 동일
   { name: '골드',   value: 2000 },
   { name: '실버',   value: 1000 },
@@ -10018,6 +10032,14 @@ function taCheckDirtySection(tbodySel) {
       if (appliedChanged) changed++;
     }
 
+    var daysEl = tr.querySelector('.ta-days');
+    if (daysEl && typeof orig.days === 'number') {
+      var daysVal = parseInt(daysEl.value, 10);
+      var daysChanged = isFinite(daysVal) && daysVal !== orig.days;
+      daysEl.classList.toggle('ta-changed', daysChanged);
+      if (daysChanged) changed++;
+    }
+
     var logoOrig = orig.logo || '';
     var logoCur = TA_LOGO[tr.dataset.code] || '';
     var logoChanged = logoCur !== logoOrig;
@@ -10143,6 +10165,8 @@ function taRenderRow(m, showHideCol) {
     + '<td><span style="display:inline-flex;align-items:center;gap:6px">'
     +   '<input class="form-input ta-rate" type="number" min="0" max="20" step="0.1" value="' + m.rate + '" style="max-width:88px;text-align:right">%</span></td>'
     + '<td class="ta-margin">—</td>'
+    + '<td><span style="display:inline-flex;align-items:center;gap:6px">'
+    +   '<input class="form-input ta-days" type="number" min="1" max="365" step="1" value="' + m.days + '" style="max-width:72px;text-align:right"><span>일</span></span></td>'
     + '<td><button type="button" class="btn btn-ghost btn-sm" onclick="taOpenSim(\'' + m.code + '\')">시뮬레이터</button></td>'
     + appliedCell
     + '</tr>';
@@ -10158,7 +10182,7 @@ function taCollectFromDom(scope) {
     : scope === 'secondary' ? '#ta-tbody-secondary'
     : '#ta-tbody-primary, #ta-tbody-secondary';
   var rows = document.querySelectorAll(tbodySel.split(',').map(function(s){return s.trim()+' tr[data-code]';}).join(', '));
-  var rates = {}, fees = {}, approval = {}, applied = {}, logos = {}, bad = false;
+  var rates = {}, fees = {}, approval = {}, applied = {}, logos = {}, convertDays = {}, bad = false;
   Array.prototype.forEach.call(rows, function(tr) {
     var code = tr.dataset.code;
     var v = parseFloat(tr.querySelector('.ta-rate').value);
@@ -10167,11 +10191,17 @@ function taCollectFromDom(scope) {
     var f = parseFloat(tr.querySelector('.ta-fee').value);
     if (!isFinite(f) || f < 0 || f > 100) { bad = true; return; }
     fees[code] = Math.round(f * 100) / 100;
+    var dEl = tr.querySelector('.ta-days');
+    if (dEl) {
+      var dv = parseInt(dEl.value, 10);
+      if (!isFinite(dv) || dv < 1 || dv > 365) { bad = true; return; }
+      convertDays[code] = dv;
+    }
     if (typeof TA_APPROVAL[code] === 'string') approval[code] = TA_APPROVAL[code];
     if (typeof TA_APPLIED[code] === 'boolean') applied[code] = TA_APPLIED[code];
     logos[code] = TA_LOGO[code] || '';
   });
-  return { rates: rates, fees: fees, approval: approval, applied: applied, logos: logos, bad: bad };
+  return { rates: rates, fees: fees, approval: approval, applied: applied, logos: logos, convertDays: convertDays, bad: bad };
 }
 
 window.taLoad = function() {
@@ -10182,8 +10212,8 @@ window.taLoad = function() {
 
   // 첫 진입 시 즉시 "불러오는 중" 을 눈에 보이게 그린다 — 조회가 끝날 때까지 표를
   // 안 건드리면 로딩 중과 실제로 텅 빈 상태가 화면에서 구분이 안 간다.
-  tbodyPrimary.innerHTML = ppEmpty(5, '불러오는 중…');
-  tbodySecondary.innerHTML = ppEmpty(8, '불러오는 중…');
+  tbodyPrimary.innerHTML = ppEmpty(6, '불러오는 중…');
+  tbodySecondary.innerHTML = ppEmpty(9, '불러오는 중…');
   if (st) st.textContent = '불러오는 중…';
 
   // 링크프라이스 카탈로그는 별도 정적 파일(linkprice_merchants.js) 대신 Firestore
@@ -10205,6 +10235,7 @@ window.taLoad = function() {
     var savedApplied = data.applied || {};
     var savedApproval = data.approval || {};
     var savedLogos = data.logos || {};
+    var savedDays = data.convertDays || {};
 
     // 대표 제휴몰: 쿠팡 하나만. affiliate_malls 문서 자체는 'coupang'(다른 화면과
     // 공유하는 실제 문서, 손대지 않는다) 그대로 읽되, settings/ticket_accrual 의
@@ -10225,6 +10256,7 @@ window.taLoad = function() {
         name: cd.name || coupangDoc.id,
         fee: cFeeFinal,
         rate: typeof saved[pCode] === 'number' ? taFmt(saved[pCode]) : taDefaultRate(cFeeFinal),
+        days: typeof savedDays[pCode] === 'number' ? savedDays[pCode] : TA_DEFAULT_CONVERT_DAYS,
         isHidden: false,
         logo: typeof savedLogos[pCode] === 'string' ? savedLogos[pCode] : '',
       });
@@ -10254,6 +10286,7 @@ window.taLoad = function() {
         category: x['카테고리'] || '',
         fee: feeFinal,
         rate: typeof saved[code] === 'number' ? taFmt(saved[code]) : taDefaultRate(feeFinal),
+        days: typeof savedDays[code] === 'number' ? savedDays[code] : TA_DEFAULT_CONVERT_DAYS,
         isApplied: typeof savedApplied[code] === 'boolean' ? savedApplied[code] : (status === '승인'),
         status: status,
         logo: typeof savedLogos[code] === 'string' ? savedLogos[code] : '',
@@ -10275,6 +10308,7 @@ window.taLoad = function() {
         name: c.name || code,
         fee: feeFinal,
         rate: typeof saved[code] === 'number' ? taFmt(saved[code]) : taDefaultRate(feeFinal),
+        days: typeof savedDays[code] === 'number' ? savedDays[code] : TA_DEFAULT_CONVERT_DAYS,
         isApplied: typeof savedApplied[code] === 'boolean' ? savedApplied[code] : true,
         logo: typeof savedLogos[code] === 'string' ? savedLogos[code] : '',
       });
@@ -10285,9 +10319,11 @@ window.taLoad = function() {
     TA_APPROVAL = {};
     TA_APPLIED = {};
     TA_LOGO = {};
-    primary.forEach(function(m) { TA_ORIGINAL[m.code] = { fee: m.fee, rate: m.rate, logo: m.logo }; TA_LOGO[m.code] = m.logo; });
+    TA_CONVERT_DAYS = {};
+    primary.forEach(function(m) { TA_ORIGINAL[m.code] = { fee: m.fee, rate: m.rate, days: m.days, logo: m.logo }; TA_LOGO[m.code] = m.logo; TA_CONVERT_DAYS[m.code] = m.days; });
     secondaryAll.forEach(function(m) {
-      TA_ORIGINAL[m.code] = { fee: m.fee, rate: m.rate, status: m.status, applied: m.isApplied, logo: m.logo };
+      TA_ORIGINAL[m.code] = { fee: m.fee, rate: m.rate, days: m.days, status: m.status, applied: m.isApplied, logo: m.logo };
+      TA_CONVERT_DAYS[m.code] = m.days;
       TA_APPROVAL[m.code] = m.status;
       TA_APPLIED[m.code] = m.isApplied;
       TA_LOGO[m.code] = m.logo;
@@ -10299,16 +10335,22 @@ window.taLoad = function() {
 
     tbodyPrimary.innerHTML = primary.length
       ? primary.map(function(m) { return taRenderRow(m, false); }).join('')
-      : ppEmpty(5, '대표 제휴몰이 없습니다.');
+      : ppEmpty(6, '대표 제휴몰이 없습니다.');
 
     tbodySecondary.innerHTML = secondary.length
       ? secondary.map(function(m) { return taRenderRow(m, true); }).join('')
-      : ppEmpty(8, catalogLoadFailed ? '카탈로그 데이터를 불러오지 못했습니다 — 새로고침 해주세요.' : '등록된 제휴몰이 없습니다.');
+      : ppEmpty(9, catalogLoadFailed ? '카탈로그 데이터를 불러오지 못했습니다 — 새로고침 해주세요.' : '등록된 제휴몰이 없습니다.');
 
     var allRows = document.querySelectorAll('#ta-tbody-primary tr[data-code], #ta-tbody-secondary tr[data-code]');
     Array.prototype.forEach.call(allRows, function(tr) {
       tr.querySelector('.ta-fee').addEventListener('input', function() { taRowRefresh(tr); });
       tr.querySelector('.ta-rate').addEventListener('input', function() { taRowRefresh(tr); });
+      var dEl = tr.querySelector('.ta-days');
+      if (dEl) dEl.addEventListener('input', function() {
+        var v = parseInt(dEl.value, 10);
+        if (isFinite(v) && v >= 1) TA_CONVERT_DAYS[tr.dataset.code] = v;
+        taCheckDirty();
+      });
       taRowRefresh(tr);
     });
     taApplyFilters();
@@ -10317,7 +10359,7 @@ window.taLoad = function() {
       : '<span>' + (res[1].exists ? '저장된 값 기준' : '아직 저장한 적이 없어 초기값 기준') + '</span> · <span>총</span> ' + secondaryAll.length + '<span>개</span>(<span>표시</span> ' + secondary.length + '<span>개</span>)';
   }).catch(function(e) {
     console.error('taLoad', e);
-    tbodyPrimary.innerHTML = ppEmpty(5, '로드 오류');
+    tbodyPrimary.innerHTML = ppEmpty(6, '로드 오류');
     tbodySecondary.innerHTML = '';
     if (st) st.textContent = '';
   });
@@ -10346,11 +10388,19 @@ function taSaveScope(scope, btnId, bannerLabel, logLabel) {
       approval: Object.assign({}, data.approval || {}, c.approval),
       applied: Object.assign({}, data.applied || {}, c.applied),
       logos: Object.assign({}, data.logos || {}, c.logos),
+      convertDays: Object.assign({}, data.convertDays || {}, c.convertDays),
       updated_at: FS.FieldValue.serverTimestamp(),
     }, { merge: true });
   }).then(function() {
-    toast(bannerLabel + ' 수수료·적립률·승인상태·적용여부·로고를 저장했습니다.');
-    logAdmin(logLabel + ' 수수료·적립률·승인상태·적용여부·로고 수정');
+    toast(bannerLabel + ' 수수료·적립률·전환 일수·승인상태·적용여부·로고를 저장했습니다.');
+    logAdmin(logLabel + ' 수수료·적립률·전환 일수·승인상태·적용여부·로고 수정');
+    // 전환 일수를 줄인 몰이 있으면 이미 발급된 대기 티켓에 소급 적용한다
+    // (김반장 확정 2026-08-24 — "새로 받는 것만이 아니라 그 티켓도 앞당겨 전환된다").
+    var shortened = Object.keys(c.convertDays).filter(function(code) {
+      var before = TA_ORIGINAL[code] && TA_ORIGINAL[code].days;
+      return typeof before === 'number' && c.convertDays[code] < before;
+    });
+    if (shortened.length) taConvertRetro(c.convertDays);
     // 방금 저장한 코드만 "원본" 기준값을 갱신 — 다른 구획(아직 저장 안 한 입력값)은
     // 안 건드린다. taLoad() 를 다시 부르면 그 구획의 입력 중이던 값이 지워진다.
     Object.keys(c.rates).forEach(function(code) {
@@ -10360,6 +10410,7 @@ function taSaveScope(scope, btnId, bannerLabel, logLabel) {
       if (Object.prototype.hasOwnProperty.call(c.approval, code)) TA_ORIGINAL[code].status = c.approval[code];
       if (Object.prototype.hasOwnProperty.call(c.applied, code)) TA_ORIGINAL[code].applied = c.applied[code];
       if (Object.prototype.hasOwnProperty.call(c.logos, code)) TA_ORIGINAL[code].logo = c.logos[code];
+      if (Object.prototype.hasOwnProperty.call(c.convertDays, code)) TA_ORIGINAL[code].days = c.convertDays[code];
     });
     taCheckDirty();
   }).catch(function(e) {
@@ -10376,6 +10427,105 @@ window.taSave = function() {
 window.taSaveSecondary = function() {
   taSaveScope('secondary', 'ta-save-btn-secondary', '제휴몰(링크프라이스)', '제휴몰(링크프라이스)');
 };
+
+// ── 전환 일수 일괄 적용 (선택 모드) ──────────────────────────────
+// 적립률 일괄 적용(taBulkApplyRatio)과 같은 방식 — 화면 값만 바꾸고 저장 버튼을
+// 눌러야 Firestore 에 반영된다.
+window.taBulkSetConvertDays = function() {
+  var codes = Object.keys(TA_SELECTED);
+  if (!codes.length) { toast('선택된 몰이 없습니다. 「선택」을 눌러 몰을 체크하세요.'); return; }
+  var v = parseInt((document.getElementById('ta-bulk-days') || {}).value, 10);
+  if (!isFinite(v) || v < 1 || v > 365) { toast('전환 일수는 1~365 사이 숫자로 입력하세요.'); return; }
+  codes.forEach(function(code) {
+    var tr = document.querySelector('#ta-tbody-secondary tr[data-code="' + code + '"]');
+    if (!tr) return;
+    var el = tr.querySelector('.ta-days');
+    if (el) el.value = v;
+    TA_CONVERT_DAYS[code] = v;
+  });
+  taCheckDirty();
+  toast(codes.length + '개 몰의 전환 일수를 ' + v + '일로 맞췄습니다. 저장 버튼을 눌러야 적용됩니다.');
+};
+
+// ── 소급 전환 배치 ──────────────────────────────────────────────
+// 전환 일수를 줄이면 "앞으로 적립되는 티켓"만이 아니라 "이미 발급되어 대기 중인
+// 랜덤 티켓"에도 새 기준을 소급 적용한다(김반장 확정 2026-08-24). 실서버에서는
+// 매일 도는 확정 배치가 같은 판정을 하지만, 일수를 줄인 그 순간 이미 기준을 넘긴
+// 티켓은 다음 배치를 기다릴 이유가 없으므로 저장 직후 한 번 즉시 돌린다.
+//
+// 티켓(user_tickets)에는 몰 코드가 없고 postback_id 만 있다 — 그 포스트백의
+// mall_name(표시 이름)으로 몰을 되찾는다. 되찾지 못하면 기본값(30일)을 쓴다.
+function taMallCodeByName(name) {
+  if (!name) return null;
+  var n = String(name).trim();
+  if (n === '쿠팡' || n.toLowerCase() === 'coupang') return 'coupang_direct';
+  for (var i = 0; i < TA_CATALOG.length; i++) {
+    if (String(TA_CATALOG[i]['머천트명'] || '').trim() === n) return 'lp:' + TA_CATALOG[i]['머천트ID'];
+  }
+  return null;
+}
+
+function taConvertRetro(convertDays) {
+  var now = Date.now();
+  return db.collection('user_tickets').where('status', '==', 'pending').get().then(function(snap) {
+    if (snap.empty) return { converted: 0, byMall: {} };
+    // 대기 티켓이 걸린 포스트백만 골라 한 번씩 읽는다(같은 구매건 티켓이 여러 장이라 중복 조회 방지).
+    var pbIds = {};
+    snap.forEach(function(doc) { var pb = doc.data().postback_id; if (pb) pbIds[pb] = true; });
+    var ids = Object.keys(pbIds);
+    return Promise.all(ids.map(function(id) {
+      return db.collection('postbacks').doc(id).get().then(function(d) {
+        return { id: id, name: (d.exists && d.data().mall_name) || '' };
+      }).catch(function() { return { id: id, name: '' }; });
+    })).then(function(pbs) {
+      var mallByPb = {};
+      pbs.forEach(function(x) { mallByPb[x.id] = x.name; });
+
+      var due = [], byMall = {};
+      snap.forEach(function(doc) {
+        var d = doc.data();
+        var earned = d.earned_at && d.earned_at.toMillis ? d.earned_at.toMillis() : null;
+        if (!earned) return;
+        var mallName = mallByPb[d.postback_id] || '';
+        var code = taMallCodeByName(mallName);
+        var days = (code && typeof convertDays[code] === 'number') ? convertDays[code] : TA_DEFAULT_CONVERT_DAYS;
+        var elapsedDays = (now - earned) / 86400000;
+        if (elapsedDays >= days) {
+          due.push(doc.ref);
+          var label = mallName || '(몰 미상)';
+          byMall[label] = (byMall[label] || 0) + 1;
+        }
+      });
+      if (!due.length) return { converted: 0, byMall: {} };
+
+      // 확정은 상태 변경만 — 새 티켓을 만들지 않는다(원장 ticket_transactions 는
+      // 적립 시점에 이미 1회 기록됐다). dmConfirmPostbackTickets 와 같은 규칙.
+      var ts = FS.Timestamp.now();
+      var chunks = [];
+      for (var i = 0; i < due.length; i += 400) chunks.push(due.slice(i, i + 400));
+      return chunks.reduce(function(chain, part) {
+        return chain.then(function() {
+          var b = db.batch();
+          part.forEach(function(ref) { b.update(ref, { status: 'active', confirmed_at: ts }); });
+          return b.commit();
+        });
+      }, Promise.resolve()).then(function() { return { converted: due.length, byMall: byMall }; });
+    });
+  }).then(function(res) {
+    if (!res.converted) {
+      toast('전환 일수를 줄였지만, 새 기준으로 이미 기간이 지난 대기 티켓은 없었습니다.');
+      return res;
+    }
+    var detail = Object.keys(res.byMall).map(function(k) { return k + ' ' + res.byMall[k] + '장'; }).join(' · ');
+    toast('대기 중이던 랜덤 티켓 ' + res.converted + '장을 앞당겨 등급 티켓으로 확정했습니다. (' + detail + ')');
+    logAdmin('전환 일수 단축 소급 적용 — 대기 랜덤 티켓 ' + res.converted + '장 즉시 확정 (' + detail + ')');
+    return res;
+  }).catch(function(e) {
+    console.error('taConvertRetro', e);
+    toast('소급 전환 실패: ' + (e.message || e));
+  });
+}
+window.taConvertRetro = taConvertRetro;
 
 // 숨김/숨김 해제. 삭제가 아니다 — settings/ticket_accrual 의 hidden 맵에 코드만
 // 추가·제거한다(fees/rates 와 같은 패턴). affiliate_malls.active 는 건드리지 않는다
