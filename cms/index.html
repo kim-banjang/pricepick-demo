@@ -1080,6 +1080,14 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
             <span class="sb-item-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/><path d="M4.5 5.5 6 7"/><path d="M19.5 5.5 18 7"/></svg></span>
             <span class="sb-item-lbl" id="nav-label-jackpot-roulette">잭팟 룰렛</span>
           </button>
+            <button class="sb-item" id="nav-giftbox-daily" data-label="매일 선물 상자 열기" onclick="go('giftbox-daily',this)">
+              <span class="sb-item-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13"/><path d="M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7"/><path d="M7.5 8a2.5 2.5 0 0 1 0-5A4.8 8 0 0 1 12 8a4.8 8 0 0 1 4.5-5 2.5 2.5 0 0 1 0 5"/></svg></span>
+              <span class="sb-item-lbl" id="nav-label-giftbox-daily">매일 선물 상자 열기</span>
+            </button>
+            <button class="sb-item" id="nav-giftbox-random" data-label="랜덤 선물 상자 열기" onclick="go('giftbox-random',this)">
+              <span class="sb-item-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13"/><path d="M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7"/><path d="M7.5 8a2.5 2.5 0 0 1 0-5A4.8 8 0 0 1 12 8a4.8 8 0 0 1 4.5-5 2.5 2.5 0 0 1 0 5"/></svg></span>
+              <span class="sb-item-lbl" id="nav-label-giftbox-random">랜덤 선물 상자 열기</span>
+            </button>
         </div>
       </div>
 
@@ -1982,6 +1990,158 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
         <div class="pagination" id="jkr-log-pager"></div>
       </div>
     </div>
+
+
+    <!-- ── 매일 선물 상자 열기 (무료 · 하루 1회) — 2026-08-25 신설 ── -->
+    <div class="section" id="sec-giftbox-daily">
+      <div class="info-box"><strong>매일 선물 상자 열기 = 출석(쿠팡 구경하기) 시 1일 1회 무료로 여는 선물 상자</strong> — 보상칸별 보상 내용과 받을 확률을 운영자가 직접 수정합니다. 확률 합계가 100%가 아니면 저장되지 않습니다. 보상칸은 6개 고정이며 보상 유형·수량·확률만 수정합니다. 이벤트 티켓을 쓰는 상자는 <strong>랜덤 선물 상자 열기</strong> 메뉴에서 따로 관리합니다.</div>
+      <div class="stats-grid" style="grid-template-columns:repeat(3,1fr)">
+        <div class="stat-card purple"><div class="stat-label">이번 달 상자 열기</div><div class="stat-value" id="gbd-stat-spins">—</div><div class="stat-change neutral" id="gbd-stat-spins-sub">실제 연 횟수 집계</div></div>
+        <div class="stat-card green"><div class="stat-label">이번 달 지급 총액</div><div class="stat-value" id="gbd-stat-payout">—</div><div class="stat-change neutral" id="gbd-stat-payout-sub">지급완료 건 원화 환산</div></div>
+        <div class="stat-card amber"><div class="stat-label">1회 기대값</div><div class="stat-value" id="gbd-stat-ev">—</div><div class="stat-change neutral" id="gbd-stat-ev-sub">저장된 구성 기준</div></div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">보상칸 구성 · 받을 확률</div>
+          <div style="display:flex;gap:6px">
+            <button class="btn btn-ghost btn-sm" onclick="rltReset('giftDaily')">기본값 복원</button>
+            <button class="btn btn-primary btn-sm" id="gbd-save-btn" onclick="rltSave('giftDaily')">저장</button>
+          </div>
+        </div>
+        <table id="gbd-table">
+          <thead>
+            <tr>
+              <th style="width:7.4%">보상칸</th>
+              <th style="width:17.5%">보상 유형</th>
+              <th style="width:17.5%">수량</th>
+              <th style="width:17.7%">가치(원)</th>
+              <th style="width:17.5%">확률(%)</th>
+              <th style="width:22.4%">기대값 기여</th>
+            </tr>
+          </thead>
+          <tbody id="gbd-tbody"></tbody>
+          <tfoot>
+            <tr>
+              <td colspan="4" style="font-weight:700">합계</td>
+              <td style="font-weight:800" id="gbd-sum-prob">—</td>
+              <td style="text-align:right;font-weight:800" id="gbd-sum-ev">—</td>
+              <td></td>
+            </tr>
+          </tfoot>
+        </table>
+        <div style="padding:12px 16px;font-size:12px;color:var(--text-3);border-top:1px solid var(--border)" id="gbd-status">불러오는 중…</div>
+        <div style="padding:0 16px 14px;font-size:12px;color:var(--text-3)">가치 환산 기준 — 포인트 10P = 1원 · 이벤트 티켓 40원 · 브론즈 티켓 10원 · 실버 티켓 100원 · 골드 티켓 200원. 기대값 기여 = 가치 × 확률.</div>
+        <div style="padding:0 16px 16px;font-size:12px;color:var(--text-3)">여기서 저장한 보상칸 구성·보상·확률을 데모 앱 선물 상자 화면이 그대로 읽어 렌더링하고 추첨·지급합니다. 등급 티켓(브론즈·실버·골드) 보상칸도 앱에서 정상 표시·지급됩니다. 앱을 새로고침하면 반영됩니다.</div>
+      </div>
+
+      <div class="card" style="margin-top:16px">
+        <div class="card-header">
+          <div class="card-title">상자 열기 기록</div>
+          <span style="font-size:12px;color:var(--text-2)" id="gbd-log-count">—</span>
+        </div>
+        <table id="gbd-log-table">
+          <thead>
+            <tr>
+              <th style="width:150px">일시</th>
+              <th>닉네임 / 카카오톡 ID</th>
+              <th style="width:150px">선물 상자 종류</th>
+              <th style="width:170px">결과</th>
+              <th style="width:110px">지급 상태</th>
+            </tr>
+          </thead>
+          <tbody id="gbd-log-tbody"></tbody>
+        </table>
+        <div class="pagination" id="gbd-log-pager"></div>
+      </div>
+    </div>
+
+
+    <!-- ── 랜덤 선물 상자 열기 (이벤트 티켓 1장 = 1회) — 2026-08-25 신설 ── -->
+    <div class="section" id="sec-giftbox-random">
+      <div class="info-box"><strong>랜덤 선물 상자 열기 = 이벤트 티켓 1장으로 1회 여는 선물 상자</strong> — 매일 선물 상자 열기와 구조는 같고 보상 구성·확률만 다릅니다. 보상칸은 6개 고정입니다. 보상칸별 보상 내용과 받을 확률을 운영자가 직접 수정하며, 확률 합계가 100%가 아니면 저장되지 않습니다. 악용 방지 제한(하루 참여 상한 · 이벤트 티켓 일/월 획득 상한)도 아래에서 조정합니다.</div>
+      <div class="stats-grid" style="grid-template-columns:repeat(3,1fr)">
+        <div class="stat-card purple"><div class="stat-label">이번 달 상자 열기</div><div class="stat-value" id="gbr-stat-spins">—</div><div class="stat-change neutral" id="gbr-stat-spins-sub">실제 연 횟수 집계</div></div>
+        <div class="stat-card green"><div class="stat-label">이번 달 지급 총액</div><div class="stat-value" id="gbr-stat-payout">—</div><div class="stat-change neutral" id="gbr-stat-payout-sub">지급완료 건 원화 환산</div></div>
+        <div class="stat-card amber"><div class="stat-label">1회 기대값</div><div class="stat-value" id="gbr-stat-ev">—</div><div class="stat-change neutral" id="gbr-stat-ev-sub">저장된 구성 기준</div></div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">보상칸 구성 · 받을 확률</div>
+          <div style="display:flex;gap:6px">
+            <button class="btn btn-ghost btn-sm" onclick="rltReset('giftRandom')">기본값 복원</button>
+            <button class="btn btn-primary btn-sm" id="gbr-save-btn" onclick="rltSave('giftRandom')">저장</button>
+          </div>
+        </div>
+        <table id="gbr-table">
+          <thead>
+            <tr>
+              <th style="width:7.4%">보상칸</th>
+              <th style="width:17.5%">보상 유형</th>
+              <th style="width:17.5%">수량</th>
+              <th style="width:17.7%">가치(원)</th>
+              <th style="width:17.5%">확률(%)</th>
+              <th style="width:22.4%">기대값 기여</th>
+            </tr>
+          </thead>
+          <tbody id="gbr-tbody"></tbody>
+          <tfoot>
+            <tr>
+              <td colspan="4" style="font-weight:700">합계</td>
+              <td style="font-weight:800" id="gbr-sum-prob">—</td>
+              <td style="text-align:right;font-weight:800" id="gbr-sum-ev">—</td>
+              <td></td>
+            </tr>
+          </tfoot>
+        </table>
+        <div style="padding:12px 16px;font-size:12px;color:var(--text-3);border-top:1px solid var(--border)" id="gbr-status">불러오는 중…</div>
+        <div style="padding:0 16px 14px;font-size:12px;color:var(--text-3)">가치 환산 기준 — 포인트 10P = 1원 · 이벤트 티켓 40원 · 브론즈 티켓 10원 · 실버 티켓 100원 · 골드 티켓 200원. 기대값 기여 = 가치 × 확률.</div>
+        <div style="padding:0 16px 16px;font-size:12px;color:var(--text-3)">여기서 저장한 보상칸 구성·보상·확률과 아래 참여 제한 정책을 데모 앱 랜덤 선물 상자 열기 화면이 그대로 읽어 적용합니다. 실행 로그·월 집계도 앱 실행 기록 실집계입니다.</div>
+      </div>
+
+      <div class="card" style="margin-top:16px">
+        <div class="card-header">
+          <div class="card-title">참여 제한 정책</div>
+          <button class="btn btn-primary btn-sm" id="gbr-limit-save-btn" onclick="jkrSaveLimits()">저장</button>
+        </div>
+        <div style="padding:16px">
+          <div class="form-group"><label class="form-label">하루 최대 참여 횟수</label>
+            <div style="display:flex;align-items:center;gap:8px"><input class="form-input" type="number" min="1" step="1" id="gbr-daily-cap" value="10" style="max-width:120px"><span style="color:var(--text-2);font-size:13px">회 / 1일</span></div>
+            <div style="font-size:12px;color:var(--text-3);margin-top:4px">매크로로 무제한 돌리는 것을 막는 상한입니다.</div>
+          </div>
+          <div class="info-box" style="margin-bottom:16px">구매로 발급된 티켓은 등급 티켓·이벤트 티켓 모두 승인 대기 상태로 발급되고, 카카오 연동 D+7 / 미연동 D+30 경과 또는 쿠팡 구매 확정 시 승인됩니다. 승인 전에는 랜덤 선물 상자 열기에 쓸 수 없으므로 "열고 환불" 악용은 티켓 단계에서 이미 차단됩니다. 별도 설정 항목을 두지 않습니다.</div>
+          <div class="form-group"><label class="form-label">이벤트 티켓 일 획득 상한</label>
+            <div style="display:flex;align-items:center;gap:8px"><input class="form-input" type="number" min="1" step="1" id="gbr-daily-ticket-cap" value="5" style="max-width:120px"><span style="color:var(--text-2);font-size:13px">장 / 1일</span></div>
+            <div style="font-size:12px;color:var(--text-3);margin-top:4px">회원 1명이 하루에 받을 수 있는 이벤트 티켓 총량입니다. 적립 정책의 하루 5건 한도와 같은 기준입니다.</div>
+          </div>
+          <div class="form-group" style="margin-bottom:0"><label class="form-label">이벤트 티켓 월 획득 상한</label>
+            <div style="display:flex;align-items:center;gap:8px"><input class="form-input" type="number" min="1" step="1" id="gbr-monthly-cap" value="30" style="max-width:120px"><span style="color:var(--text-2);font-size:13px">장 / 월</span></div>
+            <div style="font-size:12px;color:var(--text-3);margin-top:4px">현행 정책 그대로 30장. 회원 1명이 한 달에 모을 수 있는 이벤트 티켓 총량입니다.</div>
+          </div>
+          <div style="font-size:12px;color:var(--text-3);margin-top:12px" id="gbr-limit-status">불러오는 중…</div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:16px">
+        <div class="card-header">
+          <div class="card-title">상자 열기 기록</div>
+          <span style="font-size:12px;color:var(--text-2)" id="gbr-log-count">—</span>
+        </div>
+        <table id="gbr-log-table">
+          <thead>
+            <tr>
+              <th style="width:150px">일시</th>
+              <th>닉네임 / 카카오톡 ID</th>
+              <th style="width:150px">선물 상자 종류</th>
+              <th style="width:170px">결과</th>
+              <th style="width:110px">지급 상태</th>
+            </tr>
+          </thead>
+          <tbody id="gbr-log-tbody"></tbody>
+        </table>
+        <div class="pagination" id="gbr-log-pager"></div>
+      </div>
+    </div>
+
 
     <!-- ── 기프티콘 발급 (신규) ── -->
     <div class="section" id="sec-gifticons">
@@ -4158,6 +4318,8 @@ const I18N = {
     'nav.ticket-accrual': '티켓 적립 설정', 'page.ticket-accrual.title': '티켓 적립 설정', 'page.ticket-accrual.bc': '티켓 · 보상',
     'nav.roulette-settings': '매일 행운 룰렛', 'page.roulette-settings.title': '매일 행운 룰렛', 'page.roulette-settings.bc': '티켓 · 보상',
     'nav.jackpot-roulette': '잭팟 룰렛', 'page.jackpot-roulette.title': '잭팟 룰렛', 'page.jackpot-roulette.bc': '티켓 · 보상',
+  'nav.giftbox-daily': '매일 선물 상자 열기', 'page.giftbox-daily.title': '매일 선물 상자 열기', 'page.giftbox-daily.bc': '티켓 · 보상',
+  'nav.giftbox-random': '랜덤 선물 상자 열기', 'page.giftbox-random.title': '랜덤 선물 상자 열기', 'page.giftbox-random.bc': '티켓 · 보상',
     'nav.group.points': '포인트 관리',
     'nav.points': '포인트 내역', 'page.points.title': '포인트 내역', 'page.points.bc': '포인트 관리',
     'nav.point-attendance': '출석체크 설정', 'page.point-attendance.title': '출석체크 설정', 'page.point-attendance.bc': '포인트 관리',
@@ -5838,6 +6000,15 @@ Object.assign(KO2VI,{
 /* 룰렛 2종 화면(2026-07-31 개편) — UI 문구만. 닉네임 등 데모 데이터는 한국어 원문 유지 */
 Object.assign(KO2VI,{
   "매일 행운 룰렛":"Vòng quay may mắn hằng ngày",
+"보상칸 구성 · 받을 확률":"Cơ cấu ô thưởng · Tỷ lệ nhận",
+"받을 확률":"Tỷ lệ nhận",
+"보상칸":"Ô thưởng",
+"이번 달 상자 열기":"Số lượt mở hộp tháng này",
+"상자 열기 기록":"Nhật ký mở hộp",
+"실제 연 횟수 집계":"Thống kê số lượt mở thực tế",
+"받은 보상 원화 환산":"Quy đổi phần thưởng đã nhận ra tiền",
+"가장 큰 선물":"Phần quà lớn nhất",
+"선물 상자 종류":"Loại hộp quà",
   "잭팟 룰렛":"Vòng quay Jackpot",
   "매일 행운 룰렛 = 출석(쿠팡 구경하기) 시 1일 1회 무료 룰렛":"Vòng quay may mắn hằng ngày = vòng quay miễn phí 1 lần/ngày khi điểm danh (dạo Coupang)",
   "— 슬롯별 보상 내용과 당첨 확률을 운영자가 직접 수정합니다. 확률 합계가 100%가 아니면 저장되지 않습니다. 슬롯은 6개 고정이며 보상 유형·수량·확률만 수정합니다. 이벤트 티켓을 쓰는 유료 룰렛은":"— Vận hành viên trực tiếp sửa nội dung thưởng và xác suất trúng của từng ô. Nếu tổng xác suất không phải 100% thì không lưu được. Cố định 6 ô, chỉ sửa loại thưởng·số lượng·xác suất. Vòng quay trả phí dùng vé sự kiện được quản lý riêng ở menu",
@@ -12851,6 +13022,28 @@ var RLT_KINDS = {
       { type: 'miss',          qty: 0,   prob: 17.8 }
     ]
   },
+  giftDaily: {
+    p: 'gbd', name: '매일 선물 상자 열기', doc: 'giftbox_daily', live: true, legacyWheel: false,
+    defaults: [                              /* 매일 행운 룰렛과 동일 — 1회 기대값 9.9원 */
+      { type: 'silver_ticket', qty: 1,   prob: 0.2  },
+      { type: 'event_ticket',  qty: 1,   prob: 5    },
+      { type: 'bronze_ticket', qty: 1,   prob: 2    },
+      { type: 'point',         qty: 100, prob: 35   },
+      { type: 'point',         qty: 10,  prob: 40   },
+      { type: 'miss',          qty: 0,   prob: 17.8 }
+    ]
+  },
+  giftRandom: {
+    p: 'gbr', name: '랜덤 선물 상자 열기', doc: 'giftbox_random', live: true, legacyWheel: false,
+    defaults: [                              /* 잭팟 룰렛과 동일 — 1회 기대값 40원 */
+      { type: 'gold_ticket',   qty: 1,    prob: 0.4  },
+      { type: 'point',         qty: 1000, prob: 5    },
+      { type: 'bronze_ticket', qty: 1,    prob: 12   },
+      { type: 'miss',          qty: 0,    prob: 31.6 },
+      { type: 'point',         qty: 100,  prob: 50   },
+      { type: 'silver_ticket', qty: 1,    prob: 1    }
+    ]
+  },
   jackpot: {
     p: 'jkr', name: '잭팟 룰렛', doc: 'jackpot_roulette', live: true, legacyWheel: false,
     /* 슬롯 순서 = 앱 휠의 칸 배치 순서(12시부터 시계방향). 20260731 시안 휠 배치 그대로 —
@@ -12867,12 +13060,23 @@ var RLT_KINDS = {
 };
 /* 잭팟 룰렛 참여 제한 정책 기본값 — 악용 방지 3종 */
 var JKR_DEFAULT_LIMITS = { daily_spin_cap: 10, event_ticket_daily_cap: 5, event_ticket_monthly_cap: 30 };
+/* 저장·검증 안내에 쓰는 낱말. 룰렛 2종은 기존 그대로, 선물 상자 2종만 갈아끼운다.
+   (선물 상자는 카지노 계열 낱말을 쓰지 않기로 한 화면이다) */
+var RLT_WORDS = {
+  daily:      { cell: '슬롯',   screen: '룰렛을',      miss: '꽝',        top: 'JACKPOT' },
+  jackpot:    { cell: '슬롯',   screen: '룰렛을',      miss: '꽝',        top: 'JACKPOT' },
+  giftDaily:  { cell: '보상칸', screen: '선물 상자를', miss: '보상 없음', top: '가장 큰 선물' },
+  giftRandom: { cell: '보상칸', screen: '선물 상자를', miss: '보상 없음', top: '가장 큰 선물' }
+};
+function rltW(k) { return RLT_WORDS[k] || RLT_WORDS.daily; }
 function rltCloneSlots(list) {
   return list.map(function(s) { return { type: s.type, qty: s.qty, prob: s.prob }; });
 }
 var rltState = {
   daily:   { slots: rltCloneSlots(RLT_KINDS.daily.defaults),   logRows: [], logPage: 1, logIsDemo: false },
-  jackpot: { slots: rltCloneSlots(RLT_KINDS.jackpot.defaults), logRows: [], logPage: 1, logIsDemo: false }
+  jackpot: { slots: rltCloneSlots(RLT_KINDS.jackpot.defaults), logRows: [], logPage: 1, logIsDemo: false },
+  giftDaily:  { slots: rltCloneSlots(RLT_KINDS.giftDaily.defaults),  logRows: [], logPage: 1, logIsDemo: false },
+  giftRandom: { slots: rltCloneSlots(RLT_KINDS.giftRandom.defaults), logRows: [], logPage: 1, logIsDemo: false }
 };
 
 function rltFmt(n) { return Number(n).toLocaleString('ko-KR', { maximumFractionDigits: 2 }); }
@@ -12912,7 +13116,7 @@ function rltRenderSlots(k) {
     var meta = RLT_REWARD_TYPES[s.type] || RLT_REWARD_TYPES.miss;
     var isMiss = s.type === 'miss';
     var opts = Object.keys(RLT_REWARD_TYPES).map(function(t) {
-      return '<option value="' + t + '"' + (t === s.type ? ' selected' : '') + '>' + RLT_REWARD_TYPES[t].label + '</option>';
+      return '<option value="' + t + '"' + (t === s.type ? ' selected' : '') + '>' + (t === 'miss' ? rltW(k).miss : RLT_REWARD_TYPES[t].label) + '</option>';
     }).join('');
     return '<tr>'
       + '<td style="font-weight:700;color:var(--text-2)">' + (i + 1) + '번</td>'
@@ -12920,7 +13124,7 @@ function rltRenderSlots(k) {
       + '<td><div class="rlt-numcell">' + (isMiss
         ? '<span class="rlt-none">보상 없음</span><span class="rlt-unit"></span>'
         : '<input class="form-input rlt-num" type="number" min="1" step="1" value="' + s.qty + '" oninput="rltSetQty(\'' + k + '\', ' + i + ', this.value)"><span class="rlt-unit">' + meta.unit + '</span>') + '</div></td>'
-      + '<td style="text-align:right;color:var(--text-2)">' + (isMiss ? '—' : rltFmt(rltSlotValue(s)) + '원' + (jackpotIdx.indexOf(i) >= 0 ? ' <span class="rlt-jackpot-badge">JACKPOT</span>' : '')) + '</td>'
+      + '<td style="text-align:right;color:var(--text-2)">' + (isMiss ? '—' : rltFmt(rltSlotValue(s)) + '원' + (jackpotIdx.indexOf(i) >= 0 ? ' <span class="rlt-jackpot-badge">' + rltW(k).top + '</span>' : '')) + '</td>'
       + '<td><div class="rlt-numcell"><input class="form-input rlt-num" type="number" min="0" max="100" step="0.1" value="' + s.prob + '" oninput="rltSetProb(\'' + k + '\', ' + i + ', this.value)"><span class="rlt-unit">%</span></div></td>'
       + '<td style="text-align:right;font-weight:600">' + rltFmt(rltSlotEv(s)) + '원</td>'
       + '</tr>';
@@ -13061,7 +13265,7 @@ window.rltSave = function(k) {
   var badQty = -1;
   rltState[k].slots.forEach(function(s, i) { if (badQty < 0 && s.type !== 'miss' && (Number(s.qty) || 0) <= 0) badQty = i; });
   if (badQty >= 0) {
-    rltSetStatus(k, '저장 차단 — ' + (badQty + 1) + '번 슬롯의 수량이 0입니다. 꽝이 아닌 슬롯은 수량이 1 이상이어야 합니다.', true);
+    rltSetStatus(k, '저장 차단 — ' + (badQty + 1) + '번 ' + rltW(k).cell + '의 수량이 0입니다. ' + rltW(k).miss + '이 아닌 ' + rltW(k).cell + '은 수량이 1 이상이어야 합니다.', true);
     toast('수량이 0인 슬롯이 있어 저장하지 않았습니다.');
     return;
   }
@@ -13080,7 +13284,7 @@ window.rltSave = function(k) {
   db.collection('settings').doc(kind.doc).set(payload, { merge: true }).then(function() {
     if (btn) { btn.disabled = false; btn.textContent = '저장'; }
     rltSetDirty(k, false);
-    rltSetStatus(k, '저장 완료 — 슬롯 ' + rltState[k].slots.length + '개 · 확률 합계 100% · 1회 기대값 ' + rltFmt(rltTotalEv(k)) + '원.');
+    rltSetStatus(k, '저장 완료 — ' + rltW(k).cell + ' ' + rltState[k].slots.length + '개 · 확률 합계 100% · 1회 기대값 ' + rltFmt(rltTotalEv(k)) + '원.');
     toast(kind.name + ' 구성을 저장했습니다.');
     logAdmin(kind.name + ' 구성 저장');
   }).catch(function(e) {
@@ -13255,9 +13459,9 @@ var RLT_LOG_DEMO = {
     ['2026-07-30 15:53:41', '쿠팡순회중',   'cpang_round',    'miss',          0,    'none']
   ]
 };
-function rltLogResultText(type, qty) {
+function rltLogResultText(type, qty, k) {
   var meta = RLT_REWARD_TYPES[type];
-  if (!meta || type === 'miss') return '<span style="color:var(--text-3)">꽝</span>';
+  if (!meta || type === 'miss') return '<span style="color:var(--text-3)">' + rltW(k).miss + '</span>';
   return '<span style="color:var(--success);font-weight:600">' + meta.label + ' ' + rltFmt(qty) + meta.unit + '</span>';
 }
 function rltLogStatusChip(st) {
@@ -13288,7 +13492,7 @@ function rltRenderLog(k) {
         + '<td style="white-space:nowrap;font-size:12px"><div style="font-weight:700;color:#333333">' + parts[0].replace(/-/g, '/') + '</div><div style="color:var(--text-3)">' + (parts[1] || '') + '</div></td>'
         + '<td><div style="font-weight:500">' + ppEsc(r[1]) + '</div><div style="font-size:11px;color:var(--text-2);font-family:monospace">' + (r[2] ? '(' + ppEsc(r[2]) + ')' : '카카오 미연동') + '</div></td>'
         + '<td style="color:var(--text-2)">' + kind.name + '</td>'
-        + '<td>' + rltLogResultText(r[3], r[4]) + '</td>'
+        + '<td>' + rltLogResultText(r[3], r[4], k) + '</td>'
         + '<td style="text-align:center">' + rltLogStatusChip(r[5]) + '</td>'
         + '</tr>';
     }).join('');
