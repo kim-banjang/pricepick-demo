@@ -283,6 +283,18 @@ tr:hover td{background:var(--surface-2);}
 #sec-ticket-accrual th{font-size:13px;font-weight:700;text-transform:none;letter-spacing:0;}
 #sec-ticket-accrual .btn{font-size:13px;font-weight:700;padding:7px 14px;}
 #sec-ticket-accrual .info-box{font-size:13px;}
+#sec-ticket-accrual .ta-notice{display:inline-flex;align-items:center;gap:8px;margin-bottom:14px;
+  background:var(--main-soft);border:1px solid var(--main-line);border-radius:var(--r-md);
+  padding:9px 14px;font-family:inherit;font-size:13px;font-weight:700;color:var(--main-hover);cursor:pointer;}
+#sec-ticket-accrual .ta-notice:hover{border-color:var(--main);}
+#sec-ticket-accrual .ta-notice-mark{display:inline-flex;align-items:center;justify-content:center;
+  width:18px;height:18px;border-radius:50%;background:var(--main);color:#fff;font-size:12px;line-height:1;}
+.ta-notice-list{margin:0;padding:0;list-style:none;}
+.ta-notice-list li{padding:9px 0;border-bottom:1px solid var(--border);font-size:13px;line-height:1.6;color:var(--text-2);}
+.ta-notice-list li:last-child{border-bottom:none;}
+.ta-notice-list .k{display:block;font-weight:700;color:var(--text);margin-bottom:2px;}
+#sec-ticket-accrual .ta-days-fixed{display:inline-block;font-size:12px;font-weight:700;line-height:1.45;
+  color:var(--text-2);background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r-sm);padding:5px 9px;}
 #sec-ticket-accrual .ta-rate{height:36px;padding:6px 10px;}
 /* 저장 전 변경 표시 — 기존 warning 토큰 그대로 재사용(새 색 안 만듦) */
 #sec-ticket-accrual .ta-fee.ta-changed,#sec-ticket-accrual .ta-rate.ta-changed{
@@ -1379,7 +1391,7 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
         <strong>회원 가입 안내</strong><br>
         카카오 연동 회원과 미연동(게스트) 회원이 모두 존재(로그인 정책 변경). 미연동 회원은 적립 확정 대기 <strong>D+30</strong> 적용.<br>
         계정 모델: <strong>게스트(닉네임)로 시작</strong> → 앱 내 <strong>카카오 연동</strong> (애플·구글 로그인 폐지). 게스트는 적립만 누적, 사용·교환은 연동 후 가능.<br>
-        구매 즉시 <strong>가지급 티켓(랜덤)</strong> 지급 → 포스트백 수신 후 <strong>제휴몰별 전환 일수 경과 시 확정</strong> 시 등급 티켓(브론즈/실버/골드)으로 전환
+        구매 즉시 <strong>가지급 티켓(랜덤)</strong> 지급 → 포스트백 수신 후 <strong>확정</strong> 시 등급 티켓(브론즈/실버/골드)으로 전환
       </div>
       <div class="toolbar">
         <input class="search-box" id="mem-search" placeholder="닉네임 검색..." onkeydown="if(event.key==='Enter')memApplyFilters()">
@@ -1580,9 +1592,10 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
     </div>
 
     <div class="section" id="sec-ticket-accrual">
-      <div class="info-box">제휴몰별 수수료와 사용자에게 돌려줄 적립률을 정합니다(계약이 바뀌면 수수료도 여기서 바로 반영). 등급 환산은 큰 단위부터 채우는 기존 방식 그대로입니다. 쿠팡은 대표 제휴몰로 항상 별도 표시됩니다. 적립률 기본값은 수수료의 60%이며, 나머지 40%가 우리 수익입니다.</div>
-      <div class="info-box"><strong>전환 일수 = 랜덤 티켓이 등급 티켓으로 바뀌기까지의 대기 일수</strong> — 제휴몰마다 다르게 정할 수 있고 기본값은 30일입니다. <strong>카카오 연동 여부와 무관합니다</strong> — 예전의 연동 D+7 / 미연동 D+30 이원 기준은 폐지되었고, 연동 회원이든 미연동 회원이든 그 구매가 발생한 제휴몰의 전환 일수 하나로만 정해집니다.</div>
-      <div class="warn-box"><strong>전환 일수를 줄이면 이미 발급된 랜덤 티켓도 앞당겨 전환됩니다</strong> — 저장하는 순간 대기 중인 가지급 티켓을 새 기준으로 다시 재서, 이미 기간이 지난 티켓은 그 자리에서 등급 티켓으로 확정합니다. 늘리는 경우 이미 확정된 티켓을 되돌리지는 않습니다.</div>
+      <button type="button" class="ta-notice" onclick="openModal('m-ta-notice')">
+        <span>티켓 적립 설정 Notice</span>
+        <span class="ta-notice-mark">!</span>
+      </button>
 
       <div class="card">
         <div class="card-header">
@@ -1598,7 +1611,7 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
               <th style="width:12%">수수료</th>
               <th style="width:13%">적립률</th>
               <th style="width:11%">수익</th>
-              <th style="width:14%">전환 일수</th>
+              <th style="width:14%">전환 대기일 수</th>
               <th style="width:27%">시뮬레이터</th>
             </tr>
           </thead>
@@ -1652,9 +1665,9 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
               <input class="form-input" type="number" id="ta-bulk-ratio" min="0" max="100" step="1" value="60" style="width:55px;text-align:right" oninput="taBulkRatioLabelUpdate()">
               <span style="font-size:13px;color:var(--text-2)">%</span>
               <button class="btn btn-ghost btn-sm" id="ta-bulk-apply-btn" onclick="taBulkApplyRatio()">적립률 60% 적용</button>
-              <input class="form-input" type="number" id="ta-bulk-days" min="1" max="365" step="1" value="30" style="width:60px;text-align:right" title="선택한 몰에 한꺼번에 적용할 전환 일수">
+              <input class="form-input" type="number" id="ta-bulk-days" min="1" max="365" step="1" value="30" style="width:60px;text-align:right" title="선택한 몰에 한꺼번에 적용할 전환 대기일 수">
               <span style="font-size:13px;color:var(--text-2)">일</span>
-              <button class="btn btn-ghost btn-sm" onclick="taBulkSetConvertDays()">전환 일수 적용</button>
+              <button class="btn btn-ghost btn-sm" onclick="taBulkSetConvertDays()">전환 대기일 수 적용</button>
               <button class="btn btn-ghost btn-sm" id="ta-bulk-on-btn" onclick="taBulkSetApplied(true)">적용으로</button>
               <button class="btn btn-ghost btn-sm" id="ta-bulk-off-btn" onclick="taBulkSetApplied(false)">미적용으로</button>
               <button class="btn btn-ghost btn-sm" onclick="taToggleSelectMode()">취소</button>
@@ -1682,7 +1695,7 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
                 <th style="width:7%">수수료</th>
                 <th style="width:9%">적립률</th>
                 <th style="width:7%">수익</th>
-                <th style="width:11%">전환 일수</th>
+                <th style="width:11%">전환 대기일 수</th>
                 <th style="width:20%">시뮬레이터</th>
                 <th style="width:14%">적용</th>
               </tr>
@@ -1961,7 +1974,7 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
             <div style="display:flex;align-items:center;gap:8px"><input class="form-input" type="number" min="1" step="1" id="jkr-daily-cap" value="10" style="max-width:120px"><span style="color:var(--text-2);font-size:13px">회 / 1일</span></div>
             <div style="font-size:12px;color:var(--text-3);margin-top:4px">매크로로 무제한 돌리는 것을 막는 상한입니다.</div>
           </div>
-          <div class="info-box" style="margin-bottom:16px">구매로 발급된 티켓은 등급 티켓·이벤트 티켓 모두 승인 대기 상태로 발급되고, 제휴몰별 전환 일수(기본 30일) 경과 또는 쿠팡 구매 확정 시 승인됩니다. 승인 전에는 잭팟 룰렛에 쓸 수 없으므로 "돌리고 환불" 악용은 티켓 단계에서 이미 차단됩니다. 별도 설정 항목을 두지 않습니다.</div>
+          <div class="info-box" style="margin-bottom:16px">구매로 발급된 티켓은 등급 티켓·이벤트 티켓 모두 승인 대기 상태로 발급되고, 쿠팡은 카카오톡 연동 D+7 / 미연동 D+30, 링크프라이스 제휴몰은 몰별 전환 대기일 수(기본 30일) 경과 시 승인됩니다. 승인 전에는 잭팟 룰렛에 쓸 수 없으므로 "돌리고 환불" 악용은 티켓 단계에서 이미 차단됩니다. 별도 설정 항목을 두지 않습니다.</div>
           <div class="form-group"><label class="form-label">이벤트 티켓 일 획득 상한</label>
             <div style="display:flex;align-items:center;gap:8px"><input class="form-input" type="number" min="1" step="1" id="jkr-daily-ticket-cap" value="5" style="max-width:120px"><span style="color:var(--text-2);font-size:13px">장 / 1일</span></div>
             <div style="font-size:12px;color:var(--text-3);margin-top:4px">회원 1명이 하루에 받을 수 있는 이벤트 티켓 총량입니다. 적립 정책의 하루 5건 한도와 같은 기준입니다.</div>
@@ -2112,7 +2125,7 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
             <div style="display:flex;align-items:center;gap:8px"><input class="form-input" type="number" min="1" step="1" id="gbr-daily-cap" value="10" style="max-width:120px"><span style="color:var(--text-2);font-size:13px">회 / 1일</span></div>
             <div style="font-size:12px;color:var(--text-3);margin-top:4px">매크로로 무제한 돌리는 것을 막는 상한입니다.</div>
           </div>
-          <div class="info-box" style="margin-bottom:16px">구매로 발급된 티켓은 등급 티켓·이벤트 티켓 모두 승인 대기 상태로 발급되고, 제휴몰별 전환 일수(기본 30일) 경과 또는 쿠팡 구매 확정 시 승인됩니다. 승인 전에는 랜덤 선물 상자 열기에 쓸 수 없으므로 "열고 환불" 악용은 티켓 단계에서 이미 차단됩니다. 별도 설정 항목을 두지 않습니다.</div>
+          <div class="info-box" style="margin-bottom:16px">구매로 발급된 티켓은 등급 티켓·이벤트 티켓 모두 승인 대기 상태로 발급되고, 쿠팡은 카카오톡 연동 D+7 / 미연동 D+30, 링크프라이스 제휴몰은 몰별 전환 대기일 수(기본 30일) 경과 시 승인됩니다. 승인 전에는 랜덤 선물 상자 열기에 쓸 수 없으므로 "열고 환불" 악용은 티켓 단계에서 이미 차단됩니다. 별도 설정 항목을 두지 않습니다.</div>
           <div class="form-group"><label class="form-label">이벤트 티켓 일 획득 상한</label>
             <div style="display:flex;align-items:center;gap:8px"><input class="form-input" type="number" min="1" step="1" id="gbr-daily-ticket-cap" value="5" style="max-width:120px"><span style="color:var(--text-2);font-size:13px">장 / 1일</span></div>
             <div style="font-size:12px;color:var(--text-3);margin-top:4px">회원 1명이 하루에 받을 수 있는 이벤트 티켓 총량입니다. 적립 정책의 하루 5건 한도와 같은 기준입니다.</div>
@@ -2703,12 +2716,12 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
                 <div class="policy-item">
                   <div class="policy-label">포스트백 수신 즉시</div>
                   <div class="policy-value">가지급 랜덤 티켓 1장 <span style="font-size:11px;color:var(--text-3)">(유저 화면: 등급 미정)</span> → <span style="color:var(--amber)">적립예정</span></div>
-                  <div class="policy-desc">등급은 구매 금액 기준으로 <strong>내부 확정</strong> — 위 등급별 적립 기준(큰 등급 우선) 적용. 적립률 비공개 정책에 따라 유저 앱에는 확정(제휴몰별 전환 일수) 전까지 '랜덤(미정)'으로 표시해 기대감 부여. 운영자는 회원 목록의 '전환예정' 컬럼에서 확정 등급을 미리 확인. 확정 시 등급 티켓으로 전환되어 기프티콘 교환에 사용. <span style="color:var(--text-3)">(경품 응모는 별도 이벤트 티켓 전용)</span></div>
+                  <div class="policy-desc">등급은 구매 금액 기준으로 <strong>내부 확정</strong> — 위 등급별 적립 기준(큰 등급 우선) 적용. 적립률 비공개 정책에 따라 유저 앱에는 확정 전까지 '랜덤(미정)'으로 표시해 기대감 부여. 운영자는 회원 목록의 '전환예정' 컬럼에서 확정 등급을 미리 확인. 확정 시 등급 티켓으로 전환되어 기프티콘 교환에 사용. <span style="color:var(--text-3)">(경품 응모는 별도 이벤트 티켓 전용)</span></div>
                 </div>
                 <div class="policy-item">
-                  <div class="policy-label">구매확정 후 — 제휴몰별 전환 일수 (기본 30일)</div>
+                  <div class="policy-label">구매확정 후 — 전환 대기일 수 경과</div>
                   <div class="policy-value" style="color:var(--success)">사용 가능 전환 + 구매 금액 기준 등급 티켓 지급</div>
-                  <div class="policy-desc">적립 확정 대기 = 이 화면 위쪽에서 정하는 제휴몰별 전환 일수(기본 30일). 카카오 연동 여부와 무관하게 이 값 하나로 정해진다. 해당 기간 내 취소 없으면 자동 처리되어 가지급 랜덤 티켓이 구매 금액 기준 등급 티켓으로 전환.</div>
+                  <div class="policy-desc">적립 확정 대기 = 쿠팡은 카카오톡 연동 D+7 / 미연동 D+30(고정), 링크프라이스 제휴몰은 「티켓 적립 설정」에서 몰마다 정하는 전환 대기일 수(기본 30일). 해당 기간 내 취소 없으면 자동 처리되어 가지급 랜덤 티켓이 구매 금액 기준 등급 티켓으로 전환.</div>
                 </div>
                 <div class="policy-item">
                   <div class="policy-label">취소 / 반품 처리</div>
@@ -2904,7 +2917,7 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
               <div class="policy-item"><div class="policy-label">가입 즉시</div><div class="policy-value">이벤트 티켓 1장 + 200P</div><div class="policy-desc">어뷰징 방지 — 이벤트 티켓·실버 보너스는 카카오 연동 후 지급.</div></div>
               <div class="policy-item"><div class="policy-label">첫 쿠팡 구경하기</div><div class="policy-value">100P</div><div class="policy-desc">최초 쿠팡 경유 방문 시 지급.</div></div>
-              <div class="policy-item"><div class="policy-label">첫 경유 구매 (가입 7일 내)</div><div class="policy-value">실버 티켓 1장</div><div class="policy-desc">구매 확정 후 지급 (제휴몰별 전환 일수 경과 후 · 취소 먹튀 방지).</div></div>
+              <div class="policy-item"><div class="policy-label">첫 경유 구매 (가입 7일 내)</div><div class="policy-value">실버 티켓 1장</div><div class="policy-desc">구매 확정 후 지급 (쿠팡 기준 카카오톡 연동 D+7 / 미연동 D+30 · 취소 먹튀 방지).</div></div>
               <div class="policy-item"><div class="policy-label">친구초대</div><div class="policy-value">양쪽 각 500P</div><div class="policy-desc">피초대자 첫 구매 성사 시 양쪽 지급.</div></div>
             </div>
             <div class="card-header" style="margin-top:18px"><div class="card-title">경품 응모 규칙</div></div>
@@ -3177,7 +3190,7 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
         <span class="ds-tag coupang">제휴몰 포스트백 (쿠팡·11번가·G마켓·알리·아이허브) · 구매 완료 시 콜백</span>
         <span class="ds-tag ours">우리 DB · 포스트백 수신 기록 (추가만 가능 · 수정·삭제 불가)</span>
       </div>
-      <div class="info-box"><strong>포스트백</strong> — 회원이 PricePick 경유 링크로 제휴몰에서 구매하면 해당 제휴몰이 우리 서버에 콜백을 보냅니다. 이 데이터로 가지급(적립예정) 처리와 <strong>제휴 수수료(매출)</strong>를 집계하며, 수수료율은 제휴몰·카테고리별로 다릅니다. 등급 티켓은 구매확정(제휴몰별 전환 일수) 후 지급됩니다. <strong>예외 처리</strong> — ① 확정 후 환불은 미사용분만 회수 ② 포스트백 미수신 24h 후 영수증 인증으로 수동 지급 ③ 중복 포스트백은 주문번호 UNIQUE로 차단.</div>
+      <div class="info-box"><strong>포스트백</strong> — 회원이 PricePick 경유 링크로 제휴몰에서 구매하면 해당 제휴몰이 우리 서버에 콜백을 보냅니다. 이 데이터로 가지급(적립예정) 처리와 <strong>제휴 수수료(매출)</strong>를 집계하며, 수수료율은 제휴몰·카테고리별로 다릅니다. 등급 티켓은 구매확정 후 지급됩니다 — 쿠팡은 카카오톡 연동 D+7 / 미연동 D+30, 링크프라이스 제휴몰은 몰별 전환 대기일 수. <strong>예외 처리</strong> — ① 확정 후 환불은 미사용분만 회수 ② 포스트백 미수신 24h 후 영수증 인증으로 수동 지급 ③ 중복 포스트백은 주문번호 UNIQUE로 차단.</div>
       <div class="toolbar">
         <input class="search-box" id="pb-search" placeholder="닉네임, 주문번호 검색..." onkeydown="if(event.key==='Enter')pbApplyFilters()">
         <select class="filter-sel" id="pb-filter-mall" onchange="pbApplyFilters()"><option value="">전체 제휴몰</option><option>쿠팡</option><option>11번가</option><option>G마켓</option><option>알리익스프레스</option><option>아이허브</option></select>
@@ -3541,7 +3554,7 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
             <span id="m-event-count" style="font-size:15px;font-weight:800;color:#c084fc"></span>
           </div>
         </div>
-        <div style="margin-top:6px;font-size:11px;color:var(--text3)">랜덤 티켓: 구매 후 제휴몰별 전환 일수 경과 시 확정 시 등급 티켓으로 전환. 취소 시 자동 환수.</div>
+        <div style="margin-top:6px;font-size:11px;color:var(--text3)">랜덤 티켓: 구매 후 전환 대기일 수가 지나면 등급 티켓으로 전환. 취소 시 자동 환수.</div>
       </div>
       <div class="form-group" id="m-ticket-section">
         <label class="form-label">티켓 수동 지급</label>
@@ -3686,6 +3699,28 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
 </div>
 
 <!-- ── 모달: 티켓 적립 시뮬레이터 (2026-08-11 신설) ── -->
+<div class="modal-overlay" id="m-ta-notice">
+  <div class="modal" style="width:520px">
+    <div class="modal-header">
+      <div class="modal-title">티켓 적립 설정 Notice</div>
+      <button class="modal-close" onclick="closeModal('m-ta-notice')"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <ul class="ta-notice-list">
+        <li><span class="k">수수료 · 적립률</span>제휴몰별로 정합니다. 적립률 기본값은 수수료의 60%이고, 남는 40%가 우리 수익입니다.</li>
+        <li><span class="k">쿠팡</span>대표 제휴몰로 목록과 별도 표시됩니다.</li>
+        <li><span class="k">쿠팡 전환 대기일 수</span><span>카카오톡 연동 D+7 / 미연동 D+30</span>. <strong>고정값이라 수정할 수 없습니다.</strong></li>
+        <li><span class="k">링크프라이스 제휴몰 전환 대기일 수</span>몰마다 설정합니다. 기본 30일.</li>
+        <li><span class="k">대기일 수를 줄이면</span>이미 발급된 랜덤 티켓도 앞당겨 전환됩니다. 늘려도 이미 확정된 티켓은 되돌리지 않습니다.</li>
+        <li><span class="k">등급 환산</span>큰 단위부터 채웁니다.</li>
+      </ul>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-primary" onclick="closeModal('m-ta-notice')">닫기</button>
+    </div>
+  </div>
+</div>
+
 <div class="modal-overlay" id="m-ta-sim">
   <div class="modal" style="width:460px">
     <div class="modal-header">
@@ -4907,7 +4942,7 @@ function giSaveTicketEdit() {
     "모든 경로 동일하게 적용":"Áp dụng giống nhau cho mọi đường dẫn",
     "구매 즉시":"Ngay khi mua","가지급 티켓(랜덤)":"Vé tạm cấp (ngẫu nhiên)",
     "지급 → 포스트백 수신 후":"Cấp → sau khi nhận Postback",
-    "제휴몰별 전환 일수 경과 시 확정":"số ngày chuyển đổi theo từng sàn xác nhận",
+    
     "시 등급 티켓(브론즈/실버/골드)으로 전환":"chuyển sang vé hạng (Đồng/Bạc/Vàng)",
     "닉네임 검색...":"Tìm biệt danh...","전체 유형":"Tất cả loại","전체 상태":"Tất cả trạng thái",
     "전체 마케팅":"Tất cả marketing",
@@ -5027,7 +5062,7 @@ function giSaveTicketEdit() {
     "가입 즉시 이벤트 티켓 1장 + 200P 지급. (어뷰징 방지: 카카오 연동 후 지급)":"Tặng 1 vé sự kiện + 200P ngay khi đăng ký. (Chống lạm dụng: cấp sau khi liên kết Kakao)",
     "첫 경유 구매 보너스":"Thưởng mua hàng qua liên kết lần đầu",
     "신규 가입 7일 내":"Trong 7 ngày đăng ký mới",
-    "첫 경유 구매(가입 7일 내) 시 실버 티켓 1장 지급. 구매 확정 후 지급(제휴몰별 전환 일수 · 기본 30일).":"Tặng 1 vé Bạc khi mua qua liên kết lần đầu (trong 7 ngày đăng ký). Cấp sau khi xác nhận mua (số ngày chuyển đổi theo từng sàn).",
+    "첫 경유 구매(가입 7일 내) 시 실버 티켓 1장 지급. 구매 확정 후 지급(쿠팡 기준 카카오톡 연동 D+7 / 미연동 D+30).":"Tặng 1 vé Bạc khi mua qua liên kết lần đầu (trong 7 ngày đăng ký). Cấp sau khi xác nhận mua (số ngày chuyển đổi theo từng sàn).",
     "진행 중":"Đang tiến hành","상시 &nbsp;·&nbsp; 신규 가입자":"Thường xuyên &nbsp;·&nbsp; Người mới",
     "출석 이벤트":"Sự kiện điểm danh","가입 보너스":"Thưởng đăng ký","등급 달성":"Đạt hạng","직접 지급":"Cấp trực tiếp",
     "지급 티켓 수":"Số vé cấp","대상":"Đối tượng","시작일":"Ngày bắt đầu","종료일":"Ngày kết thúc",
@@ -5141,7 +5176,7 @@ function giSaveTicketEdit() {
     "첫 쿠팡 구경하기":"Ghé thăm Coupang lần đầu","300P":"300P",
     "최초 쿠팡 경유 방문 시 지급.":"Cấp khi ghé thăm qua Coupang lần đầu.",
     "첫 경유 구매 (가입 7일 내)":"Mua qua LK lần đầu (trong 7 ngày đăng ký)","실버 티켓 1장":"1 vé Bạc",
-    "구매 확정 후 지급 (제휴몰별 전환 일수 경과 후 · 취소 먹튀 방지).":"Cấp sau xác nhận mua (số ngày chuyển đổi theo từng sàn, chống hủy gian lận).",
+    "구매 확정 후 지급 (쿠팡 기준 카카오톡 연동 D+7 / 미연동 D+30 · 취소 먹튀 방지).":"Cấp sau xác nhận mua (số ngày chuyển đổi theo từng sàn, chống hủy gian lận).",
     "친구초대":"Mời bạn","양쪽 각 500P":"Mỗi bên 500P",
     "피초대자 첫 구매 성사 시 양쪽 지급.":"Cấp cho cả hai khi người được mời hoàn thành lần mua đầu tiên.",
     "경품 응모 규칙":"Quy tắc tham dự giải thưởng",
@@ -5188,7 +5223,7 @@ function giSaveTicketEdit() {
     /* Scheduler section */
     "포스트백 수신 처리":"Xử lý nhận Postback","실시간":"Thời gian thực",
     "방금 전":"Vừa xong","정상":"Bình thường",
-    "티켓 확정 처리 (제휴몰별 전환 일수 · 기본 30일)":"Xử lý xác nhận vé (số ngày chuyển đổi theo từng sàn)",
+    "티켓 확정 처리 (전환 대기일 수 경과)":"Xử lý xác nhận vé (số ngày chuyển đổi theo từng sàn)",
     "매일 자정":"Mỗi ngày nửa đêm","어제 00:00":"Hôm qua 00:00",
     "알림 발송":"Gửi thông báo","매 5분":"Mỗi 5 phút","2분 전":"2 phút trước",
     "주간 추첨 티켓 집계":"Tổng hợp vé rút thăm tuần","매주 월요일 자정":"Nửa đêm thứ Hai hàng tuần",
@@ -5792,7 +5827,7 @@ function giSaveTicketEdit() {
   "브론즈 = ⌊잔여 / 5,000⌋ → 5,000원 미만 잔돈은 지급 안 함":"Đồng = ⌊còn lại / 5.000⌋ → Tiền lẻ dưới 5.000 won không cấp",
   "골드 = ⌊금액 / 100,000⌋ → 잔여 = 금액 mod 100,000":"Vàng = ⌊số tiền / 100.000⌋ → Còn lại = số tiền mod 100.000",
   "— 티켓 환산가치(브론즈 100원·실버 1,000원·골드 2,000원)에 약":"— Vào khoảng giá trị quy đổi vé (Đồng 100 won·Bạc 1.000 won·Vàng 2.000 won)",
-  "매일 오전 3시 · 대기 티켓 자동 확정 (제휴몰별 전환 일수 · 기본 30일)":"3 giờ sáng hàng ngày · Tự động xác nhận vé chờ (số ngày chuyển đổi theo từng sàn)",
+  "매일 오전 3시 · 대기 티켓 자동 확정 (전환 대기일 수 경과)":"3 giờ sáng hàng ngày · Tự động xác nhận vé chờ (số ngày chuyển đổi theo từng sàn)",
   "— 이벤트 티켓 1장 소모 · 1회 추첨 최대 10장 · 추첨 회차 기준 응모":"— Tiêu 1 vé sự kiện · Tối đa 10 vé mỗi lần rút thăm · Tham dự theo vòng rút thăm",
   "을 더해 책정. 마진은 기프티콘 도매가 + 운영비를 커버하는 정상 범위입니다.":"được cộng thêm để định giá. Biên lợi nhuận trong phạm vi bình thường, bao gồm giá bán buôn Gifticon + chi phí vận hành.",
   "제휴몰 포스트백 (쿠팡·11번가·G마켓·알리·아이허브) · 구매 완료 시 콜백":"Postback cửa hàng LK (Coupang·11번가·Gmarket·AliExpress·iHerb) · Callback khi mua hoàn tất",
@@ -5809,7 +5844,7 @@ function giSaveTicketEdit() {
   "— 약관 변경 시 법적 요건을 반드시 확인하고, 변경 30일 전 회원에게 사전 공지 후 적용하세요.":"— Khi thay đổi điều khoản, bắt buộc xác nhận yêu cầu pháp lý và thông báo trước cho thành viên 30 ngày trước khi áp dụng.",
   "· 성사 기준 피초대자 첫 구매 완료(성사 시점 양쪽 지급) · 초대자 월 최대 50명. 상세 정책은":"· Tiêu chuẩn thành công: người được mời hoàn thành lần mua đầu tiên (cấp cả hai khi thành công) · Người mời tối đa 50 người/tháng. Chính sách chi tiết xem",
   "제외 대상 카테고리·상품은 적립 계산에서 제외되며, 앱 10e 화면에 \"적립 제외 상품\"으로 안내됩니다.":"Danh mục·sản phẩm loại trừ không tính vào tích lũy, được thông báo là \"Sản phẩm loại trừ tích lũy\" trên màn hình 10e của ứng dụng.",
-  "랜덤 티켓: 구매 후 제휴몰별 전환 일수 경과 시 확정 시 등급 티켓으로 전환. 취소 시 자동 환수.":"Vé ngẫu nhiên: Sau mua, khi xác nhận số ngày chuyển đổi theo từng sàn chuyển thành vé hạng. Tự động thu hồi khi hủy.",
+  "랜덤 티켓: 구매 후 전환 대기일 수가 지나면 등급 티켓으로 전환. 취소 시 자동 환수.":"Vé ngẫu nhiên: Sau mua, khi xác nhận số ngày chuyển đổi theo từng sàn chuyển thành vé hạng. Tự động thu hồi khi hủy.",
   "— 친구초대 보상 = 양쪽 각 500P(포인트), 초대자 월 최대 50명. (이벤트 티켓 → 포인트 변경)":"— Thưởng mời bạn = mỗi bên 500P (điểm), người mời tối đa 50 người/tháng. (Vé sự kiện → đổi thành Điểm)",
   "동안 철회 가능, 이후 개인정보 영구 삭제. 처리 누락 시 개인정보보호법 위반 + Apple 심사 거절 사유.":"Có thể thu hồi trong thời gian đó, sau đó xóa vĩnh viễn thông tin cá nhân. Nếu bỏ sót: vi phạm Luật bảo vệ TTCN + lý do từ chối kiểm duyệt Apple.",
   "— 회계/세무/부정거래 추적의 근거. 회수 시에도 음수 레코드로 추가, 원본 보존. (추가만 가능 · 수정·삭제 불가)":"— Cơ sở theo dõi kế toán/thuế/gian lận. Khi thu hồi cũng thêm bản ghi âm, bảo tồn bản gốc. (chỉ thêm mới · không sửa/xóa)",
@@ -5818,7 +5853,7 @@ function giSaveTicketEdit() {
   "2건 · -38,000원 (제휴몰은 차감, 우리 시스템 미반영 → 포스트백 재처리 필요) &nbsp;/&nbsp;":"2 tr.hợp · -38.000 won (cửa hàng LK đã trừ, hệ thống chưa phản ánh → Cần xử lý lại postback) &nbsp;/&nbsp;",
   "— 적립·사용·만료·교환 모두 레코드로 누적되며 삭제 금지. 회수도 음수 레코드로 추가합니다. (10P = 1원)":"— Tích lũy·dùng·hết hạn·đổi đều tích lũy bản ghi và không được xóa. Thu hồi cũng thêm bản ghi âm. (10P = 1 won)",
   "활성화된 티켓이 사용된 후 취소·반품 발생 시 즉시 회수 불가. 부채(음수 잔액)로 기록 후 다음 적립 시 자동 상계.":"Sau khi vé đã được kích hoạt và dùng, xảy ra hủy·trả thì không thể thu hồi ngay. Ghi dưới dạng nợ (số dư âm) và tự động bù trừ ở lần tích lũy tiếp.",
-  "를 집계하며, 수수료율은 제휴몰·카테고리별로 다릅니다. 등급 티켓은 구매확정(제휴몰별 전환 일수) 후 지급됩니다.":"được tổng hợp, tỷ lệ hoa hồng khác nhau theo cửa hàng LK·danh mục. Vé hạng được cấp sau xác nhận mua (số ngày chuyển đổi theo từng sàn).",
+  "를 집계하며, 수수료율은 제휴몰·카테고리별로 다릅니다. 등급 티켓은 구매확정 후 지급됩니다 — 쿠팡은 카카오톡 연동 D+7 / 미연동 D+30, 링크프라이스 제휴몰은 몰별 전환 대기일 수.":"được tổng hợp, tỷ lệ hoa hồng khác nhau theo cửa hàng LK·danh mục. Vé hạng được cấp sau xác nhận mua (số ngày chuyển đổi theo từng sàn).",
   "(회원이 티켓을 기프티콘으로 교환할 때 발생하는 마진). 두 수익에서 회원에게 적립해준 티켓의 환산가치(적립 비용)를 차감한 것이":"(Biên phát sinh khi thành viên đổi vé lấy Gifticon). Từ hai nguồn doanh thu trừ giá trị quy đổi (chi phí tích lũy) của vé đã tích lũy cho thành viên thì",
   "— API 키는 마스킹 처리됩니다. 키 노출 시 즉시 재발급 후 교체하세요. 키 교체 시 해당 제휴몰의 적립 추적이 일시 중단됩니다.":"— Khóa API được ẩn. Khi khóa bị lộ, cấp lại ngay và thay thế. Khi thay khóa, theo dõi tích lũy của cửa hàng LK đó tạm dừng.",
   "을 지급합니다. 추첨이 이벤트 티켓을 새로 발급하지 않습니다. (이벤트 티켓 획득 경로는 출석 5연속·매일 행운 룰렛·이부장 패키지 5종 등 별도 경로)":"được cấp. Rút thăm không phát hành vé sự kiện mới. (Đường dẫn nhận vé sự kiện: điểm danh 5 lần liên tiếp·vòng quay·gói Trưởng phòng Lee 5 loại, v.v.)",
@@ -5830,8 +5865,8 @@ function giSaveTicketEdit() {
   "은 구매 취소·반품에 의한 회수 및 등급 티켓 유효기간 만료 소멸 내역입니다. TicketTransaction 테이블의 type='CLAWBACK'·'EXPIRE' 레코드를 조회합니다.":"là chi tiết thu hồi do hủy·trả hàng và hủy hết hiệu lực vé hạng. Truy vấn bản ghi type='CLAWBACK'·'EXPIRE' của bảng TicketTransaction.",
   "— 앱·서비스 운영의 핵심 정책 기준을 한곳에서 확인하는 페이지입니다. 정책 수치·기준 변경은 별도 승인 절차를 거쳐 반영되며, 이 화면에서 직접 수정하지 않습니다. (이용약관·개인정보처리방침 등 앱 노출용 약관은":"— Đây là trang xác nhận các tiêu chuẩn chính sách cốt lõi vận hành ứng dụng·dịch vụ tại một nơi. Thay đổi số liệu·tiêu chuẩn chính sách được phản ánh qua quy trình phê duyệt riêng, không chỉnh sửa trực tiếp trên màn hình này. (Điều khoản sử dụng·chính sách bảo mật v.v. dùng để hiển thị trên ứng dụng thì",
   "기산일 = 구매로 랜덤 티켓을 받은 적립일. 적립일 기준 1년 경과 시 만료(등급 확정 시점 아님). 만료 30일·7일 전 알림 유지, 기한 경과 시 자동 소멸(복구 불가). 이벤트 티켓은 발급일+100일 고정 소멸 만료로 별도 처리.":"Ngày tính = ngày tích lũy nhận vé ngẫu nhiên khi mua. Hết hạn khi qua 1 năm tính từ ngày tích lũy (không phải thời điểm xác nhận hạng). Giữ thông báo trước hết hạn 30·7 ngày, qua hạn thì tự tiêu hủy (không khôi phục). Vé sự kiện xử lý riêng bằng tiêu hủy cố định ngày phát hành+100 ngày (không rollover).",
-  "적립 확정 대기 = 이 화면 위쪽에서 정하는 제휴몰별 전환 일수(기본 30일). 카카오 연동 여부와 무관하게 이 값 하나로 정해진다. 해당 기간 내 취소 없으면 자동 처리되어 가지급 랜덤 티켓이 구매 금액 기준 등급 티켓으로 전환.":"Chờ xác nhận tích lũy = số ngày chuyển đổi theo từng sàn được đặt ở phía trên màn hình này (mặc định 30 ngày). Không phụ thuộc việc có liên kết Kakao hay không. Nếu không có hủy trong thời gian đó, tự động xử lý và vé ngẫu nhiên tạm cấp chuyển thành vé hạng theo số tiền mua.",
-  "— 위 등급별 적립 기준(큰 등급 우선) 적용. 적립률 비공개 정책에 따라 유저 앱에는 확정(제휴몰별 전환 일수) 전까지 '랜덤(미정)'으로 표시해 기대감 부여. 운영자는 회원 목록의 '전환예정' 컬럼에서 확정 등급을 미리 확인. 확정 시 등급 티켓으로 전환되어 기프티콘 교환에 사용.":"— Áp dụng tiêu chuẩn tích lũy theo hạng (ưu tiên hạng lớn) trên. Theo chính sách không công khai tỷ lệ, ứng dụng người dùng hiển thị 'Ngẫu nhiên (chưa xác định)' cho đến khi xác nhận (số ngày chuyển đổi theo từng sàn). Quản trị viên xem trước hạng xác nhận trong cột 'Dự kiến chuyển đổi'. Khi xác nhận, chuyển thành vé hạng để đổi Gifticon.",
+  "적립 확정 대기 = 쿠팡은 카카오톡 연동 D+7 / 미연동 D+30(고정), 링크프라이스 제휴몰은 「티켓 적립 설정」에서 몰마다 정하는 전환 대기일 수(기본 30일). 해당 기간 내 취소 없으면 자동 처리되어 가지급 랜덤 티켓이 구매 금액 기준 등급 티켓으로 전환.":"Chờ xác nhận tích lũy = số ngày chuyển đổi theo từng sàn được đặt ở phía trên màn hình này (mặc định 30 ngày). Không phụ thuộc việc có liên kết Kakao hay không. Nếu không có hủy trong thời gian đó, tự động xử lý và vé ngẫu nhiên tạm cấp chuyển thành vé hạng theo số tiền mua.",
+  "— 위 등급별 적립 기준(큰 등급 우선) 적용. 적립률 비공개 정책에 따라 유저 앱에는 확정 전까지 '랜덤(미정)'으로 표시해 기대감 부여. 운영자는 회원 목록의 '전환예정' 컬럼에서 확정 등급을 미리 확인. 확정 시 등급 티켓으로 전환되어 기프티콘 교환에 사용.":"— Áp dụng tiêu chuẩn tích lũy theo hạng (ưu tiên hạng lớn) trên. Theo chính sách không công khai tỷ lệ, ứng dụng người dùng hiển thị 'Ngẫu nhiên (chưa xác định)' cho đến khi xác nhận (số ngày chuyển đổi theo từng sàn). Quản trị viên xem trước hạng xác nhận trong cột 'Dự kiến chuyển đổi'. Khi xác nhận, chuyển thành vé hạng để đổi Gifticon.",
   "이번달 순수익":"Lợi nhuận ròng tháng này",
   "제휴 수수료 매출":"Doanh thu hoa hồng LK",
   "기프티콘 판매 수익":"Doanh thu Gifticon",
@@ -5932,11 +5967,11 @@ function giSaveTicketEdit() {
   "상품코드가 일치하는 기존 데이터는 덮어쓰기됩니다. 등록 전 백업을 권장합니다.":"Dữ liệu hiện có trùng mã sản phẩm sẽ bị ghi đè. Khuyến nghị sao lưu trước khi đăng ký.",
   "배송비, 쿠폰, 캐시, 적립 제외 상품가는 계산 대상에서 제외 후 알고리즘 적용.":"Phí vận chuyển, coupon, tiền mặt, giá sản phẩm loại trừ được trừ khỏi đối tượng tính trước khi áp dụng thuật toán.",
   "마케팅성 알림은 수신 동의 회원에게만 발송됩니다. 서비스 필수 알림(티켓 지급·기프티콘 발송·경품 당첨)은 동의 여부와 무관하게 발송됩니다.":"Thông báo marketing chỉ gửi cho thành viên đã đồng ý nhận. Thông báo dịch vụ bắt buộc (cấp vé·gửi Gifticon·trúng giải) được gửi bất kể có đồng ý hay không.",
-  "첫 경유 구매(가입 7일 내) 시 실버 티켓 1장 지급. 구매 확정 후 지급(제휴몰별 전환 일수 · 기본 30일).":"Cấp 1 vé Bạc khi mua qua lần đầu (trong 7 ngày đăng ký). Cấp sau xác nhận mua (số ngày chuyển đổi theo từng sàn).",
+  "첫 경유 구매(가입 7일 내) 시 실버 티켓 1장 지급. 구매 확정 후 지급(쿠팡 기준 카카오톡 연동 D+7 / 미연동 D+30).":"Cấp 1 vé Bạc khi mua qua lần đầu (trong 7 ngày đăng ký). Cấp sau xác nhận mua (số ngày chuyển đổi theo từng sàn).",
   "적립 기준 변경은 이후 확정되는 구매부터 적용됩니다. 기존 대기 중인 티켓은 영향 없음.":"Thay đổi tiêu chuẩn tích lũy áp dụng từ các mua hàng xác nhận sau đó. Vé đang chờ hiện tại không bị ảnh hưởng.",
   "기프티콘 연동 상품 목록입니다. 교환 티켓은 보상정책 기준으로 자동 계산됩니다. 교환 티켓 칩을 클릭하면 수량을 수정할 수 있습니다.":"Đây là danh sách sản phẩm Gifticon đã liên kết. Vé đổi được tính tự động theo chính sách thưởng. Nhấp vào chip vé đổi để chỉnh sửa số lượng.",
   "추첨 회차 기준. 추첨 주기(월1/격주)는 미정 — 운영 회의 후 확정.":"Theo vòng rút thăm. Chu kỳ (tháng 1/cách tuần) chưa xác định — xác nhận sau họp vận hành.",
-  "구매 확정 후 지급 (제휴몰별 전환 일수 경과 후 · 취소 먹튀 방지).":"Cấp sau xác nhận mua (số ngày chuyển đổi theo từng sàn, phòng hủy gian lận).",
+  "구매 확정 후 지급 (쿠팡 기준 카카오톡 연동 D+7 / 미연동 D+30 · 취소 먹튀 방지).":"Cấp sau xác nhận mua (số ngày chuyển đổi theo từng sàn, phòng hủy gian lận).",
   "이벤트 티켓 신규 상한. (구매 적립 랜덤 티켓 1일 5/월 50과 별도)":"Hạn mức mới vé sự kiện. (Riêng với vé ngẫu nhiên tích lũy mua: 5/ngày và 50/tháng)",
   "제휴 수수료 (매출)":"Hoa hồng LK (doanh thu)",
   "앱 진입만으로 인정":"Công nhận chỉ khi vào ứng dụng",
@@ -6146,19 +6181,38 @@ Object.assign(KO2VI,{"룰렛 보상 슬롯은 운영자가 CMS에서 직접 정�
 Object.assign(KO2VI,{"잭팟 보상 슬롯도 운영자가 CMS에서 직접 정하는 값입니다(자동 계산 대상 아님). 티켓 가치를 바꾸면 슬롯 구성도 다시 정해야 합니다.":"Ô thưởng Jackpot cũng là giá trị do quản trị viên tự đặt trực tiếp trong CMS (không phải đối tượng tự động tính toán). Nếu đổi giá trị vé thì cấu hình ô thưởng cũng cần được đặt lại."});
 Object.assign(KO2VI,{"적립액은 구매금액과 제휴몰별 적립률로 정해집니다. 티켓 가치를 바꾸면 같은 적립액이 몇 장으로 지급되는지가 달라집니다. 최소 구매 금액 문턱은 없습니다.":"Số tiền tích lũy được quyết định bởi số tiền mua và tỷ lệ tích lũy theo từng sàn liên kết. Nếu đổi giá trị vé thì số lượng vé được phát cho cùng một số tiền tích lũy sẽ thay đổi. Không có mức tối thiểu cho số tiền mua."});
 
-/* ── 제휴몰별 전환 일수 (김반장 확정 2026-08-24) ── */
+/* ── 전환 대기일 수 · 티켓 적립 설정 Notice (김반장 확정 2026-08-26) ── */
 Object.assign(KO2VI,{
-  "전환 일수":"Số ngày chuyển đổi",
-  "전환 일수 적용":"Áp dụng số ngày chuyển đổi",
-  "전환 일수 = 랜덤 티켓이 등급 티켓으로 바뀌기까지의 대기 일수":"Số ngày chuyển đổi = số ngày chờ để vé ngẫu nhiên trở thành vé hạng",
-  "— 제휴몰마다 다르게 정할 수 있고 기본값은 30일입니다.":" — có thể đặt khác nhau cho từng sàn liên kết, mặc định là 30 ngày.",
-  "카카오 연동 여부와 무관합니다":"Không liên quan đến việc có liên kết Kakao hay không",
-  "— 예전의 연동 D+7 / 미연동 D+30 이원 기준은 폐지되었고, 연동 회원이든 미연동 회원이든 그 구매가 발생한 제휴몰의 전환 일수 하나로만 정해집니다.":" — tiêu chuẩn hai nhánh cũ (đã liên kết D+7 / chưa liên kết D+30) đã bị bãi bỏ. Dù thành viên đã liên kết hay chưa, thời điểm chuyển đổi chỉ do một giá trị quyết định: số ngày chuyển đổi của sàn phát sinh giao dịch đó.",
-  "전환 일수를 줄이면 이미 발급된 랜덤 티켓도 앞당겨 전환됩니다":"Nếu giảm số ngày chuyển đổi thì vé ngẫu nhiên đã phát hành cũng được chuyển đổi sớm hơn",
-  "— 저장하는 순간 대기 중인 가지급 티켓을 새 기준으로 다시 재서, 이미 기간이 지난 티켓은 그 자리에서 등급 티켓으로 확정합니다. 늘리는 경우 이미 확정된 티켓을 되돌리지는 않습니다.":" — ngay khi lưu, các vé tạm cấp đang chờ sẽ được đo lại theo tiêu chuẩn mới; vé nào đã quá hạn thì được xác nhận thành vé hạng ngay tại chỗ. Nếu tăng số ngày thì vé đã xác nhận không bị hoàn lại.",
-  "선택한 몰에 한꺼번에 적용할 전환 일수":"Số ngày chuyển đổi áp dụng hàng loạt cho các sàn đã chọn",
-  "전환 일수는 1~365 사이 숫자로 입력하세요.":"Vui lòng nhập số ngày chuyển đổi trong khoảng 1~365.",
-  "전환 일수를 줄였지만, 해당 제휴몰에는 새 기준으로 이미 기간이 지난 대기 티켓이 없었습니다.":"Đã giảm số ngày chuyển đổi, nhưng sàn đó không có vé đang chờ nào đã quá hạn theo tiêu chuẩn mới."
+  "전환 대기일 수":"Số ngày chờ chuyển đổi",
+  "전환 대기일 수 적용":"Áp dụng số ngày chờ chuyển đổi",
+  "선택한 몰에 한꺼번에 적용할 전환 대기일 수":"Số ngày chờ chuyển đổi áp dụng hàng loạt cho các sàn đã chọn",
+  "카카오톡 연동 D+7 / 미연동 D+30":"Liên kết KakaoTalk D+7 / Chưa liên kết D+30",
+  "쿠팡은 직접 제휴라 카카오톡 연동 기준을 그대로 씁니다. 고정값이라 수정할 수 없습니다.":"Coupang là liên kết trực tiếp nên dùng đúng tiêu chuẩn liên kết KakaoTalk. Đây là giá trị cố định, không sửa được.",
+  "티켓 적립 설정 Notice":"Lưu ý — Thiết lập tích lũy vé",
+  "수수료 · 적립률":"Hoa hồng · Tỷ lệ tích lũy",
+  "제휴몰별로 정합니다. 적립률 기본값은 수수료의 60%이고, 남는 40%가 우리 수익입니다.":"Đặt riêng cho từng sàn liên kết. Tỷ lệ tích lũy mặc định là 60% hoa hồng, 40% còn lại là lợi nhuận của chúng ta.",
+  "쿠팡":"Coupang",
+  "대표 제휴몰로 목록과 별도 표시됩니다.":"Hiển thị riêng khỏi danh sách, với tư cách sàn liên kết đại diện.",
+  "쿠팡 전환 대기일 수":"Số ngày chờ chuyển đổi của Coupang",
+  "고정값이라 수정할 수 없습니다.":"Là giá trị cố định, không sửa được.",
+  "링크프라이스 제휴몰 전환 대기일 수":"Số ngày chờ chuyển đổi của sàn Linkprice",
+  "몰마다 설정합니다. 기본 30일.":"Đặt riêng cho từng sàn. Mặc định 30 ngày.",
+  "대기일 수를 줄이면":"Nếu giảm số ngày chờ",
+  "이미 발급된 랜덤 티켓도 앞당겨 전환됩니다. 늘려도 이미 확정된 티켓은 되돌리지 않습니다.":"vé ngẫu nhiên đã phát hành cũng được chuyển đổi sớm hơn. Dù tăng lên thì vé đã xác nhận cũng không bị hoàn lại.",
+  "등급 환산":"Quy đổi hạng",
+  "큰 단위부터 채웁니다.":"Điền từ đơn vị lớn trước.",
+  "닫기":"Đóng",
+  "전환 대기일 수는 1~365 사이 숫자로 입력하세요.":"Vui lòng nhập số ngày chờ chuyển đổi trong khoảng 1~365.",
+  "전환 대기일 수를 줄였지만, 해당 제휴몰에는 새 기준으로 이미 기간이 지난 대기 티켓이 없었습니다.":"Đã giảm số ngày chờ chuyển đổi, nhưng sàn đó không có vé đang chờ nào đã quá hạn theo tiêu chuẩn mới.",
+  "쿠팡은 카카오톡 연동 D+7 / 미연동 D+30, 링크프라이스 제휴몰은 몰별 전환 대기일 수(기본 30일) 경과 시 승인됩니다.":"Coupang theo liên kết KakaoTalk D+7 / chưa liên kết D+30; sàn Linkprice thì được duyệt khi hết số ngày chờ chuyển đổi của từng sàn (mặc định 30 ngày).",
+  "적립 확정 대기 = 쿠팡은 카카오톡 연동 D+7 / 미연동 D+30(고정), 링크프라이스 제휴몰은 「티켓 적립 설정」에서 몰마다 정하는 전환 대기일 수(기본 30일).":"Chờ xác nhận tích lũy = Coupang là liên kết KakaoTalk D+7 / chưa liên kết D+30 (cố định); sàn Linkprice là số ngày chờ chuyển đổi đặt riêng cho từng sàn trong 「Thiết lập tích lũy vé」 (mặc định 30 ngày).",
+  "구매확정 후 — 전환 대기일 수 경과":"Sau xác nhận mua — hết số ngày chờ chuyển đổi",
+  "티켓 확정 처리 (전환 대기일 수 경과)":"Xử lý xác nhận vé (hết số ngày chờ chuyển đổi)",
+  "매일 오전 3시 · 대기 티켓 자동 확정 (전환 대기일 수 경과)":"3 giờ sáng hàng ngày · Tự động xác nhận vé chờ (hết số ngày chờ chuyển đổi)",
+  "랜덤 티켓: 구매 후 전환 대기일 수가 지나면 등급 티켓으로 전환. 취소 시 자동 환수.":"Vé ngẫu nhiên: sau khi mua, hết số ngày chờ chuyển đổi thì chuyển thành vé hạng. Tự động thu hồi khi hủy.",
+  "등급 티켓은 구매확정 후 지급됩니다 — 쿠팡은 카카오톡 연동 D+7 / 미연동 D+30, 링크프라이스 제휴몰은 몰별 전환 대기일 수.":"Vé hạng được cấp sau khi xác nhận mua — Coupang là liên kết KakaoTalk D+7 / chưa liên kết D+30, sàn Linkprice là số ngày chờ chuyển đổi của từng sàn.",
+  "구매 확정 후 지급 (쿠팡 기준 카카오톡 연동 D+7 / 미연동 D+30 · 취소 먹튀 방지).":"Cấp sau khi xác nhận mua (theo chuẩn Coupang: liên kết KakaoTalk D+7 / chưa liên kết D+30 · chống hủy gian lận).",
+  "첫 경유 구매(가입 7일 내) 시 실버 티켓 1장 지급. 구매 확정 후 지급(쿠팡 기준 카카오톡 연동 D+7 / 미연동 D+30).":"Mua qua liên kết lần đầu (trong 7 ngày đăng ký) được cấp 1 vé Bạc. Cấp sau khi xác nhận mua (theo chuẩn Coupang: liên kết KakaoTalk D+7 / chưa liên kết D+30)."
 });
 
 
@@ -9000,7 +9054,7 @@ window.wdShowDetail = function(id) {
 var SCHED_JOBS = [
   { id:'notify_dispatch', name:'알림 발송', desc:'매 5분 · 예약·이벤트 알림 큐 처리' },
   { id:'weekly_draw', name:'주간 추첨 집계', desc:'매주 월요일 자정 · 빈 등수 슬롯 자동 추첨' },
-  { id:'ticket_confirm', name:'티켓 확정 배치', desc:'매일 오전 3시 · 대기 티켓 자동 확정 (제휴몰별 전환 일수 · 기본 30일)' },
+  { id:'ticket_confirm', name:'티켓 확정 배치', desc:'매일 오전 3시 · 대기 티켓 자동 확정 (전환 대기일 수 경과)' },
   { id:'ticket_expire', name:'티켓 만료 배치', desc:'매일 새벽 4시 · 등급 티켓 만료 소멸 + D-30/D-7 임박 알림' },
   { id:'db_backup', name:'DB 백업', desc:'매일 새벽 3시 · S3 자동 업로드' },
 ];
@@ -10093,11 +10147,17 @@ function taDefaultRate(fee, ratio) {
   var r = taFmt(fee * (typeof ratio === 'number' ? ratio : TA_DEFAULT_RATE_RATIO) / 100);
   return r > 20 ? 20 : r;
 }
-// 「전환 일수」— 랜덤(가지급) 티켓이 등급 티켓으로 확정되기까지의 대기 일수.
-// 카카오 연동 여부로 D+7 / D+30 을 가르던 기존 기준은 폐지하고(김반장 확정 2026-08-24)
-// 제휴몰마다 정하는 이 값 하나로만 정한다. settings/ticket_accrual.convertDays 에
-// { code: 일수 } 맵으로 저장한다 — rates/fees/applied 와 같은 패턴이라 새 문서를 안 만든다.
+// 「전환 대기일 수」— 랜덤(가지급) 티켓이 등급 티켓으로 확정되기까지의 대기 일수.
+// 두 규칙이 별개로 공존한다(김반장 확정 2026-08-26):
+//   · 쿠팡(대표 제휴몰) = 카카오톡 연동 D+7 / 미연동 D+30. 고정값이라 CMS에서 못 고친다.
+//   · 링크프라이스 제휴몰 = 몰마다 설정, 기본 30일.
+// 그래서 convertDays 맵에는 링크프라이스 몰(lp: · 수동 추가분)만 들어간다 —
+// coupang_direct 는 애초에 입력칸이 없어 수집 대상이 아니다.
+// settings/ticket_accrual.convertDays 에 { code: 일수 } 맵으로 저장한다
+// — rates/fees/applied 와 같은 패턴이라 새 문서를 안 만든다.
 var TA_DEFAULT_CONVERT_DAYS = 30;
+// 쿠팡 칸에 그대로 박히는 글자. 관리자가 고칠 수 없다.
+var TA_COUPANG_WAIT_LABEL = '카카오톡 연동 D+7 / 미연동 D+30';
 var TA_CONVERT_DAYS = {};   // { code: 일수 } — 화면(저장 전 편집분 포함) 값
 
 var TA_UNITS = [                                           // ticket_grades 시드의 환산가치와 동일
@@ -10372,8 +10432,10 @@ function taRenderRow(m, showHideCol) {
     + '<td><span style="display:inline-flex;align-items:center;gap:6px">'
     +   '<input class="form-input ta-rate" type="number" min="0" max="20" step="0.1" value="' + m.rate + '" style="max-width:88px;text-align:right">%</span></td>'
     + '<td class="ta-margin">—</td>'
-    + '<td><span style="display:inline-flex;align-items:center;gap:6px">'
-    +   '<input class="form-input ta-days" type="number" min="1" max="365" step="1" value="' + m.days + '" style="max-width:72px;text-align:right"><span>일</span></span></td>'
+    + (!showHideCol
+        ? '<td><span class="ta-days-fixed" title="쿠팡은 직접 제휴라 카카오톡 연동 기준을 그대로 씁니다. 고정값이라 수정할 수 없습니다.">' + TA_COUPANG_WAIT_LABEL + '</span></td>'
+        : '<td><span style="display:inline-flex;align-items:center;gap:6px">'
+          + '<input class="form-input ta-days" type="number" min="1" max="365" step="1" value="' + m.days + '" style="max-width:72px;text-align:right"><span>일</span></span></td>')
     + '<td><button type="button" class="btn btn-ghost btn-sm" onclick="taOpenSim(\'' + m.code + '\')">시뮬레이터</button></td>'
     + appliedCell
     + '</tr>';
@@ -10463,7 +10525,6 @@ window.taLoad = function() {
         name: cd.name || coupangDoc.id,
         fee: cFeeFinal,
         rate: typeof saved[pCode] === 'number' ? taFmt(saved[pCode]) : taDefaultRate(cFeeFinal),
-        days: typeof savedDays[pCode] === 'number' ? savedDays[pCode] : TA_DEFAULT_CONVERT_DAYS,
         isHidden: false,
         logo: typeof savedLogos[pCode] === 'string' ? savedLogos[pCode] : '',
       });
@@ -10527,7 +10588,7 @@ window.taLoad = function() {
     TA_APPLIED = {};
     TA_LOGO = {};
     TA_CONVERT_DAYS = {};
-    primary.forEach(function(m) { TA_ORIGINAL[m.code] = { fee: m.fee, rate: m.rate, days: m.days, logo: m.logo }; TA_LOGO[m.code] = m.logo; TA_CONVERT_DAYS[m.code] = m.days; });
+    primary.forEach(function(m) { TA_ORIGINAL[m.code] = { fee: m.fee, rate: m.rate, logo: m.logo }; TA_LOGO[m.code] = m.logo; });
     secondaryAll.forEach(function(m) {
       TA_ORIGINAL[m.code] = { fee: m.fee, rate: m.rate, days: m.days, status: m.status, applied: m.isApplied, logo: m.logo };
       TA_CONVERT_DAYS[m.code] = m.days;
@@ -10599,9 +10660,9 @@ function taSaveScope(scope, btnId, bannerLabel, logLabel) {
       updated_at: FS.FieldValue.serverTimestamp(),
     }, { merge: true });
   }).then(function() {
-    toast(bannerLabel + ' 수수료·적립률·전환 일수·승인상태·적용여부·로고를 저장했습니다.');
-    logAdmin(logLabel + ' 수수료·적립률·전환 일수·승인상태·적용여부·로고 수정');
-    // 전환 일수를 줄인 몰이 있으면 이미 발급된 대기 티켓에 소급 적용한다
+    toast(bannerLabel + ' 수수료·적립률·전환 대기일 수·승인상태·적용여부·로고를 저장했습니다.');
+    logAdmin(logLabel + ' 수수료·적립률·전환 대기일 수·승인상태·적용여부·로고 수정');
+    // 전환 대기일 수를 줄인 몰이 있으면 이미 발급된 대기 티켓에 소급 적용한다
     // (김반장 확정 2026-08-24 — "새로 받는 것만이 아니라 그 티켓도 앞당겨 전환된다").
     var shortened = Object.keys(c.convertDays).filter(function(code) {
       var before = TA_ORIGINAL[code] && TA_ORIGINAL[code].days;
@@ -10635,14 +10696,14 @@ window.taSaveSecondary = function() {
   taSaveScope('secondary', 'ta-save-btn-secondary', '제휴몰(링크프라이스)', '제휴몰(링크프라이스)');
 };
 
-// ── 전환 일수 일괄 적용 (선택 모드) ──────────────────────────────
+// ── 전환 대기일 수 일괄 적용 (선택 모드) ──────────────────────────────
 // 적립률 일괄 적용(taBulkApplyRatio)과 같은 방식 — 화면 값만 바꾸고 저장 버튼을
 // 눌러야 Firestore 에 반영된다.
 window.taBulkSetConvertDays = function() {
   var codes = Object.keys(TA_SELECTED);
   if (!codes.length) { toast('선택된 몰이 없습니다. 「선택」을 눌러 몰을 체크하세요.'); return; }
   var v = parseInt((document.getElementById('ta-bulk-days') || {}).value, 10);
-  if (!isFinite(v) || v < 1 || v > 365) { toast('전환 일수는 1~365 사이 숫자로 입력하세요.'); return; }
+  if (!isFinite(v) || v < 1 || v > 365) { toast('전환 대기일 수는 1~365 사이 숫자로 입력하세요.'); return; }
   codes.forEach(function(code) {
     var tr = document.querySelector('#ta-tbody-secondary tr[data-code="' + code + '"]');
     if (!tr) return;
@@ -10651,11 +10712,11 @@ window.taBulkSetConvertDays = function() {
     TA_CONVERT_DAYS[code] = v;
   });
   taCheckDirty();
-  toast(codes.length + '개 몰의 전환 일수를 ' + v + '일로 맞췄습니다. 저장 버튼을 눌러야 적용됩니다.');
+  toast(codes.length + '개 몰의 전환 대기일 수를 ' + v + '일로 맞췄습니다. 저장 버튼을 눌러야 적용됩니다.');
 };
 
 // ── 소급 전환 배치 ──────────────────────────────────────────────
-// 전환 일수를 줄이면 "앞으로 적립되는 티켓"만이 아니라 "이미 발급되어 대기 중인
+// 전환 대기일 수를 줄이면 "앞으로 적립되는 티켓"만이 아니라 "이미 발급되어 대기 중인
 // 랜덤 티켓"에도 새 기준을 소급 적용한다(김반장 확정 2026-08-24). 실서버에서는
 // 매일 도는 확정 배치가 같은 판정을 하지만, 일수를 줄인 그 순간 이미 기준을 넘긴
 // 티켓은 다음 배치를 기다릴 이유가 없으므로 저장 직후 한 번 즉시 돌린다.
@@ -10728,12 +10789,12 @@ function taConvertRetro(convertDays, shortenedCodes) {
     });
   }).then(function(res) {
     if (!res.converted) {
-      toast('전환 일수를 줄였지만, 해당 제휴몰에는 새 기준으로 이미 기간이 지난 대기 티켓이 없었습니다.');
+      toast('전환 대기일 수를 줄였지만, 해당 제휴몰에는 새 기준으로 이미 기간이 지난 대기 티켓이 없었습니다.');
       return res;
     }
     var detail = Object.keys(res.byMall).map(function(k) { return k + ' ' + res.byMall[k] + '장'; }).join(' · ');
     toast('대기 중이던 랜덤 티켓 ' + res.converted + '장을 앞당겨 등급 티켓으로 확정했습니다. (' + detail + ')');
-    logAdmin('전환 일수 단축 소급 적용 — 대기 랜덤 티켓 ' + res.converted + '장 즉시 확정 (' + detail + ')');
+    logAdmin('전환 대기일 수 단축 소급 적용 — 대기 랜덤 티켓 ' + res.converted + '장 즉시 확정 (' + detail + ')');
     return res;
   }).catch(function(e) {
     console.error('taConvertRetro', e);

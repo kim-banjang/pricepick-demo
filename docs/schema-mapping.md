@@ -121,7 +121,7 @@ CMS에서도 직접 수정 불가 — 취소/환불은 반대 부호 qty로 신�
 ### 구매 시나리오 (C그룹)
 | 유저 | 구매액 | 상태 | 발급 티켓 |
 |---|---|---|---|
-| 앨리스 | 67,000원 | confirmed (전환 일수 경과) | silver 1 + bronze 4 (greedy) |
+| 앨리스 | 67,000원 | confirmed (쿠팡 D+7) | silver 1 + bronze 4 (greedy) |
 | 밥 | 120,000원 | confirmed (D+0) | gold 1 + bronze 4 (greedy) |
 | 데이브(게스트) | 15,000원 | pending (D+30) | bronze 3 pending |
 | unmatched | 34,000원 | pending | 미매칭 |
