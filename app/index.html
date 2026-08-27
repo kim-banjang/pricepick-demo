@@ -5583,37 +5583,102 @@
     text-decoration: underline;
   }
 
-/* ============== 선물 상자 열기 (gb-) — 2026-08-24 신설 ==============
-   원판·바늘·회전·점멸 전구를 쓰지 않는다. 상자가 조금 흔들리다가 한 번 열릴 뿐이다. */
-.gb-screen { position:relative; height:100%; background:#FBFAFF; display:flex; flex-direction:column; }
-.gb-lead { text-align:center; padding:22px 26px 0; font-size:var(--fs-body); font-weight:600; color:#4A4160; line-height:1.6; }
-.gb-sub { text-align:center; padding:8px 26px 0; font-size:var(--fs-caption); color:#8B84A3; }
-.gb-stage { flex:1; display:flex; align-items:center; justify-content:center; padding:10px 0 0; }
-.gb-box { position:relative; width:210px; height:190px; transform-origin:50% 92%; animation:gbWobble 2.2s ease-in-out infinite; }
-.gb-box.opened { animation:none; }
-.gb-box-body { position:absolute; left:50%; margin-left:-72px; bottom:14px; width:144px; }
-.gb-box-lid { position:absolute; left:50%; margin-left:-84px; top:56px; width:168px; transition:transform .45s cubic-bezier(.3,1.5,.5,1), opacity .4s; }
-.gb-box.opened .gb-box-lid { transform:translateY(-64px) rotate(-12deg); }
-.gb-flash { position:absolute; left:50%; top:52%; width:150px; height:150px; margin:-75px 0 0 -75px; border-radius:50%;
-  background:radial-gradient(circle,rgba(255,214,94,.85),rgba(255,214,94,0) 65%); opacity:0; pointer-events:none; }
-.gb-box.opened .gb-flash { animation:gbFlash .55s ease-out both; }
-@keyframes gbWobble { 0%,100%{transform:rotate(-2.5deg)} 50%{transform:rotate(2.5deg)} }
-@keyframes gbFlash { 0%{opacity:.9;transform:scale(.35)} 100%{opacity:0;transform:scale(1.25)} }
-.gb-confetti { position:absolute; inset:0; overflow:hidden; pointer-events:none; z-index:6; }
-.gb-confetti i { position:absolute; top:44%; left:50%; width:8px; height:12px; border-radius:2px; opacity:0; }
-.gb-confetti.go i { animation:gbFall 1.15s cubic-bezier(.2,.7,.3,1) forwards; }
-@keyframes gbFall { 0%{opacity:1;transform:translate(0,0) rotate(0)} 100%{opacity:0;transform:translate(var(--dx),var(--dy)) rotate(var(--rot))} }
-.gb-cta { margin:0 20px 8px; height:54px; border:none; border-radius:14px; background:#845EEE; color:#fff;
-  font-family:inherit; font-size:var(--fs-label); font-weight:700; cursor:pointer; }
-.gb-cta:disabled { background:#D8D3E6; cursor:default; }
-.gb-foot { text-align:center; padding:2px 20px 22px; font-size:var(--fs-caption); color:#9B93B0; }
-.gb-ov { position:absolute; inset:0; background:rgba(26,17,48,.55); display:none; align-items:center; justify-content:center; z-index:50; padding:32px; }
-.gb-ov.show { display:flex; }
-.gb-card { background:#fff; border-radius:20px; padding:30px 22px 20px; width:100%; max-width:296px; text-align:center; color:#1A1130;
-  animation:popIn .3s cubic-bezier(.2,1.4,.4,1); }
-.gb-card .gb-ico { margin:0 auto 16px; padding:16px 0; border-radius:16px; background:#E2D9FF; display:flex; align-items:center; justify-content:center; gap:12px; min-height:60px; }
-.gb-card .gb-ttl { font-size:var(--fs-section); font-weight:700; }
-.gb-card .gb-dsc { font-size:var(--fs-caption); font-weight:500; color:#5A5370; margin-top:6px; line-height:1.55; }
+/* ============== 선물 상자 열기 (gbx-) ==============
+   2026-08-27. 시안 20260825_NewDesign_giftbox.html(4판)을 그대로 옮겼다.
+   그 전 자리채우기(도형으로 그린 상자·뚜껑 열림)는 걷어냈다.
+   낱말 앞머리를 gbx- 로 두어 다른 화면 CSS와 부딪히지 않게 했다.
+   원판·바늘·회전·점멸 전구는 쓰지 않는다. 상자가 흔들리다 한 번 열릴 뿐이다. */
+.gbx-screen { position:relative; height:100%; background:#F7F5FC; display:flex; flex-direction:column; overflow:hidden; }
+.gbx-screen > .statusbar { background:#FFFFFF; color:#1F1B2E; flex-shrink:0; }
+.gbx-hdr { background:#FFFFFF; display:flex; align-items:center; padding:10px 16px 14px; border-bottom:1px solid #EEEAF7; flex-shrink:0; }
+.gbx-hdr .back-btn { width:36px; height:36px; border:none; background:transparent; cursor:pointer; display:flex; align-items:center; justify-content:center; padding:0; color:#1F1B2E; }
+.gbx-hdr-title { flex:1; text-align:center; font-size:18px; font-weight:700; color:#1F1B2E; margin-right:36px; }
+
+.gbx-stage { flex:1; display:flex; flex-direction:column; align-items:center; padding:24px 24px 0; position:relative; overflow:hidden; min-height:0; }
+.gbx-stage.d { background:linear-gradient(180deg,#EFE9FF 0%,#F7F5FC 42%); }
+.gbx-stage.r { background:linear-gradient(180deg,#FFF3DD 0%,#F7F5FC 42%); }
+
+.gbx-pill { color:#FFFFFF; font-size:13px; font-weight:800; padding:7px 16px; border-radius:999px; animation:gbxBannerPulse 2.6s ease-in-out infinite; letter-spacing:.02em; position:relative; z-index:1; flex-shrink:0; }
+.gbx-stage.d .gbx-pill { background:linear-gradient(120deg,#7B5CE5,#9D7BFF); box-shadow:0 6px 16px rgba(123,92,229,.35); }
+.gbx-stage.r .gbx-pill { background:linear-gradient(120deg,#F5A623,#FFC94F); box-shadow:0 6px 16px rgba(245,166,35,.4); }
+.gbx-lead { margin-top:16px; font-size:19px; font-weight:800; color:#1F1B2E; text-align:center; line-height:1.45; position:relative; z-index:1; flex-shrink:0; }
+.gbx-sub { margin-top:8px; font-size:14px; color:#8B85A0; position:relative; z-index:1; flex-shrink:0; text-align:center; }
+.gbx-sub b { color:#7B5CE5; font-weight:700; }
+
+.gbx-arena { flex:1; display:flex; align-items:center; justify-content:center; position:relative; width:100%; padding-top:128px; box-sizing:border-box; min-height:0; }
+.gbx-rays { position:absolute; width:1600px; height:1600px; flex:none; animation:gbxRaysSpin 24s linear infinite; pointer-events:none; }
+.gbx-stage.d .gbx-rays { opacity:.38; }
+.gbx-stage.r .gbx-rays { opacity:.35; }
+.gbx-glow { position:absolute; width:340px; height:340px; border-radius:50%; animation:gbxGlowPulse 3s ease-in-out infinite; pointer-events:none; }
+.gbx-stage.d .gbx-glow { background:radial-gradient(closest-side,rgba(124,92,224,.22),transparent 72%); }
+.gbx-stage.r .gbx-glow { background:radial-gradient(closest-side,rgba(245,166,35,.2),transparent 72%); }
+
+.gbx-chip { position:absolute; background:#FFFFFF; box-shadow:0 10px 24px rgba(48,32,110,.15); border:1.5px solid #EEEAF3; display:flex; pointer-events:none; }
+.gbx-chip::after { content:""; position:absolute; width:11px; height:11px; background:#FFFFFF; bottom:-7px; transform:rotate(45deg); border-right:1.5px solid #EEEAF3; border-bottom:1.5px solid #EEEAF3; border-radius:2px; }
+.gbx-chip.p1 { top:18%; left:10%; --tilt:-6deg; animation:gbxFloatTilt 3.6s ease-in-out infinite 0s; border-radius:20px; padding:12px; z-index:2; opacity:1; }
+.gbx-chip.p1::after { right:16px; }
+.gbx-chip.p2 { top:18%; right:10%; --tilt:5deg; animation:gbxFloatTilt2 4s ease-in-out infinite .6s; border-radius:20px; padding:3px; z-index:2; opacity:1; }
+.gbx-chip.p2::after { left:16px; }
+.gbx-chip.p3 { top:38%; left:4%; --tilt:-9deg; animation:gbxFloatTilt2 3.4s ease-in-out infinite 1.1s; border-radius:16px; padding:9px; z-index:1; opacity:.96; }
+.gbx-chip.p3::after { right:16px; }
+.gbx-chip.p4 { top:40%; right:5%; --tilt:8deg; animation:gbxFloatTilt 4.3s ease-in-out infinite 1.6s; border-radius:16px; padding:9px; z-index:1; opacity:.96; }
+.gbx-chip.p4::after { left:16px; }
+.gbx-chip.p5 { top:27%; left:44%; --tilt:-3deg; animation:gbxFloatTilt 3.9s ease-in-out infinite .9s; border-radius:13px; padding:7px; z-index:1; opacity:.88; }
+.gbx-chip.p5::after { left:50%; margin-left:-6px; }
+.gbx-chip img { display:block; }
+
+.gbx-star { position:absolute; pointer-events:none; }
+
+.gbx-boxwrap { position:relative; padding-bottom:26px; }
+.gbx-shadow { position:absolute; bottom:0; left:50%; width:124px; height:18px; border-radius:50%; filter:blur(7px); transform:translateX(-50%); animation:gbxShadowBreath 3s ease-in-out infinite; }
+.gbx-stage.d .gbx-shadow { background:#CFC5EC; }
+.gbx-stage.r .gbx-shadow { background:#E4CFA4; }
+.gbx-box { cursor:pointer; position:relative; animation:gbxBoxFloat 3s ease-in-out infinite; }
+.gbx-box img { width:172px; height:auto; display:block; }
+.gbx-box.shaking { animation:gbxBoxShake .75s ease-in-out; }
+.gbx-box.opened { animation:none; }
+.gbx-boxwrap.done .gbx-shadow, .gbx-boxwrap.opened .gbx-shadow { animation:none; }
+.gbx-boxwrap.done .gbx-box { animation:none; cursor:default; filter:grayscale(.45) opacity(.75); }
+
+.gbx-foot { padding:0 20px 18px; background:linear-gradient(transparent,#F7F5FC 30%); flex-shrink:0; }
+.gbx-cta { width:100%; height:56px; border:none; border-radius:16px;
+  background:linear-gradient(110deg,#7B5CE5 40%,#9D7BFF 50%,#7B5CE5 60%); background-size:200% 100%;
+  animation:gbxShimmer 2.8s linear infinite; color:#FFFFFF; font-size:17px; font-weight:800;
+  font-family:inherit; cursor:pointer; box-shadow:0 8px 24px rgba(123,92,229,.45); }
+.gbx-cta:active { transform:scale(.98); }
+.gbx-cta:disabled { background:#E5E1F0; background-image:none; animation:none; color:#A9A3C0; font-weight:700; box-shadow:none; cursor:default; transform:none; }
+.gbx-note { text-align:center; font-size:13px; color:#8B85A0; margin-top:12px; }
+
+.gbx-ov { position:absolute; inset:0; background:rgba(24,17,46,.55); display:none; flex-direction:column; align-items:center; justify-content:center; z-index:50; }
+.gbx-ov.show { display:flex; animation:gbxFadeIn .25s ease-out; }
+.gbx-conf { position:absolute; inset:0; overflow:hidden; pointer-events:none; }
+.gbx-conf i { position:absolute; display:block; }
+.gbx-conf.go i { animation:gbxConfettiFall var(--dur) ease-out var(--dly) forwards; }
+.gbx-card { width:300px; background:#FFFFFF; border-radius:24px; padding:24px 22px 22px; text-align:center;
+  animation:gbxPopIn .45s cubic-bezier(.34,1.4,.64,1); position:relative; }
+.gbx-card-box { width:72px; height:auto; display:block; margin:0 auto 14px; filter:drop-shadow(0 8px 14px rgba(14,8,33,.25)); }
+.gbx-ico { background:#F1EEFF; border-radius:16px; padding:20px 16px; display:flex; align-items:center; justify-content:center; gap:14px; }
+.gbx-ico svg, .gbx-ico img { width:64px; height:64px; display:block; flex-shrink:0; }
+.gbx-ico .gbx-amt { font-size:28px; font-weight:800; color:#1A1130; line-height:1.15; }
+.gbx-ico .gbx-nm { font-size:15px; color:#5A5370; margin-top:2px; }
+.gbx-ttl { margin-top:18px; font-size:22px; font-weight:800; color:#1A1130; }
+.gbx-dsc { margin-top:6px; font-size:14px; color:#5A5370; }
+.gbx-ok { margin-top:20px; width:100%; height:48px; border:none; border-radius:14px; background:#845EEE; color:#FFFFFF;
+  font-size:16px; font-weight:700; font-family:inherit; cursor:pointer; }
+
+@keyframes gbxBoxFloat { 0%,100% { transform:translateY(0); } 50% { transform:translateY(-10px); } }
+@keyframes gbxBoxShake { 0%,100% { transform:rotate(0); } 15% { transform:rotate(-7deg) scale(1.02); } 30% { transform:rotate(6deg); } 45% { transform:rotate(-5deg) scale(1.04); } 60% { transform:rotate(4deg); } 75% { transform:rotate(-2deg) scale(1.05); } }
+@keyframes gbxPopIn { 0% { transform:scale(.7) translateY(24px); opacity:0; } 60% { transform:scale(1.04) translateY(-4px); opacity:1; } 100% { transform:scale(1) translateY(0); } }
+@keyframes gbxFadeIn { from { opacity:0; } to { opacity:1; } }
+@keyframes gbxConfettiFall { 0% { transform:translateY(-30px) rotate(0deg); opacity:1; } 100% { transform:translateY(360px) rotate(540deg); opacity:0; } }
+@keyframes gbxTwinkle { 0%,100% { opacity:.2; transform:scale(.8); } 50% { opacity:1; transform:scale(1.15); } }
+@keyframes gbxGlowPulse { 0%,100% { opacity:.7; transform:scale(1); } 50% { opacity:1; transform:scale(1.06); } }
+@keyframes gbxRaysSpin { from { transform:rotate(0deg); } to { transform:rotate(360deg); } }
+@keyframes gbxFloatTilt { 0%,100% { transform:translateY(0) rotate(var(--tilt,0deg)); } 50% { transform:translateY(-9px) rotate(var(--tilt,0deg)); } }
+@keyframes gbxFloatTilt2 { 0%,100% { transform:translateY(0) rotate(var(--tilt,0deg)); } 50% { transform:translateY(-12px) rotate(var(--tilt,0deg)); } }
+@keyframes gbxShadowBreath { 0%,100% { transform:translateX(-50%) scale(1); opacity:.85; } 50% { transform:translateX(-50%) scale(.72); opacity:.45; } }
+@keyframes gbxShimmer { 0% { background-position:-200% 0; } 100% { background-position:200% 0; } }
+@keyframes gbxBannerPulse { 0%,100% { transform:scale(1); } 50% { transform:scale(1.04); } }
 
 
   /* ============== 14. 마이페이지 ============== */
@@ -12019,76 +12084,114 @@ window.PP_FEATURES = {
   </div>
 
 
-  <!-- 매일 선물 상자 열기 — 2026-08-24 신설. 기존 룰렛과 별개 화면이다. -->
+  <!-- 매일 선물 상자 열기 — 시안 20260825_NewDesign_giftbox.html(4판) 「매일 선물 상자 열기」 판을 그대로 옮겼다.
+       markup·CSS·움직임 모두 시안 값이다. 폰 틀(390×844) 안에서 돌도록 겉은 .gbx-screen 로 감싼다.
+       열림 연출: 상자를 누르면 0.75초 흔들린 뒤 열린 상자 그림으로 바뀌고 결과가 뜬다. -->
   <div class="phone-wrap" id="pw-gb1" data-screen="gb1">
     <div class="phone">
-      <div class="gb-screen">
+      <div class="gbx-screen">
         <div class="statusbar"><span>9:41</span><div class="statusbar-icons"></div></div>
-        <div class="ac-header">
-          <button class="back-btn" data-jump="10"><svg width="22" height="22" viewBox="0 0 18 18" fill="none"><path d="M11.25 15.5L5.96 10.45C5.17 9.65 5.17 8.35 5.96 7.55L11.25 2.66" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-          <span class="ac-header-title"><span class="i18n"><span class="ko">매일 선물 상자 열기</span><span class="vi">Mở hộp quà mỗi ngày</span></span></span>
-          <div style="width:36px"></div>
+        <div class="gbx-hdr">
+          <button class="back-btn" data-jump="10"><svg width="10" height="18" viewBox="0 0 10 18" fill="none"><path d="M9 1L1 9L9 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <div class="gbx-hdr-title"><span class="i18n"><span class="ko">매일 선물 상자 열기</span><span class="vi">Mở hộp quà mỗi ngày</span></span></div>
         </div>
-        <div class="gb-lead"><span class="i18n"><span class="ko">이벤트티켓, 포인트, 등급티켓 등 다양한 선물이 쏟아집니다.</span><span class="vi">Vé sự kiện, điểm, vé hạng và nhiều phần quà khác đang chờ bạn.</span></span></div>
-        <div class="gb-sub"><span id="gb-gb1-badge"><span class="i18n"><span class="ko">오늘 남은 기회 1회</span><span class="vi">Còn 1 lần hôm nay</span></span></span></div>
-        <div class="gb-stage">
-          <div class="gb-box" id="gb-gb1-box">
-            <div class="gb-flash"></div>
-            <div class="gb-box-body">
-              <svg width="144" height="110" viewBox="0 0 144 110"><rect x="0" y="0" width="144" height="110" rx="12" fill="#7C5BE0"/><rect x="60" y="0" width="24" height="110" fill="#FFC24B"/></svg>
+        <div class="gbx-stage d">
+          <div class="gbx-pill"><span class="i18n"><span class="ko">EVENT · 하루 1회 무료</span><span class="vi">EVENT · Miễn phí 1 lần/ngày</span></span></div>
+          <div class="gbx-lead"><span class="i18n"><span class="ko">이벤트티켓, 포인트, 등급티켓 등<br>다양한 선물이 쏟아집니다.</span><span class="vi">Vé sự kiện, điểm, vé hạng<br>và nhiều phần quà khác đang chờ bạn.</span></span></div>
+          <div class="gbx-sub" id="gb-gb1-badge"><span class="i18n"><span class="ko">오늘 참여 가능 · 상자를 눌러 열어보세요</span><span class="vi">Hôm nay có thể tham gia · Nhấn vào hộp để mở</span></span></div>
+          <div class="gbx-arena">
+            <div class="gbx-rays"><svg width="1600" height="1600" viewBox="0 0 380 380"><g fill="#C9BBF5"><path d="M190 190 L160 0 L220 0 Z" opacity="0.5"/><path d="M190 190 L380 160 L380 220 Z" opacity="0.5"/><path d="M190 190 L160 380 L220 380 Z" opacity="0.5"/><path d="M190 190 L0 160 L0 220 Z" opacity="0.5"/><path d="M190 190 L318 26 L352 62 Z" opacity="0.3"/><path d="M190 190 L318 354 L352 318 Z" opacity="0.3"/><path d="M190 190 L28 62 L62 26 Z" opacity="0.3"/><path d="M190 190 L62 354 L28 318 Z" opacity="0.3"/></g></svg></div>
+            <div class="gbx-glow"></div>
+            <div class="gbx-chip p1"><img src="/app/assets/giftbox/ico-point.svg" alt="" style="width:44px;height:44px"></div>
+            <div class="gbx-chip p2"><img src="/app/assets/giftbox/ico-ticket-gold.svg" alt="" style="width:76px;height:76px;transform:rotate(25deg)"></div>
+            <div class="gbx-chip p3"><img src="/app/assets/giftbox/ico-ticket-silver.svg" alt="" style="width:44px;height:44px;transform:rotate(75deg)"></div>
+            <div class="gbx-chip p4"><img src="/app/assets/giftbox/ico-ticket-event.svg" alt="" style="width:44px;height:44px;transform:rotate(-25deg)"></div>
+            <div class="gbx-chip p5"><img src="/app/assets/giftbox/ico-ticket-bronze.svg" alt="" style="width:34px;height:34px;transform:rotate(50deg)"></div>
+            <div class="gbx-star" style="top:18%;left:18%;animation:gbxTwinkle 2.4s ease-in-out infinite"><svg width="18" height="18" viewBox="0 0 20 20"><path d="M10 0 L12 8 L20 10 L12 12 L10 20 L8 12 L0 10 L8 8 Z" fill="#C9BBF5"/></svg></div>
+            <div class="gbx-star" style="top:26%;right:16%;animation:gbxTwinkle 3s ease-in-out infinite .8s"><svg width="12" height="12" viewBox="0 0 20 20"><path d="M10 0 L12 8 L20 10 L12 12 L10 20 L8 12 L0 10 L8 8 Z" fill="#FFD98A"/></svg></div>
+            <div class="gbx-star" style="bottom:20%;left:24%;animation:gbxTwinkle 2.8s ease-in-out infinite 1.4s"><svg width="10" height="10" viewBox="0 0 20 20"><path d="M10 0 L12 8 L20 10 L12 12 L10 20 L8 12 L0 10 L8 8 Z" fill="#B3A2F0"/></svg></div>
+            <div class="gbx-boxwrap" id="gb-gb1-wrap">
+              <div class="gbx-shadow"></div>
+              <div class="gbx-box" id="gb-gb1-box"><img id="gb-gb1-img" src="/app/assets/giftbox/box-purple.png" alt="선물 상자"></div>
             </div>
-            <div class="gb-box-lid">
-              <svg width="168" height="64" viewBox="0 0 168 64"><path d="M84 22C84 8 71 2 65 8c-5 5 7 14 19 14Zm0 0c0-14 13-20 19-14 5 5-7 14-19 14Z" fill="#FFC24B"/><rect x="0" y="22" width="168" height="40" rx="11" fill="#6C4AB6"/><rect x="72" y="22" width="24" height="40" fill="#FFC24B"/></svg>
-            </div>
-            <div class="gb-confetti" id="gb-gb1-conf"></div>
           </div>
         </div>
-        <button class="gb-cta" id="gb-gb1-btn"><span class="i18n"><span class="ko">선물 열기</span><span class="vi">Mở quà</span></span></button>
-        <div class="gb-foot"><span class="i18n"><span class="ko">매일 자정에 다시 열 수 있어요</span><span class="vi">Đến 0h mỗi ngày lại mở được</span></span></div>
-        <div class="gb-ov" id="gb-gb1-ov">
-          <div class="gb-card">
-            <div class="gb-ico" id="gb-gb1-ico"></div>
-            <div class="gb-ttl" id="gb-gb1-ttl"></div>
-            <div class="gb-dsc" id="gb-gb1-dsc"></div>
-            <button class="gb-cta" style="margin:18px 0 0;width:100%;height:48px" id="gb-gb1-ok"><span class="i18n"><span class="ko">확인</span><span class="vi">Xác nhận</span></span></button>
+        <div class="gbx-foot">
+          <button class="gbx-cta" id="gb-gb1-btn"><span class="i18n"><span class="ko">선물 상자 열기</span><span class="vi">Mở hộp quà</span></span></button>
+          <div class="gbx-note"><span class="i18n"><span class="ko">매일 자정이 지나면 다시 열 수 있어요</span><span class="vi">Qua 0h mỗi ngày lại mở được</span></span></div>
+        </div>
+        <div class="gbx-ov" id="gb-gb1-ov">
+          <div class="gbx-conf" id="gb-gb1-conf">
+            <i style="top:120px;left:15%;width:10px;height:10px;background:#FFC24B;border-radius:2px;--dur:1.3s;--dly:0s"></i>
+            <i style="top:100px;left:32%;width:8px;height:8px;background:#8A6BF0;border-radius:50%;--dur:1.5s;--dly:.1s"></i>
+            <i style="top:130px;left:50%;width:12px;height:6px;background:#FF8FB1;border-radius:2px;--dur:1.2s;--dly:.05s"></i>
+            <i style="top:90px;left:65%;width:9px;height:9px;background:#6EDBB4;border-radius:50%;--dur:1.6s;--dly:.2s"></i>
+            <i style="top:120px;left:82%;width:10px;height:10px;background:#FFD98A;border-radius:2px;--dur:1.4s;--dly:.15s"></i>
+            <i style="top:150px;left:22%;width:7px;height:7px;background:#B3A2F0;border-radius:50%;--dur:1.35s;--dly:.25s"></i>
+            <i style="top:140px;left:72%;width:8px;height:12px;background:#7B5CE5;border-radius:2px;--dur:1.5s;--dly:.3s"></i>
+          </div>
+          <div class="gbx-card">
+            <img class="gbx-card-box" src="/app/assets/giftbox/box-purple-open.png" alt="">
+            <div class="gbx-ico" id="gb-gb1-ico"></div>
+            <div class="gbx-ttl" id="gb-gb1-ttl"></div>
+            <div class="gbx-dsc" id="gb-gb1-dsc"></div>
+            <button class="gbx-ok" id="gb-gb1-ok"><span class="i18n"><span class="ko">확인</span><span class="vi">Xác nhận</span></span></button>
           </div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- 랜덤 선물 상자 열기 — 2026-08-24 신설. 기존 룰렛과 별개 화면이다. -->
+  <!-- 랜덤 선물 상자 열기 — 시안 같은 판 「랜덤 선물 상자 열기」. 이벤트 티켓 1장을 쓴다. -->
   <div class="phone-wrap" id="pw-gb2" data-screen="gb2">
     <div class="phone">
-      <div class="gb-screen">
+      <div class="gbx-screen">
         <div class="statusbar"><span>9:41</span><div class="statusbar-icons"></div></div>
-        <div class="ac-header">
-          <button class="back-btn" data-jump="10"><svg width="22" height="22" viewBox="0 0 18 18" fill="none"><path d="M11.25 15.5L5.96 10.45C5.17 9.65 5.17 8.35 5.96 7.55L11.25 2.66" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-          <span class="ac-header-title"><span class="i18n"><span class="ko">랜덤 선물 상자 열기</span><span class="vi">Mở hộp quà ngẫu nhiên</span></span></span>
-          <div style="width:36px"></div>
+        <div class="gbx-hdr">
+          <button class="back-btn" data-jump="10"><svg width="10" height="18" viewBox="0 0 10 18" fill="none"><path d="M9 1L1 9L9 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <div class="gbx-hdr-title"><span class="i18n"><span class="ko">랜덤 선물 상자 열기</span><span class="vi">Mở hộp quà ngẫu nhiên</span></span></div>
         </div>
-        <div class="gb-lead"><span class="i18n"><span class="ko">이벤트티켓, 포인트, 등급티켓 등 다양한 선물이 쏟아집니다.</span><span class="vi">Vé sự kiện, điểm, vé hạng và nhiều phần quà khác đang chờ bạn.</span></span></div>
-        <div class="gb-sub"><span id="gb-gb2-badge"><span class="i18n"><span class="ko">오늘 남은 횟수 10회</span><span class="vi">Còn 10 lượt hôm nay</span></span></span></div>
-        <div class="gb-stage">
-          <div class="gb-box" id="gb-gb2-box">
-            <div class="gb-flash"></div>
-            <div class="gb-box-body">
-              <svg width="144" height="110" viewBox="0 0 144 110"><rect x="0" y="0" width="144" height="110" rx="12" fill="#7C5BE0"/><rect x="60" y="0" width="24" height="110" fill="#FFC24B"/></svg>
+        <div class="gbx-stage r">
+          <div class="gbx-pill"><span class="i18n"><span class="ko">EVENT · 티켓 1장으로 열기</span><span class="vi">EVENT · Mở bằng 1 vé</span></span></div>
+          <div class="gbx-lead"><span class="i18n"><span class="ko">이벤트티켓, 포인트, 등급티켓 등<br>다양한 선물이 쏟아집니다.</span><span class="vi">Vé sự kiện, điểm, vé hạng<br>và nhiều phần quà khác đang chờ bạn.</span></span></div>
+          <div class="gbx-sub" id="gb-gb2-badge"><span class="i18n"><span class="ko">오늘 남은 횟수 <b>10회</b></span><span class="vi">Số lượt còn lại hôm nay <b>10 lượt</b></span></span></div>
+          <div class="gbx-arena">
+            <div class="gbx-rays"><svg width="1600" height="1600" viewBox="0 0 380 380"><g fill="#FFDFA0"><path d="M190 190 L160 0 L220 0 Z" opacity="0.6"/><path d="M190 190 L380 160 L380 220 Z" opacity="0.6"/><path d="M190 190 L160 380 L220 380 Z" opacity="0.6"/><path d="M190 190 L0 160 L0 220 Z" opacity="0.6"/><path d="M190 190 L318 26 L352 62 Z" opacity="0.35"/><path d="M190 190 L318 354 L352 318 Z" opacity="0.35"/><path d="M190 190 L28 62 L62 26 Z" opacity="0.35"/><path d="M190 190 L62 354 L28 318 Z" opacity="0.35"/></g></svg></div>
+            <div class="gbx-glow"></div>
+            <div class="gbx-chip p1"><img src="/app/assets/giftbox/ico-point.svg" alt="" style="width:44px;height:44px"></div>
+            <div class="gbx-chip p2"><img src="/app/assets/giftbox/ico-ticket-gold.svg" alt="" style="width:76px;height:76px;transform:rotate(25deg)"></div>
+            <div class="gbx-chip p3"><img src="/app/assets/giftbox/ico-ticket-silver.svg" alt="" style="width:44px;height:44px;transform:rotate(75deg)"></div>
+            <div class="gbx-chip p4"><img src="/app/assets/giftbox/ico-ticket-event.svg" alt="" style="width:44px;height:44px;transform:rotate(-25deg)"></div>
+            <div class="gbx-chip p5"><img src="/app/assets/giftbox/ico-ticket-bronze.svg" alt="" style="width:34px;height:34px;transform:rotate(50deg)"></div>
+            <div class="gbx-star" style="top:18%;left:16%;animation:gbxTwinkle 2.6s ease-in-out infinite .4s"><svg width="16" height="16" viewBox="0 0 20 20"><path d="M10 0 L12 8 L20 10 L12 12 L10 20 L8 12 L0 10 L8 8 Z" fill="#FFD98A"/></svg></div>
+            <div class="gbx-star" style="top:24%;right:18%;animation:gbxTwinkle 3.2s ease-in-out infinite 1s"><svg width="12" height="12" viewBox="0 0 20 20"><path d="M10 0 L12 8 L20 10 L12 12 L10 20 L8 12 L0 10 L8 8 Z" fill="#C9BBF5"/></svg></div>
+            <div class="gbx-star" style="bottom:22%;right:26%;animation:gbxTwinkle 2.9s ease-in-out infinite 1.6s"><svg width="10" height="10" viewBox="0 0 20 20"><path d="M10 0 L12 8 L20 10 L12 12 L10 20 L8 12 L0 10 L8 8 Z" fill="#F5C46B"/></svg></div>
+            <div class="gbx-boxwrap" id="gb-gb2-wrap">
+              <div class="gbx-shadow"></div>
+              <div class="gbx-box" id="gb-gb2-box"><img id="gb-gb2-img" src="/app/assets/giftbox/box-gold.png" alt="선물 상자"></div>
             </div>
-            <div class="gb-box-lid">
-              <svg width="168" height="64" viewBox="0 0 168 64"><path d="M84 22C84 8 71 2 65 8c-5 5 7 14 19 14Zm0 0c0-14 13-20 19-14 5 5-7 14-19 14Z" fill="#FFC24B"/><rect x="0" y="22" width="168" height="40" rx="11" fill="#6C4AB6"/><rect x="72" y="22" width="24" height="40" fill="#FFC24B"/></svg>
-            </div>
-            <div class="gb-confetti" id="gb-gb2-conf"></div>
           </div>
         </div>
-        <button class="gb-cta" id="gb-gb2-btn"><span class="i18n"><span class="ko">이벤트 티켓 1장으로 열기</span><span class="vi">Mở bằng 1 vé sự kiện</span></span></button>
-        <div class="gb-foot"><span class="i18n"><span class="ko">하루 최대 10번까지 열 수 있어요</span><span class="vi">Mỗi ngày mở được tối đa 10 lần</span></span></div>
-        <div class="gb-ov" id="gb-gb2-ov">
-          <div class="gb-card">
-            <div class="gb-ico" id="gb-gb2-ico"></div>
-            <div class="gb-ttl" id="gb-gb2-ttl"></div>
-            <div class="gb-dsc" id="gb-gb2-dsc"></div>
-            <button class="gb-cta" style="margin:18px 0 0;width:100%;height:48px" id="gb-gb2-ok"><span class="i18n"><span class="ko">확인</span><span class="vi">Xác nhận</span></span></button>
+        <div class="gbx-foot">
+          <button class="gbx-cta" id="gb-gb2-btn"><span class="i18n"><span class="ko">이벤트 티켓 1장으로 열기</span><span class="vi">Mở bằng 1 vé sự kiện</span></span></button>
+          <div class="gbx-note"><span class="i18n"><span class="ko">하루 최대 10번까지 열 수 있어요</span><span class="vi">Mỗi ngày mở được tối đa 10 lần</span></span></div>
+        </div>
+        <div class="gbx-ov" id="gb-gb2-ov">
+          <div class="gbx-conf" id="gb-gb2-conf">
+            <i style="top:120px;left:15%;width:10px;height:10px;background:#FFC24B;border-radius:2px;--dur:1.3s;--dly:0s"></i>
+            <i style="top:100px;left:32%;width:8px;height:8px;background:#8A6BF0;border-radius:50%;--dur:1.5s;--dly:.1s"></i>
+            <i style="top:130px;left:50%;width:12px;height:6px;background:#FF8FB1;border-radius:2px;--dur:1.2s;--dly:.05s"></i>
+            <i style="top:90px;left:65%;width:9px;height:9px;background:#6EDBB4;border-radius:50%;--dur:1.6s;--dly:.2s"></i>
+            <i style="top:120px;left:82%;width:10px;height:10px;background:#FFD98A;border-radius:2px;--dur:1.4s;--dly:.15s"></i>
+            <i style="top:150px;left:22%;width:7px;height:7px;background:#B3A2F0;border-radius:50%;--dur:1.35s;--dly:.25s"></i>
+            <i style="top:140px;left:72%;width:8px;height:12px;background:#7B5CE5;border-radius:2px;--dur:1.5s;--dly:.3s"></i>
+          </div>
+          <div class="gbx-card">
+            <img class="gbx-card-box" src="/app/assets/giftbox/box-gold-open.png" alt="">
+            <div class="gbx-ico" id="gb-gb2-ico"></div>
+            <div class="gbx-ttl" id="gb-gb2-ttl"></div>
+            <div class="gbx-dsc" id="gb-gb2-dsc"></div>
+            <button class="gbx-ok" id="gb-gb2-ok"><span class="i18n"><span class="ko">확인</span><span class="vi">Xác nhận</span></span></button>
           </div>
         </div>
       </div>
@@ -14756,22 +14859,25 @@ function gbSlots(kind) {
   return (typeof JP_ACTIVE_SLOTS !== 'undefined' && JP_ACTIVE_SLOTS.length) ? JP_ACTIVE_SLOTS : JP_DEFAULT_SLOTS;
 }
 
+/* 상자 그림 — 시안이 준 것 그대로. 매일은 보라, 랜덤은 금색이다. */
+var GB_BOX_IMG = {
+  gb1: { shut: '/app/assets/giftbox/box-purple.png', open: '/app/assets/giftbox/box-purple-open.png' },
+  gb2: { shut: '/app/assets/giftbox/box-gold.png',   open: '/app/assets/giftbox/box-gold-open.png' }
+};
+/* 결과 모달 안 선물 아이콘 — 시안이 쓴 파일 그대로 */
+var GB_ICO_SRC = {
+  point:  '/app/assets/giftbox/ico-point.svg',
+  event:  '/app/assets/giftbox/ico-ticket-event.svg',
+  bronze: '/app/assets/giftbox/ico-ticket-bronze.svg',
+  silver: '/app/assets/giftbox/ico-ticket-silver.svg',
+  gold:   '/app/assets/giftbox/ico-ticket-gold.svg'
+};
+
+/* 색종이는 시안이 마크업에 박아 둔 7장 그대로다. 여기서는 다시 뿌리기만 한다. */
 function gbConfetti(kind) {
   var box = document.getElementById('gb-' + kind + '-conf');
   if (!box) return;
-  var cols = ['#FFC24B', '#FF6FA8', '#845EEE', '#5BD6C0', '#FFE27A'];
   box.classList.remove('go');
-  box.innerHTML = '';
-  for (var i = 0; i < 16; i++) {
-    var p = document.createElement('i');
-    var ang = (i / 16) * Math.PI * 2;
-    p.style.background = cols[i % cols.length];
-    p.style.setProperty('--dx', (Math.cos(ang) * (70 + i * 3)).toFixed(0) + 'px');
-    p.style.setProperty('--dy', (Math.sin(ang) * 46 + 120).toFixed(0) + 'px');
-    p.style.setProperty('--rot', (i % 2 ? 1 : -1) * (180 + i * 12) + 'deg');
-    p.style.animationDelay = (i * 12) + 'ms';
-    box.appendChild(p);
-  }
   void box.offsetWidth;
   box.classList.add('go');
 }
@@ -14784,21 +14890,23 @@ function gbShowResult(kind, slot, qty) {
   var dsc = document.getElementById('gb-' + kind + '-dsc');
   var disp = ppSlotDisplay(slot);
   function block(v, l) {
-    return '<div style="text-align:left;"><div style="font-size:var(--fs-title);font-weight:800;color:#845EEE;line-height:1.1;">' + v +
-           '</div><div style="font-size:var(--fs-caption);font-weight:600;color:#8B84A3;margin-top:2px;">' + l + '</div></div>';
+    return '<div style="text-align:left;"><div class="gbx-amt">' + v + '</div><div class="gbx-nm">' + l + '</div></div>';
   }
   if (disp.win && qty > 0) {
-    ico.style.background = '#E2D9FF';
+    ico.style.background = '#F1EEFF';
     ico.style.border = 'none';
     if (slot.type === 'point') {
-      ico.innerHTML = RL_POINT_ICO_ROW + block(qty + 'P', '포인트 적립');
+      ico.innerHTML = '<img src="' + GB_ICO_SRC.point + '" alt="">' + block(qty + 'P', '포인트 적립');
+      ttl.textContent = '🎉 축하해요!';
+      dsc.textContent = '포인트가 자동으로 적립됐어요';
     } else {
       var grade = PP_TICKET_SLOT_GRADE[slot.type] || 'event';
       var tier = PP_TIER_STYLE[grade];
-      ico.innerHTML = (grade === 'event' ? RL_TICKET_SVG : ppTicketSvg(64, tier.icon, tier.ink)) + block(qty + '장', tier.name);
+      ico.innerHTML = '<img src="' + (GB_ICO_SRC[grade] || GB_ICO_SRC.event) + '" alt="">' + block(qty + '장', tier.name);
+      /* 「잭팟!」이 아니라 「대박!」이다 — 시안 확정 문구 */
+      ttl.textContent = (grade === 'gold') ? '대박! 골드 티켓' : '🎉 축하해요!';
+      dsc.textContent = (grade === 'gold') ? '가장 가치가 높은 등급 티켓이예요!' : '내 티켓에 보관됐어요';
     }
-    ttl.textContent = '선물을 받았어요!';
-    dsc.textContent = '선물이 자동으로 지급됐어요';
     gbConfetti(kind);
   } else if (disp.win && qty === 0) {
     ico.style.background = '#FAFAFA';
@@ -14822,43 +14930,47 @@ function gbCloseResult(kind) {
   var ov = document.getElementById('gb-' + kind + '-ov');
   if (ov) ov.classList.remove('show');
   var box = document.getElementById('gb-' + kind + '-box');
-  if (box) {
-    box.classList.remove('opened');
-    var lid = box.querySelector('.gb-box-lid');
-    if (lid) lid.style.transform = '';
-  }
+  if (box) box.classList.remove('opened', 'shaking');
+  var img = document.getElementById('gb-' + kind + '-img');
+  if (img) img.src = GB_BOX_IMG[kind].shut;
   var conf = document.getElementById('gb-' + kind + '-conf');
-  if (conf) { conf.classList.remove('go'); conf.innerHTML = ''; }
+  if (conf) conf.classList.remove('go');
   gbApplyState(kind);
 }
 
 function gbApplyState(kind) {
   var btn = document.getElementById('gb-' + kind + '-btn');
   var badge = document.getElementById('gb-' + kind + '-badge');
-  var box = document.getElementById('gb-' + kind + '-box');
+  var wrap = document.getElementById('gb-' + kind + '-wrap');
   if (!btn) return;
+  var done;
   if (kind === 'gb1') {
-    if (gbPlayedToday()) {
+    done = gbPlayedToday();
+    if (done) {
       btn.disabled = true;
       btn.textContent = '오늘 이미 열었어요';
       if (badge) badge.textContent = '오늘 참여 완료 · 내일 다시 오세요';
     } else {
       btn.disabled = false;
-      btn.textContent = '선물 열기';
-      if (badge) badge.textContent = '오늘 남은 기회 1회';
+      btn.textContent = '선물 상자 열기';
+      if (badge) badge.textContent = '오늘 참여 가능 · 상자를 눌러 열어보세요';
     }
   } else {
     var left = GB_RANDOM_DAILY_CAP - _gbRandomUsed;
-    if (left <= 0) {
+    done = left <= 0;
+    if (done) {
       btn.disabled = true;
-      btn.textContent = '오늘은 다 열었어요';
-      if (badge) badge.textContent = '오늘 남은 횟수 0회';
+      btn.textContent = '오늘 횟수를 모두 사용했어요';
     } else {
       btn.disabled = false;
       btn.textContent = '이벤트 티켓 1장으로 열기';
-      if (badge) badge.textContent = '오늘 남은 횟수 ' + left + '회';
     }
+    /* 남은 횟수는 시안처럼 보라 굵게 둔다. 숫자가 섞여 사전으로는 못 옮기니 한/베를 함께 심는다 */
+    var n = Math.max(0, left);
+    if (badge) badge.innerHTML = '<span class="i18n"><span class="ko">오늘 남은 횟수 <b>' + n +
+      '회</b></span><span class="vi">Số lượt còn lại hôm nay <b>' + n + ' lượt</b></span></span>';
   }
+  if (wrap) wrap.classList.toggle('done', !!done);
 }
 
 function gbOpen(kind) {
@@ -14892,13 +15004,12 @@ function gbOpen(kind) {
     }
     if (kind === 'gb1') gbMarkPlayed(); else _gbRandomUsed += 1;
     btn.textContent = '여는 중...';
-    if (box) {
-      box.classList.add('opened');
-      // 뚜껑 열림은 JS로 직접 준다 — CSS 하위 선택자만 믿지 않는다(화면이 숨겨진 상태에서 클래스가 붙는 경우가 있어 값이 확실히 먹게 한다)
-      var _lid = box.querySelector('.gb-box-lid');
-      if (_lid) _lid.style.transform = 'translateY(-64px) rotate(-12deg)';
-    }
+    /* 시안의 열림 연출 — 0.75초 흔들리다가 열린 상자 그림으로 바뀐다. 뚜껑 도형은 없다. */
+    if (box) { box.classList.remove('opened'); void box.offsetWidth; box.classList.add('shaking'); }
     setTimeout(function () {
+      if (box) { box.classList.remove('shaking'); box.classList.add('opened'); }
+      var _img = document.getElementById('gb-' + kind + '-img');
+      if (_img) _img.src = GB_BOX_IMG[kind].open;
       var memo = (kind === 'gb1') ? '매일 선물 상자 열기' : '랜덤 선물 상자 열기';
       var src = (kind === 'gb1') ? 'giftbox_daily' : 'giftbox_random';
       ppApplySlotGrant(slot, qty, memo, src).then(function (granted) {
@@ -14906,7 +15017,7 @@ function gbOpen(kind) {
         _gbBusy[kind] = false;
         gbApplyState(kind);
       });
-    }, 620);
+    }, 750);
   })['catch'](function (e) {
     console.error('gbOpen', e);
     _gbBusy[kind] = false;
@@ -14930,6 +15041,12 @@ function bindGiftBoxes() {
     if (ok && !ok.dataset.ipBound) {
       ok.dataset.ipBound = '1';
       ok.addEventListener('click', function (e) { e.stopPropagation(); gbCloseResult(kind); });
+    }
+    /* 시안대로 상자를 눌러도 열린다 */
+    var box = document.getElementById('gb-' + kind + '-box');
+    if (box && !box.dataset.ipBound) {
+      box.dataset.ipBound = '1';
+      box.addEventListener('click', function (e) { e.stopPropagation(); gbOpen(kind); });
     }
     if (btn.dataset.ipBound) return;
     btn.dataset.ipBound = '1';
@@ -16916,6 +17033,18 @@ Object.assign(KO2VI, {
     "선물 상자를 여는 중 오류가 발생했어요": "Đã xảy ra lỗi khi mở hộp quà",
     "매일 자정에 다시 열 수 있어요": "Đến 0h mỗi ngày lại mở được",
     "하루 최대 10번까지 열 수 있어요": "Mỗi ngày mở được tối đa 10 lần"
+  });
+  /* 2026-08-27 · 시안(20260825_NewDesign_giftbox.html 4판)을 이식하며 늘어난 문구.
+     JS가 textContent 로 갈아 끼우는 것만 여기 둔다 — 마크업에 박힌 것은 .i18n 으로 이미 한/베가 함께 있다.
+     ⚠️ quay·trúng·may mắn 계열과 Jackpot 은 쓰지 않는다. 「대박!」은 Phần quà lớn nhất! 로 둔다. */
+  Object.assign(KO2VI, {
+    "선물 상자 열기": "Mở hộp quà",
+    "오늘 참여 가능 · 상자를 눌러 열어보세요": "Hôm nay có thể tham gia · Nhấn vào hộp để mở",
+    "오늘 횟수를 모두 사용했어요": "Hôm nay đã dùng hết số lượt",
+    "🎉 축하해요!": "🎉 Chúc mừng!",
+    "내 티켓에 보관됐어요": "Đã lưu vào Vé của tôi",
+    "대박! 골드 티켓": "Phần quà lớn nhất! Vé Gold",
+    "가장 가치가 높은 등급 티켓이예요!": "Đây là vé hạng có giá trị cao nhất!"
   });
   var IPLANG='ko';
   var KO_RE=/[\uac00-\ud7a3]/;
