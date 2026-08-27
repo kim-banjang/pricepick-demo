@@ -462,6 +462,16 @@ td.rf-net-col{font-weight:700;color:var(--success);}
 .rf-stack-earn{background:linear-gradient(180deg,#FBBF24,var(--amber));}
 .rf-stack-net{background:linear-gradient(180deg,#22C55E,var(--success));}
 .rf-mall-kind{font-size:11px;color:var(--text-3);font-weight:400;margin-top:2px;}
+.rf-tb-label{font-size:11px;font-weight:700;color:var(--text-3);letter-spacing:-.1px;}
+/* 월별·일별 줄은 눌러서 그 구간으로 들어가는 자리다 — 눌리는 줄임을 손끝으로 알 수 있게. */
+.rf-bd-row{cursor:pointer;transition:background .12s;}
+.rf-bd-row:hover{background:var(--surface-2);}
+.rf-bd-row.sel{background:var(--main-soft);}
+.rf-bd-row.sel td{font-weight:700;}
+.rf-drill{display:flex;align-items:center;gap:10px;margin:-4px 0 16px;padding:10px 16px;
+  background:var(--main-soft);border:1px solid var(--main-line);border-radius:var(--r-md);
+  font-size:12.5px;color:var(--main-hover);font-weight:600;flex-wrap:wrap;}
+.rf-drill-mark{font-size:11px;opacity:.7;}
 
 /* ── 스케줄러 ── */
 .scheduler-item{padding:13px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
@@ -3141,10 +3151,13 @@ window.CMS_FEATURES = {
       </div>
       <div class="info-box"><strong>제휴 수수료 매출</strong> — 수수료가 전부 우리 돈이 아닙니다. 적립률만큼은 유저에게 나가고 <strong>남는 것</strong>이 실제 수익입니다. 수수료율·적립률은 <strong>티켓 적립 설정</strong>에서 정한 값을 그대로 씁니다. 링크프라이스는 <strong>매월 6일</strong> 전월 실적을 한 번에 확정하므로 그전 숫자는 바뀔 수 있습니다.</div>
 
+      <!-- 조회 기간(어디부터 어디까지)과 보기(그 안을 어떻게 쪼갤지)는 다른 것이라
+           둘을 나란히 두되 앞에 이름표를 붙여 섞이지 않게 한다(김반장 지시 2026-08-27). -->
       <div class="toolbar">
+        <span class="rf-tb-label">조회 기간</span>
         <select class="filter-sel" id="rf-period-mode" onchange="rfPeriodModeChanged()">
-          <option value="day">일</option>
-          <option value="month">월</option>
+          <option value="day">하루</option>
+          <option value="month">한 달</option>
           <option value="range" selected>기간 지정</option>
         </select>
         <input class="form-input" type="date" id="rf-period-day" style="width:150px;display:none" onchange="rfReload()">
@@ -3155,6 +3168,13 @@ window.CMS_FEATURES = {
           <input class="form-input" type="date" id="rf-period-to" style="width:150px" onchange="rfReload()">
         </span>
         <button class="btn btn-primary btn-sm" onclick="rfReload()">조회</button>
+        <span style="width:1px;height:22px;background:var(--border)"></span>
+        <span class="rf-tb-label">보기</span>
+        <select class="filter-sel" id="rf-view" onchange="rfViewChanged()">
+          <option value="month" selected>월별</option>
+          <option value="day">일별</option>
+          <option value="range">기간별</option>
+        </select>
         <span style="font-size:12px;color:var(--text-3)" id="rf-period-label">—</span>
       </div>
 
@@ -3162,6 +3182,43 @@ window.CMS_FEATURES = {
         <div class="stat-card purple"><div class="stat-label">수수료 매출</div><div class="stat-value" id="rf-kpi-comm">—</div><div class="stat-change neutral" id="rf-kpi-comm-sub">—</div></div>
         <div class="stat-card amber"><div class="stat-label">유저 적립</div><div class="stat-value" id="rf-kpi-earn">—</div><div class="stat-change neutral" id="rf-kpi-earn-sub">—</div></div>
         <div class="stat-card green"><div class="stat-label">남는 것</div><div class="stat-value" id="rf-kpi-net">—</div><div class="stat-change neutral" id="rf-kpi-net-sub">—</div></div>
+      </div>
+
+      <!-- ── 월별 / 일별 / 기간별 내역 ──
+           줄을 누르면 아래 블록(쿠팡 카드·확정/미확정·제휴몰별·추이·거래 상세)이 그 구간으로
+           좁혀진다. 아코디언으로 줄 안에 접어 넣지 않은 이유 — 제휴몰별 표는 정렬·검색에
+           8칸짜리 표라 좁은 줄 안에 넣으면 그 기능이 다 죽는다(김반장이 「어느 제휴몰이 진짜
+           돈이 되나」를 보시는 표다). 위쪽(요약·이 표)은 조회 기간 전체, 아래쪽은 선택 구간이다.
+           줄은 링크프라이스만이다 — 쿠팡은 주문번호가 없어 섞을 수 없다. 합계는 두 줄로 두어
+           「링크프라이스만」과 「쿠팡 포함」을 헷갈리지 않게 갈라 놨다. -->
+      <div class="card">
+        <div class="card-header">
+          <div><div class="card-title" id="rf-bd-title">월별 내역 <span style="font-weight:400;font-size:12px;color:var(--text-3)">링크프라이스</span></div>
+            <div class="card-sub" id="rf-bd-sub">—</div></div>
+          <button class="btn btn-ghost btn-sm" onclick="rfDownloadXlsx()">⬇️ 엑셀 내려받기</button>
+        </div>
+        <table id="rf-bd-table">
+          <thead>
+            <tr>
+              <th style="width:17%">기간</th>
+              <th style="width:9%">주문 건수</th>
+              <th style="width:14%">거래액</th>
+              <th style="width:9%">수수료율</th>
+              <th style="width:13%">수수료 매출</th>
+              <th style="width:13%">유저 적립</th>
+              <th style="width:14%" class="rf-net-col">남는 것</th>
+              <th style="width:11%">상태</th>
+            </tr>
+          </thead>
+          <tbody id="rf-bd-tbody"></tbody>
+        </table>
+        <div id="rf-bd-pagination"></div>
+      </div>
+
+      <div class="rf-drill" id="rf-drill" style="display:none">
+        <span class="rf-drill-mark">▸</span>
+        <span id="rf-drill-text">—</span>
+        <button class="btn btn-ghost btn-sm" onclick="rfClearSelection()">전체 기간으로</button>
       </div>
 
       <!-- ── 쿠팡 (직접 제휴) ──
@@ -3199,7 +3256,6 @@ window.CMS_FEATURES = {
       <div class="card">
         <div class="card-header">
           <div><div class="card-title">제휴몰별 내역 <span style="font-weight:400;font-size:12px;color:var(--text-3)">링크프라이스</span></div><div class="card-sub" id="rf-mall-sub">—</div></div>
-          <button class="btn btn-ghost btn-sm" onclick="rfDownloadXlsx()">⬇️ 엑셀 내려받기</button>
         </div>
         <div style="padding:14px 20px 0">
           <div class="toolbar" style="margin-bottom:14px">
@@ -6436,6 +6492,25 @@ Object.assign(KO2VI,{
   "(취소 제외)":"(không gồm hủy)",
   "직접 제휴":"Hợp tác trực tiếp",
   "링크프라이스 제휴몰":"cửa hàng LK Linkprice",
+  "조회 기간":"Khoảng xem",
+  "보기":"Kiểu xem",
+  "하루":"Một ngày",
+  "한 달":"Một tháng",
+  "월별":"Theo tháng",
+  "일별":"Theo ngày",
+  "기간별":"Theo khoảng",
+  "월별 내역":"Chi tiết theo tháng",
+  "일별 내역":"Chi tiết theo ngày",
+  "기간별 내역":"Chi tiết theo khoảng",
+  "기간":"Khoảng thời gian",
+  "수수료 매출":"Doanh thu hoa hồng",
+  "전체 기간으로":"Về toàn bộ khoảng",
+  "조회 기간 전체":"Toàn bộ khoảng xem",
+  "한 덩어리로 봅니다":"Xem gộp thành một khối",
+  "링크프라이스 · 취소 제외":"Linkprice · không gồm hủy",
+  "쿠팡 포함 · 위 요약과 같은 값":"Gồm Coupang · bằng với phần tóm tắt phía trên",
+  "일요일":"Chủ nhật", "월요일":"Thứ Hai", "화요일":"Thứ Ba", "수요일":"Thứ Tư",
+  "목요일":"Thứ Năm", "금요일":"Thứ Sáu", "토요일":"Thứ Bảy",
   "쿠팡은 주문번호가 오지 않아 건별 내역이 없습니다.":"Coupang không gửi mã đơn hàng nên không có chi tiết theo từng đơn.",
   "거래액·수수료는 쿠팡 파트너스 리포트의 집계값이고, 유저 적립은 우리 DB의 지급 기록입니다. 둘을 주문 단위로 맞출 수 없으므로":"Giá trị giao dịch·hoa hồng là số tổng hợp từ báo cáo Coupang Partners, còn tích lũy người dùng là bản ghi chi trả trong DB của ta. Không thể khớp hai bên theo từng đơn nên",
   "주문 건수는 「—」":"số đơn để là 「—」",
@@ -11902,6 +11977,35 @@ function rfPeriodRange() {
   return { from: from, to: to, mode: mode };
 }
 
+/* ── 보기(월별 / 일별 / 기간별) ────────────────────────────────────
+   조회 기간은 「어디부터 어디까지」, 보기는 「그 안을 어떻게 쪼갤지」다.
+   기본은 월별(김반장 확정 2026-08-27) — 쿠팡은 구매확정 D+30이라 최근 30일만 보면
+   확정이 전부 0원으로 찍힌다. 월별로 보면 지난 달 확정이 바로 보인다. */
+function rfView() { return (document.getElementById('rf-view') || {}).value || 'month'; }
+window.rfViewChanged = function() { RF.sel = null; rfReload(); };
+window.rfClearSelection = function() { RF.sel = null; rfRefreshDrill(); };
+
+function rfBucketKey(d, view) {
+  if (view === 'day') return rfDayKey(d);
+  if (view === 'month') return rfMonthKey(d);
+  return 'all';
+}
+/* 버킷 하나의 실제 시작·끝(선택했을 때 아래 블록을 좁히는 데 쓴다) */
+function rfBucketRange(key, view, base) {
+  if (view === 'day') {
+    var f = new Date(key + 'T00:00:00'), t = new Date(f);
+    f.setHours(0, 0, 0, 0); t.setHours(23, 59, 59, 999);
+    return { from: f, to: t };
+  }
+  if (view === 'month') {
+    var y = parseInt(key.slice(0, 4), 10), m = parseInt(key.slice(5, 7), 10) - 1;
+    var mf = new Date(y, m, 1), mt = new Date(y, m + 1, 0);
+    mf.setHours(0, 0, 0, 0); mt.setHours(23, 59, 59, 999);
+    return { from: mf < base.from ? base.from : mf, to: mt > base.to ? base.to : mt };
+  }
+  return { from: base.from, to: base.to };
+}
+
 /* ── 집계 · 렌더 ─────────────────────────────────────────────────── */
 function rfAggregate(rows) {
   var a = { count: 0, gmv: 0, comm: 0, earn: 0, net: 0 };
@@ -11909,34 +12013,29 @@ function rfAggregate(rows) {
   return a;
 }
 function rfPctOf(part, whole) { return whole > 0 ? (part / whole * 100) : 0; }
+function rfSplit(rows) {
+  return {
+    live: rfAggregate(rows.filter(function(o) { return o.status !== 'canceled'; })),
+    confirmed: rfAggregate(rows.filter(function(o) { return o.status === 'confirmed'; })),
+    pending: rfAggregate(rows.filter(function(o) { return o.status === 'pending'; })),
+    canceled: rfAggregate(rows.filter(function(o) { return o.status === 'canceled'; })),
+  };
+}
+/* 쿠팡은 주문번호가 오지 않아 건별로 못 짚는다 — 어느 표에서든 건수 자리는 이걸 쓴다.
+   0으로 적으면 「읽어서 0」으로 읽히는데 사실은 「알 수 없음」이라 뜻이 다르다. */
+var RF_CP_NA = '<span style="color:var(--text-3)" title="쿠팡은 주문번호가 오지 않아 건별로 셀 수 없습니다.">—</span>';
 
 window.rfReload = function() {
   if (!RF.built) return;
+  RF.sel = null;   // 조회 기간·보기가 바뀌면 이전 줄 선택은 무효다
   var p = rfPeriodRange();
-  var all = RF.orders.filter(function(o) { return o.at >= p.from && o.at <= p.to; });
   RF.period = p;
-  RF.rows = all;
-  /* 쿠팡은 주문번호가 오지 않아 건별로 못 짚는다(김반장 확정 2026-08-27) — 제휴몰별
-     표·거래 상세는 링크프라이스만 쓰고, 쿠팡은 자기 카드에서 총액으로만 본다.
-     다만 돈은 들어오는 것이므로 위 요약 세 장에는 둘 다 합쳐 넣는다. */
-  var lpRows = all.filter(function(o) { return o.kind !== 'coupang'; });
-  var cpRows = all.filter(function(o) { return o.kind === 'coupang'; });
-  RF.lpRows = lpRows;
+  RF.base = RF.orders.filter(function(o) { return o.at >= p.from && o.at <= p.to; });
 
-  function split(rows) {
-    return {
-      live: rfAggregate(rows.filter(function(o) { return o.status !== 'canceled'; })),
-      confirmed: rfAggregate(rows.filter(function(o) { return o.status === 'confirmed'; })),
-      pending: rfAggregate(rows.filter(function(o) { return o.status === 'pending'; })),
-      canceled: rfAggregate(rows.filter(function(o) { return o.status === 'canceled'; })),
-    };
-  }
-  var TOT = split(all), LP = split(lpRows), CP = split(cpRows);
-  var A = TOT.live;
-  RF.sum = { all: A, confirmed: TOT.confirmed, pending: TOT.pending, canceled: TOT.canceled, lp: LP, cp: CP };
-
-  var lbl = document.getElementById('rf-period-label');
-  if (lbl) lbl.textContent = ppDt(p.from) + ' ~ ' + ppDt(p.to) + ' · 링크프라이스 주문 ' + ppN(LP.live.count) + '건';
+  /* 요약 세 장과 월별·일별 표는 언제나 조회 기간 전체 기준이다(선택해도 안 움직인다).
+     선택은 그 아래 블록만 좁힌다 — 위/아래 기준이 섞이면 숫자를 못 믿는다. */
+  var baseAll = rfSplit(RF.base), A = baseAll.live;
+  var baseLp = rfSplit(RF.base.filter(function(o) { return o.kind !== 'coupang'; }));
 
   function setTxt(id, v) { var e = document.getElementById(id); if (e) e.textContent = v; }
   setTxt('rf-kpi-comm', ppN(A.comm) + '원');
@@ -11946,9 +12045,142 @@ window.rfReload = function() {
   setTxt('rf-kpi-net', ppN(A.net) + '원');
   setTxt('rf-kpi-net-sub', '수수료 − 유저 적립 · 거래액 대비 ' + rfPctOf(A.net, A.gmv).toFixed(2) + '%p');
 
-  /* 상태 표 — 링크프라이스용(건수 있음)과 쿠팡용(건수 「—」) 두 벌을 같은 모양으로 그린다.
-     countCell 을 넘기면 그 값을 그대로 쓴다: 쿠팡은 「—」다. 0으로 적으면 「읽어서 0」으로
-     읽히는데 사실은 「알 수 없음」이라 뜻이 다르다(김반장 지시). */
+  var lbl = document.getElementById('rf-period-label');
+  if (lbl) lbl.textContent = ppDt(p.from) + ' ~ ' + ppDt(p.to) + ' · 링크프라이스 주문 ' + ppN(baseLp.live.count) + '건';
+
+  rfBuildBuckets();
+  rfRefreshDrill();
+};
+
+/* 월별·일별 줄 만들기 — 줄은 링크프라이스만이고, 쿠팡은 「쿠팡 포함」 합계에서만 더한다. */
+function rfBuildBuckets() {
+  var view = rfView(), p = RF.period;
+  var map = {}, order = [];
+  RF.base.forEach(function(o) {
+    var k = rfBucketKey(o.at, view);
+    if (!map[k]) {
+      map[k] = { key: k, lp: [], cp: [] };
+      order.push(k);
+    }
+    map[k][o.kind === 'coupang' ? 'cp' : 'lp'].push(o);
+  });
+  order.sort();
+  RF.buckets = order.map(function(k) {
+    var r = rfBucketRange(k, view, p);
+    return {
+      key: k,
+      label: view === 'range' ? (ppDt(p.from) + ' ~ ' + ppDt(p.to)) : (view === 'month' ? k : k.slice(5).replace('-', '/')),
+      sub: view === 'day' ? ['일', '월', '화', '수', '목', '금', '토'][new Date(k + 'T00:00:00').getDay()] + '요일'
+        : (view === 'month' ? ppDt(r.from).slice(5) + ' ~ ' + ppDt(r.to).slice(5) : '한 덩어리로 봅니다'),
+      from: r.from, to: r.to,
+      lp: rfSplit(map[k].lp), cp: rfSplit(map[k].cp),
+    };
+  });
+  if (view === 'range' && !RF.buckets.length) {
+    RF.buckets = [{ key: 'all', label: ppDt(p.from) + ' ~ ' + ppDt(p.to), sub: '조회 기간 전체',
+      from: p.from, to: p.to, lp: rfSplit([]), cp: rfSplit([]) }];
+  }
+  RF.viewName = { month: '월별', day: '일별', range: '기간별' }[view] || '월별';
+  BD_CTRL.setRows(RF.buckets);
+}
+
+function rfBdRowHtml(b) {
+  var lp = b.lp.live;
+  var feePct = rfPctOf(lp.comm, lp.gmv);
+  var status = b.lp.pending.comm > 0
+    ? '<span class="badge badge-amber">확정 대기</span>'
+    : (lp.count > 0 ? '<span class="badge badge-green">확정</span>' : '<span class="badge badge-gray">거래 없음</span>');
+  var sel = (RF.sel && RF.sel.key === b.key) ? ' sel' : '';
+  // 「기간별」 줄은 조회 기간 그 자체라 더 들어갈 데가 없다 — 눌리는 줄로 보이지 않게 한다.
+  var clickable = rfView() !== 'range';
+  return '<tr class="' + (clickable ? 'rf-bd-row' + sel : '') + '" data-key="' + b.key + '"'
+    + (clickable ? ' onclick="rfSelectBucket(\'' + b.key + '\')"' : '') + '>'
+    + '<td style="text-align:left!important"><div style="font-weight:700">' + b.label + '</div>'
+    +   '<div class="rf-mall-kind">' + b.sub + '</div></td>'
+    + '<td>' + ppN(lp.count) + '건</td>'
+    + '<td>' + ppN(lp.gmv) + '원</td>'
+    + '<td>' + feePct.toFixed(2) + '%</td>'
+    + '<td style="font-weight:600">' + ppN(lp.comm) + '원</td>'
+    + '<td style="color:var(--amber)">− ' + ppN(lp.earn) + '원</td>'
+    + '<td class="rf-net-col">' + ppN(lp.net) + '원'
+    +   '<div style="font-size:11px;font-weight:400;color:var(--text-3)">' + rfPctOf(lp.net, lp.gmv).toFixed(2) + '%p</div></td>'
+    + '<td>' + status + '</td></tr>';
+}
+function rfBdTotalRows() {
+  var L = { count: 0, gmv: 0, comm: 0, earn: 0, net: 0 };
+  var T = { gmv: 0, comm: 0, earn: 0, net: 0 };
+  RF.buckets.forEach(function(b) {
+    ['count', 'gmv', 'comm', 'earn', 'net'].forEach(function(k) { L[k] += b.lp.live[k]; });
+    ['gmv', 'comm', 'earn', 'net'].forEach(function(k) { T[k] += b.lp.live[k] + b.cp.live[k]; });
+  });
+  function row(label, note, agg, countCell, strong) {
+    return '<tr style="border-top:2px solid var(--border)">'
+      + '<td style="text-align:left!important;font-weight:700">' + label
+      +   (note ? ' <span style="font-weight:400;font-size:11px;color:var(--text-3)">' + note + '</span>' : '') + '</td>'
+      + '<td style="font-weight:700">' + countCell + '</td>'
+      + '<td style="font-weight:700">' + ppN(agg.gmv) + '원</td>'
+      + '<td>' + rfPctOf(agg.comm, agg.gmv).toFixed(2) + '%</td>'
+      + '<td style="font-weight:700">' + ppN(agg.comm) + '원</td>'
+      + '<td style="font-weight:700;color:var(--amber)">− ' + ppN(agg.earn) + '원</td>'
+      + '<td class="rf-net-col" style="font-weight:' + (strong ? '800' : '700') + '">' + ppN(agg.net) + '원</td>'
+      + '<td>—</td></tr>';
+  }
+  /* 합계를 두 줄로 나눈 이유 — 줄은 링크프라이스만이고 쿠팡은 못 섞는다. 그런데 돈은
+     들어오는 것이라 총액에는 쿠팡이 들어가야 한다(위 요약 세 장과 같은 규칙).
+     한 줄로 합치면 「이 합계에 쿠팡이 있나 없나」가 매번 헷갈린다. */
+  return row('합계', '링크프라이스 · 취소 제외', L, ppN(L.count) + '건', false)
+    + row('합계', '쿠팡 포함 · 위 요약과 같은 값', T, RF_CP_NA, true);
+}
+
+var BD_CTRL = window.BD_CTRL = ppMakeListController(12, function(pageItems, state, totalPages) {
+  var tb = document.getElementById('rf-bd-tbody');
+  var pag = document.getElementById('rf-bd-pagination');
+  if (!tb) return;
+  var title = document.getElementById('rf-bd-title');
+  if (title) title.innerHTML = RF.viewName + ' 내역 <span style="font-weight:400;font-size:12px;color:var(--text-3)">링크프라이스</span>';
+  var sub = document.getElementById('rf-bd-sub');
+  if (sub) sub.textContent = RF.buckets.length + '개 구간 · 줄을 누르면 그 구간의 제휴몰별 내역으로 들어갑니다';
+  if (!pageItems.length) { tb.innerHTML = ppEmpty(8, '기간 내 거래가 없습니다.'); if (pag) pag.innerHTML = ''; return; }
+  tb.innerHTML = pageItems.map(rfBdRowHtml).join('') + rfBdTotalRows();
+  if (pag) pag.innerHTML = totalPages > 1 ? ppPaginationHtml('BD_CTRL', state.page, totalPages) : '';
+});
+
+window.rfSelectBucket = function(key) {
+  RF.sel = (RF.sel && RF.sel.key === key) ? null : (RF.buckets.filter(function(b) { return b.key === key; })[0] || null);
+  rfRefreshDrill();
+};
+
+/* 선택이 바뀔 때마다 아래 블록(쿠팡 카드·확정/미확정·제휴몰별·추이·거래 상세)을 다시 그린다. */
+window.rfRefreshDrill = function() {
+  var view = rfView();
+  var bar = document.getElementById('rf-drill');
+  var scope = RF.sel ? { from: RF.sel.from, to: RF.sel.to } : RF.period;
+  if (bar) {
+    if (RF.sel && view !== 'range') {
+      bar.style.display = 'flex';
+      document.getElementById('rf-drill-text').textContent =
+        RF.sel.label + ' 선택 — 아래 표·그래프는 이 구간(' + ppDt(scope.from) + ' ~ ' + ppDt(scope.to) + ')만 보여줍니다';
+    } else {
+      bar.style.display = 'none';
+    }
+  }
+  /* 선택 표시만 갈아끼운다 — 표를 다시 그리면 보고 있던 페이지가 1로 튄다. */
+  Array.prototype.forEach.call(document.querySelectorAll('#rf-bd-tbody tr[data-key]'), function(tr) {
+    tr.classList.toggle('sel', !!(RF.sel && RF.sel.key === tr.dataset.key));
+  });
+  rfRenderScope(scope);
+};
+
+/* scope 구간 하나를 아래 블록 전체에 적용한다. */
+function rfRenderScope(scope) {
+  var rows = RF.orders.filter(function(o) { return o.at >= scope.from && o.at <= scope.to; });
+  var lpRows = rows.filter(function(o) { return o.kind !== 'coupang'; });
+  var cpRows = rows.filter(function(o) { return o.kind === 'coupang'; });
+  RF.rows = rows; RF.lpRows = lpRows; RF.scope = scope;
+  var LP = rfSplit(lpRows), CP = rfSplit(cpRows), ALL = rfSplit(rows);
+  RF.sum = { all: ALL.live, confirmed: ALL.confirmed, pending: ALL.pending, canceled: ALL.canceled, lp: LP, cp: CP };
+
+  function setTxt(id, v) { var e = document.getElementById(id); if (e) e.textContent = v; }
   function statRow(badge, agg, dim, countCell) {
     var st = dim ? ' style="color:var(--text-3)"' : '';
     return '<tr><td>' + badge + '</td>'
@@ -11969,6 +12201,7 @@ window.rfReload = function() {
   var BADGE_CONF = '<span class="badge badge-green">확정</span>';
   var BADGE_PEND = '<span class="badge badge-amber">미확정</span>';
   var BADGE_CANC = '<span class="badge badge-gray">취소</span> <span style="font-size:11px;color:var(--text-3)">집계 제외</span>';
+  var scopeNote = RF.sel ? (RF.sel.label + ' · ') : '';
 
   var stb = document.getElementById('rf-status-tbody');
   if (stb) {
@@ -11977,28 +12210,21 @@ window.rfReload = function() {
       + statRow(BADGE_CANC, LP.canceled, true)
       + totalRow(LP.live);
   }
-
-  /* 쿠팡 카드 — 주문 건수는 전부 「—」. 대신 우리가 아는 것(적립 지급 건수)을 밑에 적는다. */
-  var cpUnknown = '<span style="color:var(--text-3)" title="쿠팡은 주문번호가 오지 않아 건별로 셀 수 없습니다.">—</span>';
   var ctb = document.getElementById('rf-cp-tbody');
   if (ctb) {
-    ctb.innerHTML = statRow(BADGE_CONF, CP.confirmed, false, cpUnknown)
-      + statRow(BADGE_PEND, CP.pending, false, cpUnknown)
-      + statRow(BADGE_CANC, CP.canceled, true, cpUnknown)
-      + totalRow(CP.live, cpUnknown);
+    ctb.innerHTML = statRow(BADGE_CONF, CP.confirmed, false, RF_CP_NA)
+      + statRow(BADGE_PEND, CP.pending, false, RF_CP_NA)
+      + statRow(BADGE_CANC, CP.canceled, true, RF_CP_NA)
+      + totalRow(CP.live, RF_CP_NA);
   }
   var cpMall = RF.roster.filter(function(m) { return m.kind === 'coupang'; })[0];
   if (cpMall) {
-    setTxt('rf-cp-sub', '수수료 ' + cpMall.fee.toFixed(2) + '% − 적립률 ' + cpMall.rate.toFixed(2) + '% = 수익 '
-      + (cpMall.fee - cpMall.rate).toFixed(2) + '%p · 구매확정 D+30 정산');
+    setTxt('rf-cp-sub', scopeNote + '수수료 ' + cpMall.fee.toFixed(2) + '% − 적립률 ' + cpMall.rate.toFixed(2)
+      + '% = 수익 ' + (cpMall.fee - cpMall.rate).toFixed(2) + '%p · 구매확정 D+30 정산');
   }
-  /* 「적립 지급 건수」 = 우리 DB에 남은 지급 기록 수. 브론즈 단가에 못 미쳐 티켓이 안 나간
-     구매는 빠지므로 쿠팡의 실제 주문 수와 같지 않다 — 그래서 주문 건수 대용이 아니라
-     별도 수치로 적는다. */
   var payouts = cpRows.filter(function(o) { return o.status !== 'canceled' && o.earn >= TA_TICKET_VALUE.bronze; }).length;
   setTxt('rf-cp-payouts', ppN(payouts) + '건');
 
-  /* 제휴몰별 집계 — 링크프라이스만. 취소 건은 빼고 센다(취소는 위 표에서 따로 본다) */
   var byMall = {};
   RF.roster.forEach(function(m) {
     if (m.kind === 'coupang') return;
@@ -12015,8 +12241,6 @@ window.rfReload = function() {
   rfRenderMalls();
   rfRenderChart();
 
-  /* 거래 상세 — 링크프라이스만(쿠팡은 주문번호가 없어 여기 못 들어온다).
-     적립 칸은 넣지 않는다(김반장 지시: 요약과 제휴몰별 표, 두 군데만). */
   var sel = document.getElementById('revfee-filter-mall');
   if (sel && sel.options.length <= 1) {
     sel.innerHTML = '<option value="">전체 제휴몰</option>'
@@ -12025,7 +12249,7 @@ window.rfReload = function() {
   }
   REVFEE_CTRL.setRows(lpRows.slice().sort(function(a, b) { return b.at - a.at; }));
   revFeeApplyFilters();
-};
+}
 
 window.rfRenderMalls = function() {
   var tb = document.getElementById('rf-mall-tbody');
@@ -12081,9 +12305,13 @@ window.rfRenderChart = function() {
   var wrap = document.getElementById('rf-chart');
   if (!wrap) return;
   var rows = (RF.rows || []).filter(function(o) { return o.status !== 'canceled'; });
-  var p = RF.period || rfPeriodRange();
+  /* 그래프는 보기(월별/일별)를 따라간다. 「기간별」은 쪼갤 단위가 없으니 구간 길이로
+     정하고(45일 넘으면 월), 줄을 골라 들어간 상태면 그 구간 안을 일별로 본다. */
+  var p = RF.scope || RF.period || rfPeriodRange();
   var days = Math.round((p.to - p.from) / 86400000) + 1;
-  var byMonth = days > 45;
+  var view = rfView();
+  var byMonth = RF.sel ? false : (view === 'month' ? true : (view === 'day' ? false : days > 45));
+  if (byMonth && days <= 31) byMonth = false;   // 한 달만 조회했는데 막대가 하나면 볼 게 없다
   var buckets = {}, order = [];
   rows.forEach(function(o) {
     var k = byMonth ? rfMonthKey(o.at) : rfDayKey(o.at);
@@ -12092,9 +12320,10 @@ window.rfRenderChart = function() {
   });
   order.sort();
   var sub = document.getElementById('rf-chart-sub');
-  if (sub) sub.textContent = (byMonth ? '월별' : '일별') + ' 수수료 · ' + order.length + '개 구간 · 쿠팡 포함 · 취소 제외';
+  if (sub) sub.textContent = (RF.sel ? RF.sel.label + ' · ' : '') + (byMonth ? '월별' : '일별') + ' 수수료 · ' + order.length + '개 구간 · 쿠팡 포함 · 취소 제외';
   if (!order.length) { wrap.innerHTML = '<div style="width:100%;text-align:center;color:var(--text-3);font-size:13px;align-self:center">기간 내 거래가 없습니다.</div>'; return; }
   var max = Math.max.apply(null, order.map(function(k) { return buckets[k].comm; })) || 1;
+  wrap.style.minWidth = Math.max(640, order.length * 16) + 'px';
   wrap.innerHTML = order.map(function(k) {
     var b = buckets[k];
     var h = Math.max(4, Math.round(b.comm / max * 100));
@@ -12111,15 +12340,17 @@ window.rfRenderChart = function() {
   }).join('');
 };
 
-/* ── 엑셀 내려받기 ── 요약 / 제휴몰별 / 거래 상세 세 시트.
-   김반장 지시로 CSV가 아니라 xlsx다(ppDownloadXlsx).
-   쿠팡은 주문번호가 없어 「거래 상세」 시트에 못 들어간다 — 「요약」 시트에 총액
-   블록으로만 넣고, 주문 건수 칸은 화면과 똑같이 「—」로 둔다(0이 아니다). */
+/* ── 엑셀 내려받기 ── 지금 화면에 보이는 것이 그대로 담긴다(김반장 지시).
+   요약 / 월별(또는 일별·기간별) / 제휴몰별 / 거래 상세 네 시트. CSV 아니라 xlsx다.
+   쿠팡은 주문번호가 없어 「거래 상세」에 못 들어간다 — 「요약」에 총액 블록으로만 넣고
+   주문 건수 자리는 화면과 똑같이 「—」다(0이 아니다). */
 window.rfDownloadXlsx = function() {
   if (!RF.built) return;
   var p = RF.period || rfPeriodRange();
-  var S = RF.sum, A = S.all, LP = S.lp, CP = S.cp;
-  var tag = ppDateInputValue(p.from) + '_' + ppDateInputValue(p.to);
+  var scope = RF.scope || p;
+  var S = RF.sum, LP = S.lp, CP = S.cp;
+  var BASE = rfSplit(RF.base || []).live;          // 화면 요약 세 장과 같은 값(조회 기간 전체)
+  var tag = ppDateInputValue(scope.from) + '_' + ppDateInputValue(scope.to);
   var H = function(a) { return a.map(function(x) { return { v: x, s: 1 }; }); };
   var W = function(n) { return { v: n, s: 2 }; };   // 천단위 쉼표
   var PC = function(n) { return { v: n, s: 3 }; };  // 0.00%
@@ -12143,16 +12374,22 @@ window.rfDownloadXlsx = function() {
 
   var summary = [
     H(['항목', '값']),
-    ['기간', ppDt(p.from) + ' ~ ' + ppDt(p.to)],
-    ['거래액 (쿠팡 포함)', W(A.gmv)],
-    ['수수료 매출 (쿠팡 포함)', W(A.comm)],
-    ['유저 적립 (쿠팡 포함)', W(A.earn)],
-    ['남는 것 (쿠팡 포함)', W(A.net)],
-    ['평균 수수료율', PC(rfPctOf(A.comm, A.gmv))],
-    ['평균 적립률', PC(rfPctOf(A.earn, A.gmv))],
-    ['거래액 대비 수익', PP(rfPctOf(A.net, A.gmv))],
+    ['조회 기간', ppDt(p.from) + ' ~ ' + ppDt(p.to)],
+    ['보기', RF.viewName || '월별'],
+    ['선택 구간', RF.sel ? RF.sel.label : '없음 (조회 기간 전체)'],
+    ['아래 표 기준 구간', ppDt(scope.from) + ' ~ ' + ppDt(scope.to)],
     [],
-  ].concat(statBlock('링크프라이스', LP, false), [[]], statBlock('쿠팡 (직접 제휴)', CP, true), [
+    H(['조회 기간 전체 (쿠팡 포함)', '값']),
+    ['거래액', W(BASE.gmv)],
+    ['수수료 매출', W(BASE.comm)],
+    ['유저 적립', W(BASE.earn)],
+    ['남는 것', W(BASE.net)],
+    ['평균 수수료율', PC(rfPctOf(BASE.comm, BASE.gmv))],
+    ['평균 적립률', PC(rfPctOf(BASE.earn, BASE.gmv))],
+    ['거래액 대비 수익', PP(rfPctOf(BASE.net, BASE.gmv))],
+    [],
+  ].concat(statBlock('링크프라이스 (기준 구간)', LP, false), [[]],
+           statBlock('쿠팡 · 직접 제휴 (기준 구간)', CP, true), [
     [],
     ['쿠팡 수수료율', PC(cpMall.fee)],
     ['쿠팡 적립률', PC(cpMall.rate)],
@@ -12161,6 +12398,23 @@ window.rfDownloadXlsx = function() {
     ['쿠팡 전환 대기일 수', '카카오톡 연동 D+7 / 미연동 D+30 (고정 · 수정 불가)'],
     ['쿠팡 주문 건수', '— 쿠팡은 주문번호가 오지 않아 건별로 셀 수 없습니다 (0이 아니라 알 수 없음)'],
   ]);
+
+  /* 월별·일별 시트 — 화면의 그 표 그대로. 줄은 링크프라이스만, 합계는 두 줄. */
+  var bdName = (RF.viewName || '월별');
+  var bdRows = [H(['기간', '주문 건수', '거래액', '수수료율', '수수료 매출', '유저 적립', '남는 것', '수익 %p', '상태'])];
+  var bdL = { count: 0, gmv: 0, comm: 0, earn: 0, net: 0 }, bdT = { gmv: 0, comm: 0, earn: 0, net: 0 };
+  (RF.buckets || []).forEach(function(b) {
+    var l = b.lp.live;
+    bdRows.push([b.label, W(l.count), W(l.gmv), PC(rfPctOf(l.comm, l.gmv)), W(l.comm), W(l.earn), W(l.net),
+      PP(rfPctOf(l.net, l.gmv)),
+      b.lp.pending.comm > 0 ? '확정 대기' : (l.count > 0 ? '확정' : '거래 없음')]);
+    ['count', 'gmv', 'comm', 'earn', 'net'].forEach(function(k) { bdL[k] += l[k]; });
+    ['gmv', 'comm', 'earn', 'net'].forEach(function(k) { bdT[k] += l[k] + b.cp.live[k]; });
+  });
+  bdRows.push(['합계 (링크프라이스 · 취소 제외)', W(bdL.count), W(bdL.gmv), PC(rfPctOf(bdL.comm, bdL.gmv)),
+    W(bdL.comm), W(bdL.earn), W(bdL.net), PP(rfPctOf(bdL.net, bdL.gmv)), '']);
+  bdRows.push(['합계 (쿠팡 포함)', NA, W(bdT.gmv), PC(rfPctOf(bdT.comm, bdT.gmv)),
+    W(bdT.comm), W(bdT.earn), W(bdT.net), PP(rfPctOf(bdT.net, bdT.gmv)), '']);
 
   var mallRows = [H(['제휴몰', '주문 건수', '거래액', '수수료율', '수수료', '유저 적립', '남는 것', '수익 %p', '상태'])];
   RF.malls.slice().sort(function(a, b) { return b.net - a.net; }).forEach(function(m) {
@@ -12175,8 +12429,10 @@ window.rfDownloadXlsx = function() {
       o.user.linked_kakao ? o.user.kakao_login_id : '미연동', o.uid, o.orderNo,
       W(o.amount), PC(o.fee), W(o.comm), STATUS_KO[o.status] || o.status]);
   });
-  ppDownloadXlsx('제휴수수료매출_' + tag + '.xlsx', [
+
+  ppDownloadXlsx('제휴수수료매출_' + bdName + '_' + tag + '.xlsx', [
     { name: '요약', rows: summary, widths: [30, 22, 16, 16, 16, 16] },
+    { name: bdName + '(링크프라이스)', rows: bdRows, widths: [20, 12, 16, 11, 16, 16, 16, 11, 12] },
     { name: '제휴몰별(링크프라이스)', rows: mallRows, widths: [22, 12, 16, 11, 16, 16, 16, 11, 12] },
     { name: '거래 상세(링크프라이스)', rows: detail, widths: [20, 18, 16, 16, 22, 18, 14, 11, 14, 10] },
   ]);
@@ -12191,10 +12447,11 @@ window.rfLoad = function() {
     RF.roster = roster;
     RF.orders = rfBuildOrders(roster);
     RF.built = true;
-    // 기본 기간 = 최근 30일. 링크프라이스 확정일(매월 6일)을 걸치는 구간이라
-    // 확정/미확정이 같이 보인다 — 이 화면에서 가장 먼저 봐야 할 게 그 구분이다.
+    // 기본 = 최근 6개월 · 월별 보기(김반장 확정 2026-08-27). 30일만 잡으면 쿠팡은
+    // 구매확정 D+30이라 확정이 전부 0원으로 찍힌다 — 월별로 넓게 보면 지난 달 확정이
+    // 바로 보인다. 좁혀 보실 때는 줄을 누르거나 조회 기간을 줄이면 된다.
     var today = new Date();
-    var from = new Date(today); from.setDate(from.getDate() - 29);
+    var from = new Date(today); from.setDate(from.getDate() - (RF_DEMO_DAYS - 1));
     var fEl = document.getElementById('rf-period-from');
     var tEl = document.getElementById('rf-period-to');
     var dEl = document.getElementById('rf-period-day');
