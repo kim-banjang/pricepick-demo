@@ -448,6 +448,21 @@ tr:hover td{background:var(--surface-2);}
 .chart-value{font-size:10px;font-weight:700;color:var(--text);font-variant-numeric:tabular-nums;}
 .chart-label{font-size:10px;color:var(--text-2);}
 
+/* ── 제휴 수수료 매출 ── */
+/* 「남는 것」이 이 화면의 결론이라 그 칸만 옅은 초록 바탕으로 띄운다(김반장 지시 2026-08-27 —
+   "수수료가 높아도 적립률을 세게 걸어놨으면 남는 게 없는데 지금은 그게 안 보인다"). */
+.rf-net-col{background:rgba(22,163,74,.05);}
+td.rf-net-col{font-weight:700;color:var(--success);}
+.rf-swatch{width:9px;height:9px;border-radius:2px;display:inline-block;}
+.rf-swatch-net{background:var(--success);}
+.rf-swatch-earn{background:var(--amber);}
+.rf-stack{width:100%;display:flex;flex-direction:column;justify-content:flex-end;min-height:5px;
+  border-radius:5px 5px 0 0;overflow:hidden;transition:filter .2s;cursor:pointer;}
+.rf-stack:hover{filter:brightness(1.15);}
+.rf-stack-earn{background:linear-gradient(180deg,#FBBF24,var(--amber));}
+.rf-stack-net{background:linear-gradient(180deg,#22C55E,var(--success));}
+.rf-mall-kind{font-size:11px;color:var(--text-3);font-weight:400;margin-top:2px;}
+
 /* ── 스케줄러 ── */
 .scheduler-item{padding:13px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
 .scheduler-item:last-child{border-bottom:none;}
@@ -3091,32 +3106,131 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
 
     </div>
 
-    <!-- ── 제휴 수수료 매출 (신규 · 건별, 매출 내역에서 메뉴 분리) ── -->
+    <!-- ── 제휴 수수료 매출 ── -->
+    <!-- 「수수료 − 유저 적립 = 남는 것」을 화면 전체의 뼈대로 삼는다(김반장 지시 2026-08-27).
+         수수료율·적립률은 「티켓 적립 설정」이 저장한 값(settings/ticket_accrual)을 그대로 읽어
+         쓴다 — 두 화면의 「수익 %p」가 어긋나면 안 되므로 이 화면에 값을 따로 두지 않는다.
+         거래 자체는 데모 표본(rfBuildOrders)이다. -->
     <div class="section" id="sec-revenue-fee">
       <div class="data-source-bar">
         <span class="ds-label">데이터 출처</span>
-        <span class="ds-tag ours">우리 DB · 수익 기록</span>
+        <span class="ds-tag coupang">링크프라이스 실적 · 매월 6일 확정</span>
+        <span class="ds-tag ours">우리 DB · 티켓 적립 설정의 수수료·적립률</span>
+        <span class="ds-tag calc">집계 · 남는 것 = 수수료 − 유저 적립</span>
       </div>
-      <div class="info-box"><strong>제휴 수수료 매출</strong> — 제휴몰 포스트백 기준으로 구매확정 후 정산되는 매출입니다(제휴몰 D+30). 합산 지표는 <strong>수익 분석</strong> 페이지 참고.</div>
-      <div class="stats-grid" style="grid-template-columns:minmax(0,320px)">
-        <div class="stat-card purple"><div class="stat-label">제휴 수수료 매출</div><div class="stat-value" id="rev-commission">—</div><div class="stat-change neutral">제휴몰 D+30 정산</div></div>
+      <div class="info-box"><strong>제휴 수수료 매출</strong> — 수수료가 전부 우리 돈이 아닙니다. 적립률만큼은 유저에게 나가고 <strong>남는 것</strong>이 실제 수익입니다. 수수료율·적립률은 <strong>티켓 적립 설정</strong>에서 정한 값을 그대로 씁니다. 링크프라이스는 <strong>매월 6일</strong> 전월 실적을 한 번에 확정하므로 그전 숫자는 바뀔 수 있습니다.</div>
+
+      <div class="toolbar">
+        <select class="filter-sel" id="rf-period-mode" onchange="rfPeriodModeChanged()">
+          <option value="day">일</option>
+          <option value="month">월</option>
+          <option value="range" selected>기간 지정</option>
+        </select>
+        <input class="form-input" type="date" id="rf-period-day" style="width:150px;display:none" onchange="rfReload()">
+        <input class="form-input" type="month" id="rf-period-month" style="width:150px;display:none" onchange="rfReload()">
+        <span id="rf-period-range" style="display:inline-flex;align-items:center;gap:8px">
+          <input class="form-input" type="date" id="rf-period-from" style="width:150px" onchange="rfReload()">
+          <span style="font-size:13px;color:var(--text-2)">~</span>
+          <input class="form-input" type="date" id="rf-period-to" style="width:150px" onchange="rfReload()">
+        </span>
+        <button class="btn btn-primary btn-sm" onclick="rfReload()">조회</button>
+        <span style="font-size:12px;color:var(--text-3)" id="rf-period-label">—</span>
       </div>
+
+      <div class="stats-grid" style="grid-template-columns:repeat(3,1fr)">
+        <div class="stat-card purple"><div class="stat-label">수수료 매출</div><div class="stat-value" id="rf-kpi-comm">—</div><div class="stat-change neutral" id="rf-kpi-comm-sub">—</div></div>
+        <div class="stat-card amber"><div class="stat-label">유저 적립</div><div class="stat-value" id="rf-kpi-earn">—</div><div class="stat-change neutral" id="rf-kpi-earn-sub">—</div></div>
+        <div class="stat-card green"><div class="stat-label">남는 것</div><div class="stat-value" id="rf-kpi-net">—</div><div class="stat-change neutral" id="rf-kpi-net-sub">—</div></div>
+      </div>
+
       <div class="card">
-        <div style="padding:18px;">
-          <div id="rev-fee">
-            <div class="toolbar">
-              <input class="search-box" id="revfee-search" placeholder="회원, 주문번호 검색..." onkeydown="if(event.key==='Enter')revFeeApplyFilters()">
-              <select class="filter-sel" id="revfee-filter-mall" onchange="revFeeApplyFilters()"><option value="">전체 제휴몰</option><option>쿠팡</option><option>11번가</option><option>G마켓</option><option>알리익스프레스</option><option>아이허브</option></select>
-              <button class="btn btn-primary btn-sm" onclick="revFeeApplyFilters()">검색</button>
-            </div>
-            <div class="card-header"><div class="card-title">제휴 수수료 매출 내역</div><div style="font-size:12px;color:var(--text-2)" id="rev-fee-sub">—</div></div>
-            <table>
-              <thead><tr><th style="text-align:center">발생 일시</th><th style="text-align:center">제휴몰</th><th>회원(식별번호)</th><th style="text-align:center">주문번호</th><th>구매금액</th><th style="text-align:center">수수료율</th><th>수수료 매출</th><th>적립 금액(티켓)</th><th style="text-align:center">상태</th></tr></thead>
-              <tbody>
-              </tbody>
-            </table>
-            <div id="revfee-pagination"></div>
+        <div class="card-header">
+          <div><div class="card-title">확정 / 미확정 / 취소</div><div class="card-sub">링크프라이스는 매월 6일 전월분 확정 · 쿠팡은 구매확정 D+30</div></div>
+        </div>
+        <table>
+          <thead><tr><th style="width:16%">상태</th><th style="width:12%">주문 건수</th><th style="width:18%">거래액</th><th style="width:18%">수수료</th><th style="width:18%">유저 적립</th><th style="width:18%">남는 것</th></tr></thead>
+          <tbody id="rf-status-tbody"></tbody>
+        </table>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div><div class="card-title">제휴몰별 내역</div><div class="card-sub" id="rf-mall-sub">—</div></div>
+          <button class="btn btn-ghost btn-sm" onclick="rfDownloadXlsx()">⬇️ 엑셀 내려받기</button>
+        </div>
+        <div style="padding:14px 20px 0">
+          <div class="toolbar" style="margin-bottom:14px">
+            <input class="search-box" id="rf-mall-search" placeholder="제휴몰 검색..." onkeydown="if(event.key==='Enter')rfRenderMalls()" oninput="rfRenderMalls()">
+            <select class="filter-sel" id="rf-mall-kind" onchange="rfRenderMalls()">
+              <option value="">전체 구분</option>
+              <option value="coupang">쿠팡(직접 제휴)</option>
+              <option value="lp">링크프라이스</option>
+            </select>
+            <select class="filter-sel" id="rf-mall-sort" onchange="rfRenderMalls()">
+              <option value="net">남는 것 많은 순</option>
+              <option value="comm">수수료 많은 순</option>
+              <option value="gmv">거래액 많은 순</option>
+              <option value="count">주문 건수 많은 순</option>
+              <option value="margin">수익 %p 높은 순</option>
+              <option value="name">제휴몰 이름순</option>
+            </select>
           </div>
+        </div>
+        <div style="overflow-x:auto">
+          <table id="rf-mall-table">
+            <thead>
+              <tr>
+                <th style="width:17%">제휴몰</th>
+                <th style="width:9%">주문 건수</th>
+                <th style="width:14%">거래액</th>
+                <th style="width:9%">수수료율</th>
+                <th style="width:13%">수수료</th>
+                <th style="width:13%">유저 적립</th>
+                <th style="width:14%" class="rf-net-col">남는 것</th>
+                <th style="width:11%">상태</th>
+              </tr>
+            </thead>
+            <tbody id="rf-mall-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div><div class="card-title">날짜별 추이</div><div class="card-sub" id="rf-chart-sub">—</div></div>
+          <div style="display:flex;gap:12px;align-items:center;font-size:11px;color:var(--text-2)">
+            <span style="display:inline-flex;align-items:center;gap:5px"><i class="rf-swatch rf-swatch-net"></i>남는 것</span>
+            <span style="display:inline-flex;align-items:center;gap:5px"><i class="rf-swatch rf-swatch-earn"></i>유저 적립</span>
+          </div>
+        </div>
+        <div style="padding:18px 20px 20px;overflow-x:auto">
+          <div class="chart-bar-wrap" id="rf-chart" style="height:150px;min-width:640px"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div><div class="card-title">거래 상세</div><div class="card-sub" id="rf-fee-sub">—</div></div>
+        </div>
+        <div style="padding:14px 20px 0">
+          <div class="toolbar" style="margin-bottom:14px">
+            <input class="search-box" id="revfee-search" placeholder="회원, 주문번호 검색..." onkeydown="if(event.key==='Enter')revFeeApplyFilters()">
+            <select class="filter-sel" id="revfee-filter-mall" onchange="revFeeApplyFilters()"><option value="">전체 제휴몰</option></select>
+            <select class="filter-sel" id="revfee-filter-status" onchange="revFeeApplyFilters()">
+              <option value="">전체 상태</option>
+              <option value="confirmed">확정</option>
+              <option value="pending">미확정</option>
+              <option value="canceled">취소</option>
+            </select>
+            <button class="btn btn-primary btn-sm" onclick="revFeeApplyFilters()">검색</button>
+          </div>
+        </div>
+        <div id="rev-fee" style="overflow-x:auto">
+          <table>
+            <thead><tr><th style="width:14%">발생 일시</th><th style="width:14%">제휴몰</th><th style="width:20%">회원(식별번호)</th><th style="width:16%">주문번호</th><th style="width:14%">거래액</th><th style="width:9%">수수료율</th><th style="width:13%">수수료</th><th style="width:10%">상태</th></tr></thead>
+            <tbody></tbody>
+          </table>
+          <div id="revfee-pagination"></div>
         </div>
       </div>
     </div>
@@ -4635,6 +4749,7 @@ function go(id, navEl) {
   if (id === 'demo-mgmt' && window.dmLoadStats) window.dmLoadStats();
   if (id === 'ticket-value' && window.tvLoad) window.tvLoad();
   if (id === 'ticket-accrual' && window.taLoad) window.taLoad();
+  if (id === 'revenue-fee' && window.rfLoad) window.rfLoad();
   if (id === 'roulette-settings' && window.rltLoad) window.rltLoad('daily');
   if (id === 'jackpot-roulette' && window.rltLoad) window.rltLoad('jackpot');
   if (id === 'giftbox-daily' && window.rltLoad) window.rltLoad('giftDaily');
@@ -6215,6 +6330,54 @@ Object.assign(KO2VI,{
   "첫 경유 구매(가입 7일 내) 시 실버 티켓 1장 지급. 구매 확정 후 지급(쿠팡 기준 카카오톡 연동 D+7 / 미연동 D+30).":"Mua qua liên kết lần đầu (trong 7 ngày đăng ký) được cấp 1 vé Bạc. Cấp sau khi xác nhận mua (theo chuẩn Coupang: liên kết KakaoTalk D+7 / chưa liên kết D+30)."
 });
 
+/* ── 제휴 수수료 매출 (김반장 지시 2026-08-27) ── */
+Object.assign(KO2VI,{
+  "제휴 수수료 매출":"Doanh thu hoa hồng LK",
+  "링크프라이스 실적 · 매월 6일 확정":"Thực tích Linkprice · chốt ngày 6 hằng tháng",
+  "우리 DB · 티켓 적립 설정의 수수료·적립률":"DB của ta · hoa hồng·tỷ lệ tích lũy từ Cài đặt tích lũy vé",
+  "집계 · 남는 것 = 수수료 − 유저 적립":"Tổng hợp · Phần còn lại = Hoa hồng − Tích lũy người dùng",
+  "— 수수료가 전부 우리 돈이 아닙니다. 적립률만큼은 유저에게 나가고":"— Hoa hồng không phải toàn bộ là tiền của ta. Phần bằng tỷ lệ tích lũy sẽ trả cho người dùng, và",
+  "이 실제 수익입니다. 수수료율·적립률은":" mới là lợi nhuận thật. Tỷ lệ hoa hồng·tỷ lệ tích lũy",
+  "에서 정한 값을 그대로 씁니다. 링크프라이스는":" dùng đúng giá trị đã đặt ở đó. Linkprice thì",
+  "전월 실적을 한 번에 확정하므로 그전 숫자는 바뀔 수 있습니다.":"chốt một lần thực tích của tháng trước, nên số liệu trước đó có thể thay đổi.",
+  "매월 6일":"ngày 6 hằng tháng",
+  "티켓 적립 설정":"Cài đặt tích lũy vé",
+  "월":"Tháng",
+  "기간 지정":"Chọn khoảng",
+  "조회":"Xem",
+  "수수료 매출":"Doanh thu hoa hồng",
+  "유저 적립":"Tích lũy người dùng",
+  "남는 것":"Phần còn lại",
+  "확정 / 미확정 / 취소":"Đã chốt / Chưa chốt / Hủy",
+  "링크프라이스는 매월 6일 전월분 확정 · 쿠팡은 구매확정 D+30":"Linkprice chốt phần tháng trước vào ngày 6 hằng tháng · Coupang là D+30 sau xác nhận mua",
+  "주문 건수":"Số đơn",
+  "거래액":"Giá trị giao dịch",
+  "수수료율":"Tỷ lệ hoa hồng",
+  "미확정":"Chưa chốt",
+  "집계 제외":"Không tính vào tổng",
+  "제휴몰별 내역":"Chi tiết theo cửa hàng LK",
+  "제휴몰 검색...":"Tìm cửa hàng LK...",
+  "전체 구분":"Toàn bộ phân loại",
+  "쿠팡(직접 제휴)":"Coupang (hợp tác trực tiếp)",
+  "링크프라이스":"Linkprice",
+  "남는 것 많은 순":"Phần còn lại nhiều nhất",
+  "수수료 많은 순":"Hoa hồng nhiều nhất",
+  "거래액 많은 순":"Giá trị giao dịch lớn nhất",
+  "주문 건수 많은 순":"Số đơn nhiều nhất",
+  "수익 %p 높은 순":"Lợi nhuận %p cao nhất",
+  "제휴몰 이름순":"Theo tên cửa hàng LK",
+  "쿠팡 · 직접 제휴":"Coupang · hợp tác trực tiếp",
+  "확정 대기":"Chờ chốt",
+  "거래 없음":"Không có giao dịch",
+  "조건에 맞는 제휴몰이 없습니다.":"Không có cửa hàng LK nào khớp điều kiện.",
+  "조건에 맞는 거래가 없습니다.":"Không có giao dịch nào khớp điều kiện.",
+  "날짜별 추이":"Xu hướng theo ngày",
+  "기간 내 거래가 없습니다.":"Không có giao dịch trong khoảng thời gian này.",
+  "거래 상세":"Chi tiết giao dịch",
+  "전체 상태":"Toàn bộ trạng thái",
+  "(취소 제외)":"(không gồm hủy)",
+});
+
 
 
   var _orig=new Map(), _tracked=new Set(), _applying=false;
@@ -7155,6 +7318,170 @@ function ppParseCsv(text) {
     return obj;
   });
 }
+/* ── 엑셀(.xlsx) 내보내기 공용 유틸 ──
+   김반장 지시로 매출 화면 내려받기는 CSV가 아니라 xlsx다. 외부 라이브러리(SheetJS 등)를
+   붙이지 않고 최소 규격만 직접 만든다 — 이 CMS는 CDN 의존을 늘리지 않는 게 원칙이고,
+   필요한 건 「여러 시트 + 천단위 쉼표 + 굵은 머리글」 정도라 그 이상은 안 만든다.
+   ZIP은 무압축(STORE)으로 쓴다. 압축 알고리즘을 직접 넣을 이유가 없고, 엑셀은
+   STORE 방식 xlsx를 그대로 연다. */
+function ppCrc32(bytes) {
+  var table = ppCrc32._t;
+  if (!table) {
+    table = ppCrc32._t = new Int32Array(256);
+    for (var n = 0; n < 256; n++) {
+      var c = n;
+      for (var k = 0; k < 8; k++) c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1);
+      table[n] = c;
+    }
+  }
+  var crc = -1;
+  for (var i = 0; i < bytes.length; i++) crc = (crc >>> 8) ^ table[(crc ^ bytes[i]) & 0xFF];
+  return (crc ^ -1) >>> 0;
+}
+function ppZipBlob(files, mime) {
+  var enc = new TextEncoder();
+  var parts = [], central = [], offset = 0;
+  files.forEach(function(f) {
+    var name = enc.encode(f.name);
+    var data = (typeof f.data === 'string') ? enc.encode(f.data) : f.data;
+    var crc = ppCrc32(data), len = data.length;
+    var lh = new Uint8Array(30 + name.length), dv = new DataView(lh.buffer);
+    dv.setUint32(0, 0x04034b50, true); dv.setUint16(4, 20, true); dv.setUint16(6, 0x0800, true);
+    dv.setUint32(14, crc, true); dv.setUint32(18, len, true); dv.setUint32(22, len, true);
+    dv.setUint16(26, name.length, true);
+    lh.set(name, 30);
+    parts.push(lh, data);
+    var cd = new Uint8Array(46 + name.length), cv = new DataView(cd.buffer);
+    cv.setUint32(0, 0x02014b50, true); cv.setUint16(4, 20, true); cv.setUint16(6, 20, true);
+    cv.setUint16(8, 0x0800, true);
+    cv.setUint32(16, crc, true); cv.setUint32(20, len, true); cv.setUint32(24, len, true);
+    cv.setUint16(28, name.length, true); cv.setUint32(42, offset, true);
+    cd.set(name, 46);
+    central.push(cd);
+    offset += lh.length + len;
+  });
+  var csize = central.reduce(function(a, b) { return a + b.length; }, 0);
+  var eocd = new Uint8Array(22), ev = new DataView(eocd.buffer);
+  ev.setUint32(0, 0x06054b50, true);
+  ev.setUint16(8, files.length, true); ev.setUint16(10, files.length, true);
+  ev.setUint32(12, csize, true); ev.setUint32(16, offset, true);
+  return new Blob(parts.concat(central, [eocd]), { type: mime });
+}
+function ppXlsxEsc(v) {
+  var s = String(v == null ? '' : v), out = '';
+  for (var i = 0; i < s.length; i++) {
+    var ch = s.charAt(i), code = s.charCodeAt(i);
+    // XML 1.0 이 허용하지 않는 제어문자는 통째로 버린다 — 엑셀이 파일을 못 연다.
+    if (code < 32 && code !== 9 && code !== 10 && code !== 13) continue;
+    if (ch === '&') out += '&amp;';
+    else if (ch === '<') out += '&lt;';
+    else if (ch === '>') out += '&gt;';
+    else if (ch === '"') out += '&quot;';
+    else out += ch;
+  }
+  return out;
+}
+function ppXlsxColName(i) {
+  var s = '';
+  i++;
+  while (i > 0) { var m = (i - 1) % 26; s = String.fromCharCode(65 + m) + s; i = Math.floor((i - 1) / 26); }
+  return s;
+}
+/* 셀 값 규칙 — 숫자면 숫자 셀(엑셀에서 합계·정렬이 그대로 된다), 그 외는 문자열.
+   { v: 값, s: 스타일번호 } 형태로 넘기면 스타일을 지정할 수 있다.
+   스타일: 1=굵은 머리글 · 2=천단위 쉼표 · 3=퍼센트 · 4=%p */
+function ppXlsxCell(ref, cell) {
+  var v = (cell && typeof cell === 'object' && 'v' in cell) ? cell.v : cell;
+  var st = (cell && typeof cell === 'object' && cell.s) ? cell.s : 0;
+  var attr = ' r="' + ref + '"' + (st ? ' s="' + st + '"' : '');
+  if (typeof v === 'number' && isFinite(v)) return '<c' + attr + '><v>' + v + '</v></c>';
+  if (v == null || v === '') return '<c' + attr + '/>';
+  return '<c' + attr + ' t="inlineStr"><is><t xml:space="preserve">' + ppXlsxEsc(v) + '</t></is></c>';
+}
+function ppXlsxSheetXml(rows, colWidths) {
+  var cols = '';
+  if (colWidths && colWidths.length) {
+    cols = '<cols>' + colWidths.map(function(w, i) {
+      return '<col min="' + (i + 1) + '" max="' + (i + 1) + '" width="' + w + '" customWidth="1"/>';
+    }).join('') + '</cols>';
+  }
+  var body = rows.map(function(row, r) {
+    return '<row r="' + (r + 1) + '">' + row.map(function(c, i) {
+      return ppXlsxCell(ppXlsxColName(i) + (r + 1), c);
+    }).join('') + '</row>';
+  }).join('');
+  return '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+    + '<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">'
+    + cols + '<sheetData>' + body + '</sheetData></worksheet>';
+}
+/* sheets: [{ name, rows: [[cell,...],...], widths: [숫자,...] }] */
+function ppDownloadXlsx(filename, sheets) {
+  var styles = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+    + '<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">'
+    + '<numFmts count="3">'
+    +   '<numFmt numFmtId="164" formatCode="#,##0"/>'
+    +   '<numFmt numFmtId="165" formatCode="0.00&quot;%&quot;"/>'
+    +   '<numFmt numFmtId="166" formatCode="0.00&quot;%p&quot;"/>'
+    + '</numFmts>'
+    + '<fonts count="2"><font><sz val="11"/><name val="맑은 고딕"/></font>'
+    +   '<font><b/><sz val="11"/><name val="맑은 고딕"/></font></fonts>'
+    + '<fills count="3"><fill><patternFill patternType="none"/></fill>'
+    +   '<fill><patternFill patternType="gray125"/></fill>'
+    +   '<fill><patternFill patternType="solid"><fgColor rgb="FFEEE9F8"/><bgColor indexed="64"/></patternFill></fill></fills>'
+    + '<borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders>'
+    + '<cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs>'
+    + '<cellXfs count="5">'
+    +   '<xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/>'
+    +   '<xf numFmtId="0" fontId="1" fillId="2" borderId="0" xfId="0" applyFont="1" applyFill="1"/>'
+    +   '<xf numFmtId="164" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1"/>'
+    +   '<xf numFmtId="165" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1"/>'
+    +   '<xf numFmtId="166" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1"/>'
+    + '</cellXfs><cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles></styleSheet>';
+
+  var sheetNames = sheets.map(function(s, i) {
+    return (s.name || ('Sheet' + (i + 1))).replace(/[\\\/\?\*\[\]:]/g, ' ').slice(0, 31);
+  });
+  var files = [
+    { name: '[Content_Types].xml', data: '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+      + '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">'
+      + '<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>'
+      + '<Default Extension="xml" ContentType="application/xml"/>'
+      + '<Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>'
+      + '<Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>'
+      + sheets.map(function(s, i) {
+          return '<Override PartName="/xl/worksheets/sheet' + (i + 1) + '.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>';
+        }).join('')
+      + '</Types>' },
+    { name: '_rels/.rels', data: '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+      + '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
+      + '<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/>'
+      + '</Relationships>' },
+    { name: 'xl/workbook.xml', data: '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+      + '<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets>'
+      + sheetNames.map(function(n, i) {
+          return '<sheet name="' + ppXlsxEsc(n) + '" sheetId="' + (i + 1) + '" r:id="rId' + (i + 1) + '"/>';
+        }).join('')
+      + '</sheets></workbook>' },
+    { name: 'xl/_rels/workbook.xml.rels', data: '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+      + '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
+      + sheets.map(function(s, i) {
+          return '<Relationship Id="rId' + (i + 1) + '" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet' + (i + 1) + '.xml"/>';
+        }).join('')
+      + '<Relationship Id="rId' + (sheets.length + 1) + '" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>'
+      + '</Relationships>' },
+    { name: 'xl/styles.xml', data: styles },
+  ];
+  sheets.forEach(function(s, i) {
+    files.push({ name: 'xl/worksheets/sheet' + (i + 1) + '.xml', data: ppXlsxSheetXml(s.rows || [], s.widths) });
+  });
+  var blob = ppZipBlob(files, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  setTimeout(function() { URL.revokeObjectURL(url); }, 1000);
+}
+
 var MALL_RATES = { '쿠팡':0.03, '11번가':0.035, 'G마켓':0.03, '알리익스프레스':0.05, '아이허브':0.05 };
 
 /* ─────────────────────────────────────────────────────────────
@@ -11308,38 +11635,486 @@ window.taSimRefresh = function() {
   taSimSyncQuickButtons(amount);
 };
 
-/* ── sec-revenue: 제휴 수수료 / 기프티콘 판매 매출 내역 리스트 컨트롤러 ── */
+/* ── 제휴 수수료 매출 (sec-revenue-fee) ──────────────────────────────────
+   김반장 지시(2026-08-27) — 이 화면의 결론은 「수수료 − 유저 적립 = 남는 것」이다.
+   「티켓 적립 설정」이 한 줄에 「수수료 2.8% − 적립률 1.68% = 수익 1.12%p」로 찍는
+   그 뺄셈을, 매출 화면에서는 원화 합계로 다시 보여준다. 두 화면이 어긋나면 안 되므로
+   수수료율·적립률을 이 화면에 따로 두지 않고 settings/ticket_accrual(= 적립 설정이
+   저장하는 그 문서)과 settings/linkprice_catalog 를 그대로 읽어 쓴다.
+
+   쿠팡 처리 — 링크프라이스 제휴몰이 아니라 직접 제휴다. 「티켓 적립 설정」은 표를
+   둘로 갈라놨지만 이 화면은 한 표에 같이 넣고 「직접 제휴」 꼬리표로 구분한다.
+   김반장이 보시려는 게 「어느 제휴몰이 진짜 돈이 되나」라, 쿠팡을 따로 빼면 정렬로
+   줄 세울 수가 없어진다. 대신 「구분」 필터로 언제든 갈라 볼 수 있게 했다.
+
+   거래 자체는 데모 표본이다(운영 데이터 아님). 시드 고정이라 새로고침해도 같은 숫자가
+   나오고, 수수료율·적립률만 실제 설정값을 따라가므로 「수익 %p」가 적립 설정 화면과
+   항상 일치한다. */
+
+var RF_DEMO_SEED = 20260827;
+/* 데모 표본을 만들 제휴몰 — 실제 링크프라이스 목록의 머천트ID 그대로다.
+   weight = 주문 배분 비중(합 100), avg = 평균 객단가(원). 수수료율·적립률은
+   여기 안 적는다 — settings/ticket_accrual 에서 읽는다. */
+var RF_DEMO_MALLS = [
+  { code: 'coupang_direct', name: '쿠팡',              kind: 'coupang', weight: 30, avg:  38000 },
+  { code: 'lp:11st',        name: '11번가',            kind: 'lp',      weight: 12, avg:  45000 },
+  { code: 'lp:gmarket',     name: 'G마켓',             kind: 'lp',      weight: 11, avg:  42000 },
+  { code: 'lp:auction',     name: '옥션',              kind: 'lp',      weight:  7, avg:  39000 },
+  { code: 'lp:lotteon',     name: '롯데온',            kind: 'lp',      weight:  6, avg:  52000 },
+  { code: 'lp:emart',       name: '이마트인터넷쇼핑몰', kind: 'lp',      weight:  5, avg:  61000 },
+  { code: 'lp:iherb',       name: '아이허브',          kind: 'lp',      weight:  5, avg:  58000 },
+  { code: 'lp:himart',      name: '하이마트쇼핑몰',    kind: 'lp',      weight:  4, avg: 210000 },
+  { code: 'lp:stories',     name: '&Otherstories',     kind: 'lp',      weight:  4, avg:  96000 },
+  { code: 'lp:pulmuone',    name: '#풀무원',           kind: 'lp',      weight:  4, avg:  34000 },
+  { code: 'lp:clubclio',    name: '클리오',            kind: 'lp',      weight:  4, avg:  41000 },
+  { code: 'lp:yes24',       name: '예스이십사',        kind: 'lp',      weight:  3, avg:  28000 },
+  { code: 'lp:wconcept',    name: '더블유컨셉코리아',  kind: 'lp',      weight:  3, avg: 118000 },
+  { code: 'lp:yanolja',     name: 'NOL',               kind: 'lp',      weight:  2, avg: 180000 },
+];
+/* 카탈로그를 못 읽었을 때 쓰는 최저커미션 기본값(%) — 링크프라이스 원본 그대로.
+   쿠팡은 affiliate_malls/coupang 의 commission_rate(3.0%). */
+var RF_FALLBACK_FEE = {
+  'coupang_direct': 3.0, 'lp:11st': 0.7, 'lp:gmarket': 0.6, 'lp:auction': 0.6,
+  'lp:lotteon': 0.7, 'lp:emart': 1.0, 'lp:iherb': 0.7, 'lp:himart': 0.63,
+  'lp:stories': 2.8, 'lp:pulmuone': 3.5, 'lp:clubclio': 3.5, 'lp:yes24': 2.1,
+  'lp:wconcept': 2.1, 'lp:yanolja': 1.4,
+};
+var RF_DEMO_NICKS = [
+  ['알뜰한하루','altteun_day'], ['오늘도절약','today_save'], ['쿠폰마스터','coupon_kr'],
+  ['장바구니요정','cart_fairy'], ['적립왕','jeoklip_king'], ['월급방어',''],
+  ['티켓수집가','ticket_col'], ['최저가사냥','lowest_hunt'], ['소소한소비',''],
+  ['배송기다림','wait_ship'], ['현명소비자','wise_buy'], ['주말쇼퍼','weekend_sh'],
+];
+var RF_DEMO_DAYS = 180;   // 오늘 기준 과거 며칠치 표본을 만들지
+
+var RF = window.RF = {
+  roster: [],      // [{code,name,kind,fee,rate,weight,avg}]
+  orders: [],      // 전체 표본
+  malls: [],       // 지금 기간의 제휴몰별 집계
+  built: false,
+};
+
+/* 시드 고정 난수(mulberry32) — 새로고침해도 같은 표본이 나와야 김반장이 「어제 본 숫자와
+   다르다」는 일이 없다. */
+function rfRng(seed) {
+  return function() {
+    seed |= 0; seed = (seed + 0x6D2B79F5) | 0;
+    var t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+function rfDayKey(d) { return ppDateInputValue(d); }
+function rfMonthKey(d) { return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0'); }
+/* 링크프라이스 확정일 — 구매한 달의 실적을 다음 달 6일에 한 번에 확정한다.
+   쿠팡은 직접 제휴라 건별 구매확정 D+30 을 쓴다(적립 설정 화면의 「전환 대기일 수」와
+   같은 개념이 아니라 정산 확정 기준이다 — 헷갈리지 않게 표 밑에 적어둔다). */
+function rfSettleDate(order) {
+  var d = new Date(order.at);
+  if (order.kind === 'coupang') { var c = new Date(d); c.setDate(c.getDate() + 30); return c; }
+  return new Date(d.getFullYear(), d.getMonth() + 1, 6);
+}
+
+/* 수수료율·적립률을 「티켓 적립 설정」이 저장한 값 그대로 가져온다. 실패하면
+   링크프라이스 원본 최저커미션 + 적립률 기본값(수수료 × 60%)으로 떨어진다 —
+   그게 적립 설정 화면의 초기값과 같은 계산이라 어차피 숫자가 맞는다. */
+function rfLoadRoster() {
+  function build(savedRates, savedFees, catalogFee, coupangFee) {
+    return RF_DEMO_MALLS.map(function(m) {
+      var fee = (typeof savedFees[m.code] === 'number') ? savedFees[m.code]
+        : (m.kind === 'coupang' ? (coupangFee != null ? coupangFee : RF_FALLBACK_FEE[m.code])
+           : (catalogFee[m.code] != null ? catalogFee[m.code] : RF_FALLBACK_FEE[m.code]));
+      fee = taFmt(fee || 0);
+      var rate = (typeof savedRates[m.code] === 'number') ? taFmt(savedRates[m.code]) : taDefaultRate(fee);
+      return Object.assign({}, m, { fee: fee, rate: rate });
+    });
+  }
+  if (typeof db === 'undefined' || !db) {
+    return Promise.resolve(build({}, {}, {}, null));
+  }
+  return Promise.all([
+    db.collection('settings').doc('ticket_accrual').get(),
+    db.collection('settings').doc('linkprice_catalog').get(),
+    db.collection('affiliate_malls').doc('coupang').get(),
+  ]).then(function(res) {
+    var acc = (res[0].exists && res[0].data()) || {};
+    var cat = (res[1].exists && res[1].data()) || {};
+    var cp = (res[2].exists && res[2].data()) || {};
+    var catalogFee = {};
+    (cat.merchants || []).forEach(function(x) {
+      catalogFee['lp:' + x['머천트ID']] = (typeof x['최저커미션'] === 'number') ? x['최저커미션'] : 0;
+    });
+    var coupangFee = (typeof cp.commission_rate === 'number') ? taFmt(cp.commission_rate * 100) : null;
+    return build(acc.rates || {}, acc.fees || {}, catalogFee, coupangFee);
+  }).catch(function(e) {
+    console.error('rfLoadRoster', e);
+    return build({}, {}, {}, null);
+  });
+}
+
+/* 표본 생성 — 하루 주문 수는 요일(주말이 조금 많다)과 완만한 우상향 추세를 태우고,
+   금액은 몰별 평균 객단가를 중심으로 흩는다. */
+function rfBuildOrders(roster) {
+  var rnd = rfRng(RF_DEMO_SEED);
+  var totalWeight = roster.reduce(function(a, m) { return a + m.weight; }, 0);
+  var today = new Date(); today.setHours(0, 0, 0, 0);
+  var orders = [], seq = 0;
+  for (var back = RF_DEMO_DAYS - 1; back >= 0; back--) {
+    var day = new Date(today); day.setDate(day.getDate() - back);
+    var dow = day.getDay();
+    var trend = 1 + (RF_DEMO_DAYS - 1 - back) / RF_DEMO_DAYS * 0.55;     // 완만한 성장
+    var weekend = (dow === 0 || dow === 6) ? 1.18 : (dow === 1 ? 1.06 : 1);
+    var count = Math.max(3, Math.round((16 + rnd() * 12) * trend * weekend));
+    for (var i = 0; i < count; i++) {
+      var pick = rnd() * totalWeight, mall = roster[roster.length - 1], acc2 = 0;
+      for (var k = 0; k < roster.length; k++) { acc2 += roster[k].weight; if (pick <= acc2) { mall = roster[k]; break; } }
+      // 객단가: 0.35~2.6배로 흩되 낮은 쪽이 두꺼운 분포(실제 구매 분포와 비슷하게)
+      var f = 0.35 + Math.pow(rnd(), 1.9) * 2.25;
+      var amount = Math.round(mall.avg * f / 100) * 100;
+      var at = new Date(day);
+      at.setHours(8 + Math.floor(rnd() * 15), Math.floor(rnd() * 60), Math.floor(rnd() * 60), 0);
+      var nick = RF_DEMO_NICKS[Math.floor(rnd() * RF_DEMO_NICKS.length)];
+      seq++;
+      var o = {
+        id: 'PB' + rfDayKey(at).replace(/-/g, '') + '-' + String(seq).padStart(5, '0'),
+        orderNo: String(200000000000 + Math.floor(rnd() * 799999999999)),
+        at: at, code: mall.code, mall: mall.name, kind: mall.kind,
+        fee: mall.fee, rate: mall.rate, amount: amount,
+        comm: Math.round(amount * mall.fee / 100),
+        earn: Math.round(amount * mall.rate / 100),
+        user: { nickname: nick[0], linked_kakao: !!nick[1], kakao_login_id: nick[1] },
+        uid: 'u_' + (nick[1] || 'guest') + '_' + String(1000 + Math.floor(rnd() * 8999)),
+      };
+      o.net = o.comm - o.earn;
+      // 취소(주문취소·반품) 약 4% — 취소 건은 수수료도 적립도 무효다.
+      o.status = (rnd() < 0.04) ? 'canceled' : (rfSettleDate(o) <= new Date() ? 'confirmed' : 'pending');
+      orders.push(o);
+    }
+  }
+  return orders;
+}
+
+/* ── 기간 ────────────────────────────────────────────────────────── */
+window.rfPeriodModeChanged = function() {
+  var mode = (document.getElementById('rf-period-mode') || {}).value || 'range';
+  var show = { day: 'rf-period-day', month: 'rf-period-month', range: 'rf-period-range' };
+  ['rf-period-day', 'rf-period-month', 'rf-period-range'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) el.style.display = (id === show[mode]) ? (id === 'rf-period-range' ? 'inline-flex' : '') : 'none';
+  });
+  rfReload();
+};
+function rfPeriodRange() {
+  var mode = (document.getElementById('rf-period-mode') || {}).value || 'range';
+  var from, to;
+  if (mode === 'day') {
+    var dv = (document.getElementById('rf-period-day') || {}).value;
+    from = dv ? new Date(dv + 'T00:00:00') : new Date();
+    to = new Date(from);
+  } else if (mode === 'month') {
+    var mv = (document.getElementById('rf-period-month') || {}).value;
+    var y, mo;
+    if (mv) { y = parseInt(mv.slice(0, 4), 10); mo = parseInt(mv.slice(5, 7), 10) - 1; }
+    else { var n = new Date(); y = n.getFullYear(); mo = n.getMonth(); }
+    from = new Date(y, mo, 1);
+    to = new Date(y, mo + 1, 0);
+  } else {
+    var fv = (document.getElementById('rf-period-from') || {}).value;
+    var tv = (document.getElementById('rf-period-to') || {}).value;
+    from = fv ? new Date(fv + 'T00:00:00') : new Date();
+    to = tv ? new Date(tv + 'T00:00:00') : new Date();
+  }
+  from.setHours(0, 0, 0, 0);
+  to.setHours(23, 59, 59, 999);
+  if (to < from) { var t = from; from = new Date(to); from.setHours(0, 0, 0, 0); to = t; to.setHours(23, 59, 59, 999); }
+  return { from: from, to: to, mode: mode };
+}
+
+/* ── 집계 · 렌더 ─────────────────────────────────────────────────── */
+function rfAggregate(rows) {
+  var a = { count: 0, gmv: 0, comm: 0, earn: 0, net: 0 };
+  rows.forEach(function(o) { a.count++; a.gmv += o.amount; a.comm += o.comm; a.earn += o.earn; a.net += o.net; });
+  return a;
+}
+function rfPctOf(part, whole) { return whole > 0 ? (part / whole * 100) : 0; }
+
+window.rfReload = function() {
+  if (!RF.built) return;
+  var p = rfPeriodRange();
+  var rows = RF.orders.filter(function(o) { return o.at >= p.from && o.at <= p.to; });
+  RF.period = p;
+  RF.rows = rows;
+
+  var live = rows.filter(function(o) { return o.status !== 'canceled'; });
+  var conf = rows.filter(function(o) { return o.status === 'confirmed'; });
+  var pend = rows.filter(function(o) { return o.status === 'pending'; });
+  var canc = rows.filter(function(o) { return o.status === 'canceled'; });
+  var A = rfAggregate(live), C = rfAggregate(conf), P = rfAggregate(pend), X = rfAggregate(canc);
+  RF.sum = { all: A, confirmed: C, pending: P, canceled: X };
+
+  var lbl = document.getElementById('rf-period-label');
+  if (lbl) lbl.textContent = ppDt(p.from) + ' ~ ' + ppDt(p.to) + ' · 주문 ' + ppN(live.count || A.count) + '건';
+
+  function setTxt(id, v) { var e = document.getElementById(id); if (e) e.textContent = v; }
+  setTxt('rf-kpi-comm', ppN(A.comm) + '원');
+  setTxt('rf-kpi-comm-sub', '거래액 ' + ppN(A.gmv) + '원 · 평균 수수료율 ' + rfPctOf(A.comm, A.gmv).toFixed(2) + '%');
+  setTxt('rf-kpi-earn', '− ' + ppN(A.earn) + '원');
+  setTxt('rf-kpi-earn-sub', '수수료의 ' + rfPctOf(A.earn, A.comm).toFixed(1) + '% · 평균 적립률 ' + rfPctOf(A.earn, A.gmv).toFixed(2) + '%');
+  setTxt('rf-kpi-net', ppN(A.net) + '원');
+  setTxt('rf-kpi-net-sub', '수수료 − 유저 적립 · 거래액 대비 ' + rfPctOf(A.net, A.gmv).toFixed(2) + '%p');
+
+  /* 확정 / 미확정 / 취소 */
+  var stb = document.getElementById('rf-status-tbody');
+  if (stb) {
+    var statRow = function(badge, agg, dim) {
+      var st = dim ? ' style="color:var(--text-3)"' : '';
+      return '<tr><td>' + badge + '</td>'
+        + '<td' + st + '>' + ppN(agg.count) + '건</td>'
+        + '<td' + st + '>' + ppN(agg.gmv) + '원</td>'
+        + '<td' + (dim ? st : ' style="font-weight:600"') + '>' + ppN(agg.comm) + '원</td>'
+        + '<td' + (dim ? st : ' style="color:var(--amber);font-weight:600"') + '>' + (dim ? '' : '− ') + ppN(agg.earn) + '원</td>'
+        + '<td' + (dim ? st : ' style="color:var(--success);font-weight:700"') + '>' + ppN(agg.net) + '원</td></tr>';
+    };
+    stb.innerHTML =
+      statRow('<span class="badge badge-green">확정</span>', C, false)
+      + statRow('<span class="badge badge-amber">미확정</span>', P, false)
+      + statRow('<span class="badge badge-gray">취소</span> <span style="font-size:11px;color:var(--text-3)">집계 제외</span>', X, true)
+      + '<tr style="border-top:2px solid var(--border)"><td style="font-weight:700">합계 <span style="font-weight:400;font-size:11px;color:var(--text-3)">(취소 제외)</span></td>'
+      + '<td style="font-weight:700">' + ppN(A.count) + '건</td>'
+      + '<td style="font-weight:700">' + ppN(A.gmv) + '원</td>'
+      + '<td style="font-weight:700">' + ppN(A.comm) + '원</td>'
+      + '<td style="font-weight:700;color:var(--amber)">− ' + ppN(A.earn) + '원</td>'
+      + '<td style="font-weight:800;color:var(--success)">' + ppN(A.net) + '원</td></tr>';
+  }
+
+  /* 제휴몰별 집계 — 취소 건은 빼고 센다(취소는 위 표에서 따로 본다) */
+  var byMall = {};
+  RF.roster.forEach(function(m) {
+    byMall[m.code] = { code: m.code, name: m.name, kind: m.kind, fee: m.fee, rate: m.rate,
+      count: 0, gmv: 0, comm: 0, earn: 0, net: 0, pendingComm: 0, canceled: 0 };
+  });
+  rows.forEach(function(o) {
+    var b = byMall[o.code]; if (!b) return;
+    if (o.status === 'canceled') { b.canceled++; return; }
+    b.count++; b.gmv += o.amount; b.comm += o.comm; b.earn += o.earn; b.net += o.net;
+    if (o.status === 'pending') b.pendingComm += o.comm;
+  });
+  RF.malls = Object.keys(byMall).map(function(k) { return byMall[k]; });
+  rfRenderMalls();
+  rfRenderChart();
+
+  /* 거래 상세 — 적립은 넣지 않는다(김반장 지시: 요약과 제휴몰별 표, 두 군데만) */
+  var sel = document.getElementById('revfee-filter-mall');
+  if (sel && sel.options.length <= 1) {
+    sel.innerHTML = '<option value="">전체 제휴몰</option>'
+      + RF.roster.map(function(m) { return '<option value="' + m.name + '">' + m.name + '</option>'; }).join('');
+  }
+  REVFEE_CTRL.setRows(rows.slice().sort(function(a, b) { return b.at - a.at; }));
+  revFeeApplyFilters();
+};
+
+window.rfRenderMalls = function() {
+  var tb = document.getElementById('rf-mall-tbody');
+  if (!tb) return;
+  var q = (document.getElementById('rf-mall-search') || {}).value || '';
+  var kind = (document.getElementById('rf-mall-kind') || {}).value || '';
+  var sort = (document.getElementById('rf-mall-sort') || {}).value || 'net';
+  var list = RF.malls.filter(function(m) {
+    if (kind && m.kind !== kind) return false;
+    if (q && !ppMatch(m.name, q)) return false;
+    return true;
+  });
+  var cmp = {
+    net: function(a, b) { return b.net - a.net; },
+    comm: function(a, b) { return b.comm - a.comm; },
+    gmv: function(a, b) { return b.gmv - a.gmv; },
+    count: function(a, b) { return b.count - a.count; },
+    margin: function(a, b) { return (b.fee - b.rate) - (a.fee - a.rate); },
+    name: function(a, b) { return a.name.localeCompare(b.name, 'ko'); },
+  }[sort] || function(a, b) { return b.net - a.net; };
+  list.sort(cmp);
+
+  var sub = document.getElementById('rf-mall-sub');
+  if (sub) sub.textContent = '표시 ' + list.length + '개 / 전체 ' + RF.malls.length + '개 · 취소 건 제외 집계';
+
+  if (!list.length) { tb.innerHTML = ppEmpty(8, '조건에 맞는 제휴몰이 없습니다.'); return; }
+  var T = rfAggregate(list.map(function(m) { return { amount: m.gmv, comm: m.comm, earn: m.earn, net: m.net }; }));
+  tb.innerHTML = list.map(function(m) {
+    var marginPp = (m.fee - m.rate);
+    var status = m.pendingComm > 0
+      ? '<span class="badge badge-amber">확정 대기</span>'
+      : (m.count > 0 ? '<span class="badge badge-green">확정</span>' : '<span class="badge badge-gray">거래 없음</span>');
+    return '<tr>'
+      + '<td style="text-align:left!important"><div style="font-weight:700">' + m.name + '</div>'
+      +   '<div class="rf-mall-kind">' + (m.kind === 'coupang' ? '쿠팡 · 직접 제휴' : '링크프라이스') + '</div></td>'
+      + '<td>' + ppN(m.count) + '건</td>'
+      + '<td>' + ppN(m.gmv) + '원</td>'
+      + '<td>' + m.fee.toFixed(2) + '%</td>'
+      + '<td style="font-weight:600">' + ppN(m.comm) + '원</td>'
+      + '<td style="color:var(--amber)">− ' + ppN(m.earn) + '원</td>'
+      + '<td class="rf-net-col">' + ppN(m.net) + '원'
+      +   '<div style="font-size:11px;font-weight:400;color:var(--text-3)">' + marginPp.toFixed(2) + '%p</div></td>'
+      + '<td>' + status + '</td></tr>';
+  }).join('')
+  + '<tr style="border-top:2px solid var(--border)"><td style="text-align:left!important;font-weight:700">합계</td>'
+  + '<td style="font-weight:700">' + ppN(T.count) + '건</td>'
+  + '<td style="font-weight:700">' + ppN(T.gmv) + '원</td>'
+  + '<td>—</td>'
+  + '<td style="font-weight:700">' + ppN(T.comm) + '원</td>'
+  + '<td style="font-weight:700;color:var(--amber)">− ' + ppN(T.earn) + '원</td>'
+  + '<td class="rf-net-col" style="font-weight:800">' + ppN(T.net) + '원</td>'
+  + '<td>—</td></tr>';
+};
+
+/* 날짜별 추이 — 막대 하나가 그 날(또는 그 달)의 수수료다. 아래쪽 초록이 남는 것,
+   위쪽 주황이 유저 적립. 기간이 길면 자동으로 월 단위로 묶는다(막대가 45개를 넘으면
+   눈으로 못 읽는다). */
+window.rfRenderChart = function() {
+  var wrap = document.getElementById('rf-chart');
+  if (!wrap) return;
+  var rows = (RF.rows || []).filter(function(o) { return o.status !== 'canceled'; });
+  var p = RF.period || rfPeriodRange();
+  var days = Math.round((p.to - p.from) / 86400000) + 1;
+  var byMonth = days > 45;
+  var buckets = {}, order = [];
+  rows.forEach(function(o) {
+    var k = byMonth ? rfMonthKey(o.at) : rfDayKey(o.at);
+    if (!buckets[k]) { buckets[k] = { comm: 0, earn: 0, net: 0, count: 0 }; order.push(k); }
+    buckets[k].comm += o.comm; buckets[k].earn += o.earn; buckets[k].net += o.net; buckets[k].count++;
+  });
+  order.sort();
+  var sub = document.getElementById('rf-chart-sub');
+  if (sub) sub.textContent = (byMonth ? '월별' : '일별') + ' 수수료 · ' + order.length + '개 구간 · 취소 제외';
+  if (!order.length) { wrap.innerHTML = '<div style="width:100%;text-align:center;color:var(--text-3);font-size:13px;align-self:center">기간 내 거래가 없습니다.</div>'; return; }
+  var max = Math.max.apply(null, order.map(function(k) { return buckets[k].comm; })) || 1;
+  wrap.innerHTML = order.map(function(k) {
+    var b = buckets[k];
+    var h = Math.max(4, Math.round(b.comm / max * 100));
+    var earnH = b.comm > 0 ? Math.round(b.earn / b.comm * 100) : 0;
+    var label = byMonth ? k.slice(2).replace('-', '/') : k.slice(5).replace('-', '/');
+    var title = k + ' · 수수료 ' + ppN(b.comm) + '원 / 유저 적립 ' + ppN(b.earn) + '원 / 남는 것 ' + ppN(b.net) + '원 · ' + ppN(b.count) + '건';
+    return '<div class="chart-bar-col">'
+      + '<div class="chart-value">' + Math.round(b.comm / 1000) + 'k</div>'
+      + '<div class="rf-stack" style="height:' + h + '%" title="' + title + '">'
+      +   '<div class="rf-stack-earn" style="height:' + earnH + '%"></div>'
+      +   '<div class="rf-stack-net" style="flex:1"></div>'
+      + '</div>'
+      + '<div class="chart-label">' + label + '</div></div>';
+  }).join('');
+};
+
+/* ── 엑셀 내려받기 ── 요약 / 제휴몰별 / 거래 상세 세 시트.
+   김반장 지시로 CSV가 아니라 xlsx다(ppDownloadXlsx). */
+window.rfDownloadXlsx = function() {
+  if (!RF.built) return;
+  var p = RF.period || rfPeriodRange();
+  var S = RF.sum, A = S.all;
+  var tag = ppDateInputValue(p.from) + '_' + ppDateInputValue(p.to);
+  var H = function(a) { return a.map(function(x) { return { v: x, s: 1 }; }); };
+  var W = function(n) { return { v: n, s: 2 }; };   // 천단위 쉼표
+  var PC = function(n) { return { v: n, s: 3 }; };  // 0.00%
+  var PP = function(n) { return { v: n, s: 4 }; };  // 0.00%p
+
+  var summary = [
+    H(['항목', '값']),
+    ['기간', ppDt(p.from) + ' ~ ' + ppDt(p.to)],
+    ['주문 건수 (취소 제외)', W(A.count)],
+    ['거래액', W(A.gmv)],
+    ['수수료 매출', W(A.comm)],
+    ['유저 적립', W(A.earn)],
+    ['남는 것', W(A.net)],
+    ['평균 수수료율', PC(rfPctOf(A.comm, A.gmv))],
+    ['평균 적립률', PC(rfPctOf(A.earn, A.gmv))],
+    ['거래액 대비 수익', PP(rfPctOf(A.net, A.gmv))],
+    [],
+    H(['상태', '주문 건수', '거래액', '수수료', '유저 적립', '남는 것']),
+    ['확정', W(S.confirmed.count), W(S.confirmed.gmv), W(S.confirmed.comm), W(S.confirmed.earn), W(S.confirmed.net)],
+    ['미확정', W(S.pending.count), W(S.pending.gmv), W(S.pending.comm), W(S.pending.earn), W(S.pending.net)],
+    ['취소', W(S.canceled.count), W(S.canceled.gmv), W(S.canceled.comm), W(S.canceled.earn), W(S.canceled.net)],
+  ];
+  var mallRows = [H(['제휴몰', '구분', '주문 건수', '거래액', '수수료율', '수수료', '유저 적립', '남는 것', '수익 %p', '상태'])];
+  RF.malls.slice().sort(function(a, b) { return b.net - a.net; }).forEach(function(m) {
+    mallRows.push([m.name, m.kind === 'coupang' ? '쿠팡 · 직접 제휴' : '링크프라이스',
+      W(m.count), W(m.gmv), PC(m.fee), W(m.comm), W(m.earn), W(m.net), PP(m.fee - m.rate),
+      m.pendingComm > 0 ? '확정 대기' : (m.count > 0 ? '확정' : '거래 없음')]);
+  });
+  var STATUS_KO = { confirmed: '확정', pending: '미확정', canceled: '취소' };
+  var detail = [H(['발생 일시', '제휴몰', '회원', '카카오톡 ID', '식별번호', '주문번호', '거래액', '수수료율', '수수료', '상태'])];
+  (RF.rows || []).slice().sort(function(a, b) { return b.at - a.at; }).forEach(function(o) {
+    detail.push([ppDt(o.at) + ' ' + ppTm(o.at), o.mall, o.user.nickname,
+      o.user.linked_kakao ? o.user.kakao_login_id : '미연동', o.uid, o.orderNo,
+      W(o.amount), PC(o.fee), W(o.comm), STATUS_KO[o.status] || o.status]);
+  });
+  ppDownloadXlsx('제휴수수료매출_' + tag + '.xlsx', [
+    { name: '요약', rows: summary, widths: [24, 18, 16, 16, 16, 16] },
+    { name: '제휴몰별', rows: mallRows, widths: [22, 16, 12, 16, 11, 16, 16, 16, 11, 12] },
+    { name: '거래 상세', rows: detail, widths: [20, 18, 16, 16, 22, 18, 14, 11, 14, 10] },
+  ]);
+};
+
+/* ── 진입 ── */
+window.rfLoad = function() {
+  if (RF.built) { rfReload(); return; }
+  var tb = document.getElementById('rf-mall-tbody');
+  if (tb) tb.innerHTML = ppEmpty(8, '불러오는 중…');
+  rfLoadRoster().then(function(roster) {
+    RF.roster = roster;
+    RF.orders = rfBuildOrders(roster);
+    RF.built = true;
+    // 기본 기간 = 최근 30일. 링크프라이스 확정일(매월 6일)을 걸치는 구간이라
+    // 확정/미확정이 같이 보인다 — 이 화면에서 가장 먼저 봐야 할 게 그 구분이다.
+    var today = new Date();
+    var from = new Date(today); from.setDate(from.getDate() - 29);
+    var fEl = document.getElementById('rf-period-from');
+    var tEl = document.getElementById('rf-period-to');
+    var dEl = document.getElementById('rf-period-day');
+    var mEl = document.getElementById('rf-period-month');
+    if (fEl && !fEl.value) fEl.value = ppDateInputValue(from);
+    if (tEl && !tEl.value) tEl.value = ppDateInputValue(today);
+    if (dEl && !dEl.value) dEl.value = ppDateInputValue(today);
+    if (mEl && !mEl.value) mEl.value = rfMonthKey(today);
+    rfPeriodModeChanged();
+  });
+};
+
+/* ── 거래 상세 리스트 컨트롤러 ── */
 var REVFEE_CTRL = window.REVFEE_CTRL = ppMakeListController(20, function(pageItems, state, totalPages) {
   var tbody = document.querySelector('#rev-fee table tbody');
   var pag = document.getElementById('revfee-pagination');
   if (!tbody) return;
-  if (!pageItems.length) { tbody.innerHTML = ppEmpty(9,'조건에 맞는 확정 포스트백이 없습니다.'); if (pag) pag.innerHTML = ''; return; }
+  if (!pageItems.length) { tbody.innerHTML = ppEmpty(8, '조건에 맞는 거래가 없습니다.'); if (pag) pag.innerHTML = ''; return; }
+  var badge = { confirmed: '<span class="badge badge-green">확정</span>',
+    pending: '<span class="badge badge-amber">미확정</span>',
+    canceled: '<span class="badge badge-gray">취소</span>' };
   tbody.innerHTML = pageItems.map(function(d) {
-    var earnCell = (d._earnWon > 0)
-      ? '<td style="color:var(--amber);font-weight:600">' + ppN(d._earnWon) + '원</td>'
-      : '<td style="color:var(--text-3)">—</td>';
-    return '<tr><td style="text-align:center;white-space:nowrap"><div style="font-weight:700;color:#333">' + ppDt(d.created_at) + '</div><div style="color:var(--text-3)">' + ppTm(d.created_at) + '</div></td>'
-      + '<td style="text-align:center;font-weight:500">' + (d.mall_name||'—') + '</td>'
-      + '<td>' + renderMemberIdentity(d._user, d.user_id) + '</td>'
-      + '<td style="text-align:center;font-family:monospace;font-size:11.5px;color:var(--text-2)">' + (d.order_id||d._id) + '</td>'
-      + '<td>' + ppN(d.purchase_amount) + '원</td>'
-      + '<td style="text-align:center">' + (d._rate*100).toFixed(1) + '%</td>'
-      + '<td style="color:var(--success);font-weight:600">+' + ppN(d._comm) + '원</td>'
-      + earnCell
-      + '<td style="text-align:center"><span class="badge badge-green">정상</span></td></tr>';
+    var dim = d.status === 'canceled' ? ' style="opacity:.55"' : '';
+    return '<tr' + dim + '>'
+      + '<td style="white-space:nowrap"><div style="font-weight:700;color:#333">' + ppDt(d.at) + '</div><div style="color:var(--text-3)">' + ppTm(d.at) + '</div></td>'
+      + '<td style="font-weight:500">' + d.mall + '</td>'
+      + '<td style="text-align:left!important">' + renderMemberIdentityListOnly(d.user, d.uid) + '</td>'
+      + '<td style="font-family:monospace;font-size:11.5px;color:var(--text-2)">' + d.orderNo + '</td>'
+      + '<td>' + ppN(d.amount) + '원</td>'
+      + '<td>' + d.fee.toFixed(2) + '%</td>'
+      + '<td style="color:' + (d.status === 'canceled' ? 'var(--text-3)' : 'var(--success)') + ';font-weight:600">' + (d.status === 'canceled' ? '' : '+') + ppN(d.comm) + '원</td>'
+      + '<td>' + (badge[d.status] || '—') + '</td></tr>';
   }).join('');
   if (pag) pag.innerHTML = ppPaginationHtml('REVFEE_CTRL', state.page, totalPages);
 });
 window.revFeeApplyFilters = function() {
-  var q = (document.getElementById('revfee-search')||{}).value || '';
-  var mall = (document.getElementById('revfee-filter-mall')||{}).value || '';
+  var q = (document.getElementById('revfee-search') || {}).value || '';
+  var mall = (document.getElementById('revfee-filter-mall') || {}).value || '';
+  var st = (document.getElementById('revfee-filter-status') || {}).value || '';
   REVFEE_CTRL.applyFilter(function(d) {
-    if (q && !ppMatch((d._user||{}).nickname, q) && !ppMatch(d.order_id, q)) return false;
-    if (mall && d.mall_name !== mall) return false;
+    if (q && !ppMatch(d.user.nickname, q) && !ppMatch(d.orderNo, q) && !ppMatch(d.uid, q)) return false;
+    if (mall && d.mall !== mall) return false;
+    if (st && d.status !== st) return false;
     return true;
   });
+  var sub = document.getElementById('rf-fee-sub');
+  if (sub) sub.textContent = '조건 ' + ppN(REVFEE_CTRL.state.filtered.length) + '건 / 기간 ' + ppN(REVFEE_CTRL.state.rows.length) + '건 · 데모 표본';
 };
 
+/* ── sec-revenue-gifticon: 기프티콘 판매 매출 내역 리스트 컨트롤러 ── */
 var REVGI_CTRL = window.REVGI_CTRL = ppMakeListController(20, function(pageItems, state, totalPages) {
   var tbody = document.querySelector('#rev-gifticon table tbody');
   var pag = document.getElementById('revgi-pagination');
@@ -11440,27 +12215,9 @@ function loadRevenueStats() {
         + '<tr><td style="color:var(--text-2);font-size:12px">순수익률 (총수익 대비)</td><td style="color:var(--text-2);font-size:12px">' + netRate + '%</td></tr>';
     }
 
-    /* sec-revenue: 제휴 수수료 매출 내역 */
-    /* 적립 티켓은 별도 컬렉션(ticket_transactions, type=earn)에 있고 postback_id로 연결됨 → 포스트백별 등급 집계 맵 구성 */
-    var earnByPb = {};
-    tkSnap.docs.forEach(function(doc){
-      var d = doc.data();
-      var pid = d.postback_id; if (!pid) return;
-      var g = d.ticket_grade; if (GRADE_VAL[g]==null) return;
-      if (!earnByPb[pid]) earnByPb[pid] = { bronze:0, silver:0, gold:0, won:0 };
-      earnByPb[pid][g]++; earnByPb[pid].won += GRADE_VAL[g];
-    });
     var confirmed = pbSnap.docs.filter(function(d){ return d.data().status==='confirmed'; });
     var revUidSource = confirmed.map(function(d){ return d.data().user_id; }).concat(giSnap.docs.map(function(d){ return d.data().user_id; }));
     dmFetchUsersByIds(revUidSource).then(function(userMap) {
-      var revFeeItems = confirmed.map(function(doc) {
-        var d = doc.data();
-        var rate = MALL_RATES[d.mall_name]||0.03;
-        var earn = earnByPb[doc.id];
-        return Object.assign({ _id: doc.id, _user: userMap[d.user_id], _rate: rate, _comm: Math.round((d.purchase_amount||0)*rate), _earnWon: earn ? earn.won : 0 }, d);
-      });
-      REVFEE_CTRL.setRows(revFeeItems);
-      setTxt('rev-fee-sub', '총 ' + confirmed.length + '건 · 합 ' + ppN(totalCommission) + '원 (데모)');
 
       /* sec-revenue: 기프티콘 판매 내역 */
       var revGiItems = giSnap.docs.map(function(doc) {
