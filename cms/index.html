@@ -283,11 +283,11 @@ tr:hover td{background:var(--surface-2);}
 #sec-ticket-accrual th{font-size:13px;font-weight:700;text-transform:none;letter-spacing:0;}
 #sec-ticket-accrual .btn{font-size:13px;font-weight:700;padding:7px 14px;}
 #sec-ticket-accrual .info-box{font-size:13px;}
-#sec-ticket-accrual .ta-notice{display:inline-flex;align-items:center;gap:8px;margin-bottom:14px;
+.ta-notice{display:inline-flex;align-items:center;gap:8px;margin-bottom:14px;
   background:var(--main-soft);border:1px solid var(--main-line);border-radius:var(--r-md);
   padding:9px 14px;font-family:inherit;font-size:13px;font-weight:700;color:var(--main-hover);cursor:pointer;}
-#sec-ticket-accrual .ta-notice:hover{border-color:var(--main);}
-#sec-ticket-accrual .ta-notice-mark{display:inline-flex;align-items:center;justify-content:center;
+.ta-notice:hover{border-color:var(--main);}
+.ta-notice-mark{display:inline-flex;align-items:center;justify-content:center;
   width:18px;height:18px;border-radius:50%;background:var(--main);color:#fff;font-size:12px;line-height:1;}
 .ta-notice-list{margin:0;padding:0;list-style:none;}
 .ta-notice-list li{padding:9px 0;border-bottom:1px solid var(--border);font-size:13px;line-height:1.6;color:var(--text-2);}
@@ -453,14 +453,6 @@ tr:hover td{background:var(--surface-2);}
    "수수료가 높아도 적립률을 세게 걸어놨으면 남는 게 없는데 지금은 그게 안 보인다"). */
 .rf-net-col{background:rgba(22,163,74,.05);}
 td.rf-net-col{font-weight:700;color:var(--success);}
-.rf-swatch{width:9px;height:9px;border-radius:2px;display:inline-block;}
-.rf-swatch-net{background:var(--success);}
-.rf-swatch-earn{background:var(--amber);}
-.rf-stack{width:100%;display:flex;flex-direction:column;justify-content:flex-end;min-height:5px;
-  border-radius:5px 5px 0 0;overflow:hidden;transition:filter .2s;cursor:pointer;}
-.rf-stack:hover{filter:brightness(1.15);}
-.rf-stack-earn{background:linear-gradient(180deg,#FBBF24,var(--amber));}
-.rf-stack-net{background:linear-gradient(180deg,#22C55E,var(--success));}
 .rf-mall-kind{font-size:11px;color:var(--text-3);font-weight:400;margin-top:2px;}
 .rf-tb-label{font-size:11px;font-weight:700;color:var(--text-3);letter-spacing:-.1px;}
 /* 월별·일별 줄은 눌러서 그 구간으로 들어가는 자리다 — 눌리는 줄임을 손끝으로 알 수 있게. */
@@ -3137,22 +3129,24 @@ window.CMS_FEATURES = {
 
     </div>
 
-    <!-- ── 제휴 수수료 매출 ── -->
-    <!-- 「수수료 − 유저 적립 = 남는 것」을 화면 전체의 뼈대로 삼는다(김반장 지시 2026-08-27).
-         수수료율·적립률은 「티켓 적립 설정」이 저장한 값(settings/ticket_accrual)을 그대로 읽어
-         쓴다 — 두 화면의 「수익 %p」가 어긋나면 안 되므로 이 화면에 값을 따로 두지 않는다.
-         거래 자체는 데모 표본(rfBuildOrders)이다. -->
+    <!-- ── 제휴 수수료 매출 ──
+         탭 하나에 질문 하나다(김반장 지시 2026-08-27) —
+           [기간별 매출] 얼마 벌었나 · [제휴몰별] 어디가 돈이 되나.
+         조회 기간은 탭 위에 두어 양쪽에 함께 걸린다(탭마다 따로 고르면 숫자가 어긋난다).
+         화면에는 값만 두고, 왜 그런지는 「Notice !」 모달로 접는다. -->
     <div class="section" id="sec-revenue-fee">
       <div class="data-source-bar">
         <span class="ds-label">데이터 출처</span>
         <span class="ds-tag coupang">링크프라이스 실적 · 매월 6일 확정</span>
-        <span class="ds-tag ours">우리 DB · 티켓 적립 설정의 수수료·적립률</span>
+        <span class="ds-tag ours">우리 DB · 티켓 적립 설정</span>
         <span class="ds-tag calc">집계 · 남는 것 = 수수료 − 유저 적립</span>
       </div>
-      <div class="info-box"><strong>제휴 수수료 매출</strong> — 수수료가 전부 우리 돈이 아닙니다. 적립률만큼은 유저에게 나가고 <strong>남는 것</strong>이 실제 수익입니다. 수수료율·적립률은 <strong>티켓 적립 설정</strong>에서 정한 값을 그대로 씁니다. 링크프라이스는 <strong>매월 6일</strong> 전월 실적을 한 번에 확정하므로 그전 숫자는 바뀔 수 있습니다.</div>
 
-      <!-- 조회 기간(어디부터 어디까지)과 보기(그 안을 어떻게 쪼갤지)는 다른 것이라
-           둘을 나란히 두되 앞에 이름표를 붙여 섞이지 않게 한다(김반장 지시 2026-08-27). -->
+      <button type="button" class="ta-notice" onclick="openModal('m-rf-notice')">
+        <span>제휴 수수료 매출 Notice</span>
+        <span class="ta-notice-mark">!</span>
+      </button>
+
       <div class="toolbar">
         <span class="rf-tb-label">조회 기간</span>
         <select class="filter-sel" id="rf-period-mode" onchange="rfPeriodModeChanged()">
@@ -3168,164 +3162,117 @@ window.CMS_FEATURES = {
           <input class="form-input" type="date" id="rf-period-to" style="width:150px" onchange="rfReload()">
         </span>
         <button class="btn btn-primary btn-sm" onclick="rfReload()">조회</button>
-        <span style="width:1px;height:22px;background:var(--border)"></span>
-        <span class="rf-tb-label">보기</span>
-        <select class="filter-sel" id="rf-view" onchange="rfViewChanged()">
-          <option value="month" selected>월별</option>
-          <option value="day">일별</option>
-          <option value="range">기간별</option>
-        </select>
         <span style="font-size:12px;color:var(--text-3)" id="rf-period-label">—</span>
       </div>
 
-      <div class="stats-grid" style="grid-template-columns:repeat(3,1fr)">
-        <div class="stat-card purple"><div class="stat-label">수수료 매출</div><div class="stat-value" id="rf-kpi-comm">—</div><div class="stat-change neutral" id="rf-kpi-comm-sub">—</div></div>
-        <div class="stat-card amber"><div class="stat-label">유저 적립</div><div class="stat-value" id="rf-kpi-earn">—</div><div class="stat-change neutral" id="rf-kpi-earn-sub">—</div></div>
-        <div class="stat-card green"><div class="stat-label">남는 것</div><div class="stat-value" id="rf-kpi-net">—</div><div class="stat-change neutral" id="rf-kpi-net-sub">—</div></div>
+      <div class="terms-nav">
+        <div class="terms-tab active" onclick="rfSwitchTab(this,'rf-tab-period')">기간별 매출</div>
+        <div class="terms-tab" onclick="rfSwitchTab(this,'rf-tab-mall')">제휴몰별</div>
       </div>
 
-      <!-- ── 월별 / 일별 / 기간별 내역 ──
-           줄을 누르면 아래 블록(쿠팡 카드·확정/미확정·제휴몰별·추이·거래 상세)이 그 구간으로
-           좁혀진다. 아코디언으로 줄 안에 접어 넣지 않은 이유 — 제휴몰별 표는 정렬·검색에
-           8칸짜리 표라 좁은 줄 안에 넣으면 그 기능이 다 죽는다(김반장이 「어느 제휴몰이 진짜
-           돈이 되나」를 보시는 표다). 위쪽(요약·이 표)은 조회 기간 전체, 아래쪽은 선택 구간이다.
-           줄은 링크프라이스만이다 — 쿠팡은 주문번호가 없어 섞을 수 없다. 합계는 두 줄로 두어
-           「링크프라이스만」과 「쿠팡 포함」을 헷갈리지 않게 갈라 놨다. -->
-      <div class="card">
-        <div class="card-header">
-          <div><div class="card-title" id="rf-bd-title">월별 내역 <span style="font-weight:400;font-size:12px;color:var(--text-3)">링크프라이스</span></div>
-            <div class="card-sub" id="rf-bd-sub">—</div></div>
-          <button class="btn btn-ghost btn-sm" onclick="rfDownloadXlsx()">⬇️ 엑셀 내려받기</button>
+      <!-- ── 탭 1 · 기간별 매출 — 얼마 벌었나 ── -->
+      <div id="rf-tab-period">
+        <div class="stats-grid" style="grid-template-columns:repeat(3,1fr)">
+          <div class="stat-card purple"><div class="stat-label">수수료 매출</div><div class="stat-value" id="rf-kpi-comm">—</div><div class="stat-change neutral" id="rf-kpi-comm-sub">—</div></div>
+          <div class="stat-card amber"><div class="stat-label">유저 적립</div><div class="stat-value" id="rf-kpi-earn">—</div><div class="stat-change neutral" id="rf-kpi-earn-sub">—</div></div>
+          <div class="stat-card green"><div class="stat-label">남는 것</div><div class="stat-value" id="rf-kpi-net">—</div><div class="stat-change neutral" id="rf-kpi-net-sub">—</div></div>
         </div>
-        <table id="rf-bd-table">
-          <thead>
-            <tr>
-              <th style="width:17%">기간</th>
-              <th style="width:9%">주문 건수</th>
-              <th style="width:14%">거래액</th>
-              <th style="width:9%">수수료율</th>
-              <th style="width:13%">수수료 매출</th>
-              <th style="width:13%">유저 적립</th>
-              <th style="width:14%" class="rf-net-col">남는 것</th>
-              <th style="width:11%">상태</th>
-            </tr>
-          </thead>
-          <tbody id="rf-bd-tbody"></tbody>
-        </table>
-        <div id="rf-bd-pagination"></div>
-      </div>
 
-      <div class="rf-drill" id="rf-drill" style="display:none">
-        <span class="rf-drill-mark">▸</span>
-        <span id="rf-drill-text">—</span>
-        <button class="btn btn-ghost btn-sm" onclick="rfClearSelection()">전체 기간으로</button>
-      </div>
-
-      <!-- ── 쿠팡 (직접 제휴) ──
-           쿠팡은 링크프라이스를 거치지 않는 직접 제휴이고, 주문번호가 넘어오지 않는다
-           (김반장 확정 2026-08-27). 그래서 주문 한 건 한 건을 짚을 수가 없다 —
-           제휴몰별 표에 섞으면 정렬·검색으로 파고들다가 「눌렀는데 아무것도 없다」가 된다.
-           갈라 놓고, 왜 건별이 없는지 그 자리에 적는다. 돈은 들어오는 것이므로 위
-           요약 세 장(수수료 매출·유저 적립·남는 것)에는 쿠팡도 포함되어 있다. -->
-      <div class="card">
-        <div class="card-header">
-          <div><div class="card-title">쿠팡 <span style="font-weight:400;font-size:12px;color:var(--text-3)">직접 제휴</span></div>
-            <div class="card-sub" id="rf-cp-sub">—</div></div>
-        </div>
-        <div class="amber-box" style="margin:14px 20px 0"><strong>쿠팡은 주문번호가 오지 않아 건별 내역이 없습니다.</strong> <span>거래액·수수료는 쿠팡 파트너스 리포트의 집계값이고, 유저 적립은 우리 DB의 지급 기록입니다. 둘을 주문 단위로 맞출 수 없으므로</span> <span style="font-weight:700">주문 건수는 「—」</span><span>로 둡니다(0이 아니라 알 수 없음). 아래</span> <strong>거래 상세</strong><span>는 링크프라이스 제휴몰만 나옵니다.</span></div>
-        <table style="margin-top:14px">
-          <thead><tr><th style="width:22%">상태</th><th style="width:12%">주문 건수</th><th style="width:18%">거래액</th><th style="width:16%">수수료</th><th style="width:16%">유저 적립</th><th style="width:16%">남는 것</th></tr></thead>
-          <tbody id="rf-cp-tbody"></tbody>
-        </table>
-        <div style="padding:12px 20px;border-top:1px solid var(--border);display:flex;flex-wrap:wrap;gap:18px;font-size:12px;color:var(--text-2)">
-          <span>적립 지급 건수 <span style="font-weight:700;color:var(--text)" id="rf-cp-payouts">—</span> <span style="color:var(--text-3)">우리 DB 기준 · 쿠팡 주문과 1:1로 맞출 수 없습니다</span></span>
-          <span>전환 대기일 수 <span style="font-weight:700;color:var(--text)">카카오톡 연동 D+7 / 미연동 D+30</span> <span style="color:var(--text-3)">고정값 · 티켓 적립 설정에서도 수정 불가</span></span>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="card-header">
-          <div><div class="card-title">확정 / 미확정 / 취소 <span style="font-weight:400;font-size:12px;color:var(--text-3)">링크프라이스</span></div><div class="card-sub">링크프라이스는 매월 6일 전월분 실적을 한 번에 확정합니다 · 쿠팡은 위 카드에서 따로 봅니다</div></div>
-        </div>
-        <table>
-          <thead><tr><th style="width:16%">상태</th><th style="width:12%">주문 건수</th><th style="width:18%">거래액</th><th style="width:18%">수수료</th><th style="width:18%">유저 적립</th><th style="width:18%">남는 것</th></tr></thead>
-          <tbody id="rf-status-tbody"></tbody>
-        </table>
-      </div>
-
-      <div class="card">
-        <div class="card-header">
-          <div><div class="card-title">제휴몰별 내역 <span style="font-weight:400;font-size:12px;color:var(--text-3)">링크프라이스</span></div><div class="card-sub" id="rf-mall-sub">—</div></div>
-        </div>
-        <div style="padding:14px 20px 0">
-          <div class="toolbar" style="margin-bottom:14px">
-            <input class="search-box" id="rf-mall-search" placeholder="제휴몰 검색..." onkeydown="if(event.key==='Enter')rfRenderMalls()" oninput="rfRenderMalls()">
-            <select class="filter-sel" id="rf-mall-sort" onchange="rfRenderMalls()">
-              <option value="net">남는 것 많은 순</option>
-              <option value="comm">수수료 많은 순</option>
-              <option value="gmv">거래액 많은 순</option>
-              <option value="count">주문 건수 많은 순</option>
-              <option value="margin">수익 %p 높은 순</option>
-              <option value="name">제휴몰 이름순</option>
-            </select>
+        <div class="card">
+          <div class="card-header">
+            <div><div class="card-title" id="rf-bd-title">월별 내역</div><div class="card-sub" id="rf-bd-sub">—</div></div>
+            <div style="display:flex;gap:8px;align-items:center">
+              <select class="filter-sel" id="rf-view" onchange="rfViewChanged()">
+                <option value="month" selected>월별</option>
+                <option value="day">일별</option>
+                <option value="range">기간별</option>
+              </select>
+              <button class="btn btn-ghost btn-sm" onclick="rfDownloadXlsx()">⬇️ 엑셀 내려받기</button>
+            </div>
           </div>
-        </div>
-        <div style="overflow-x:auto">
-          <table id="rf-mall-table">
+          <table id="rf-bd-table">
             <thead>
               <tr>
-                <th style="width:17%">제휴몰</th>
-                <th style="width:9%">주문 건수</th>
-                <th style="width:14%">거래액</th>
-                <th style="width:9%">수수료율</th>
-                <th style="width:13%">수수료</th>
-                <th style="width:13%">유저 적립</th>
-                <th style="width:14%" class="rf-net-col">남는 것</th>
-                <th style="width:11%">상태</th>
+                <th style="width:19%">기간</th>
+                <th style="width:11%">주문 건수</th>
+                <th style="width:16%">거래액</th>
+                <th style="width:16%">수수료 매출</th>
+                <th style="width:15%">유저 적립</th>
+                <th style="width:15%" class="rf-net-col">남는 것</th>
+                <th style="width:8%">상태</th>
               </tr>
             </thead>
-            <tbody id="rf-mall-tbody"></tbody>
+            <tbody id="rf-bd-tbody"></tbody>
           </table>
+          <div id="rf-bd-pagination"></div>
         </div>
-      </div>
 
-      <div class="card">
-        <div class="card-header">
-          <div><div class="card-title">날짜별 추이</div><div class="card-sub" id="rf-chart-sub">—</div></div>
-          <div style="display:flex;gap:12px;align-items:center;font-size:11px;color:var(--text-2)">
-            <span style="display:inline-flex;align-items:center;gap:5px"><i class="rf-swatch rf-swatch-net"></i>남는 것</span>
-            <span style="display:inline-flex;align-items:center;gap:5px"><i class="rf-swatch rf-swatch-earn"></i>유저 적립</span>
+        <div class="card">
+          <div class="card-header">
+            <div><div class="card-title">확정 / 미확정 / 취소</div><div class="card-sub" id="rf-status-sub">—</div></div>
           </div>
-        </div>
-        <div style="padding:18px 20px 20px;overflow-x:auto">
-          <div class="chart-bar-wrap" id="rf-chart" style="height:150px;min-width:640px"></div>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="card-header">
-          <div><div class="card-title">거래 상세 <span style="font-weight:400;font-size:12px;color:var(--text-3)">링크프라이스</span></div><div class="card-sub" id="rf-fee-sub">—</div></div>
-        </div>
-        <div style="padding:14px 20px 0">
-          <div class="info-box" style="margin-bottom:14px">주문번호가 오는 <strong>링크프라이스 제휴몰</strong>만 건별로 나옵니다. 쿠팡은 주문번호가 오지 않아 여기에 없습니다 — 위 <strong>쿠팡</strong> 카드에서 총액으로 봅니다.</div>
-          <div class="toolbar" style="margin-bottom:14px">
-            <input class="search-box" id="revfee-search" placeholder="회원, 주문번호 검색..." onkeydown="if(event.key==='Enter')revFeeApplyFilters()">
-            <select class="filter-sel" id="revfee-filter-mall" onchange="revFeeApplyFilters()"><option value="">전체 제휴몰</option></select>
-            <select class="filter-sel" id="revfee-filter-status" onchange="revFeeApplyFilters()">
-              <option value="">전체 상태</option>
-              <option value="confirmed">확정</option>
-              <option value="pending">미확정</option>
-              <option value="canceled">취소</option>
-            </select>
-            <button class="btn btn-primary btn-sm" onclick="revFeeApplyFilters()">검색</button>
-          </div>
-        </div>
-        <div id="rev-fee" style="overflow-x:auto">
           <table>
-            <thead><tr><th style="width:14%">발생 일시</th><th style="width:14%">제휴몰</th><th style="width:20%">회원(식별번호)</th><th style="width:16%">주문번호</th><th style="width:14%">거래액</th><th style="width:9%">수수료율</th><th style="width:13%">수수료</th><th style="width:10%">상태</th></tr></thead>
-            <tbody></tbody>
+            <thead><tr><th style="width:19%">상태</th><th style="width:11%">주문 건수</th><th style="width:16%">거래액</th><th style="width:16%">수수료</th><th style="width:15%">유저 적립</th><th style="width:23%">남는 것</th></tr></thead>
+            <tbody id="rf-status-tbody"></tbody>
           </table>
-          <div id="revfee-pagination"></div>
+        </div>
+      </div>
+
+      <!-- ── 탭 2 · 제휴몰별 — 어디가 돈이 되나 ── -->
+      <div id="rf-tab-mall" style="display:none">
+        <div class="rf-drill" id="rf-drill" style="display:none">
+          <span class="rf-drill-mark">▸</span>
+          <span id="rf-drill-text">—</span>
+          <button class="btn btn-ghost btn-sm" onclick="rfClearSelection()">전체 기간으로</button>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div><div class="card-title">제휴몰별 <span style="font-weight:400;font-size:12px;color:var(--text-3)">링크프라이스</span></div><div class="card-sub" id="rf-mall-sub">—</div></div>
+          </div>
+          <div style="padding:14px 20px 0">
+            <div class="toolbar" style="margin-bottom:14px">
+              <input class="search-box" id="rf-mall-search" placeholder="제휴몰 검색..." onkeydown="if(event.key==='Enter')rfRenderMalls()" oninput="rfRenderMalls()">
+              <select class="filter-sel" id="rf-mall-sort" onchange="rfRenderMalls()">
+                <option value="net">남는 것 많은 순</option>
+                <option value="comm">수수료 많은 순</option>
+                <option value="gmv">거래액 많은 순</option>
+                <option value="count">주문 건수 많은 순</option>
+                <option value="margin">수익 %p 높은 순</option>
+                <option value="name">제휴몰 이름순</option>
+              </select>
+            </div>
+          </div>
+          <div style="overflow-x:auto">
+            <table id="rf-mall-table">
+              <thead>
+                <tr>
+                  <th style="width:20%">제휴몰</th>
+                  <th style="width:11%">주문 건수</th>
+                  <th style="width:16%">거래액</th>
+                  <th style="width:16%">수수료</th>
+                  <th style="width:15%">유저 적립</th>
+                  <th style="width:15%" class="rf-net-col">남는 것</th>
+                  <th style="width:7%">상태</th>
+                </tr>
+              </thead>
+              <tbody id="rf-mall-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div><div class="card-title">쿠팡 <span style="font-weight:400;font-size:12px;color:var(--text-3)">직접 제휴</span></div>
+              <div class="card-sub" id="rf-cp-sub">—</div></div>
+          </div>
+          <table>
+            <thead><tr><th style="width:19%">상태</th><th style="width:11%">주문 건수</th><th style="width:16%">거래액</th><th style="width:16%">수수료</th><th style="width:15%">유저 적립</th><th style="width:23%">남는 것</th></tr></thead>
+            <tbody id="rf-cp-tbody"></tbody>
+          </table>
+          <div style="padding:12px 20px;border-top:1px solid var(--border);font-size:12px;color:var(--text-2)">
+            적립 지급 건수 <span style="font-weight:700;color:var(--text)" id="rf-cp-payouts">—</span>
+          </div>
         </div>
       </div>
     </div>
@@ -3908,6 +3855,31 @@ window.CMS_FEATURES = {
 </div>
 
 <!-- ── 모달: 티켓 적립 시뮬레이터 (2026-08-11 신설) ── -->
+<!-- ── 모달: 제휴 수수료 매출 Notice ──
+     화면에서 걷어낸 설명을 여기 담는다(김반장 지시 2026-08-27 — 화면에는 값만). -->
+<div class="modal-overlay" id="m-rf-notice">
+  <div class="modal" style="width:520px">
+    <div class="modal-header">
+      <div class="modal-title">제휴 수수료 매출 Notice</div>
+      <button class="modal-close" onclick="closeModal('m-rf-notice')"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <ul class="ta-notice-list">
+        <li><span class="k">남는 것</span>수수료 − 유저 적립. 적립률만큼은 유저에게 나갑니다.</li>
+        <li><span class="k">수수료율 · 적립률</span><strong>티켓 적립 설정</strong>의 값을 그대로 씁니다.</li>
+        <li><span class="k">확정</span>링크프라이스는 매월 6일 전월분, 쿠팡은 D+30. 그전 숫자는 바뀝니다. 취소는 합계에서 뺍니다.</li>
+        <li><span class="k">쿠팡 주문 건수 「—」</span>주문번호가 오지 않아 셀 수 없습니다. 0이 아니라 알 수 없음입니다. 적립 지급 건수는 우리 DB 기준이라 1:1로 안 맞습니다.</li>
+        <li><span class="k">쿠팡 전환 대기일 수</span><span>카카오톡 연동 D+7 / 미연동 D+30</span>. <strong>고정값입니다.</strong></li>
+        <li><span class="k">합계 두 줄</span>줄은 링크프라이스만. 쿠팡은 「쿠팡 포함」 줄에서만 더합니다.</li>
+        <li><span class="k">월 줄 누르기</span><strong>제휴몰별</strong> 탭이 그 달로 좁혀집니다.</li>
+      </ul>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-primary" onclick="closeModal('m-rf-notice')">닫기</button>
+    </div>
+  </div>
+</div>
+
 <div class="modal-overlay" id="m-ta-notice">
   <div class="modal" style="width:520px">
     <div class="modal-header">
@@ -4927,12 +4899,13 @@ function switchOp(el, id) {
   });
 }
 
-function switchRev(el, id) {
+/* 제휴 수수료 매출 — 탭 하나에 질문 하나(기간별 매출 / 제휴몰별). 기존 .terms-tab 그대로. */
+function rfSwitchTab(el, id) {
   el.parentNode.querySelectorAll('.terms-tab').forEach(x => x.classList.remove('active'));
   el.classList.add('active');
-  ['rev-fee','rev-gifticon'].forEach(rid => {
-    const e2 = document.getElementById(rid);
-    if (e2) e2.style.display = rid === id ? 'block' : 'none';
+  ['rf-tab-period', 'rf-tab-mall'].forEach(tid => {
+    const e2 = document.getElementById(tid);
+    if (e2) e2.style.display = tid === id ? 'block' : 'none';
   });
 }
 
@@ -6507,6 +6480,30 @@ Object.assign(KO2VI,{
   "전체 기간으로":"Về toàn bộ khoảng",
   "조회 기간 전체":"Toàn bộ khoảng xem",
   "한 덩어리로 봅니다":"Xem gộp thành một khối",
+  "제휴 수수료 매출 Notice":"Lưu ý — Doanh thu hoa hồng LK",
+  "기간별 매출":"Doanh thu theo khoảng",
+  "제휴몰별":"Theo cửa hàng LK",
+  "우리 DB · 티켓 적립 설정":"DB của ta · Cài đặt tích lũy vé",
+  "쿠팡 포함":"Gồm Coupang",
+  "수수료 − 유저 적립. 적립률만큼은 유저에게 나갑니다.":"Hoa hồng − tích lũy người dùng. Phần bằng tỷ lệ tích lũy sẽ trả cho người dùng.",
+  "수수료율 · 적립률":"Tỷ lệ hoa hồng · tỷ lệ tích lũy",
+  "의 값을 그대로 씁니다.":" dùng đúng giá trị ở đó.",
+  "링크프라이스는 매월 6일 전월분, 쿠팡은 구매확정 D+30. 그전 숫자는 바뀔 수 있습니다.":"Linkprice chốt phần tháng trước vào ngày 6 hằng tháng, Coupang là D+30 sau xác nhận mua. Số liệu trước đó có thể thay đổi.",
+  "쿠팡 주문 건수 「—」":"Số đơn Coupang 「—」",
+  "쿠팡은 주문번호가 오지 않아 건별로 셀 수 없습니다. 0이 아니라 알 수 없음입니다.":"Coupang không gửi mã đơn hàng nên không đếm được theo từng đơn. Không phải 0, mà là không biết được.",
+  "쿠팡 적립 지급 건수":"Số lần chi trả tích lũy Coupang",
+  "우리 DB 기준. 쿠팡 주문과 1:1로 맞출 수 없습니다.":"Theo DB của ta. Không khớp 1:1 với đơn hàng Coupang.",
+  "합계에서 뺍니다.":"Được trừ khỏi tổng.",
+  "합계 두 줄":"Hai dòng tổng",
+  "링크프라이스는 매월 6일 전월분, 쿠팡은 D+30. 그전 숫자는 바뀝니다. 취소는 합계에서 뺍니다.":"Linkprice chốt phần tháng trước vào ngày 6 hằng tháng, Coupang là D+30. Số liệu trước đó sẽ thay đổi. Hủy được trừ khỏi tổng.",
+  "주문번호가 오지 않아 셀 수 없습니다. 0이 아니라 알 수 없음입니다. 적립 지급 건수는 우리 DB 기준이라 1:1로 안 맞습니다.":"Không gửi mã đơn hàng nên không đếm được. Không phải 0, mà là không biết được. Số lần chi trả tích lũy theo DB của ta nên không khớp 1:1.",
+  "고정값입니다.":"Là giá trị cố định.",
+  "줄은 링크프라이스만. 쿠팡은 「쿠팡 포함」 줄에서만 더합니다.":"Các dòng chỉ là Linkprice. Coupang chỉ cộng ở dòng 「Gồm Coupang」.",
+  "줄은 링크프라이스만입니다. 쿠팡은 「쿠팡 포함」 줄에서만 더합니다.":"Các dòng chỉ là Linkprice. Coupang chỉ được cộng ở dòng 「Gồm Coupang」.",
+  "월 줄 누르기":"Bấm vào dòng tháng",
+  "탭이 그 달로 좁혀집니다.":" sẽ thu hẹp về tháng đó.",
+  "적립 지급 건수":"Số lần chi trả tích lũy",
+  "확정 / 미확정 / 취소":"Đã chốt / Chưa chốt / Hủy",
   "링크프라이스 · 취소 제외":"Linkprice · không gồm hủy",
   "쿠팡 포함 · 위 요약과 같은 값":"Gồm Coupang · bằng với phần tóm tắt phía trên",
   "일요일":"Chủ nhật", "월요일":"Thứ Hai", "화요일":"Thứ Ba", "수요일":"Thứ Tư",
@@ -12086,7 +12083,6 @@ function rfBuildBuckets() {
 
 function rfBdRowHtml(b) {
   var lp = b.lp.live;
-  var feePct = rfPctOf(lp.comm, lp.gmv);
   var status = b.lp.pending.comm > 0
     ? '<span class="badge badge-amber">확정 대기</span>'
     : (lp.count > 0 ? '<span class="badge badge-green">확정</span>' : '<span class="badge badge-gray">거래 없음</span>');
@@ -12099,7 +12095,6 @@ function rfBdRowHtml(b) {
     +   '<div class="rf-mall-kind">' + b.sub + '</div></td>'
     + '<td>' + ppN(lp.count) + '건</td>'
     + '<td>' + ppN(lp.gmv) + '원</td>'
-    + '<td>' + feePct.toFixed(2) + '%</td>'
     + '<td style="font-weight:600">' + ppN(lp.comm) + '원</td>'
     + '<td style="color:var(--amber)">− ' + ppN(lp.earn) + '원</td>'
     + '<td class="rf-net-col">' + ppN(lp.net) + '원'
@@ -12116,20 +12111,18 @@ function rfBdTotalRows() {
   function row(label, note, agg, countCell, strong) {
     return '<tr style="border-top:2px solid var(--border)">'
       + '<td style="text-align:left!important;font-weight:700">' + label
-      +   (note ? ' <span style="font-weight:400;font-size:11px;color:var(--text-3)">' + note + '</span>' : '') + '</td>'
+      +   ' <span style="font-weight:400;font-size:11px;color:var(--text-3)">' + note + '</span></td>'
       + '<td style="font-weight:700">' + countCell + '</td>'
       + '<td style="font-weight:700">' + ppN(agg.gmv) + '원</td>'
-      + '<td>' + rfPctOf(agg.comm, agg.gmv).toFixed(2) + '%</td>'
       + '<td style="font-weight:700">' + ppN(agg.comm) + '원</td>'
       + '<td style="font-weight:700;color:var(--amber)">− ' + ppN(agg.earn) + '원</td>'
       + '<td class="rf-net-col" style="font-weight:' + (strong ? '800' : '700') + '">' + ppN(agg.net) + '원</td>'
       + '<td>—</td></tr>';
   }
-  /* 합계를 두 줄로 나눈 이유 — 줄은 링크프라이스만이고 쿠팡은 못 섞는다. 그런데 돈은
-     들어오는 것이라 총액에는 쿠팡이 들어가야 한다(위 요약 세 장과 같은 규칙).
-     한 줄로 합치면 「이 합계에 쿠팡이 있나 없나」가 매번 헷갈린다. */
-  return row('합계', '링크프라이스 · 취소 제외', L, ppN(L.count) + '건', false)
-    + row('합계', '쿠팡 포함 · 위 요약과 같은 값', T, RF_CP_NA, true);
+  /* 줄은 링크프라이스만이고 쿠팡은 못 섞는다. 그런데 돈은 들어오는 것이라 총액에는
+     쿠팡이 들어가야 한다 — 그래서 합계가 두 줄이다(까닭은 Notice 모달에). */
+  return row('합계', '링크프라이스', L, ppN(L.count) + '건', false)
+    + row('합계', '쿠팡 포함', T, RF_CP_NA, true);
 }
 
 var BD_CTRL = window.BD_CTRL = ppMakeListController(12, function(pageItems, state, totalPages) {
@@ -12137,20 +12130,24 @@ var BD_CTRL = window.BD_CTRL = ppMakeListController(12, function(pageItems, stat
   var pag = document.getElementById('rf-bd-pagination');
   if (!tb) return;
   var title = document.getElementById('rf-bd-title');
-  if (title) title.innerHTML = RF.viewName + ' 내역 <span style="font-weight:400;font-size:12px;color:var(--text-3)">링크프라이스</span>';
+  if (title) title.textContent = RF.viewName + ' 내역';
   var sub = document.getElementById('rf-bd-sub');
-  if (sub) sub.textContent = RF.buckets.length + '개 구간 · 줄을 누르면 그 구간의 제휴몰별 내역으로 들어갑니다';
-  if (!pageItems.length) { tb.innerHTML = ppEmpty(8, '기간 내 거래가 없습니다.'); if (pag) pag.innerHTML = ''; return; }
+  if (sub) sub.textContent = RF.buckets.length + '개 구간';
+  if (!pageItems.length) { tb.innerHTML = ppEmpty(7, '기간 내 거래가 없습니다.'); if (pag) pag.innerHTML = ''; return; }
   tb.innerHTML = pageItems.map(rfBdRowHtml).join('') + rfBdTotalRows();
   if (pag) pag.innerHTML = totalPages > 1 ? ppPaginationHtml('BD_CTRL', state.page, totalPages) : '';
 });
 
+/* 줄을 누르면 「제휴몰별」 탭이 그 달로 좁혀지고, 탭도 그리로 넘어간다. */
 window.rfSelectBucket = function(key) {
   RF.sel = (RF.sel && RF.sel.key === key) ? null : (RF.buckets.filter(function(b) { return b.key === key; })[0] || null);
   rfRefreshDrill();
+  if (RF.sel) {
+    var tabs = document.querySelectorAll('#sec-revenue-fee .terms-tab');
+    if (tabs[1]) rfSwitchTab(tabs[1], 'rf-tab-mall');
+  }
 };
 
-/* 선택이 바뀔 때마다 아래 블록(쿠팡 카드·확정/미확정·제휴몰별·추이·거래 상세)을 다시 그린다. */
 window.rfRefreshDrill = function() {
   var view = rfView();
   var bar = document.getElementById('rf-drill');
@@ -12159,7 +12156,7 @@ window.rfRefreshDrill = function() {
     if (RF.sel && view !== 'range') {
       bar.style.display = 'flex';
       document.getElementById('rf-drill-text').textContent =
-        RF.sel.label + ' 선택 — 아래 표·그래프는 이 구간(' + ppDt(scope.from) + ' ~ ' + ppDt(scope.to) + ')만 보여줍니다';
+        RF.sel.label + ' · ' + ppDt(scope.from) + ' ~ ' + ppDt(scope.to);
     } else {
       bar.style.display = 'none';
     }
@@ -12200,8 +12197,9 @@ function rfRenderScope(scope) {
   }
   var BADGE_CONF = '<span class="badge badge-green">확정</span>';
   var BADGE_PEND = '<span class="badge badge-amber">미확정</span>';
-  var BADGE_CANC = '<span class="badge badge-gray">취소</span> <span style="font-size:11px;color:var(--text-3)">집계 제외</span>';
+  var BADGE_CANC = '<span class="badge badge-gray">취소</span>';
   var scopeNote = RF.sel ? (RF.sel.label + ' · ') : '';
+  setTxt('rf-status-sub', (RF.sel ? RF.sel.label + ' · ' : '') + '링크프라이스');
 
   var stb = document.getElementById('rf-status-tbody');
   if (stb) {
@@ -12220,7 +12218,7 @@ function rfRenderScope(scope) {
   var cpMall = RF.roster.filter(function(m) { return m.kind === 'coupang'; })[0];
   if (cpMall) {
     setTxt('rf-cp-sub', scopeNote + '수수료 ' + cpMall.fee.toFixed(2) + '% − 적립률 ' + cpMall.rate.toFixed(2)
-      + '% = 수익 ' + (cpMall.fee - cpMall.rate).toFixed(2) + '%p · 구매확정 D+30 정산');
+      + '% = 수익 ' + (cpMall.fee - cpMall.rate).toFixed(2) + '%p');
   }
   var payouts = cpRows.filter(function(o) { return o.status !== 'canceled' && o.earn >= TA_TICKET_VALUE.bronze; }).length;
   setTxt('rf-cp-payouts', ppN(payouts) + '건');
@@ -12239,16 +12237,6 @@ function rfRenderScope(scope) {
   });
   RF.malls = Object.keys(byMall).map(function(k) { return byMall[k]; });
   rfRenderMalls();
-  rfRenderChart();
-
-  var sel = document.getElementById('revfee-filter-mall');
-  if (sel && sel.options.length <= 1) {
-    sel.innerHTML = '<option value="">전체 제휴몰</option>'
-      + RF.roster.filter(function(m) { return m.kind !== 'coupang'; })
-          .map(function(m) { return '<option value="' + m.name + '">' + m.name + '</option>'; }).join('');
-  }
-  REVFEE_CTRL.setRows(lpRows.slice().sort(function(a, b) { return b.at - a.at; }));
-  revFeeApplyFilters();
 }
 
 window.rfRenderMalls = function() {
@@ -12268,9 +12256,9 @@ window.rfRenderMalls = function() {
   list.sort(cmp);
 
   var sub = document.getElementById('rf-mall-sub');
-  if (sub) sub.textContent = '표시 ' + list.length + '개 / 링크프라이스 ' + RF.malls.length + '개 · 취소 건 제외 집계 · 쿠팡은 위 카드에서 따로';
+  if (sub) sub.textContent = (RF.sel ? RF.sel.label + ' · ' : '') + list.length + '개';
 
-  if (!list.length) { tb.innerHTML = ppEmpty(8, '조건에 맞는 제휴몰이 없습니다.'); return; }
+  if (!list.length) { tb.innerHTML = ppEmpty(7, '조건에 맞는 제휴몰이 없습니다.'); return; }
   var T = rfAggregate(list.map(function(m) { return { amount: m.gmv, comm: m.comm, earn: m.earn, net: m.net }; }));
   tb.innerHTML = list.map(function(m) {
     var marginPp = (m.fee - m.rate);
@@ -12281,7 +12269,6 @@ window.rfRenderMalls = function() {
       + '<td style="text-align:left!important;font-weight:700">' + m.name + '</td>'
       + '<td>' + ppN(m.count) + '건</td>'
       + '<td>' + ppN(m.gmv) + '원</td>'
-      + '<td>' + m.fee.toFixed(2) + '%</td>'
       + '<td style="font-weight:600">' + ppN(m.comm) + '원</td>'
       + '<td style="color:var(--amber)">− ' + ppN(m.earn) + '원</td>'
       + '<td class="rf-net-col">' + ppN(m.net) + '원'
@@ -12291,53 +12278,10 @@ window.rfRenderMalls = function() {
   + '<tr style="border-top:2px solid var(--border)"><td style="text-align:left!important;font-weight:700">합계</td>'
   + '<td style="font-weight:700">' + ppN(T.count) + '건</td>'
   + '<td style="font-weight:700">' + ppN(T.gmv) + '원</td>'
-  + '<td>—</td>'
   + '<td style="font-weight:700">' + ppN(T.comm) + '원</td>'
   + '<td style="font-weight:700;color:var(--amber)">− ' + ppN(T.earn) + '원</td>'
   + '<td class="rf-net-col" style="font-weight:800">' + ppN(T.net) + '원</td>'
   + '<td>—</td></tr>';
-};
-
-/* 날짜별 추이 — 막대 하나가 그 날(또는 그 달)의 수수료다. 아래쪽 초록이 남는 것,
-   위쪽 주황이 유저 적립. 기간이 길면 자동으로 월 단위로 묶는다(막대가 45개를 넘으면
-   눈으로 못 읽는다). */
-window.rfRenderChart = function() {
-  var wrap = document.getElementById('rf-chart');
-  if (!wrap) return;
-  var rows = (RF.rows || []).filter(function(o) { return o.status !== 'canceled'; });
-  /* 그래프는 보기(월별/일별)를 따라간다. 「기간별」은 쪼갤 단위가 없으니 구간 길이로
-     정하고(45일 넘으면 월), 줄을 골라 들어간 상태면 그 구간 안을 일별로 본다. */
-  var p = RF.scope || RF.period || rfPeriodRange();
-  var days = Math.round((p.to - p.from) / 86400000) + 1;
-  var view = rfView();
-  var byMonth = RF.sel ? false : (view === 'month' ? true : (view === 'day' ? false : days > 45));
-  if (byMonth && days <= 31) byMonth = false;   // 한 달만 조회했는데 막대가 하나면 볼 게 없다
-  var buckets = {}, order = [];
-  rows.forEach(function(o) {
-    var k = byMonth ? rfMonthKey(o.at) : rfDayKey(o.at);
-    if (!buckets[k]) { buckets[k] = { comm: 0, earn: 0, net: 0, count: 0 }; order.push(k); }
-    buckets[k].comm += o.comm; buckets[k].earn += o.earn; buckets[k].net += o.net; buckets[k].count++;
-  });
-  order.sort();
-  var sub = document.getElementById('rf-chart-sub');
-  if (sub) sub.textContent = (RF.sel ? RF.sel.label + ' · ' : '') + (byMonth ? '월별' : '일별') + ' 수수료 · ' + order.length + '개 구간 · 쿠팡 포함 · 취소 제외';
-  if (!order.length) { wrap.innerHTML = '<div style="width:100%;text-align:center;color:var(--text-3);font-size:13px;align-self:center">기간 내 거래가 없습니다.</div>'; return; }
-  var max = Math.max.apply(null, order.map(function(k) { return buckets[k].comm; })) || 1;
-  wrap.style.minWidth = Math.max(640, order.length * 16) + 'px';
-  wrap.innerHTML = order.map(function(k) {
-    var b = buckets[k];
-    var h = Math.max(4, Math.round(b.comm / max * 100));
-    var earnH = b.comm > 0 ? Math.round(b.earn / b.comm * 100) : 0;
-    var label = byMonth ? k.slice(2).replace('-', '/') : k.slice(5).replace('-', '/');
-    var title = k + ' · 수수료 ' + ppN(b.comm) + '원 / 유저 적립 ' + ppN(b.earn) + '원 / 남는 것 ' + ppN(b.net) + '원 · ' + ppN(b.count) + '건';
-    return '<div class="chart-bar-col">'
-      + '<div class="chart-value">' + Math.round(b.comm / 1000) + 'k</div>'
-      + '<div class="rf-stack" style="height:' + h + '%" title="' + title + '">'
-      +   '<div class="rf-stack-earn" style="height:' + earnH + '%"></div>'
-      +   '<div class="rf-stack-net" style="flex:1"></div>'
-      + '</div>'
-      + '<div class="chart-label">' + label + '</div></div>';
-  }).join('');
 };
 
 /* ── 엑셀 내려받기 ── 지금 화면에 보이는 것이 그대로 담긴다(김반장 지시).
@@ -12401,40 +12345,31 @@ window.rfDownloadXlsx = function() {
 
   /* 월별·일별 시트 — 화면의 그 표 그대로. 줄은 링크프라이스만, 합계는 두 줄. */
   var bdName = (RF.viewName || '월별');
-  var bdRows = [H(['기간', '주문 건수', '거래액', '수수료율', '수수료 매출', '유저 적립', '남는 것', '수익 %p', '상태'])];
+  var bdRows = [H(['기간', '주문 건수', '거래액', '수수료 매출', '유저 적립', '남는 것', '수익 %p', '상태'])];
   var bdL = { count: 0, gmv: 0, comm: 0, earn: 0, net: 0 }, bdT = { gmv: 0, comm: 0, earn: 0, net: 0 };
   (RF.buckets || []).forEach(function(b) {
     var l = b.lp.live;
-    bdRows.push([b.label, W(l.count), W(l.gmv), PC(rfPctOf(l.comm, l.gmv)), W(l.comm), W(l.earn), W(l.net),
+    bdRows.push([b.label, W(l.count), W(l.gmv), W(l.comm), W(l.earn), W(l.net),
       PP(rfPctOf(l.net, l.gmv)),
       b.lp.pending.comm > 0 ? '확정 대기' : (l.count > 0 ? '확정' : '거래 없음')]);
     ['count', 'gmv', 'comm', 'earn', 'net'].forEach(function(k) { bdL[k] += l[k]; });
     ['gmv', 'comm', 'earn', 'net'].forEach(function(k) { bdT[k] += l[k] + b.cp.live[k]; });
   });
-  bdRows.push(['합계 (링크프라이스 · 취소 제외)', W(bdL.count), W(bdL.gmv), PC(rfPctOf(bdL.comm, bdL.gmv)),
+  bdRows.push(['합계 (링크프라이스)', W(bdL.count), W(bdL.gmv),
     W(bdL.comm), W(bdL.earn), W(bdL.net), PP(rfPctOf(bdL.net, bdL.gmv)), '']);
-  bdRows.push(['합계 (쿠팡 포함)', NA, W(bdT.gmv), PC(rfPctOf(bdT.comm, bdT.gmv)),
+  bdRows.push(['합계 (쿠팡 포함)', NA, W(bdT.gmv),
     W(bdT.comm), W(bdT.earn), W(bdT.net), PP(rfPctOf(bdT.net, bdT.gmv)), '']);
 
-  var mallRows = [H(['제휴몰', '주문 건수', '거래액', '수수료율', '수수료', '유저 적립', '남는 것', '수익 %p', '상태'])];
+  var mallRows = [H(['제휴몰', '주문 건수', '거래액', '수수료', '유저 적립', '남는 것', '수익 %p', '상태'])];
   RF.malls.slice().sort(function(a, b) { return b.net - a.net; }).forEach(function(m) {
-    mallRows.push([m.name, W(m.count), W(m.gmv), PC(m.fee), W(m.comm), W(m.earn), W(m.net), PP(m.fee - m.rate),
+    mallRows.push([m.name, W(m.count), W(m.gmv), W(m.comm), W(m.earn), W(m.net), PP(m.fee - m.rate),
       m.pendingComm > 0 ? '확정 대기' : (m.count > 0 ? '확정' : '거래 없음')]);
-  });
-
-  var STATUS_KO = { confirmed: '확정', pending: '미확정', canceled: '취소' };
-  var detail = [H(['발생 일시', '제휴몰', '회원', '카카오톡 ID', '식별번호', '주문번호', '거래액', '수수료율', '수수료', '상태'])];
-  (RF.lpRows || []).slice().sort(function(a, b) { return b.at - a.at; }).forEach(function(o) {
-    detail.push([ppDt(o.at) + ' ' + ppTm(o.at), o.mall, o.user.nickname,
-      o.user.linked_kakao ? o.user.kakao_login_id : '미연동', o.uid, o.orderNo,
-      W(o.amount), PC(o.fee), W(o.comm), STATUS_KO[o.status] || o.status]);
   });
 
   ppDownloadXlsx('제휴수수료매출_' + bdName + '_' + tag + '.xlsx', [
     { name: '요약', rows: summary, widths: [30, 22, 16, 16, 16, 16] },
-    { name: bdName + '(링크프라이스)', rows: bdRows, widths: [20, 12, 16, 11, 16, 16, 16, 11, 12] },
-    { name: '제휴몰별(링크프라이스)', rows: mallRows, widths: [22, 12, 16, 11, 16, 16, 16, 11, 12] },
-    { name: '거래 상세(링크프라이스)', rows: detail, widths: [20, 18, 16, 16, 22, 18, 14, 11, 14, 10] },
+    { name: bdName + '(링크프라이스)', rows: bdRows, widths: [20, 12, 16, 16, 16, 16, 11, 12] },
+    { name: '제휴몰별(링크프라이스)', rows: mallRows, widths: [22, 12, 16, 16, 16, 16, 11, 12] },
   ]);
 };
 
@@ -12442,7 +12377,7 @@ window.rfDownloadXlsx = function() {
 window.rfLoad = function() {
   if (RF.built) { rfReload(); return; }
   var tb = document.getElementById('rf-mall-tbody');
-  if (tb) tb.innerHTML = ppEmpty(8, '불러오는 중…');
+  if (tb) tb.innerHTML = ppEmpty(7, '불러오는 중…');
   rfLoadRoster().then(function(roster) {
     RF.roster = roster;
     RF.orders = rfBuildOrders(roster);
@@ -12464,42 +12399,6 @@ window.rfLoad = function() {
   });
 };
 
-/* ── 거래 상세 리스트 컨트롤러 ── */
-var REVFEE_CTRL = window.REVFEE_CTRL = ppMakeListController(20, function(pageItems, state, totalPages) {
-  var tbody = document.querySelector('#rev-fee table tbody');
-  var pag = document.getElementById('revfee-pagination');
-  if (!tbody) return;
-  if (!pageItems.length) { tbody.innerHTML = ppEmpty(8, '조건에 맞는 거래가 없습니다.'); if (pag) pag.innerHTML = ''; return; }
-  var badge = { confirmed: '<span class="badge badge-green">확정</span>',
-    pending: '<span class="badge badge-amber">미확정</span>',
-    canceled: '<span class="badge badge-gray">취소</span>' };
-  tbody.innerHTML = pageItems.map(function(d) {
-    var dim = d.status === 'canceled' ? ' style="opacity:.55"' : '';
-    return '<tr' + dim + '>'
-      + '<td style="white-space:nowrap"><div style="font-weight:700;color:#333">' + ppDt(d.at) + '</div><div style="color:var(--text-3)">' + ppTm(d.at) + '</div></td>'
-      + '<td style="font-weight:500">' + d.mall + '</td>'
-      + '<td style="text-align:left!important">' + renderMemberIdentityListOnly(d.user, d.uid) + '</td>'
-      + '<td style="font-family:monospace;font-size:11.5px;color:var(--text-2)">' + d.orderNo + '</td>'
-      + '<td>' + ppN(d.amount) + '원</td>'
-      + '<td>' + d.fee.toFixed(2) + '%</td>'
-      + '<td style="color:' + (d.status === 'canceled' ? 'var(--text-3)' : 'var(--success)') + ';font-weight:600">' + (d.status === 'canceled' ? '' : '+') + ppN(d.comm) + '원</td>'
-      + '<td>' + (badge[d.status] || '—') + '</td></tr>';
-  }).join('');
-  if (pag) pag.innerHTML = ppPaginationHtml('REVFEE_CTRL', state.page, totalPages);
-});
-window.revFeeApplyFilters = function() {
-  var q = (document.getElementById('revfee-search') || {}).value || '';
-  var mall = (document.getElementById('revfee-filter-mall') || {}).value || '';
-  var st = (document.getElementById('revfee-filter-status') || {}).value || '';
-  REVFEE_CTRL.applyFilter(function(d) {
-    if (q && !ppMatch(d.user.nickname, q) && !ppMatch(d.orderNo, q) && !ppMatch(d.uid, q)) return false;
-    if (mall && d.mall !== mall) return false;
-    if (st && d.status !== st) return false;
-    return true;
-  });
-  var sub = document.getElementById('rf-fee-sub');
-  if (sub) sub.textContent = '조건 ' + ppN(REVFEE_CTRL.state.filtered.length) + '건 / 기간 ' + ppN(REVFEE_CTRL.state.rows.length) + '건 · 데모 표본';
-};
 
 /* ── sec-revenue-gifticon: 기프티콘 판매 매출 내역 리스트 컨트롤러 ── */
 var REVGI_CTRL = window.REVGI_CTRL = ppMakeListController(20, function(pageItems, state, totalPages) {
