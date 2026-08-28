@@ -2161,7 +2161,7 @@ window.CMS_FEATURES = {
         <div style="padding:16px">
           <div class="form-group"><label class="form-label">하루 최대 참여 횟수</label>
             <div style="display:flex;align-items:center;gap:8px"><input class="form-input" type="number" min="1" step="1" id="gbr-daily-cap" value="10" style="max-width:120px"><span style="color:var(--text-2);font-size:13px">회 / 1일</span></div>
-            <div style="font-size:12px;color:var(--text-3);margin-top:4px">매크로로 무제한 돌리는 것을 막는 상한입니다.</div>
+            <div style="font-size:12px;color:var(--text-3);margin-top:4px">매크로로 무제한 여는 것을 막는 상한입니다.</div>
           </div>
           <div class="info-box" style="margin-bottom:16px">구매로 발급된 티켓은 등급 티켓·이벤트 티켓 모두 승인 대기 상태로 발급되고, 쿠팡은 카카오톡 연동 D+7 / 미연동 D+30, 링크프라이스 제휴몰은 몰별 전환 대기일 수(기본 30일) 경과 시 승인됩니다. 승인 전에는 랜덤 선물 상자 열기에 쓸 수 없으므로 "열고 환불" 악용은 티켓 단계에서 이미 차단됩니다. 별도 설정 항목을 두지 않습니다.</div>
           <div class="form-group"><label class="form-label">이벤트 티켓 일 획득 상한</label>
@@ -6204,6 +6204,11 @@ Object.assign(KO2VI,{"확인중":"Đang kiểm tra","클릭해서 확인중 → 
 /* 2026-08-27 — 티켓 가치 설정 「영향 범위 안내」가 룰렛 대신 선물 상자 2종을 가리키게 바뀌면서 추가 */
 Object.assign(KO2VI,{
 "매일 선물 상자 열기":"Mở hộp quà mỗi ngày",
+"실제 연 횟수 집계":"Tổng hợp số lượt mở thực tế",
+"상자 열기 기록이 없습니다.":"Chưa có lịch sử mở hộp.",
+"매크로로 무제한 여는 것을 막는 상한입니다.":"Trần chặn việc dùng macro mở không giới hạn.",
+"참여 제한 정책을 저장했습니다.":"Đã lưu chính sách giới hạn tham gia.",
+"확정 기본값으로 복원했습니다.":"Đã khôi phục về giá trị mặc định đã chốt.",
 "랜덤 선물 상자 열기":"Mở hộp quà ngẫu nhiên",
 "매일 선물 상자 열기 보상 구성":"Cấu hình phần thưởng Mở hộp quà mỗi ngày",
 "랜덤 선물 상자 열기 보상 구성":"Cấu hình phần thưởng Mở hộp quà ngẫu nhiên",
@@ -6295,7 +6300,7 @@ Object.assign(KO2VI,{
   "여기서 저장한 슬롯 구성·보상·확률과 아래 참여 제한 정책을 데모 앱 잭팟 룰렛 화면(홈 하단 잭팟 배너로 진입)이 그대로 읽어 적용합니다. 실행 로그·월 집계도 앱 실행 기록 실집계입니다.":"Màn Vòng quay Jackpot của app demo (vào từ banner Jackpot ở dưới trang chủ) đọc nguyên cơ cấu ô·thưởng·xác suất đã lưu ở đây cùng chính sách giới hạn tham gia bên dưới để áp dụng. Log lượt quay·tổng hợp theo tháng cũng là tổng hợp thật từ bản ghi lượt quay của app.",
   "지급완료 건 원화 환산":"Quy đổi ra KRW các lượt đã cấp thưởng",
   "지급완료 건 환산 · 구 기록 제외(결과 미기록)":"Quy đổi các lượt đã cấp thưởng · loại trừ bản ghi cũ (chưa ghi kết quả)",
-  "실행 기록 없음 · 데모 표시 데이터":"Không có bản ghi lượt quay · dữ liệu hiển thị demo",
+  "실행 기록 없음 · 데모 표시 데이터":"Không có bản ghi · dữ liệu hiển thị demo",
   "참여 제한 정책":"Chính sách giới hạn tham gia",
   "하루 최대 참여 횟수":"Số lượt tối đa mỗi ngày",
   "회 / 1일":"lượt / ngày",
@@ -14211,10 +14216,10 @@ var JKR_DEFAULT_LIMITS = { daily_spin_cap: 10, event_ticket_daily_cap: 5, event_
 /* 저장·검증 안내에 쓰는 낱말. 룰렛 2종은 기존 그대로, 선물 상자 2종만 갈아끼운다.
    (선물 상자는 카지노 계열 낱말을 쓰지 않기로 한 화면이다) */
 var RLT_WORDS = {
-  daily:      { cell: '슬롯',   screen: '룰렛을',      miss: '꽝',        top: 'JACKPOT' },
-  jackpot:    { cell: '슬롯',   screen: '룰렛을',      miss: '꽝',        top: 'JACKPOT' },
-  giftDaily:  { cell: '보상칸', screen: '선물 상자를', miss: '보상 없음', top: '가장 큰 선물' },
-  giftRandom: { cell: '보상칸', screen: '선물 상자를', miss: '보상 없음', top: '가장 큰 선물' }
+  daily:      { cell: '슬롯',   screen: '룰렛을',      miss: '꽝',        top: 'JACKPOT',      spins: '실제 돌린 횟수 집계', logEmpty: '룰렛 실행 로그가 없습니다.' },
+  jackpot:    { cell: '슬롯',   screen: '룰렛을',      miss: '꽝',        top: 'JACKPOT',      spins: '실제 돌린 횟수 집계', logEmpty: '룰렛 실행 로그가 없습니다.' },
+  giftDaily:  { cell: '보상칸', screen: '선물 상자를', miss: '보상 없음', top: '가장 큰 선물', spins: '실제 연 횟수 집계',   logEmpty: '상자 열기 기록이 없습니다.' },
+  giftRandom: { cell: '보상칸', screen: '선물 상자를', miss: '보상 없음', top: '가장 큰 선물', spins: '실제 연 횟수 집계',   logEmpty: '상자 열기 기록이 없습니다.' }
 };
 function rltW(k) { return RLT_WORDS[k] || RLT_WORDS.daily; }
 function rltCloneSlots(list) {
@@ -14354,7 +14359,7 @@ window.rltReset = function(k) {
   rltState[k].slots = rltCloneSlots(RLT_KINDS[k].defaults);
   rltState[k].dirty = true;
   rltRenderSlots(k);
-  toast('확정 기본값(6슬롯)으로 복원했습니다.');
+  toast('확정 기본값으로 복원했습니다.');
 };
 function rltSetStatus(k, html, isError) {
   var el = document.getElementById(RLT_KINDS[k].p + '-status');
@@ -14372,7 +14377,7 @@ window.rltLoad = function(k) {
     if (data && Array.isArray(data.slots) && data.slots.length >= 2) {
       rltState[k].slots = data.slots.map(rltNormalizeSlot);
       rltSetDirty(k, false);
-      rltSetStatus(k, '저장된 구성을 불러왔습니다 · 슬롯 ' + rltState[k].slots.length + '개.');
+      rltSetStatus(k, '저장된 구성을 불러왔습니다 · ' + rltW(k).cell + ' ' + rltState[k].slots.length + '개.');
     } else if (kind.legacyWheel && data && Array.isArray(data.wheel) && data.wheel.length >= 2) {
       /* 구 스키마(칸별 균등 확률)를 슬롯으로 승격 — 확률은 균등 배분해 두고 운영자가 조정한다 */
       var n = data.wheel.length;
@@ -14391,12 +14396,13 @@ window.rltLoad = function(k) {
          확정에 맞춰, 대응 룰렛에 저장돼 있는 구성을 그대로 물려받아 보여준다.
          여기서 저장하면 이 화면 전용 문서로 갈라져 따로 운영된다. */
       rltState[k].slots = rltCloneSlots(kind.defaults);
-      rltSetStatus(k, '대응하는 룰렛 구성을 불러오는 중…');
+      /* 화면에는 아무 말도 적지 않는다 — 어디서 물려받았는지는 운영자가 알 필요가 없다(2026-08-28 확정). */
+      rltSetStatus(k, '');
       db.collection('settings').doc(kind.fallbackDoc).get().then(function(fd) {
         var fdata = fd.exists ? fd.data() : null;
         if (fdata && Array.isArray(fdata.slots) && fdata.slots.length >= 2) {
           rltState[k].slots = fdata.slots.map(rltNormalizeSlot);
-          rltSetStatus(k, '대응하는 룰렛과 같은 구성으로 표시 중 · 저장하면 이 화면 전용 구성이 됩니다.');
+          rltSetStatus(k, '');
         } else {
           rltSetStatus(k, '확정 기본값(6보상칸) 표시 중 · 저장하면 이 구성이 앱에 적용됩니다.');
         }
@@ -14498,7 +14504,7 @@ window.jkrSaveLimits = function() {
   }, { merge: true }).then(function() {
     if (btn) { btn.disabled = false; btn.textContent = '저장'; }
     if (st) st.textContent = '저장 완료 — 하루 ' + cap + '회 · 이벤트 티켓 일 ' + dayTk + '장 / 월 ' + monthly + '장.';
-    toast('잭팟 룰렛 참여 제한 정책을 저장했습니다.');
+    toast('참여 제한 정책을 저장했습니다.');
   }).catch(function(e) {
     console.error('jkrSaveLimits', e);
     if (btn) { btn.disabled = false; btn.textContent = '저장'; }
@@ -14559,7 +14565,7 @@ function rltLoadStats(k) {
       return;
     }
     rltSetStatCard(k, n.toLocaleString('ko-KR') + '회', Math.round(won).toLocaleString('ko-KR') + '원',
-      '실제 돌린 횟수 집계', legacy
+      rltW(k).spins, legacy
         ? '지급완료 건 환산 · 구 기록 ' + legacy + '건 제외(결과 미기록)'
         : '지급완료 건 원화 환산');
   }).catch(function(e) {
@@ -14652,7 +14658,7 @@ function rltRenderLog(k) {
   if (rltState[k].logPage > total) rltState[k].logPage = total;
   var cur = rltState[k].logPage;
   var from = (cur - 1) * RLT_LOG_PAGE_SIZE;
-  if (!rows.length) { tbody.innerHTML = ppEmpty(5, '룰렛 실행 로그가 없습니다.'); }
+  if (!rows.length) { tbody.innerHTML = ppEmpty(5, rltW(k).logEmpty); }
   else {
     tbody.innerHTML = rows.slice(from, from + RLT_LOG_PAGE_SIZE).map(function(r) {
       var parts = String(r[0]).split(' ');
