@@ -1299,13 +1299,13 @@ window.CMS_FEATURES = {
       <!-- 데모 데이터 관리 -->
       <div class="sb-grp" id="grp-demo">
         <div class="sb-grp-hd" onclick="toggleGroup('grp-demo')">
-          <span class="sb-grp-lbl" style="color:#F59E0B;">개발 · 데모</span>
+          <span class="sb-grp-lbl" style="color:#F59E0B;">개발용</span>
           <span class="sb-chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></span>
         </div>
         <div class="sb-grp-items">
           <button class="sb-item" id="nav-demo-mgmt" data-label="데이터 관리" onclick="go('demo-mgmt',this)">
             <span class="sb-item-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg></span>
-            <span class="sb-item-lbl">데이터 관리(데모)</span>
+            <span class="sb-item-lbl">데이터 관리(개발용)</span>
           </button>
         </div>
       </div>
@@ -1359,13 +1359,13 @@ window.CMS_FEATURES = {
     <!-- ── 대시보드 ── -->
     <div class="section active" id="sec-dashboard">
       <div class="stats-grid">
-        <div class="stat-card green"><div class="stat-label">순수익 (추정)</div><div class="stat-value" id="kpi-net">—</div><div class="stat-change neutral">데모 데이터 실집계</div></div>
+        <div class="stat-card green"><div class="stat-label">순수익 (추정)</div><div class="stat-value" id="kpi-net">—</div><div class="stat-change neutral">실집계</div></div>
         <div class="stat-card purple"><div class="stat-label">제휴 수수료 매출</div><div class="stat-value" id="kpi-commission">—</div><div class="stat-change neutral">포스트백 확정 기준</div></div>
         <div class="stat-card info"><div class="stat-label">기프티콘 판매 수익</div><div class="stat-value" id="kpi-gifticon-rev">—</div><div class="stat-change neutral">교환 마진</div></div>
         <div class="stat-card amber"><div class="stat-label">티켓 적립 비용</div><div class="stat-value" id="kpi-ticket-cost">—</div><div class="stat-change neutral">차감 항목</div></div>
       </div>
       <div class="stats-grid">
-        <div class="stat-card purple"><div class="stat-label">전체 회원</div><div class="stat-value" id="kpi-users">—</div><div class="stat-change neutral">데모 실데이터</div></div>
+        <div class="stat-card purple"><div class="stat-label">전체 회원</div><div class="stat-value" id="kpi-users">—</div><div class="stat-change neutral">실데이터</div></div>
         <div class="stat-card green"><div class="stat-label">발행 티켓 (누적 적립)</div><div class="stat-value" id="kpi-tickets">—</div><div class="stat-change neutral">적립 확정 기준</div></div>
         <div class="stat-card amber"><div class="stat-label">미처리 문의</div><div class="stat-value" id="kpi-inquiries">—</div><div class="stat-change neutral">미처리 상태</div></div>
         <div class="stat-card red"><div class="stat-label">미처리 추첨</div><div class="stat-value" id="kpi-draws">—</div><div class="stat-change neutral">마감 후 미처리</div></div>
@@ -1936,7 +1936,7 @@ window.CMS_FEATURES = {
         </table>
         <div style="padding:12px 16px;font-size:12px;color:var(--text-3);border-top:1px solid var(--border)" id="rlt-status">불러오는 중…</div>
         <div style="padding:0 16px 14px;font-size:12px;color:var(--text-3)">가치 환산 기준 — 포인트 10P = 1원 · 이벤트 티켓 40원 · 브론즈 티켓 10원 · 실버 티켓 100원 · 골드 티켓 200원. 기대값 기여 = 가치 × 확률.</div>
-        <div style="padding:0 16px 16px;font-size:12px;color:var(--text-3)">여기서 저장한 슬롯 구성·보상·확률을 데모 앱 룰렛 화면이 그대로 읽어 렌더링하고 추첨·지급합니다. 등급 티켓(브론즈·실버·골드) 슬롯도 앱에서 정상 표시·지급됩니다. 앱을 새로고침하면 반영됩니다.</div>
+        <div style="padding:0 16px 16px;font-size:12px;color:var(--text-3)">여기서 저장한 슬롯 구성·보상·확률을 앱 룰렛 화면이 그대로 읽어 렌더링하고 추첨·지급합니다. 등급 티켓(브론즈·실버·골드) 슬롯도 앱에서 정상 표시·지급됩니다. 앱을 새로고침하면 반영됩니다.</div>
       </div>
 
       <div class="card" style="margin-top:16px">
@@ -1999,7 +1999,7 @@ window.CMS_FEATURES = {
         </table>
         <div style="padding:12px 16px;font-size:12px;color:var(--text-3);border-top:1px solid var(--border)" id="jkr-status">불러오는 중…</div>
         <div style="padding:0 16px 14px;font-size:12px;color:var(--text-3)">가치 환산 기준 — 포인트 10P = 1원 · 이벤트 티켓 40원 · 브론즈 티켓 10원 · 실버 티켓 100원 · 골드 티켓 200원. 기대값 기여 = 가치 × 확률.</div>
-        <div style="padding:0 16px 16px;font-size:12px;color:var(--text-3)">여기서 저장한 슬롯 구성·보상·확률과 아래 참여 제한 정책을 데모 앱 잭팟 룰렛 화면(홈 하단 잭팟 배너로 진입)이 그대로 읽어 적용합니다. 실행 로그·월 집계도 앱 실행 기록 실집계입니다.</div>
+        <div style="padding:0 16px 16px;font-size:12px;color:var(--text-3)">여기서 저장한 슬롯 구성·보상·확률과 아래 참여 제한 정책을 앱 잭팟 룰렛 화면(홈 하단 잭팟 배너로 진입)이 그대로 읽어 적용합니다. 실행 로그·월 집계도 앱 실행 기록 실집계입니다.</div>
       </div>
 
       <div class="card" style="margin-top:16px">
@@ -2086,7 +2086,7 @@ window.CMS_FEATURES = {
         </table>
         <div style="padding:12px 16px;font-size:12px;color:var(--text-3);border-top:1px solid var(--border)" id="gbd-status">불러오는 중…</div>
         <div style="padding:0 16px 14px;font-size:12px;color:var(--text-3)">가치 환산 기준 — 포인트 10P = 1원 · 이벤트 티켓 40원 · 브론즈 티켓 10원 · 실버 티켓 100원 · 골드 티켓 200원. 기대값 기여 = 가치 × 확률.</div>
-        <div style="padding:0 16px 16px;font-size:12px;color:var(--text-3)">여기서 저장한 보상칸 구성·보상·확률을 데모 앱 선물 상자 화면이 그대로 읽어 렌더링하고 추첨·지급합니다. 등급 티켓(브론즈·실버·골드) 보상칸도 앱에서 정상 표시·지급됩니다. 앱을 새로고침하면 반영됩니다.</div>
+        <div style="padding:0 16px 16px;font-size:12px;color:var(--text-3)">여기서 저장한 보상칸 구성·보상·확률을 앱 선물 상자 화면이 그대로 읽어 렌더링하고 추첨·지급합니다. 등급 티켓(브론즈·실버·골드) 보상칸도 앱에서 정상 표시·지급됩니다. 앱을 새로고침하면 반영됩니다.</div>
       </div>
 
       <div class="card" style="margin-top:16px">
@@ -2150,7 +2150,7 @@ window.CMS_FEATURES = {
         </table>
         <div style="padding:12px 16px;font-size:12px;color:var(--text-3);border-top:1px solid var(--border)" id="gbr-status">불러오는 중…</div>
         <div style="padding:0 16px 14px;font-size:12px;color:var(--text-3)">가치 환산 기준 — 포인트 10P = 1원 · 이벤트 티켓 40원 · 브론즈 티켓 10원 · 실버 티켓 100원 · 골드 티켓 200원. 기대값 기여 = 가치 × 확률.</div>
-        <div style="padding:0 16px 16px;font-size:12px;color:var(--text-3)">여기서 저장한 보상칸 구성·보상·확률과 아래 참여 제한 정책을 데모 앱 랜덤 선물 상자 열기 화면이 그대로 읽어 적용합니다. 실행 로그·월 집계도 앱 실행 기록 실집계입니다.</div>
+        <div style="padding:0 16px 16px;font-size:12px;color:var(--text-3)">여기서 저장한 보상칸 구성·보상·확률과 아래 참여 제한 정책을 앱 랜덤 선물 상자 열기 화면이 그대로 읽어 적용합니다. 실행 로그·월 집계도 앱 실행 기록 실집계입니다.</div>
       </div>
 
       <div class="card" style="margin-top:16px">
@@ -2268,7 +2268,7 @@ window.CMS_FEATURES = {
       </div>
     </div>
 <div class="section" id="sec-gifticon-bulk">
-      <div class="info-box">CSV 파일로 상품 설명을 일괄 등록·수정합니다. 상품코드가 일치하는 항목은 덮어쓰기됩니다. <strong>(.xlsx는 데모 범위 밖 — CSV만 지원)</strong></div>
+      <div class="info-box">CSV 파일로 상품 설명을 일괄 등록·수정합니다. 상품코드가 일치하는 항목은 덮어쓰기됩니다. <strong>(CSV만 지원)</strong></div>
       <div class="card">
         <div class="card-header"><div class="card-title">상품설명 일괄등록</div></div>
         <div style="padding:24px">
@@ -2672,7 +2672,7 @@ window.CMS_FEATURES = {
               <button class="btn btn-primary" id="noti-send-btn" onclick="notiSend()">발송</button>
             </div>
           </div>
-          <div class="info-box" style="margin-top:14px">1단계 발송 채널은 <strong>앱 푸시 단일</strong>입니다 — 카카오 알림톡은 서드파티 비용이 발생해 도입하지 않습니다. 마케팅성 알림은 수신 동의 회원에게만 발송됩니다. 서비스 필수 알림(티켓 지급·기프티콘 발송·경품 당첨)은 동의 여부와 무관하게 발송됩니다. <strong>데모 범위 밖</strong> — 실제 FCM 발송 연동은 없고, 발송 내역만 DB에 기록됩니다(대상 인원은 실집계).</div>
+          <div class="info-box" style="margin-top:14px">1단계 발송 채널은 <strong>앱 푸시 단일</strong>입니다 — 카카오 알림톡은 서드파티 비용이 발생해 도입하지 않습니다. 마케팅성 알림은 수신 동의 회원에게만 발송됩니다. 서비스 필수 알림(티켓 지급·기프티콘 발송·경품 당첨)은 동의 여부와 무관하게 발송됩니다. 실제 FCM 발송 연동은 없고, 발송 내역만 DB에 기록됩니다(대상 인원은 실집계).</div>
         </div>
       </div>
       <div class="card">
@@ -3314,7 +3314,7 @@ window.CMS_FEATURES = {
         <span class="ds-tag calc">우리 DB 집계 · 추정 매출 (포스트백 기준)</span>
       </div>
       <div class="stats-grid" style="grid-template-columns:repeat(3,1fr)">
-        <div class="stat-card green"><div class="stat-label">확정 정산 (집계)</div><div class="stat-value" id="settle-confirmed">—</div><div class="stat-change neutral">데모 집계</div></div>
+        <div class="stat-card green"><div class="stat-label">확정 정산 (집계)</div><div class="stat-value" id="settle-confirmed">—</div><div class="stat-change neutral">집계</div></div>
         <div class="stat-card purple"><div class="stat-label">추정 매출</div><div class="stat-value" id="settle-estimate">—</div><div class="stat-change neutral">포스트백 기준</div></div>
         <div class="stat-card amber"><div class="stat-label">누적 수익</div><div class="stat-value">—</div><div class="stat-change neutral">운영 데이터 없음</div></div>
       </div>
@@ -3409,13 +3409,13 @@ window.CMS_FEATURES = {
           <div class="card-header"><div class="card-title">쿠팡 파트너스 API 키</div><button class="btn btn-ghost btn-sm" id="apikeys-edit-btn" onclick="apOpenEdit('coupang')">키/상태 수정</button></div>
           <div>
             <div class="policy-item"><div class="policy-label">Access Key</div><div class="policy-value" style="font-family:monospace;font-size:13px;color:var(--main)" id="ap-coupang-key">—</div><div class="policy-desc" id="ap-coupang-updated">운영 데이터 없음</div></div>
-            <div class="policy-item"><div class="policy-label">API 상태</div><div class="policy-value" id="ap-coupang-status">—</div><div class="policy-desc">운영자 수동 갱신 (데모 범위 밖: 실제 API 호출 없음)</div></div>
+            <div class="policy-item"><div class="policy-label">API 상태</div><div class="policy-value" id="ap-coupang-status">—</div><div class="policy-desc">운영자 수동 갱신 (실제 API 호출 없음)</div></div>
             <div class="policy-item"><div class="policy-label">일일 호출 한도</div><div class="policy-value" id="ap-coupang-limit">—</div><div class="policy-desc">오늘 사용: 운영 데이터 없음</div></div>
           </div>
         </div>
         <div class="card">
           <div class="card-header"><div class="card-title">API 호출 현황</div></div>
-          <div style="padding:32px 18px;text-align:center;color:var(--text-3);font-size:13px">데모 범위 밖 — 실제 API 호출 로그 연동 없음</div>
+          <div style="padding:32px 18px;text-align:center;color:var(--text-3);font-size:13px">실제 API 호출 로그 연동 없음</div>
         </div>
         <div class="card">
           <div class="card-header"><div class="card-title">제휴몰 연동 현황</div><span style="font-size:12px;color:var(--text-3)" id="ap-count">—</span></div>
@@ -3430,7 +3430,7 @@ window.CMS_FEATURES = {
     <!-- ── 스케줄러 ── -->
     <div class="section" id="sec-scheduler">
       <div class="info-box"><strong>스케줄러</strong>는 백그라운드 자동 작업입니다. 비정상 상태 감지 시 즉시 재시작하세요.</div>
-      <div class="info-box"><strong>데모 범위 밖</strong> — 실제 정기 실행 엔진은 없습니다. 일시정지/재시작/즉시 실행은 상태·로그를 예약 작업 기록에 실제로 남기는 것까지만 동작합니다.</div>
+      <div class="info-box">실제 정기 실행 엔진은 없습니다. 일시정지/재시작/즉시 실행은 상태·로그를 예약 작업 기록에 실제로 남기는 것까지만 동작합니다.</div>
       <div class="card">
         <div class="card-header"><div><div class="card-title">스케줄러 목록</div><div class="card-sub">시스템 정의 배치 — 생성·삭제 없음 · 활성/비활성 토글·즉시 실행만 제공</div></div></div>
         <div id="sched-list"></div>
@@ -3605,8 +3605,8 @@ window.CMS_FEATURES = {
       <div class="card" style="margin-bottom:16px;">
         <div class="card-header" style="display:flex;align-items:center;gap:8px;">
           <svg viewBox="0 0 24 24" fill="none" stroke="#F59E0B" stroke-width="1.8" stroke-linecap="round" width="18" height="18"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
-          <span>데이터 관리 (데모 전용)</span>
-          <span style="margin-left:auto;background:#FEF3C7;color:#92400E;font-size:11px;font-weight:700;padding:2px 8px;border-radius:99px;">DEMO ONLY</span>
+          <span>데이터 관리 (개발용)</span>
+          <span style="margin-left:auto;background:#FEF3C7;color:#92400E;font-size:11px;font-weight:700;padding:2px 8px;border-radius:99px;">개발용</span>
         </div>
 
         <!-- 상태 현황 -->
@@ -4472,7 +4472,7 @@ const I18N = {
     'login.subtitle': '관리자 전용',
     'login.title': '로그인',
     'login.sub': '권한에 따라 접근 메뉴가 달라집니다.',
-    'login.role.label': '역할 선택 (데모)',
+    'login.role.label': '역할 선택',
     'login.role.superadmin': '슈퍼어드민',
     'login.role.superadmin.sub': '전체 + 계정관리',
     'login.role.operator': '운영자',
@@ -4542,7 +4542,7 @@ const I18N = {
     'page.apikeys.title': '제휴몰 API 관리', 'page.apikeys.bc': '시스템',
     'page.scheduler.title': '스케줄러', 'page.scheduler.bc': '시스템',
     'page.accounts.title': '관리자 계정', 'page.accounts.bc': '계정 관리',
-    'page.demo-mgmt.title': '데이터 관리(데모)', 'page.demo-mgmt.bc': '개발 · 데모',
+    'page.demo-mgmt.title': '데이터 관리(개발용)', 'page.demo-mgmt.bc': '개발용',
     'nav.op-policy': '운영 정책', 'page.op-policy.title': '운영 정책', 'page.op-policy.bc': '운영',
     'page.clawback.title': '환수 이력', 'page.clawback.bc': '티켓 · 보상',
     'nav.ticket-value': '티켓 가치 설정', 'page.ticket-value.title': '티켓 가치 설정', 'page.ticket-value.bc': '티켓 · 보상',
@@ -5100,7 +5100,7 @@ function giSaveTicketEdit() {
     "시스템":"Hệ thống","계정 관리":"Quản lý tài khoản",
     /* Login */
     "로그인":"Đăng nhập","로그아웃":"Đăng xuất","이메일":"Email","비밀번호":"Mật khẩu",
-    "역할 선택 (데모)":"Chọn vai trò (Demo)","전체 + 계정관리":"Tất cả + Quản lý TK",
+    "역할 선택":"Chọn vai trò","전체 + 계정관리":"Tất cả + Quản lý TK",
     "전체 관리":"Quản lý toàn bộ","조회 전용":"Chỉ xem","관리자 전용":"Chỉ quản trị",
     "접속 권한":"Quyền truy cập","권한에 따라 접근 메뉴가 달라집니다.":"Menu truy cập thay đổi theo vai trò.",
     /* Role labels */
@@ -6195,7 +6195,7 @@ Object.assign(KO2VI, {"카카오 연동 회원과 미연동(게스트) 회원이
 Object.assign(KO2VI,{"전체 거래유형":"Tất cả loại giao dịch","구매 대기(등급 미정)":"Chờ mua (chưa định hạng)","출석 보너스":"Thưởng điểm danh","룰렛 당첨":"Trúng vòng quay","카카오 연동 보상":"Thưởng liên kết Kakao","기프티콘 사용":"Sử dụng Gifticon","경품 응모":"Dự thưởng quà","포인트 전환":"Chuyển đổi điểm","등급 전환":"Chuyển hạng","관리자 회수":"Admin thu hồi","환불(취소·반품)":"Hoàn tiền (hủy·trả hàng)","꽝":"Trượt","이벤트티켓":"Vé sự kiện","출석(쿠팡 구경하기)":"Điểm danh (Dạo Coupang)","매일 행운 룰렛 당첨":"Trúng vòng quay may mắn hằng ngày","티켓→포인트 전환":"Chuyển vé→điểm","포인트→티켓 전환":"Chuyển điểm→vé","전체 기간":"Toàn bộ thời gian","사용완료":"Đã sử dụng","취소됨":"Đã hủy","기프티콘 문의":"Hỏi đáp Gifticon","정상(확정)":"Bình thường (đã xác nhận)","대기":"Chờ","환불":"Hoàn tiền"});
 /* ── i18n 보강 (2026-07-21) — VI 전환 시 한국어로 남던 문구 ── */
 Object.assign(KO2VI,{"이벤트 티켓 일 획득 상한":"Giới hạn nhận vé sự kiện mỗi ngày","장 / 1일":"vé / 1 ngày","회원 1명이 하루에 받을 수 있는 이벤트 티켓 총량입니다. 적립 정책의 하루 5건 한도와 같은 기준입니다.":"Tổng số vé sự kiện 1 hội viên có thể nhận trong một ngày. Cùng chuẩn với hạn mức 5 lượt/ngày của chính sách tích lũy.","일 획득 상한이 월 획득 상한보다 큽니다.":"Giới hạn ngày lớn hơn giới hạn tháng."});
-Object.assign(KO2VI,{"매일 행운 룰렛 설정":"Cài đặt vòng quay may mắn hằng ngày","어뷰징 모니터링":"Giám sát lạm dụng","개발 · 데모":"Phát triển · Demo","데이터 관리(데모)":"Quản lý dữ liệu (Demo)","순수익 (추정)":"Lợi nhuận ròng (ước tính)","데모 데이터 실집계":"Tổng hợp dữ liệu Demo thực tế","포스트백 확정 기준":"Theo chuẩn postback đã xác nhận","교환 마진":"Biên đổi thưởng","데모 실데이터":"Dữ liệu thật của Demo","발행 티켓 (누적 적립)":"Vé đã phát hành (tích lũy)","적립 확정 기준":"Theo chuẩn tích lũy đã xác nhận","미처리 상태":"Trạng thái chưa xử lý","마감 후 미처리":"Đã đóng nhưng chưa xử lý","운영 데이터 없음":"Không có dữ liệu vận hành","운영 누적 데이터 없음 (시계열 집계는 실서비스 운영 후 표시)":"Không có dữ liệu vận hành tích lũy (tổng hợp theo chuỗi thời gian sẽ hiển thị sau khi vận hành dịch vụ thật)","실행 이력 없음 (배치 스케줄러 미가동)":"Không có lịch sử chạy (batch scheduler chưa hoạt động)","닉네임 / 카카오톡 ID / 식별 아이디":"Biệt danh / Kakao ID / ID định danh","총 매출":"Tổng doanh thu","포스트백 + 교환 마진":"Postback + biên đổi thưởng","확정 정산 (집계)":"Quyết toán đã xác nhận (tổng hợp)","데모 집계":"Tổng hợp Demo","포스트백 기준":"Theo chuẩn postback","누적 수익":"Doanh thu tích lũy","차액 사유":"Lý do chênh lệch","—  차이 발생 원인: 환불 누락 · 포스트백 미수신 · 제휴몰별 수수료율 변경 · 부정거래 검증 지연. (실제 차액 데이터는 제휴몰 정산 확정 후 표시)":"—  Nguyên nhân phát sinh chênh lệch: bỏ sót hoàn tiền · không nhận được postback · thay đổi tỷ lệ hoa hồng theo từng cửa hàng LK · chậm xác minh giao dịch gian lận. (Dữ liệu chênh lệch thật sẽ hiển thị sau khi chốt quyết toán với cửa hàng LK)","총":"Tổng","누적 발행 (적립)":"Tổng phát hành (tích lũy)","티켓 소모":"Tiêu dùng vé","전체 원장 레코드":"Toàn bộ bản ghi sổ cái","유효기간 경과":"Quá thời hạn sử dụng","취소·반품":"Hủy·Trả hàng","오늘 기준":"Tính đến hôm nay","매일 행운 룰렛 = 포인트·이벤트티켓을 확률로 지급":"Vòng quay may mắn = cấp điểm·vé sự kiện theo xác suất","— 확률·배분은 정책상 미결이라 운영자가 직접 정합니다. 룰렛은 6칸이며 각 칸을 균등 확률(1/6)로 추첨합니다. 여기서 저장한 설정을 앱이 그대로 읽어 룰렛을 렌더링하고 당첨 보상을 지급합니다.":"— Xác suất·phân bổ chưa chốt trong chính sách nên Vận hành viên tự quyết định. Vòng quay có 6 ô và mỗi ô được quay với xác suất đều nhau (1/6). App đọc nguyên cài đặt lưu ở đây để render vòng quay và cấp thưởng trúng.","룰렛 6칸 설정":"Cài đặt 6 ô vòng quay","칸":"Ô","값":"Giá trị","1칸":"Ô 1","2칸":"Ô 2","3칸":"Ô 3","4칸":"Ô 4","5칸":"Ô 5","6칸":"Ô 6","저장된 설정을 불러왔습니다.":"Đã tải cài đặt đã lưu.","장수":"Số vé","P 액수":"Số điểm P","누적 사용·차감":"Tích lũy sử dụng·trừ","닉네임 또는 취소사유 검색":"Tìm biệt danh hoặc lý do hủy","CSV 파일로 상품 설명을 일괄 등록·수정합니다. 상품코드가 일치하는 항목은 덮어쓰기됩니다.":"Đăng ký·sửa hàng loạt mô tả sản phẩm bằng file CSV. Mục có mã sản phẩm trùng khớp sẽ bị ghi đè.","(.xlsx는 데모 범위 밖 — CSV만 지원)":"(.xlsx nằm ngoài phạm vi demo — chỉ hỗ trợ CSV)","CSV 파일을 선택하세요":"Hãy chọn file CSV","지원 형식: .csv (헤더: 상품코드,브랜드,상품명,이모지,카테고리,등급,필요장수,유효일수)":"Định dạng hỗ trợ: .csv (header: mã sản phẩm, thương hiệu, tên sản phẩm, emoji, danh mục, hạng, số vé cần, số ngày hiệu lực)","홈 상단 슬라이드 · 카드 순서 드래그로 노출 순서 변경":"Slide đầu trang chủ · kéo thứ tự thẻ để đổi thứ tự hiển thị","전체 공지":"Thông báo toàn bộ","등록 누적":"Tổng đã đăng ký","데모 범위 밖(열람 추적 미구현)":"Ngoài phạm vi demo (chưa triển khai theo dõi lượt xem)","데모 범위 밖":"Ngoài phạm vi demo","— 실제 FCM/카카오 알림톡 발송 연동은 없고, 발송 내역만 DB에 기록됩니다(대상 인원은 실집계).":"— Không có kết nối gửi FCM/Kakao AlimTalk thật, chỉ ghi lịch sử gửi vào DB (số người nhận là số liệu tổng hợp thật).","답변 완료 기준":"Theo chuẩn đã trả lời xong","닉네임, 제목 검색...":"Tìm biệt danh, tiêu đề...","— 회원이 앱 \"마이 → 계정탈퇴\" 누르면":"— Khi hội viên bấm \"Của tôi → Hủy tài khoản\" trong app thì","그 자리에서 즉시 처리":"xử lý ngay tại chỗ","됩니다(유예·철회 기간 없음). 개인정보는 즉시 삭제되고 회원 문서(레코드)는 유지됩니다. 처리 누락 시 개인정보보호법 위반 소지.":"(không có thời gian ân hạn·rút lại). Thông tin cá nhân được xóa ngay và bản ghi hội viên vẫn được giữ. Bỏ sót xử lý có thể vi phạm Luật bảo vệ thông tin cá nhân.","0명":"0 người","누적 탈퇴 회원":"Tổng hội viên đã hủy","탈퇴 확인":"Xác nhận hủy","앱 마이탭 → 최종 확인":"Tab Của tôi trong app → xác nhận cuối","상태 전환 · 개인정보 삭제 · 기기 로컬데이터 삭제":"Chuyển trạng thái · xóa thông tin cá nhân · xóa dữ liệu cục bộ trên thiết bị","거래 기록 존치":"Giữ lại bản ghi giao dịch","티켓·결제 기록은 레코드 유지 · 5년 보관":"Bản ghi vé·thanh toán được giữ lại · lưu 5 năm","탈퇴 회원 목록":"Danh sách hội viên đã hủy","가입 유형(탈퇴 전)":"Loại đăng ký (trước khi hủy)","탈퇴일시":"Thời điểm hủy","처리 방식":"Cách xử lý","즉시 처리 (유예·철회 없음)":"Xử lý ngay (không ân hạn·không rút lại)","확인 즉시 회원 상태가 '탈퇴'로 전환, 재로그인·복구 불가":"Xác nhận xong là chuyển ngay trạng thái hội viên sang 'đã hủy', không thể đăng nhập lại·khôi phục","개인정보 삭제 항목":"Mục xóa thông tin cá nhân","닉네임, 카카오 닉네임, 카카오 로그인ID":"Biệt danh, biệt danh Kakao, ID đăng nhập Kakao","탈퇴 즉시 제거 (레코드는 유지)":"Xóa ngay khi hủy (bản ghi vẫn giữ)","거래·정산 기록":"Bản ghi giao dịch·quyết toán","DB에 그대로 존치":"Giữ nguyên trong DB","개인정보 없이 회원 식별번호로만 연결 · 전자상거래법 5년 보존":"Chỉ liên kết bằng mã định danh hội viên, không có thông tin cá nhân · lưu 5 năm theo luật TMĐT","식별 아이디 검색...":"Tìm ID định danh...","어뷰징·이상적립 모니터링":"Giám sát lạm dụng·tích lũy bất thường","— 적립형 서비스 부정 사용(다계정·부정적립·환불 어뷰징)을 탐지합니다. 환불 포스트백·정지 계정·티켓 환수 기록을 실시간 집계합니다.":"— Phát hiện việc lạm dụng dịch vụ tích lũy (đa tài khoản·tích lũy gian lận·lạm dụng hoàn tiền). Tổng hợp thời gian thực các bản ghi postback hoàn tiền·tài khoản bị đình chỉ·thu hồi vé.","이상 징후 계정":"Tài khoản có dấu hiệu bất thường","중복 제거":"Đã khử trùng lặp","환불 어뷰징":"Lạm dụng hoàn tiền","환불 포스트백":"Postback hoàn tiền","정지 계정":"Tài khoản bị đình chỉ","운영자 차단":"Admin chặn","티켓 환수":"Thu hồi vé","탐지 케이스":"Trường hợp phát hiện","환불 어뷰징 · 정지 계정 · 티켓 환수 — 최신순":"Lạm dụng hoàn tiền · tài khoản bị đình chỉ · thu hồi vé — mới nhất trước","근거":"Căn cứ","닉네임, 주문번호 검색...":"Tìm biệt danh, mã đơn hàng...","배포 이력 없음":"Không có lịch sử phát hành","키/상태 수정":"Sửa khóa/trạng thái","운영자 수동 갱신 (데모 범위 밖: 실제 API 호출 없음)":"Vận hành viên cập nhật thủ công (ngoài phạm vi demo: không gọi API thật)","오늘 사용: 운영 데이터 없음":"Dùng hôm nay: không có dữ liệu vận hành","데모 범위 밖 — 실제 API 호출 로그 연동 없음":"Ngoài phạm vi demo — không kết nối log gọi API thật","— 실제 정기 실행 엔진은 없습니다. 일시정지/재시작/즉시 실행은 상태·로그를 예약 작업 기록에 실제로 남기는 것까지만 동작합니다.":"— Không có engine chạy định kỳ thật. Tạm dừng/khởi động lại/chạy ngay chỉ hoạt động đến mức ghi thật trạng thái·nhật ký vào bản ghi tác vụ hẹn giờ.","시스템 정의 배치 — 생성·삭제 없음 · 활성/비활성 토글·즉시 실행만 제공":"Batch do hệ thống định nghĩa — không tạo·xóa · chỉ cung cấp toggle bật/tắt·chạy ngay","실행 로그 없음 (배치 스케줄러 미가동)":"Không có log chạy (batch scheduler chưa hoạt động)","VIN 화면 구성예정":"VIN sẽ dựng màn hình","데이터 관리 (데모 전용)":"Quản lý dữ liệu (chỉ dành cho Demo)","문의":"Hỏi đáp","교환이력":"Lịch sử đổi","포인트원장":"Sổ cái điểm","클릭":"Click","티켓원장":"Sổ cái vé","초대":"Mời","방문":"Truy cập","시나리오 채우기":"Đổ dữ liệu kịch bản","새로고침":"Làm mới","전체 비우기":"Xóa toàn bộ","[시나리오 채우기]는":"[Đổ dữ liệu kịch bản] sẽ","(scripts/seed-demo.js로 등록)에 등록된 가상 손님대로 데이터를 생성합니다. [전체 비우기]는 가상 데이터만 삭제하고\n          운영 뼈대(관리자 계정 firstadmin · 마스터 데이터 · 기프티콘 상품 · 배너 · 공지 · 시나리오 정의)는 보존합니다.":"(đăng ký qua scripts/seed-demo.js) tạo dữ liệu đúng theo các khách ảo đã đăng ký. [Xóa toàn bộ] chỉ xóa dữ liệu ảo và\n          giữ lại bộ khung vận hành (tài khoản quản trị firstadmin · dữ liệu master · sản phẩm Gifticon · banner · thông báo · định nghĩa kịch bản).","문서 추가 — users":"Thêm document — users","카카오연동":"Liên kết Kakao","카카오 닉네임":"Biệt danh Kakao","카카오 로그인 ID":"ID đăng nhập Kakao","+ 추가":"+ Thêm","오류: Missing or insufficient permissions.":"Lỗi: Missing or insufficient permissions."});
+Object.assign(KO2VI,{"매일 행운 룰렛 설정":"Cài đặt vòng quay may mắn hằng ngày","어뷰징 모니터링":"Giám sát lạm dụng","개발용":"Dùng cho phát triển","데이터 관리(개발용)":"Quản lý dữ liệu (dùng cho phát triển)","순수익 (추정)":"Lợi nhuận ròng (ước tính)","실집계":"Tổng hợp thực tế","포스트백 확정 기준":"Theo chuẩn postback đã xác nhận","교환 마진":"Biên đổi thưởng","실데이터":"Dữ liệu thật","발행 티켓 (누적 적립)":"Vé đã phát hành (tích lũy)","적립 확정 기준":"Theo chuẩn tích lũy đã xác nhận","미처리 상태":"Trạng thái chưa xử lý","마감 후 미처리":"Đã đóng nhưng chưa xử lý","운영 데이터 없음":"Không có dữ liệu vận hành","운영 누적 데이터 없음 (시계열 집계는 실서비스 운영 후 표시)":"Không có dữ liệu vận hành tích lũy (tổng hợp theo chuỗi thời gian sẽ hiển thị sau khi vận hành dịch vụ thật)","실행 이력 없음 (배치 스케줄러 미가동)":"Không có lịch sử chạy (batch scheduler chưa hoạt động)","닉네임 / 카카오톡 ID / 식별 아이디":"Biệt danh / Kakao ID / ID định danh","총 매출":"Tổng doanh thu","포스트백 + 교환 마진":"Postback + biên đổi thưởng","확정 정산 (집계)":"Quyết toán đã xác nhận (tổng hợp)","집계":"Tổng hợp","포스트백 기준":"Theo chuẩn postback","누적 수익":"Doanh thu tích lũy","차액 사유":"Lý do chênh lệch","—  차이 발생 원인: 환불 누락 · 포스트백 미수신 · 제휴몰별 수수료율 변경 · 부정거래 검증 지연. (실제 차액 데이터는 제휴몰 정산 확정 후 표시)":"—  Nguyên nhân phát sinh chênh lệch: bỏ sót hoàn tiền · không nhận được postback · thay đổi tỷ lệ hoa hồng theo từng cửa hàng LK · chậm xác minh giao dịch gian lận. (Dữ liệu chênh lệch thật sẽ hiển thị sau khi chốt quyết toán với cửa hàng LK)","총":"Tổng","누적 발행 (적립)":"Tổng phát hành (tích lũy)","티켓 소모":"Tiêu dùng vé","전체 원장 레코드":"Toàn bộ bản ghi sổ cái","유효기간 경과":"Quá thời hạn sử dụng","취소·반품":"Hủy·Trả hàng","오늘 기준":"Tính đến hôm nay","매일 행운 룰렛 = 포인트·이벤트티켓을 확률로 지급":"Vòng quay may mắn = cấp điểm·vé sự kiện theo xác suất","— 확률·배분은 정책상 미결이라 운영자가 직접 정합니다. 룰렛은 6칸이며 각 칸을 균등 확률(1/6)로 추첨합니다. 여기서 저장한 설정을 앱이 그대로 읽어 룰렛을 렌더링하고 당첨 보상을 지급합니다.":"— Xác suất·phân bổ chưa chốt trong chính sách nên Vận hành viên tự quyết định. Vòng quay có 6 ô và mỗi ô được quay với xác suất đều nhau (1/6). App đọc nguyên cài đặt lưu ở đây để render vòng quay và cấp thưởng trúng.","룰렛 6칸 설정":"Cài đặt 6 ô vòng quay","칸":"Ô","값":"Giá trị","1칸":"Ô 1","2칸":"Ô 2","3칸":"Ô 3","4칸":"Ô 4","5칸":"Ô 5","6칸":"Ô 6","저장된 설정을 불러왔습니다.":"Đã tải cài đặt đã lưu.","장수":"Số vé","P 액수":"Số điểm P","누적 사용·차감":"Tích lũy sử dụng·trừ","닉네임 또는 취소사유 검색":"Tìm biệt danh hoặc lý do hủy","CSV 파일로 상품 설명을 일괄 등록·수정합니다. 상품코드가 일치하는 항목은 덮어쓰기됩니다.":"Đăng ký·sửa hàng loạt mô tả sản phẩm bằng file CSV. Mục có mã sản phẩm trùng khớp sẽ bị ghi đè.","(CSV만 지원)":"(chỉ hỗ trợ CSV)","CSV 파일을 선택하세요":"Hãy chọn file CSV","지원 형식: .csv (헤더: 상품코드,브랜드,상품명,이모지,카테고리,등급,필요장수,유효일수)":"Định dạng hỗ trợ: .csv (header: mã sản phẩm, thương hiệu, tên sản phẩm, emoji, danh mục, hạng, số vé cần, số ngày hiệu lực)","홈 상단 슬라이드 · 카드 순서 드래그로 노출 순서 변경":"Slide đầu trang chủ · kéo thứ tự thẻ để đổi thứ tự hiển thị","전체 공지":"Thông báo toàn bộ","등록 누적":"Tổng đã đăng ký","열람 추적 미구현":"Chưa triển khai theo dõi lượt xem","데모 범위 밖":"Ngoài phạm vi demo","— 실제 FCM/카카오 알림톡 발송 연동은 없고, 발송 내역만 DB에 기록됩니다(대상 인원은 실집계).":"— Không có kết nối gửi FCM/Kakao AlimTalk thật, chỉ ghi lịch sử gửi vào DB (số người nhận là số liệu tổng hợp thật).","답변 완료 기준":"Theo chuẩn đã trả lời xong","닉네임, 제목 검색...":"Tìm biệt danh, tiêu đề...","— 회원이 앱 \"마이 → 계정탈퇴\" 누르면":"— Khi hội viên bấm \"Của tôi → Hủy tài khoản\" trong app thì","그 자리에서 즉시 처리":"xử lý ngay tại chỗ","됩니다(유예·철회 기간 없음). 개인정보는 즉시 삭제되고 회원 문서(레코드)는 유지됩니다. 처리 누락 시 개인정보보호법 위반 소지.":"(không có thời gian ân hạn·rút lại). Thông tin cá nhân được xóa ngay và bản ghi hội viên vẫn được giữ. Bỏ sót xử lý có thể vi phạm Luật bảo vệ thông tin cá nhân.","0명":"0 người","누적 탈퇴 회원":"Tổng hội viên đã hủy","탈퇴 확인":"Xác nhận hủy","앱 마이탭 → 최종 확인":"Tab Của tôi trong app → xác nhận cuối","상태 전환 · 개인정보 삭제 · 기기 로컬데이터 삭제":"Chuyển trạng thái · xóa thông tin cá nhân · xóa dữ liệu cục bộ trên thiết bị","거래 기록 존치":"Giữ lại bản ghi giao dịch","티켓·결제 기록은 레코드 유지 · 5년 보관":"Bản ghi vé·thanh toán được giữ lại · lưu 5 năm","탈퇴 회원 목록":"Danh sách hội viên đã hủy","가입 유형(탈퇴 전)":"Loại đăng ký (trước khi hủy)","탈퇴일시":"Thời điểm hủy","처리 방식":"Cách xử lý","즉시 처리 (유예·철회 없음)":"Xử lý ngay (không ân hạn·không rút lại)","확인 즉시 회원 상태가 '탈퇴'로 전환, 재로그인·복구 불가":"Xác nhận xong là chuyển ngay trạng thái hội viên sang 'đã hủy', không thể đăng nhập lại·khôi phục","개인정보 삭제 항목":"Mục xóa thông tin cá nhân","닉네임, 카카오 닉네임, 카카오 로그인ID":"Biệt danh, biệt danh Kakao, ID đăng nhập Kakao","탈퇴 즉시 제거 (레코드는 유지)":"Xóa ngay khi hủy (bản ghi vẫn giữ)","거래·정산 기록":"Bản ghi giao dịch·quyết toán","DB에 그대로 존치":"Giữ nguyên trong DB","개인정보 없이 회원 식별번호로만 연결 · 전자상거래법 5년 보존":"Chỉ liên kết bằng mã định danh hội viên, không có thông tin cá nhân · lưu 5 năm theo luật TMĐT","식별 아이디 검색...":"Tìm ID định danh...","어뷰징·이상적립 모니터링":"Giám sát lạm dụng·tích lũy bất thường","— 적립형 서비스 부정 사용(다계정·부정적립·환불 어뷰징)을 탐지합니다. 환불 포스트백·정지 계정·티켓 환수 기록을 실시간 집계합니다.":"— Phát hiện việc lạm dụng dịch vụ tích lũy (đa tài khoản·tích lũy gian lận·lạm dụng hoàn tiền). Tổng hợp thời gian thực các bản ghi postback hoàn tiền·tài khoản bị đình chỉ·thu hồi vé.","이상 징후 계정":"Tài khoản có dấu hiệu bất thường","중복 제거":"Đã khử trùng lặp","환불 어뷰징":"Lạm dụng hoàn tiền","환불 포스트백":"Postback hoàn tiền","정지 계정":"Tài khoản bị đình chỉ","운영자 차단":"Admin chặn","티켓 환수":"Thu hồi vé","탐지 케이스":"Trường hợp phát hiện","환불 어뷰징 · 정지 계정 · 티켓 환수 — 최신순":"Lạm dụng hoàn tiền · tài khoản bị đình chỉ · thu hồi vé — mới nhất trước","근거":"Căn cứ","닉네임, 주문번호 검색...":"Tìm biệt danh, mã đơn hàng...","배포 이력 없음":"Không có lịch sử phát hành","키/상태 수정":"Sửa khóa/trạng thái","운영자 수동 갱신 (실제 API 호출 없음)":"Vận hành viên cập nhật thủ công (không gọi API thật)","오늘 사용: 운영 데이터 없음":"Dùng hôm nay: không có dữ liệu vận hành","실제 API 호출 로그 연동 없음":"Không kết nối log gọi API thật","— 실제 정기 실행 엔진은 없습니다. 일시정지/재시작/즉시 실행은 상태·로그를 예약 작업 기록에 실제로 남기는 것까지만 동작합니다.":"— Không có engine chạy định kỳ thật. Tạm dừng/khởi động lại/chạy ngay chỉ hoạt động đến mức ghi thật trạng thái·nhật ký vào bản ghi tác vụ hẹn giờ.","시스템 정의 배치 — 생성·삭제 없음 · 활성/비활성 토글·즉시 실행만 제공":"Batch do hệ thống định nghĩa — không tạo·xóa · chỉ cung cấp toggle bật/tắt·chạy ngay","실행 로그 없음 (배치 스케줄러 미가동)":"Không có log chạy (batch scheduler chưa hoạt động)","VIN 화면 구성예정":"VIN sẽ dựng màn hình","데이터 관리 (개발용)":"Quản lý dữ liệu (dùng cho phát triển)","문의":"Hỏi đáp","교환이력":"Lịch sử đổi","포인트원장":"Sổ cái điểm","클릭":"Click","티켓원장":"Sổ cái vé","초대":"Mời","방문":"Truy cập","시나리오 채우기":"Đổ dữ liệu kịch bản","새로고침":"Làm mới","전체 비우기":"Xóa toàn bộ","[시나리오 채우기]는":"[Đổ dữ liệu kịch bản] sẽ","(scripts/seed-demo.js로 등록)에 등록된 가상 손님대로 데이터를 생성합니다. [전체 비우기]는 가상 데이터만 삭제하고\n          운영 뼈대(관리자 계정 firstadmin · 마스터 데이터 · 기프티콘 상품 · 배너 · 공지 · 시나리오 정의)는 보존합니다.":"(đăng ký qua scripts/seed-demo.js) tạo dữ liệu đúng theo các khách ảo đã đăng ký. [Xóa toàn bộ] chỉ xóa dữ liệu ảo và\n          giữ lại bộ khung vận hành (tài khoản quản trị firstadmin · dữ liệu master · sản phẩm Gifticon · banner · thông báo · định nghĩa kịch bản).","문서 추가 — users":"Thêm document — users","카카오연동":"Liên kết Kakao","카카오 닉네임":"Biệt danh Kakao","카카오 로그인 ID":"ID đăng nhập Kakao","+ 추가":"+ Thêm","오류: Missing or insufficient permissions.":"Lỗi: Missing or insufficient permissions."});
 /* ── i18n 보강 (2026-07-21 재질문 답변 반영) — 탈퇴 정책·탈퇴 상세·공지 관리 UI 변경 ── */
 Object.assign(KO2VI,{"안내":"Hướng dẫn","탈퇴 정책 안내":"Hướng dẫn chính sách hủy TK","고정 정책 — 운영자가 수정할 수 없습니다.":"Chính sách cố định — quản trị viên không thể sửa.","탈퇴 즉시 제거 (레코드는 유지, 고정 정책)":"Xóa ngay khi hủy (bản ghi vẫn giữ, chính sách cố định)","탈퇴 회원 상세":"Chi tiết hội viên đã hủy","식별 아이디":"ID định danh","탈퇴 완료 (즉시 처리 · 유예 없음)":"Đã hủy hoàn tất (xử lý ngay · không ân hạn)","개인정보 처리":"Xử lý thông tin cá nhân","닉네임·카카오 식별값 삭제됨":"Nickname·mã định danh Kakao đã được xóa","레코드는 유지, 거래 기록 참조 무결성 보호":"Bản ghi vẫn giữ, bảo vệ tính toàn vẹn tham chiếu lịch sử giao dịch","공지 수정":"Sửa thông báo"});
 Object.assign(KO2VI,{"답변하기":"Trả lời","답변 수정":"Sửa câu trả lời","작성자":"Người viết","문의를 삭제했습니다.":"Đã xóa hỏi đáp.","공지가 삭제되었습니다.":"Đã xóa thông báo.","공지가 수정되었습니다.":"Thông báo đã được sửa.","공지가 게시되었습니다.":"Thông báo đã được đăng.","제목과 내용을 입력하세요.":"Hãy nhập tiêu đề và nội dung.","작성일":"Ngày viết"});
@@ -6282,8 +6282,7 @@ Object.assign(KO2VI,{
   "실제 돌린 횟수 집계":"Tổng hợp số lượt quay thực tế",
   "이번 달 지급 총액":"Tổng tiền cấp tháng này",
   "포인트·티켓 원장 원화 환산":"Quy đổi sổ cái điểm·vé ra KRW",
-  "데모 표시 데이터 (앱 미구현)":"Dữ liệu hiển thị demo (app chưa triển khai)",
-  "데모 로그 원화 환산":"Quy đổi log demo ra KRW",
+    "원화 환산":"Quy đổi ra KRW",
   "1회 기대값":"Giá trị kỳ vọng 1 lượt",
   "현재 구성 기준":"Theo cơ cấu hiện tại",
   "슬롯 구성 · 당첨 확률":"Cơ cấu ô · Xác suất trúng",
@@ -6296,11 +6295,11 @@ Object.assign(KO2VI,{
   "기대값 기여":"Đóng góp giá trị kỳ vọng",
   "보상 없음":"Không có thưởng",
   "가치 환산 기준 — 포인트 10P = 1원 · 이벤트 티켓 40원 · 브론즈 티켓 10원 · 실버 티켓 100원 · 골드 티켓 200원. 기대값 기여 = 가치 × 확률.":"Chuẩn quy đổi giá trị — Điểm 10P = 1₩ · Vé sự kiện 40₩ · Vé Đồng 10₩ · Vé Bạc 100₩ · Vé Vàng 200₩. Đóng góp giá trị kỳ vọng = giá trị × xác suất.",
-  "여기서 저장한 슬롯 구성·보상·확률을 데모 앱 룰렛 화면이 그대로 읽어 렌더링하고 추첨·지급합니다. 등급 티켓(브론즈·실버·골드) 슬롯도 앱에서 정상 표시·지급됩니다. 앱을 새로고침하면 반영됩니다.":"App demo đọc nguyên cơ cấu ô·thưởng·xác suất đã lưu ở đây để render vòng quay, quay số và cấp thưởng. Ô vé theo hạng (Đồng·Bạc·Vàng) cũng hiển thị·cấp phát bình thường trên app. Làm mới app là được áp dụng.",
-  "여기서 저장한 슬롯 구성·보상·확률과 아래 참여 제한 정책을 데모 앱 잭팟 룰렛 화면(홈 하단 잭팟 배너로 진입)이 그대로 읽어 적용합니다. 실행 로그·월 집계도 앱 실행 기록 실집계입니다.":"Màn Vòng quay Jackpot của app demo (vào từ banner Jackpot ở dưới trang chủ) đọc nguyên cơ cấu ô·thưởng·xác suất đã lưu ở đây cùng chính sách giới hạn tham gia bên dưới để áp dụng. Log lượt quay·tổng hợp theo tháng cũng là tổng hợp thật từ bản ghi lượt quay của app.",
+  "여기서 저장한 슬롯 구성·보상·확률을 앱 룰렛 화면이 그대로 읽어 렌더링하고 추첨·지급합니다. 등급 티켓(브론즈·실버·골드) 슬롯도 앱에서 정상 표시·지급됩니다. 앱을 새로고침하면 반영됩니다.":"App đọc nguyên cơ cấu ô·thưởng·xác suất đã lưu ở đây để render vòng quay, quay số và cấp thưởng. Ô vé theo hạng (Đồng·Bạc·Vàng) cũng hiển thị·cấp phát bình thường trên app. Làm mới app là được áp dụng.",
+  "여기서 저장한 슬롯 구성·보상·확률과 아래 참여 제한 정책을 앱 잭팟 룰렛 화면(홈 하단 잭팟 배너로 진입)이 그대로 읽어 적용합니다. 실행 로그·월 집계도 앱 실행 기록 실집계입니다.":"Màn Vòng quay Jackpot của app (vào từ banner Jackpot ở dưới trang chủ) đọc nguyên cơ cấu ô·thưởng·xác suất đã lưu ở đây cùng chính sách giới hạn tham gia bên dưới để áp dụng. Log lượt quay·tổng hợp theo tháng cũng là tổng hợp thật từ bản ghi lượt quay của app.",
   "지급완료 건 원화 환산":"Quy đổi ra KRW các lượt đã cấp thưởng",
   "지급완료 건 환산 · 구 기록 제외(결과 미기록)":"Quy đổi các lượt đã cấp thưởng · loại trừ bản ghi cũ (chưa ghi kết quả)",
-  "실행 기록 없음 · 데모 표시 데이터":"Không có bản ghi · dữ liệu hiển thị demo",
+  "실행 기록 없음":"Không có bản ghi",
   "참여 제한 정책":"Chính sách giới hạn tham gia",
   "하루 최대 참여 횟수":"Số lượt tối đa mỗi ngày",
   "회 / 1일":"lượt / ngày",
@@ -9587,7 +9586,7 @@ window.schedRunNow = function(id) {
     last_run: now,
     run_log: FS.FieldValue.arrayUnion(logEntry),
   }, { merge: true }).then(function() {
-    toast('즉시 실행 완료 (데모 — 실제 배치 로직은 실행되지 않음)');
+    toast('즉시 실행 완료 — 실제 배치 로직은 실행되지 않습니다.');
     logAdmin('스케줄러 즉시 실행: ' + id);
     loadScheduler();
   }).catch(function(e) { toast('실행 실패: ' + (e.message||e)); });
@@ -12537,7 +12536,7 @@ function loadRevenueStats() {
       settleTbodies[0].innerHTML = sRows.join('');
     }
     if (settleTbodies[1]) {
-      settleTbodies[1].innerHTML = '<tr><td><strong>데모 집계</strong></td><td>' + ppN(totalCommission) + '원</td><td>' + ppN(totalSettled) + '원</td><td style="color:var(--text-3)">' + ppN(totalCommission-totalSettled) + '원</td><td><span class="badge badge-amber">집계 중</span></td></tr>';
+      settleTbodies[1].innerHTML = '<tr><td><strong>집계</strong></td><td>' + ppN(totalCommission) + '원</td><td>' + ppN(totalSettled) + '원</td><td style="color:var(--text-3)">' + ppN(totalCommission-totalSettled) + '원</td><td><span class="badge badge-amber">집계 중</span></td></tr>';
     }
     /* sec-settlement stat cards — 확정 정산(D+30 경과분) vs 추정 매출(전체 확정 포스트백) */
     setTxt('settle-confirmed', ppN(totalSettled)+'원');
@@ -14559,7 +14558,7 @@ function rltLoadStats(k) {
       var rows = RLT_LOG_DEMO[k] || [];
       rltSetStatCard(k, rows.length.toLocaleString('ko-KR') + '회',
         Math.round(rltDemoPayout(rows)).toLocaleString('ko-KR') + '원',
-        '실행 기록 없음 · 데모 표시 데이터', '데모 로그 원화 환산');
+        '실행 기록 없음', '원화 환산');
       return;
     }
     rltSetStatCard(k, n.toLocaleString('ko-KR') + '회', Math.round(won).toLocaleString('ko-KR') + '원',
@@ -14670,7 +14669,7 @@ function rltRenderLog(k) {
     }).join('');
   }
   var cnt = document.getElementById(kind.p + '-log-count');
-  if (cnt) cnt.textContent = (rltState[k].logIsDemo ? '데모 표시 데이터 · ' : '') + '최근 ' + rows.length + '건 · ' + cur + ' / ' + total + ' 페이지';
+  if (cnt) cnt.textContent = '최근 ' + rows.length + '건 · ' + cur + ' / ' + total + ' 페이지';
   var pager = document.getElementById(kind.p + '-log-pager');
   if (pager) {
     if (total <= 1) { pager.innerHTML = ''; return; }
