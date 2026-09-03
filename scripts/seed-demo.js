@@ -185,7 +185,9 @@ for (const [pbId, pb] of Object.entries(POSTBACKS)) {
 
 // ═══════════════════════════════════════════════════════
 // USER TICKETS (개별 문서, grade 필드)
-// Greedy: 150k→gold1+silver1 / 120k→gold1+bronze4 / 100k→gold1 / 67k→silver1+bronze4
+// Greedy: 150k→gold1+silver1 / 120k→gold1+bronze4 / 100k→gold1 / 67k→silver1+bronze3
+// 단위 수는 floor(금액/5,000) — 5,000원 미만으로 남는 금액은 버린다. 67,000원은 13단위(65,000원)라
+// 실버1(10단위)+브론즈3(3단위)이고, 2,000원은 버려진다. ceil로 올리면 안 산 금액만큼 더 준다.
 //         50k→silver1 / 25k→bronze5 / 15k→bronze3 / 10k→bronze2 / 5k→bronze1 / 200k→gold2
 // ═══════════════════════════════════════════════════════
 const TKT_RAW = [
@@ -194,23 +196,21 @@ const TKT_RAW = [
   tkt('tk-frank-02','user-frank-001','silver','active','pb-frank-001', ago(60), ago(53), future(305)),
   tkt('tk-frank-03','user-frank-001','gold',  'active','pb-frank-002', ago(30), ago(23), future(335)),
   tkt('tk-frank-04','user-frank-001','silver','active','pb-frank-002', ago(30), ago(23), future(335)),
-  // Grace: 67k(silver1+bronze4) + 25k(bronze5), bronze2 used(교환)
+  // Grace: 67k(silver1+bronze3) + 25k(bronze5), bronze2 used(교환)
   tkt('tk-grace-01','user-grace-001','silver','active','pb-grace-001', ago(45), ago(38), future(320)),
   tkt('tk-grace-02','user-grace-001','bronze','active','pb-grace-001', ago(45), ago(38), future(320)),
-  tkt('tk-grace-03','user-grace-001','bronze','active','pb-grace-001', ago(45), ago(38), future(320)),
+  tkt('tk-grace-03','user-grace-001','bronze','used',  'pb-grace-001', ago(45), ago(38), future(320)),
   tkt('tk-grace-04','user-grace-001','bronze','used',  'pb-grace-001', ago(45), ago(38), future(320)),
-  tkt('tk-grace-05','user-grace-001','bronze','used',  'pb-grace-001', ago(45), ago(38), future(320)),
   tkt('tk-grace-06','user-grace-001','bronze','active','pb-grace-002', ago(20), ago(13), future(350)),
   tkt('tk-grace-07','user-grace-001','bronze','active','pb-grace-002', ago(20), ago(13), future(350)),
   tkt('tk-grace-08','user-grace-001','bronze','active','pb-grace-002', ago(20), ago(13), future(350)),
   tkt('tk-grace-09','user-grace-001','bronze','active','pb-grace-002', ago(20), ago(13), future(350)),
   tkt('tk-grace-10','user-grace-001','bronze','active','pb-grace-002', ago(20), ago(13), future(350)),
-  // Henry: 67k(silver1+bronze4), bronze2 used(교환)
+  // Henry: 67k(silver1+bronze3), bronze2 used(교환)
   tkt('tk-henry-01','user-henry-001','silver','active','pb-henry-001', ago(35), ago(28), future(330)),
   tkt('tk-henry-02','user-henry-001','bronze','active','pb-henry-001', ago(35), ago(28), future(330)),
-  tkt('tk-henry-03','user-henry-001','bronze','active','pb-henry-001', ago(35), ago(28), future(330)),
+  tkt('tk-henry-03','user-henry-001','bronze','used',  'pb-henry-001', ago(35), ago(28), future(330)),
   tkt('tk-henry-04','user-henry-001','bronze','used',  'pb-henry-001', ago(35), ago(28), future(330)),
-  tkt('tk-henry-05','user-henry-001','bronze','used',  'pb-henry-001', ago(35), ago(28), future(330)),
   // Iris: 100k→gold1
   tkt('tk-iris-01','user-iris-001','gold','active','pb-iris-001', ago(20), ago(13), future(350)),
   // Jake: 67k PENDING(가지급)
@@ -218,7 +218,6 @@ const TKT_RAW = [
   tkt('tk-jake-02','user-jake-001','bronze','pending','pb-jake-001', ago(3), null, future(362)),
   tkt('tk-jake-03','user-jake-001','bronze','pending','pb-jake-001', ago(3), null, future(362)),
   tkt('tk-jake-04','user-jake-001','bronze','pending','pb-jake-001', ago(3), null, future(362)),
-  tkt('tk-jake-05','user-jake-001','bronze','pending','pb-jake-001', ago(3), null, future(362)),
   // Kate: 50k→silver1 active / 100k→gold1 clawback(used)
   tkt('tk-kate-01','user-kate-001','silver','active','pb-kate-001', ago(40), ago(33), future(325)),
   tkt('tk-kate-02','user-kate-001','gold',  'used',  'pb-kate-002', ago(25), ago(18), future(340)),
@@ -253,12 +252,11 @@ const TKT_RAW = [
   tkt('tk-sara-04','user-sara-001','bronze','active','pb-sara-001', ago(30), ago(23), future(335)),
   tkt('tk-sara-05','user-sara-001','bronze','active','pb-sara-001', ago(30), ago(23), future(335)),
   // ── 16~20 ──
-  // Alice: 67k→silver1+bronze4 active + 이벤트티켓2(출석)
+  // Alice: 67k→silver1+bronze3 active + 이벤트티켓2(출석)
   tkt('tk-alice-01','user-linked-alice','silver','active','pb-alice-001', ago(13), ago(6), future(352)),
   tkt('tk-alice-02','user-linked-alice','bronze','active','pb-alice-001', ago(13), ago(6), future(352)),
   tkt('tk-alice-03','user-linked-alice','bronze','active','pb-alice-001', ago(13), ago(6), future(352)),
   tkt('tk-alice-04','user-linked-alice','bronze','active','pb-alice-001', ago(13), ago(6), future(352)),
-  tkt('tk-alice-05','user-linked-alice','bronze','active','pb-alice-001', ago(13), ago(6), future(352)),
   tkt('tk-alice-ev1','user-linked-alice','event','active', null, ago(2), ago(2), future(28)),
   tkt('tk-alice-ev2','user-linked-alice','event','active', null, ago(2), ago(2), future(28)),
   // Bob: 120k→gold1+bronze4 active
@@ -292,7 +290,6 @@ const TICKET_TX = {
   'ttx-grace-02': { user_id:'user-grace-001', ticket_grade:'bronze', type:'earn', postback_id:'pb-grace-001', created_at:ago(38) },
   'ttx-grace-03': { user_id:'user-grace-001', ticket_grade:'bronze', type:'earn', postback_id:'pb-grace-001', created_at:ago(38) },
   'ttx-grace-04': { user_id:'user-grace-001', ticket_grade:'bronze', type:'earn', postback_id:'pb-grace-001', created_at:ago(38) },
-  'ttx-grace-05': { user_id:'user-grace-001', ticket_grade:'bronze', type:'earn', postback_id:'pb-grace-001', created_at:ago(38) },
   'ttx-grace-06': { user_id:'user-grace-001', ticket_grade:'bronze', type:'earn', postback_id:'pb-grace-002', created_at:ago(13) },
   'ttx-grace-07': { user_id:'user-grace-001', ticket_grade:'bronze', type:'earn', postback_id:'pb-grace-002', created_at:ago(13) },
   'ttx-grace-08': { user_id:'user-grace-001', ticket_grade:'bronze', type:'earn', postback_id:'pb-grace-002', created_at:ago(13) },
@@ -305,7 +302,6 @@ const TICKET_TX = {
   'ttx-henry-02': { user_id:'user-henry-001', ticket_grade:'bronze', type:'earn', postback_id:'pb-henry-001', created_at:ago(28) },
   'ttx-henry-03': { user_id:'user-henry-001', ticket_grade:'bronze', type:'earn', postback_id:'pb-henry-001', created_at:ago(28) },
   'ttx-henry-04': { user_id:'user-henry-001', ticket_grade:'bronze', type:'earn', postback_id:'pb-henry-001', created_at:ago(28) },
-  'ttx-henry-05': { user_id:'user-henry-001', ticket_grade:'bronze', type:'earn', postback_id:'pb-henry-001', created_at:ago(28) },
   'ttx-henry-06': { user_id:'user-henry-001', ticket_grade:'bronze', type:'use',  gifticon_id:'gif-ediya-2000', created_at:ago(20) },
   'ttx-henry-07': { user_id:'user-henry-001', ticket_grade:'bronze', type:'use',  gifticon_id:'gif-ediya-2000', created_at:ago(20) },
   // Iris
@@ -315,7 +311,6 @@ const TICKET_TX = {
   'ttx-jake-02':  { user_id:'user-jake-001',  ticket_grade:'bronze', type:'earn', postback_id:'pb-jake-001',  created_at:ago(3) },
   'ttx-jake-03':  { user_id:'user-jake-001',  ticket_grade:'bronze', type:'earn', postback_id:'pb-jake-001',  created_at:ago(3) },
   'ttx-jake-04':  { user_id:'user-jake-001',  ticket_grade:'bronze', type:'earn', postback_id:'pb-jake-001',  created_at:ago(3) },
-  'ttx-jake-05':  { user_id:'user-jake-001',  ticket_grade:'bronze', type:'earn', postback_id:'pb-jake-001',  created_at:ago(3) },
   // Kate (earn silver, earn gold → clawback gold)
   'ttx-kate-01':  { user_id:'user-kate-001',  ticket_grade:'silver', type:'earn',     postback_id:'pb-kate-001', created_at:ago(33) },
   'ttx-kate-02':  { user_id:'user-kate-001',  ticket_grade:'gold',   type:'earn',     postback_id:'pb-kate-002', created_at:ago(18) },
@@ -352,12 +347,11 @@ const TICKET_TX = {
   'ttx-sara-04':  { user_id:'user-sara-001',  ticket_grade:'bronze', type:'earn', postback_id:'pb-sara-001', created_at:ago(23) },
   'ttx-sara-05':  { user_id:'user-sara-001',  ticket_grade:'bronze', type:'earn', postback_id:'pb-sara-001', created_at:ago(23) },
   // ── 16~20 ──
-  // Alice (67k earn silver1+bronze4) + 이벤트티켓2 earn
+  // Alice (67k earn silver1+bronze3) + 이벤트티켓2 earn
   'ttx-alice-01': { user_id:'user-linked-alice', ticket_grade:'silver', type:'earn', postback_id:'pb-alice-001', created_at:ago(6) },
   'ttx-alice-02': { user_id:'user-linked-alice', ticket_grade:'bronze', type:'earn', postback_id:'pb-alice-001', created_at:ago(6) },
   'ttx-alice-03': { user_id:'user-linked-alice', ticket_grade:'bronze', type:'earn', postback_id:'pb-alice-001', created_at:ago(6) },
   'ttx-alice-04': { user_id:'user-linked-alice', ticket_grade:'bronze', type:'earn', postback_id:'pb-alice-001', created_at:ago(6) },
-  'ttx-alice-05': { user_id:'user-linked-alice', ticket_grade:'bronze', type:'earn', postback_id:'pb-alice-001', created_at:ago(6) },
   'ttx-alice-ev1':{ user_id:'user-linked-alice', ticket_grade:'event',  type:'earn', created_at:ago(2) },
   'ttx-alice-ev2':{ user_id:'user-linked-alice', ticket_grade:'event',  type:'earn', created_at:ago(2) },
   // Bob (120k earn gold1+bronze4)

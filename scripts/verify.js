@@ -78,23 +78,29 @@ async function before() {
 async function testGreedy() {
   console.log('\n── B1. Greedy 알고리즘 ──');
   function greedy(amount) {
-    const u = Math.ceil(amount / 5000);
+    const u = Math.floor(amount / 5000);
     const g = Math.floor(u / 20);
     const r = u % 20;
     const s = Math.floor(r / 10);
     const b = r % 10;
     return { gold: g, silver: s, bronze: b, total: g + s + b };
   }
-  // units = ceil(amount/5000); gold=floor(units/20); rem=units%20; silver=floor(rem/10); bronze=rem%10
+  // units = floor(amount/5000); gold=floor(units/20); rem=units%20; silver=floor(rem/10); bronze=rem%10
+  // 잔돈(5,000원 미만)은 버린다 — ceil로 올리면 구매하지 않은 금액에도 티켓이 나간다.
+  // 정책서 예시와 같은 값이어야 한다: 99,999원→실버1+브론즈9 · 100,000원→골드1 · 7,800원→브론즈1
   const cases = [
     [5000,  {gold:0,silver:0,bronze:1,total:1}],   // units=1
-    [9999,  {gold:0,silver:0,bronze:2,total:2}],   // units=2
+    [9999,  {gold:0,silver:0,bronze:1,total:1}],   // units=1 (4,999원 버림)
     [10000, {gold:0,silver:0,bronze:2,total:2}],   // units=2
     [25000, {gold:0,silver:0,bronze:5,total:5}],   // units=5
     [50000, {gold:0,silver:1,bronze:0,total:1}],   // units=10
-    [67000, {gold:0,silver:1,bronze:4,total:5}],   // units=14
+    [67000, {gold:0,silver:1,bronze:3,total:4}],   // units=13 (2,000원 버림)
     [100000,{gold:1,silver:0,bronze:0,total:1}],   // units=20
     [200000,{gold:2,silver:0,bronze:0,total:2}],   // units=40
+    [7800,  {gold:0,silver:0,bronze:1,total:1}],   // 정책서 예시 (2,800원 버림)
+    [99999, {gold:0,silver:1,bronze:9,total:10}],  // 정책서 예시 (4,999원 버림)
+    [70000, {gold:0,silver:1,bronze:4,total:5}],   // units=14
+    [300000,{gold:3,silver:0,bronze:0,total:3}],   // units=60
   ];
   let ok = true;
   for (const [amt, exp] of cases) {

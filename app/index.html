@@ -13043,7 +13043,7 @@ window.PP_FEATURES = {
           <!-- 랜덤 티켓 활성화 목록 -->
           <div class="gd-section">
             <div class="gd-section-t" style="display:flex;align-items:center;justify-content:space-between;">
-              <span class="i18n"><span class="ko">랜덤 티켓 전환 현황</span><span class="vi">Tình trạng đổi vé ngẫu nhiên</span></span>
+              <span class="i18n"><span class="ko">티켓 적립 내역</span><span class="vi">Lịch sử tích lũy vé</span></span>
               <span id="mt21-pending-count" style="color:#9B93B0;font-size:var(--fs-caption);font-weight:400;"></span>
             </div>
             <div id="mt21-pending"><!-- PP: 실데이터 렌더 --></div>
@@ -17044,7 +17044,9 @@ Object.assign(KO2VI, {
     "🎉 축하해요!": "🎉 Chúc mừng!",
     "내 티켓에 보관됐어요": "Đã lưu vào Vé của tôi",
     "대박! 골드 티켓": "Phần quà lớn nhất! Vé Gold",
-    "가장 가치가 높은 등급 티켓이예요!": "Đây là vé hạng có giá trị cao nhất!"
+    "가장 가치가 높은 등급 티켓이예요!": "Đây là vé hạng có giá trị cao nhất!",
+    "취소됨": "Đã hủy",
+    "회수됨": "Đã thu hồi"
   });
   var IPLANG='ko';
   var KO_RE=/[\uac00-\ud7a3]/;
@@ -19968,23 +19970,81 @@ function mt21RenderHoldTickets(byGrade) {
   return out;
 }
 
-function mt21PurchaseLine(pb) {
+/* ── 화면 연출용 구매 취소 표식 (김반장 2026-09-03 지시 · DEVQA 공지 캡처용) ─────────────
+   실제 취소 처리가 아니다. 아래 「티켓 적립 내역」 목록만 이 표를 읽는다 — 티켓 보유 현황·
+   홈 티켓 카드·CMS 집계는 쳐다보지도 않는다. "이미 다 구성된 화면을 왜 건드리냐"는 지시대로
+   보유 장수(브론즈 58 · 실버 25 · 골드 13 · 이벤트 25)와 포인트는 그대로 둔다 — 그래서 회수된
+   14장이 보유에서 안 빠진다(연출이라 일부러 그렇게 둔 것이지 집계가 틀린 게 아니다).
+   포스트백 문서 id는 시드를 다시 돌리면 바뀌니 구매일·구매금액으로 짚는다. 값은 취소한 날.
+   연출을 걷을 때는 이 표만 비우면 된다 — 표가 비면 목록은 원래대로 그려진다. */
+var MT21_DEMO_CANCEL = {
+  '2026.08.03|75000': '2026.08.15', /* ① 랜덤(가지급) 상태에서 취소 → 「취소됨」 */
+  '2026.07.14|70000': '2026.08.15'  /* ② 등급 티켓으로 전환된 뒤 취소 → 「회수됨」 */
+};
+/* ①·②를 가르는 건 이 표가 아니라 그 구매건이 지금 어느 묶음에 있느냐다 — 아직 대기중이면
+   받은 게 없으니 「취소됨」, 이미 전환 완료면 받았다 도로 뺏기는 것이니 「회수됨」. */
+function mt21DemoCancel(pb) {
+  if (!pb) return null;
+  var d = ppFmt(ppDate(pb.created_at));
+  if (!d) return null;
+  return MT21_DEMO_CANCEL[d + '|' + (pb.purchase_amount || 0)] || null;
+}
+
+/* 제휴몰 이름 베트남어 — CMS 사전과 같은 표기를 쓴다(두 화면이 다른 이름을 쓰면 안 된다).
+   사전에 없는 몰은 한국어 이름을 그대로 내보낸다 — 못 옮겼다고 빼버리면 어느 몰에서 산
+   건지 알 수가 없다. 1단계는 쿠팡뿐이지만 데모 자료엔 11번가·G마켓도 섞여 있다. */
+var MT21_MALL_VI = { '쿠팡': 'Coupang', '11번가': '11st', 'G마켓': 'Gmarket', '알리익스프레스': 'AliExpress', '아이허브': 'iHerb' };
+
+function mt21PurchaseLine(pb, cancelledOn, clawbackCount) {
   if (!pb) return '';
   var d = ppFmt(ppDate(pb.created_at));
+  /* 구매처 — 날짜와 금액 사이(김반장 2026-09-03). 포스트백에 이미 있는 mall_name을 그대로 쓴다.
+     비어 있는 건(과거 자료·미매칭 포스트백)은 「·」만 덩그러니 남기지 않고 통째로 뺀다. */
+  var mallKo = pb.mall_name || '';
+  var mallVi = mallKo ? (MT21_MALL_VI[mallKo] || mallKo) : '';
   var amtKo = pb.purchase_amount ? pb.purchase_amount.toLocaleString('ko-KR') + '원 구매' : '';
   var amtVi = pb.purchase_amount ? 'mua ' + pb.purchase_amount.toLocaleString('ko-KR') + '원' : '';
-  if (!d && !amtKo) return '';
-  return '<span style="display:block;color:#9B93B0;font-size:var(--fs-caption);font-weight:400;">' + mt21I18n(
-    d + (d && amtKo ? ' · ' : '') + amtKo,
-    d + (d && amtVi ? ' · ' : '') + amtVi
+  if (!d && !amtKo && !mallKo) return '';
+  /* 취소날은 줄을 새로 만들지 않고 같은 줄 끝에 잇는다 — 줄을 늘리면 카드 높이가 옆줄과 어긋난다.
+     연도는 앞 날짜에 이미 있으니 월·일만 쓴다. 전환 뒤 회수된 건은 몇 장을 가져갔는지까지 적는다. */
+  var tailKo = '', tailVi = '';
+  if (cancelledOn) {
+    var md = cancelledOn.slice(5);
+    tailKo = ' · ' + md + ' 구매 취소';
+    tailVi = ' · ' + md + ' hủy mua';
+    if (clawbackCount) {
+      tailKo += ' · ' + clawbackCount + '장 회수';
+      tailVi += ' · thu hồi ' + clawbackCount + ' vé';
+    }
+  }
+  /* 구매처가 붙어 줄이 길어졌다 — 취소·회수 줄은 두 줄로 넘어간다. 넘치는 게 아니라 그냥
+     아래로 흐르는 것이라 잘리지 않는다. 다만 한글은 기본값이면 낱말 가운데서 끊겨서
+     "구매 취" / "소" 처럼 갈라진다 — keep-all로 빈칸에서만 끊기게 한다(이 파일이 이미 쓰는 값). */
+  var joined = function (parts) { return parts.filter(Boolean).join(' · '); };
+  return '<span style="display:block;color:#9B93B0;font-size:var(--fs-caption);font-weight:400;word-break:keep-all;">' + mt21I18n(
+    joined([d, mallKo, amtKo]) + tailKo,
+    joined([d, mallVi, amtVi]) + tailVi
   ) + '</span>';
 }
-/* 랜덤 티켓 전환 현황 — 시안 카드(반경16·그림자·구분선) 그대로, phone19의 구 .gd-pending-multi 스타일과는 분리 */
+/* 티켓 적립 내역 — 시안 카드(반경16·그림자·구분선) 그대로, phone19의 구 .gd-pending-multi 스타일과는 분리 */
 function mt21RenderPending(doneItems, pendItems, waitDays) {
   var rows = [];
   /* 대기중을 완료보다 먼저 — 상태로 먼저 묶고 그룹 안에서만 최신순(전체를 날짜만으로 섞으면
      대기중 건이 완료 건보다 오래됐을 때 밑으로 깔림, 사용자가 봐야 할 진행중 건이 위에 있어야 함) */
   pendItems.forEach(function (it) {
+    /* ① 랜덤 상태에서 취소 — 등급이 정해지기 전이라 받은 게 없다(정책: 승인 전 환불 = 자연 취소,
+       잔액 영향 없음). 줄을 지우지 않고 제자리에서 회색으로만 죽인다 — 사라지면 티켓이 왜
+       없어졌는지 짚을 데가 없다. 배지 회색은 이 파일이 이미 쓰는 #F1EFF6 / #9B93B0. */
+    if (it.cancelledOn) {
+      rows.push('<div style="display:flex;align-items:center;gap:12px;padding:16px 18px;opacity:0.75;">'
+        + ticketIcon('random', 34)
+        + '<div style="display:flex;flex-direction:column;gap:6px;flex:1;">'
+        + '<div style="display:flex;align-items:center;gap:8px;">'
+        + '<span style="color:#9B93B0;font-size:var(--fs-body);font-weight:700;">' + mt21I18n('랜덤 티켓 ' + it.total + '장', it.total + ' vé ngẫu nhiên') + '</span>'
+        + '<span style="padding:3px 8px;border-radius:7px;background:#F1EFF6;color:#9B93B0;font-size:var(--fs-caption);font-weight:400;">취소됨</span>'
+        + '</div>' + mt21PurchaseLine(it.pb, it.cancelledOn) + '</div></div>');
+      return;
+    }
     var ddayHtml = '', barHtml = '';
     if (it.earnedAt) {
       var daysLeft = Math.ceil((it.earnedAt.getTime() + waitDays * 86400000 - Date.now()) / 86400000);
@@ -20007,18 +20067,29 @@ function mt21RenderPending(doneItems, pendItems, waitDays) {
        등급마다 아이콘+행을 따로 그리고(순서 고정: 브론즈→실버→골드), 완료 배지·날짜·구매금액은
        묶음당 한 번만(김반장 2026-08-05 확정). ticketIcon()이 호출마다 gradient id를 자동 증가시켜서
        한 화면에 같은 등급 아이콘이 여러 번 나와도 색이 안 깨진다. */
+    /* ② 등급 티켓으로 전환된 뒤 취소 — 받아서 쓸 수 있던 걸 도로 가져가는 것이라 「취소됨」과
+       반드시 다른 말로 적는다(「회수됨」). 같은 말로 쓰면 "안 받은 것"과 "받았다 뺏긴 것"을
+       구분할 수가 없다. 배지 색·크기·여백은 완료 배지와 똑같고 초록만 회색으로 바뀐다.
+       회수 장수는 표에 따로 적지 않고 이 묶음의 등급 장수를 그대로 더한다 — 위에 적힌
+       "브론즈 14장"과 아래 "14장 회수"가 어긋날 수가 없다. */
+    var cancelledOn = it.cancelledOn;
+    var clawback = 0;
     var gradeRows = ['bronze', 'silver', 'gold'].filter(function (g) { return it.grades[g]; })
       .map(function (g) {
+        clawback += it.grades[g];
         return '<div style="display:flex;align-items:center;gap:10px;">'
           + ticketIcon(g, 24)
-          + '<span style="color:#1A1130;font-size:var(--fs-body);font-weight:700;">' + mt21I18n(GRADE_KO[g] + ' ' + it.grades[g] + '장', it.grades[g] + ' vé ' + MT21_GRADE_VI[g]) + '</span>'
+          + '<span style="color:' + (cancelledOn ? '#9B93B0' : '#1A1130') + ';font-size:var(--fs-body);font-weight:700;">' + mt21I18n(GRADE_KO[g] + ' ' + it.grades[g] + '장', it.grades[g] + ' vé ' + MT21_GRADE_VI[g]) + '</span>'
           + '</div>';
       }).join('');
+    var badge = cancelledOn
+      ? '<span style="padding:3px 8px;border-radius:7px;background:#F1EFF6;color:#9B93B0;font-size:var(--fs-caption);font-weight:400;flex-shrink:0;">회수됨</span>'
+      : '<span style="padding:3px 8px;border-radius:7px;background:#F0FDF4;color:#16A34A;font-size:var(--fs-caption);font-weight:400;flex-shrink:0;">완료</span>';
     rows.push('<div style="display:flex;flex-direction:column;gap:6px;padding:16px 18px;opacity:0.75;">'
       + '<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;">'
       + '<div style="display:flex;flex-direction:column;gap:6px;">' + gradeRows + '</div>'
-      + '<span style="padding:3px 8px;border-radius:7px;background:#F0FDF4;color:#16A34A;font-size:var(--fs-caption);font-weight:400;flex-shrink:0;">완료</span>'
-      + '</div><div style="padding-left:34px;">' + mt21PurchaseLine(it.pb) + '</div></div>');
+      + badge
+      + '</div><div style="padding-left:34px;">' + mt21PurchaseLine(it.pb, cancelledOn, clawback) + '</div></div>');
   });
   if (!rows.length) {
     return '<div class="i18n"><span class="ko"><span style="display:block;padding:26px 20px;border-radius:16px;background:#fff;box-shadow:0 0 0 1px rgba(132,94,238,0.1);color:#9B93B0;font-size:var(--fs-body);font-weight:400;text-align:center;">대기 중이거나 최근 전환된 랜덤 티켓이 없어요.</span></span><span class="vi"><span style="display:block;padding:26px 20px;border-radius:16px;background:#fff;box-shadow:0 0 0 1px rgba(132,94,238,0.1);color:#9B93B0;font-size:var(--fs-body);font-weight:400;text-align:center;">Không có vé ngẫu nhiên đang chờ hoặc vừa đổi gần đây.</span></span></div>';
@@ -20115,7 +20186,7 @@ function renderTicketDetail() {
         .map(function (g) { return GRADE_KO[g] + ' ' + b.grades[g] + '장'; }).join(' + ');
       var labelVi = ['bronze', 'silver', 'gold'].filter(function (g) { return b.grades[g]; })
         .map(function (g) { return b.grades[g] + ' vé ' + MT21_GRADE_VI[g]; }).join(' + ');
-      return { earnedAt: b.earnedAt, label: label, labelVi: labelVi, grade: mainGrade, grades: b.grades, pb: pbMap[key] };
+      return { earnedAt: b.earnedAt, label: label, labelVi: labelVi, grade: mainGrade, grades: b.grades, pb: pbMap[key], cancelledOn: mt21DemoCancel(pbMap[key]) };
     }).sort(function (a, b) { return (b.earnedAt ? b.earnedAt.getTime() : 0) - (a.earnedAt ? a.earnedAt.getTime() : 0); });
 
     /* 대기중 랜덤 티켓 = "아직 안 깐 뽑기권" — 구매(포스트백) 1건당 1장이다.
@@ -20125,7 +20196,7 @@ function renderTicketDetail() {
     var pendBundles = {};
     pend.forEach(function (t) {
       var key = t.postback_id || t._id;
-      if (!pendBundles[key]) pendBundles[key] = { total: 1, earnedAt: null, pb: pbMap[t.postback_id] };
+      if (!pendBundles[key]) pendBundles[key] = { total: 1, earnedAt: null, pb: pbMap[t.postback_id], cancelledOn: mt21DemoCancel(pbMap[t.postback_id]) };
       var d = ppDate(t.earned_at);
       if (d && (!pendBundles[key].earnedAt || d < pendBundles[key].earnedAt)) pendBundles[key].earnedAt = d;
     });
@@ -20159,9 +20230,11 @@ function renderTicketDetail() {
     if (!pm) pm = '<div style="font-size:var(--fs-caption);color:var(--text3);padding:10px 2px;">대기 중이거나 최근 전환된 랜덤 티켓이 없어요.</div>';
     document.querySelectorAll('#gd-pending-multi-19').forEach(function (el) { el.innerHTML = pm; });
 
-    /* pw-21 — 시안 카드 스타일 그대로(랜덤 티켓 전환 현황) */
+    /* pw-21 — 시안 카드 스타일 그대로(티켓 적립 내역) */
     var pendCountEl = document.getElementById('mt21-pending-count');
-    if (pendCountEl) pendCountEl.innerHTML = pendItems.length ? mt21I18n('대기 ' + pendItems.length + '건', 'Đang chờ ' + pendItems.length) : '';
+    /* 취소된 건은 줄로는 남지만 더는 "대기 중"이 아니다 — 머릿수에서 뺀다(김반장 2026-09-03). */
+    var waitingCount = pendItems.filter(function (it) { return !it.cancelledOn; }).length;
+    if (pendCountEl) pendCountEl.innerHTML = waitingCount ? mt21I18n('대기 ' + waitingCount + '건', 'Đang chờ ' + waitingCount) : '';
     var mt21PendEl = document.getElementById('mt21-pending');
     if (mt21PendEl) mt21PendEl.innerHTML = mt21RenderPending(doneItems, pendItems, waitDays);
   });
