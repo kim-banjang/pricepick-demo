@@ -437,21 +437,23 @@ tr:hover td{background:var(--surface-2);}
      #rf-mall-table  1제휴몰 2주문건수 3거래액 4수수료 5유저적립 6수익
      #rf-cp-table    위와 같다(제휴몰별 탭의 쿠팡 한 줄)
      #rf-cpbd-table  1기간 2주문건수 3거래액 4수수료 5유저적립 6수익 (기간별 탭의 쿠팡) */
-#rf-od-table th:nth-child(2), #rf-od-table td:nth-child(2),
-#rf-od-table th:nth-child(3), #rf-od-table td:nth-child(3),
-#rf-mall-table th:nth-child(1), #rf-mall-table td:nth-child(1),
-#rf-cp-table th:nth-child(1), #rf-cp-table td:nth-child(1){text-align:left!important;}
-#rf-od-table th:nth-child(1), #rf-od-table td:nth-child(1),
-#rf-od-table th:nth-child(4), #rf-od-table td:nth-child(4),
-#rf-od-table th:nth-child(9), #rf-od-table td:nth-child(9),
-#rf-bd-table th:nth-child(1), #rf-bd-table td:nth-child(1),
-#rf-cpbd-table th:nth-child(1), #rf-cpbd-table td:nth-child(1){text-align:center!important;}
-#rf-od-table th:nth-child(n+5):nth-child(-n+8),
+/* 머리글은 예외 없이 가운데다(김반장 2026-09-03). 줄만 아래 규칙대로 갈린다 —
+   머리글까지 따라 움직이면 표마다 머리 줄이 들쭉날쭉해 보인다. */
+#sec-revenue-fee th{text-align:center!important;}
+#rf-od-table td:nth-child(2),
+#rf-od-table td:nth-child(3),
+#rf-mall-table td:nth-child(1),
+#rf-cp-table td:nth-child(1){text-align:left!important;}
+#rf-od-table td:nth-child(1),
+#rf-od-table td:nth-child(4),
+#rf-od-table td:nth-child(9),
+#rf-bd-table td:nth-child(1),
+#rf-cpbd-table td:nth-child(1){text-align:center!important;}
 #rf-od-table td:nth-child(n+5):nth-child(-n+8),
-#rf-bd-table th:nth-child(n+2), #rf-bd-table td:nth-child(n+2),
-#rf-mall-table th:nth-child(n+2), #rf-mall-table td:nth-child(n+2),
-#rf-cp-table th:nth-child(n+2), #rf-cp-table td:nth-child(n+2),
-#rf-cpbd-table th:nth-child(n+2), #rf-cpbd-table td:nth-child(n+2){text-align:right!important;}
+#rf-bd-table td:nth-child(n+2),
+#rf-mall-table td:nth-child(n+2),
+#rf-cp-table td:nth-child(n+2),
+#rf-cpbd-table td:nth-child(n+2){text-align:right!important;}
 /* 세로 가운데는 .toolbar·.card-header 가 이미 align-items:center 를 갖고 있으니
    따로 적지 않는다 — 높이가 같아지면 그것만으로 줄이 맞는다. */
 .search-box{background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r-md);
@@ -12545,7 +12547,14 @@ window.rfRenderMalls = function() {
   if (sub) sub.textContent = (RF.sel ? RF.sel.label + ' · ' : '') + list.length + '개';
 
   if (!list.length) { tb.innerHTML = ppEmpty(6, '조건에 맞는 제휴몰이 없습니다.'); return; }
-  var T = rfAggregate(list.map(function(m) { return { amount: m.gmv, comm: m.comm, earn: m.earn, net: m.net }; }));
+  /* 합계 줄 — rfAggregate() 는 「넘긴 줄이 몇 개냐」를 세는 함수다. 여기 넘기는 것은
+     주문이 아니라 몰 묶음이라, 주문 건수 자리에 몰 개수(13)가 들어가 있었다(김반장이
+     2026-09-03에 짚으심 — 「합계 주문건수가 왜 13건이냐」). 몰마다 이미 세어 둔 count 를
+     더해야 주문 건수가 된다. 나머지 네 칸은 값이 맞았지만 같은 자리에서 함께 더한다. */
+  var T = list.reduce(function(a, m) {
+    a.count += m.count; a.gmv += m.gmv; a.comm += m.comm; a.earn += m.earn; a.net += m.net;
+    return a;
+  }, { count: 0, gmv: 0, comm: 0, earn: 0, net: 0 });
   tb.innerHTML = list.map(function(m) {
     var status = m.pendingGrantComm > 0 ? RF_OD_BADGE.pending_grant
       : (m.count > 0 ? RF_OD_BADGE.granted : '<span class="badge badge-gray">거래 없음</span>');
