@@ -3213,13 +3213,15 @@ window.CMS_FEATURES = {
           <table id="rf-bd-table">
             <thead>
               <tr>
-                <th style="width:19%">기간</th>
-                <th style="width:11%">주문 건수</th>
-                <th style="width:16%">거래액</th>
-                <th style="width:16%">수수료 매출</th>
-                <th style="width:15%">유저 적립</th>
-                <th style="width:15%" class="rf-net-col">수익</th>
-                <th style="width:8%">상태</th>
+                <th style="width:21%">기간</th>
+                <th style="width:12%">주문 건수</th>
+                <th style="width:17%">거래액</th>
+                <th style="width:17%">수수료 매출</th>
+                <th style="width:16%">유저 적립</th>
+                <th style="width:17%" class="rf-net-col">수익</th>
+                <!-- 상태 칸을 물렸다 — 한 달(한 제휴몰) 안에도 확정된 건과 대기 건이 섞인다 — 묶어서 「확정」이라
+                   붙이면 틀린 말이 된다(김반장 2026-09-03). 상태는 건별 내역에만 둔다. 셀은 그대로다.
+                <th style="width:8%">상태</th> -->
               </tr>
             </thead>
             <tbody id="rf-bd-tbody"></tbody>
@@ -3267,13 +3269,15 @@ window.CMS_FEATURES = {
             <table id="rf-mall-table">
               <thead>
                 <tr>
-                  <th style="width:20%">제휴몰</th>
-                  <th style="width:11%">주문 건수</th>
-                  <th style="width:16%">거래액</th>
-                  <th style="width:16%">수수료</th>
+                  <th style="width:23%">제휴몰</th>
+                  <th style="width:12%">주문 건수</th>
+                  <th style="width:17%">거래액</th>
+                  <th style="width:17%">수수료</th>
                   <th style="width:15%">유저 적립</th>
-                  <th style="width:15%" class="rf-net-col">수익</th>
-                  <th style="width:7%">상태</th>
+                  <th style="width:16%" class="rf-net-col">수익</th>
+                  <!-- 상태 칸을 물렸다 — 한 달(한 제휴몰) 안에도 확정된 건과 대기 건이 섞인다 — 묶어서 「확정」이라
+                   붙이면 틀린 말이 된다(김반장 2026-09-03). 상태는 건별 내역에만 둔다. 셀은 그대로다.
+                  <th style="width:7%">상태</th> -->
                 </tr>
               </thead>
               <tbody id="rf-mall-tbody"></tbody>
@@ -12188,7 +12192,10 @@ function rfBdRowHtml(b) {
     + '<td style="color:var(--amber)">− ' + ppN(lp.earn) + '원</td>'
     + '<td class="rf-net-col">' + ppN(lp.net) + '원'
     +   '<div style="font-size:11px;font-weight:400;color:var(--text-3)">' + rfPctOf(lp.net, lp.gmv).toFixed(2) + '%p</div></td>'
-    + '<td>' + status + '</td></tr>';
+    /* 상태 칸을 물렸다 — 묶은 줄 안에 확정과 대기가 섞이므로 한 말로 붙일 수 없다
+       (김반장 2026-09-03). 윗줄을 살리고 아랫줄을 지우면 그대로 돌아온다.
+    + '<td>' + status + '</td></tr>'; */
+    + '</tr>';
 }
 function rfBdTotalRows() {
   var L = { count: 0, gmv: 0, comm: 0, earn: 0, net: 0 };
@@ -12206,7 +12213,8 @@ function rfBdTotalRows() {
       + '<td style="font-weight:700">' + ppN(agg.comm) + '원</td>'
       + '<td style="font-weight:700;color:var(--amber)">− ' + ppN(agg.earn) + '원</td>'
       + '<td class="rf-net-col" style="font-weight:' + (strong ? '800' : '700') + '">' + ppN(agg.net) + '원</td>'
-      + '<td>—</td></tr>';
+      /* 상태 칸 물림 — 윗 주석 참고.  + '<td>—</td>' */
+      + '</tr>';
   }
   /* 줄은 링크프라이스만이고 쿠팡은 못 섞는다. 그런데 돈은 들어오는 것이라 총액에는
      쿠팡이 들어가야 한다 — 그래서 합계가 두 줄이다(까닭은 Notice 모달에). */
@@ -12222,7 +12230,7 @@ var BD_CTRL = window.BD_CTRL = ppMakeListController(12, function(pageItems, stat
   if (title) title.textContent = RF.viewName + ' 내역';
   var sub = document.getElementById('rf-bd-sub');
   if (sub) sub.textContent = RF.buckets.length + '개 구간';
-  if (!pageItems.length) { tb.innerHTML = ppEmpty(7, '기간 내 거래가 없습니다.'); if (pag) pag.innerHTML = ''; return; }
+  if (!pageItems.length) { tb.innerHTML = ppEmpty(6, '기간 내 거래가 없습니다.'); if (pag) pag.innerHTML = ''; return; }
   tb.innerHTML = pageItems.map(rfBdRowHtml).join('') + rfBdTotalRows();
   if (pag) pag.innerHTML = totalPages > 1 ? ppPaginationHtml('BD_CTRL', state.page, totalPages) : '';
 });
@@ -12347,7 +12355,7 @@ window.rfRenderMalls = function() {
   var sub = document.getElementById('rf-mall-sub');
   if (sub) sub.textContent = (RF.sel ? RF.sel.label + ' · ' : '') + list.length + '개';
 
-  if (!list.length) { tb.innerHTML = ppEmpty(7, '조건에 맞는 제휴몰이 없습니다.'); return; }
+  if (!list.length) { tb.innerHTML = ppEmpty(6, '조건에 맞는 제휴몰이 없습니다.'); return; }
   var T = rfAggregate(list.map(function(m) { return { amount: m.gmv, comm: m.comm, earn: m.earn, net: m.net }; }));
   tb.innerHTML = list.map(function(m) {
     var marginPp = (m.fee - m.rate);
@@ -12362,7 +12370,8 @@ window.rfRenderMalls = function() {
       + '<td style="color:var(--amber)">− ' + ppN(m.earn) + '원</td>'
       + '<td class="rf-net-col">' + ppN(m.net) + '원'
       +   '<div style="font-size:11px;font-weight:400;color:var(--text-3)">' + marginPp.toFixed(2) + '%p</div></td>'
-      + '<td>' + status + '</td></tr>';
+      /* 상태 칸 물림 — 윗 주석과 같은 까닭이다.  + '<td>' + status + '</td>' */
+      + '</tr>';
   }).join('')
   + '<tr style="border-top:2px solid var(--border)"><td style="text-align:left!important;font-weight:700">합계</td>'
   + '<td style="font-weight:700">' + ppN(T.count) + '건</td>'
@@ -12370,7 +12379,8 @@ window.rfRenderMalls = function() {
   + '<td style="font-weight:700">' + ppN(T.comm) + '원</td>'
   + '<td style="font-weight:700;color:var(--amber)">− ' + ppN(T.earn) + '원</td>'
   + '<td class="rf-net-col" style="font-weight:800">' + ppN(T.net) + '원</td>'
-  + '<td>—</td></tr>';
+  /* 상태 칸 물림  + '<td>—</td>' */
+  + '</tr>';
 };
 
 /* ── 엑셀 내려받기 ── 지금 화면에 보이는 것이 그대로 담긴다(김반장 지시).
@@ -12583,7 +12593,7 @@ window.rfDownloadXlsx = function() {
 window.rfLoad = function() {
   if (RF.built) { rfReload(); return; }
   var tb = document.getElementById('rf-mall-tbody');
-  if (tb) tb.innerHTML = ppEmpty(7, '불러오는 중…');
+  if (tb) tb.innerHTML = ppEmpty(6, '불러오는 중…');
   rfLoadRoster().then(function(roster) {
     RF.roster = roster;
     RF.orders = rfBuildOrders(roster);
