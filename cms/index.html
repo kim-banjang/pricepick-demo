@@ -439,6 +439,9 @@ tr:hover td{background:var(--surface-2);}
      #rf-cpbd-table  1기간 2주문건수 3거래액 4수수료 5유저적립 6수익 (기간별 탭의 쿠팡) */
 /* 머리글은 예외 없이 가운데다(김반장 2026-09-03). 줄만 아래 규칙대로 갈린다 —
    머리글까지 따라 움직이면 표마다 머리 줄이 들쭉날쭉해 보인다. */
+/* 카드가 세 장에서 다섯 장으로 늘었다 — 28px 그대로면 「311,651,600원」이 칸을 넘는다.
+   이 화면 카드만 줄인다(김반장 2026-09-03). */
+#sec-revenue-fee .stat-value{font-size:22px;letter-spacing:-.5px;}
 #sec-revenue-fee th{text-align:center!important;}
 #rf-od-table td:nth-child(2),
 #rf-od-table td:nth-child(3),
@@ -3220,7 +3223,14 @@ window.CMS_FEATURES = {
       <!-- 요약 카드 세 장은 탭 밖으로 내놓는다 — 어느 탭에서든 같이 보여야 한다
            (김반장 2026-09-03). 전에는 「기간별 매출」 판 안에 들어 있어 다른 탭으로
            넘어가면 사라졌고, 기본을 건별로 바꾸면 열자마자 안 보이게 된다. -->
-      <div class="stats-grid" style="grid-template-columns:repeat(3,1fr)">
+      <!-- 왼쪽에서 오른쪽으로 돈이 흐른다 — 몇 건 팔렸나 · 얼마어치 팔렸나 · 우리가 얼마
+           받았나 · 유저에게 얼마 나갔나 · 얼마 남았나. 쿠팡 + 링크프라이스를 합친 값이고
+           조회 기간을 따라 움직인다(김반장 2026-09-03). 「수수료 매출」을 넷에 안 적으셨지만
+           남겼다 — 빼면 「수익 = 수수료 − 유저 적립」에서 수수료가 사라져 유저 적립·수익이
+           어디서 나온 값인지 화면에서 확인할 길이 없어진다. 빼실 것이면 이 한 장만 지우면 된다. -->
+      <div class="stats-grid" style="grid-template-columns:repeat(5,1fr)">
+        <div class="stat-card blue"><div class="stat-label">주문 건수</div><div class="stat-value" id="rf-kpi-count">—</div><div class="stat-change neutral" id="rf-kpi-count-sub">—</div></div>
+        <div class="stat-card blue"><div class="stat-label">거래액</div><div class="stat-value" id="rf-kpi-gmv">—</div><div class="stat-change neutral" id="rf-kpi-gmv-sub">—</div></div>
         <div class="stat-card purple"><div class="stat-label">수수료 매출</div><div class="stat-value" id="rf-kpi-comm">—</div><div class="stat-change neutral" id="rf-kpi-comm-sub">—</div></div>
         <div class="stat-card amber"><div class="stat-label">유저 적립</div><div class="stat-value" id="rf-kpi-earn">—</div><div class="stat-change neutral" id="rf-kpi-earn-sub">—</div></div>
         <div class="stat-card green"><div class="stat-label">수익</div><div class="stat-value" id="rf-kpi-net">—</div><div class="stat-change neutral" id="rf-kpi-net-sub">—</div></div>
@@ -12259,10 +12269,19 @@ window.rfReload = function() {
      선택은 그 아래 블록만 좁힌다 — 위/아래 기준이 섞이면 숫자를 못 믿는다. */
   var baseAll = rfSplit(RF.base), A = baseAll.live;
   var baseLp = rfSplit(RF.base.filter(function(o) { return o.kind !== 'coupang'; }));
+  var baseCp = rfSplit(RF.base.filter(function(o) { return o.kind === 'coupang'; }));
+  var LPv = baseLp.live, CPv = baseCp.live;
 
   function setTxt(id, v) { var e = document.getElementById(id); if (e) e.textContent = v; }
+  /* 카드 다섯 장 — 아래 두 표의 합계와 같은 잣대(취소·취소(환수) 제외)를 쓴다.
+     갈라 놓은 두 표를 더한 값이라, 꼬리말에 쿠팡·링크프라이스를 따로 적어 어디서 온
+     값인지 카드에서 바로 짚을 수 있게 한다. */
+  setTxt('rf-kpi-count', ppN(A.count) + '건');
+  setTxt('rf-kpi-count-sub', '쿠팡 ' + ppN(CPv.count) + '건 + 링크프라이스 ' + ppN(LPv.count) + '건 · 취소 제외');
+  setTxt('rf-kpi-gmv', ppN(A.gmv) + '원');
+  setTxt('rf-kpi-gmv-sub', '쿠팡 ' + ppN(CPv.gmv) + '원 + 링크프라이스 ' + ppN(LPv.gmv) + '원');
   setTxt('rf-kpi-comm', ppN(A.comm) + '원');
-  setTxt('rf-kpi-comm-sub', '쿠팡 포함 · 거래액 ' + ppN(A.gmv) + '원 · 평균 수수료율 ' + rfPctOf(A.comm, A.gmv).toFixed(2) + '%');
+  setTxt('rf-kpi-comm-sub', '쿠팡 포함 · 평균 수수료율 ' + rfPctOf(A.comm, A.gmv).toFixed(2) + '%');
   setTxt('rf-kpi-earn', '− ' + ppN(A.earn) + '원');
   setTxt('rf-kpi-earn-sub', '수수료의 ' + rfPctOf(A.earn, A.comm).toFixed(1) + '% · 평균 적립률 ' + rfPctOf(A.earn, A.gmv).toFixed(2) + '%');
   setTxt('rf-kpi-net', ppN(A.net) + '원');
