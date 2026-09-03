@@ -12268,6 +12268,10 @@ var RF_CP_NO_ORDERNO = '<span style="font-size:11px;color:var(--text-3)" title="
 function rfCnt(n) { return ppN(n); }
 function rfWon(n) { return ppN(n) + '<span>원</span>'; }
 function rfKo(t) { return '<span>' + t + '</span>'; }
+/* 마디로 넣는 도우미는 반드시 이 자리(가장 바깥)에 둔다. 앞서 함수 안에 두었다가
+   다른 함수에서 부르는 순간 ReferenceError 가 나 그 뒤 줄을 그리는 코드가 통째로
+   멈췄다(2026-09-03). 문법 검사로는 안 잡힌다 — 돌려 봐야 잡힌다. */
+function rfSetHtml(id, v) { var e = document.getElementById(id); if (e) e.innerHTML = v; }
 
 /* 거래액 대비 비율 — 금액 앞에 작고 흐리게 붙인다. 딱 떨어지면 정수, 아니면 소수 한 자리.
    거래액이 0이거나 없으면 아무것도 적지 않는다 — 0으로 나누지 않는다.
@@ -12296,20 +12300,19 @@ window.rfReload = function() {
 
   function setTxt(id, v) { var e = document.getElementById(id); if (e) e.textContent = v; }
   /* 카드·꼬리말은 마디로 넣는다 — 한국어 조각을 <span> 으로 갈라야 사전이 잡는다. */
-  function setHtml(id, v) { var e = document.getElementById(id); if (e) e.innerHTML = v; }
   /* 카드 다섯 장 — 아래 두 표의 합계와 같은 잣대(취소·취소(환수) 제외)를 쓴다.
      갈라 놓은 두 표를 더한 값이라, 꼬리말에 쿠팡·링크프라이스를 따로 적어 어디서 온
      값인지 카드에서 바로 짚을 수 있게 한다. */
-  setHtml('rf-kpi-count', rfCnt(A.count));
-  setHtml('rf-kpi-count-sub', rfKo('쿠팡') + ' ' + rfCnt(CPv.count) + ' + ' + rfKo('링크프라이스') + ' ' + rfCnt(LPv.count) + ' · ' + rfKo('취소 제외'));
-  setHtml('rf-kpi-gmv', rfWon(A.gmv));
-  setHtml('rf-kpi-gmv-sub', rfKo('쿠팡') + ' ' + rfWon(CPv.gmv) + ' + ' + rfKo('링크프라이스') + ' ' + rfWon(LPv.gmv));
-  setHtml('rf-kpi-comm', rfWon(A.comm));
-  setHtml('rf-kpi-comm-sub', rfKo('쿠팡 포함 · 평균 수수료율') + ' ' + rfPctOf(A.comm, A.gmv).toFixed(2) + '%');
-  setHtml('rf-kpi-earn', '− ' + rfWon(A.earn));
-  setHtml('rf-kpi-earn-sub', rfKo('수수료의') + ' ' + rfPctOf(A.earn, A.comm).toFixed(1) + '% · ' + rfKo('평균 적립률') + ' ' + rfPctOf(A.earn, A.gmv).toFixed(2) + '%');
-  setHtml('rf-kpi-net', rfWon(A.net));
-  setHtml('rf-kpi-net-sub', rfKo('수수료 − 유저 적립 · 거래액 대비') + ' ' + rfPctOf(A.net, A.gmv).toFixed(2) + '%p');
+  rfSetHtml('rf-kpi-count', rfCnt(A.count));
+  rfSetHtml('rf-kpi-count-sub', rfKo('쿠팡') + ' ' + rfCnt(CPv.count) + ' + ' + rfKo('링크프라이스') + ' ' + rfCnt(LPv.count) + ' · ' + rfKo('취소 제외'));
+  rfSetHtml('rf-kpi-gmv', rfWon(A.gmv));
+  rfSetHtml('rf-kpi-gmv-sub', rfKo('쿠팡') + ' ' + rfWon(CPv.gmv) + ' + ' + rfKo('링크프라이스') + ' ' + rfWon(LPv.gmv));
+  rfSetHtml('rf-kpi-comm', rfWon(A.comm));
+  rfSetHtml('rf-kpi-comm-sub', rfKo('쿠팡 포함 · 평균 수수료율') + ' ' + rfPctOf(A.comm, A.gmv).toFixed(2) + '%');
+  rfSetHtml('rf-kpi-earn', '− ' + rfWon(A.earn));
+  rfSetHtml('rf-kpi-earn-sub', rfKo('수수료의') + ' ' + rfPctOf(A.earn, A.comm).toFixed(1) + '% · ' + rfKo('평균 적립률') + ' ' + rfPctOf(A.earn, A.gmv).toFixed(2) + '%');
+  rfSetHtml('rf-kpi-net', rfWon(A.net));
+  rfSetHtml('rf-kpi-net-sub', rfKo('수수료 − 유저 적립 · 거래액 대비') + ' ' + rfPctOf(A.net, A.gmv).toFixed(2) + '%p');
 
   var lbl = document.getElementById('rf-period-label');
   if (lbl) lbl.innerHTML = ppDt(p.from) + ' ~ ' + ppDt(p.to) + ' · ' + rfKo('링크프라이스 주문') + ' ' + rfCnt(baseLp.live.count);
@@ -12546,14 +12549,14 @@ function rfRenderScope(scope) {
        어느 쪽이 맞는지 물어볼 수밖에 없게 된다. */
     var cpSub = scopeNote + rfKo('수수료') + ' ' + cpMall.fee.toFixed(2) + '% − ' + rfKo('적립률') + ' ' + cpMall.rate.toFixed(2)
       + '% = ' + rfKo('수익') + ' ' + (cpMall.fee - cpMall.rate).toFixed(2) + '%p';
-    setHtml('rf-cp-sub', cpSub);
-    setHtml('rf-cpbd-sub', cpSub);
+    rfSetHtml('rf-cp-sub', cpSub);
+    rfSetHtml('rf-cpbd-sub', cpSub);
   }
   /* 취소 둘 다 뺀다 — 상태가 넯으로 늘면서 'canceled' 하나만 보면 환수된 건이
      지급 건수에 남아 버린다. 합계(live)와 같은 잣대를 써야 서로 맞는다. */
   var payouts = cpRows.filter(function(o) { return !rfIsCanceled(o) && o.earn >= TA_TICKET_VALUE.bronze; }).length;
-  setHtml('rf-cp-payouts', rfCnt(payouts));
-  setHtml('rf-cpbd-payouts', rfCnt(payouts));
+  rfSetHtml('rf-cp-payouts', rfCnt(payouts));
+  rfSetHtml('rf-cpbd-payouts', rfCnt(payouts));
 
   var byMall = {};
   RF.roster.forEach(function(m) {
