@@ -12361,7 +12361,10 @@ function rfOdRowHtml(o) {
   var cancelled = o.status === 'canceled';
   var dim = cancelled ? 'color:var(--text-3);' : '';
   return '<tr>'
-    + '<td style="text-align:left!important;' + dim + '">' + ppDt(o.at) + '</td>'
+    /* 주문일은 두 줄 — 날짜 밑에 시·분·초. 같은 날 건이 수십 건이라 시각이 없으면
+       실구매 기록과 줄을 맞출 수가 없다(김반장 2026-09-03). */
+    + '<td style="text-align:left!important;white-space:nowrap;' + dim + '"><div>' + ppDt(o.at) + '</div>'
+    +   '<div style="padding-left:10px;font-size:11px;color:var(--text-3)">' + ppTm(o.at) + '</div></td>'
     + '<td style="text-align:left!important;' + dim + '">' + o.mall
     +   (o.kind === 'coupang' ? ' <span class="rf-mall-kind">직접 제휴</span>' : '') + '</td>'
     + '<td style="' + dim + '">' + (o.kind === 'coupang' ? RF_CP_NA : o.orderNo) + '</td>'
@@ -12428,20 +12431,20 @@ window.rfDownloadOrdersXlsx = function() {
   var W = function(n) { return { v: n, s: 2 }; };
   var NA = '—';
   var ST = { confirmed: '확정', pending: '확정 대기', canceled: '취소' };
-  var out = [H(['주문일', '제휴몰', '구분', '주문번호', '거래액', '수수료', '유저 적립', '남는 것', '상태'])];
+  var out = [H(['주문일', '시각', '제휴몰', '구분', '주문번호', '거래액', '수수료', '유저 적립', '남는 것', '상태'])];
   rows.forEach(function(o) {
-    out.push([ppDt(o.at), o.mall, o.kind === 'coupang' ? '직접 제휴' : '링크프라이스',
+    out.push([ppDt(o.at), ppTm(o.at), o.mall, o.kind === 'coupang' ? '직접 제휴' : '링크프라이스',
       o.kind === 'coupang' ? NA : o.orderNo,
       W(o.amount), W(o.comm), W(o.earn), W(o.net), ST[o.status] || o.status]);
   });
   var live = rows.filter(function(o) { return o.status !== 'canceled'; });
   var sum = function(k) { return live.reduce(function(a, o) { return a + o[k]; }, 0); };
   out.push([]);
-  out.push(['합계 (취소 제외)', '', '', W(live.length) , W(sum('amount')), W(sum('comm')), W(sum('earn')), W(sum('net')), '']);
+  out.push(['합계 (취소 제외)', '', '', '', W(live.length), W(sum('amount')), W(sum('comm')), W(sum('earn')), W(sum('net')), '']);
   out.push([]);
   out.push(['쿠팡 주문번호', '— 쿠팡은 주문번호가 오지 않아 건별로 짚을 수 없습니다 (0이 아니라 알 수 없음)']);
   ppDownloadXlsx('제휴수수료매출_건별_' + ppDateInputValue(p.from) + '_' + ppDateInputValue(p.to) + '.xlsx',
-    [{ name: '건별 내역', rows: out, widths: [13, 20, 12, 18, 14, 14, 14, 14, 11] }]);
+    [{ name: '건별 내역', rows: out, widths: [13, 11, 20, 12, 18, 14, 14, 14, 14, 11] }]);
 };
 
 window.rfDownloadXlsx = function() {
