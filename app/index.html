@@ -20005,26 +20005,25 @@ function mt21PurchaseLine(pb, cancelledOn, clawbackCount) {
   var amtKo = pb.purchase_amount ? pb.purchase_amount.toLocaleString('ko-KR') + '원 구매' : '';
   var amtVi = pb.purchase_amount ? 'mua ' + pb.purchase_amount.toLocaleString('ko-KR') + '원' : '';
   if (!d && !amtKo && !mallKo) return '';
-  /* 취소날은 줄을 새로 만들지 않고 같은 줄 끝에 잇는다 — 줄을 늘리면 카드 높이가 옆줄과 어긋난다.
-     연도는 앞 날짜에 이미 있으니 월·일만 쓴다. 전환 뒤 회수된 건은 몇 장을 가져갔는지까지 적는다. */
-  var tailKo = '', tailVi = '';
-  if (cancelledOn) {
-    var md = cancelledOn.slice(5);
-    tailKo = ' · ' + md + ' 구매 취소';
-    tailVi = ' · ' + md + ' hủy mua';
-    if (clawbackCount) {
-      tailKo += ' · ' + clawbackCount + '장 회수';
-      tailVi += ' · thu hồi ' + clawbackCount + ' vé';
-    }
-  }
-  /* 구매처가 붙어 줄이 길어졌다 — 취소·회수 줄은 두 줄로 넘어간다. 넘치는 게 아니라 그냥
-     아래로 흐르는 것이라 잘리지 않는다. 다만 한글은 기본값이면 낱말 가운데서 끊겨서
-     "구매 취" / "소" 처럼 갈라진다 — keep-all로 빈칸에서만 끊기게 한다(이 파일이 이미 쓰는 값). */
+  /* 한글은 기본값이면 낱말 가운데서 끊긴다("구매 취"/"소") — keep-all로 빈칸에서만 끊기게 한다
+     (이 파일이 이미 쓰는 값). */
+  var css = 'display:block;color:#9B93B0;font-size:var(--fs-caption);font-weight:400;word-break:keep-all;';
   var joined = function (parts) { return parts.filter(Boolean).join(' · '); };
-  return '<span style="display:block;color:#9B93B0;font-size:var(--fs-caption);font-weight:400;word-break:keep-all;">' + mt21I18n(
-    joined([d, mallKo, amtKo]) + tailKo,
-    joined([d, mallVi, amtVi]) + tailVi
+  var out = '<span style="' + css + '">' + mt21I18n(
+    joined([d, mallKo, amtKo]),
+    joined([d, mallVi, amtVi])
   ) + '</span>';
+  /* 취소·회수는 「산 날」과 다른 사건이라 줄을 따로 뺀다(김반장 2026-09-03 시안). 흘러넘친 줄로
+     보이면 안 되니 첫 줄과 같은 크기·같은 색을 쓰되 3px 띄우고, 첫 줄처럼 연도까지 붙인
+     날짜로 시작한다 — 두 줄 다 날짜로 시작하면 줄바꿈이 아니라 두 사건임이 바로 읽힌다. */
+  if (cancelledOn) {
+    var ko = [cancelledOn, '구매 취소'], vi = [cancelledOn, 'hủy mua'];
+    if (clawbackCount) { ko.push(clawbackCount + '장 회수'); vi.push('thu hồi ' + clawbackCount + ' vé'); }
+    out += '<span style="' + css + 'margin-top:3px;">' + mt21I18n(ko.join(' · '), vi.join(' · ')) + '</span>';
+  }
+  /* 한 덩이로 감싼다 — 대기중 줄은 이 자리가 flex 칸이라, 안 감싸면 두 줄이 각각 칸이 되어
+     위에서 정한 3px 대신 칸 사이 간격(6px)이 끼어든다. 완료 줄과 간격이 달라지면 안 된다. */
+  return '<span style="display:block;">' + out + '</span>';
 }
 /* 티켓 적립 내역 — 시안 카드(반경16·그림자·구분선) 그대로, phone19의 구 .gd-pending-multi 스타일과는 분리 */
 function mt21RenderPending(doneItems, pendItems, waitDays) {
@@ -20176,18 +20175,32 @@ function renderTicketDetail() {
     /* 랜덤 티켓 활성화 목록 — 전환 완료(postback 단위 등급 구성 공개) + 대기중(D-day, 등급 미공개) */
     var waitDays = (PP.user && PP.user.linked_kakao) ? 7 : 30;
     var doneItems = Object.keys(done).map(function (key) {
-      var b = done[key];
+      var b = done[key], pb = pbMap[key];
+      /* 등급 구성은 쌓여 있는 티켓 문서를 세지 않고 구매금액에서 정책대로 다시 뽑는다
+         (greedyTickets = 5,000원 브론즈 · 50,000원 실버 · 100,000원 골드, 큰 단위부터 채우고 잔돈 버림).
+         예전 코드가 만들어 둔 낡은 조합이 DB에 그대로 남아 있어서(70,000원인데 브론즈 14장,
+         300,000원인데 실버 6장 같은) 문서를 세면 화면이 정책과 어긋난다 — 이 목록이 답해야 하는 건
+         "지금 몇 장 쌓여 있나"가 아니라 "이 구매로 정책상 몇 장인가"다. 김반장 2026-09-03 확정.
+         구매금액을 모르는 옛 포스트백만 어쩔 수 없이 문서 수를 그대로 쓴다.
+         회수 장수도 이 값을 더해 쓰므로 위 등급 줄과 아래 「N장 회수」가 어긋날 수 없다. */
+      var grades = b.grades;
+      if (pb && pb.purchase_amount) {
+        var byPolicy = greedyTickets(pb.purchase_amount);
+        grades = {};
+        ['bronze', 'silver', 'gold'].forEach(function (g) { if (byPolicy[g]) grades[g] = byPolicy[g]; });
+      }
       var mainGrade = ['bronze', 'silver', 'gold'].reduce(function (best, g) {
-        if (!b.grades[g]) return best;
-        if (!best || b.grades[g] > b.grades[best]) return g;
+        if (!grades[g]) return best;
+        if (!best || grades[g] > grades[best]) return g;
         return best;
       }, null) || 'bronze';
-      var label = ['bronze', 'silver', 'gold'].filter(function (g) { return b.grades[g]; })
-        .map(function (g) { return GRADE_KO[g] + ' ' + b.grades[g] + '장'; }).join(' + ');
-      var labelVi = ['bronze', 'silver', 'gold'].filter(function (g) { return b.grades[g]; })
-        .map(function (g) { return b.grades[g] + ' vé ' + MT21_GRADE_VI[g]; }).join(' + ');
-      return { earnedAt: b.earnedAt, label: label, labelVi: labelVi, grade: mainGrade, grades: b.grades, pb: pbMap[key], cancelledOn: mt21DemoCancel(pbMap[key]) };
-    }).sort(function (a, b) { return (b.earnedAt ? b.earnedAt.getTime() : 0) - (a.earnedAt ? a.earnedAt.getTime() : 0); });
+      var label = ['bronze', 'silver', 'gold'].filter(function (g) { return grades[g]; })
+        .map(function (g) { return GRADE_KO[g] + ' ' + grades[g] + '장'; }).join(' + ');
+      var labelVi = ['bronze', 'silver', 'gold'].filter(function (g) { return grades[g]; })
+        .map(function (g) { return grades[g] + ' vé ' + MT21_GRADE_VI[g]; }).join(' + ');
+      return { earnedAt: b.earnedAt, label: label, labelVi: labelVi, grade: mainGrade, grades: grades, pb: pb, cancelledOn: mt21DemoCancel(pb) };
+    }).filter(function (it) { return it.label; })
+      .sort(function (a, b) { return (b.earnedAt ? b.earnedAt.getTime() : 0) - (a.earnedAt ? a.earnedAt.getTime() : 0); });
 
     /* 대기중 랜덤 티켓 = "아직 안 깐 뽑기권" — 구매(포스트백) 1건당 1장이다.
        Greedy가 이미 등급별로 나눠 pending user_tickets를 여러 장 만들어 두지만(확정 시 그대로 활성화되도록),
