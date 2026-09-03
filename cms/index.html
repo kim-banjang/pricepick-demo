@@ -3183,20 +3183,25 @@ window.CMS_FEATURES = {
         <span style="font-size:12px;color:var(--text-3)" id="rf-period-label">—</span>
       </div>
 
-      <div class="terms-nav">
-        <div class="terms-tab active" onclick="rfSwitchTab(this,'rf-tab-period')">기간별 매출</div>
-        <div class="terms-tab" onclick="rfSwitchTab(this,'rf-tab-mall')">제휴몰별</div>
-        <div class="terms-tab" onclick="rfSwitchTab(this,'rf-tab-order')">건별 내역</div>
+      <!-- 요약 카드 세 장은 탭 밖으로 내놓는다 — 어느 탭에서든 같이 보여야 한다
+           (김반장 2026-09-03). 전에는 「기간별 매출」 판 안에 들어 있어 다른 탭으로
+           넘어가면 사라졌고, 기본을 건별로 바꾸면 열자마자 안 보이게 된다. -->
+      <div class="stats-grid" style="grid-template-columns:repeat(3,1fr)">
+        <div class="stat-card purple"><div class="stat-label">수수료 매출</div><div class="stat-value" id="rf-kpi-comm">—</div><div class="stat-change neutral" id="rf-kpi-comm-sub">—</div></div>
+        <div class="stat-card amber"><div class="stat-label">유저 적립</div><div class="stat-value" id="rf-kpi-earn">—</div><div class="stat-change neutral" id="rf-kpi-earn-sub">—</div></div>
+        <div class="stat-card green"><div class="stat-label">수익</div><div class="stat-value" id="rf-kpi-net">—</div><div class="stat-change neutral" id="rf-kpi-net-sub">—</div></div>
       </div>
 
-      <!-- ── 탭 1 · 기간별 매출 — 얼마 벌었나 ── -->
-      <div id="rf-tab-period">
-        <div class="stats-grid" style="grid-template-columns:repeat(3,1fr)">
-          <div class="stat-card purple"><div class="stat-label">수수료 매출</div><div class="stat-value" id="rf-kpi-comm">—</div><div class="stat-change neutral" id="rf-kpi-comm-sub">—</div></div>
-          <div class="stat-card amber"><div class="stat-label">유저 적립</div><div class="stat-value" id="rf-kpi-earn">—</div><div class="stat-change neutral" id="rf-kpi-earn-sub">—</div></div>
-          <div class="stat-card green"><div class="stat-label">수익</div><div class="stat-value" id="rf-kpi-net">—</div><div class="stat-change neutral" id="rf-kpi-net-sub">—</div></div>
-        </div>
+      <!-- 건별 내역이 맨 앞이고 기본이다(김반장 2026-09-03) — 이 화면을 여는 까닭은
+           대개 「그 건이 여기 제대로 들어왔나」라, 묶은 숫자보다 건별이 먼저 보여야 한다. -->
+      <div class="terms-nav">
+        <div class="terms-tab active" onclick="rfSwitchTab(this,'rf-tab-order')">건별 내역</div>
+        <div class="terms-tab" onclick="rfSwitchTab(this,'rf-tab-period')">기간별 매출</div>
+        <div class="terms-tab" onclick="rfSwitchTab(this,'rf-tab-mall')">제휴몰별</div>
+      </div>
 
+      <!-- ── 탭 2 · 기간별 매출 — 얼마 벌었나 ── -->
+      <div id="rf-tab-period" style="display:none">
         <div class="card">
           <div class="card-header">
             <div><div class="card-title" id="rf-bd-title">월별 내역</div><div class="card-sub" id="rf-bd-sub">—</div></div>
@@ -3240,7 +3245,7 @@ window.CMS_FEATURES = {
         </div>
       </div>
 
-      <!-- ── 탭 2 · 제휴몰별 — 어디가 돈이 되나 ── -->
+      <!-- ── 탭 3 · 제휴몰별 — 어디가 돈이 되나 ── -->
       <div id="rf-tab-mall" style="display:none">
         <div class="rf-drill" id="rf-drill" style="display:none">
           <span class="rf-drill-mark">▸</span>
@@ -3300,8 +3305,8 @@ window.CMS_FEATURES = {
         </div>
       </div>
 
-      <!-- ── 탭 3 · 건별 내역 — 한 건씩 짚어 보기 ── -->
-      <div id="rf-tab-order" style="display:none">
+      <!-- ── 탭 1 · 건별 내역 — 한 건씩 짚어 보기 (기본) ── -->
+      <div id="rf-tab-order">
         <div class="card">
           <div class="card-header">
             <div><div class="card-title">건별 내역</div><div class="card-sub" id="rf-od-sub">—</div></div>
@@ -12240,8 +12245,15 @@ window.rfSelectBucket = function(key) {
   RF.sel = (RF.sel && RF.sel.key === key) ? null : (RF.buckets.filter(function(b) { return b.key === key; })[0] || null);
   rfRefreshDrill();
   if (RF.sel) {
+    /* 탭을 차례(tabs[1])로 짚지 않는다 — 차례가 바뀌면 엉뚟한 탭이 열리고,
+       그런 버송은 누를 때까지 모른다. 가려는 판 이름으로 찾는다. */
     var tabs = document.querySelectorAll('#sec-revenue-fee .terms-tab');
-    if (tabs[1]) rfSwitchTab(tabs[1], 'rf-tab-mall');
+    for (var ti = 0; ti < tabs.length; ti++) {
+      if ((tabs[ti].getAttribute('onclick') || '').indexOf('rf-tab-mall') >= 0) {
+        rfSwitchTab(tabs[ti], 'rf-tab-mall');
+        break;
+      }
+    }
   }
 };
 
