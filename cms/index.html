@@ -406,14 +406,24 @@ tr:hover td{background:var(--surface-2);}
 
 /* ── 툴바/필터 ── */
 .toolbar{display:flex;gap:10px;margin-bottom:16px;align-items:center;flex-wrap:wrap;}
-/* 조회 기간 줄 — 고르기 칸(filter-sel)·날짜 칸(form-input은 height:40px)·
-   조회 단추(btn-sm)가 저마다 다른 높이로 났다(김반장 2026-09-03).
-   클래스 자체를 고치면 CMS 다른 화면이 다 같이 움직이므로 이 줄에서만 맞춘다. */
-.rf-period-bar{align-items:center;}
-.rf-period-bar .filter-sel,
-.rf-period-bar .form-input,
-.rf-period-bar .btn{height:36px;box-sizing:border-box;padding-top:0;padding-bottom:0;line-height:normal;}
-.rf-period-bar .btn{padding-left:16px;padding-right:16px;font-size:12px;}
+/* ── 제휴 수수료 매출 — 칸·단추 높이를 하나로 ──
+   한 줄에 놓인 것들이 저마다 다른 높이로 났다 — 김반장이 두 군데를 연달아
+   짚으셨다(2026-09-03). 원래 값은 form-input 40px · filter-sel/search-box ≈ 36px ·
+   btn-sm ≈ 27px 로 세 가지였다.
+   값을 --rf-ctl-h 하나로 두고 이 화면의 모든 입력칸·고르기·단추가 그것만 보게 한다 —
+   칸마다 따로 적으면 다음에 하나 더할 때 또 어긋난다.
+   화면 밖으로는 안 나간다: .btn-sm·.filter-sel 자체를 고치면 CMS 툴바 열세 줄이
+   다 같이 움직이고, 그중 아홉은 김반장이 아직 안 보신 화면이다. */
+#sec-revenue-fee{--rf-ctl-h:36px;}
+#sec-revenue-fee .form-input,
+#sec-revenue-fee .filter-sel,
+#sec-revenue-fee .search-box,
+#sec-revenue-fee .btn{
+  height:var(--rf-ctl-h);box-sizing:border-box;
+  padding-top:0;padding-bottom:0;line-height:normal;vertical-align:middle;}
+#sec-revenue-fee .btn{padding-left:16px;padding-right:16px;font-size:12px;}
+/* 세로 가운데는 .toolbar·.card-header 가 이미 align-items:center 를 갖고 있으니
+   따로 적지 않는다 — 높이가 같아지면 그것만으로 줄이 맞는다. */
 .search-box{background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r-md);
   padding:8px 14px;color:var(--text);font-size:13px;outline:none;font-family:var(--font);min-width:200px;transition:border-color .15s;}
 .search-box:focus{border-color:var(--main);}
@@ -3155,7 +3165,7 @@ window.CMS_FEATURES = {
         <span class="ta-notice-mark">!</span>
       </button>
 
-      <div class="toolbar rf-period-bar">
+      <div class="toolbar">
         <span class="rf-tb-label">조회 기간</span>
         <select class="filter-sel" id="rf-period-mode" onchange="rfPeriodModeChanged()">
           <option value="day">하루</option>
