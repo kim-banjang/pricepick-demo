@@ -435,7 +435,8 @@ tr:hover td{background:var(--surface-2);}
      #rf-od-table    1주문일 2제휴몰 3주문번호 4회원 5거래액 6수수료 7유저적립 8수익 9상태
      #rf-bd-table    1기간 2주문건수 3거래액 4수수료매출 5유저적립 6수익
      #rf-mall-table  1제휴몰 2주문건수 3거래액 4수수료 5유저적립 6수익
-     #rf-cp-table    위와 같다(쿠팡 한 줄) */
+     #rf-cp-table    위와 같다(제휴몰별 탭의 쿠팡 한 줄)
+     #rf-cpbd-table  1기간 2주문건수 3거래액 4수수료 5유저적립 6수익 (기간별 탭의 쿠팡) */
 #rf-od-table th:nth-child(2), #rf-od-table td:nth-child(2),
 #rf-od-table th:nth-child(3), #rf-od-table td:nth-child(3),
 #rf-mall-table th:nth-child(1), #rf-mall-table td:nth-child(1),
@@ -443,12 +444,14 @@ tr:hover td{background:var(--surface-2);}
 #rf-od-table th:nth-child(1), #rf-od-table td:nth-child(1),
 #rf-od-table th:nth-child(4), #rf-od-table td:nth-child(4),
 #rf-od-table th:nth-child(9), #rf-od-table td:nth-child(9),
-#rf-bd-table th:nth-child(1), #rf-bd-table td:nth-child(1){text-align:center!important;}
+#rf-bd-table th:nth-child(1), #rf-bd-table td:nth-child(1),
+#rf-cpbd-table th:nth-child(1), #rf-cpbd-table td:nth-child(1){text-align:center!important;}
 #rf-od-table th:nth-child(n+5):nth-child(-n+8),
 #rf-od-table td:nth-child(n+5):nth-child(-n+8),
 #rf-bd-table th:nth-child(n+2), #rf-bd-table td:nth-child(n+2),
 #rf-mall-table th:nth-child(n+2), #rf-mall-table td:nth-child(n+2),
-#rf-cp-table th:nth-child(n+2), #rf-cp-table td:nth-child(n+2){text-align:right!important;}
+#rf-cp-table th:nth-child(n+2), #rf-cp-table td:nth-child(n+2),
+#rf-cpbd-table th:nth-child(n+2), #rf-cpbd-table td:nth-child(n+2){text-align:right!important;}
 /* 세로 가운데는 .toolbar·.card-header 가 이미 align-items:center 를 갖고 있으니
    따로 적지 않는다 — 높이가 같아지면 그것만으로 줄이 맞는다. */
 .search-box{background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r-md);
