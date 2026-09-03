@@ -12202,8 +12202,10 @@ var RF_CP_NO_ORDERNO = '<span style="font-size:11px;color:var(--text-3)" title="
    자리에서 아직 쓰이므로 그대로 두고, 눈에 보이는 칸에는 이걸 쓴다. */
 var RF_CP_NO_COUNT = '<span style="font-size:11px;color:var(--text-3)" title="쿠팡은 거래액·수수료가 총액으로만 들어와 주문 건수를 셀 수 없습니다. 0이 아니라 받을 수 없는 값입니다.">쿠팡 미제공</span>';
 
-/* 거래액 대비 비율 — 건마다 다르다. 딱 떨어지면 정수, 아니면 소수 한 자리.
-   거래액이 0이거나 없으면 아무것도 적지 않는다 — 0으로 나누지 않는다. */
+/* 거래액 대비 비율 — 금액 앞에 작고 흐리게 붙인다. 딱 떨어지면 정수, 아니면 소수 한 자리.
+   거래액이 0이거나 없으면 아무것도 적지 않는다 — 0으로 나누지 않는다.
+   건별·월별·제휴몰별·쿠팡 네 표가 다 이걸 쓴다(김반장 2026-09-03) — 표마다 따로 셈하면
+   같은 값이 표마다 다르게 반올림된다. */
 function rfOdPct(part, gmv) {
   if (!gmv || gmv <= 0) return '';
   var r = Math.round(Math.abs(part) / gmv * 1000) / 10;
@@ -12285,10 +12287,10 @@ function rfBdRowHtml(b) {
     +   '<div class="rf-mall-kind">' + b.sub + '</div></td>'
     + '<td>' + ppN(lp.count) + '건</td>'
     + '<td>' + ppN(lp.gmv) + '원</td>'
-    + '<td style="font-weight:600">' + ppN(lp.comm) + '원</td>'
-    + '<td style="color:var(--amber)">− ' + ppN(lp.earn) + '원</td>'
-    + '<td class="rf-net-col">' + ppN(lp.net) + '원'
-    +   '<div style="font-size:11px;font-weight:400;color:var(--text-3)">' + rfPctOf(lp.net, lp.gmv).toFixed(2) + '%p</div></td>'
+    + '<td style="font-weight:600">' + rfOdPct(lp.comm, lp.gmv) + ppN(lp.comm) + '원</td>'
+    + '<td style="color:var(--amber)">' + rfOdPct(lp.earn, lp.gmv) + '− ' + ppN(lp.earn) + '원</td>'
+    /* 수익 밑에 있던 「%p」를 앞으로 — 제휴몰별과 같은 까닭이다. */
+    + '<td class="rf-net-col">' + rfOdPct(lp.net, lp.gmv) + ppN(lp.net) + '원</td>'
     /* 상태 칸을 물렸다 — 묶은 줄 안에 확정과 대기가 섞이므로 한 말로 붙일 수 없다
        (김반장 2026-09-03). 윗줄을 살리고 아랫줄을 지우면 그대로 돌아온다.
     + '<td>' + status + '</td></tr>'; */
@@ -12307,9 +12309,9 @@ function rfBdTotalRows() {
       +   ' <span style="font-weight:400;font-size:11px;color:var(--text-3)">' + note + '</span></td>'
       + '<td style="font-weight:700">' + countCell + '</td>'
       + '<td style="font-weight:700">' + ppN(agg.gmv) + '원</td>'
-      + '<td style="font-weight:700">' + ppN(agg.comm) + '원</td>'
-      + '<td style="font-weight:700;color:var(--amber)">− ' + ppN(agg.earn) + '원</td>'
-      + '<td class="rf-net-col" style="font-weight:' + (strong ? '800' : '700') + '">' + ppN(agg.net) + '원</td>'
+      + '<td style="font-weight:700">' + rfOdPct(agg.comm, agg.gmv) + ppN(agg.comm) + '원</td>'
+      + '<td style="font-weight:700;color:var(--amber)">' + rfOdPct(agg.earn, agg.gmv) + '− ' + ppN(agg.earn) + '원</td>'
+      + '<td class="rf-net-col" style="font-weight:' + (strong ? '800' : '700') + '">' + rfOdPct(agg.net, agg.gmv) + ppN(agg.net) + '원</td>'
       /* 상태 칸 물림 — 윗 주석 참고.  + '<td>—</td>' */
       + '</tr>';
   }
@@ -12420,15 +12422,13 @@ function rfRenderScope(scope) {
   var ctb = document.getElementById('rf-cp-tbody');
   if (ctb) {
     var CL = CP.live;
-    var cpPp = cpMall ? (cpMall.fee - cpMall.rate) : rfPctOf(CL.net, CL.gmv);
     ctb.innerHTML = '<tr>'
       + '<td style="font-weight:700">쿠팡 <span class="rf-mall-kind">직접 제휴</span></td>'
       + '<td>' + RF_CP_NO_COUNT + '</td>'
       + '<td>' + ppN(CL.gmv) + '원</td>'
-      + '<td style="font-weight:600">' + ppN(CL.comm) + '원</td>'
-      + '<td style="color:var(--amber)">− ' + ppN(CL.earn) + '원</td>'
-      + '<td class="rf-net-col">' + ppN(CL.net) + '원'
-      +   '<div style="font-size:11px;font-weight:400;color:var(--text-3)">' + cpPp.toFixed(2) + '%p</div></td>'
+      + '<td style="font-weight:600">' + rfOdPct(CL.comm, CL.gmv) + ppN(CL.comm) + '원</td>'
+      + '<td style="color:var(--amber)">' + rfOdPct(CL.earn, CL.gmv) + '− ' + ppN(CL.earn) + '원</td>'
+      + '<td class="rf-net-col">' + rfOdPct(CL.net, CL.gmv) + ppN(CL.net) + '원</td>'
       + '</tr>';
   }
   if (cpMall) {
@@ -12476,26 +12476,27 @@ window.rfRenderMalls = function() {
   if (!list.length) { tb.innerHTML = ppEmpty(6, '조건에 맞는 제휴몰이 없습니다.'); return; }
   var T = rfAggregate(list.map(function(m) { return { amount: m.gmv, comm: m.comm, earn: m.earn, net: m.net }; }));
   tb.innerHTML = list.map(function(m) {
-    var marginPp = (m.fee - m.rate);
     var status = m.pendingGrantComm > 0 ? RF_OD_BADGE.pending_grant
       : (m.count > 0 ? RF_OD_BADGE.granted : '<span class="badge badge-gray">거래 없음</span>');
     return '<tr>'
       + '<td style="font-weight:700">' + m.name + '</td>'
       + '<td>' + ppN(m.count) + '건</td>'
       + '<td>' + ppN(m.gmv) + '원</td>'
-      + '<td style="font-weight:600">' + ppN(m.comm) + '원</td>'
-      + '<td style="color:var(--amber)">− ' + ppN(m.earn) + '원</td>'
-      + '<td class="rf-net-col">' + ppN(m.net) + '원'
-      +   '<div style="font-size:11px;font-weight:400;color:var(--text-3)">' + marginPp.toFixed(2) + '%p</div></td>'
+      + '<td style="font-weight:600">' + rfOdPct(m.comm, m.gmv) + ppN(m.comm) + '원</td>'
+      + '<td style="color:var(--amber)">' + rfOdPct(m.earn, m.gmv) + '− ' + ppN(m.earn) + '원</td>'
+      /* 수익 밑에 있던 「%p」(수수료율 − 적립률)를 앞으로 옮겼다 — 같은 값을 두 번 적게
+         되기 때문이다. 정책값(fee − rate)과 집계값(net ÷ gmv)의 차이는 표본 전체에서
+         가장 큰 것이 0.0005%p 라 소수 한 자리로는 같은 값이다(김반장 2026-09-03 확인). */
+      + '<td class="rf-net-col">' + rfOdPct(m.net, m.gmv) + ppN(m.net) + '원</td>'
       /* 상태 칸 물림 — 윗 주석과 같은 까닭이다.  + '<td>' + status + '</td>' */
       + '</tr>';
   }).join('')
   + '<tr style="border-top:2px solid var(--border)"><td style="font-weight:700">합계</td>'
   + '<td style="font-weight:700">' + ppN(T.count) + '건</td>'
   + '<td style="font-weight:700">' + ppN(T.gmv) + '원</td>'
-  + '<td style="font-weight:700">' + ppN(T.comm) + '원</td>'
-  + '<td style="font-weight:700;color:var(--amber)">− ' + ppN(T.earn) + '원</td>'
-  + '<td class="rf-net-col" style="font-weight:800">' + ppN(T.net) + '원</td>'
+  + '<td style="font-weight:700">' + rfOdPct(T.comm, T.gmv) + ppN(T.comm) + '원</td>'
+  + '<td style="font-weight:700;color:var(--amber)">' + rfOdPct(T.earn, T.gmv) + '− ' + ppN(T.earn) + '원</td>'
+  + '<td class="rf-net-col" style="font-weight:800">' + rfOdPct(T.net, T.gmv) + ppN(T.net) + '원</td>'
   /* 상태 칸 물림  + '<td>—</td>' */
   + '</tr>';
 };
