@@ -439,9 +439,16 @@ tr:hover td{background:var(--surface-2);}
      #rf-cpbd-table  1기간 2주문건수 3거래액 4수수료 5유저적립 6수익 (기간별 탭의 쿠팡) */
 /* 머리글은 예외 없이 가운데다(김반장 2026-09-03). 줄만 아래 규칙대로 갈린다 —
    머리글까지 따라 움직이면 표마다 머리 줄이 들쭉날쭉해 보인다. */
-/* 카드가 세 장에서 다섯 장으로 늘었다 — 28px 그대로면 「311,651,600원」이 칸을 넘는다.
-   이 화면 카드만 줄인다(김반장 2026-09-03). */
-#sec-revenue-fee .stat-value{font-size:22px;letter-spacing:-.5px;}
+/* 카드가 세 장에서 다섯 장으로 늘었다(김반장 2026-09-03) — 한 줄에 다섯이 들어가야 하고
+   두 줄로 접히면 안 된다. 1440px 화면에서 카드 하나가 약 218px, 여백을 빼면 숫자가 쓸 수
+   있는 폭이 약 174px다. 「311,651,600원」이 28px 로는 약 196px 라 잘린다.
+   창을 좁히면 더 좁아지므로 고정값 대신 창 너비를 따라가게 했다 — 1440px 에서 21.6px,
+   1280px 에서 19.2px, 1100px 에서 16.5px 로 줄어 어디서도 안 잘린다. 아래끝 15px 은
+   그보다 좁으면 표가 이미 가로로 밀리는 폭이라 거기서 멈춘다.
+   여백과 칸 사이도 조금 줄여 숫자가 쓸 폭을 넓혔다. 이 화면 카드만이다. */
+#sec-revenue-fee .stats-grid{gap:10px;}
+#sec-revenue-fee .stat-card{padding:16px 14px;}
+#sec-revenue-fee .stat-value{font-size:clamp(15px,1.5vw,22px);letter-spacing:-.5px;white-space:nowrap;}
 #sec-revenue-fee th{text-align:center!important;}
 #rf-od-table td:nth-child(2),
 #rf-od-table td:nth-child(3),
@@ -3231,7 +3238,7 @@ window.CMS_FEATURES = {
       <div class="stats-grid" style="grid-template-columns:repeat(5,1fr)">
         <div class="stat-card blue"><div class="stat-label">주문 건수</div><div class="stat-value" id="rf-kpi-count">—</div><div class="stat-change neutral" id="rf-kpi-count-sub">—</div></div>
         <div class="stat-card blue"><div class="stat-label">거래액</div><div class="stat-value" id="rf-kpi-gmv">—</div><div class="stat-change neutral" id="rf-kpi-gmv-sub">—</div></div>
-        <div class="stat-card purple"><div class="stat-label">수수료 매출</div><div class="stat-value" id="rf-kpi-comm">—</div><div class="stat-change neutral" id="rf-kpi-comm-sub">—</div></div>
+        <div class="stat-card purple"><div class="stat-label">수수료</div><div class="stat-value" id="rf-kpi-comm">—</div><div class="stat-change neutral" id="rf-kpi-comm-sub">—</div></div>
         <div class="stat-card amber"><div class="stat-label">유저 적립</div><div class="stat-value" id="rf-kpi-earn">—</div><div class="stat-change neutral" id="rf-kpi-earn-sub">—</div></div>
         <div class="stat-card green"><div class="stat-label">수익</div><div class="stat-value" id="rf-kpi-net">—</div><div class="stat-change neutral" id="rf-kpi-net-sub">—</div></div>
       </div>
@@ -3294,7 +3301,7 @@ window.CMS_FEATURES = {
                 <th style="width:21%">기간</th>
                 <th style="width:12%">주문 건수</th>
                 <th style="width:17%">거래액</th>
-                <th style="width:17%">수수료 매출</th>
+                <th style="width:17%">수수료</th>
                 <th style="width:16%">유저 적립</th>
                 <th style="width:17%" class="rf-net-col">수익</th>
                 <!-- 상태 칸을 물렸다 — 한 달(한 제휴몰) 안에도 지급 완료 건과 대기 건이 섞인다 — 묶어서 한 말로
@@ -12783,7 +12790,7 @@ window.rfDownloadXlsx = function() {
   /* 월별·일별 시트 — 화면의 그 표 그대로. 줄은 링크프라이스만, 합계는 두 줄. */
   var bdName = (RF.viewName || '월별');
   /* 묶은 줄에는 상태를 적지 않는다 — 화면에서 뺀 것과 같은 까닭이다. */
-  var bdRows = [H(['기간', '주문 건수', '거래액', '수수료 매출', '유저 적립', '수익', '수익 %p'])];
+  var bdRows = [H(['기간', '주문 건수', '거래액', '수수료', '유저 적립', '수익', '수익 %p'])];
   var bdL = { count: 0, gmv: 0, comm: 0, earn: 0, net: 0 }, bdT = { gmv: 0, comm: 0, earn: 0, net: 0 };
   (RF.buckets || []).forEach(function(b) {
     var l = b.lp.live;
