@@ -498,10 +498,6 @@ tr:hover td{background:var(--surface-2);}
 .ds-tag.policy{color:var(--main-hover);border-color:var(--main-line);background:var(--main-soft);}
 .ds-tag.policy::before{background:var(--main);}
 /* ── 포스트백 로그 — 제휴사별 블록(쿠팡 / 링크프라이스) 공용 ── */
-.pb-block-head{display:flex;align-items:baseline;gap:10px;margin:0 0 12px;flex-wrap:wrap;}
-.pb-block-head .t{font-size:16px;font-weight:800;letter-spacing:-.2px;color:var(--text);}
-.pb-block-head .api{font-size:11px;font-weight:600;color:var(--text-3);font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;}
-.pb-block + .pb-block{margin-top:34px;padding-top:30px;border-top:1px solid var(--border);}
 .pb-mem{text-align:left;line-height:1.45;}
 .pb-mem .nm{font-weight:600;font-size:13px;color:var(--text);}
 .pb-mem .kk{font-size:11px;color:var(--text-2);}
@@ -3561,19 +3557,22 @@ window.CMS_FEATURES = {
       </div>
     </div>
 
-    <!-- ── 포스트백 로그 ── 쿠팡 / 링크프라이스 블록 분리 (API 상이) · 수신 로그 확인 전용 ── -->
+    <!-- ── 포스트백 로그 ── 쿠팡 / 링크프라이스 탭 분리 (API 상이) · 수신 로그 확인 전용 ── -->
     <div class="section" id="sec-postback">
       <button type="button" class="ta-notice" onclick="openModal('m-pb-notice')">
         <span>포스트백 로그 Notice</span>
         <span class="ta-notice-mark">!</span>
       </button>
 
-      <!-- ── 쿠팡 ── -->
-      <div class="pb-block" id="pb-block-coupang">
-        <div class="pb-block-head">
-          <span class="t">쿠팡 포스트백 로그</span>
-          <span class="api">Coupang Partners Postback</span>
-        </div>
+      <!-- 두 제휴사는 포스트백 API 규격이 아예 달라 한 화면에 쌓지 않고 탭으로 가른다.
+           탭은 CMS 공용 .terms-nav / .terms-tab 을 그대로 쓴다. -->
+      <div class="terms-nav">
+        <div class="terms-tab active" onclick="pbSwitchTab(this,'pb-tab-coupang')">쿠팡</div>
+        <div class="terms-tab" onclick="pbSwitchTab(this,'pb-tab-linkprice')">링크프라이스</div>
+      </div>
+
+      <!-- ── 탭 1 · 쿠팡 ── -->
+      <div id="pb-tab-coupang">
         <div class="data-source-bar">
           <span class="ds-label">데이터 출처</span>
           <span class="ds-tag coupang">쿠팡 파트너스 포스트백 수신 원문</span>
@@ -3586,7 +3585,7 @@ window.CMS_FEATURES = {
         </div>
         <div class="card">
           <div class="card-header">
-            <div><div class="card-title">쿠팡 포스트백 로그</div></div>
+            <div><div class="card-title">쿠팡 포스트백 로그</div><div class="card-sub">Coupang Partners Postback</div></div>
             <div style="font-size:12px;color:var(--text-2)" id="cpb-sub">—</div>
           </div>
           <table>
@@ -3604,12 +3603,8 @@ window.CMS_FEATURES = {
         </div>
       </div>
 
-      <!-- ── 링크프라이스 ── -->
-      <div class="pb-block" id="pb-block-linkprice">
-        <div class="pb-block-head">
-          <span class="t">링크프라이스 포스트백 로그</span>
-          <span class="api">LinkPrice Affiliate Postback</span>
-        </div>
+      <!-- ── 탭 2 · 링크프라이스 ── -->
+      <div id="pb-tab-linkprice" style="display:none">
         <div class="data-source-bar">
           <span class="ds-label">데이터 출처</span>
           <span class="ds-tag policy">링크프라이스 포스트백 수신 원문 · 상품 1건당 1콜백</span>
@@ -3622,7 +3617,7 @@ window.CMS_FEATURES = {
         </div>
         <div class="card">
           <div class="card-header">
-            <div><div class="card-title">링크프라이스 포스트백 로그</div></div>
+            <div><div class="card-title">링크프라이스 포스트백 로그</div><div class="card-sub">LinkPrice Affiliate Postback</div></div>
             <div style="font-size:12px;color:var(--text-2)" id="lpb-sub">—</div>
           </div>
           <table>
@@ -5199,6 +5194,18 @@ function switchOp(el, id) {
   el.parentNode.querySelectorAll('.terms-tab').forEach(x => x.classList.remove('active'));
   el.classList.add('active');
   ['op-reward','op-event','op-exclusion'].forEach(tid => {
+    const e2 = document.getElementById(tid);
+    if (e2) e2.style.display = tid === id ? 'block' : 'none';
+  });
+}
+
+/* 포스트백 로그 — 쿠팡 / 링크프라이스. 두 제휴사는 API 규격이 달라 한 화면에 쌓지 않고
+   탭으로 가른다(김반장 2026-09-07). 기존 .terms-tab 그대로. 각 탭은 자기 검색·필터를
+   갖고 서로 건드리지 않는다 — 표시만 바꾸므로 한쪽을 걸러도 다른 쪽은 그대로다. */
+function pbSwitchTab(el, id) {
+  el.parentNode.querySelectorAll('.terms-tab').forEach(x => x.classList.remove('active'));
+  el.classList.add('active');
+  ['pb-tab-coupang', 'pb-tab-linkprice'].forEach(tid => {
     const e2 = document.getElementById(tid);
     if (e2) e2.style.display = tid === id ? 'block' : 'none';
   });
