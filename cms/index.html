@@ -3604,8 +3604,8 @@ window.CMS_FEATURES = {
       <!-- ── 탭 1 · 쿠팡 ── -->
       <div id="pb-tab-coupang">
         <div class="toolbar">
-          <input class="search-box" id="cpb-search" placeholder="orderId, subid, subparam, 상품번호, productName 검색..." onkeydown="if(event.key==='Enter')cpbApplyFilters()">
-          <select class="filter-sel" id="cpb-filter-kind" onchange="cpbApplyFilters()"><option value="">purchase_cancel 전체</option><option value="purchase">purchase</option><option value="cancel">cancel</option></select>
+          <input class="search-box" id="cpb-search" placeholder="주문번호·상품 검색" onkeydown="if(event.key==='Enter')cpbApplyFilters()">
+          <select class="filter-sel" id="cpb-filter-kind" onchange="cpbApplyFilters()"><option value="">전체</option><option value="purchase">purchase</option><option value="cancel">cancel</option></select>
           <button class="btn btn-primary btn-sm" onclick="cpbApplyFilters()">검색</button>
         </div>
         <div class="pb-sample-bar" id="cpb-sample-bar" style="display:none">
@@ -3635,8 +3635,8 @@ window.CMS_FEATURES = {
       <!-- ── 탭 2 · 링크프라이스 ── -->
       <div id="pb-tab-linkprice" style="display:none">
         <div class="toolbar">
-          <input class="search-box" id="lpb-search" placeholder="merchant_id, order_code, product_code, affiliate_user_id, trlog_id, uniq_id 검색..." onkeydown="if(event.key==='Enter')lpbApplyFilters()">
-          <select class="filter-sel" id="lpb-filter-merchant" onchange="lpbApplyFilters()"><option value="">전체 merchant_id</option></select>
+          <input class="search-box" id="lpb-search" placeholder="주문코드·상품코드 검색" onkeydown="if(event.key==='Enter')lpbApplyFilters()">
+          <select class="filter-sel" id="lpb-filter-merchant" onchange="lpbApplyFilters()"><option value="">전체</option></select>
           <button class="btn btn-primary btn-sm" onclick="lpbApplyFilters()">검색</button>
         </div>
         <div class="pb-sample-bar" id="lpb-sample-bar" style="display:none">
@@ -10777,7 +10777,7 @@ function lpbFillMerchantFilter(rows) {
   var seen = {}, opts = [];
   rows.forEach(function(r) { if (r.merchantId && !seen[r.merchantId]) { seen[r.merchantId] = 1; opts.push(r.merchantId); } });
   opts.sort(function(a, b) { return String(a).localeCompare(String(b), 'ko-KR'); });
-  sel.innerHTML = '<option value="">전체 merchant_id</option>' + opts.map(function(id) {
+  sel.innerHTML = '<option value="">전체</option>' + opts.map(function(id) {
     return '<option value="' + pbEsc(id) + '">' + pbEsc(id) + '</option>';
   }).join('');
 }
