@@ -3603,11 +3603,6 @@ window.CMS_FEATURES = {
 
       <!-- ── 탭 1 · 쿠팡 ── -->
       <div id="pb-tab-coupang">
-        <div class="data-source-bar">
-          <span class="ds-label">데이터 출처</span>
-          <span class="ds-tag coupang">쿠팡 파트너스 포스트백 수신 원문</span>
-          <span class="ds-tag ours">우리 DB · 수신 기록 (추가만 가능 · 수정·삭제 불가)</span>
-        </div>
         <div class="toolbar">
           <input class="search-box" id="cpb-search" placeholder="orderId, subid, subparam, 상품번호, productName 검색..." onkeydown="if(event.key==='Enter')cpbApplyFilters()">
           <select class="filter-sel" id="cpb-filter-kind" onchange="cpbApplyFilters()"><option value="">purchase_cancel 전체</option><option value="purchase">purchase</option><option value="cancel">cancel</option></select>
@@ -3616,7 +3611,6 @@ window.CMS_FEATURES = {
         <div class="pb-sample-bar" id="cpb-sample-bar" style="display:none">
           <span class="tag">예시 데이터</span>
           <span id="cpb-sample-note"></span>
-          <span class="tail">실제 포스트백이 수신되면 자동으로 대체됩니다</span>
         </div>
         <div class="card">
           <div class="card-header">
@@ -3640,15 +3634,14 @@ window.CMS_FEATURES = {
 
       <!-- ── 탭 2 · 링크프라이스 ── -->
       <div id="pb-tab-linkprice" style="display:none">
-        <div class="data-source-bar">
-          <span class="ds-label">데이터 출처</span>
-          <span class="ds-tag policy">링크프라이스 포스트백 수신 원문 · 상품 1건당 1콜백</span>
-          <span class="ds-tag ours">우리 DB · 수신 기록 (추가만 가능 · 수정·삭제 불가)</span>
-        </div>
         <div class="toolbar">
           <input class="search-box" id="lpb-search" placeholder="order_code, uniq_id, affiliate_user_id, product_code, product_name, trlog_id 검색..." onkeydown="if(event.key==='Enter')lpbApplyFilters()">
           <select class="filter-sel" id="lpb-filter-merchant" onchange="lpbApplyFilters()"><option value="">전체 merchant_id</option></select>
           <button class="btn btn-primary btn-sm" onclick="lpbApplyFilters()">검색</button>
+        </div>
+        <div class="pb-sample-bar" id="lpb-sample-bar" style="display:none">
+          <span class="tag">예시 데이터</span>
+          <span id="lpb-sample-note"></span>
         </div>
         <div class="card">
           <div class="card-header">
@@ -10166,14 +10159,26 @@ function pbRawFields(pairs) {
    ⚠ 상품번호 키가 구매/취소에서 다르다(productid / productId). 양쪽 다 읽는다.
    ══════════════════════════════════════════════════════════ */
 
-/* ── 쿠팡 예시 데이터 ──
-   2026-09-07 실제 수신분(김반장 서버 로그 캡처) 4건을 값 그대로 옮긴 것이다.
+/* ══════════════════════════════════════════════════════════════════════════
+   예시 데이터 — 데모 전용 (김반장 2026-09-07)
+   데모 환경에는 실제 포스트백이 들어오지 않아, 목록·검색·필터가 어떻게 보이는지
+   확인할 수 있도록 예시로 표를 채운다.
+
+   ⚠ 실제 연동이 붙으면 이 블록만 걷어내면 된다:
+     ① 이 주석부터 「예시 데이터 끝」 주석까지 지운다
+     ② loadPostback() 안의 useSample / useSampleLp 분기 세 곳을 지운다
+   수신 건이 하나라도 있으면 예시는 쓰이지 않는다 — 실데이터 경로는 막지 않는다.
+
+   CPB_SAMPLE_CAPTURED — 2026-09-07 실제 수신분(김반장 서버 로그 캡처). 값 무변경.
+   CPB_SAMPLE_MADE     — 형식만 같게 지어낸 것. 실재하는 특정 상품이 아니다.
+   LPB_SAMPLE          — 링크프라이스 형식으로 지어낸 것.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* ── 쿠팡 · 실제 수신 캡처 4건 ──
    ⚠ 아래 값은 손대지 않는다:
      · 상품번호 키가 구매는 productid(소문자 i), 취소는 productId(대문자 I) — 실제로 그렇게 온다.
      · ④ 취소 payment 29900 은 ① 구매 payment 26910 과 다르다 — 취소 payment 는 본상품 가격이라 그렇다.
-     · ③ 은 ② 의 상품 셋 중 하나만 취소된 부분 취소다.
-   쓰임: 쿠팡 수신 건이 하나도 없을 때만 이 값으로 표를 채운다. 실제 포스트백이 한 건이라도
-   들어오면 그쪽이 그대로 쓰이고 예시는 사라진다 — 실데이터 경로를 막지 않는다. */
+     · ③ 은 ② 의 상품 셋 중 하나만 취소된 부분 취소다. */
 var CPB_SAMPLE_COMMON = {
   afcode: 'AF6898452',
   subid: 'sleepIfUCanSTG',
@@ -10181,7 +10186,7 @@ var CPB_SAMPLE_COMMON = {
   adid: '4FDDCF6D-1583-4C37-95BB-56F7639623BB',
   subparam: '91c9bb20-84b5-11f1-b820-d3b05b507cd4',
 };
-var CPB_SAMPLE = [
+var CPB_SAMPLE_CAPTURED = [
   Object.assign({}, CPB_SAMPLE_COMMON, {
     _id: 'sample-cp-1', provider: 'coupang', is_sample: true,
     purchase_time: '2026-09-07 10:40:58', orderId: '8354194650158105', purchase_cancel: 'purchase',
@@ -10213,14 +10218,245 @@ var CPB_SAMPLE = [
     ],
   }),
 ];
+
+/* ── 쿠팡 · 지어낸 예시 ──
+   형식은 위 실수신분과 완전히 같다(필드 구성·타입·표기).
+   afcode 는 프라이스픽의 파트너스 계정 코드라 전 건 동일하고, 회원별로 subid·adid·subparam 이 갈린다.
+   adid 는 iOS 는 대문자 IDFA, Android 는 소문자 GAID 꼴을 따른다.
+   담은 경우: 단품/복수 상품(2~4) · 구매만/전액 취소/부분 취소 ·
+             취소 payment 가 구매 payment 보다 큰 건 · iOS/Android · 09-01~09-07 분포.
+   상품명·상품번호·금액은 일반 생필품·식품으로 지어낸 것이며 실재하는 특정 상품이 아니다. */
+var CPB_M = {
+  a: { subid: 'morningDewSTG',   os: 'iOS',     adid: '9B2E4F71-6C3A-4D82-A5E1-0F7C93B4D826', subparam: 'a7f3c210-9d4e-11f1-8b62-4e19ac5f2703' },
+  b: { subid: 'blueWhale77STG',  os: 'Android', adid: 'e3c7a91d-4b28-4f6a-9c15-72d80e4b3f9a', subparam: 'b214e8d5-6a17-11f1-9f43-2c67b1a09e58' },
+  c: { subid: 'quietRiverSTG',   os: 'Android', adid: '5f81b3d0-27ae-4c93-8e26-1a94f7c05b63', subparam: 'c9a05f31-8e72-11f1-a1d7-5b30e28f4c16' },
+  d: { subid: 'sunnyDay0912STG', os: 'iOS',     adid: 'D74A0E93-15BF-4827-9C60-3E82AB61D5F4', subparam: 'd6b14a27-3f95-11f1-b8e0-9a41c73d206b' },
+  e: { subid: 'greenLeafSTG',    os: 'Android', adid: '2a6d94f7-83c1-4e50-b729-6d18ea350c47', subparam: 'e08c37b6-5d21-11f1-84a9-31f6b0d92e75' },
+  f: { subid: 'starLightSTG',    os: 'iOS',     adid: 'C1F58B26-40D7-4A19-8E53-72B9046FCA38', subparam: 'f52a90c8-7b46-11f1-96c2-08d5e714b3a9' },
+};
+/* 구매 한 건 — order_detail 상품번호 키는 productid(소문자) */
+function cpbMkBuy(id, m, time, orderId, items) {
+  return Object.assign({ afcode: 'AF6898452' }, CPB_M[m], {
+    _id: id, provider: 'coupang', is_sample: true,
+    purchase_time: time, orderId: orderId, purchase_cancel: 'purchase',
+    order_detail: items.map(function(it) {
+      return { productid: it[0], productName: it[1], payment: it[2], quantity: it[3] };
+    }),
+  });
+}
+/* 취소 한 건 — order_detail 상품번호 키는 productId(대문자) */
+function cpbMkCancel(id, m, time, orderId, items) {
+  return Object.assign({ afcode: 'AF6898452' }, CPB_M[m], {
+    _id: id, provider: 'coupang', is_sample: true,
+    purchase_time: time, orderId: orderId, purchase_cancel: 'cancel',
+    order_detail: items.map(function(it) {
+      return { productId: it[0], productName: it[1], payment: it[2], quantity: it[3] };
+    }),
+  });
+}
+var CPB_SAMPLE_MADE = [
+  // 단품 구매만
+  cpbMkBuy('sample-cp-11', 'a', '2026-09-01 09:12:33', '8351072940381226',
+    [[7712043318, '무형광 3겹 롤화장지 30롤', 18900, 1]]),
+  // 상품 2개 구매만
+  cpbMkBuy('sample-cp-12', 'b', '2026-09-01 14:27:05', '8351240118357049',
+    [[6820471195, '섬유유연제 리필 2.1L 3개입', 21400, 1],
+     [7455190882, '주방세제 대용량 1.2L 2개', 12800, 2]]),
+  // 단품 구매 → 전액 취소 · 취소 payment 가 더 크다
+  cpbMkBuy('sample-cp-13', 'c', '2026-09-02 08:41:19', '8351663307492815',
+    [[8103372640, '고흥 하우스 감귤 3kg', 23900, 1]]),
+  cpbMkCancel('sample-cp-14', 'c', '2026-09-02 19:03:44', '8351663307492815',
+    [[8103372640, '고흥 하우스 감귤 3kg', 26800, 1]]),
+  // 상품 3개 구매 → 1개만 부분 취소
+  cpbMkBuy('sample-cp-15', 'd', '2026-09-02 11:55:02', '8352019447260133',
+    [[7938815027, '국내산 찹쌀 4kg', 19800, 1],
+     [6644029183, '스테인리스 밀폐용기 8종 세트', 34500, 1],
+     [8271560934, '유기농 방울토마토 1.5kg', 15600, 1]]),
+  cpbMkCancel('sample-cp-16', 'd', '2026-09-03 10:22:17', '8352019447260133',
+    [[6644029183, '스테인리스 밀폐용기 8종 세트', 34500, 1]]),
+  // 단품 구매만
+  cpbMkBuy('sample-cp-17', 'a', '2026-09-03 07:30:48', '8352384095617728',
+    [[7509384112, '즉석밥 210g 24개입', 26400, 1]]),
+  // 상품 4개 구매 → 2개 부분 취소
+  cpbMkBuy('sample-cp-18', 'e', '2026-09-03 16:08:59', '8352751230884506',
+    [[8845127603, '아기 물티슈 캡형 10팩', 17200, 1],
+     [6337905428, '천연 수세미 6개입', 6900, 2],
+     [7160248359, '대용량 종량제 규격 봉투 100매', 9800, 1],
+     [8492617035, '냉동 삼겹살 구이용 1kg', 28900, 1]]),
+  cpbMkCancel('sample-cp-19', 'e', '2026-09-04 09:14:26', '8352751230884506',
+    [[6337905428, '천연 수세미 6개입', 6900, 2],
+     [7160248359, '대용량 종량제 규격 봉투 100매', 9800, 1]]),
+  // 상품 2개 구매 → 전액 취소 · 두 상품 모두 취소 payment 가 더 크다
+  cpbMkBuy('sample-cp-20', 'f', '2026-09-04 12:47:13', '8353118762045391',
+    [[7023958641, '견과류 한줌 정 30봉', 22500, 1],
+     [6758134092, '초극세사 걸레 12장', 11300, 1]]),
+  cpbMkCancel('sample-cp-21', 'f', '2026-09-04 20:31:55', '8353118762045391',
+    [[7023958641, '견과류 한줌 정 30봉', 24900, 1],
+     [6758134092, '초극세사 걸레 12장', 12800, 1]]),
+  // 단품 구매만
+  cpbMkBuy('sample-cp-22', 'b', '2026-09-04 18:22:40', '8353492018736204',
+    [[8916402577, '캡슐 세탁세제 60개입', 24900, 1]]),
+  // 상품 3개 구매만
+  cpbMkBuy('sample-cp-23', 'd', '2026-09-05 10:05:31', '8353860594127083',
+    [[7384029516, '생수 2L 12병', 8900, 2],
+     [6591873204, '주방 키친타올 6롤', 13400, 1],
+     [8047215869, '국산 들기름 500ml', 16700, 1]]),
+  // 단품 구매 → 전액 취소 · 금액 동일
+  cpbMkBuy('sample-cp-24', 'c', '2026-09-05 15:39:07', '8354027381650912',
+    [[7862350194, '전복 손질 냉장 10미', 39800, 1]]),
+  cpbMkCancel('sample-cp-25', 'c', '2026-09-06 11:02:48', '8354027381650912',
+    [[7862350194, '전복 손질 냉장 10미', 39800, 1]]),
+  // 상품 2개 구매 → 1개 부분 취소 · 취소 payment 가 더 크다
+  cpbMkBuy('sample-cp-26', 'e', '2026-09-06 08:53:22', '8354215960348271',
+    [[6412079538, '어린이 칫솔 6개입', 7400, 3],
+     [7712043318, '무형광 3겹 롤화장지 30롤', 18900, 1]]),
+  cpbMkCancel('sample-cp-27', 'e', '2026-09-06 17:26:04', '8354215960348271',
+    [[6412079538, '어린이 칫솔 6개입', 8900, 3]]),
+  // 단품 구매만
+  cpbMkBuy('sample-cp-28', 'f', '2026-09-06 13:18:45', '8354390147025638',
+    [[8271560934, '유기농 방울토마토 1.5kg', 15600, 2]]),
+  // 상품 4개 구매만
+  cpbMkBuy('sample-cp-29', 'a', '2026-09-07 08:04:19', '8354508273916440',
+    [[7509384112, '즉석밥 210g 24개입', 26400, 1],
+     [8845127603, '아기 물티슈 캡형 10팩', 17200, 1],
+     [7455190882, '주방세제 대용량 1.2L 2개', 12800, 1],
+     [7384029516, '생수 2L 12병', 8900, 1]]),
+  // 단품 구매 → 전액 취소
+  cpbMkBuy('sample-cp-30', 'b', '2026-09-07 09:36:52', '8354672019483527',
+    [[8103372640, '고흥 하우스 감귤 3kg', 23900, 1]]),
+  cpbMkCancel('sample-cp-31', 'b', '2026-09-07 12:11:30', '8354672019483527',
+    [[8103372640, '고흥 하우스 감귤 3kg', 23900, 1]]),
+  // 상품 2개 구매만
+  cpbMkBuy('sample-cp-32', 'd', '2026-09-07 11:47:08', '8354790362158104',
+    [[8492617035, '냉동 삼겹살 구이용 1kg', 28900, 1],
+     [8047215869, '국산 들기름 500ml', 16700, 1]]),
+  // 상품 3개 구매 → 1개 부분 취소 · 취소 payment 가 더 크다
+  cpbMkBuy('sample-cp-33', 'e', '2026-09-07 14:20:36', '8354811593627740',
+    [[8916402577, '캡슐 세탁세제 60개입', 24900, 1],
+     [6591873204, '주방 키친타올 6롤', 13400, 1],
+     [6337905428, '천연 수세미 6개입', 6900, 2]]),
+  cpbMkCancel('sample-cp-34', 'e', '2026-09-07 18:55:11', '8354811593627740',
+    [[8916402577, '캡슐 세탁세제 60개입', 27900, 1]]),
+  // 단품 구매만
+  cpbMkBuy('sample-cp-35', 'c', '2026-09-07 16:02:44', '8354923048571362',
+    [[7023958641, '견과류 한줌 정 30봉', 22500, 1]]),
+];
+var CPB_SAMPLE = CPB_SAMPLE_CAPTURED.concat(CPB_SAMPLE_MADE);
+
+/* ── 링크프라이스 · 지어낸 예시 ──
+   필드 구성 근거: 해리 전달 「Postback Data: LinkPrice, Coupang」(Notion, 2026-08-27)
+   → 마스터 정책서 v8.3 「링크프라이스 필드」 표. 실측 예시값까지 그 표에 있다.
+   day, time, merchant_id, order_code, product_code, product_name, category_code,
+   item_count, price, commision(원문 철자), affiliate_user_id, base_commission,
+   incentive_commission, trlog_id, uniq_id, affiliate_id
+
+   · 한 주문에 상품이 여럿이면 상품 수만큼 포스트백이 따로 오고 uniq_id 가 같다 —
+     아래 예시도 그렇게 만들었다(온 그대로 한 건 한 줄).
+   · 취소 포스트백이 없는 규격이라 취소 건은 만들지 않았다.
+   · merchant_id 는 링크프라이스 카탈로그(settings/linkprice_catalog)의 실제 머천트 ID이고,
+     base_commission 도 그 카탈로그의 커미션 범위 안에서 잡았다. commision 은 price × 요율이다.
+   · affiliate_id 'A100706012' 는 프라이스픽의 링크프라이스 계정 번호라 전 건 동일하다.
+   · category_code 는 실측에서 빈 값으로 왔기에 빈 값으로 둔다.
+   · order_code · product_code · product_name 은 지어낸 값이며 실재하는 특정 상품이 아니다. */
+var LPB_U = {
+  a: 'e5f037d0-6e15-11f1-8c25-a5e9adfc27be',
+  b: '3b91c4a7-2f80-11f1-9d46-7c1e05ba3f92',
+  c: '8d24f6b1-5a37-11f1-a072-b53f918e2c04',
+  d: 'c70a8e35-9b12-11f1-8f61-2d4907ac6b58',
+  e: '1f6b30d9-4c85-11f1-b3a8-6e920f74d15c',
+};
+function lpbMk(id, uid, merchant, rate, day, time, uniqId, trlogId, orderCode, productCode, productName, itemCount, price) {
+  return {
+    _id: id, provider: 'linkprice', is_sample: true,
+    day: day, time: time, merchant_id: merchant,
+    order_code: orderCode, product_code: productCode, product_name: productName,
+    category_code: '', item_count: itemCount, price: price,
+    commision: Math.round(price * rate / 100),
+    affiliate_user_id: LPB_U[uid],
+    base_commission: rate + '%', incentive_commission: '0%',
+    trlog_id: trlogId, uniq_id: uniqId, affiliate_id: 'A100706012',
+  };
+}
+var LPB_SAMPLE = [
+  // gmarket 0.6% — 단품
+  lpbMk('sample-lp-01', 'a', 'gmarket', 0.6, '20260901', '101432', '7c1e05ba3f92a', 18000662104738,
+    'GM-2609011014-0031', 'GM8842017', '접이식 빨래건조대 3단', 1, 32900),
+  // auction 0.6% — 상품 2개(uniq_id 동일)
+  lpbMk('sample-lp-02', 'b', 'auction', 0.6, '20260902', '134755', '4a9f27c1d0b83', 18000662147209,
+    'AU-260902-77410', 'AU2210945', '실리콘 주방장갑 2켤레', 2, 9800),
+  lpbMk('sample-lp-03', 'b', 'auction', 0.6, '20260902', '134755', '4a9f27c1d0b83', 18000662147210,
+    'AU-260902-77410', 'AU2210946', '스테인리스 국자 세트', 1, 14500),
+  // dswellife 7.0% — 단품
+  lpbMk('sample-lp-04', 'c', 'dswellife', 7.0, '20260902', '201118', 'b6d3810e4f27c', 18000662183355,
+    'DW-26090202011', 'DW1003488', '단백질 파우더 400g', 1, 39000),
+  // lotteon 1.4% — 상품 3개
+  lpbMk('sample-lp-05', 'd', 'lotteon', 1.4, '20260903', '092640', 'e91b57a2c34d0', 18000662219471,
+    'LO260903-40218', 'LO7714203', '무향 세탁 세제 3L', 1, 15900),
+  lpbMk('sample-lp-06', 'd', 'lotteon', 1.4, '20260903', '092640', 'e91b57a2c34d0', 18000662219472,
+    'LO260903-40218', 'LO7714204', '섬유 탈취제 500ml 2개', 1, 11200),
+  lpbMk('sample-lp-07', 'd', 'lotteon', 1.4, '20260903', '092640', 'e91b57a2c34d0', 18000662219473,
+    'LO260903-40218', 'LO7714205', '욕실 청소용 솔 3종', 1, 8400),
+  // yes24 2.1% — 상품 2개
+  lpbMk('sample-lp-08', 'e', 'yes24', 2.1, '20260903', '175302', '2f80d4e916ba7', 18000662256018,
+    'Y24-2609031753', 'Y24993071', '실용 글쓰기 안내서', 1, 16200),
+  lpbMk('sample-lp-09', 'e', 'yes24', 2.1, '20260903', '175302', '2f80d4e916ba7', 18000662256019,
+    'Y24-2609031753', 'Y24993072', '문고판 소설 선집', 2, 12800),
+  // himart 1.26% — 단품
+  lpbMk('sample-lp-10', 'a', 'himart', 1.26, '20260904', '111527', 'a03c6b8f5d192', 18000662291884,
+    'HM-260904-11152', 'HM5502914', '무선 핸디 청소기', 1, 89000),
+  // clubclio 3.5% — 상품 2개
+  lpbMk('sample-lp-11', 'b', 'clubclio', 3.5, '20260904', '160845', 'd7e21093c4a6f', 18000662327560,
+    'CC260904-8817', 'CC3301672', '수분 크림 50ml', 1, 27000),
+  lpbMk('sample-lp-12', 'b', 'clubclio', 3.5, '20260904', '160845', 'd7e21093c4a6f', 18000662327561,
+    'CC260904-8817', 'CC3301673', '클렌징 폼 150ml', 2, 13500),
+  // gmarket 0.6% — 상품 4개
+  lpbMk('sample-lp-13', 'c', 'gmarket', 0.6, '20260905', '084119', '5b8a4f0d2e731', 18000662364093,
+    'GM-2609050841-0177', 'GM8842118', '주방 밀폐용기 6종', 1, 24800),
+  lpbMk('sample-lp-14', 'c', 'gmarket', 0.6, '20260905', '084119', '5b8a4f0d2e731', 18000662364094,
+    'GM-2609050841-0177', 'GM8842119', '식탁 매트 4장', 1, 11900),
+  lpbMk('sample-lp-15', 'c', 'gmarket', 0.6, '20260905', '084119', '5b8a4f0d2e731', 18000662364095,
+    'GM-2609050841-0177', 'GM8842120', '냉장고 정리 트레이 8개', 1, 16400),
+  lpbMk('sample-lp-16', 'c', 'gmarket', 0.6, '20260905', '084119', '5b8a4f0d2e731', 18000662364096,
+    'GM-2609050841-0177', 'GM8842121', '실리콘 뚜껑 5종', 2, 7300),
+  // wconcept 2.1% — 단품
+  lpbMk('sample-lp-17', 'd', 'wconcept', 2.1, '20260905', '193714', 'c46e19b7a0d53', 18000662400627,
+    'WC-26090519371', 'WC4418260', '기본 코튼 셔츠', 1, 46000),
+  // kbbook 2.1% — 상품 2개
+  lpbMk('sample-lp-18', 'e', 'kbbook', 2.1, '20260906', '103358', '9012fd5c8b46e', 18000662437185,
+    'KB260906-51204', 'KB1170338', '업무용 기록 노트 3권', 1, 13800),
+  lpbMk('sample-lp-19', 'e', 'kbbook', 2.1, '20260906', '103358', '9012fd5c8b46e', 18000662437186,
+    'KB260906-51204', 'KB1170339', '중성펜 12자루 세트', 1, 9600),
+  // lotteon 0.7% — 단품
+  lpbMk('sample-lp-20', 'a', 'lotteon', 0.7, '20260906', '150922', 'f3b70a4d9c218', 18000662473740,
+    'LO260906-40993', 'LO7714470', '건조 표고버섯 200g', 1, 18700),
+  // auction 0.6% — 상품 3개
+  lpbMk('sample-lp-21', 'd', 'auction', 0.6, '20260907', '093046', '68d5c1e072a94', 18000662510362,
+    'AU-260907-78802', 'AU2211308', '접이식 장바구니 2개', 1, 8900),
+  lpbMk('sample-lp-22', 'd', 'auction', 0.6, '20260907', '093046', '68d5c1e072a94', 18000662510363,
+    'AU-260907-78802', 'AU2211309', '다용도 수납 바구니 4개', 1, 12600),
+  lpbMk('sample-lp-23', 'd', 'auction', 0.6, '20260907', '093046', '68d5c1e072a94', 18000662510364,
+    'AU-260907-78802', 'AU2211310', '옷걸이 30개입', 2, 10400),
+  // dswellife 7.0% — 상품 2개
+  lpbMk('sample-lp-24', 'b', 'dswellife', 7.0, '20260907', '144215', '07e9b23a6f5d1', 18000662546918,
+    'DW-26090714421', 'DW1003701', '종합 비타민 90정', 1, 28500),
+  lpbMk('sample-lp-25', 'b', 'dswellife', 7.0, '20260907', '144215', '07e9b23a6f5d1', 18000662546919,
+    'DW-26090714421', 'DW1003702', '식이섬유 분말 스틱 30포', 1, 21900),
+];
+
 /* 예시로 채웠는지 화면에 드러낸다 — 실제 수신분과 헷갈리면 안 된다 */
 function cpbSetSampleMark(on, note) {
   var bar = document.getElementById('cpb-sample-bar');
-  if (!bar) return;
-  bar.style.display = on ? '' : 'none';
+  if (bar) bar.style.display = on ? '' : 'none';
   var n = document.getElementById('cpb-sample-note');
   if (n) n.textContent = note || '';
 }
+function lpbSetSampleMark(on, note) {
+  var bar = document.getElementById('lpb-sample-bar');
+  if (bar) bar.style.display = on ? '' : 'none';
+  var n = document.getElementById('lpb-sample-note');
+  if (n) n.textContent = note || '';
+}
+/* ══ 예시 데이터 끝 ══ */
 
 /* order_detail 한 줄의 상품번호 — 구매는 productid(소문자 i), 취소는 productId(대문자 I) */
 function cpbItemPid(it) {
@@ -10508,10 +10744,12 @@ function loadPostback() {
      이 파일의 다른 postbacks 조회도 전부 orderBy 없는 .get() 이다. 정렬은 아래에서 한다. */
   db.collection('postbacks').get().then(function(snap) {
     if (snap.empty) {
-      cpbSetSampleMark(true, '수신 건 0 — 아래는 2026-09-07 실수신 캡처 4건');
+      cpbSetSampleMark(true, '수신 건 0'); lpbSetSampleMark(true, '수신 건 0');
       COUPANG_PB_CTRL.setRows(cpbBuildRows(CPB_SAMPLE));
-      LINKPRICE_PB_CTRL.setRows([]);
-      setTxt('cpb-sub', '예시 ' + CPB_SAMPLE.length + '건'); setTxt('lpb-sub', '0건 수신');
+      var lp0 = lpbBuildRows(LPB_SAMPLE);
+      lpbFillMerchantFilter(lp0); LINKPRICE_PB_CTRL.setRows(lp0);
+      setTxt('cpb-sub', '예시 ' + CPB_SAMPLE.length + '건');
+      setTxt('lpb-sub', '예시 ' + lp0.length + '건');
       return;
     }
     var cp = [], lp = [];
@@ -10519,16 +10757,19 @@ function loadPostback() {
       var d = Object.assign({ _id: doc.id }, doc.data());
       (pbProvider(d) === 'coupang' ? cp : lp).push(d);
     });
-    /* 쿠팡 수신 건이 하나도 없을 때만 예시로 채운다 — 한 건이라도 들어오면 실제 값만 쓴다 */
+    /* 수신 건이 하나도 없을 때만 예시로 채운다 — 한 건이라도 들어오면 실제 값만 쓴다 */
     var useSample = (cp.length === 0);
+    var useSampleLp = (lp.length === 0);
     if (useSample) cp = CPB_SAMPLE;
-    cpbSetSampleMark(useSample, useSample ? '수신 건 0 — 아래는 2026-09-07 실수신 캡처 4건' : '');
+    if (useSampleLp) lp = LPB_SAMPLE;
+    cpbSetSampleMark(useSample, useSample ? '수신 건 0' : '');
+    lpbSetSampleMark(useSampleLp, useSampleLp ? '수신 건 0' : '');
     var cRows = cpbBuildRows(cp), lRows = lpbBuildRows(lp);
     COUPANG_PB_CTRL.setRows(cRows);
     lpbFillMerchantFilter(lRows);
     LINKPRICE_PB_CTRL.setRows(lRows);
     setTxt('cpb-sub', useSample ? '예시 ' + cRows.length + '건' : cRows.length + '건 수신');
-    setTxt('lpb-sub', lRows.length + '건 수신');
+    setTxt('lpb-sub', useSampleLp ? '예시 ' + lRows.length + '건' : lRows.length + '건 수신');
   }).catch(function(e){
     console.error('loadPostback', e);
     /* 조회 실패와 「데이터가 없음」은 화면에서 구분되어야 한다 — 둘 다 빈 표로 보이면
@@ -10537,10 +10778,12 @@ function loadPostback() {
     var msg = (code === 'resource-exhausted') ? '조회 실패 — Firestore 일일 할당량 초과'
             : (code === 'permission-denied') ? '조회 실패 — 권한 없음(로그인 확인)'
             : ('조회 실패 — ' + (code || (e && e.message) || '알 수 없는 오류'));
-    cpbSetSampleMark(true, msg + ' — 아래는 2026-09-07 실수신 캡처 4건');
+    cpbSetSampleMark(true, msg); lpbSetSampleMark(true, msg);
     COUPANG_PB_CTRL.setRows(cpbBuildRows(CPB_SAMPLE));
+    var lpErr = lpbBuildRows(LPB_SAMPLE);
+    lpbFillMerchantFilter(lpErr); LINKPRICE_PB_CTRL.setRows(lpErr);
     setTxt('cpb-sub', '예시 ' + CPB_SAMPLE.length + '건');
-    ltb.innerHTML = ppEmpty(9, msg); setTxt('lpb-sub', '조회 실패');
+    setTxt('lpb-sub', '예시 ' + lpErr.length + '건');
   });
 }
 
