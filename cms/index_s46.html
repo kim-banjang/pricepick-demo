@@ -13609,22 +13609,17 @@ window.rfRenderOrders = function() {
   }
 };
 
-/* 제휴몰 거르개는 조회 기간에 거래가 있는 몰만 채운다(김반장 확정 2026-09-07).
-   기준은 RF.base — 조회 기간으로 걸러 낸 자료다. RF.orders(전 기간)를 쓰면 그 기간에
-   거래가 없는 몰까지 목록에 남아, 눌렀을 때 빈 표가 떠 결함으로 보인다.
-   「티켓 적립 설정」의 적용 목록을 그대로 가져오지 않는다 — 그건 몰을 켜고 끄는 설정이지
-   그 기간에 거래가 있었다는 뜻이 아니다.
-   골라 두신 몰이 새 기간에 없으면 「전체 제휴몰」로 되돌린다 — 값만 남아 빈 표가 되면 안 된다. */
+/* 제휴몰 거르개는 표본에 실제로 있는 몰만 채운다 — 목록에 있는데 눌러도 빈 표면 결함으로 보인다. */
 function rfFillOrderMallSelect() {
   var sel = document.getElementById('rf-od-mall');
   if (!sel) return;
   var keep = sel.value;
   var seen = {}, opts = [];
-  (RF.base || []).forEach(function(o) { if (!seen[o.code]) { seen[o.code] = 1; opts.push({ code: o.code, name: o.mall }); } });
+  (RF.orders || []).forEach(function(o) { if (!seen[o.code]) { seen[o.code] = 1; opts.push({ code: o.code, name: o.mall }); } });
   opts.sort(function(a, b) { return a.name.localeCompare(b.name, 'ko'); });
   sel.innerHTML = '<option value="">전체 제휴몰</option>'
     + opts.map(function(o) { return '<option value="' + o.code + '">' + o.name + '</option>'; }).join('');
-  sel.value = seen[keep] ? keep : '';
+  sel.value = keep;
 }
 
 window.rfDownloadOrdersXlsx = function() {
