@@ -518,6 +518,12 @@ tr:hover td{background:var(--surface-2);}
 .pb-rawitem .k{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:10.5px;color:var(--text-3);}
 .pb-rawitem .v{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:11.5px;color:var(--text-2);}
 .pb-empty-raw{padding:14px 0 4px;font-size:12px;color:var(--text-3);}
+.pb-sample-bar{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:12px;
+  padding:9px 14px;border-radius:var(--r-md);background:var(--amber-soft);
+  border:1px solid rgba(245,158,11,.28);font-size:12px;color:var(--text-2);}
+.pb-sample-bar .tag{display:inline-flex;align-items:center;padding:3px 9px;border-radius:20px;
+  background:var(--amber);color:#fff;font-size:11px;font-weight:700;}
+.pb-sample-bar .tail{color:var(--text-3);}
 
 
 /* ── 차트 바 ── */
@@ -3606,6 +3612,11 @@ window.CMS_FEATURES = {
           <input class="search-box" id="cpb-search" placeholder="orderId, subid, subparam, 상품번호, productName 검색..." onkeydown="if(event.key==='Enter')cpbApplyFilters()">
           <select class="filter-sel" id="cpb-filter-kind" onchange="cpbApplyFilters()"><option value="">purchase_cancel 전체</option><option value="purchase">purchase</option><option value="cancel">cancel</option></select>
           <button class="btn btn-primary btn-sm" onclick="cpbApplyFilters()">검색</button>
+        </div>
+        <div class="pb-sample-bar" id="cpb-sample-bar" style="display:none">
+          <span class="tag">예시 데이터</span>
+          <span id="cpb-sample-note"></span>
+          <span class="tail">실제 포스트백이 수신되면 자동으로 대체됩니다</span>
         </div>
         <div class="card">
           <div class="card-header">
@@ -10155,6 +10166,62 @@ function pbRawFields(pairs) {
    ⚠ 상품번호 키가 구매/취소에서 다르다(productid / productId). 양쪽 다 읽는다.
    ══════════════════════════════════════════════════════════ */
 
+/* ── 쿠팡 예시 데이터 ──
+   2026-09-07 실제 수신분(김반장 서버 로그 캡처) 4건을 값 그대로 옮긴 것이다.
+   ⚠ 아래 값은 손대지 않는다:
+     · 상품번호 키가 구매는 productid(소문자 i), 취소는 productId(대문자 I) — 실제로 그렇게 온다.
+     · ④ 취소 payment 29900 은 ① 구매 payment 26910 과 다르다 — 취소 payment 는 본상품 가격이라 그렇다.
+     · ③ 은 ② 의 상품 셋 중 하나만 취소된 부분 취소다.
+   쓰임: 쿠팡 수신 건이 하나도 없을 때만 이 값으로 표를 채운다. 실제 포스트백이 한 건이라도
+   들어오면 그쪽이 그대로 쓰이고 예시는 사라진다 — 실데이터 경로를 막지 않는다. */
+var CPB_SAMPLE_COMMON = {
+  afcode: 'AF6898452',
+  subid: 'sleepIfUCanSTG',
+  os: 'iOS',
+  adid: '4FDDCF6D-1583-4C37-95BB-56F7639623BB',
+  subparam: '91c9bb20-84b5-11f1-b820-d3b05b507cd4',
+};
+var CPB_SAMPLE = [
+  Object.assign({}, CPB_SAMPLE_COMMON, {
+    _id: 'sample-cp-1', provider: 'coupang', is_sample: true,
+    purchase_time: '2026-09-07 10:40:58', orderId: '8354194650158105', purchase_cancel: 'purchase',
+    order_detail: [
+      { productid: 8942873592, productName: '새콤달콤 고창 산딸기', payment: 26910, quantity: 1 },
+    ],
+  }),
+  Object.assign({}, CPB_SAMPLE_COMMON, {
+    _id: 'sample-cp-2', provider: 'coupang', is_sample: true,
+    purchase_time: '2026-09-07 10:42:42', orderId: '8354194050471340', purchase_cancel: 'purchase',
+    order_detail: [
+      { productid: 8529746863, productName: '맛꾼 파손보상 촉촉쫄깃 맥반석 구운계란 찜질방', payment: 12380, quantity: 1 },
+      { productid: 7672087486, productName: '서동 맛에 반했닭 닭가슴살 왕갈비', payment: 33350, quantity: 1 },
+      { productid: 7629937513, productName: '열두닭 오븐으로만 조리한 닭가슴살 오리지널 훈제맛', payment: 46410, quantity: 1 },
+    ],
+  }),
+  Object.assign({}, CPB_SAMPLE_COMMON, {
+    _id: 'sample-cp-3', provider: 'coupang', is_sample: true,
+    purchase_time: '2026-09-07 10:44:11', orderId: '8354194050471340', purchase_cancel: 'cancel',
+    order_detail: [
+      { productId: 7672087486, productName: '서동 맛에 반했닭 닭가슴살 왕갈비', payment: 33350, quantity: 1 },
+    ],
+  }),
+  Object.assign({}, CPB_SAMPLE_COMMON, {
+    _id: 'sample-cp-4', provider: 'coupang', is_sample: true,
+    purchase_time: '2026-09-07 10:44:37', orderId: '8354194650158105', purchase_cancel: 'cancel',
+    order_detail: [
+      { productId: 8942873592, productName: '새콤달콤 고창 산딸기', payment: 29900, quantity: 1 },
+    ],
+  }),
+];
+/* 예시로 채웠는지 화면에 드러낸다 — 실제 수신분과 헷갈리면 안 된다 */
+function cpbSetSampleMark(on, note) {
+  var bar = document.getElementById('cpb-sample-bar');
+  if (!bar) return;
+  bar.style.display = on ? '' : 'none';
+  var n = document.getElementById('cpb-sample-note');
+  if (n) n.textContent = note || '';
+}
+
 /* order_detail 한 줄의 상품번호 — 구매는 productid(소문자 i), 취소는 productId(대문자 I) */
 function cpbItemPid(it) {
   if (it == null) return '';
@@ -10441,8 +10508,10 @@ function loadPostback() {
      이 파일의 다른 postbacks 조회도 전부 orderBy 없는 .get() 이다. 정렬은 아래에서 한다. */
   db.collection('postbacks').get().then(function(snap) {
     if (snap.empty) {
-      COUPANG_PB_CTRL.setRows([]); LINKPRICE_PB_CTRL.setRows([]);
-      setTxt('cpb-sub', '0건 수신'); setTxt('lpb-sub', '0건 수신');
+      cpbSetSampleMark(true, '수신 건 0 — 아래는 2026-09-07 실수신 캡처 4건');
+      COUPANG_PB_CTRL.setRows(cpbBuildRows(CPB_SAMPLE));
+      LINKPRICE_PB_CTRL.setRows([]);
+      setTxt('cpb-sub', '예시 ' + CPB_SAMPLE.length + '건'); setTxt('lpb-sub', '0건 수신');
       return;
     }
     var cp = [], lp = [];
@@ -10450,11 +10519,15 @@ function loadPostback() {
       var d = Object.assign({ _id: doc.id }, doc.data());
       (pbProvider(d) === 'coupang' ? cp : lp).push(d);
     });
+    /* 쿠팡 수신 건이 하나도 없을 때만 예시로 채운다 — 한 건이라도 들어오면 실제 값만 쓴다 */
+    var useSample = (cp.length === 0);
+    if (useSample) cp = CPB_SAMPLE;
+    cpbSetSampleMark(useSample, useSample ? '수신 건 0 — 아래는 2026-09-07 실수신 캡처 4건' : '');
     var cRows = cpbBuildRows(cp), lRows = lpbBuildRows(lp);
     COUPANG_PB_CTRL.setRows(cRows);
     lpbFillMerchantFilter(lRows);
     LINKPRICE_PB_CTRL.setRows(lRows);
-    setTxt('cpb-sub', cRows.length + '건 수신');
+    setTxt('cpb-sub', useSample ? '예시 ' + cRows.length + '건' : cRows.length + '건 수신');
     setTxt('lpb-sub', lRows.length + '건 수신');
   }).catch(function(e){
     console.error('loadPostback', e);
@@ -10464,8 +10537,10 @@ function loadPostback() {
     var msg = (code === 'resource-exhausted') ? '조회 실패 — Firestore 일일 할당량 초과'
             : (code === 'permission-denied') ? '조회 실패 — 권한 없음(로그인 확인)'
             : ('조회 실패 — ' + (code || (e && e.message) || '알 수 없는 오류'));
-    ctb.innerHTML = ppEmpty(6, msg); ltb.innerHTML = ppEmpty(9, msg);
-    setTxt('cpb-sub', '조회 실패'); setTxt('lpb-sub', '조회 실패');
+    cpbSetSampleMark(true, msg + ' — 아래는 2026-09-07 실수신 캡처 4건');
+    COUPANG_PB_CTRL.setRows(cpbBuildRows(CPB_SAMPLE));
+    setTxt('cpb-sub', '예시 ' + CPB_SAMPLE.length + '건');
+    ltb.innerHTML = ppEmpty(9, msg); setTxt('lpb-sub', '조회 실패');
   });
 }
 
