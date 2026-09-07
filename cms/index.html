@@ -10126,10 +10126,12 @@ function pbTimeDate(v) {
   return isNaN(d.getTime()) ? null : d;
 }
 function pbTimeCell(raw, dt) {
-  if (raw == null || raw === '') return '<span class="pb-none">—</span>';
+  var hasRaw = (raw != null && raw !== '');
+  if (!hasRaw && !dt) return '<span class="pb-none">—</span>';
+  /* 포스트백 원문 시각이 없어도 우리 수신 시각(created_at)이 있으면 그것을 보여준다 */
   if (!dt) return '<div class="pb-raw">' + pbEsc(raw) + '</div>';
   return '<div style="font-weight:700">' + ppDt(dt) + '</div><div class="pb-dim">' + ppTm(dt) + '</div>'
-    + '<div class="pb-raw">' + pbEsc(raw) + '</div>';
+    + (hasRaw ? '<div class="pb-raw">' + pbEsc(raw) + '</div>' : '');
 }
 
 function pbToggleBtn(rowId, label) {
