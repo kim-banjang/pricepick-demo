@@ -379,13 +379,18 @@ tr:hover td{background:var(--surface-2);}
 .badge-amber{background:var(--amber-soft);color:var(--amber);}
 .badge-gray{background:rgba(155,147,176,.12);color:var(--text-2);}
 .badge-blue{background:var(--info-soft);color:var(--info);}
-/* 「취소」와 「취소(환수)」는 둘 다 죽은 건이라 회색 계열로 두되, 받았다 도로 빼앗긴 것은
+/* (구) 티켓 상태 배지를 둘 다 회색으로 두던 규칙 — 이제 .badge-ts-* 를 쓴다. 아래 설명은 다른 배지용.
+   원문: 「취소」와 「취소(환수)」는 둘 다 죽은 건이라 회색 계열로 두되, 받았다 도로 빼앗긴 것은
    테두리를 둘러 갈라 놓는다 — 같은 회색으로 두면 「안 받은 것」과 「받았다 빼앗긴 것」을
    눈으로 가를 수 없다(앱도 「취소됨」·「환수됨」으로 갈라 쓴다). */
 .badge-gray-out{background:transparent;color:var(--text-3);border:1px solid var(--border);}
-/* 「부분 환수」 전용 — 잔여가 남은 건이라 다 빼앗긴 것과 같은 회색으로 둘 수 없다.
-   앱 「티켓 적립 내역」과 같은 색값을 쓴다. 나머지 상태 배지는 쓰던 것 그대로다. */
+/* 티켓 상태 배지 5종 — 앱 「티켓 적립 내역」과 같은 색값을 쓴다(두 화면이 다른 색을 쓰면 안 된다).
+   잃은 정도로 위계를 잡는다: 진행(보라) · 지급(초록) · 잃은 것 없음(회색) · 일부 잃음(앰버) · 전부 잃음(레드). */
+.badge-ts-wait{background:#F1EEFF;color:#845EEE;}
+.badge-ts-done{background:#F0FDF4;color:#16A34A;}
+.badge-ts-pre{background:#F1EFF6;color:#5A5370;}
 .badge-ts-part{background:#FDF2E6;color:#D97706;}
+.badge-ts-all{background:#FEF2F2;color:#DC2626;}
 
 .role-tag{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:10px;font-weight:700;}
 .role-tag.superadmin{background:var(--main-soft);color:var(--main-hover);border:1px solid var(--main-line);}
@@ -13544,10 +13549,10 @@ window.rfRenderMalls = function() {
    김반장이 그 번호로 실구매 기록과 대조하려다 헛짚게 된다. 대신 왜 없는지 표 밑에
    적어둔다. 금액(거래액·수수료·적립)은 총액으로 들어오므로 그대로 쓴다. */
 var RF_OD_BADGE = {
-  granted:       '<span class="badge badge-green">지급 완료</span>',
-  pending_grant: '<span class="badge badge-amber">지급 대기</span>',
-  canceled:      '<span class="badge badge-gray">미전환 환수</span>',
-  clawed_back:   '<span class="badge badge-gray-out">전환 후 환수</span>',
+  granted:       '<span class="badge badge-ts-done">지급 완료</span>',
+  pending_grant: '<span class="badge badge-ts-wait">지급 대기</span>',
+  canceled:      '<span class="badge badge-ts-pre">미전환 환수</span>',
+  clawed_back:   '<span class="badge badge-ts-all">전환 후 환수</span>',
   clawed_back_partial: '<span class="badge badge-ts-part">부분 환수</span>' };
 
 function rfOdRowHtml(o) {

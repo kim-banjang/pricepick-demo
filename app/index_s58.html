@@ -20109,7 +20109,7 @@ function mt21RenderPending(doneItems, pendItems, waitDays) {
         + '<div style="display:flex;flex-direction:column;gap:6px;flex:1;">'
         + '<div style="display:flex;align-items:center;gap:8px;">'
         + '<span style="color:#9B93B0;font-size:var(--fs-body);font-weight:700;">' + mt21I18n('랜덤 티켓 ' + it.total + '장', it.total + ' vé ngẫu nhiên') + '</span>'
-        + '<span style="padding:3px 8px;border-radius:7px;background:#F1EFF6;color:#9B93B0;font-size:var(--fs-caption);font-weight:400;">미전환 환수</span>'
+        + '<span style="padding:3px 8px;border-radius:7px;background:#F1EFF6;color:#5A5370;font-size:var(--fs-caption);font-weight:400;">미전환 환수</span>'
         + '</div>' + mt21PurchaseLine(it.pb, it.cancelledOn) + '</div></div>');
       return;
     }
@@ -20127,7 +20127,7 @@ function mt21RenderPending(doneItems, pendItems, waitDays) {
       + '<div style="display:flex;flex-direction:column;gap:6px;flex:1;">'
       + '<div style="display:flex;align-items:center;gap:8px;">'
       + '<span style="color:#1A1130;font-size:var(--fs-body);font-weight:700;">' + mt21I18n('랜덤 티켓 ' + it.total + '장', it.total + ' vé ngẫu nhiên') + '</span>'
-      + '<span style="padding:3px 8px;border-radius:7px;background:#FFF0F0;color:#D64545;font-size:var(--fs-caption);font-weight:400;">대기중</span>'
+      + '<span style="padding:3px 8px;border-radius:7px;background:#F1EEFF;color:#845EEE;font-size:var(--fs-caption);font-weight:400;">대기중</span>'
       + ddayHtml + '</div>' + barHtml + mt21PurchaseLine(it.pb) + '</div></div>');
   });
   doneItems.forEach(function (it) {
@@ -20150,13 +20150,15 @@ function mt21RenderPending(doneItems, pendItems, waitDays) {
           + '<span style="color:' + (cancelledOn ? '#9B93B0' : '#1A1130') + ';font-size:var(--fs-body);font-weight:700;">' + mt21I18n(GRADE_KO[g] + ' ' + it.grades[g] + '장', it.grades[g] + ' vé ' + MT21_GRADE_VI[g]) + '</span>'
           + '</div>';
       }).join('');
-    /* 「부분 환수」만 주황을 쓴다(김반장 확정 2026-09-07 · DEVQA 존 답변). 잔여가 남은 건이라
-       다 뺏긴 것과 같은 회색으로 두면 안 된다. 나머지 배지 색은 손대지 않는다. */
+    /* 배지 색 — 잃은 정도로 위계를 잡는다(김반장 확정 2026-09-07 · DEVQA 존 답변).
+       대기중 보라(진행) · 지급 완료 초록 · 미전환 환수 회색(잃은 것 없음) ·
+       부분 환수 앰버(일부 잃음, 남은 것 있음) · 전환 후 환수 레드(전부 잃음).
+       회색 하나로 셋을 다 칠하면 「안 받은 것」과 「받았다 뺏긴 것」이 같아 보인다. */
     var badge = !cancelledOn
       ? '<span style="padding:3px 8px;border-radius:7px;background:#F0FDF4;color:#16A34A;font-size:var(--fs-caption);font-weight:400;flex-shrink:0;">지급 완료</span>'
       : (it.partialRemain
         ? '<span style="padding:3px 8px;border-radius:7px;background:#FDF2E6;color:#D97706;font-size:var(--fs-caption);font-weight:400;flex-shrink:0;">부분 환수</span>'
-        : '<span style="padding:3px 8px;border-radius:7px;background:#F1EFF6;color:#9B93B0;font-size:var(--fs-caption);font-weight:400;flex-shrink:0;">전환 후 환수</span>');
+        : '<span style="padding:3px 8px;border-radius:7px;background:#FEF2F2;color:#DC2626;font-size:var(--fs-caption);font-weight:400;flex-shrink:0;">전환 후 환수</span>');
     rows.push('<div style="display:flex;flex-direction:column;gap:6px;padding:16px 18px;opacity:0.75;">'
       + '<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;">'
       + '<div style="display:flex;flex-direction:column;gap:6px;">' + gradeRows + '</div>'
@@ -20295,7 +20297,7 @@ function renderTicketDetail() {
       pm += '<div class="gd-pending-item" style="opacity:0.75;"><div class="gd-pending-head">'
         + ticketIcon(it.grade)
         + '<div class="gd-pending-info" style="flex:1;">' + it.label + '<span class="dim">· 전환 완료</span></div>'
-        + '<div style="font-size:var(--fs-caption);font-weight:600;color:#22C55E;background:#F0FDF4;padding:2px 7px;border-radius:20px;flex-shrink:0;">지급 완료</div></div>'
+        + '<div style="font-size:var(--fs-caption);font-weight:600;color:#16A34A;background:#F0FDF4;padding:2px 7px;border-radius:20px;flex-shrink:0;">지급 완료</div></div>'
         + purchaseLine(it.pb) + '</div>';
     });
     pendItems.forEach(function (it) {
@@ -20311,7 +20313,7 @@ function renderTicketDetail() {
       pm += '<div class="gd-pending-item"><div class="gd-pending-head">'
         + ticketIcon('random')
         + '<div class="gd-pending-info" style="flex:1;">랜덤 티켓 ' + it.total + '장<span class="dim">· ' + ddayLabel + '</span></div>'
-        + '<div style="font-size:var(--fs-caption);font-weight:600;color:#FF6B55;background:#FFF4F2;padding:2px 7px;border-radius:20px;flex-shrink:0;">대기중</div></div>'
+        + '<div style="font-size:var(--fs-caption);font-weight:600;color:#845EEE;background:#F1EEFF;padding:2px 7px;border-radius:20px;flex-shrink:0;">대기중</div></div>'
         + barHtml + purchaseLine(it.pb) + '</div>';
     });
     if (!pm) pm = '<div style="font-size:var(--fs-caption);color:var(--text3);padding:10px 2px;">대기 중이거나 최근 전환된 랜덤 티켓이 없어요.</div>';
