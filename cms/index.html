@@ -491,11 +491,14 @@ tr:hover td{background:var(--surface-2);}
   max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .pb-ord{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:11.5px;color:var(--text-2);
   max-width:190px;margin:0 auto;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.pb-toggle{display:inline-flex;align-items:center;gap:6px;background:none;border:1px solid var(--border);
-  border-radius:20px;padding:4px 11px;font-family:inherit;font-size:11.5px;font-weight:600;color:var(--text-2);cursor:pointer;}
-.pb-toggle:hover{border-color:var(--main);color:var(--main-hover);}
-.pb-toggle .car{font-size:9px;transition:transform .15s;}
-.pb-toggle[aria-expanded="true"] .car{transform:rotate(90deg);}
+/* 목록 행은 통째로 눌린다 — 커서와 배경으로 드러내고 안내 문구는 두지 않는다 */
+.pb-row{cursor:pointer;}
+.pb-row:hover td{background:var(--surface-3);}
+.pb-row[aria-expanded="true"] td{background:var(--main-soft);}
+.pb-caret{width:34px;color:var(--text-3);}
+.pb-caret i{display:inline-block;font-style:normal;font-size:12px;transition:transform .15s;}
+.pb-row:hover .pb-caret{color:var(--main);}
+.pb-row[aria-expanded="true"] .pb-caret i{transform:rotate(180deg);}
 .pb-detail>td{padding:0 18px 14px;background:var(--surface-2);white-space:normal;text-align:left!important;}
 .pb-detail table{border:1px solid var(--border);border-radius:var(--r-sm);overflow:hidden;background:var(--surface);}
 .pb-detail th{font-size:10px;padding:7px 12px;}
@@ -3623,8 +3626,9 @@ window.CMS_FEATURES = {
               <th>구분<br><span class="fk">purchase_cancel</span></th>
               <th>회원<br><span class="fk">subid</span></th>
               <th>주문번호<br><span class="fk">orderId</span></th>
-              <th>상품<br><span class="fk">order_detail</span></th>
+              <th>상품<br><span class="fk">productid · productName</span></th>
               <th>금액<br><span class="fk">payment 합</span></th>
+              <th></th>
             </tr></thead>
             <tbody id="cpb-tbody"></tbody>
           </table>
@@ -3652,11 +3656,12 @@ window.CMS_FEATURES = {
             <thead><tr>
               <th>주문 일시<br><span class="fk">day · time</span></th>
               <th>머천트<br><span class="fk">merchant_id</span></th>
-              <th>상품명<br><span class="fk">product_name</span></th>
+              <th>상품<br><span class="fk">product_code · product_name</span></th>
               <th>수량<br><span class="fk">item_count</span></th>
               <th>구매금액<br><span class="fk">price</span></th>
               <th>수수료<br><span class="fk">commision</span></th>
               <th>회원<br><span class="fk">affiliate_user_id</span></th>
+              <th></th>
             </tr></thead>
             <tbody id="lpb-tbody"></tbody>
           </table>
@@ -10134,17 +10139,23 @@ function pbTimeCell(raw, dt) {
     + (hasRaw ? '<div class="pb-raw">' + pbEsc(raw) + '</div>' : '');
 }
 
-function pbToggleBtn(rowId, label) {
-  return '<button type="button" class="pb-toggle" aria-expanded="false" onclick="pbToggleDetail(&quot;' + rowId + '&quot;,this)">'
-    + '<span class="car">▶</span><span>' + label + '</span></button>';
-}
-window.pbToggleDetail = function(rowId, btn) {
-  var row = document.getElementById(rowId);
-  if (!row) return;
-  var open = row.style.display === 'none';
-  row.style.display = open ? '' : 'none';
-  btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+/* 행을 누르면 바로 뒤의 상세행이 펼쳐진다(다시 누르면 접힌다).
+   오른쪽 끝 화살표는 상태 표시일 뿐이고 클릭은 행 전체가 받는다. */
+window.pbToggleRow = function(tr) {
+  var d = tr.nextElementSibling;
+  if (!d || d.className.indexOf('pb-detail') < 0) return;
+  var open = (d.style.display === 'none');
+  d.style.display = open ? '' : 'none';
+  tr.setAttribute('aria-expanded', open ? 'true' : 'false');
 };
+var PB_CARET = '<td class="pb-caret"><i>▾</i></td>';
+/* 금액 표기 — 천 단위를 끊는다. 숫자가 아니면 받은 값 그대로 둔다. */
+function pbMoney(v) {
+  if (v == null || v === '') return '<span class="pb-none">—</span>';
+  var t = String(v).replace(/[^0-9.-]/g, '');
+  var n = (t === '' || t === '-' || t === '.') ? NaN : Number(t);
+  return isNaN(n) ? pbEsc(v) : ppN(n);   /* 숫자로 못 읽으면 받은 값 그대로 둔다 */
+}
 /* 펼침 영역의 수신 원문 필드 나열 */
 function pbRawFields(pairs) {
   return '<div class="pb-rawbox">' + pairs.map(function(p) {
@@ -10516,9 +10527,8 @@ var COUPANG_PB_CTRL = window.COUPANG_PB_CTRL = ppMakeListController(20, function
   var tbody = document.getElementById('cpb-tbody');
   var pag = document.getElementById('cpb-pagination');
   if (!tbody) return;
-  if (!pageItems.length) { tbody.innerHTML = ppEmpty(6, '조건에 맞는 쿠팡 포스트백이 없습니다.'); if (pag) pag.innerHTML = ''; return; }
-  tbody.innerHTML = pageItems.map(function(r, i) {
-    var rowId = 'cpb-d-' + state.page + '-' + i;
+  if (!pageItems.length) { tbody.innerHTML = ppEmpty(7, '조건에 맞는 쿠팡 포스트백이 없습니다.'); if (pag) pag.innerHTML = ''; return; }
+  tbody.innerHTML = pageItems.map(function(r) {
     var kindLower = (r.kind || '').toLowerCase();
     var kindCell = r.kind
       ? (PB_KIND_BADGE[kindLower] || '<span class="badge badge-gray">' + pbEsc(r.kind) + '</span>')
@@ -10529,23 +10539,25 @@ var COUPANG_PB_CTRL = window.COUPANG_PB_CTRL = ppMakeListController(20, function
         ? '<div class="pb-dim">원 구매 연결 ' + r.linkedCount + '건</div>'
         : '<div class="pb-dim">취소 연결 ' + r.linkedCount + '건</div>';
     }
-    /* 상품 칸은 요약만 — 첫 상품명 + 외 N건. 상세는 펼쳐서 본다. */
+    /* 상품 칸 — 취소를 상품번호로 맞추므로 목록에서 번호가 보여야 한다.
+       상품번호를 위에, 상품명을 아래에. 여럿이면 첫 건 + 외 N건. */
     var prodCell;
     if (r.items.length) {
-      var first = r.items[0].name || r.items[0].pid || '';
+      var it0 = r.items[0];
       var more = r.items.length > 1 ? ' <span class="pb-dim">외 ' + (r.items.length - 1) + '건</span>' : '';
-      prodCell = '<div class="pb-pname" title="' + pbEsc(first) + '">' + pbRaw(first) + more + '</div>'
-        + pbToggleBtn(rowId, 'order_detail ' + r.items.length + '건') + linkNote;
+      prodCell = '<div class="pb-pid">' + pbRaw(it0.pid) + '<span class="pb-raw"> ' + pbEsc(it0.pidKey) + '</span></div>'
+        + '<div class="pb-pname" title="' + pbEsc(it0.name) + '">' + pbRaw(it0.name) + more + '</div>' + linkNote;
     } else {
-      prodCell = '<div class="pb-none">order_detail 미수신</div>' + pbToggleBtn(rowId, '수신 원문');
+      prodCell = '<span class="pb-none">order_detail 미수신</span>';
     }
-    var main = '<tr>'
+    var main = '<tr class="pb-row" aria-expanded="false" onclick="pbToggleRow(this)">'
       + '<td style="white-space:nowrap">' + pbTimeCell(r.purchaseTime, r.at) + '</td>'
       + '<td>' + kindCell + '</td>'
       + '<td><div class="pb-uid" title="' + pbEsc(r.subid) + '">' + pbRaw(r.subid) + '</div></td>'
       + '<td><div class="pb-ord" title="' + pbEsc(r.orderId) + '">' + pbRaw(r.orderId) + '</div></td>'
       + '<td>' + prodCell + '</td>'
       + '<td>' + pbRaw(r.amountText) + '</td>'
+      + PB_CARET
       + '</tr>';
     var itemsHtml = r.items.length
       ? '<table><thead><tr><th>상품번호</th><th>productName</th><th>payment</th><th>quantity</th><th>대사</th></tr></thead><tbody>'
@@ -10560,13 +10572,13 @@ var COUPANG_PB_CTRL = window.COUPANG_PB_CTRL = ppMakeListController(20, function
           }
           return '<tr><td class="pb-pid">' + pbRaw(it.pid) + '<div class="pb-raw">' + pbEsc(it.pidKey) + '</div></td>'
             + '<td class="pb-pname" title="' + pbEsc(it.name) + '">' + pbRaw(it.name) + '</td>'
-            + '<td>' + pbRaw(it.payment) + '</td>'
+            + '<td>' + pbMoney(it.payment) + '</td>'
             + '<td>' + pbRaw(it.qty) + '</td>'
             + '<td>' + link + '</td></tr>';
         }).join('')
         + '</tbody></table>'
       : '<div class="pb-empty-raw">order_detail 미수신</div>';
-    var detail = '<tr class="pb-detail" id="' + rowId + '" style="display:none"><td colspan="6">'
+    var detail = '<tr class="pb-detail" style="display:none"><td colspan="7">'
       + itemsHtml
       + pbRawFields([['afcode', r._d.afcode], ['os', r.os], ['adid', r._d.adid], ['subparam', r._d.subparam]])
       + '</td></tr>';
@@ -10688,27 +10700,28 @@ var LINKPRICE_PB_CTRL = window.LINKPRICE_PB_CTRL = ppMakeListController(20, func
   var tbody = document.getElementById('lpb-tbody');
   var pag = document.getElementById('lpb-pagination');
   if (!tbody) return;
-  if (!pageItems.length) { tbody.innerHTML = ppEmpty(7, '조건에 맞는 링크프라이스 포스트백이 없습니다.'); if (pag) pag.innerHTML = ''; return; }
-  tbody.innerHTML = pageItems.map(function(r, i) {
-    var rowId = 'lpb-d-' + state.page + '-' + i;
+  if (!pageItems.length) { tbody.innerHTML = ppEmpty(8, '조건에 맞는 링크프라이스 포스트백이 없습니다.'); if (pag) pag.innerHTML = ''; return; }
+  tbody.innerHTML = pageItems.map(function(r) {
     var timeCell = (r.day || r.time)
       ? '<div style="font-weight:700">' + ppDt(r.at) + '</div><div class="pb-dim">' + ppTm(r.at) + '</div>'
         + '<div class="pb-raw">' + pbRaw(r.day) + ' · ' + pbRaw(r.time) + '</div>'
       : (r.at ? '<div style="font-weight:700">' + ppDt(r.at) + '</div><div class="pb-dim">' + ppTm(r.at) + '</div>'
               : '<span class="pb-none">—</span>');
-    var main = '<tr>'
+    var main = '<tr class="pb-row" aria-expanded="false" onclick="pbToggleRow(this)">'
       + '<td style="white-space:nowrap">' + timeCell + '</td>'
       + '<td style="font-weight:500">' + pbRaw(r.merchantId) + '</td>'
-      + '<td><div class="pb-pname" title="' + pbEsc(r.productName) + '">' + pbRaw(r.productName) + '</div>'
-        + pbToggleBtn(rowId, '수신 원문') + '</td>'
+      /* 상품 칸 — 상품코드를 위에, 상품명을 아래에 (상품 1건당 1콜백이라 하나뿐이다) */
+      + '<td><div class="pb-pid">' + pbRaw(r.productCode) + '</div>'
+        + '<div class="pb-pname" title="' + pbEsc(r.productName) + '">' + pbRaw(r.productName) + '</div></td>'
       + '<td>' + pbRaw(r.itemCount) + '</td>'
-      + '<td>' + pbRaw(r.price) + '</td>'
-      + '<td>' + pbRaw(r.commision) + '</td>'
+      + '<td>' + pbMoney(r.price) + '</td>'
+      + '<td>' + pbMoney(r.commision) + '</td>'
       + '<td><div class="pb-uid" title="' + pbEsc(r.affiliateUserId) + '">' + pbRaw(r.affiliateUserId) + '</div></td>'
+      + PB_CARET
       + '</tr>';
-    var detail = '<tr class="pb-detail" id="' + rowId + '" style="display:none"><td colspan="7">'
+    var detail = '<tr class="pb-detail" style="display:none"><td colspan="8">'
       + pbRawFields([
-          ['order_code', r.orderCode], ['product_code', r.productCode], ['category_code', r.categoryCode],
+          ['order_code', r.orderCode], ['category_code', r.categoryCode],
           ['base_commission', r.baseCommission], ['incentive_commission', r.incentiveCommission],
           ['trlog_id', r.trlogId], ['uniq_id', r.uniqId], ['affiliate_id', r.affiliateId],
         ])
