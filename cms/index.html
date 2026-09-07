@@ -497,6 +497,34 @@ tr:hover td{background:var(--surface-2);}
 .ds-tag.calc::before{background:var(--info);}
 .ds-tag.policy{color:var(--main-hover);border-color:var(--main-line);background:var(--main-soft);}
 .ds-tag.policy::before{background:var(--main);}
+/* ── 포스트백 로그 — 제휴사별 블록(쿠팡 / 링크프라이스) 공용 ── */
+.pb-block-head{display:flex;align-items:baseline;gap:10px;margin:0 0 12px;flex-wrap:wrap;}
+.pb-block-head .t{font-size:16px;font-weight:800;letter-spacing:-.2px;color:var(--text);}
+.pb-block-head .api{font-size:11px;font-weight:600;color:var(--text-3);font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;}
+.pb-block + .pb-block{margin-top:34px;padding-top:30px;border-top:1px solid var(--border);}
+.pb-mem{text-align:left;line-height:1.45;}
+.pb-mem .nm{font-weight:600;font-size:13px;color:var(--text);}
+.pb-mem .kk{font-size:11px;color:var(--text-2);}
+.pb-uid{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:11px;color:var(--text-3);
+  max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.pb-ord{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:11.5px;color:var(--text-2);
+  max-width:190px;margin:0 auto;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.pb-toggle{display:inline-flex;align-items:center;gap:6px;background:none;border:1px solid var(--border);
+  border-radius:20px;padding:4px 11px;font-family:inherit;font-size:11.5px;font-weight:600;color:var(--text-2);cursor:pointer;}
+.pb-toggle:hover{border-color:var(--main);color:var(--main-hover);}
+.pb-toggle .car{font-size:9px;transition:transform .15s;}
+.pb-toggle[aria-expanded="true"] .car{transform:rotate(90deg);}
+.pb-detail>td{padding:0 18px 14px;background:var(--surface-2);white-space:normal;text-align:left!important;}
+.pb-detail table{border:1px solid var(--border);border-radius:var(--r-sm);overflow:hidden;background:var(--surface);}
+.pb-detail th{font-size:10px;padding:7px 12px;}
+.pb-detail td{font-size:12px;padding:9px 12px;}
+.pb-detail tr:hover td{background:var(--surface);}
+.pb-pid{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:11.5px;color:var(--text-2);}
+.pb-pname{text-align:left!important;max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.pb-dim{font-size:11px;color:var(--text-3);}
+.pb-strike{text-decoration:line-through;color:var(--text-3);}
+.pb-cx{color:var(--danger);font-weight:600;}
+
 
 /* ── 차트 바 ── */
 .chart-bar-wrap{display:flex;align-items:flex-end;gap:8px;height:120px;padding:4px 0 0;}
@@ -3521,28 +3549,78 @@ window.CMS_FEATURES = {
       </div>
     </div>
 
-    <!-- ── 포스트백 로그 (신규) ── -->
+    <!-- ── 포스트백 로그 ── 쿠팡 / 링크프라이스 블록 분리 (API 상이) ── -->
     <div class="section" id="sec-postback">
-      <div class="data-source-bar">
-        <span class="ds-label">데이터 출처</span>
-        <span class="ds-tag coupang">제휴몰 포스트백 (쿠팡·11번가·G마켓·알리·아이허브) · 구매 완료 시 콜백</span>
-        <span class="ds-tag ours">우리 DB · 포스트백 수신 기록 (추가만 가능 · 수정·삭제 불가)</span>
+      <button type="button" class="ta-notice" onclick="openModal('m-pb-notice')">
+        <span>포스트백 로그 Notice</span>
+        <span class="ta-notice-mark">!</span>
+      </button>
+
+      <!-- ── 쿠팡 ── -->
+      <div class="pb-block" id="pb-block-coupang">
+        <div class="pb-block-head">
+          <span class="t">쿠팡 포스트백 로그</span>
+          <span class="api">Coupang Partners Postback</span>
+        </div>
+        <div class="data-source-bar">
+          <span class="ds-label">데이터 출처</span>
+          <span class="ds-tag coupang">쿠팡 파트너스 포스트백 · 구매/취소 콜백</span>
+          <span class="ds-tag ours">우리 DB · 수신 기록 (추가만 가능 · 수정·삭제 불가)</span>
+        </div>
+        <div class="toolbar">
+          <input class="search-box" id="cpb-search" placeholder="닉네임, orderId, subid, 상품번호, 상품명 검색..." onkeydown="if(event.key==='Enter')cpbApplyFilters()">
+          <select class="filter-sel" id="cpb-filter-kind" onchange="cpbApplyFilters()"><option value="">구매·취소 전체</option><option value="purchase">구매</option><option value="cancel">취소</option></select>
+          <select class="filter-sel" id="cpb-filter-status" onchange="cpbApplyFilters()"><option value="">전체 상태</option><option value="confirmed">정상(확정)</option><option value="pending">대기</option><option value="refunded">환불</option></select>
+          <button class="btn btn-primary btn-sm" onclick="cpbApplyFilters()">검색</button>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div><div class="card-title">쿠팡 포스트백 로그</div><div class="card-sub">주문 1건 = 1행 · 상품 내역은 order_detail 펼침</div></div>
+            <div style="font-size:12px;color:var(--text-2)" id="cpb-sub">—</div>
+          </div>
+          <table>
+            <thead><tr>
+              <th>수신 시각</th><th>구분</th><th>회원(subid)</th><th>주문번호(orderId)</th>
+              <th>상품</th><th>구매금액</th><th>제휴 수수료 (매출)</th><th>상태</th>
+            </tr></thead>
+            <tbody id="cpb-tbody"></tbody>
+          </table>
+          <div id="cpb-pagination"></div>
+        </div>
       </div>
-      <div class="info-box"><strong>포스트백</strong> — 회원이 PricePick 경유 링크로 제휴몰에서 구매하면 해당 제휴몰이 우리 서버에 콜백을 보냅니다. 이 데이터로 가지급(적립예정) 처리와 <strong>제휴 수수료(매출)</strong>를 집계하며, 수수료율은 제휴몰·카테고리별로 다릅니다. 등급 티켓은 구매확정 후 지급됩니다 — 쿠팡은 카카오톡 연동 D+7 / 미연동 D+30, 링크프라이스 제휴몰은 몰별 전환 대기일 수. <strong>예외 처리</strong> — ① 확정 후 환불은 미사용분만 환수 ② 포스트백 미수신 24h 후 영수증 인증으로 수동 지급 ③ 중복 포스트백은 주문번호 UNIQUE로 차단.</div>
-      <div class="toolbar">
-        <input class="search-box" id="pb-search" placeholder="닉네임, 주문번호 검색..." onkeydown="if(event.key==='Enter')pbApplyFilters()">
-        <select class="filter-sel" id="pb-filter-mall" onchange="pbApplyFilters()"><option value="">전체 제휴몰</option><option>쿠팡</option><option>11번가</option><option>G마켓</option><option>알리익스프레스</option><option>아이허브</option></select>
-        <select class="filter-sel" id="pb-filter-status" onchange="pbApplyFilters()"><option value="">전체 상태</option><option value="confirmed">정상(확정)</option><option value="pending">대기</option><option value="refunded">환불</option></select>
-        <button class="btn btn-primary btn-sm" onclick="pbApplyFilters()">검색</button>
-      </div>
-      <div class="card">
-        <div class="card-header"><div class="card-title">포스트백 로그</div><div style="font-size:12px;color:var(--text-2)" id="pb-sub">—</div></div>
-        <table>
-          <thead><tr><th style="text-align:center">수신 시각</th><th style="text-align:center">제휴몰</th><th>회원(식별번호)</th><th style="text-align:center">주문번호</th><th style="text-align:center">구매금액</th><th style="text-align:center">제휴 수수료 (매출)</th><th style="text-align:center">상태</th></tr></thead>
-          <tbody>
-          </tbody>
-        </table>
-        <div id="postback-pagination"></div>
+
+      <!-- ── 링크프라이스 ── -->
+      <div class="pb-block" id="pb-block-linkprice">
+        <div class="pb-block-head">
+          <span class="t">링크프라이스 포스트백 로그</span>
+          <span class="api">LinkPrice Affiliate Postback</span>
+        </div>
+        <div class="data-source-bar">
+          <span class="ds-label">데이터 출처</span>
+          <span class="ds-tag policy">링크프라이스 포스트백 · 상품 1건당 1콜백 (uniq_id로 주문 묶음)</span>
+          <span class="ds-tag calc">취소는 포스트백 없음 · translist 조회 API 대사</span>
+          <span class="ds-tag ours">우리 DB · 수신 기록 (추가만 가능 · 수정·삭제 불가)</span>
+        </div>
+        <div class="toolbar">
+          <input class="search-box" id="lpb-search" placeholder="닉네임, order_code, uniq_id, affiliate_user_id, 상품코드, 상품명 검색..." onkeydown="if(event.key==='Enter')lpbApplyFilters()">
+          <select class="filter-sel" id="lpb-filter-merchant" onchange="lpbApplyFilters()"><option value="">전체 머천트</option></select>
+          <select class="filter-sel" id="lpb-filter-status" onchange="lpbApplyFilters()"><option value="">전체 상태</option><option value="confirmed">정상(확정)</option><option value="pending">대기</option><option value="refunded">환불</option></select>
+          <button class="btn btn-primary btn-sm" onclick="lpbApplyFilters()">검색</button>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div><div class="card-title">링크프라이스 포스트백 로그</div><div class="card-sub">uniq_id 1건 = 1행 · 상품별 포스트백은 펼침</div></div>
+            <div style="font-size:12px;color:var(--text-2)" id="lpb-sub">—</div>
+          </div>
+          <table>
+            <thead><tr>
+              <th>수신 시각</th><th>머천트</th><th>회원(affiliate_user_id)</th><th>주문(order_code / uniq_id)</th>
+              <th>상품</th><th>구매금액</th><th>수수료 (commision)</th><th>취소 확인</th>
+            </tr></thead>
+            <tbody id="lpb-tbody"></tbody>
+          </table>
+          <div id="lpb-pagination"></div>
+        </div>
       </div>
     </div>
 
@@ -4059,6 +4137,30 @@ window.CMS_FEATURES = {
     </div>
     <div class="modal-footer">
       <button class="btn btn-primary" onclick="closeModal('m-rf-notice')">닫기</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="m-pb-notice">
+  <div class="modal" style="width:560px">
+    <div class="modal-header">
+      <div class="modal-title">포스트백 로그 Notice</div>
+      <button class="modal-close" onclick="closeModal('m-pb-notice')"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <ul class="ta-notice-list">
+        <li><span class="k">포스트백</span>회원이 PricePick 경유 링크로 제휴몰에서 구매하면 제휴사가 우리 서버로 보내는 콜백입니다. 가지급(적립예정) 처리와 제휴 수수료(매출) 집계의 기준 데이터입니다.</li>
+        <li><span class="k">쿠팡 · 링크프라이스 분리</span>두 제휴사는 API 규격이 달라 별도 블록·별도 컬럼으로 적재·조회합니다. 한 표로 합치지 않습니다.</li>
+        <li><span class="k">쿠팡 상품번호</span>구매 포스트백은 <strong>productid</strong>(소문자 i), 취소 포스트백은 <strong>productId</strong>(대문자 I)로 옵니다. 양쪽을 모두 읽습니다.</li>
+        <li><span class="k">쿠팡 취소 대사</span>취소 포스트백의 payment는 <strong>사용하지 않습니다</strong>. orderId로 원 구매 기록을 찾고 상품번호로 해당 상품을 지정한 뒤, 환수 금액·수수료는 <strong>원 구매 기록의 값</strong>을 씁니다. 부분 취소는 해당 상품만 환수합니다.</li>
+        <li><span class="k">링크프라이스 주문 묶음</span>한 주문에 상품이 여럿이면 상품 수만큼 포스트백이 옵니다. uniq_id가 같은 건을 한 주문으로 묶어 적립액을 한 번만 계산합니다.</li>
+        <li><span class="k">링크프라이스 취소</span>취소 포스트백이 없습니다. translist 조회 API를 매일 돌려 대사합니다.</li>
+        <li><span class="k">등급 티켓 확정</span>쿠팡은 카카오톡 연동 D+7 / 미연동 D+30, 링크프라이스 제휴몰은 몰별 전환 대기일 수(기본 30일).</li>
+        <li><span class="k">예외 처리</span>① 확정 후 환불은 미사용분만 환수 ② 포스트백 미수신 24h 후 영수증 인증으로 수동 지급 ③ 중복 포스트백은 주문번호 UNIQUE로 차단.</li>
+      </ul>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-primary" onclick="closeModal('m-pb-notice')">닫기</button>
     </div>
   </div>
 </div>
@@ -9928,50 +10030,406 @@ window.avSubmit = function() {
   });
 };
 
-/* ── sec-postback ── postbacks collection */
+/* ── sec-postback ── postbacks 컬렉션 · 제휴사별 분리(쿠팡 / 링크프라이스)
+   두 제휴사는 포스트백 API 규격이 다르다. 컬럼·검색·필터·페이지네이션을 각각 갖고,
+   한 표에 합치지 않는다. 제휴사 구분은 provider 필드(coupang|linkprice)를 정본으로 하고,
+   값이 없는 기존 문서는 제휴사 고유 필드로 추론한다. */
+
 var PB_STATUS_BADGE = { confirmed:'<span class="badge badge-green">정상</span>', pending:'<span class="badge badge-amber">대기</span>', refunded:'<span class="badge badge-red">환불</span>' };
-var POSTBACK_CTRL = window.POSTBACK_CTRL = ppMakeListController(20, function(pageItems, state, totalPages) {
-  var tbody = document.querySelector('#sec-postback table tbody');
-  var pag = document.getElementById('postback-pagination');
+var PB_KIND_BADGE = { purchase:'<span class="badge badge-blue">구매</span>', cancel:'<span class="badge badge-red">취소</span>' };
+
+/* 수수료율 표기 — 0.035*100 이 3.5000000000000004 로 새는 것을 막는다 */
+function pbRate(rate) { return (Math.round((rate || 0) * 10000) / 100) + '%'; }
+
+function pbEsc(v) {
+  return (v == null ? '' : String(v)).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+/* 제휴사 판별 — provider 필드 우선, 없으면 제휴사 고유 필드로 추론 */
+function pbProvider(d) {
+  if (d.provider) return d.provider;
+  if (d.afcode || d.order_detail || d.purchase_cancel || d.subid) return 'coupang';
+  if (d.trlog_id || d.uniq_id || d.merchant_id || d.affiliate_user_id) return 'linkprice';
+  return (d.mall_name === '쿠팡') ? 'coupang' : 'linkprice';
+}
+
+/* 시각 파서 — 포스트백 원본 시각(유닉스 초/밀리초, YYYYMMDDHHMMSS, ISO)과
+   Firestore Timestamp 를 모두 받아 Date 로 돌려준다. 해석 불가면 fallback. */
+function pbTime(v, fallback) {
+  if (v == null || v === '') return fallback;
+  if (typeof v === 'object') return (typeof v.toDate === 'function') ? v.toDate() : fallback;
+  if (typeof v === 'number') return new Date(v < 1e12 ? v * 1000 : v);
+  var s = String(v).trim();
+  if (/^\d{10}$/.test(s)) return new Date(Number(s) * 1000);
+  if (/^\d{13}$/.test(s)) return new Date(Number(s));
+  if (/^\d{14}$/.test(s)) return new Date(s.slice(0,4)+'-'+s.slice(4,6)+'-'+s.slice(6,8)+'T'+s.slice(8,10)+':'+s.slice(10,12)+':'+s.slice(12,14));
+  var d = new Date(s);
+  return isNaN(d.getTime()) ? fallback : d;
+}
+
+/* 회원 표기 — 닉네임 / 카카오ID / 제휴사 식별자(subid·affiliate_user_id).
+   식별자는 한 줄로 자르고 전체 값은 title 로 남긴다(줄바꿈으로 지저분해지는 것 방지). */
+function pbMemberCell(u, uid) {
+  u = u || {};
+  var out = '<div class="pb-mem"><div class="nm">' + pbEsc(u.nickname || '미매칭') + '</div>'
+    + '<div class="kk">' + pbEsc((u.linked_kakao && u.kakao_login_id) ? u.kakao_login_id : '미연동') + '</div>';
+  if (uid) out += '<div class="pb-uid" title="' + pbEsc(uid) + '">' + pbEsc(uid) + '</div>';
+  return out + '</div>';
+}
+
+function pbToggleBtn(rowId, n) {
+  return '<button type="button" class="pb-toggle" aria-expanded="false" onclick="pbToggleDetail(&quot;' + rowId + '&quot;,this)">'
+    + '<span class="car">▶</span><span>' + n + '개 상품</span></button>';
+}
+window.pbToggleDetail = function(rowId, btn) {
+  var row = document.getElementById(rowId);
+  if (!row) return;
+  var open = row.style.display === 'none';
+  row.style.display = open ? '' : 'none';
+  btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+};
+
+/* ══════════════════════════════════════════════════════════
+   쿠팡 — Coupang Partners Postback
+   수신 필드(2026-09-07 실측):
+     공통            afcode, subid, os, adid, subparam, purchase_time, orderId, purchase_cancel
+     order_detail[]  productid(구매) / productId(취소), productName, payment, quantity
+   ⚠ 상품번호 키가 구매/취소에서 다르다(productid / productId). 양쪽 다 읽는다.
+   ══════════════════════════════════════════════════════════ */
+
+/* order_detail 한 줄의 상품번호 — 구매는 productid(소문자 i), 취소는 productId(대문자 I) */
+function cpbItemPid(it) {
+  if (it == null) return '';
+  if (it.productid != null && it.productid !== '') return String(it.productid);
+  if (it.productId != null && it.productId !== '') return String(it.productId);
+  return '';
+}
+function cpbItems(d) { return Array.isArray(d.order_detail) ? d.order_detail : []; }
+function cpbOrderId(d) { return d.orderId || d.order_id || ''; }
+function cpbKind(d) {
+  var v = (d.purchase_cancel || '').toString().toLowerCase();
+  if (v === 'cancel' || v === 'cancelled' || v === 'canceled') return 'cancel';
+  if (v === 'purchase') return 'purchase';
+  return (d.status === 'refunded') ? 'cancel' : 'purchase';
+}
+function cpbNum(v) { var n = Number(String(v == null ? '' : v).replace(/[^0-9.-]/g,'')); return isNaN(n) ? 0 : n; }
+
+var COUPANG_PB_CTRL = window.COUPANG_PB_CTRL = ppMakeListController(20, function(pageItems, state, totalPages) {
+  var tbody = document.getElementById('cpb-tbody');
+  var pag = document.getElementById('cpb-pagination');
   if (!tbody) return;
-  if (!pageItems.length) { tbody.innerHTML = ppEmpty(7,'조건에 맞는 포스트백 로그가 없습니다.'); if (pag) pag.innerHTML = ''; return; }
-  tbody.innerHTML = pageItems.map(function(d) {
-    var rate = MALL_RATES[d.mall_name] || 0.03;
-    var amt = d.purchase_amount || 0;
-    var comm = d.status === 'refunded' ? '<span style="color:var(--danger)">환수</span>' : '<span style="color:var(--success);font-weight:600">+' + ppN(Math.round(amt*rate)) + '원</span>';
-    return '<tr><td style="text-align:center;white-space:nowrap"><div style="font-weight:700;color:#333">' + ppDt(d.created_at) + '</div><div style="color:var(--text-3)">' + ppTm(d.created_at) + '</div></td>'
-      + '<td style="text-align:center;font-weight:500">' + (d.mall_name||'—') + '</td>'
-      + '<td>' + renderMemberIdentity(d._user, d.user_id) + '</td>'
-      + '<td style="text-align:center;font-family:monospace;font-size:11px;color:var(--text-2)">' + (d.order_id||d._id) + '</td>'
-      + '<td style="text-align:center">' + ppN(amt) + '원</td>'
-      + '<td style="text-align:center">' + comm + '<div style="font-size:11px;color:var(--text-3)">수수료율 ' + (rate*100) + '%</div></td>'
-      + '<td style="text-align:center">' + (PB_STATUS_BADGE[d.status]||'<span class="badge badge-gray">' + d.status + '</span>') + '</td></tr>';
+  if (!pageItems.length) { tbody.innerHTML = ppEmpty(8, '조건에 맞는 쿠팡 포스트백이 없습니다.'); if (pag) pag.innerHTML = ''; return; }
+  tbody.innerHTML = pageItems.map(function(r, i) {
+    var rowId = 'cpb-d-' + state.page + '-' + i;
+    var oid = r.orderId || r._id;
+    var amtCell, commCell;
+    if (r.kind === 'cancel') {
+      amtCell = '<span class="pb-cx">−' + ppN(r.clawAmount) + '원</span>'
+        + (r.unmatched ? '<div class="pb-dim">원 구매 미확인</div>' : '<div class="pb-dim">원 구매 기준</div>');
+      commCell = '<span class="pb-cx">−' + ppN(r.clawCommission) + '원</span>'
+        + '<div class="pb-dim">수수료율 ' + pbRate(r.rate) + '</div>';
+    } else {
+      amtCell = '<span style="font-weight:600">' + ppN(r.netAmount) + '원</span>'
+        + (r.cancelledAmount ? '<div class="pb-dim">총 ' + ppN(r.grossAmount) + '원 · 취소 −' + ppN(r.cancelledAmount) + '원</div>' : '');
+      commCell = '<span style="color:var(--success);font-weight:600">+' + ppN(Math.round(r.netAmount * r.rate)) + '원</span>'
+        + '<div class="pb-dim">수수료율 ' + pbRate(r.rate) + '</div>';
+    }
+    var prodCell = r.items.length
+      ? pbToggleBtn(rowId, r.items.length) + (r.cancelledCount ? '<div class="pb-dim">취소 ' + r.cancelledCount + '건</div>' : '')
+      : '<span class="pb-dim">order_detail 미수신</span>';
+    var main = '<tr>'
+      + '<td style="white-space:nowrap"><div style="font-weight:700">' + ppDt(r.at) + '</div><div class="pb-dim">' + ppTm(r.at) + '</div></td>'
+      + '<td>' + (PB_KIND_BADGE[r.kind] || '') + '</td>'
+      + '<td>' + pbMemberCell(r._user, r.subid) + '</td>'
+      + '<td><div class="pb-ord" title="' + pbEsc(oid) + '">' + pbEsc(oid) + '</div>'
+        + (r.kind === 'cancel' && !r.unmatched ? '<div class="pb-dim">원 구매 ' + ppDt(r.originAt) + '</div>' : '') + '</td>'
+      + '<td>' + prodCell + '</td>'
+      + '<td>' + amtCell + '</td>'
+      + '<td>' + commCell + '</td>'
+      + '<td>' + (PB_STATUS_BADGE[r.status] || '<span class="badge badge-gray">' + pbEsc(r.status || '—') + '</span>') + '</td>'
+      + '</tr>';
+    if (!r.items.length) return main;
+    var detail = '<tr class="pb-detail" id="' + rowId + '" style="display:none"><td colspan="8"><table>'
+      + '<thead><tr><th>상품번호</th><th>상품명</th><th>수량</th><th>금액</th><th>구분</th><th>' + (r.kind === 'cancel' ? '환수 금액' : '취소 여부') + '</th></tr></thead><tbody>'
+      + r.items.map(function(it) {
+        var right;
+        if (r.kind === 'cancel') {
+          right = it.origin
+            ? '<span class="pb-cx">−' + ppN(it.origin.payment) + '원</span><div class="pb-dim">원 구매 payment</div>'
+            : '<span class="pb-dim">원 구매 미확인</span>';
+        } else {
+          right = it.cancelled
+            ? '<span class="pb-cx">취소</span><div class="pb-dim">' + ppDt(it.cancelledAt) + ' ' + ppTm(it.cancelledAt) + '</div>'
+            : '<span class="pb-dim">—</span>';
+        }
+        var amtTxt = (r.kind === 'cancel')
+          ? '<span class="pb-strike">' + ppN(it.payment) + '원</span><div class="pb-dim">포스트백 payment · 미적용</div>'
+          : (it.cancelled ? '<span class="pb-strike">' + ppN(it.payment) + '원</span>' : ppN(it.payment) + '원');
+        return '<tr><td class="pb-pid">' + pbEsc(it.pid || '—') + '</td>'
+          + '<td class="pb-pname" title="' + pbEsc(it.name) + '">' + pbEsc(it.name || '—') + '</td>'
+          + '<td>' + ppN(it.qty) + '</td>'
+          + '<td>' + amtTxt + '</td>'
+          + '<td>' + (PB_KIND_BADGE[r.kind] || '') + '</td>'
+          + '<td>' + right + '</td></tr>';
+      }).join('')
+      + '</tbody></table></td></tr>';
+    return main + detail;
   }).join('');
-  if (pag) pag.innerHTML = ppPaginationHtml('POSTBACK_CTRL', state.page, totalPages);
+  if (pag) pag.innerHTML = ppPaginationHtml('COUPANG_PB_CTRL', state.page, totalPages);
 });
 
-window.pbApplyFilters = function() {
-  var q = (document.getElementById('pb-search')||{}).value || '';
-  var mall = (document.getElementById('pb-filter-mall')||{}).value || '';
-  var status = (document.getElementById('pb-filter-status')||{}).value || '';
-  POSTBACK_CTRL.applyFilter(function(d) {
-    if (q && !ppMatch((d._user||{}).nickname, q) && !ppMatch(d.order_id, q)) return false;
-    if (mall && d.mall_name !== mall) return false;
-    if (status && d.status !== status) return false;
+window.cpbApplyFilters = function() {
+  var q = (document.getElementById('cpb-search')||{}).value || '';
+  var kind = (document.getElementById('cpb-filter-kind')||{}).value || '';
+  var status = (document.getElementById('cpb-filter-status')||{}).value || '';
+  COUPANG_PB_CTRL.applyFilter(function(r) {
+    if (kind && r.kind !== kind) return false;
+    if (status && r.status !== status) return false;
+    if (q) {
+      var hit = ppMatch((r._user||{}).nickname, q) || ppMatch(r.orderId, q) || ppMatch(r._id, q) || ppMatch(r.subid, q);
+      if (!hit) hit = r.items.some(function(it) { return ppMatch(it.pid, q) || ppMatch(it.name, q); });
+      if (!hit) return false;
+    }
     return true;
   });
 };
 
-function loadPostback() {
-  var tbody = document.querySelector('#sec-postback table tbody');
-  if (!tbody) return;
-  db.collection('postbacks').orderBy('created_at','desc').limit(300).get().then(function(snap) {
-    if (snap.empty) { POSTBACK_CTRL.setRows([]); return; }
-    dmFetchUsersByIds(snap.docs.map(function(doc){ return doc.data().user_id; })).then(function(userMap) {
-      var items = snap.docs.map(function(doc) { return Object.assign({ _id: doc.id, _user: userMap[doc.data().user_id] }, doc.data()); });
-      POSTBACK_CTRL.setRows(items);
+/* 쿠팡 행 구성 — 취소 대사 정책(김반장 확정 2026-09-07)
+   · 취소 포스트백의 payment 는 쓰지 않는다(본상품 가격이라 회원이 실제 낸 돈과 다르다).
+   · orderId 로 원 구매 기록을 찾고, 상품번호로 어느 상품인지 지정한다.
+   · 환수 금액·수수료는 원 구매 기록의 값을 쓴다. 부분 취소는 그 상품만 환수한다. */
+function cpbBuildRows(docs) {
+  var rate = MALL_RATES['쿠팡'] || 0.03;
+  var rows = docs.map(function(d) {
+    var kind = cpbKind(d);
+    var at = pbTime(d.purchase_time || d.order_time, null) || pbTime(d.created_at, new Date());
+    return {
+      _id: d._id, _d: d, _user: d._user, kind: kind, at: at, rate: rate,
+      subid: d.subid || d.subparam || '',
+      orderId: cpbOrderId(d) || '',
+      status: d.status || (kind === 'cancel' ? 'refunded' : 'pending'),
+      items: cpbItems(d).map(function(it) {
+        return { pid: cpbItemPid(it), name: it.productName || it.product_name || '', payment: cpbNum(it.payment), qty: cpbNum(it.quantity) || 1, cancelled: false, cancelledAt: null, origin: null };
+      }),
+      _legacyAmount: cpbNum(d.purchase_amount || d.order_price || 0),
+    };
+  });
+
+  // 원 구매 색인 — orderId + 상품번호
+  var purchaseIdx = {};
+  rows.forEach(function(r) {
+    if (r.kind !== 'purchase' || !r.orderId) return;
+    var g = purchaseIdx[r.orderId] || (purchaseIdx[r.orderId] = { row: r, items: {} });
+    r.items.forEach(function(it) { if (it.pid) g.items[it.pid] = it; });
+  });
+
+  // 취소 → 원 구매 연결 (양방향)
+  rows.forEach(function(r) {
+    if (r.kind !== 'cancel') return;
+    var src = r.orderId ? purchaseIdx[r.orderId] : null;
+    r.originAt = src ? src.row.at : null;
+    var claw = 0, matched = 0;
+    r.items.forEach(function(it) {
+      var origin = (src && it.pid) ? src.items[it.pid] : null;
+      if (!origin) return;
+      it.origin = { payment: origin.payment, qty: origin.qty, name: origin.name };
+      origin.cancelled = true; origin.cancelledAt = r.at;
+      claw += origin.payment; matched++;
     });
-  }).catch(function(e){ console.error('loadPostback',e); tbody.innerHTML = ppEmpty(7,'로드 오류'); });
+    r.unmatched = (matched === 0);
+    r.clawAmount = claw;                    // 원 구매 payment 합계 — 취소 포스트백 payment 는 쓰지 않는다
+    r.clawCommission = Math.round(claw * rate);
+  });
+
+  // 구매 행 금액 — 총액 / 취소분 / 유효금액
+  rows.forEach(function(r) {
+    if (r.kind !== 'purchase') return;
+    var gross = 0, cancelled = 0, cnt = 0;
+    r.items.forEach(function(it) { gross += it.payment; if (it.cancelled) { cancelled += it.payment; cnt++; } });
+    if (!r.items.length) gross = r._legacyAmount;
+    r.grossAmount = gross; r.cancelledAmount = cancelled; r.cancelledCount = cnt;
+    r.netAmount = gross - cancelled;
+  });
+
+  rows.sort(function(a, b) { return (b.at ? b.at.getTime() : 0) - (a.at ? a.at.getTime() : 0); });
+  return rows;
+}
+
+/* ══════════════════════════════════════════════════════════
+   링크프라이스 — LinkPrice Affiliate Postback
+   수신 필드(출처: 해리 전달 「Postback Data: LinkPrice, Coupang」 2026-08-27 · 마스터 정책서 v8.3):
+     day, time, merchant_id, order_code, product_code, product_name, category_code,
+     item_count, price, commision(원문 철자), affiliate_user_id, base_commission,
+     incentive_commission, trlog_id, uniq_id, affiliate_id
+   · 한 주문에 상품이 여럿이면 상품 수만큼 포스트백이 따로 오고 uniq_id 가 같다 → uniq_id 로 묶는다.
+   · 취소 포스트백은 오지 않는다 → translist 조회 API 대사 결과를 상태로 표기한다.
+   ══════════════════════════════════════════════════════════ */
+
+var LP_CANCEL_LABEL = {
+  confirmed: '<span class="badge badge-green">조회 대사 정상</span>',
+  pending:   '<span class="badge badge-amber">대사 대기</span>',
+  refunded:  '<span class="badge badge-red">조회 대사 취소</span>',
+};
+
+function lpbNum(v) { var n = Number(String(v == null ? '' : v).replace(/[^0-9.-]/g,'')); return isNaN(n) ? 0 : n; }
+function lpbMerchant(d) { return d.merchant_id || d.mall_name || ''; }
+function lpbRateText(d) {
+  var b = d.base_commission, i = d.incentive_commission;
+  if ((b == null || b === '') && (i == null || i === '')) return '';
+  var parts = [];
+  if (b != null && b !== '') parts.push('기본 ' + b);
+  if (i != null && i !== '' && lpbNum(i) !== 0) parts.push('추가 ' + i);
+  return parts.join(' · ');
+}
+
+/* merchant_id → 머천트명 — 링크프라이스 카탈로그(settings/linkprice_catalog)를 쓴다.
+   TA_CATALOG 는 티켓 적립 설정 화면이 채우므로, 비어 있으면 캐시하지 않고 다음에 다시 본다. */
+var LPB_MERCHANT_NAME = null;
+function lpbMerchantName(id) {
+  if (!id) return '';
+  if (!LPB_MERCHANT_NAME) {
+    var list = (window.TA_CATALOG && window.TA_CATALOG.length) ? window.TA_CATALOG
+             : ((typeof TA_CATALOG !== 'undefined' && TA_CATALOG.length) ? TA_CATALOG : (window.LINKPRICE_MERCHANTS || []));
+    if (!list.length) return '';
+    var map = {};
+    for (var i = 0; i < list.length; i++) {
+      var m = list[i];
+      if (m && m['머천트ID']) map[m['머천트ID']] = m['머천트명'] || m['머천트ID'];
+    }
+    LPB_MERCHANT_NAME = map;
+  }
+  return LPB_MERCHANT_NAME[id] || '';
+}
+
+var LINKPRICE_PB_CTRL = window.LINKPRICE_PB_CTRL = ppMakeListController(20, function(pageItems, state, totalPages) {
+  var tbody = document.getElementById('lpb-tbody');
+  var pag = document.getElementById('lpb-pagination');
+  if (!tbody) return;
+  if (!pageItems.length) { tbody.innerHTML = ppEmpty(8, '조건에 맞는 링크프라이스 포스트백이 없습니다.'); if (pag) pag.innerHTML = ''; return; }
+  tbody.innerHTML = pageItems.map(function(r, i) {
+    var rowId = 'lpb-d-' + state.page + '-' + i;
+    var main = '<tr>'
+      + '<td style="white-space:nowrap"><div style="font-weight:700">' + ppDt(r.at) + '</div><div class="pb-dim">' + ppTm(r.at) + '</div></td>'
+      + '<td style="font-weight:500">' + pbEsc(r.merchantLabel || '—') + (r.merchantId ? '<div class="pb-dim">' + pbEsc(r.merchantId) + '</div>' : '') + '</td>'
+      + '<td>' + pbMemberCell(r._user, r.affiliateUserId) + '</td>'
+      + '<td><div class="pb-ord" title="' + pbEsc(r.orderCode) + '">' + pbEsc(r.orderCode || '—') + '</div>'
+        + '<div class="pb-dim">uniq_id ' + pbEsc(r.uniqId || '—') + '</div></td>'
+      + '<td>' + pbToggleBtn(rowId, r.items.length) + '</td>'
+      + '<td><span style="font-weight:600">' + ppN(r.priceTotal) + '원</span><div class="pb-dim">수량 ' + ppN(r.qtyTotal) + '</div></td>'
+      + '<td><span style="color:var(--success);font-weight:600">+' + ppN(r.commissionTotal) + '원</span>'
+        + (r.rateText ? '<div class="pb-dim">' + pbEsc(r.rateText) + '</div>' : '') + '</td>'
+      + '<td>' + (LP_CANCEL_LABEL[r.status] || '<span class="badge badge-gray">' + pbEsc(r.status || '—') + '</span>') + '</td>'
+      + '</tr>';
+    var detail = '<tr class="pb-detail" id="' + rowId + '" style="display:none"><td colspan="8"><table>'
+      + '<thead><tr><th>trlog_id</th><th>상품코드</th><th>상품명</th><th>카테고리</th><th>수량</th><th>구매금액</th><th>수수료</th></tr></thead><tbody>'
+      + r.items.map(function(it) {
+        return '<tr><td class="pb-pid">' + pbEsc(it.trlogId || '—') + '</td>'
+          + '<td class="pb-pid">' + pbEsc(it.productCode || '—') + '</td>'
+          + '<td class="pb-pname" title="' + pbEsc(it.productName) + '">' + pbEsc(it.productName || '—') + '</td>'
+          + '<td class="pb-dim">' + pbEsc(it.categoryCode || '—') + '</td>'
+          + '<td>' + ppN(it.itemCount) + '</td>'
+          + '<td>' + ppN(it.price) + '원</td>'
+          + '<td>' + ppN(it.commission) + '원' + (it.rateText ? '<div class="pb-dim">' + pbEsc(it.rateText) + '</div>' : '') + '</td></tr>';
+      }).join('')
+      + '</tbody></table></td></tr>';
+    return main + detail;
+  }).join('');
+  if (pag) pag.innerHTML = ppPaginationHtml('LINKPRICE_PB_CTRL', state.page, totalPages);
+});
+
+window.lpbApplyFilters = function() {
+  var q = (document.getElementById('lpb-search')||{}).value || '';
+  var merchant = (document.getElementById('lpb-filter-merchant')||{}).value || '';
+  var status = (document.getElementById('lpb-filter-status')||{}).value || '';
+  LINKPRICE_PB_CTRL.applyFilter(function(r) {
+    if (merchant && r.merchantKey !== merchant) return false;
+    if (status && r.status !== status) return false;
+    if (q) {
+      var hit = ppMatch((r._user||{}).nickname, q) || ppMatch(r.orderCode, q) || ppMatch(r.uniqId, q) || ppMatch(r.affiliateUserId, q);
+      if (!hit) hit = r.items.some(function(it) { return ppMatch(it.productCode, q) || ppMatch(it.productName, q) || ppMatch(it.trlogId, q); });
+      if (!hit) return false;
+    }
+    return true;
+  });
+};
+
+/* 링크프라이스 행 구성 — uniq_id 가 같은 포스트백은 한 주문으로 묶는다.
+   (건별로 나누면 잔돈 버림이 여러 번 일어나 회원이 손해를 본다 — 김반장 확정 2026-08-27) */
+function lpbBuildRows(docs) {
+  var groups = {}, order = [];
+  docs.forEach(function(d) {
+    var key = d.uniq_id || d.order_code || d.order_id || d._id;
+    var g = groups[key];
+    if (!g) {
+      var mid = lpbMerchant(d);
+      g = groups[key] = {
+        _id: d._id, _d: d, _user: d._user,
+        at: pbTime((d.day && d.time) ? (String(d.day) + String(d.time)) : null, null) || pbTime(d.created_at, new Date()),
+        merchantId: d.merchant_id || '', merchantKey: mid,
+        merchantLabel: lpbMerchantName(mid) || d.mall_name || mid,
+        affiliateUserId: d.affiliate_user_id || d.user_id || '',
+        orderCode: d.order_code || d.order_id || '', uniqId: d.uniq_id || '',
+        status: d.status || 'pending', rateText: lpbRateText(d),
+        items: [], priceTotal: 0, qtyTotal: 0, commissionTotal: 0,
+      };
+      order.push(key);
+    }
+    var price = lpbNum(d.price != null ? d.price : d.purchase_amount);
+    var comm = (d.commision != null || d.commission != null)
+      ? lpbNum(d.commision != null ? d.commision : d.commission)
+      : Math.round(price * (MALL_RATES[d.mall_name] || 0.03));
+    var qty = lpbNum(d.item_count) || 1;
+    g.items.push({
+      trlogId: d.trlog_id || '', productCode: d.product_code || '', productName: d.product_name || '',
+      categoryCode: d.category_code || '', itemCount: qty, price: price, commission: comm, rateText: lpbRateText(d),
+    });
+    g.priceTotal += price; g.qtyTotal += qty; g.commissionTotal += comm;
+    if (d.status === 'refunded') g.status = 'refunded';
+  });
+  var rows = order.map(function(k) { return groups[k]; });
+  rows.sort(function(a, b) { return (b.at ? b.at.getTime() : 0) - (a.at ? a.at.getTime() : 0); });
+  return rows;
+}
+
+function lpbFillMerchantFilter(rows) {
+  var sel = document.getElementById('lpb-filter-merchant');
+  if (!sel) return;
+  var seen = {}, opts = [];
+  rows.forEach(function(r) { if (r.merchantKey && !seen[r.merchantKey]) { seen[r.merchantKey] = 1; opts.push([r.merchantKey, r.merchantLabel || r.merchantKey]); } });
+  opts.sort(function(a, b) { return String(a[1]).localeCompare(String(b[1]), 'ko-KR'); });
+  sel.innerHTML = '<option value="">전체 머천트</option>' + opts.map(function(o) {
+    return '<option value="' + pbEsc(o[0]) + '">' + pbEsc(o[1]) + '</option>';
+  }).join('');
+}
+
+/* ── 로드 ── postbacks 를 한 번 읽어 제휴사별로 갈라 각 블록에 넘긴다 ── */
+function loadPostback() {
+  var ctb = document.getElementById('cpb-tbody');
+  var ltb = document.getElementById('lpb-tbody');
+  if (!ctb || !ltb) return;
+  db.collection('postbacks').orderBy('created_at','desc').limit(300).get().then(function(snap) {
+    if (snap.empty) {
+      COUPANG_PB_CTRL.setRows([]); LINKPRICE_PB_CTRL.setRows([]);
+      setTxt('cpb-sub', '0건 수신'); setTxt('lpb-sub', '0건 수신');
+      return;
+    }
+    return dmFetchUsersByIds(snap.docs.map(function(doc){ return doc.data().user_id; })).then(function(userMap) {
+      var cp = [], lp = [];
+      snap.docs.forEach(function(doc) {
+        var d = Object.assign({ _id: doc.id, _user: userMap[doc.data().user_id] }, doc.data());
+        (pbProvider(d) === 'coupang' ? cp : lp).push(d);
+      });
+      var cRows = cpbBuildRows(cp), lRows = lpbBuildRows(lp);
+      COUPANG_PB_CTRL.setRows(cRows);
+      lpbFillMerchantFilter(lRows);
+      LINKPRICE_PB_CTRL.setRows(lRows);
+      setTxt('cpb-sub', '포스트백 ' + cp.length + '건 · 주문 ' + cRows.length + '행');
+      setTxt('lpb-sub', '포스트백 ' + lp.length + '건 · 주문 ' + lRows.length + '행');
+    });
+  }).catch(function(e){
+    console.error('loadPostback', e);
+    ctb.innerHTML = ppEmpty(8, '로드 오류'); ltb.innerHTML = ppEmpty(8, '로드 오류');
+  });
 }
 
 /* ── sec-accounts ── admin_accounts collection */
@@ -13005,8 +13463,6 @@ function loadRevenueStats() {
     setTxt('settle-confirmed', ppN(totalSettled)+'원');
     setTxt('settle-estimate', ppN(totalCommission)+'원');
 
-    /* sec-postback header */
-    setTxt('pb-sub', '총 ' + pbSnap.size + '건 수신');
   }).catch(function(e){ console.error('loadRevenueStats',e); });
 }
 
