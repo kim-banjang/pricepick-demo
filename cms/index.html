@@ -10547,7 +10547,9 @@ var COUPANG_PB_CTRL = window.COUPANG_PB_CTRL = ppMakeListController(20, function
       + '<td><div class="pb-ord" title="' + pbEsc(r.orderId) + '">' + pbRaw(r.orderId) + '</div></td>'
       + '<td>' + pidCell + '</td>'
       + '<td>' + pbRaw(r.qtyText) + '</td>'
-      + '<td>' + pbRaw(r.amountText) + '</td>'
+      + '<td>' + pbRaw(r.amountText)
+        + (r.originAmountText ? '<div class="pb-dim">' + r.originAmountText + '<span class="pb-raw"> 원 구매</span></div>' : '')
+        + '</td>'
       + PB_CARET
       + '</tr>';
     /* 펼치면 수신 원문 전부 — 접힌 화면에 이미 나온 것도 빼지 않는다 */
@@ -10563,7 +10565,8 @@ var COUPANG_PB_CTRL = window.COUPANG_PB_CTRL = ppMakeListController(20, function
           if (!it.match) {
             link = '<span class="pb-none">—</span>';
           } else if (kindLower === 'cancel') {
-            link = '<span class="pb-link">원 구매 있음</span><div class="pb-dim">' + (it.match.at ? ppDt(it.match.at) + ' ' + ppTm(it.match.at) : '') + '</div>';
+            link = '<span class="pb-link">원 구매 있음</span><div class="pb-dim">' + (it.match.at ? ppDt(it.match.at) + ' ' + ppTm(it.match.at) : '') + '</div>'
+              + (it.match.payment !== '' && it.match.payment != null ? '<div class="pb-dim">' + pbMoneyText(it.match.payment) + '<span class="pb-raw"> 원 구매</span></div>' : '');
           } else {
             link = '<span class="pb-cx">취소 포스트백 있음</span><div class="pb-dim">' + (it.match.at ? ppDt(it.match.at) + ' ' + ppTm(it.match.at) : '') + '</div>';
           }
@@ -10649,7 +10652,9 @@ function cpbBuildRows(docs) {
     r.items.forEach(function(it) {
       var hits = it.pid ? g[other][it.pid] : null;
       if (!hits || !hits.length) return;
-      it.match = { id: hits[0].row._id, at: hits[0].row.at };
+      /* 상대편의 payment 도 들고 온다 — 취소 행에서 원 구매 금액을 나란히 보이기 위해서다.
+         취소로 온 payment 는 본상품 가격이라 실제 결제액과 다를 수 있다. */
+      it.match = { id: hits[0].row._id, at: hits[0].row.at, payment: hits[0].item.payment };
       n++;
     });
     r.linkedCount = n;
@@ -10672,6 +10677,16 @@ function cpbBuildRows(docs) {
         q += cpbNum(it.qty);
       });
       r.qtyText = qKnown ? ppN(q) : '';
+      /* 취소 행이면 연결된 원 구매의 payment 합도 따로 둔다(연결이 없으면 비운다) */
+      if ((r.kind || '').toLowerCase() === 'cancel') {
+        var o = 0, oKnown = false;
+        r.items.forEach(function(it) {
+          if (it.match && it.match.payment !== '' && it.match.payment != null) {
+            oKnown = true; o += cpbNum(it.match.payment);
+          }
+        });
+        r.originAmountText = oKnown ? ppN(o) : '';
+      }
     } else {
       r.amountText = (r._legacyAmount !== '' && r._legacyAmount != null) ? ppN(cpbNum(r._legacyAmount)) : '';
       r.qtyText = '';
