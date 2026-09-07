@@ -518,8 +518,6 @@ tr:hover td{background:var(--surface-2);}
 .pb-rawitem .k{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:10.5px;color:var(--text-3);}
 .pb-rawitem .v{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:11.5px;color:var(--text-2);}
 .pb-empty-raw{padding:14px 0 4px;font-size:12px;color:var(--text-3);}
-.pb-xscroll{overflow-x:auto;}
-.pb-xscroll table{min-width:100%;width:max-content;}
 .pb-sample-bar{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:12px;
   padding:9px 14px;border-radius:var(--r-md);background:var(--amber-soft);
   border:1px solid rgba(245,158,11,.28);font-size:12px;color:var(--text-2);}
@@ -3625,8 +3623,8 @@ window.CMS_FEATURES = {
               <th>구분<br><span class="fk">purchase_cancel</span></th>
               <th>회원<br><span class="fk">subid</span></th>
               <th>주문번호<br><span class="fk">orderId</span></th>
-              <th>OS<br><span class="fk">os</span></th>
               <th>상품<br><span class="fk">order_detail</span></th>
+              <th>금액<br><span class="fk">payment 합</span></th>
             </tr></thead>
             <tbody id="cpb-tbody"></tbody>
           </table>
@@ -3650,29 +3648,18 @@ window.CMS_FEATURES = {
             <div><div class="card-title">링크프라이스 포스트백 로그</div><div class="card-sub">LinkPrice Affiliate Postback</div></div>
             <div style="font-size:12px;color:var(--text-2)" id="lpb-sub">—</div>
           </div>
-          <div class="pb-xscroll">
           <table>
             <thead><tr>
-              <th>주문일<br><span class="fk">day</span></th>
-              <th>주문시각<br><span class="fk">time</span></th>
+              <th>주문 일시<br><span class="fk">day · time</span></th>
               <th>머천트<br><span class="fk">merchant_id</span></th>
-              <th>주문코드<br><span class="fk">order_code</span></th>
-              <th>상품코드<br><span class="fk">product_code</span></th>
               <th>상품명<br><span class="fk">product_name</span></th>
-              <th>카테고리<br><span class="fk">category_code</span></th>
               <th>수량<br><span class="fk">item_count</span></th>
               <th>구매금액<br><span class="fk">price</span></th>
               <th>수수료<br><span class="fk">commision</span></th>
               <th>회원<br><span class="fk">affiliate_user_id</span></th>
-              <th>기본요율<br><span class="fk">base_commission</span></th>
-              <th>추가요율<br><span class="fk">incentive_commission</span></th>
-              <th>거래기록<br><span class="fk">trlog_id</span></th>
-              <th>주문묶음<br><span class="fk">uniq_id</span></th>
-              <th>계정<br><span class="fk">affiliate_id</span></th>
             </tr></thead>
             <tbody id="lpb-tbody"></tbody>
           </table>
-          </div>
           <div id="lpb-pagination"></div>
         </div>
       </div>
@@ -10516,6 +10503,8 @@ function cpbItemPid(it) {
 function cpbItems(d) { return Array.isArray(d.order_detail) ? d.order_detail : []; }
 function cpbOrderId(d) { return d.orderId || d.order_id || ''; }
 /* 구분 — 수신 필드 purchase_cancel 값 그대로다(우리가 판정한 값이 아니다) */
+/* 금액 문자열을 숫자로 — 표시용 합계에만 쓴다(요율 계산 따위는 하지 않는다) */
+function cpbNum(v) { var n = Number(String(v == null ? '' : v).replace(/[^0-9.-]/g, '')); return isNaN(n) ? 0 : n; }
 function cpbKind(d) {
   var v = (d.purchase_cancel == null) ? '' : String(d.purchase_cancel).trim();
   return v;
@@ -10538,16 +10527,23 @@ var COUPANG_PB_CTRL = window.COUPANG_PB_CTRL = ppMakeListController(20, function
         ? '<div class="pb-dim">원 구매 연결 ' + r.linkedCount + '건</div>'
         : '<div class="pb-dim">취소 연결 ' + r.linkedCount + '건</div>';
     }
-    var prodCell = r.items.length
-      ? pbToggleBtn(rowId, 'order_detail ' + r.items.length + '건') + linkNote
-      : pbToggleBtn(rowId, 'order_detail 미수신');
+    /* 상품 칸은 요약만 — 첫 상품명 + 외 N건. 상세는 펼쳐서 본다. */
+    var prodCell;
+    if (r.items.length) {
+      var first = r.items[0].name || r.items[0].pid || '';
+      var more = r.items.length > 1 ? ' <span class="pb-dim">외 ' + (r.items.length - 1) + '건</span>' : '';
+      prodCell = '<div class="pb-pname" title="' + pbEsc(first) + '">' + pbRaw(first) + more + '</div>'
+        + pbToggleBtn(rowId, 'order_detail ' + r.items.length + '건') + linkNote;
+    } else {
+      prodCell = '<div class="pb-none">order_detail 미수신</div>' + pbToggleBtn(rowId, '수신 원문');
+    }
     var main = '<tr>'
       + '<td style="white-space:nowrap">' + pbTimeCell(r.purchaseTime, r.at) + '</td>'
       + '<td>' + kindCell + '</td>'
       + '<td><div class="pb-uid" title="' + pbEsc(r.subid) + '">' + pbRaw(r.subid) + '</div></td>'
       + '<td><div class="pb-ord" title="' + pbEsc(r.orderId) + '">' + pbRaw(r.orderId) + '</div></td>'
-      + '<td><div class="pb-raw">' + pbRaw(r.os) + '</div></td>'
       + '<td>' + prodCell + '</td>'
+      + '<td>' + pbRaw(r.amountText) + '</td>'
       + '</tr>';
     var itemsHtml = r.items.length
       ? '<table><thead><tr><th>상품번호</th><th>productName</th><th>payment</th><th>quantity</th><th>대사</th></tr></thead><tbody>'
@@ -10570,7 +10566,7 @@ var COUPANG_PB_CTRL = window.COUPANG_PB_CTRL = ppMakeListController(20, function
       : '<div class="pb-empty-raw">order_detail 미수신</div>';
     var detail = '<tr class="pb-detail" id="' + rowId + '" style="display:none"><td colspan="6">'
       + itemsHtml
-      + pbRawFields([['afcode', r._d.afcode], ['adid', r._d.adid], ['subparam', r._d.subparam]])
+      + pbRawFields([['afcode', r._d.afcode], ['os', r.os], ['adid', r._d.adid], ['subparam', r._d.subparam]])
       + '</td></tr>';
     return main + detail;
   }).join('');
@@ -10600,9 +10596,12 @@ function cpbBuildRows(docs) {
       _id: d._id, _d: d,
       kind: cpbKind(d),
       purchaseTime: (d.purchase_time != null && d.purchase_time !== '') ? d.purchase_time : (d.order_time != null ? d.order_time : ''),
-      at: pbTimeDate(d.purchase_time != null && d.purchase_time !== '' ? d.purchase_time : d.order_time),
-      subid: d.subid || '', subparam: d.subparam || '', os: d.os || '',
+      /* 시각·회원은 포스트백 값이 없으면 같은 건의 옛 키로 채운다 — 값을 만들어 넣는 것이 아니라
+         같은 값이 다른 이름으로 저장돼 있던 것을 읽는 것이다(옛 기록: created_at · user_id). */
+      at: pbTimeDate(d.purchase_time != null && d.purchase_time !== '' ? d.purchase_time : d.order_time) || pbTimeDate(d.created_at),
+      subid: d.subid || d.user_id || '', subparam: d.subparam || '', os: d.os || '',
       orderId: cpbOrderId(d) || '',
+      _legacyAmount: (d.purchase_amount != null ? d.purchase_amount : (d.order_price != null ? d.order_price : '')),
       _sortAt: pbTimeDate(d.purchase_time || d.order_time) || pbTimeDate(d.created_at) || null,
       items: cpbItems(d).map(function(it) {
         return {
@@ -10647,6 +10646,22 @@ function cpbBuildRows(docs) {
     r.linkedCount = n;
   });
 
+  /* 금액 칸 — 받은 payment 를 더한 값이다(김반장 2026-09-07 지시).
+     order_detail 이 없는 옛 기록은 그 기록이 가진 purchase_amount 를 그대로 쓴다.
+     요율·환수 같은 파생 계산은 하지 않는다. */
+  rows.forEach(function(r) {
+    if (r.items.length) {
+      var sum = 0, known = false;
+      r.items.forEach(function(it) {
+        if (it.payment !== '' && it.payment != null) known = true;
+        sum += cpbNum(it.payment);
+      });
+      r.amountText = known ? ppN(sum) : '';
+    } else {
+      r.amountText = (r._legacyAmount !== '' && r._legacyAmount != null) ? ppN(cpbNum(r._legacyAmount)) : '';
+    }
+  });
+
   // 받은 순서 그대로 — 수신 시각 내림차순(같으면 원래 순서 유지)
   rows.forEach(function(r, i) { r._seq = i; });
   rows.sort(function(a, b) {
@@ -10671,26 +10686,32 @@ var LINKPRICE_PB_CTRL = window.LINKPRICE_PB_CTRL = ppMakeListController(20, func
   var tbody = document.getElementById('lpb-tbody');
   var pag = document.getElementById('lpb-pagination');
   if (!tbody) return;
-  if (!pageItems.length) { tbody.innerHTML = ppEmpty(16, '조건에 맞는 링크프라이스 포스트백이 없습니다.'); if (pag) pag.innerHTML = ''; return; }
-  tbody.innerHTML = pageItems.map(function(r) {
-    return '<tr>'
-      + '<td>' + pbRaw(r.day) + '</td>'
-      + '<td>' + pbRaw(r.time) + '</td>'
+  if (!pageItems.length) { tbody.innerHTML = ppEmpty(7, '조건에 맞는 링크프라이스 포스트백이 없습니다.'); if (pag) pag.innerHTML = ''; return; }
+  tbody.innerHTML = pageItems.map(function(r, i) {
+    var rowId = 'lpb-d-' + state.page + '-' + i;
+    var timeCell = (r.day || r.time)
+      ? '<div style="font-weight:700">' + ppDt(r.at) + '</div><div class="pb-dim">' + ppTm(r.at) + '</div>'
+        + '<div class="pb-raw">' + pbRaw(r.day) + ' · ' + pbRaw(r.time) + '</div>'
+      : (r.at ? '<div style="font-weight:700">' + ppDt(r.at) + '</div><div class="pb-dim">' + ppTm(r.at) + '</div>'
+              : '<span class="pb-none">—</span>');
+    var main = '<tr>'
+      + '<td style="white-space:nowrap">' + timeCell + '</td>'
       + '<td style="font-weight:500">' + pbRaw(r.merchantId) + '</td>'
-      + '<td class="pb-pid">' + pbRaw(r.orderCode) + '</td>'
-      + '<td class="pb-pid">' + pbRaw(r.productCode) + '</td>'
-      + '<td><div class="pb-pname" title="' + pbEsc(r.productName) + '">' + pbRaw(r.productName) + '</div></td>'
-      + '<td class="pb-pid">' + pbRaw(r.categoryCode) + '</td>'
+      + '<td><div class="pb-pname" title="' + pbEsc(r.productName) + '">' + pbRaw(r.productName) + '</div>'
+        + pbToggleBtn(rowId, '수신 원문') + '</td>'
       + '<td>' + pbRaw(r.itemCount) + '</td>'
       + '<td>' + pbRaw(r.price) + '</td>'
       + '<td>' + pbRaw(r.commision) + '</td>'
       + '<td><div class="pb-uid" title="' + pbEsc(r.affiliateUserId) + '">' + pbRaw(r.affiliateUserId) + '</div></td>'
-      + '<td>' + pbRaw(r.baseCommission) + '</td>'
-      + '<td>' + pbRaw(r.incentiveCommission) + '</td>'
-      + '<td class="pb-pid">' + pbRaw(r.trlogId) + '</td>'
-      + '<td class="pb-pid">' + pbRaw(r.uniqId) + '</td>'
-      + '<td class="pb-pid">' + pbRaw(r.affiliateId) + '</td>'
       + '</tr>';
+    var detail = '<tr class="pb-detail" id="' + rowId + '" style="display:none"><td colspan="7">'
+      + pbRawFields([
+          ['order_code', r.orderCode], ['product_code', r.productCode], ['category_code', r.categoryCode],
+          ['base_commission', r.baseCommission], ['incentive_commission', r.incentiveCommission],
+          ['trlog_id', r.trlogId], ['uniq_id', r.uniqId], ['affiliate_id', r.affiliateId],
+        ])
+      + '</td></tr>';
+    return main + detail;
   }).join('');
   if (pag) pag.innerHTML = ppPaginationHtml('LINKPRICE_PB_CTRL', state.page, totalPages);
 });
@@ -10719,20 +10740,24 @@ function lpbBuildRows(docs) {
       _id: d._id, _d: d,
       day: d.day != null ? d.day : '',
       time: d.time != null ? d.time : '',
-      merchantId: d.merchant_id != null ? d.merchant_id : '',
-      orderCode: d.order_code != null ? d.order_code : '',
+      /* 옛 기록은 merchant_id 대신 제휴몰 이름(mall_name), order_code 대신 order_id 로 저장돼 있다 */
+      merchantId: d.merchant_id != null ? d.merchant_id : (d.mall_name != null ? d.mall_name : ''),
+      orderCode: d.order_code != null ? d.order_code : (d.order_id != null ? d.order_id : ''),
       productCode: d.product_code != null ? d.product_code : '',
       productName: d.product_name != null ? d.product_name : '',
       categoryCode: d.category_code != null ? d.category_code : '',
       itemCount: d.item_count != null ? d.item_count : '',
-      price: d.price != null ? d.price : '',
+      price: d.price != null ? d.price : (d.purchase_amount != null ? d.purchase_amount : ''),
+      /* commision 은 링크프라이스가 보내 주는 값이다. 없으면 비워 둔다 — 계산해 채우지 않는다. */
       commision: d.commision != null ? d.commision : '',
-      affiliateUserId: d.affiliate_user_id != null ? d.affiliate_user_id : '',
+      affiliateUserId: d.affiliate_user_id != null ? d.affiliate_user_id : (d.user_id != null ? d.user_id : ''),
       baseCommission: d.base_commission != null ? d.base_commission : '',
       incentiveCommission: d.incentive_commission != null ? d.incentive_commission : '',
       trlogId: d.trlog_id != null ? d.trlog_id : '',
       uniqId: d.uniq_id != null ? d.uniq_id : '',
       affiliateId: d.affiliate_id != null ? d.affiliate_id : '',
+      /* 시각은 day+time 이 없으면 우리 수신 시각(created_at)으로 채운다 */
+      at: pbTimeDate((d.day && d.time) ? (String(d.day) + String(d.time)) : null) || pbTimeDate(d.created_at),
       _sortAt: pbTimeDate((d.day && d.time) ? (String(d.day) + String(d.time)) : null) || pbTimeDate(d.created_at) || null,
     };
   });
