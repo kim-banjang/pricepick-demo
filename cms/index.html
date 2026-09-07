@@ -518,6 +518,8 @@ tr:hover td{background:var(--surface-2);}
 .pb-rawitem .k{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:10.5px;color:var(--text-3);}
 .pb-rawitem .v{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:11.5px;color:var(--text-2);}
 .pb-empty-raw{padding:14px 0 4px;font-size:12px;color:var(--text-3);}
+.pb-xscroll{overflow-x:auto;}
+.pb-xscroll table{min-width:100%;width:max-content;}
 .pb-sample-bar{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:12px;
   padding:9px 14px;border-radius:var(--r-md);background:var(--amber-soft);
   border:1px solid rgba(245,158,11,.28);font-size:12px;color:var(--text-2);}
@@ -3635,7 +3637,7 @@ window.CMS_FEATURES = {
       <!-- ── 탭 2 · 링크프라이스 ── -->
       <div id="pb-tab-linkprice" style="display:none">
         <div class="toolbar">
-          <input class="search-box" id="lpb-search" placeholder="order_code, uniq_id, affiliate_user_id, product_code, product_name, trlog_id 검색..." onkeydown="if(event.key==='Enter')lpbApplyFilters()">
+          <input class="search-box" id="lpb-search" placeholder="merchant_id, order_code, product_code, affiliate_user_id, trlog_id, uniq_id 검색..." onkeydown="if(event.key==='Enter')lpbApplyFilters()">
           <select class="filter-sel" id="lpb-filter-merchant" onchange="lpbApplyFilters()"><option value="">전체 merchant_id</option></select>
           <button class="btn btn-primary btn-sm" onclick="lpbApplyFilters()">검색</button>
         </div>
@@ -3648,20 +3650,29 @@ window.CMS_FEATURES = {
             <div><div class="card-title">링크프라이스 포스트백 로그</div><div class="card-sub">LinkPrice Affiliate Postback</div></div>
             <div style="font-size:12px;color:var(--text-2)" id="lpb-sub">—</div>
           </div>
+          <div class="pb-xscroll">
           <table>
             <thead><tr>
-              <th>주문 일시<br><span class="fk">day · time</span></th>
+              <th>주문일<br><span class="fk">day</span></th>
+              <th>주문시각<br><span class="fk">time</span></th>
               <th>머천트<br><span class="fk">merchant_id</span></th>
-              <th>회원<br><span class="fk">affiliate_user_id</span></th>
               <th>주문코드<br><span class="fk">order_code</span></th>
-              <th>상품<br><span class="fk">product_code · product_name</span></th>
+              <th>상품코드<br><span class="fk">product_code</span></th>
+              <th>상품명<br><span class="fk">product_name</span></th>
+              <th>카테고리<br><span class="fk">category_code</span></th>
               <th>수량<br><span class="fk">item_count</span></th>
               <th>구매금액<br><span class="fk">price</span></th>
               <th>수수료<br><span class="fk">commision</span></th>
-              <th>원문</th>
+              <th>회원<br><span class="fk">affiliate_user_id</span></th>
+              <th>기본요율<br><span class="fk">base_commission</span></th>
+              <th>추가요율<br><span class="fk">incentive_commission</span></th>
+              <th>거래기록<br><span class="fk">trlog_id</span></th>
+              <th>주문묶음<br><span class="fk">uniq_id</span></th>
+              <th>계정<br><span class="fk">affiliate_id</span></th>
             </tr></thead>
             <tbody id="lpb-tbody"></tbody>
           </table>
+          </div>
           <div id="lpb-pagination"></div>
         </div>
       </div>
@@ -4197,9 +4208,10 @@ window.CMS_FEATURES = {
         <li><span class="k">쿠팡 수신 필드</span>afcode · subid · os · adid · subparam · purchase_time · orderId · purchase_cancel · order_detail[]</li>
         <li><span class="k">쿠팡 order_detail</span>productid(구매) / <strong>productId</strong>(취소) · productName · payment · quantity. 상품번호 키가 구매/취소에서 다릅니다.</li>
         <li><span class="k">쿠팡 대사 표시</span>같은 orderId · 같은 상품번호로 구매·취소 포스트백을 짝지어 보여 줍니다. 연결까지이고 금액은 계산하지 않습니다.</li>
-        <li><span class="k">링크프라이스 수신 필드</span>day · time · merchant_id · order_code · product_code · product_name · category_code · item_count · price · commision · affiliate_user_id · base_commission · incentive_commission · trlog_id · uniq_id · affiliate_id</li>
-        <li><span class="k">링크프라이스 수신 단위</span>한 주문에 상품이 여럿이면 상품 수만큼 포스트백이 따로 옵니다(uniq_id 동일). 온 그대로 한 건 한 줄로 둡니다.</li>
-        <li><span class="k">commision</span>철자가 commission이 아닙니다 — 링크프라이스 원문 그대로입니다. 링크프라이스는 수수료 금액을 직접 보내 줍니다.</li>
+        <li><span class="k">링크프라이스 수신 필드 16개</span>day · time · merchant_id · order_code · product_code · product_name · category_code · item_count · price · commision · affiliate_user_id · base_commission · incentive_commission · trlog_id · uniq_id · affiliate_id. 쿠팡과 겹치는 필드가 없습니다.</li>
+        <li><span class="k">링크프라이스 수신 단위</span>상품 1건당 1콜백입니다. order_detail 같은 배열이 없고, 한 주문에 상품이 여럿이면 order_code · uniq_id 가 같은 건이 상품 수만큼 따로 옵니다.</li>
+        <li><span class="k">commision</span>철자가 commission이 아닙니다 — 링크프라이스 원문 그대로입니다. 링크프라이스가 수수료 <strong>금액</strong>을 직접 보내 주며, base_commission · incentive_commission 도 받은 값입니다.</li>
+        <li><span class="k">링크프라이스 취소</span>취소 포스트백이 어떤 모양으로 오는지 <strong>아직 확인되지 않았습니다.</strong> 확인 전까지 취소 관련 표시를 두지 않습니다.</li>
       </ul>
     </div>
     <div class="modal-footer">
@@ -10343,105 +10355,141 @@ var CPB_SAMPLE_MADE = [
 ];
 var CPB_SAMPLE = CPB_SAMPLE_CAPTURED.concat(CPB_SAMPLE_MADE);
 
-/* ── 링크프라이스 · 지어낸 예시 ──
-   필드 구성 근거: 해리 전달 「Postback Data: LinkPrice, Coupang」(Notion, 2026-08-27)
-   → 마스터 정책서 v8.3 「링크프라이스 필드」 표. 실측 예시값까지 그 표에 있다.
-   day, time, merchant_id, order_code, product_code, product_name, category_code,
-   item_count, price, commision(원문 철자), affiliate_user_id, base_commission,
-   incentive_commission, trlog_id, uniq_id, affiliate_id
+/* ── 링크프라이스 · 실제 수신 캡처 1건 ──
+   2026-08-28 서버 로그(김반장 전달). [linkprice.postback] Received data 의 body 그대로다.
+   필드 16개. 쿠팡과 공통 필드가 하나도 없다.
+   ⚠ 값을 손대지 않는다. 특히:
+     · commision — 링크프라이스가 보내 주는 수수료 금액이다. 철자가 commission 이 아니다.
+       우리가 계산한 값이 아니므로 받은 그대로 보여준다.
+     · base_commission · incentive_commission 도 받은 값이다.
+     · affiliate_user_id 는 쿠팡 subparam 과 같은 값 형식이고, 이 예시는 실제로 같은 값이다.
+   ※ 마스터 정책서 v8.3 과 다른 점(실제 로그를 정본으로 삼는다):
+     · affiliate_id — 정책서 'A100706012' / 실제 로그 'A100706907'
+     · category_code — 정책서는 빈 값으로 적혀 있으나 실제로는 값이 온다('300007874') */
+var LPB_SAMPLE_CAPTURED = [
+  {
+    _id: 'sample-lp-cap-1', provider: 'linkprice', is_sample: true,
+    day: '20260828',
+    time: '145356',
+    merchant_id: 'gmarket',
+    order_code: '4484125255',
+    product_code: '2189156727',
+    product_name: '(신선집중) 샤인머스켓 망고포도 득템특가(송이작음.알작음.일부 알빠짐) 에어셀 안전포장 실중량2kg 3-6수',
+    category_code: '300007874',
+    item_count: 1,
+    price: 9480,
+    commision: 57,
+    affiliate_user_id: '91c9bb20-84b5-11f1-b820-d3b05b507cd4',
+    base_commission: '0.6%',
+    incentive_commission: '0%',
+    trlog_id: 18000661337441,
+    uniq_id: '6a9122b280711',
+    affiliate_id: 'A100706907',
+  },
+];
 
-   · 한 주문에 상품이 여럿이면 상품 수만큼 포스트백이 따로 오고 uniq_id 가 같다 —
-     아래 예시도 그렇게 만들었다(온 그대로 한 건 한 줄).
-   · 취소 포스트백이 없는 규격이라 취소 건은 만들지 않았다.
-   · merchant_id 는 링크프라이스 카탈로그(settings/linkprice_catalog)의 실제 머천트 ID이고,
-     base_commission 도 그 카탈로그의 커미션 범위 안에서 잡았다. commision 은 price × 요율이다.
-   · affiliate_id 'A100706012' 는 프라이스픽의 링크프라이스 계정 번호라 전 건 동일하다.
-   · category_code 는 실측에서 빈 값으로 왔기에 빈 값으로 둔다.
-   · order_code · product_code · product_name 은 지어낸 값이며 실재하는 특정 상품이 아니다. */
+/* ── 링크프라이스 · 지어낸 예시 ──
+   형식은 위 실수신분과 완전히 같다(필드 16개 · 타입 · 표기).
+     · order_code · product_code · category_code 는 숫자 문자열, trlog_id · item_count · price ·
+       commision 은 숫자, base_commission · incentive_commission 은 '0.6%' 꼴 문자열.
+     · uniq_id 는 13자리 소문자 영숫자.
+     · affiliate_id 는 프라이스픽 계정 번호라 전 건 동일하다.
+     · commision 은 price × base_commission 이다 — 실측(9480 × 0.6% = 57)과 같은 셈이다.
+       링크프라이스가 보내 주는 값을 흉내 낸 것이지 화면에서 계산하는 값이 아니다.
+     · merchant_id 는 링크프라이스 카탈로그의 실제 머천트 ID이고 base_commission 도
+       그 카탈로그의 커미션 범위 안에서 잡았다.
+     · affiliate_user_id 는 쿠팡 블록의 subparam 과 같은 회원을 가리키도록 같은 값을 썼다.
+     · 상품 1건당 1콜백이라 order_detail 같은 배열이 없다. 한 주문에 상품이 여럿이면
+       order_code · uniq_id 가 같은 건이 상품 수만큼 따로 온다.
+   ⚠ 취소는 만들지 않았다 — 링크프라이스 취소 포스트백이 어떤 모양으로 오는지 확인되지 않았다.
+   상품명·상품코드·금액은 지어낸 것이며 실재하는 특정 상품이 아니다. */
 var LPB_U = {
-  a: 'e5f037d0-6e15-11f1-8c25-a5e9adfc27be',
-  b: '3b91c4a7-2f80-11f1-9d46-7c1e05ba3f92',
-  c: '8d24f6b1-5a37-11f1-a072-b53f918e2c04',
-  d: 'c70a8e35-9b12-11f1-8f61-2d4907ac6b58',
-  e: '1f6b30d9-4c85-11f1-b3a8-6e920f74d15c',
+  a: 'a7f3c210-9d4e-11f1-8b62-4e19ac5f2703',
+  b: 'b214e8d5-6a17-11f1-9f43-2c67b1a09e58',
+  c: 'c9a05f31-8e72-11f1-a1d7-5b30e28f4c16',
+  d: 'd6b14a27-3f95-11f1-b8e0-9a41c73d206b',
+  e: 'e08c37b6-5d21-11f1-84a9-31f6b0d92e75',
+  f: '91c9bb20-84b5-11f1-b820-d3b05b507cd4',
 };
-function lpbMk(id, uid, merchant, rate, day, time, uniqId, trlogId, orderCode, productCode, productName, itemCount, price) {
+function lpbMk(id, uid, merchant, rate, day, time, orderCode, uniqId, trlogId,
+               productCode, productName, categoryCode, itemCount, price) {
   return {
     _id: id, provider: 'linkprice', is_sample: true,
     day: day, time: time, merchant_id: merchant,
     order_code: orderCode, product_code: productCode, product_name: productName,
-    category_code: '', item_count: itemCount, price: price,
+    category_code: categoryCode, item_count: itemCount, price: price,
     commision: Math.round(price * rate / 100),
     affiliate_user_id: LPB_U[uid],
     base_commission: rate + '%', incentive_commission: '0%',
-    trlog_id: trlogId, uniq_id: uniqId, affiliate_id: 'A100706012',
+    trlog_id: trlogId, uniq_id: uniqId, affiliate_id: 'A100706907',
   };
 }
-var LPB_SAMPLE = [
-  // gmarket 0.6% — 단품
-  lpbMk('sample-lp-01', 'a', 'gmarket', 0.6, '20260901', '101432', '7c1e05ba3f92a', 18000662104738,
-    'GM-2609011014-0031', 'GM8842017', '접이식 빨래건조대 3단', 1, 32900),
-  // auction 0.6% — 상품 2개(uniq_id 동일)
-  lpbMk('sample-lp-02', 'b', 'auction', 0.6, '20260902', '134755', '4a9f27c1d0b83', 18000662147209,
-    'AU-260902-77410', 'AU2210945', '실리콘 주방장갑 2켤레', 2, 9800),
-  lpbMk('sample-lp-03', 'b', 'auction', 0.6, '20260902', '134755', '4a9f27c1d0b83', 18000662147210,
-    'AU-260902-77410', 'AU2210946', '스테인리스 국자 세트', 1, 14500),
-  // dswellife 7.0% — 단품
-  lpbMk('sample-lp-04', 'c', 'dswellife', 7.0, '20260902', '201118', 'b6d3810e4f27c', 18000662183355,
-    'DW-26090202011', 'DW1003488', '단백질 파우더 400g', 1, 39000),
-  // lotteon 1.4% — 상품 3개
-  lpbMk('sample-lp-05', 'd', 'lotteon', 1.4, '20260903', '092640', 'e91b57a2c34d0', 18000662219471,
-    'LO260903-40218', 'LO7714203', '무향 세탁 세제 3L', 1, 15900),
-  lpbMk('sample-lp-06', 'd', 'lotteon', 1.4, '20260903', '092640', 'e91b57a2c34d0', 18000662219472,
-    'LO260903-40218', 'LO7714204', '섬유 탈취제 500ml 2개', 1, 11200),
-  lpbMk('sample-lp-07', 'd', 'lotteon', 1.4, '20260903', '092640', 'e91b57a2c34d0', 18000662219473,
-    'LO260903-40218', 'LO7714205', '욕실 청소용 솔 3종', 1, 8400),
-  // yes24 2.1% — 상품 2개
-  lpbMk('sample-lp-08', 'e', 'yes24', 2.1, '20260903', '175302', '2f80d4e916ba7', 18000662256018,
-    'Y24-2609031753', 'Y24993071', '실용 글쓰기 안내서', 1, 16200),
-  lpbMk('sample-lp-09', 'e', 'yes24', 2.1, '20260903', '175302', '2f80d4e916ba7', 18000662256019,
-    'Y24-2609031753', 'Y24993072', '문고판 소설 선집', 2, 12800),
-  // himart 1.26% — 단품
-  lpbMk('sample-lp-10', 'a', 'himart', 1.26, '20260904', '111527', 'a03c6b8f5d192', 18000662291884,
-    'HM-260904-11152', 'HM5502914', '무선 핸디 청소기', 1, 89000),
-  // clubclio 3.5% — 상품 2개
-  lpbMk('sample-lp-11', 'b', 'clubclio', 3.5, '20260904', '160845', 'd7e21093c4a6f', 18000662327560,
-    'CC260904-8817', 'CC3301672', '수분 크림 50ml', 1, 27000),
-  lpbMk('sample-lp-12', 'b', 'clubclio', 3.5, '20260904', '160845', 'd7e21093c4a6f', 18000662327561,
-    'CC260904-8817', 'CC3301673', '클렌징 폼 150ml', 2, 13500),
-  // gmarket 0.6% — 상품 4개
-  lpbMk('sample-lp-13', 'c', 'gmarket', 0.6, '20260905', '084119', '5b8a4f0d2e731', 18000662364093,
-    'GM-2609050841-0177', 'GM8842118', '주방 밀폐용기 6종', 1, 24800),
-  lpbMk('sample-lp-14', 'c', 'gmarket', 0.6, '20260905', '084119', '5b8a4f0d2e731', 18000662364094,
-    'GM-2609050841-0177', 'GM8842119', '식탁 매트 4장', 1, 11900),
-  lpbMk('sample-lp-15', 'c', 'gmarket', 0.6, '20260905', '084119', '5b8a4f0d2e731', 18000662364095,
-    'GM-2609050841-0177', 'GM8842120', '냉장고 정리 트레이 8개', 1, 16400),
-  lpbMk('sample-lp-16', 'c', 'gmarket', 0.6, '20260905', '084119', '5b8a4f0d2e731', 18000662364096,
-    'GM-2609050841-0177', 'GM8842121', '실리콘 뚜껑 5종', 2, 7300),
-  // wconcept 2.1% — 단품
-  lpbMk('sample-lp-17', 'd', 'wconcept', 2.1, '20260905', '193714', 'c46e19b7a0d53', 18000662400627,
-    'WC-26090519371', 'WC4418260', '기본 코튼 셔츠', 1, 46000),
-  // kbbook 2.1% — 상품 2개
-  lpbMk('sample-lp-18', 'e', 'kbbook', 2.1, '20260906', '103358', '9012fd5c8b46e', 18000662437185,
-    'KB260906-51204', 'KB1170338', '업무용 기록 노트 3권', 1, 13800),
-  lpbMk('sample-lp-19', 'e', 'kbbook', 2.1, '20260906', '103358', '9012fd5c8b46e', 18000662437186,
-    'KB260906-51204', 'KB1170339', '중성펜 12자루 세트', 1, 9600),
-  // lotteon 0.7% — 단품
-  lpbMk('sample-lp-20', 'a', 'lotteon', 0.7, '20260906', '150922', 'f3b70a4d9c218', 18000662473740,
-    'LO260906-40993', 'LO7714470', '건조 표고버섯 200g', 1, 18700),
-  // auction 0.6% — 상품 3개
-  lpbMk('sample-lp-21', 'd', 'auction', 0.6, '20260907', '093046', '68d5c1e072a94', 18000662510362,
-    'AU-260907-78802', 'AU2211308', '접이식 장바구니 2개', 1, 8900),
-  lpbMk('sample-lp-22', 'd', 'auction', 0.6, '20260907', '093046', '68d5c1e072a94', 18000662510363,
-    'AU-260907-78802', 'AU2211309', '다용도 수납 바구니 4개', 1, 12600),
-  lpbMk('sample-lp-23', 'd', 'auction', 0.6, '20260907', '093046', '68d5c1e072a94', 18000662510364,
-    'AU-260907-78802', 'AU2211310', '옷걸이 30개입', 2, 10400),
-  // dswellife 7.0% — 상품 2개
-  lpbMk('sample-lp-24', 'b', 'dswellife', 7.0, '20260907', '144215', '07e9b23a6f5d1', 18000662546918,
-    'DW-26090714421', 'DW1003701', '종합 비타민 90정', 1, 28500),
-  lpbMk('sample-lp-25', 'b', 'dswellife', 7.0, '20260907', '144215', '07e9b23a6f5d1', 18000662546919,
-    'DW-26090714421', 'DW1003702', '식이섬유 분말 스틱 30포', 1, 21900),
+var LPB_SAMPLE_MADE = [
+  // gmarket 0.6% — 상품 1건
+  lpbMk('sample-lp-01', 'a', 'gmarket', 0.6, '20260828', '181204', '4484310927', '6a91f4c703d28', 18000661349072,
+    '2190447338', '무형광 3겹 롤화장지 30롤 대용량', '300012045', 1, 18900),
+  // auction 0.6% — 한 주문 상품 2건(order_code · uniq_id 동일)
+  lpbMk('sample-lp-02', 'b', 'auction', 0.6, '20260829', '102847', '4485072118', '6a935b18ef402', 18000661382915,
+    '2191026473', '실리콘 주방장갑 2켤레 내열', '300004112', 2, 9800),
+  lpbMk('sample-lp-03', 'b', 'auction', 0.6, '20260829', '102847', '4485072118', '6a935b18ef402', 18000661382916,
+    '2191026474', '스테인리스 국자 세트 3종', '300004119', 1, 14500),
+  // dswellife 7.0% — 상품 1건
+  lpbMk('sample-lp-04', 'c', 'dswellife', 7.0, '20260829', '193311', '4485449063', '6a94ac2f10b57', 18000661417308,
+    '2191553902', '단백질 파우더 400g 초코맛', '300021884', 1, 39000),
+  // lotteon 1.4% — 한 주문 상품 3건
+  lpbMk('sample-lp-05', 'd', 'lotteon', 1.4, '20260830', '090512', '4486013774', '6a960d3a2c184', 18000661451663,
+    '2192108355', '무향 세탁 세제 3L 리필', '300009237', 1, 15900),
+  lpbMk('sample-lp-06', 'd', 'lotteon', 1.4, '20260830', '090512', '4486013774', '6a960d3a2c184', 18000661451664,
+    '2192108356', '섬유 탈취제 500ml 2개입', '300009241', 1, 11200),
+  lpbMk('sample-lp-07', 'd', 'lotteon', 1.4, '20260830', '090512', '4486013774', '6a960d3a2c184', 18000661451665,
+    '2192108357', '욕실 청소용 솔 3종 세트', '300009318', 1, 8400),
+  // yes24 2.1% — 한 주문 상품 2건
+  lpbMk('sample-lp-08', 'e', 'yes24', 2.1, '20260831', '164739', '4486778450', '6a97be4b73e60', 18000661486021,
+    '2192774108', '실용 글쓰기 안내서 개정판', '300030512', 1, 16200),
+  lpbMk('sample-lp-09', 'e', 'yes24', 2.1, '20260831', '164739', '4486778450', '6a97be4b73e60', 18000661486022,
+    '2192774109', '문고판 소설 선집 전2권', '300030518', 2, 12800),
+  // himart 1.26% — 상품 1건
+  lpbMk('sample-lp-10', 'f', 'himart', 1.26, '20260901', '111527', '4487205318', '6a991fc584a93', 18000661520477,
+    '2193310664', '무선 핸디 청소기 2단 흡입', '300017730', 1, 89000),
+  // clubclio 3.5% — 한 주문 상품 2건
+  lpbMk('sample-lp-11', 'a', 'clubclio', 3.5, '20260901', '200845', '4487661209', '6a9a81d6950a4', 18000661554832,
+    '2193846271', '수분 크림 50ml 대용량', '300025901', 1, 27000),
+  lpbMk('sample-lp-12', 'a', 'clubclio', 3.5, '20260901', '200845', '4487661209', '6a9a81d6950a4', 18000661554833,
+    '2193846272', '클렌징 폼 150ml 2개입', '300025907', 2, 13500),
+  // gmarket 0.6% — 한 주문 상품 4건
+  lpbMk('sample-lp-13', 'c', 'gmarket', 0.6, '20260902', '084119', '4488134875', '6a9be3e7a61b5', 18000661589186,
+    '2194402817', '주방 밀폐용기 6종 세트', '300012118', 1, 24800),
+  lpbMk('sample-lp-14', 'c', 'gmarket', 0.6, '20260902', '084119', '4488134875', '6a9be3e7a61b5', 18000661589187,
+    '2194402818', '식탁 매트 4장 방수', '300012124', 1, 11900),
+  lpbMk('sample-lp-15', 'c', 'gmarket', 0.6, '20260902', '084119', '4488134875', '6a9be3e7a61b5', 18000661589188,
+    '2194402819', '냉장고 정리 트레이 8개', '300012131', 1, 16400),
+  lpbMk('sample-lp-16', 'c', 'gmarket', 0.6, '20260902', '084119', '4488134875', '6a9be3e7a61b5', 18000661589189,
+    '2194402820', '실리콘 냄비 뚜껑 5종', '300012140', 2, 7300),
+  // wconcept 2.1% — 상품 1건
+  lpbMk('sample-lp-17', 'd', 'wconcept', 2.1, '20260903', '193714', '4488602341', '6a9d45f8b72c6', 18000661623541,
+    '2194958360', '기본 코튼 셔츠 옥스퍼드', '300028445', 1, 46000),
+  // kbbook 2.1% — 한 주문 상품 2건
+  lpbMk('sample-lp-18', 'e', 'kbbook', 2.1, '20260904', '103358', '4489078652', '6a9ea809c83d7', 18000661657895,
+    '2195514903', '업무용 기록 노트 3권 세트', '300031077', 1, 13800),
+  lpbMk('sample-lp-19', 'e', 'kbbook', 2.1, '20260904', '103358', '4489078652', '6a9ea809c83d7', 18000661657896,
+    '2195514904', '중성펜 12자루 세트 0.5mm', '300031082', 1, 9600),
+  // lotteon 0.7% — 상품 1건
+  lpbMk('sample-lp-20', 'f', 'lotteon', 0.7, '20260905', '150922', '4489551408', '6aa00a1ad94e8', 18000661692250,
+    '2196071446', '건조 표고버섯 200g 국내산', '300009802', 1, 18700),
+  // auction 0.6% — 한 주문 상품 3건
+  lpbMk('sample-lp-21', 'd', 'auction', 0.6, '20260906', '093046', '4490027193', '6aa16c2bea5f9', 18000661726604,
+    '2196628089', '접이식 장바구니 2개입', '300004330', 1, 8900),
+  lpbMk('sample-lp-22', 'd', 'auction', 0.6, '20260906', '093046', '4490027193', '6aa16c2bea5f9', 18000661726605,
+    '2196628090', '다용도 수납 바구니 4개', '300004337', 1, 12600),
+  lpbMk('sample-lp-23', 'd', 'auction', 0.6, '20260906', '093046', '4490027193', '6aa16c2bea5f9', 18000661726606,
+    '2196628091', '옷걸이 30개입 논슬립', '300004345', 2, 10400),
+  // dswellife 7.0% — 한 주문 상품 2건
+  lpbMk('sample-lp-24', 'b', 'dswellife', 7.0, '20260907', '144215', '4490503866', '6aa2ce3cfb60a', 18000661760958,
+    '2197184632', '종합 비타민 90정 3개월분', '300021903', 1, 28500),
+  lpbMk('sample-lp-25', 'b', 'dswellife', 7.0, '20260907', '144215', '4490503866', '6aa2ce3cfb60a', 18000661760959,
+    '2197184633', '식이섬유 분말 스틱 30포', '300021911', 1, 21900),
 ];
+var LPB_SAMPLE = LPB_SAMPLE_CAPTURED.concat(LPB_SAMPLE_MADE);
 
 /* 예시로 채웠는지 화면에 드러낸다 — 실제 수신분과 헷갈리면 안 된다 */
 function cpbSetSampleMark(on, note) {
@@ -10619,58 +10667,30 @@ function cpbBuildRows(docs) {
    수수료(commision)는 링크프라이스가 금액을 직접 보내 주는 값이라 그대로 표시한다.
    ══════════════════════════════════════════════════════════ */
 
-function lpbMerchant(d) { return d.merchant_id || ''; }
-
-/* merchant_id → 머천트명 — 링크프라이스 카탈로그(settings/linkprice_catalog)를 쓴다.
-   TA_CATALOG 는 티켓 적립 설정 화면이 채우므로, 비어 있으면 캐시하지 않고 다음에 다시 본다. */
-var LPB_MERCHANT_NAME = null;
-function lpbMerchantName(id) {
-  if (!id) return '';
-  if (!LPB_MERCHANT_NAME) {
-    var list = (typeof TA_CATALOG !== 'undefined' && TA_CATALOG && TA_CATALOG.length) ? TA_CATALOG : (window.LINKPRICE_MERCHANTS || []);
-    if (!list.length) return '';
-    var map = {};
-    for (var i = 0; i < list.length; i++) {
-      var m = list[i];
-      if (m && m['머천트ID']) map[m['머천트ID']] = m['머천트명'] || m['머천트ID'];
-    }
-    LPB_MERCHANT_NAME = map;
-  }
-  return LPB_MERCHANT_NAME[id] || '';
-}
-
 var LINKPRICE_PB_CTRL = window.LINKPRICE_PB_CTRL = ppMakeListController(20, function(pageItems, state, totalPages) {
   var tbody = document.getElementById('lpb-tbody');
   var pag = document.getElementById('lpb-pagination');
   if (!tbody) return;
-  if (!pageItems.length) { tbody.innerHTML = ppEmpty(9, '조건에 맞는 링크프라이스 포스트백이 없습니다.'); if (pag) pag.innerHTML = ''; return; }
-  tbody.innerHTML = pageItems.map(function(r, i) {
-    var rowId = 'lpb-d-' + state.page + '-' + i;
-    var timeCell = (r.day || r.time)
-      ? (r.at ? '<div style="font-weight:700">' + ppDt(r.at) + '</div><div class="pb-dim">' + ppTm(r.at) + '</div>' : '')
-        + '<div class="pb-raw">' + pbRaw(r.day) + ' · ' + pbRaw(r.time) + '</div>'
-      : '<span class="pb-none">—</span>';
-    var main = '<tr>'
-      + '<td style="white-space:nowrap">' + timeCell + '</td>'
-      + '<td><div style="font-weight:500">' + pbRaw(r.merchantId) + '</div>'
-        + (r.merchantLabel ? '<div class="pb-dim">' + pbEsc(r.merchantLabel) + '</div>' : '') + '</td>'
-      + '<td><div class="pb-uid" title="' + pbEsc(r.affiliateUserId) + '">' + pbRaw(r.affiliateUserId) + '</div></td>'
-      + '<td><div class="pb-ord" title="' + pbEsc(r.orderCode) + '">' + pbRaw(r.orderCode) + '</div></td>'
-      + '<td><div class="pb-pid">' + pbRaw(r.productCode) + '</div>'
-        + '<div class="pb-pname" title="' + pbEsc(r.productName) + '">' + pbRaw(r.productName) + '</div></td>'
+  if (!pageItems.length) { tbody.innerHTML = ppEmpty(16, '조건에 맞는 링크프라이스 포스트백이 없습니다.'); if (pag) pag.innerHTML = ''; return; }
+  tbody.innerHTML = pageItems.map(function(r) {
+    return '<tr>'
+      + '<td>' + pbRaw(r.day) + '</td>'
+      + '<td>' + pbRaw(r.time) + '</td>'
+      + '<td style="font-weight:500">' + pbRaw(r.merchantId) + '</td>'
+      + '<td class="pb-pid">' + pbRaw(r.orderCode) + '</td>'
+      + '<td class="pb-pid">' + pbRaw(r.productCode) + '</td>'
+      + '<td><div class="pb-pname" title="' + pbEsc(r.productName) + '">' + pbRaw(r.productName) + '</div></td>'
+      + '<td class="pb-pid">' + pbRaw(r.categoryCode) + '</td>'
       + '<td>' + pbRaw(r.itemCount) + '</td>'
       + '<td>' + pbRaw(r.price) + '</td>'
       + '<td>' + pbRaw(r.commision) + '</td>'
-      + '<td>' + pbToggleBtn(rowId, '수신 원문') + '</td>'
+      + '<td><div class="pb-uid" title="' + pbEsc(r.affiliateUserId) + '">' + pbRaw(r.affiliateUserId) + '</div></td>'
+      + '<td>' + pbRaw(r.baseCommission) + '</td>'
+      + '<td>' + pbRaw(r.incentiveCommission) + '</td>'
+      + '<td class="pb-pid">' + pbRaw(r.trlogId) + '</td>'
+      + '<td class="pb-pid">' + pbRaw(r.uniqId) + '</td>'
+      + '<td class="pb-pid">' + pbRaw(r.affiliateId) + '</td>'
       + '</tr>';
-    var detail = '<tr class="pb-detail" id="' + rowId + '" style="display:none"><td colspan="9">'
-      + pbRawFields([
-          ['uniq_id', r.uniqId], ['trlog_id', r.trlogId], ['category_code', r.categoryCode],
-          ['base_commission', r.baseCommission], ['incentive_commission', r.incentiveCommission],
-          ['affiliate_id', r.affiliateId],
-        ])
-      + '</td></tr>';
-    return main + detail;
   }).join('');
   if (pag) pag.innerHTML = ppPaginationHtml('LINKPRICE_PB_CTRL', state.page, totalPages);
 });
@@ -10681,37 +10701,39 @@ window.lpbApplyFilters = function() {
   LINKPRICE_PB_CTRL.applyFilter(function(r) {
     if (merchant && r.merchantId !== merchant) return false;
     if (q) {
-      var hit = ppMatch(r.orderCode, q) || ppMatch(r.uniqId, q) || ppMatch(r.affiliateUserId, q)
-        || ppMatch(r.productCode, q) || ppMatch(r.productName, q) || ppMatch(r.trlogId, q);
+      var hit = ppMatch(r.merchantId, q) || ppMatch(r.orderCode, q) || ppMatch(r.productCode, q)
+        || ppMatch(r.affiliateUserId, q) || ppMatch(r.trlogId, q) || ppMatch(r.uniqId, q);
       if (!hit) return false;
     }
     return true;
   });
 };
 
-/* 링크프라이스 행 구성 — 포스트백 1건 = 1행. 묶지도 합치지도 않는다. */
+/* 링크프라이스 행 구성 — 포스트백 1건 = 1행. 상품 1건당 1콜백이라 묶을 배열이 없다.
+   한 주문에 상품이 여럿이면 order_code · uniq_id 가 같은 건이 상품 수만큼 따로 온다 —
+   온 그대로 한 줄씩 둔다(묶는 것은 적립 계산 쪽 일이다).
+   받은 16개 필드를 담기만 하고 계산·조합은 하지 않는다. */
 function lpbBuildRows(docs) {
   var rows = docs.map(function(d) {
-    var mid = lpbMerchant(d);
     return {
       _id: d._id, _d: d,
-      day: d.day != null ? d.day : '', time: d.time != null ? d.time : '',
-      at: pbTimeDate((d.day && d.time) ? (String(d.day) + String(d.time)) : null),
-      _sortAt: pbTimeDate((d.day && d.time) ? (String(d.day) + String(d.time)) : null) || pbTimeDate(d.created_at) || null,
-      merchantId: mid, merchantLabel: lpbMerchantName(mid),
-      affiliateUserId: d.affiliate_user_id != null ? d.affiliate_user_id : '',
+      day: d.day != null ? d.day : '',
+      time: d.time != null ? d.time : '',
+      merchantId: d.merchant_id != null ? d.merchant_id : '',
       orderCode: d.order_code != null ? d.order_code : '',
       productCode: d.product_code != null ? d.product_code : '',
       productName: d.product_name != null ? d.product_name : '',
       categoryCode: d.category_code != null ? d.category_code : '',
       itemCount: d.item_count != null ? d.item_count : '',
       price: d.price != null ? d.price : '',
-      commision: d.commision != null ? d.commision : (d.commission != null ? d.commission : ''),
+      commision: d.commision != null ? d.commision : '',
+      affiliateUserId: d.affiliate_user_id != null ? d.affiliate_user_id : '',
       baseCommission: d.base_commission != null ? d.base_commission : '',
       incentiveCommission: d.incentive_commission != null ? d.incentive_commission : '',
       trlogId: d.trlog_id != null ? d.trlog_id : '',
       uniqId: d.uniq_id != null ? d.uniq_id : '',
       affiliateId: d.affiliate_id != null ? d.affiliate_id : '',
+      _sortAt: pbTimeDate((d.day && d.time) ? (String(d.day) + String(d.time)) : null) || pbTimeDate(d.created_at) || null,
     };
   });
   rows.forEach(function(r, i) { r._seq = i; });
@@ -10729,8 +10751,7 @@ function lpbFillMerchantFilter(rows) {
   rows.forEach(function(r) { if (r.merchantId && !seen[r.merchantId]) { seen[r.merchantId] = 1; opts.push(r.merchantId); } });
   opts.sort(function(a, b) { return String(a).localeCompare(String(b), 'ko-KR'); });
   sel.innerHTML = '<option value="">전체 merchant_id</option>' + opts.map(function(id) {
-    var nm = lpbMerchantName(id);
-    return '<option value="' + pbEsc(id) + '">' + pbEsc(id) + (nm ? ' (' + pbEsc(nm) + ')' : '') + '</option>';
+    return '<option value="' + pbEsc(id) + '">' + pbEsc(id) + '</option>';
   }).join('');
 }
 
