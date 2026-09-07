@@ -10783,56 +10783,70 @@ function lpbFillMerchantFilter(rows) {
 }
 
 /* ── 로드 ── postbacks 를 한 번 읽어 제휴사별로 갈라 각 블록에 넘긴다 ── */
+/* 문서가 제휴사 원본 필드를 하나라도 갖고 있는지 — 갖고 있으면 「실제 포스트백」,
+   하나도 없으면 옛 스키마 기록이다(user_id · mall_name · purchase_amount 만 있는 초기 데모 데이터).
+   옛 기록에는 제휴사 필드가 아예 없어 화면에 올리면 빈칸만 남는다. */
+function pbIsNativeCoupang(d) {
+  return !!(d.afcode || d.subid || d.subparam || d.purchase_cancel || d.purchase_time || d.orderId || d.order_detail);
+}
+function pbIsNativeLinkprice(d) {
+  return !!(d.merchant_id || d.order_code || d.product_code || d.trlog_id || d.uniq_id
+            || d.affiliate_user_id || d.affiliate_id || d.commision != null || d.day);
+}
+
+/* ⚠ 예시 데이터 스위치 — 실제 연동이 붙으면 이 값을 false 로 두면 예시가 화면에서 사라진다.
+   (아주 걷어내려면 「예시 데이터」 블록째 지운다.)
+   데모에는 실제 포스트백이 들어오지 않으므로 기본은 켜 둔다 — 김반장 확정 2026-09-07. */
+var PB_DEMO_SAMPLE = true;
+
 function loadPostback() {
   var ctb = document.getElementById('cpb-tbody');
   var ltb = document.getElementById('lpb-tbody');
   if (!ctb || !ltb) return;
-  /* orderBy 를 쓰지 않는다 — Firestore 는 정렬 필드가 없는 문서를 결과에서 통째로 뺀다.
-     created_at 이 없는 문서(앱·수기 등록분)가 표에서 통째로 사라져 0건이 되던 원인이었다.
-     이 파일의 다른 postbacks 조회도 전부 orderBy 없는 .get() 이다. 정렬은 아래에서 한다. */
-  db.collection('postbacks').get().then(function(snap) {
-    if (snap.empty) {
-      cpbSetSampleMark(true, '수신 건 0'); lpbSetSampleMark(true, '수신 건 0');
-      COUPANG_PB_CTRL.setRows(cpbBuildRows(CPB_SAMPLE));
-      var lp0 = lpbBuildRows(LPB_SAMPLE);
-      lpbFillMerchantFilter(lp0); LINKPRICE_PB_CTRL.setRows(lp0);
-      setTxt('cpb-sub', '예시 ' + CPB_SAMPLE.length + '건');
-      setTxt('lpb-sub', '예시 ' + lp0.length + '건');
-      return;
-    }
-    var cp = [], lp = [];
-    snap.docs.forEach(function(doc) {
-      var d = Object.assign({ _id: doc.id }, doc.data());
-      (pbProvider(d) === 'coupang' ? cp : lp).push(d);
-    });
-    /* 수신 건이 하나도 없을 때만 예시로 채운다 — 한 건이라도 들어오면 실제 값만 쓴다 */
-    var useSample = (cp.length === 0);
-    var useSampleLp = (lp.length === 0);
-    if (useSample) cp = CPB_SAMPLE;
-    if (useSampleLp) lp = LPB_SAMPLE;
-    cpbSetSampleMark(useSample, useSample ? '수신 건 0' : '');
-    lpbSetSampleMark(useSampleLp, useSampleLp ? '수신 건 0' : '');
+
+  /* 실제 수신분 + 예시를 합쳐 표에 올린다. 옛 기록은 제휴사 필드가 없어 빈칸만 되므로 넣지 않는다. */
+  function draw(cpNative, lpNative, legacyCount, note) {
+    var cp = PB_DEMO_SAMPLE ? cpNative.concat(CPB_SAMPLE) : cpNative;
+    var lp = PB_DEMO_SAMPLE ? lpNative.concat(LPB_SAMPLE) : lpNative;
+    var usedSample = PB_DEMO_SAMPLE && CPB_SAMPLE.length > 0;
+    var usedSampleLp = PB_DEMO_SAMPLE && LPB_SAMPLE.length > 0;
+    cpbSetSampleMark(usedSample, note || '');
+    lpbSetSampleMark(usedSampleLp, note || '');
     var cRows = cpbBuildRows(cp), lRows = lpbBuildRows(lp);
     COUPANG_PB_CTRL.setRows(cRows);
     lpbFillMerchantFilter(lRows);
     LINKPRICE_PB_CTRL.setRows(lRows);
-    setTxt('cpb-sub', useSample ? '예시 ' + cRows.length + '건' : cRows.length + '건 수신');
-    setTxt('lpb-sub', useSampleLp ? '예시 ' + lRows.length + '건' : lRows.length + '건 수신');
+    setTxt('cpb-sub', pbCountText(cpNative.length, PB_DEMO_SAMPLE ? CPB_SAMPLE.length : 0, legacyCount));
+    setTxt('lpb-sub', pbCountText(lpNative.length, PB_DEMO_SAMPLE ? LPB_SAMPLE.length : 0, legacyCount));
+  }
+
+  db.collection('postbacks').get().then(function(snap) {
+    var cpNative = [], lpNative = [], legacyCount = 0;
+    snap.docs.forEach(function(doc) {
+      var d = Object.assign({ _id: doc.id }, doc.data());
+      if (pbIsNativeCoupang(d)) cpNative.push(d);
+      else if (pbIsNativeLinkprice(d)) lpNative.push(d);
+      else legacyCount++;
+    });
+    draw(cpNative, lpNative, legacyCount, '');
   }).catch(function(e){
     console.error('loadPostback', e);
-    /* 조회 실패와 「데이터가 없음」은 화면에서 구분되어야 한다 — 둘 다 빈 표로 보이면
-       원인을 못 가린다. 실패 사유를 그대로 적는다. */
+    /* 조회에 실패해도 예시로 화면은 볼 수 있게 하되 실패 사유를 밝힌다. */
     var code = (e && e.code) || '';
     var msg = (code === 'resource-exhausted') ? '조회 실패 — Firestore 일일 할당량 초과'
             : (code === 'permission-denied') ? '조회 실패 — 권한 없음(로그인 확인)'
             : ('조회 실패 — ' + (code || (e && e.message) || '알 수 없는 오류'));
-    cpbSetSampleMark(true, msg); lpbSetSampleMark(true, msg);
-    COUPANG_PB_CTRL.setRows(cpbBuildRows(CPB_SAMPLE));
-    var lpErr = lpbBuildRows(LPB_SAMPLE);
-    lpbFillMerchantFilter(lpErr); LINKPRICE_PB_CTRL.setRows(lpErr);
-    setTxt('cpb-sub', '예시 ' + CPB_SAMPLE.length + '건');
-    setTxt('lpb-sub', '예시 ' + lpErr.length + '건');
+    draw([], [], 0, msg);
   });
+}
+/* 머리말 — 실제 수신분 · 예시 · 화면에 올리지 않은 옛 기록을 사실대로 적는다 */
+function pbCountText(nativeN, sampleN, legacyN) {
+  var parts = [];
+  if (nativeN) parts.push('수신 ' + nativeN + '건');
+  if (sampleN) parts.push('예시 ' + sampleN + '건');
+  if (!parts.length) parts.push('0건');
+  if (legacyN) parts.push('옛 기록 ' + legacyN + '건 제외');
+  return parts.join(' · ');
 }
 
 /* ── sec-accounts ── admin_accounts collection */
