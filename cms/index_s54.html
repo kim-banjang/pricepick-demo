@@ -3631,15 +3631,16 @@ window.CMS_FEATURES = {
               <th style="width:5%"><span class="fk">os</span></th>
               <th style="width:11%"><span class="fk">adid</span></th>
               <th style="width:11%"><span class="fk">subparam</span></th>
-              <th style="width:11%"><span class="fk">click_id</span></th>
+              <th style="width:10%"><span class="fk">click_id</span></th>
               <th style="width:6%"><span class="fk">purchase_time</span></th>
               <th style="width:7%"><span class="fk">orderid</span></th>
               <th style="width:5%"><span class="fk">purchase_cancel</span></th>
-              <th style="width:7%"><span class="fk">productName</span></th>
+              <th style="width:6%"><span class="fk">productName</span></th>
               <th style="width:7%"><span class="fk">productId</span></th>
               <th style="width:4%"><span class="fk">payment</span></th>
               <th style="width:2%"><span class="fk">quantity</span></th>
-              <th style="width:7%"><span class="fk">regdate</span></th>
+              <th style="width:6%"><span class="fk">regdate</span></th>
+              <th style="width:3%"></th>
             </tr></thead>
             <tbody id="cpb-tbody"></tbody>
           </table>
@@ -10549,7 +10550,7 @@ var COUPANG_PB_CTRL = window.COUPANG_PB_CTRL = ppMakeListController(20, function
   var tbody = document.getElementById('cpb-tbody');
   var pag = document.getElementById('cpb-pagination');
   if (!tbody) return;
-  if (!pageItems.length) { tbody.innerHTML = ppEmpty(15, '0건'); if (pag) pag.innerHTML = ''; return; }
+  if (!pageItems.length) { tbody.innerHTML = ppEmpty(16, '0건'); if (pag) pag.innerHTML = ''; return; }
   tbody.innerHTML = pageItems.map(function(r) {
     var kindLower = (r.kind || '').toLowerCase();
     /* 받은 값을 칸 하나에 하나씩 그대로 적는다(김반장 2026-09-08).
@@ -10562,7 +10563,7 @@ var COUPANG_PB_CTRL = window.COUPANG_PB_CTRL = ppMakeListController(20, function
     }
     var it0 = r.items.length ? r.items[0] : null;
     var d = r._d || {};
-    var main = '<tr>'
+    var main = '<tr class="pb-row" aria-expanded="false" onclick="pbToggleRow(this)">'
       + '<td>' + raw(d.No) + '</td>'
       + '<td>' + raw(d.afcode) + '</td>'
       + '<td>' + raw(r.subid) + '</td>'
@@ -10578,11 +10579,29 @@ var COUPANG_PB_CTRL = window.COUPANG_PB_CTRL = ppMakeListController(20, function
       + '<td>' + (it0 ? pbMoney(it0.payment) : '<span class="pb-none">—</span>') + '</td>'
       + '<td>' + raw(it0 ? it0.qty : '') + '</td>'
       + '<td>' + raw(d.regdate) + '</td>'
+      + PB_CARET
       + '</tr>';
-    /* 펼침은 두지 않는다(김반장 2026-09-08). 포스트백은 상품마다 한 줄씩 들어오므로
-       묶을 것이 없고, 접힌 줄에 받은 필드가 전부 나와 있어 펼쳐 봐야 같은 값이 한 번 더
-       나올 뿐이다. 줄만 쭉 나오면 된다. */
-    return main;
+    /* 펼치면 수신 원문 전부 — 접힌 화면에 이미 나온 것도 빼지 않는다 */
+    var rawAll = pbRawFields([
+      ['No', d.No], ['afcode', d.afcode], ['subid', r.subid], ['os', r.os],
+      ['adid', d.adid], ['subparam', d.subparam], ['click_id', d.click_id],
+      ['purchase_time', r.purchaseTime], ['orderid', r.orderId],
+      ['purchase_cancel', r.kind], ['regdate', d.regdate],
+    ]);
+    /* 상세도 받은 값만이다 — 우리가 맞춰 본 「원 구매 있음」·「취소 포스트백 있음」은 뺀다. */
+    var itemsHtml = r.items.length
+      ? '<table><thead><tr><th>productId</th><th>productName</th><th>payment</th><th>quantity</th></tr></thead><tbody>'
+        + r.items.map(function(it) {
+          return '<tr><td class="pb-pid">' + pbRaw(it.pid) + '<div class="pb-raw">' + pbEsc(it.pidKey) + '</div></td>'
+            + '<td class="pb-pname" title="' + pbEsc(it.name) + '">' + pbRaw(it.name) + '</td>'
+            + '<td>' + pbMoney(it.payment) + '</td>'
+            + '<td>' + pbRaw(it.qty) + '</td></tr>';
+        }).join('')
+        + '</tbody></table>'
+      : '';
+    var detail = '<tr class="pb-detail" style="display:none"><td colspan="16">'
+      + rawAll + itemsHtml + '</td></tr>';
+    return main + detail;
   }).join('');
   if (pag) pag.innerHTML = ppPaginationHtml('COUPANG_PB_CTRL', state.page, totalPages);
 });
