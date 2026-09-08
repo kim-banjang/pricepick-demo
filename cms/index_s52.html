@@ -495,13 +495,6 @@ tr:hover td{background:var(--surface-2);}
 .pb-ord{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:11.5px;color:var(--text-2);
   max-width:190px;margin:0 auto;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 /* 목록 행은 통째로 눌린다 — 커서와 배경으로 드러내고 안내 문구는 두지 않는다 */
-/* 포스트백 로그 표 — 칸 너비를 머리글 %로 못박는다. 값이 길어도 표가 옆으로
-   밀리지 않게 하려면 자동 너비로는 안 된다(김반장 2026-09-08).
-   긴 값은 .pb-cut 으로 줄여 보이고 title 로 전체를 띄운다 — 값을 바꾸는 것이 아니다. */
-.pb-table{table-layout:fixed;width:100%;}
-.pb-table th,.pb-table td{overflow:hidden;}
-.pb-cut{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.pb-sub{font-size:11px;color:var(--text-3);}
 .pb-row{cursor:pointer;}
 .pb-row:hover td{background:var(--surface-3);}
 .pb-row[aria-expanded="true"] td{background:var(--main-soft);}
@@ -3621,18 +3614,16 @@ window.CMS_FEATURES = {
             <div class="card-title">쿠팡 포스트백 로그</div>
             <div style="font-size:12px;color:var(--text-2)" id="cpb-sub">—</div>
           </div>
-          <table class="pb-table">
+          <table>
             <thead><tr>
-              <th style="width:4%">No</th>
-              <th style="width:13%"><span class="fk">purchase_time</span><span class="fk">regdate</span></th>
-              <th style="width:8%"><span class="fk">purchase_cancel</span></th>
-              <th style="width:12%"><span class="fk">subid</span><span class="fk">afcode</span></th>
-              <th style="width:11%"><span class="fk">os</span><span class="fk">adid</span></th>
-              <th style="width:11%"><span class="fk">subparam</span><span class="fk">click_id</span></th>
-              <th style="width:13%"><span class="fk">orderid</span><span class="fk">productId</span></th>
-              <th style="width:14%"><span class="fk">productName</span></th>
-              <th style="width:10%"><span class="fk">payment</span><span class="fk">quantity</span></th>
-              <th style="width:4%"></th>
+              <th>구매 시각<br><span class="fk">purchase_time</span></th>
+              <th>구분<br><span class="fk">purchase_cancel</span></th>
+              <th>회원<br><span class="fk">subid</span></th>
+              <th>주문번호<br><span class="fk">orderId</span></th>
+              <th>상품번호<br><span class="fk">productid</span></th>
+              <th>수량<br><span class="fk">quantity</span></th>
+              <th>금액<br><span class="fk">payment</span></th>
+              <th></th>
             </tr></thead>
             <tbody id="cpb-tbody"></tbody>
           </table>
@@ -10529,60 +10520,68 @@ var COUPANG_PB_CTRL = window.COUPANG_PB_CTRL = ppMakeListController(20, function
   var tbody = document.getElementById('cpb-tbody');
   var pag = document.getElementById('cpb-pagination');
   if (!tbody) return;
-  if (!pageItems.length) { tbody.innerHTML = ppEmpty(10, '0건'); if (pag) pag.innerHTML = ''; return; }
-  var base = (state.page - 1) * state.pageSize;
-  tbody.innerHTML = pageItems.map(function(r, idx) {
+  if (!pageItems.length) { tbody.innerHTML = ppEmpty(8, '0건'); if (pag) pag.innerHTML = ''; return; }
+  tbody.innerHTML = pageItems.map(function(r) {
     var kindLower = (r.kind || '').toLowerCase();
     var kindCell = r.kind
       ? (PB_KIND_BADGE[kindLower] || '<span class="badge badge-gray">' + pbEsc(r.kind) + '</span>')
       : '<span class="pb-none">—</span>';
-    /* 받은 값만 뿌린다 — 「외 N건」·「원 구매 연결」·「원 구매 금액」처럼 우리가 만들어 낸
-       값은 넣지 않는다(김반장 2026-09-08). 이 화면은 모양을 잡는 곳이 아니다.
-       긴 값은 .pb-cut 으로 줄여 보이고 title 에 전체를 담는다 — 줄여 보이는 것이지
-       값을 바꾸는 것이 아니다. */
-    function cut(v) {
-      if (v == null || v === '') return '<span class="pb-none">—</span>';
-      var t = String(v);
-      return '<span class="pb-cut" title="' + pbEsc(t) + '">' + pbEsc(t) + '</span>';
+    var linkNote = '';
+    if (r.linkedCount) {
+      linkNote = (kindLower === 'cancel')
+        ? '<div class="pb-dim">원 구매 연결 ' + r.linkedCount + '건</div>'
+        : '<div class="pb-dim">취소 연결 ' + r.linkedCount + '건</div>';
     }
-    function cutSub(v) {
-      if (v == null || v === '') return '<span class="pb-none pb-sub">—</span>';
-      var t = String(v);
-      return '<span class="pb-cut pb-sub" title="' + pbEsc(t) + '">' + pbEsc(t) + '</span>';
+    /* 접힌 화면은 주문 ID·상품 ID 까지 둔다 — 취소를 이 둘로 맞추기 때문이다.
+       상품명은 길어서 펼침으로 내렸다(김반장 확정 2026-09-07). */
+    var pidCell;
+    if (r.items.length) {
+      var it0 = r.items[0];
+      var more = r.items.length > 1 ? '<div class="pb-dim">외 ' + (r.items.length - 1) + '건</div>' : '';
+      pidCell = '<div class="pb-pid">' + pbRaw(it0.pid) + '</div>'
+        + '<div class="pb-raw">' + pbEsc(it0.pidKey) + '</div>' + more + linkNote;
+    } else {
+      pidCell = '<span class="pb-none">—</span>';
     }
-    var it0 = r.items.length ? r.items[0] : null;
-    var d = r._d || {};
     var main = '<tr class="pb-row" aria-expanded="false" onclick="pbToggleRow(this)">'
-      + '<td class="pb-sub">' + (base + idx + 1) + '</td>'
-      + '<td>' + pbTimeCell(r.purchaseTime, r.at) + cutSub(d.regdate) + '</td>'
+      + '<td style="white-space:nowrap">' + pbTimeCell(r.purchaseTime, r.at) + '</td>'
       + '<td>' + kindCell + '</td>'
-      + '<td>' + cut(r.subid) + cutSub(d.afcode) + '</td>'
-      + '<td>' + cut(r.os) + cutSub(d.adid) + '</td>'
-      + '<td>' + cut(d.subparam) + cutSub(d.click_id) + '</td>'
-      + '<td>' + cut(r.orderId) + cutSub(it0 ? it0.pid : '') + '</td>'
-      + '<td>' + cut(it0 ? it0.name : '') + '</td>'
-      + '<td>' + pbRaw(r.amountText) + '<div class="pb-sub">' + pbRaw(r.qtyText) + '</div></td>'
+      + '<td><div class="pb-uid" title="' + pbEsc(r.subid) + '">' + pbRaw(r.subid) + '</div></td>'
+      + '<td><div class="pb-ord" title="' + pbEsc(r.orderId) + '">' + pbRaw(r.orderId) + '</div></td>'
+      + '<td>' + pidCell + '</td>'
+      + '<td>' + pbRaw(r.qtyText) + '</td>'
+      + '<td>' + pbRaw(r.amountText)
+        + (r.originAmountText ? '<div class="pb-dim">' + r.originAmountText + '<span class="pb-raw"> 원 구매</span></div>' : '')
+        + '</td>'
       + PB_CARET
       + '</tr>';
     /* 펼치면 수신 원문 전부 — 접힌 화면에 이미 나온 것도 빼지 않는다 */
     var rawAll = pbRawFields([
       ['purchase_time', r.purchaseTime], ['purchase_cancel', r.kind], ['orderId', r.orderId],
       ['subid', r.subid], ['afcode', r._d.afcode], ['adid', r._d.adid],
-      ['subparam', r._d.subparam], ['click_id', r._d.click_id], ['os', r.os],
-      ['regdate', r._d.regdate],
+      ['subparam', r._d.subparam], ['os', r.os],
     ]);
-    /* 상세도 받은 값만이다 — 우리가 맞춰 본 「원 구매 있음」·「취소 포스트백 있음」은 뺀다. */
     var itemsHtml = r.items.length
-      ? '<table><thead><tr><th>productId</th><th>productName</th><th>payment</th><th>quantity</th></tr></thead><tbody>'
+      ? '<table><thead><tr><th>상품번호</th><th>productName</th><th>payment</th><th>quantity</th><th>대사</th></tr></thead><tbody>'
         + r.items.map(function(it) {
+          var link;
+          if (!it.match) {
+            link = '<span class="pb-none">—</span>';
+          } else if (kindLower === 'cancel') {
+            link = '<span class="pb-link">원 구매 있음</span><div class="pb-dim">' + (it.match.at ? ppDt(it.match.at) + ' ' + ppTm(it.match.at) : '') + '</div>'
+              + (it.match.payment !== '' && it.match.payment != null ? '<div class="pb-dim">' + pbMoneyText(it.match.payment) + '<span class="pb-raw"> 원 구매</span></div>' : '');
+          } else {
+            link = '<span class="pb-cx">취소 포스트백 있음</span><div class="pb-dim">' + (it.match.at ? ppDt(it.match.at) + ' ' + ppTm(it.match.at) : '') + '</div>';
+          }
           return '<tr><td class="pb-pid">' + pbRaw(it.pid) + '<div class="pb-raw">' + pbEsc(it.pidKey) + '</div></td>'
             + '<td class="pb-pname" title="' + pbEsc(it.name) + '">' + pbRaw(it.name) + '</td>'
             + '<td>' + pbMoney(it.payment) + '</td>'
-            + '<td>' + pbRaw(it.qty) + '</td></tr>';
+            + '<td>' + pbRaw(it.qty) + '</td>'
+            + '<td>' + link + '</td></tr>';
         }).join('')
         + '</tbody></table>'
       : '';
-    var detail = '<tr class="pb-detail" style="display:none"><td colspan="10">'
+    var detail = '<tr class="pb-detail" style="display:none"><td colspan="8">'
       + rawAll + itemsHtml + '</td></tr>';
     return main + detail;
   }).join('');
