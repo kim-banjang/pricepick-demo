@@ -10523,36 +10523,7 @@ var LPB_SAMPLE = LPB_SAMPLE_CAPTURED.concat(LPB_SAMPLE_MADE);
     var x = String(a.purchase_time || ''), y = String(b.purchase_time || '');
     return x < y ? -1 : (x > y ? 1 : 0);
   });
-  /* 쿠팡이 보내 주는 페이로드에는 No · click_id · regdate 가 없다 — 서버가 저장하면서
-     붙이는 값이다(김반장 2026-09-08). 그래서 받은 페이로드 자료는 손대지 않고
-     저장 단계에서 붙는 세 값만 여기서 매긴다.
-       No       저장 순서대로. 최근 것이 큰 수.
-       click_id 주문·취소를 잇는 클릭 식별자. 같은 주문이면 같은 값이다.
-       regdate  저장된 시각. 구매 시각보다 조금 뒤다.
-     ⚠ click_id 의 실제 형식은 아직 받아 보지 못했다 — 받으면 그 형식으로 바꾼다. */
-  function ck(seed) {
-    /* 32비트 안에서만 굴린다 — 곱셈이 2^53 을 넘으면 아랫자리가 0 으로 뭉개진다. */
-    var h = '', x = (seed * 2654435761) >>> 0;
-    for (var i = 0; i < 24; i++) {
-      x = (Math.imul(x, 1664525) + 1013904223) >>> 0;
-      h += '0123456789abcdef'[(x >>> 24) % 16];
-    }
-    return h;
-  }
-  var byOrder = {};
-  byTime.forEach(function (d, i) {
-    d.No = 31400 + i;
-    var key = String(d.orderId || d._id);
-    if (!byOrder[key]) byOrder[key] = ck(31400 + i);
-    d.click_id = byOrder[key];
-    var t = new Date(String(d.purchase_time).replace(' ', 'T'));
-    if (!isNaN(t.getTime())) {
-      t.setSeconds(t.getSeconds() + 1 + (i % 3));
-      var pad = function (n) { return String(n).length < 2 ? '0' + n : String(n); };
-      d.regdate = t.getFullYear() + '-' + pad(t.getMonth() + 1) + '-' + pad(t.getDate())
-        + ' ' + pad(t.getHours()) + ':' + pad(t.getMinutes()) + ':' + pad(t.getSeconds());
-    }
-  });
+  byTime.forEach(function (d, i) { d.No = 31400 + i; });
 })();
 
 /* ══ 예시 데이터 끝 ══ */
@@ -10623,7 +10594,6 @@ window.cpbApplyFilters = function() {
     if (kind && (r.kind || '').toLowerCase() !== kind) return false;
     if (q) {
       var hit = ppMatch(r.orderId, q) || ppMatch(r.subid, q) || ppMatch(r._id, q) || ppMatch(r.subparam, q);
-      /* 줄마다 상품이 하나다 — 그 줄이 가진 상품으로 맞춘다 */
       if (!hit) hit = r.items.some(function(it) { return ppMatch(it.pid, q) || ppMatch(it.name, q); });
       if (!hit) return false;
     }
@@ -10731,25 +10701,7 @@ function cpbBuildRows(docs) {
     var ta = a._sortAt ? a._sortAt.getTime() : -1, tb = b._sortAt ? b._sortAt.getTime() : -1;
     return (tb - ta) || (a._seq - b._seq);
   });
-
-  /* order_detail 은 배열이다 — 한 주문에 상품이 여럿 올 수 있다.
-     상품이 셋이면 세 줄로 편다(김반장 2026-09-08 · 실 페이로드).
-     주문 정보(No·afcode·subid·os·adid·subparam·click_id·purchase_time·orderid·
-     purchase_cancel·regdate)는 세 줄에 똑같이 들어가고,
-     productName·productId·payment·quantity 만 줄마다 다르다.
-     그래서 펼침이 필요 없다 — 받은 줄이 곧 화면의 줄이다.
-     order_detail 이 없는 기록은 한 줄로 둔다(상품 칸은 비어 보인다). */
-  var flat = [];
-  rows.forEach(function(r) {
-    if (!r.items.length) { flat.push(r); return; }
-    r.items.forEach(function(it, i) {
-      var line = Object.create(r);
-      line.items = [it];
-      line._line = i;
-      flat.push(line);
-    });
-  });
-  return flat;
+  return rows;
 }
 
 /* ══════════════════════════════════════════════════════════
