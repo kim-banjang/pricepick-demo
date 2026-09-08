@@ -13094,28 +13094,9 @@ function rfBuildOrders(roster) {
          난수를 새로 뽑지 않고 seq로 갈라 표본의 다른 숫자가 밀리지 않게 한다. 집계에서는
          「전환 후 환수」와 똑같이 취급한다 — 부분 취소 금액 처리는 아직 정해진 게 없어서
          여기서 금액을 새로 만들지 않는다. */
-      /* 부분 환수는 「묶음 주문에서 일부 상품만 취소된 건」이다(김반장 2026-09-08).
-         상품이 하나뿐인 주문은 일부만 취소될 수가 없으므로 대상이 아니다. */
-      var partial = canceled && granted && mall.kind === 'coupang'
-                    && o.items.length > 1 && (seq % 2 === 0);
+      var partial = canceled && granted && mall.kind === 'coupang' && (seq % 3 === 0);
       o.status = canceled ? (granted ? (partial ? 'clawed_back_partial' : 'clawed_back') : 'canceled')
                           : (granted ? 'granted' : 'pending_grant');
-      /* 취소된 몫 — 어느 상품이 물렸는지 상품 줄에 적고, 그 금액만 합계에서 뺀다.
-         적립·수익은 취소된 거래액 몫만큼만 덜어낸다. 살아 있는 몫은 뺄셈으로 얻으므로
-         「살아 있는 몫 + 취소된 몫 = 받은 값」이 언제나 정확히 맞는다. */
-      o.cancelPart = null;
-      if (partial) {
-        var ck = (o.items.length === 3 && seq % 2 === 0) ? 2 : 1;   /* 최소 하나는 남긴다 */
-        var ca = 0, cc = 0;
-        o.items.forEach(function(it, ii) {
-          it.canceled = ii < ck;
-          if (it.canceled) { ca += it.amount; cc += it.comm; }
-        });
-        var ce = Math.round(o.earn * ca / o.amount);
-        o.cancelPart = { amount: ca, comm: cc, earn: ce, net: cc - ce };
-      } else if (rfIsCanceled(o)) {
-        o.cancelPart = { amount: o.amount, comm: o.comm, earn: o.earn, net: o.net };
-      }
       orders.push(o);
     }
   }
@@ -13198,48 +13179,13 @@ function rfPctOf(part, whole) { return whole > 0 ? (part / whole * 100) : 0; }
 /* 취소는 둘이다 — 둘 다 합계에서 빠진다. 샀다 물린 건은 수수료가 안 들어오고,
    환수는 그 위에 이미 준 티켓까지 도로 빼앗는 것이다. */
 function rfIsCanceled(o) { return o.status === 'canceled' || o.status === 'clawed_back' || o.status === 'clawed_back_partial'; }
-function rfIsPartial(o) { return o.status === 'clawed_back_partial'; }
-/* 부분 환수 건의 살아 있는 몫 / 물린 몫. 나머지 건은 통째로 한쪽이다. */
-function rfCancelPart(o) { return o.cancelPart || { amount: 0, comm: 0, earn: 0, net: 0 }; }
-function rfLivePart(o) {
-  var c = rfCancelPart(o);
-  return { amount: o.amount - c.amount, comm: o.comm - c.comm, earn: o.earn - c.earn, net: o.net - c.net };
-}
-/* 몫을 골라 더한다. 건수는 그 몫이 있는 건만 센다. */
-function rfAggregatePart(rows, pick) {
-  var a = { count: 0, gmv: 0, comm: 0, earn: 0, net: 0 };
-  rows.forEach(function(o) {
-    var p = pick(o);
-    if (!p.amount && !p.comm && !p.earn && !p.net) return;
-    a.count++; a.gmv += p.amount; a.comm += p.comm; a.earn += p.earn; a.net += p.net;
-  });
-  return a;
-}
-function rfAddAgg(a, b) {
-  return { count: a.count + b.count, gmv: a.gmv + b.gmv, comm: a.comm + b.comm,
-           earn: a.earn + b.earn, net: a.net + b.net };
-}
-/* 부분 환수 건은 통째로 넣거나 빼면 안 된다(김반장 2026-09-08).
-   살아 있는 몫은 「지급 완료」로, 물린 몫은 「전환 후 환수」로 갈라 넣는다.
-   그래야 「지급 대기 + 지급 완료 = 합계(취소 제외)」와
-   「받은 값 전체 = 합계 + 미전환 환수 + 전환 후 환수」가 둘 다 정확히 맞는다.
-   부분 환수 건은 두 줄 모두에 건수로 잡힌다 — 한 건 안에 살아 있는 몫과 물린 몫이
-   같이 있기 때문이다. 금액은 어느 쪽에도 겹쳐 들어가지 않는다. */
 function rfSplit(rows) {
-  var partial = rows.filter(rfIsPartial);
-  var granted = rfAddAgg(
-    rfAggregate(rows.filter(function(o) { return o.status === 'granted'; })),
-    rfAggregatePart(partial, rfLivePart));
-  var pendingGrant = rfAggregate(rows.filter(function(o) { return o.status === 'pending_grant'; }));
-  var clawedBack = rfAddAgg(
-    rfAggregate(rows.filter(function(o) { return o.status === 'clawed_back'; })),
-    rfAggregatePart(partial, rfCancelPart));
   return {
-    live: rfAddAgg(pendingGrant, granted),
-    granted: granted,
-    pendingGrant: pendingGrant,
+    live: rfAggregate(rows.filter(function(o) { return !rfIsCanceled(o); })),
+    granted: rfAggregate(rows.filter(function(o) { return o.status === 'granted'; })),
+    pendingGrant: rfAggregate(rows.filter(function(o) { return o.status === 'pending_grant'; })),
     canceled: rfAggregate(rows.filter(function(o) { return o.status === 'canceled'; })),
-    clawedBack: clawedBack,
+    clawedBack: rfAggregate(rows.filter(function(o) { return o.status === 'clawed_back' || o.status === 'clawed_back_partial'; })),
   };
 }
 /* 옛 「—」. 지금은 쓰이는 자리가 없다 — 되살릴 자리를 위해 남긴다. */
@@ -13645,11 +13591,7 @@ var RF_OD_BADGE = {
 
 function rfOdRowHtml(o) {
   var cancelled = rfIsCanceled(o);
-  /* 부분 환수는 잔여가 살아 있는 건이다 — 통째로 물린 건과 같은 회색으로 두면
-     다 취소된 것으로 읽힌다(김반장 2026-09-08). 금액도 취소분을 뺀 값으로 적는다. */
-  var partial = rfIsPartial(o);
-  var dim = (cancelled && !partial) ? 'color:var(--text-3);' : '';
-  var v = partial ? rfLivePart(o) : { amount: o.amount, comm: o.comm, earn: o.earn, net: o.net };
+  var dim = cancelled ? 'color:var(--text-3);' : '';
   /* 묶음 주문만 펼친다. 단일 상품은 펼칠 것이 없으므로 표시를 달지 않는다.
      펼치는 방식·생김새는 포스트백 로그 화면 것을 그대로 쓴다 — pbToggleRow · pb-row ·
      pb-detail · PB_CARET. 새로 짓지 않는다(김반장 2026-09-08). */
@@ -13678,10 +13620,10 @@ function rfOdRowHtml(o) {
        길을 걸어 두면 누를 때마다 「회원을 찾을 수 없습니다」가 뜼게 된다 — 결함으로 보인다. */
     + '<td style="white-space:nowrap;' + dim + '"><div>' + ppEsc((o.user || {}).nickname || '—') + '</div>'
     +   '<div style="font-size:11px;color:var(--text-3)">' + ppEsc(o.uid || '') + '</div></td>'
-    + '<td style="' + dim + '">' + rfWon(v.amount) + '</td>'
-    + '<td style="font-weight:600;' + dim + '">' + rfOdPct(v.comm, v.amount) + rfWon(v.comm) + '</td>'
-    + '<td style="' + ((cancelled && !partial) ? dim : 'color:var(--amber)') + '">' + rfOdPct(v.earn, v.amount) + '− ' + rfWon(v.earn) + '</td>'
-    + '<td class="rf-net-col" style="' + dim + '">' + rfOdPct(v.net, v.amount) + rfWon(v.net) + '</td>'
+    + '<td style="' + dim + '">' + rfWon(o.amount) + '</td>'
+    + '<td style="font-weight:600;' + dim + '">' + rfOdPct(o.comm, o.amount) + rfWon(o.comm) + '</td>'
+    + '<td style="' + (cancelled ? dim : 'color:var(--amber)') + '">' + rfOdPct(o.earn, o.amount) + '− ' + rfWon(o.earn) + '</td>'
+    + '<td class="rf-net-col" style="' + dim + '">' + rfOdPct(o.net, o.amount) + rfWon(o.net) + '</td>'
     + '<td>' + (RF_OD_BADGE[o.status] || '') + '</td>'
     + (multi ? PB_CARET : '<td class="pb-caret"></td>')
     + '</tr>'
@@ -13694,16 +13636,11 @@ function rfOdDetailHtml(o) {
   return '<tr class="pb-detail" style="display:none"><td colspan="11">'
     + '<table><thead><tr><th>상품번호</th><th>상품명</th><th>수량</th><th>금액</th><th>수수료</th></tr></thead><tbody>'
     + o.items.map(function(it) {
-        /* 물린 상품은 흐리게 두고 금액에 줄을 긋는다. 살아 있는 상품은 그대로다.
-           표기는 포스트백 로그가 쓰는 것을 그대로 쓴다 — pb-strike · pb-cx. */
-        var cx = !!it.canceled;
-        var st = cx ? ' style="color:var(--text-3)"' : '';
-        return '<tr><td class="pb-pid"' + st + '>' + ppEsc(it.productId) + '</td>'
-          + '<td class="pb-pname" title="' + ppEsc(it.name) + '"' + st + '>' + ppEsc(it.name)
-            + (cx ? ' <span class="pb-cx">취소</span>' : '') + '</td>'
-          + '<td' + st + '>' + it.qty + '</td>'
-          + '<td>' + (cx ? '<span class="pb-strike">' + rfWon(it.amount) + '</span>' : rfWon(it.amount)) + '</td>'
-          + '<td>' + (cx ? '<span class="pb-strike">' + rfWon(it.comm) + '</span>' : rfWon(it.comm)) + '</td></tr>';
+        return '<tr><td class="pb-pid">' + ppEsc(it.productId) + '</td>'
+          + '<td class="pb-pname" title="' + ppEsc(it.name) + '">' + ppEsc(it.name) + '</td>'
+          + '<td>' + it.qty + '</td>'
+          + '<td>' + rfWon(it.amount) + '</td>'
+          + '<td>' + rfWon(it.comm) + '</td></tr>';
       }).join('')
     + '</tbody></table></td></tr>';
 }
