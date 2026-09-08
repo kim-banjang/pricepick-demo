@@ -13096,8 +13096,7 @@ function rfBuildOrders(roster) {
          여기서 금액을 새로 만들지 않는다. */
       /* 부분 환수는 「묶음 주문에서 일부 상품만 취소된 건」이다(김반장 2026-09-08).
          상품이 하나뿐인 주문은 일부만 취소될 수가 없으므로 대상이 아니다. */
-      var partial = canceled && granted && mall.kind === 'coupang'
-                    && o.items.length > 1 && (seq % 2 === 0);
+      var partial = canceled && granted && mall.kind === 'coupang' && o.items.length > 1;
       o.status = canceled ? (granted ? (partial ? 'clawed_back_partial' : 'clawed_back') : 'canceled')
                           : (granted ? 'granted' : 'pending_grant');
       /* 취소된 몫 — 어느 상품이 물렸는지 상품 줄에 적고, 그 금액만 합계에서 뺀다.
