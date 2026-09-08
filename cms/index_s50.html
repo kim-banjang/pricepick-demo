@@ -3506,16 +3506,15 @@ window.CMS_FEATURES = {
               <thead>
                 <tr>
                   <th style="width:9%">주문일</th>
-                  <th style="width:12%">제휴몰</th>
-                  <th style="width:11%">주문번호</th>
-                  <th style="width:10%">상품번호</th>
+                  <th style="width:13%">제휴몰</th>
+                  <th style="width:12%">주문번호</th>
+                  <th style="width:11%">상품번호</th>
                   <th style="width:12%">회원</th>
                   <th style="width:10%">거래액</th>
                   <th style="width:10%">수수료</th>
-                  <th style="width:9%">유저 적립</th>
+                  <th style="width:10%">유저 적립</th>
                   <th style="width:8%" class="rf-net-col">수익</th>
                   <th style="width:5%">상태</th>
-                  <th style="width:4%"></th>
                 </tr>
               </thead>
               <tbody id="rf-od-tbody"></tbody>
@@ -12999,45 +12998,6 @@ function rfLoadRoster() {
 
 /* 표본 생성 — 하루 주문 수는 요일(주말이 조금 많다)과 완만한 우상향 추세를 태우고,
    금액은 몰별 평균 객단가를 중심으로 흩는다. */
-/* 묶음 주문 표본 — 한 번에 여러 상품을 산 건이다. 데모 자료에 이런 건이 없어
-   펼침을 확인할 수가 없었다(김반장 2026-09-08).
-   난수를 새로 뽑지 않고 주문번호에서 갈라 만든다 — 난수 차례가 밀리면 이미 보고된
-   집계값이 통째로 바뀐다. 상품별 금액·수수료의 합은 주문 값과 정확히 같게 맞춘다.
-   실제 연동이 붙으면 이 자리에 포스트백의 order_detail 을 그대로 담으면 된다. */
-var RF_DEMO_ITEM_NAMES = [
-  '무선 이어폰', '핸드크림 3종 세트', '스탠드 조명', '텀블러 500ml', '캠핑 의자',
-  '보조배터리 10000mAh', '실내화 2켤레', '주방 세제 리필', '요가 매트', '차량용 거치대',
-  '유선 키보드', '반려동물 간식'
-];
-function rfDemoItems(o) {
-  var key = String(o.orderNo);
-  var seed = Number(key.slice(-6)) || 0;
-  var n = (seed % 11 === 0) ? 3 : ((seed % 5 === 0) ? 2 : 1);
-  if (n < 2) return [];                       /* 단일 상품 — 펼칠 것이 없다 */
-  var items = [], remA = o.amount, remC = o.comm;
-  for (var i = 0; i < n; i++) {
-    var last = (i === n - 1), a, c;
-    if (last) { a = remA; c = remC; }
-    else {
-      var w = 3 + (Number(key.charAt(key.length - 1 - i)) || 0) % 5;   /* 3~7 */
-      a = Math.round(o.amount * w / (n * 10) / 100) * 100;
-      var floor = 100 * (n - i - 1);
-      if (a < 100) a = 100;
-      if (a > remA - floor) a = Math.max(100, remA - floor);
-      c = Math.round(o.comm * a / o.amount);
-      if (c > remC) c = remC;
-    }
-    remA -= a; remC -= c;
-    items.push({
-      productId: String(Number(o.productId) + i + 1),
-      name: RF_DEMO_ITEM_NAMES[(seed + i * 7) % RF_DEMO_ITEM_NAMES.length],
-      qty: 1 + ((seed + i) % 2),
-      amount: a, comm: c
-    });
-  }
-  return items;
-}
-
 function rfBuildOrders(roster) {
   var rnd = rfRng(RF_DEMO_SEED);
   var totalWeight = roster.reduce(function(a, m) { return a + m.weight; }, 0);
@@ -13075,7 +13035,6 @@ function rfBuildOrders(roster) {
          집계값(건수·거래액)이 통째로 바뀐다. */
       if (o.kind === 'coupang') o.orderNo = '8354' + o.orderNo;
       o.productId = String(7000000000 + Number(String(o.orderNo).slice(-9)) % 2999999999);
-      o.items = rfDemoItems(o);
       o.net = o.comm - o.earn;
       o.linked_kakao = o.user.linked_kakao;
       o.convertDays = (typeof mall.days === 'number') ? mall.days : null;
@@ -13592,11 +13551,7 @@ var RF_OD_BADGE = {
 function rfOdRowHtml(o) {
   var cancelled = rfIsCanceled(o);
   var dim = cancelled ? 'color:var(--text-3);' : '';
-  /* 묶음 주문만 펼친다. 단일 상품은 펼칠 것이 없으므로 표시를 달지 않는다.
-     펼치는 방식·생김새는 포스트백 로그 화면 것을 그대로 쓴다 — pbToggleRow · pb-row ·
-     pb-detail · PB_CARET. 새로 짓지 않는다(김반장 2026-09-08). */
-  var multi = !!(o.items && o.items.length > 1);
-  return '<tr' + (multi ? ' class="pb-row" aria-expanded="false" onclick="pbToggleRow(this)"' : '') + '>'
+  return '<tr>'
     /* 주문일은 두 줄 — 날짜 밑에 시·분·초. 같은 날 건이 수십 건이라 시각이 없으면
        실구매 기록과 줄을 맞출 수가 없다(김반장 2026-09-03). */
     + '<td style="white-space:nowrap;' + dim + '"><div>' + ppDt(o.at) + '</div>'
@@ -13607,12 +13562,8 @@ function rfOdRowHtml(o) {
     +   ' <span class="rf-mall-kind">' + rfKo(o.kind === 'coupang' ? '직접 제휴' : '링크프라이스 제휴') + '</span></td>'
     /* 주문번호 - 쿠팡도 주문아이디를 보내 준다(김반장 2026-09-08). 두 제휴사 모두 받은 값을 그대로 적는다. */
     + '<td style="' + dim + '">' + ppEsc(o.orderNo) + '</td>'
-    /* 상품번호 - 쿠팡 productid / 링크프라이스 product_code. 받은 값을 그대로 적는다.
-       묶음이면 첫 상품을 적고 나머지 수를 밑에 붙인다 - 포스트백 로그와 같은 표기다. */
-    + '<td style="' + dim + '">'
-      + (multi ? ppEsc(o.items[0].productId) + '<div class="pb-dim">외 ' + (o.items.length - 1) + '건</div>'
-               : ppEsc(o.productId || ''))
-      + '</td>'
+    /* 상품번호 - 쿠팡 productid / 링크프라이스 product_code. 받은 값을 그대로 적는다. */
+    + '<td style="' + dim + '">' + ppEsc(o.productId || '') + '</td>'
     /* 회원 — 닉네임 밑에 식별 아이디. 누구에게서 난 매출인지 보여야 실구매 기록과
        대조할 수 있다(김반장 2026-09-03).
        회원 상세로 가는 길은 일부러 만들지 않았다. openMemberDetail() 은 users/{id} 문서를 읽는데,
@@ -13624,32 +13575,14 @@ function rfOdRowHtml(o) {
     + '<td style="font-weight:600;' + dim + '">' + rfOdPct(o.comm, o.amount) + rfWon(o.comm) + '</td>'
     + '<td style="' + (cancelled ? dim : 'color:var(--amber)') + '">' + rfOdPct(o.earn, o.amount) + '− ' + rfWon(o.earn) + '</td>'
     + '<td class="rf-net-col" style="' + dim + '">' + rfOdPct(o.net, o.amount) + rfWon(o.net) + '</td>'
-    + '<td>' + (RF_OD_BADGE[o.status] || '') + '</td>'
-    + (multi ? PB_CARET : '<td class="pb-caret"></td>')
-    + '</tr>'
-    + (multi ? rfOdDetailHtml(o) : '');
-}
-
-/* 펼친 자리 - 상품마다 상품번호 · 상품명 · 수량 · 금액 · 수수료.
-   표 생김새는 포스트백 로그의 펼침 표를 그대로 따른다. */
-function rfOdDetailHtml(o) {
-  return '<tr class="pb-detail" style="display:none"><td colspan="11">'
-    + '<table><thead><tr><th>상품번호</th><th>상품명</th><th>수량</th><th>금액</th><th>수수료</th></tr></thead><tbody>'
-    + o.items.map(function(it) {
-        return '<tr><td class="pb-pid">' + ppEsc(it.productId) + '</td>'
-          + '<td class="pb-pname" title="' + ppEsc(it.name) + '">' + ppEsc(it.name) + '</td>'
-          + '<td>' + it.qty + '</td>'
-          + '<td>' + rfWon(it.amount) + '</td>'
-          + '<td>' + rfWon(it.comm) + '</td></tr>';
-      }).join('')
-    + '</tbody></table></td></tr>';
+    + '<td>' + (RF_OD_BADGE[o.status] || '') + '</td></tr>';
 }
 
 var OD_CTRL = window.OD_CTRL = ppMakeListController(50, function(pageItems, state, totalPages) {
   var tb = document.getElementById('rf-od-tbody');
   var pag = document.getElementById('rf-od-pagination');
   if (!tb) return;
-  if (!pageItems.length) { tb.innerHTML = ppEmpty(11, '조건에 맞는 거래가 없습니다.'); if (pag) pag.innerHTML = ''; return; }
+  if (!pageItems.length) { tb.innerHTML = ppEmpty(10, '조건에 맞는 거래가 없습니다.'); if (pag) pag.innerHTML = ''; return; }
   tb.innerHTML = pageItems.map(rfOdRowHtml).join('');
   if (pag) pag.innerHTML = totalPages > 1 ? ppPaginationHtml('OD_CTRL', state.page, totalPages) : '';
 });
@@ -13669,8 +13602,7 @@ window.rfRenderOrders = function() {
     if (st && o.status !== st) return false;
     if (q) {
       /* 쿠팡도 주문아이디·상품번호가 오므로 번호로 찾을 때 빼지 않는다(김반장 2026-09-08). */
-      var byOrder = ppMatch(o.orderNo, q) || ppMatch(o.productId, q)
-        || (o.items || []).some(function(it) { return ppMatch(it.productId, q) || ppMatch(it.name, q); });
+      var byOrder = ppMatch(o.orderNo, q) || ppMatch(o.productId, q);
       var byUser = ppMatch((o.user || {}).nickname, q) || ppMatch(o.uid, q);
       if (!byOrder && !byUser) return false;
     }
