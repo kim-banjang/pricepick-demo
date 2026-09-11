@@ -19318,12 +19318,8 @@ function renderNotifications() {
     ppQuery('invites', 'inviter_id', PP.uid),
     ppQuery('point_transactions', 'user_id', PP.uid),
     ppQuery('prize_winners', 'user_id', PP.uid),
-    /* 취소·환수 알림을 만들려면 그 구매건의 티켓 상태가 있어야 한다 — 전환 전인지
-       전환 후인지로 문구가 갈린다(김반장 확정 2026-09-11 · DEVQA 존 답변). */
-    ppQuery('user_tickets', 'user_id', PP.uid),
   ]).then(function (res) {
     var pbs = res[0], gex = res[1], inv = res[2], ptx = res[3], pzw = res[4], items = [];
-    items = items.concat(ppDemoCancelNotifs(pbs, res[5] || []));
     pbs.forEach(function (p) {
       items.push({ key: 'pb:' + p._id, type: 'pick', dom: p.mall_domain || '', d: ppDate(p.created_at), tag: '구매', head: (p.mall_name || '쇼핑몰') + ' 구매로 티켓 적립', desc: (p.purchase_amount ? p.purchase_amount.toLocaleString('ko-KR') + '원 · ' : '') + (p.status === 'confirmed' ? '적립 완료' : '구매 확정 대기') });
     });
@@ -20003,13 +19999,10 @@ function mt21DemoCancel(pb) {
   return MT21_DEMO_CANCEL[d + '|' + (pb.purchase_amount || 0)] || null;
 }
 
-/* 부분 환수 연출 표 — 「구매일|구매금액」: { claw: 환수 장수, used: 사용분, remain: 잔여,
-   amount: 취소 금액, grades: 환수 등급 구성 문구 }.
+/* 부분 환수 연출 표 — 「구매일|구매금액」: { claw: 환수 장수, used: 사용분, remain: 잔여 }.
    전환 후 일부만 회수되고 잔여가 남은 건이다(쿠팡 전용, 개발 지시서 2026-09-03/09-04 8번).
-   amount·grades는 취소 알림 문구에만 쓴다(김반장 확정 2026-09-11 · DEVQA 존 답변) —
-   「70,000원 중 22,320원 취소」·「브론즈 2장이 환수되었습니다」의 그 자리다.
    지금 데모 자료에는 여기에 걸리는 구매건이 없어 화면에 뜨지 않는다 — 표에 줄을 넣으면
-   그 구매건의 배지가 「부분 환수」(앰버)로 바뀌고 알림 목록에도 부분 환수 문구가 뜬다. */
+   그 구매건의 배지가 「부분 환수」(앰버)로 바뀐다. */
 var MT21_DEMO_PARTIAL = {};
 function mt21DemoPartial(pb) {
   if (!pb) return null;
@@ -20066,68 +20059,6 @@ function ppDemoClawbackEvents(pbs, tks) {
     });
   });
   return ev;
-}
-
-/* 취소·환수 알림 문구 (김반장 확정 2026-09-11 · DEVQA 존 답변 app-john-20260911) ─────────
-   문구는 답변서 확정본을 글자 그대로 쓴다. 「티켓 적립 내역」·「활동 내역 → 환수」와 같은
-   연출 표(MT21_DEMO_CANCEL / MT21_DEMO_PARTIAL)를 읽으므로 세 화면의 장수가 어긋날 수 없다.
-   전환 전은 아직 받은 게 없으니 「적립 예정 티켓 취소」, 전환 후는 받았다 도로 가져가는
-   것이라 「지급 티켓 환수」 — 두 경우에 같은 말을 쓰면 회원이 구분하지 못한다.
-   거래 알림이라 「구매」 거르개(type: 'pick')에 붙는다 — 알림 설정 「구매 알림」 스위치가
-   구매 추적·적립/가지급·구매확정·환수를 한 묶음으로 다루는 것과 같은 기준이다. */
-function ppDemoCancelNotifs(pbs, tks) {
-  var byPb = {};
-  tks.forEach(function (t) {
-    if (!t.postback_id) return;
-    var b = byPb[t.postback_id] || (byPb[t.postback_id] = { pending: 0, settled: 0 });
-    if (t.status === 'pending') b.pending++; else b.settled++;
-  });
-  var money = function (n) { return (n || 0).toLocaleString('ko-KR'); };
-  var out = [];
-  pbs.forEach(function (pb) {
-    var on = mt21DemoCancel(pb);
-    if (!on) return;
-    var b = byPb[pb._id] || { pending: 0, settled: 0 };
-    var part = mt21DemoPartial(pb);
-    var amtKrw = pb.purchase_amount || 0;
-    var mall = pb.mall_name || '쇼핑몰';
-    /* 전체와 부분을 가르는 건 이 한 토막뿐이다 — 「A원 구매 취소」 / 「A원 중 B원 취소」 */
-    var scope = (part && part.amount)
-      ? mall + ' ' + money(amtKrw) + '원 중 ' + money(part.amount) + '원 취소'
-      : mall + ' ' + money(amtKrw) + '원 구매 취소';
-    var head, desc;
-    if (!b.settled) {
-      head = '적립 예정 티켓 취소';
-      desc = scope + ' · 적립 예정이던 랜덤 티켓 ' + (b.pending || 1) + '장이 취소되었습니다.';
-    } else {
-      /* 등급 구성은 브론즈 → 실버 → 골드 순으로 적는다(개발 지시서 8번 표시 예시·
-         「티켓 적립 내역」과 같은 순서). 0장 등급은 뺀다. */
-      var g = greedyTickets(amtKrw), names = [], total = 0;
-      ['bronze', 'silver', 'gold'].forEach(function (k) {
-        if (!g[k]) return;
-        names.push(GRADE_KO[k] + ' ' + g[k] + '장');
-        total += g[k];
-      });
-      if (!total) return;
-      if (part && part.remain) {
-        head = '지급 티켓 부분 환수';
-        desc = scope + ' · ' + (part.grades || (GRADE_KO.bronze + ' ' + part.claw + '장'))
-          + '이 환수되었습니다. 남은 ' + part.remain + '장은 그대로 사용하실 수 있습니다.';
-      } else {
-        head = '지급 티켓 환수';
-        desc = scope + ' · 지급된 ' + names.join(' · ') + '이 환수되었습니다.';
-      }
-      /* 이미 쓴 티켓은 도로 뺏지 않는다(정책서 「어뷰징·환불」 2번 카드) — 왜 덜 빠졌는지
-         한 문장 덧붙이지 않으면 회원은 숫자가 안 맞는 것으로 읽는다. */
-      var used = part ? part.used : 0;
-      if (used) desc += ' 이미 사용하신 ' + used + '장은 환수되지 않습니다.';
-    }
-    out.push({
-      key: 'cx:' + pb._id, type: 'pick', dom: pb.mall_domain || '',
-      d: new Date(on.replace(/\./g, '/')), tag: '구매', head: head, desc: desc
-    });
-  });
-  return out;
 }
 
 function mt21PurchaseLine(pb, cancelledOn, clawbackCount, usedExcluded) {

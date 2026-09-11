@@ -2766,25 +2766,6 @@ window.CMS_FEATURES = {
           </div>
         </div>
       </div>
-      <!-- 취소·환수 자동 알림 문구 — 김반장 확정 2026-09-11 · DEVQA 존 답변 app-john-20260911.
-           운영자가 쓰는 것이 아니라 앱이 자동으로 내보내는 거래 알림이라 조회 전용이다.
-           앱 「알림」 목록에 뜨는 문구와 글자 그대로 같아야 한다 — 두 화면이 다르면 안 된다. -->
-      <div class="card">
-        <div class="card-header"><div class="card-title">취소 · 환수 자동 알림 문구 <span style="font-size:11px;color:var(--success);font-weight:600">정책 확정</span></div><div class="card-sub">조회 전용 · 앱이 자동 발송 · 쿠팡 전용(링크프라이스는 취소 통보 미수신)</div></div>
-        <div style="padding:16px">
-          <table>
-            <thead><tr><th>취소 범위</th><th>시점</th><th>앱 배지</th><th>알림 제목</th><th>알림 내용</th></tr></thead>
-            <tbody>
-              <tr><td>전체 취소</td><td>전환 전</td><td>미전환 환수</td><td>적립 예정 티켓 취소</td><td>{제휴몰} {구매금액}원 구매 취소 · 적립 예정이던 랜덤 티켓 {대기 장수}장이 취소되었습니다.</td></tr>
-              <tr><td>전체 취소</td><td>전환 후</td><td>전환 후 환수</td><td>지급 티켓 환수</td><td>{제휴몰} {구매금액}원 구매 취소 · 지급된 {등급 구성}이 환수되었습니다.</td></tr>
-              <tr><td>부분 취소</td><td>전환 전</td><td>미전환 환수</td><td>적립 예정 티켓 취소</td><td>{제휴몰} {구매금액}원 중 {취소금액}원 취소 · 적립 예정이던 랜덤 티켓 {대기 장수}장이 취소되었습니다.</td></tr>
-              <tr><td>부분 취소</td><td>전환 후</td><td>부분 환수</td><td>지급 티켓 부분 환수</td><td>{제휴몰} {구매금액}원 중 {취소금액}원 취소 · {등급 구성}이 환수되었습니다. 남은 {잔여 장수}장은 그대로 사용하실 수 있습니다.</td></tr>
-              <tr><td>사용분 제외</td><td>전환 후 공통</td><td>—</td><td>—</td><td>이미 사용하신 {사용 장수}장은 환수되지 않습니다. (사용분이 있을 때만 끝에 덧붙임)</td></tr>
-            </tbody>
-          </table>
-          <div class="info-box" style="margin-top:14px">등급 구성은 <strong>브론즈 → 실버 → 골드</strong> 순으로 적고 0장 등급은 뺍니다. 구매 금액 원본은 덮어쓰지 않고, 분할 취소는 취소 금액을 누적해 취소 수신 회차마다 1건씩 발송합니다. 잔액은 0에서 멈추며 음수 장수는 문구에 쓰지 않습니다. 거래 알림이라 발송 상한이 없고 야간에도 즉시 나갑니다.</div>
-        </div>
-      </div>
       <div class="card">
         <div class="card-header"><div class="card-title">알림 작성 · 발송</div></div>
         <div style="padding:18px">
@@ -6776,25 +6757,6 @@ Object.assign(KO2VI,{
 });
 
 /* ── 제휴 수수료 매출 (김반장 지시 2026-08-27) ── */
-/* 취소·환수 자동 알림 문구 표 — 라벨·설명만 옮긴다. 알림 내용 원문은 회원에게 나가는
-   한국어 발송본이라 번역하지 않는다(제휴몰 유의사항 원문과 같은 기준). */
-Object.assign(KO2VI,{
-  "취소 · 환수 자동 알림 문구":"Nội dung thông báo tự động hủy · thu hồi",
-  "조회 전용 · 앱이 자동 발송 · 쿠팡 전용(링크프라이스는 취소 통보 미수신)":"Chỉ xem · app gửi tự động · chỉ Coupang (LinkPrice không nhận thông báo hủy)",
-  "취소 범위":"Phạm vi hủy",
-  "앱 배지":"Huy hiệu app",
-  "알림 제목":"Tiêu đề thông báo",
-  "알림 내용":"Nội dung thông báo",
-  "전체 취소":"Hủy toàn phần",
-  "부분 취소":"Hủy một phần",
-  "사용분 제외":"Trừ phần đã dùng",
-  "전환 전":"Trước chuyển đổi",
-  "전환 후":"Sau chuyển đổi",
-  "전환 후 공통":"Chung cho sau chuyển đổi",
-  "등급 구성은 ":"Cấu tạo hạng ghi theo thứ tự ",
-  "브론즈 → 실버 → 골드":"Bronze → Silver → Gold",
-  " 순으로 적고 0장 등급은 뺍니다. 구매 금액 원본은 덮어쓰지 않고, 분할 취소는 취소 금액을 누적해 취소 수신 회차마다 1건씩 발송합니다. 잔액은 0에서 멈추며 음수 장수는 문구에 쓰지 않습니다. 거래 알림이라 발송 상한이 없고 야간에도 즉시 나갑니다.":", bỏ hạng có 0 vé. Không ghi đè số tiền mua gốc; hủy nhiều lần thì cộng dồn số tiền hủy và mỗi lần nhận hủy gửi 1 thông báo. Số dư dừng ở 0, không ghi số vé âm trong nội dung. Là thông báo giao dịch nên không có giới hạn gửi và gửi ngay cả ban đêm."
-});
 Object.assign(KO2VI,{
   "제휴 수수료 매출":"Doanh thu hoa hồng LK",
   "티켓 지급 대기 · 쿠팡 D+7/D+30 · 링크프라이스 몰별 전환 대기일 수":"Chờ cấp vé · Coupang D+7/D+30 · Linkprice theo số ngày chuyển đổi từng sàn",
