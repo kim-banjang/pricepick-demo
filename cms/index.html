@@ -1912,6 +1912,20 @@ window.CMS_FEATURES = {
           </table>
           <div id="tickets-pagination"></div>
         </div>
+      <!-- 환수 부채 추적 — CMS 답변 · Vin(2026-06-18)의 항목을 복원. 김반장 확정 2026-09-14.
+           「티켓 회수·소멸 이력」이 이미 처리된 결과 로그라면, 이쪽은 아직 처리되지 않은 미결
+           추적이다 — 이미 사용된 티켓에 취소·반품이 생겨 즉시 회수가 불가할 때 음수 잔액(부채)
+           으로 기록하고 다음 적립 시 자동 상계를 기다리는 건이다.
+           원래 별도 페이지에 있었으나 2026-07-20에 회수 전용 페이지를 통합하면서 같이 사라졌다
+           (해리 #12 Q3가 없애기로 한 것은 회수 전용 조회 페이지였고 이 표가 아니다). -->
+      <div class="card" style="margin-top:16px">
+        <div class="card-header"><div><div class="card-title">환수 부채 추적</div><div class="card-sub">미결 추적 · 즉시 회수 불가분 · 다음 적립 시 자동 상계 대기</div></div></div>
+        <table>
+          <thead><tr><th>닉네임 / 식별 아이디</th><th>부채 티켓</th><th>발생일</th><th>예상 상계일</th><th>상태</th></tr></thead>
+          <tbody id="debt-tbody"></tbody>
+        </table>
+        <div class="info-box" style="margin:14px">앱 화면에는 <strong>음수를 쓰지 않습니다</strong> — 해당 등급 잔액을 <strong>0</strong>으로 보여주고 「회수 예정 N장」을 따로 표시합니다. 회수 예정 수량이 보이는 자리는 앱 「내 티켓 &amp; 포인트」 한 곳입니다. 차감은 <strong>같은 등급 안에서만</strong> 일어나며 다른 등급으로 넘어가지 않습니다.</div>
+      </div>
     </div>
 
     <!-- ── 티켓 등급 설정 (신규) ── -->
@@ -2770,7 +2784,7 @@ window.CMS_FEATURES = {
            운영자가 쓰는 것이 아니라 앱이 자동으로 내보내는 거래 알림이라 조회 전용이다.
            앱 「알림」 목록에 뜨는 문구와 글자 그대로 같아야 한다 — 두 화면이 다르면 안 된다. -->
       <div class="card">
-        <div class="card-header"><div class="card-title">취소 · 환수 자동 알림 문구 <span style="font-size:11px;color:var(--success);font-weight:600">정책 확정</span></div><div class="card-sub">조회 전용 · 앱이 자동 발송 · 쿠팡 전용(링크프라이스는 취소 통보 미수신)</div></div>
+        <div class="card-header"><div class="card-title">취소 · 환수 자동 알림 문구 <span style="font-size:11px;color:var(--success);font-weight:600">정책 확정</span></div><div class="card-sub">조회 전용 · 앱이 자동 발송 · 쿠팡 전용(링크프라이스는 취소 통보 미수신) · 2026-09-14 개정</div></div>
         <div style="padding:16px">
           <table>
             <thead><tr><th>취소 범위</th><th>시점</th><th>앱 배지</th><th>알림 제목</th><th>알림 내용</th></tr></thead>
@@ -2779,10 +2793,10 @@ window.CMS_FEATURES = {
               <tr><td>전체 취소</td><td>전환 후</td><td>전환 후 환수</td><td>지급 티켓 환수</td><td>{제휴몰} {구매금액}원 구매 취소 · 지급된 {등급 구성}이 환수되었습니다.</td></tr>
               <tr><td>부분 취소</td><td>전환 전</td><td>미전환 환수</td><td>적립 예정 티켓 취소</td><td>{제휴몰} {구매금액}원 중 {취소금액}원 취소 · 적립 예정이던 랜덤 티켓 {대기 장수}장이 취소되었습니다.</td></tr>
               <tr><td>부분 취소</td><td>전환 후</td><td>부분 환수</td><td>지급 티켓 부분 환수</td><td>{제휴몰} {구매금액}원 중 {취소금액}원 취소 · {등급 구성}이 환수되었습니다. 남은 {잔여 장수}장은 그대로 사용하실 수 있습니다.</td></tr>
-              <tr><td>사용분 제외</td><td>전환 후 공통</td><td>—</td><td>—</td><td>이미 사용하신 {사용 장수}장은 환수되지 않습니다. (사용분이 있을 때만 끝에 덧붙임)</td></tr>
+              <tr><td>회수 예정 발생</td><td>전환 후 공통</td><td>—</td><td>—</td><td>보유하신 {등급}가 모자라 {회수 예정 장수}장은 회수 예정으로 남았습니다. 다음에 {등급} 티켓을 받으실 때 자동으로 차감됩니다. (회수할 티켓이 모자랄 때만 끝에 덧붙임)</td></tr>
             </tbody>
           </table>
-          <div class="info-box" style="margin-top:14px">등급 구성은 <strong>브론즈 → 실버 → 골드</strong> 순으로 적고 0장 등급은 뺍니다. 구매 금액 원본은 덮어쓰지 않고, 분할 취소는 취소 금액을 누적해 취소 수신 회차마다 1건씩 발송합니다. 잔액은 0에서 멈추며 음수 장수는 문구에 쓰지 않습니다. 거래 알림이라 발송 상한이 없고 야간에도 즉시 나갑니다.</div>
+          <div class="info-box" style="margin-top:14px">등급 구성은 <strong>브론즈 → 실버 → 골드</strong> 순으로 적고 0장 등급은 뺍니다. 구매 금액 원본은 덮어쓰지 않고, 분할 취소는 취소 금액을 누적해 취소 수신 회차마다 1건씩 발송합니다. 거래 알림이라 발송 상한이 없고 야간에도 즉시 나갑니다.<br><br>회수할 티켓이 모자라면 <strong>같은 등급 안에서만</strong> 차감하고, 그래도 모자란 몫은 <strong>회수 예정(부채)</strong>으로 남겨 다음 적립 때 자동 상계합니다. 앱 화면과 알림 문구에는 <strong>음수를 쓰지 않습니다</strong>.</div>
         </div>
       </div>
       <div class="card">
@@ -6780,6 +6794,14 @@ Object.assign(KO2VI,{
    한국어 발송본이라 번역하지 않는다(제휴몰 유의사항 원문과 같은 기준). */
 Object.assign(KO2VI,{
   "취소 · 환수 자동 알림 문구":"Nội dung thông báo tự động hủy · thu hồi",
+  "환수 부채 추적":"Theo dõi nợ thu hồi",
+  "미결 추적 · 즉시 회수 불가분 · 다음 적립 시 자동 상계 대기":"Theo dõi chưa xử lý · phần không thu hồi ngay được · chờ tự bù trừ ở lần tích lũy sau",
+  "닉네임 / 식별 아이디":"Biệt danh / ID định danh",
+  "부채 티켓":"Vé nợ",
+  "발생일":"Ngày phát sinh",
+  "예상 상계일":"Ngày bù trừ dự kiến",
+  "환수 부채가 없습니다. (즉시 회수 불가분이 생기면 여기에 쌓입니다)":"Không có nợ thu hồi. (Khi phát sinh phần không thu hồi ngay được thì sẽ hiện ở đây)",
+  "회수 예정 발생":"Phát sinh khoản sẽ thu hồi",
   "조회 전용 · 앱이 자동 발송 · 쿠팡 전용(링크프라이스는 취소 통보 미수신)":"Chỉ xem · app gửi tự động · chỉ Coupang (LinkPrice không nhận thông báo hủy)",
   "취소 범위":"Phạm vi hủy",
   "앱 배지":"Huy hiệu app",
@@ -7280,6 +7302,7 @@ function loadAllData() {
     loadScheduler();
     loadAccounts();
     loadClawback();
+    loadDebtTracking();
     loadPoints();
     loadPointAttendance();
     loadPointPolicy();
@@ -11121,6 +11144,17 @@ function loadAbuse() {
         + '<td style="text-align:center">'+c.badge+'</td></tr>';
     }).join('');
   }).catch(function(e){ console.error('loadAbuse',e); tbody.innerHTML = ppEmpty(5,'로드 오류'); });
+}
+
+/* 환수 부채 추적 (sec-tickets) — 이미 사용된 티켓에 취소·반품이 생겨 즉시 회수가 불가한 건.
+   음수 잔액(부채)으로 기록하고 다음 적립 시 자동 상계한다(CMS 답변 Vin 2026-06-18 ·
+   백엔드 #13 2026-08-19 · 앱 Kelvin 2026-08-20 · 김반장 확정 2026-09-14).
+   원장(ticket_transactions)에는 부채 전용 유형이 아직 없다 — 런칭 전이라 실제 발생 건도
+   없으므로 지금은 빈 상태로 그린다. 서버가 부채 레코드를 쌓기 시작하면 여기에 연결한다. */
+function loadDebtTracking() {
+  var tbody = document.getElementById('debt-tbody');
+  if (!tbody) return;
+  tbody.innerHTML = ppEmpty(5, '환수 부채가 없습니다. (즉시 회수 불가분이 생기면 여기에 쌓입니다)');
 }
 
 /* ── sec-clawback ── ticket_transactions where type in [clawback,expire] */

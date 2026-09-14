@@ -19943,13 +19943,38 @@ window.mt21ToggleHold = mt21ToggleHold;
 
 /* 등급 줄 1개 — 헤더(요약, 클릭시 토글) + 접힌 본문(만료일 그룹, D-7 이내 임박은 주황 강조).
    groups가 없으면(무보유, 또는 만료일 미추적 정책) 펼칠 내용이 없으므로 토글 없이 정적으로만 표시. */
+/* 회수 예정 연출 표 — 「등급: 회수 예정 장수」 (김반장 확정 2026-09-14 · 부채·상계 유지 결정).
+   근거: 백엔드 답변 #13(2026-08-19) · 앱 답변 Kelvin(2026-08-20).
+   취소로 회수할 티켓이 모자라면 내부 잔액은 음수로 두되 화면에는 음수를 쓰지 않는다 —
+   그 등급의 잔액을 0으로 보여주고 「회수 예정 N장」을 따로 붙인다. 다음 적립 때 자동 상계된다.
+   값은 Kelvin 답변의 예시(실버 -3 → 0 · 회수 예정 3장)를 그대로 쓴다.
+   ⚠️ 연출이라 이 표에 걸린 등급은 이 카드에서만 0으로 보인다 — 다른 화면의 보유 장수는
+   그대로다. 연출을 걷을 때는 이 표만 비우면 원래대로 그려진다. */
+var MT21_DEMO_PENDING_CLAWBACK = { silver: 3 };
 function mt21RenderHoldRow(key, iconHtml, nameKo, nameVi, count, unitKo, unitVi, groups, groupRowFn) {
+  /* 회수 예정이 있는 등급은 잔액을 0으로 쓴다(앱 화면에 음수를 쓰지 않는다 · Kelvin 2026-08-20) */
+  var pending = MT21_DEMO_PENDING_CLAWBACK[key] || 0;
+  if (pending) { count = 0; groups = []; }
   var zero = count === 0;
   var head = '<div style="display:flex;align-items:center;gap:8px;">' + iconHtml
     + '<span style="color:' + (zero ? '#C4BED0' : '#1A1130') + ';font-size:var(--fs-body);font-weight:700;">' + mt21I18n(nameKo, nameVi) + '</span>'
     + '<span style="color:#9B93B0;font-size:var(--fs-caption);font-weight:400;">' + (groups.length
       ? mt21I18n(count + unitKo + ' · 만료일 ' + groups.length + '개', count + ' ' + unitVi + ' · ' + groups.length + ' hạn dùng')
-      : mt21I18n(count + unitKo, count + ' ' + unitVi)) + '</span></div>';
+      : mt21I18n(count + unitKo, count + ' ' + unitVi)) + '</span>'
+    /* 회수 예정 배지 — 「회수 예정 수량이 보이는 자리는 「내 티켓 & 포인트」 한 곳」(Kelvin 2026-08-20).
+       홈·혜택 탭과 기프티샵에는 붙이지 않는다. */
+    + (pending ? '<span style="margin-left:auto;padding:3px 8px;border-radius:7px;background:#FDF2E6;color:#D97706;font-size:var(--fs-caption);font-weight:400;flex-shrink:0;">'
+        + mt21I18n('회수 예정 ' + pending + '장', 'sẽ thu hồi ' + pending + ' vé') + '</span>' : '')
+    + '</div>';
+  if (pending) {
+    /* 왜 0인지 한 줄로 짚어 준다 — 안 적으면 적립을 받아도 안 늘어나는 이유를 몰라 문의가 들어온다
+       (Kelvin 2026-08-20). 사유 자체는 「활동 내역 → 환수」에 남는다. */
+    return '<div style="padding:14px 16px;">' + head
+      + '<span style="display:block;margin-top:6px;color:#9B93B0;font-size:var(--fs-caption);font-weight:400;word-break:keep-all;">'
+      + mt21I18n('구매 취소로 회수할 티켓이 모자랐습니다. 다음에 ' + nameKo + ' 티켓을 받으실 때 자동으로 차감됩니다.',
+                 'Khi hủy mua không đủ vé để thu hồi. Sẽ tự động trừ khi bạn nhận vé ' + nameVi + ' lần tới.')
+      + '</span></div>';
+  }
   if (!groups.length) {
     return '<div style="padding:14px 16px;">' + head + '</div>';
   }
@@ -20003,7 +20028,7 @@ function mt21DemoCancel(pb) {
   return MT21_DEMO_CANCEL[d + '|' + (pb.purchase_amount || 0)] || null;
 }
 
-/* 부분 환수 연출 표 — 「구매일|구매금액」: { claw: 환수 장수, used: 사용분, remain: 잔여,
+/* 부분 환수 연출 표 — 「구매일|구매금액」: { claw: 환수 장수, used: 회수 예정 장수, remain: 잔여,
    amount: 취소 금액, grades: 환수 등급 구성 문구 }.
    전환 후 일부만 회수되고 잔여가 남은 건이다(쿠팡 전용, 개발 지시서 2026-09-03/09-04 8번).
    amount·grades는 취소 알림 문구에만 쓴다(김반장 확정 2026-09-11 · DEVQA 존 답변) —
@@ -20117,10 +20142,11 @@ function ppDemoCancelNotifs(pbs, tks) {
         head = '지급 티켓 환수';
         desc = scope + ' · 지급된 ' + names.join(' · ') + '이 환수되었습니다.';
       }
-      /* 이미 쓴 티켓은 도로 뺏지 않는다(정책서 「어뷰징·환불」 2번 카드) — 왜 덜 빠졌는지
-         한 문장 덧붙이지 않으면 회원은 숫자가 안 맞는 것으로 읽는다. */
-      var used = part ? part.used : 0;
-      if (used) desc += ' 이미 사용하신 ' + used + '장은 환수되지 않습니다.';
+      /* 회수할 티켓이 모자라면 그만큼 「회수 예정」으로 남고 다음 적립 때 자동 상계된다
+         (백엔드 #13 2026-08-19 · Kelvin 2026-08-20). 한 문장 붙이지 않으면 회원은 다음에
+         적립을 받아도 안 늘어나는 이유를 모른다. */
+      var pending = part ? part.used : 0;
+      if (pending) desc += ' 보유하신 ' + GRADE_KO.bronze + '가 모자라 ' + pending + '장은 회수 예정으로 남았습니다. 다음에 ' + GRADE_KO.bronze + ' 티켓을 받으실 때 자동으로 차감됩니다.';
     }
     out.push({
       key: 'cx:' + pb._id, type: 'pick', dom: pb.mall_domain || '',
@@ -20130,7 +20156,7 @@ function ppDemoCancelNotifs(pbs, tks) {
   return out;
 }
 
-function mt21PurchaseLine(pb, cancelledOn, clawbackCount, usedExcluded) {
+function mt21PurchaseLine(pb, cancelledOn, clawbackCount, pendingClawback) {
   if (!pb) return '';
   var d = ppFmt(ppDate(pb.created_at));
   /* 구매처 — 날짜와 금액 사이(김반장 2026-09-03). 포스트백에 이미 있는 mall_name을 그대로 쓴다.
@@ -20154,9 +20180,10 @@ function mt21PurchaseLine(pb, cancelledOn, clawbackCount, usedExcluded) {
   if (cancelledOn) {
     var ko = [cancelledOn, '구매 취소'], vi = [cancelledOn, 'hủy mua'];
     if (clawbackCount) { ko.push(clawbackCount + '장 환수'); vi.push('thu hồi ' + clawbackCount + ' vé'); }
-    /* 이미 쓴 티켓은 도로 뺏지 않는다(정책서 「어뷰징·환불」 2번 카드) — 왜 덜 빠졌는지
-       한 줄에 같이 적어 준다. 안 적으면 유저는 숫자가 안 맞는 것으로 읽는다. */
-    if (usedExcluded) { ko.push(usedExcluded + '장 사용분 제외'); vi.push('trừ ' + usedExcluded + ' vé đã dùng'); }
+    /* 회수할 티켓이 모자라면 그만큼 「회수 예정」으로 남고 다음 적립 때 자동 상계된다
+       (백엔드 #13 2026-08-19 · Kelvin 2026-08-20). 안 적으면 유저는 숫자가 안 맞는 것으로 읽는다.
+       ⚠️ 「사용분 제외」는 2026-08-27·09-03 판의 말이다 — 2026-09-14 확정으로 폐기됐다. */
+    if (pendingClawback) { ko.push(pendingClawback + '장 회수 예정'); vi.push('sẽ thu hồi ' + pendingClawback + ' vé'); }
     out += '<span style="' + css + 'margin-top:3px;">' + mt21I18n(ko.join(' · '), vi.join(' · ')) + '</span>';
   }
   /* 한 덩이로 감싼다 — 대기중 줄은 이 자리가 flex 칸이라, 안 감싸면 두 줄이 각각 칸이 되어
