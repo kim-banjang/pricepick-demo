@@ -10609,7 +10609,7 @@ window.PP_FEATURES = {
             <div class="reward-top-title">기프티샵</div>
           </div>
           <div class="reward-top-actions">
-            <button class="reward-top-btn" data-ip-bound="1" title="교환 내역" onclick="event.stopPropagation();showScreen('pw-24h');"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M20 8.25V18C20 21 18.21 22 16 22H8C5.79 22 4 21 4 18V8.25C4 5 5.79 4.25 8 4.25C8 4.87 8.24997 5.43 8.65997 5.84C9.06997 6.25 9.63 6.5 10.25 6.5H13.75C14.99 6.5 16 5.49 16 4.25C18.21 4.25 20 5 20 8.25Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M16 4.25C16 5.49 14.99 6.5 13.75 6.5H10.25C9.63 6.5 9.06997 6.25 8.65997 5.84C8.24997 5.43 8 4.87 8 4.25C8 3.01 9.01 2 10.25 2H13.75C14.37 2 14.93 2.25 15.34 2.66C15.75 3.07 16 3.63 16 4.25Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+            <button class="reward-top-btn" data-ip-bound="1" title="교환 내역" onclick="event.stopPropagation();var p=document.getElementById('gx-history');p.style.display='block';p.scrollIntoView({block:'nearest'});"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M20 8.25V18C20 21 18.21 22 16 22H8C5.79 22 4 21 4 18V8.25C4 5 5.79 4.25 8 4.25C8 4.87 8.24997 5.43 8.65997 5.84C9.06997 6.25 9.63 6.5 10.25 6.5H13.75C14.99 6.5 16 5.49 16 4.25C18.21 4.25 20 5 20 8.25Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M16 4.25C16 5.49 14.99 6.5 13.75 6.5H10.25C9.63 6.5 9.06997 6.25 8.65997 5.84C8.24997 5.43 8 4.87 8 4.25C8 3.01 9.01 2 10.25 2H13.75C14.37 2 14.93 2.25 15.34 2.66C15.75 3.07 16 3.63 16 4.25Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
           </div>
         </div>
 
@@ -10635,12 +10635,14 @@ window.PP_FEATURES = {
           </div>
         </div>
 
-        <!-- 검색 + 정렬 -->
+        <!-- 검색 + 정렬 + 교환 내역 -->
         <div style="flex-shrink:0;padding:8px 16px 0;">
           <div style="display:flex;gap:7px;align-items:center;">
             <input placeholder="상품·브랜드 검색" style="flex:1;min-width:0;height:34px;border:1px solid #E4DBFF;border-radius:9px;padding:0 11px;font-size:var(--fs-caption);box-sizing:border-box;">
             <select style="height:34px;min-width:0;flex-shrink:1;border:1px solid #E4DBFF;border-radius:9px;font-size:var(--fs-caption);padding:0 6px;color:var(--text2);"><option>추천순</option><option>가격 낮은순</option><option>가격 높은순</option><option>교환 가능순</option></select>
+            <button onclick="var p=document.getElementById('gx-history');p.style.display=(p.style.display==='block')?'none':'block';" style="height:34px;background:#F1ECFF;border:none;border-radius:9px;font-size:var(--fs-caption);font-weight:700;color:var(--main);padding:0 11px;cursor:pointer;white-space:nowrap;">교환 내역</button>
           </div>
+          <div id="gx-history" style="display:none;margin-top:8px;background:#fff;border:1px solid #EFEAF7;border-radius:10px;overflow:hidden;"><div style="font-size:var(--fs-caption);font-weight:800;color:var(--text1);padding:9px 12px;background:#FAF8FF;">기프티콘 교환 내역</div><div id="gx-history-list"><!-- PP: 실데이터 (gifticon_exchanges) --></div></div>
         </div>
 
         <!-- 카테고리 필터 (고정) -->
@@ -13358,24 +13360,6 @@ window.PP_FEATURES = {
     </div>
   </div>
 
-  <div class="phone-wrap" id="pw-24h" data-screen="10a-h">
-    <div class="phone-label"><span class="num">24h</span>기프티콘 교환 내역<span class="pill-cat">기프티샵</span></div>
-    <div class="phone">
-      <div class="ac-screen">
-        <div class="statusbar"><span>9:41</span><div class="statusbar-icons"><svg width="17" height="12" viewBox="0 0 17 12" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><rect x="0" y="4" width="3" height="8" rx="1"/><rect x="4.5" y="2.5" width="3" height="9.5" rx="1"/><rect x="9" y="1" width="3" height="11" rx="1"/><rect x="13.5" y="0" width="3" height="12" rx="1"/></svg><svg width="16" height="12" viewBox="0 0 16 12" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M8 2.5C10.2 2.5 12.2 3.4 13.6 4.9L15 3.4C13.2 1.5 10.7 0.3 8 0.3C5.3 0.3 2.8 1.5 1 3.4L2.4 4.9C3.8 3.4 5.8 2.5 8 2.5Z"/></svg><svg width="25" height="12" viewBox="0 0 25 12" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="currentColor" stroke-opacity="0.35"/><rect x="2" y="2" width="17" height="8" rx="2" fill="currentColor"/></svg></div></div>
-        <div class="ac-header">
-          <button class="back-btn" data-jump="24"><svg width="22" height="22" viewBox="0 0 18 18" fill="none"><path d="M11.25 15.5L5.96 10.45C5.17 9.65 5.17 8.35 5.96 7.55L11.25 2.66" stroke="currentColor" stroke-width="1.6" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-          <span class="ac-header-title">기프티콘 교환 내역</span>
-          <div style="width:36px"></div>
-        </div>
-        <div style="flex:1;overflow-y:auto;background:var(--bg);">
-          <div id="gx-history-list"><!-- PP: 실데이터 렌더 (gifticon_exchanges) --></div>
-          <div style="height:20px;"></div>
-        </div>
-      </div>
-    </div>
-  </div>
-
 <div class="phone-wrap" id="pw-32" data-screen="06b">
     <div class="phone">
       <div class="activity-screen">
@@ -13446,7 +13430,6 @@ const SCREEN_MAP = {
   'pw-22':          { id:'22',             name:'티켓 & 포인트 교환소' },
   'pw-23':          { id:'23',             name:'적립 조건 안내' },
   'pw-24':          { id:'24',             name:'기프티샵 (카탈로그)' },
-  'pw-24h':         { id:'24h',            name:'기프티콘 교환 내역' },
   'pw-25':          { id:'25',             name:'기프티콘 교환 상세' },
   'pw-26':          { id:'26',             name:'경품 응모' },
   'pw-30':          { id:'30',             name:'마이페이지' },
@@ -13509,7 +13492,6 @@ const FLOW_MAP = [
   ['pw-23', '.back-btn, .close-btn', 'pw-20', '닫기 → 혜택'],
   ['pw-24', '.ex-item',                    'pw-25', '기프티콘 → 25'],
   ['pw-24', '.back-btn, .reward-top-btn',  'pw-20', '뒤로 → 혜택'],
-  ['pw-24h', '.back-btn',                  'pw-24', '뒤로 → 기프티샵'],
   ['pw-25', '.back-btn',                   'pw-24', '뒤로 → 24'],
   ['pw-25', '.btn-primary, .btn-exchange', 'pw-20', '교환완료 → 혜택'],
   ['pw-26', '.back-btn, .reward-top-btn', 'pw-20', '뒤로 → 혜택'],
@@ -17982,7 +17964,7 @@ function onScreenShown(id) {
   if (id === 'pw-34') renderPurchaseHistory();
   if (id === 'pw-21' || id === 'phone19') renderTicketDetail();
   if (id === 'pw-21') renderPointPanel();
-  if (id === 'pw-24h') renderGifticonHistory();
+  if (id === 'pw-24') renderGifticonHistory();
   if (id === 'pw-30-cs') renderInquiries();
   if (id === 'pw-22') { refreshHomeData(); renderGradeSwapScreen(); renderPointTicketExchange(); }
   if (id === 'pw-17') renderStreakMission();
@@ -20445,7 +20427,7 @@ function renderGifticonHistory() {
   ppQuery('gifticon_exchanges', 'user_id', PP.uid).then(function (ex) {
     ex = ex.filter(function (x) { return ppDate(x.exchanged_at); }).sort(function (a, b) { return ppDate(b.exchanged_at) - ppDate(a.exchanged_at); });
     if (!ex.length) {
-      box.innerHTML = ppEmpty('🎁', '아직 교환한 기프티콘이 없어요', '기프티샵에서 티켓으로 교환하면<br>여기에 기록돼요');
+      box.innerHTML = '<div style="padding:18px 12px;text-align:center;font-size:var(--fs-caption);color:var(--text3);">아직 교환한 기프티콘이 없어요</div>';
       return;
     }
     box.innerHTML = ex.map(function (x, i) {
@@ -20455,17 +20437,10 @@ function renderGifticonHistory() {
         if (g) { nm = g.name || g.product_name || nm; brand = g.brand || ''; emoji = g.emoji || emoji; }
       }
       var done = (x.status === 'completed' || x.status === 'issued');
-      var stc = done ? '#1A7A4A' : '#B26A00', stbg = done ? '#E8F7EF' : '#FFF3E0';
-      return '<div data-gx="' + i + '" style="margin:8px 16px;background:#fff;border:1px solid var(--border);border-radius:14px;overflow:hidden;cursor:' + (x.code ? 'pointer' : 'default') + ';">'
-        + '<div style="display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border-bottom:1px solid var(--border);">'
-        + '<div style="display:flex;align-items:center;gap:7px;min-width:0;"><span style="font-size:var(--fs-caption);">' + emoji + '</span>'
-        + '<span style="font-size:var(--fs-caption);font-weight:400;color:var(--text1);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + ppEsc((brand ? brand + ' ' : '') + nm) + '</span></div>'
-        + '<span style="flex-shrink:0;font-size:var(--fs-caption);font-weight:400;color:' + stc + ';background:' + stbg + ';padding:3px 9px;border-radius:20px;">' + (done ? '발급완료' : '처리중') + '</span></div>'
-        + '<div style="padding:12px 14px;">'
-        + '<div style="display:flex;justify-content:space-between;font-size:var(--fs-caption);color:var(--text3);margin-bottom:5px;"><span>교환일</span><span style="color:var(--text2);font-weight:400;">' + ppFmt(ppDate(x.exchanged_at)) + '</span></div>'
-        + '<div style="display:flex;justify-content:space-between;font-size:var(--fs-caption);color:var(--text3);' + (x.code ? 'margin-bottom:5px;' : '') + '"><span>사용 티켓</span><span style="color:var(--text2);font-weight:400;">' + ((GRADE_KO[x.grade_used] || '') + ' ' + (x.count_used || 1) + '장').replace(/^ /, '') + '</span></div>'
-        + (x.code ? '<div style="display:flex;justify-content:space-between;font-size:var(--fs-caption);color:var(--text3);"><span>기프티콘 코드</span><span style="color:var(--main);font-weight:700;">코드 보기 &rsaquo;</span></div>' : '')
-        + '</div></div>';
+      return '<div data-gx="' + i + '" style="padding:10px 12px;border-top:1px solid #F3EFFA;cursor:' + (x.code ? 'pointer' : 'default') + ';"><div style="display:flex;justify-content:space-between;align-items:center;font-size:var(--fs-caption);">'
+        + '<span style="font-weight:400;">' + ppEsc((brand ? brand + ' ' : '') + nm) + '</span>'
+        + '<span style="font-size:var(--fs-caption);font-weight:400;color:' + (done ? '#1f9d57' : '#6b7280') + ';background:' + (done ? '#e6f7ec' : '#f3f4f6') + ';border-radius:8px;padding:2px 7px;">' + (done ? '발급완료' : '처리중') + '</span></div>'
+        + '<div style="font-size:var(--fs-caption);color:var(--text3);margin-top:3px;">' + (GRADE_KO[x.grade_used] || '') + ' ' + (x.count_used || 1) + '장 사용 · ' + ppFmt(ppDate(x.exchanged_at)) + ' 교환' + (x.code ? ' · 코드 보기 ›' : '') + '</div></div>';
     }).join('');
     box.querySelectorAll('[data-gx]').forEach(function (row) {
       row.addEventListener('click', function () {
