@@ -1116,7 +1116,7 @@ textarea.form-input,textarea.terms-editor,.terms-editor{
 <script>
 window.CMS_FEATURES = {
   roulette: false   // 매일 행운 룰렛 · 잭팟 룰렛 (2026-08-27 확정: 구글플레이 App Content: Gambling 대응.
-                    // 행운 룰렛 → 매일 선물 열기, 잭팟 룰렛 → 랜덤 선물 상자 열기로 대체. 숨김이지 삭제가 아니다)
+                    // 행운 룰렛 → 매일 선물 상자 열기, 잭팟 룰렛 → 랜덤 선물 상자 열기로 대체. 숨김이지 삭제가 아니다)
 };
 (function(){
   var f = window.CMS_FEATURES, c = document.body.classList;
@@ -1259,9 +1259,9 @@ window.CMS_FEATURES = {
             <span class="sb-item-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/><path d="M4.5 5.5 6 7"/><path d="M19.5 5.5 18 7"/></svg></span>
             <span class="sb-item-lbl" id="nav-label-jackpot-roulette">잭팟 룰렛</span>
           </button>
-            <button class="sb-item" id="nav-giftbox-daily" data-label="매일 선물 열기" onclick="go('giftbox-daily',this)">
+            <button class="sb-item" id="nav-giftbox-daily" data-label="매일 선물 상자 열기" onclick="go('giftbox-daily',this)">
               <span class="sb-item-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13"/><path d="M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7"/><path d="M7.5 8a2.5 2.5 0 0 1 0-5A4.8 8 0 0 1 12 8a4.8 8 0 0 1 4.5-5 2.5 2.5 0 0 1 0 5"/></svg></span>
-              <span class="sb-item-lbl" id="nav-label-giftbox-daily">매일 선물 열기</span>
+              <span class="sb-item-lbl" id="nav-label-giftbox-daily">매일 선물 상자 열기</span>
             </button>
             <button class="sb-item" id="nav-giftbox-random" data-label="랜덤 선물 상자 열기" onclick="go('giftbox-random',this)">
               <span class="sb-item-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13"/><path d="M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7"/><path d="M7.5 8a2.5 2.5 0 0 1 0-5A4.8 8 0 0 1 12 8a4.8 8 0 0 1 4.5-5 2.5 2.5 0 0 1 0 5"/></svg></span>
@@ -1730,8 +1730,8 @@ window.CMS_FEATURES = {
         <!-- 2026-08-27 확정으로 룰렛 2종이 숨겨져, 안내가 가리키는 화면을 선물 상자 2종으로 바꿨다.
              읽고 쓰는 문서(settings/roulette · settings/jackpot_roulette)는 그대로라 id는 유지한다. -->
         <div class="policy-item">
-          <div class="policy-label">매일 선물 열기 보상 구성</div>
-          <div class="policy-value">보상칸별 티켓 종류·수량<span class="badge badge-gray tv-impact-badge">티켓 · 보상 &gt; 매일 선물 열기</span></div>
+          <div class="policy-label">매일 선물 상자 열기 보상 구성</div>
+          <div class="policy-value">보상칸별 티켓 종류·수량<span class="badge badge-gray tv-impact-badge">티켓 · 보상 &gt; 매일 선물 상자 열기</span></div>
           <div class="policy-desc">선물 상자 보상칸은 운영자가 CMS에서 직접 정하는 값입니다(자동 계산 대상 아님). 티켓 가치를 바꾸면 보상칸 구성도 다시 정해야 합니다.</div>
           <div class="tv-sim-line" id="tv-sim-roulette-daily"></div>
         </div>
@@ -2188,9 +2188,9 @@ window.CMS_FEATURES = {
     </div>
 
 
-    <!-- ── 매일 선물 열기 (무료 · 하루 1회) — 2026-08-25 신설 ── -->
+    <!-- ── 매일 선물 상자 열기 (무료 · 하루 1회) — 2026-08-25 신설 ── -->
     <div class="section" id="sec-giftbox-daily">
-      <div class="info-box"><strong>매일 선물 열기 = 출석(쿠팡 구경하기) 시 1일 1회 무료로 여는 선물 상자</strong> — 보상칸별 보상 내용과 받을 확률을 운영자가 직접 수정합니다. 확률 합계가 100%가 아니면 저장되지 않습니다. 보상칸은 6개 고정이며 보상 유형·수량·확률만 수정합니다. 이벤트 티켓을 쓰는 상자는 <strong>랜덤 선물 상자 열기</strong> 메뉴에서 따로 관리합니다.</div>
+      <div class="info-box"><strong>매일 선물 상자 열기 = 출석(쿠팡 구경하기) 시 1일 1회 무료로 여는 선물 상자</strong> — 보상칸별 보상 내용과 받을 확률을 운영자가 직접 수정합니다. 확률 합계가 100%가 아니면 저장되지 않습니다. 보상칸은 6개 고정이며 보상 유형·수량·확률만 수정합니다. 이벤트 티켓을 쓰는 상자는 <strong>랜덤 선물 상자 열기</strong> 메뉴에서 따로 관리합니다.</div>
       <div class="stats-grid" style="grid-template-columns:repeat(3,1fr)">
         <div class="stat-card purple"><div class="stat-label">이번 달 상자 열기</div><div class="stat-value" id="gbd-stat-spins">—</div><div class="stat-change neutral" id="gbd-stat-spins-sub">실제 연 횟수 집계</div></div>
         <div class="stat-card green"><div class="stat-label">이번 달 지급 총액</div><div class="stat-value" id="gbd-stat-payout">—</div><div class="stat-change neutral" id="gbd-stat-payout-sub">지급완료 건 원화 환산</div></div>
@@ -2254,7 +2254,7 @@ window.CMS_FEATURES = {
 
     <!-- ── 랜덤 선물 상자 열기 (이벤트 티켓 1장 = 1회) — 2026-08-25 신설 ── -->
     <div class="section" id="sec-giftbox-random">
-      <div class="info-box"><strong>랜덤 선물 상자 열기 = 이벤트 티켓 1장으로 1회 여는 선물 상자</strong> — 매일 선물 열기와 구조는 같고 보상 구성·확률만 다릅니다. 보상칸은 6개 고정입니다. 보상칸별 보상 내용과 받을 확률을 운영자가 직접 수정하며, 확률 합계가 100%가 아니면 저장되지 않습니다. 악용 방지 제한(하루 참여 상한 · 이벤트 티켓 일/월 획득 상한)도 아래에서 조정합니다.</div>
+      <div class="info-box"><strong>랜덤 선물 상자 열기 = 이벤트 티켓 1장으로 1회 여는 선물 상자</strong> — 매일 선물 상자 열기와 구조는 같고 보상 구성·확률만 다릅니다. 보상칸은 6개 고정입니다. 보상칸별 보상 내용과 받을 확률을 운영자가 직접 수정하며, 확률 합계가 100%가 아니면 저장되지 않습니다. 악용 방지 제한(하루 참여 상한 · 이벤트 티켓 일/월 획득 상한)도 아래에서 조정합니다.</div>
       <div class="stats-grid" style="grid-template-columns:repeat(3,1fr)">
         <div class="stat-card purple"><div class="stat-label">이번 달 상자 열기</div><div class="stat-value" id="gbr-stat-spins">—</div><div class="stat-change neutral" id="gbr-stat-spins-sub">실제 연 횟수 집계</div></div>
         <div class="stat-card green"><div class="stat-label">이번 달 지급 총액</div><div class="stat-value" id="gbr-stat-payout">—</div><div class="stat-change neutral" id="gbr-stat-payout-sub">지급완료 건 원화 환산</div></div>
@@ -4906,7 +4906,7 @@ const I18N = {
     'nav.ticket-accrual': '티켓 적립 설정', 'page.ticket-accrual.title': '티켓 적립 설정', 'page.ticket-accrual.bc': '티켓 · 보상',
     'nav.roulette-settings': '매일 행운 룰렛', 'page.roulette-settings.title': '매일 행운 룰렛', 'page.roulette-settings.bc': '티켓 · 보상',
     'nav.jackpot-roulette': '잭팟 룰렛', 'page.jackpot-roulette.title': '잭팟 룰렛', 'page.jackpot-roulette.bc': '티켓 · 보상',
-  'nav.giftbox-daily': '매일 선물 열기', 'page.giftbox-daily.title': '매일 선물 열기', 'page.giftbox-daily.bc': '티켓 · 보상',
+  'nav.giftbox-daily': '매일 선물 상자 열기', 'page.giftbox-daily.title': '매일 선물 상자 열기', 'page.giftbox-daily.bc': '티켓 · 보상',
   'nav.giftbox-random': '랜덤 선물 상자 열기', 'page.giftbox-random.title': '랜덤 선물 상자 열기', 'page.giftbox-random.bc': '티켓 · 보상',
     'nav.group.points': '포인트 관리',
     'nav.points': '포인트 내역', 'page.points.title': '포인트 내역', 'page.points.bc': '포인트 관리',
@@ -6573,18 +6573,18 @@ Object.assign(KO2VI,{"답변하기":"Trả lời","답변 수정":"Sửa câu tr
 Object.assign(KO2VI,{"확인중":"Đang kiểm tra","클릭해서 확인중 → 확정 → 숨김 전환":"Nhấn để chuyển Đang kiểm tra → Đã xác nhận → Ẩn"});
 /* 2026-08-27 — 티켓 가치 설정 「영향 범위 안내」가 룰렛 대신 선물 상자 2종을 가리키게 바뀌면서 추가 */
 Object.assign(KO2VI,{
-"매일 선물 열기":"Mở hộp quà mỗi ngày",
+"매일 선물 상자 열기":"Mở hộp quà mỗi ngày",
 "실제 연 횟수 집계":"Tổng hợp số lượt mở thực tế",
 "상자 열기 기록이 없습니다.":"Chưa có lịch sử mở hộp.",
 "매크로로 무제한 여는 것을 막는 상한입니다.":"Trần chặn việc dùng macro mở không giới hạn.",
 "참여 제한 정책을 저장했습니다.":"Đã lưu chính sách giới hạn tham gia.",
 "확정 기본값으로 복원했습니다.":"Đã khôi phục về giá trị mặc định đã chốt.",
 "랜덤 선물 상자 열기":"Mở hộp quà ngẫu nhiên",
-"매일 선물 열기 보상 구성":"Cấu hình phần thưởng Mở hộp quà mỗi ngày",
+"매일 선물 상자 열기 보상 구성":"Cấu hình phần thưởng Mở hộp quà mỗi ngày",
 "랜덤 선물 상자 열기 보상 구성":"Cấu hình phần thưởng Mở hộp quà ngẫu nhiên",
 "보상칸별 티켓 종류·수량":"Loại · số lượng vé theo từng ô thưởng",
 "보상칸별 보상·확률 테이블":"Bảng phần thưởng · xác suất theo từng ô thưởng",
-"티켓 · 보상 > 매일 선물 열기":"Vé · Thưởng > Mở hộp quà mỗi ngày",
+"티켓 · 보상 > 매일 선물 상자 열기":"Vé · Thưởng > Mở hộp quà mỗi ngày",
 "티켓 · 보상 > 랜덤 선물 상자 열기":"Vé · Thưởng > Mở hộp quà ngẫu nhiên",
 "선물 상자 보상칸은 운영자가 CMS에서 직접 정하는 값입니다(자동 계산 대상 아님). 티켓 가치를 바꾸면 보상칸 구성도 다시 정해야 합니다.":"Ô thưởng của hộp quà là giá trị do người vận hành tự đặt trong CMS (không thuộc diện tự động tính). Đổi giá trị vé thì phải đặt lại cấu hình ô thưởng.",
 "랜덤 선물 상자 보상칸도 운영자가 CMS에서 직접 정하는 값입니다(자동 계산 대상 아님). 티켓 가치를 바꾸면 보상칸 구성도 다시 정해야 합니다.":"Ô thưởng của hộp quà ngẫu nhiên cũng là giá trị do người vận hành tự đặt trong CMS (không thuộc diện tự động tính). Đổi giá trị vé thì phải đặt lại cấu hình ô thưởng."
@@ -15737,7 +15737,7 @@ var RLT_KINDS = {
     ]
   },
   giftDaily: {
-    p: 'gbd', name: '매일 선물 열기', doc: 'giftbox_daily', fallbackDoc: 'roulette', live: true, legacyWheel: false,
+    p: 'gbd', name: '매일 선물 상자 열기', doc: 'giftbox_daily', fallbackDoc: 'roulette', live: true, legacyWheel: false,
     defaults: [                              /* 매일 행운 룰렛과 동일 — 1회 기대값 9.9원 */
       { type: 'silver_ticket', qty: 1,   prob: 0.2  },
       { type: 'event_ticket',  qty: 1,   prob: 5    },
