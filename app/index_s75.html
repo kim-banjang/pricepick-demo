@@ -18561,16 +18561,6 @@ function loadGifticons() {
     }).catch(function(e){ console.error('gifticons', e); });
 }
 
-/* 상품 이미지가 깨지면 이모지로 되돌린다 — 이모지가 기본값이고 이미지는 덧입힘이다. */
-var PP_GI_EMOJI_STYLE = 'font-size:48px;display:flex;align-items:center;justify-content:center;line-height:1;';
-function ppGiImgFallback(img) {
-  var box = img.parentNode;
-  if (!box) return;
-  box.setAttribute('style', PP_GI_EMOJI_STYLE);
-  box.textContent = img.getAttribute('data-emoji') || '🎁';
-}
-window.ppGiImgFallback = ppGiImgFallback;
-
 function renderGifticons() {
   var list = PP.gifticonList;
   var grid = document.querySelector('#pw-24 .ex-grid');
@@ -18589,15 +18579,9 @@ function renderGifticons() {
     var cnt = g.required_count || 1;
     var have = PP.tickets[g.required_grade || 'bronze'] || 0;
     var ok = have >= cnt;
-    /* 상품 이미지(CMS 상품 목록에서 등록)가 있으면 이미지, 없으면 이모지 — 이모지 경로는 그대로 남긴다.
-       .ex-img img 규칙(width/height 100% · object-fit:cover)은 데모에 이미 있는 상품 카드 방식 그대로. */
-    var imgUrl = g.image_url || '';
-    var imgBox = imgUrl
-      ? '<div class="ex-img"><img src="' + ppEsc(imgUrl) + '" alt="" loading="lazy" data-emoji="' + ppEsc(emoji) + '" onerror="ppGiImgFallback(this)"></div>'
-      : '<div class="ex-img" style="' + PP_GI_EMOJI_STYLE + '">' + emoji + '</div>';
     return '<div class="ex-item" data-pp-gi="' + i + '" style="cursor:pointer;">'
       + (ok ? '<span class="ex-avail-pill">구매가능</span>' : '')
-      + '<div class="ex-img-wrap">' + imgBox + '</div>'
+      + '<div class="ex-img-wrap"><div class="ex-img" style="font-size:48px;display:flex;align-items:center;justify-content:center;line-height:1;">' + emoji + '</div></div>'
       + '<div class="ex-body">'
       + '<div class="ex-brand">' + (g.brand || '') + '</div>'
       + '<div class="ex-name">' + (g.name || g.product_name || '') + '</div>'

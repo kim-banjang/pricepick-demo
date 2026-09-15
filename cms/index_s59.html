@@ -2387,7 +2387,7 @@ window.CMS_FEATURES = {
     </div>
 
     <div class="section" id="sec-gifticon-products">
-      <div class="info-box">기프티콘 연동 상품 목록입니다. 교환 티켓은 보상정책 기준으로 자동 계산됩니다. 교환 티켓 칩을 클릭하면 수량을, 이미지 칸을 클릭하면 상품 이미지를 수정할 수 있습니다.</div>
+      <div class="info-box">기프티콘 연동 상품 목록입니다. 교환 티켓은 보상정책 기준으로 자동 계산됩니다. 교환 티켓 칩을 클릭하면 수량을 수정할 수 있습니다.</div>
       <div class="toolbar" style="flex-wrap:wrap;gap:8px">
         <select class="filter-sel"><option>전체 카테고리</option><option>커피/음료</option><option>문화/생활</option><option>편의점</option><option>외식</option><option>쇼핑</option></select>
         <select class="filter-sel"><option>전체 상태</option><option>판매중</option><option>품절</option><option>판매중지</option></select>
@@ -2397,7 +2397,7 @@ window.CMS_FEATURES = {
       <div class="card">
         <div class="card-header"><div class="card-title">상품 목록</div><span style="font-size:12px;color:var(--text-2)">총 455개 상품</span></div>
         <table>
-          <thead><tr><th>No</th><th>이미지</th><th>카테고리</th><th>브랜드</th><th>상품명</th><th>상품코드</th><th>판매종료일</th><th>유효기간</th><th>판매 가격</th><th>교환 티켓</th><th>상태</th></tr></thead>
+          <thead><tr><th>No</th><th>카테고리</th><th>브랜드</th><th>상품명</th><th>상품코드</th><th>판매종료일</th><th>유효기간</th><th>판매 가격</th><th>교환 티켓</th><th>상태</th></tr></thead>
           <tbody id="gifticon-tbody"></tbody>
         </table>
         <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 18px;border-top:1px solid var(--border)">
@@ -2416,7 +2416,7 @@ window.CMS_FEATURES = {
           <div style="border:2px dashed var(--border);border-radius:var(--r-md);padding:40px;text-align:center;margin-bottom:20px">
             <div style="font-size:32px;margin-bottom:12px;color:var(--text-3)">↑</div>
             <div style="font-size:14px;font-weight:600;margin-bottom:6px">CSV 파일을 선택하세요</div>
-            <div style="font-size:12px;color:var(--text-2);margin-bottom:16px">지원 형식: .csv (헤더: 상품코드,브랜드,상품명,이모지,카테고리,등급,필요장수,유효일수,이미지경로)</div>
+            <div style="font-size:12px;color:var(--text-2);margin-bottom:16px">지원 형식: .csv (헤더: 상품코드,브랜드,상품명,이모지,카테고리,등급,필요장수,유효일수)</div>
             <input type="file" id="gi-bulk-file" accept=".csv" style="display:none" onchange="giBulkFileSelected(this)">
             <button class="btn btn-primary" onclick="document.getElementById('gi-bulk-file').click()">파일 선택</button>
             <div id="gi-bulk-filename" style="margin-top:10px;font-size:12px;color:var(--text-2)"></div>
@@ -2424,7 +2424,7 @@ window.CMS_FEATURES = {
           <div id="gi-bulk-preview" style="display:none;margin-bottom:16px">
             <div style="font-size:13px;font-weight:600;margin-bottom:8px" id="gi-bulk-preview-title"></div>
             <div style="max-height:240px;overflow:auto;border:1px solid var(--border);border-radius:var(--r-md)">
-              <table><thead><tr><th>상품코드</th><th>브랜드</th><th>상품명</th><th>등급</th><th>필요장수</th><th>이미지경로</th></tr></thead><tbody id="gi-bulk-preview-tbody"></tbody></table>
+              <table><thead><tr><th>상품코드</th><th>브랜드</th><th>상품명</th><th>등급</th><th>필요장수</th></tr></thead><tbody id="gi-bulk-preview-tbody"></tbody></table>
             </div>
             <button class="btn btn-primary" style="margin-top:12px" id="gi-bulk-submit-btn" onclick="giBulkSubmit()">일괄 등록 실행</button>
           </div>
@@ -5335,46 +5335,6 @@ function giOpenTicketEdit(id) {
   openModal('m-ticket-edit');
 }
 
-/* ── 상품 이미지 등록·수정 (상품 목록의 섬네일 칸에서 실행) ──
-   실제 기프티콘 공급사 API 연동 전까지 쓰는 시연용 이미지 경로다.
-   저장소에 넣은 파일 경로(/app/assets/gifticon/…)를 넣는다. 비우면 이모지로 돌아간다. */
-function giOpenImageEdit(id) {
-  var g = GIFTICON_PRODUCTS_CACHE[id];
-  if (!g) return;
-  document.getElementById('gie-doc-id').value = id;
-  document.getElementById('gie-name').textContent = (g.emoji || '') + ' ' + (g.name || g.product_name || '');
-  document.getElementById('gie-url-input').value = g.image_url || '';
-  giImagePreview();
-  openModal('m-gi-image');
-}
-window.giOpenImageEdit = giOpenImageEdit;
-
-function giImagePreview() {
-  var url = (document.getElementById('gie-url-input') || {}).value || '';
-  var box = document.getElementById('gie-preview');
-  if (!box) return;
-  box.innerHTML = url
-    ? '<img src="' + ppEsc(url) + '" alt="" style="width:100%;height:100%;object-fit:cover;display:block;">'
-    : '<span style="font-size:13px;color:var(--text-3)">이미지 없음 — 앱에서 이모지로 표시됩니다</span>';
-}
-window.giImagePreview = giImagePreview;
-
-function giSaveImageEdit() {
-  var id = document.getElementById('gie-doc-id').value;
-  if (!id) return;
-  var url = (document.getElementById('gie-url-input').value || '').trim();
-  window.db.collection('gifticons').doc(id).update({
-    image_url: url || null,
-    updated_at: window.FS.FieldValue.serverTimestamp(),
-  }).then(function() {
-    toast(url ? '상품 이미지를 저장했습니다.' : '상품 이미지를 비웠습니다(이모지로 표시).');
-    logAdmin('기프티콘 상품 이미지 수정: ' + id + ' → ' + (url || '(비움)'));
-    closeModal('m-gi-image');
-    loadGifticonProducts();
-  }).catch(function(e) { toast('저장 실패: ' + (e.message || e)); });
-}
-window.giSaveImageEdit = giSaveImageEdit;
-
 function giSaveTicketEdit() {
   var id = document.getElementById('te-doc-id').value;
   if (!id) return;
@@ -5394,36 +5354,6 @@ function giSaveTicketEdit() {
 }
 
 </script>
-
-<!-- 상품 이미지 등록·수정 모달 -->
-<div class="modal-overlay" id="m-gi-image">
-  <div class="modal" style="width:440px">
-    <div class="modal-header">
-      <div class="modal-title">상품 이미지</div>
-      <button class="modal-close" onclick="closeModal('m-gi-image')"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
-    </div>
-    <div class="modal-body" style="display:flex;flex-direction:column;gap:16px">
-      <input type="hidden" id="gie-doc-id">
-      <div>
-        <div style="font-size:12px;color:var(--text-2);margin-bottom:4px">상품명</div>
-        <div id="gie-name" style="font-size:14px;font-weight:600"></div>
-      </div>
-      <div>
-        <div style="font-size:12px;color:var(--text-2);margin-bottom:4px">이미지 경로</div>
-        <input class="form-input" id="gie-url-input" type="text" placeholder="/app/assets/gifticon/ediya-americano.jpg" oninput="giImagePreview()">
-        <div style="font-size:11px;color:var(--text-3);margin-top:6px">저장소에 올린 파일 경로를 넣습니다. 비우면 이모지로 표시됩니다.</div>
-      </div>
-      <div>
-        <div style="font-size:12px;color:var(--text-2);margin-bottom:4px">미리보기</div>
-        <div id="gie-preview" style="width:120px;height:120px;border:1px solid var(--border);border-radius:var(--r-md);overflow:hidden;display:flex;align-items:center;justify-content:center;text-align:center;padding:6px;background:var(--surface-2)"></div>
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="closeModal('m-gi-image')">취소</button>
-      <button class="btn btn-primary" onclick="giSaveImageEdit()">저장</button>
-    </div>
-  </div>
-</div>
 
 <!-- 교환 티켓 수정 모달 -->
 <div class="modal-overlay" id="m-ticket-edit">
@@ -6635,7 +6565,7 @@ Object.assign(KO2VI, {"카카오 연동 회원과 미연동(게스트) 회원이
 Object.assign(KO2VI,{"전체 거래유형":"Tất cả loại giao dịch","구매 대기(등급 미정)":"Chờ mua (chưa định hạng)","출석 보너스":"Thưởng điểm danh","룰렛 당첨":"Trúng vòng quay","카카오 연동 보상":"Thưởng liên kết Kakao","기프티콘 사용":"Sử dụng Gifticon","경품 응모":"Dự thưởng quà","포인트 전환":"Chuyển đổi điểm","등급 전환":"Chuyển hạng","관리자 환수":"Admin thu hồi","환불(취소·반품)":"Hoàn tiền (hủy·trả hàng)","꽝":"Trượt","이벤트티켓":"Vé sự kiện","출석(쿠팡 구경하기)":"Điểm danh (Dạo Coupang)","매일 행운 룰렛 당첨":"Trúng vòng quay may mắn hằng ngày","티켓→포인트 전환":"Chuyển vé→điểm","포인트→티켓 전환":"Chuyển điểm→vé","전체 기간":"Toàn bộ thời gian","사용완료":"Đã sử dụng","취소됨":"Đã hủy","기프티콘 문의":"Hỏi đáp Gifticon","정상(확정)":"Bình thường (đã xác nhận)","대기":"Chờ","환불":"Hoàn tiền"});
 /* ── i18n 보강 (2026-07-21) — VI 전환 시 한국어로 남던 문구 ── */
 Object.assign(KO2VI,{"이벤트 티켓 일 획득 상한":"Giới hạn nhận vé sự kiện mỗi ngày","장 / 1일":"vé / 1 ngày","회원 1명이 하루에 받을 수 있는 이벤트 티켓 총량입니다. 적립 정책의 하루 5건 한도와 같은 기준입니다.":"Tổng số vé sự kiện 1 hội viên có thể nhận trong một ngày. Cùng chuẩn với hạn mức 5 lượt/ngày của chính sách tích lũy.","일 획득 상한이 월 획득 상한보다 큽니다.":"Giới hạn ngày lớn hơn giới hạn tháng."});
-Object.assign(KO2VI,{"매일 행운 룰렛 설정":"Cài đặt vòng quay may mắn hằng ngày","어뷰징 모니터링":"Giám sát lạm dụng","개발용":"Dùng cho phát triển","데이터 관리(개발용)":"Quản lý dữ liệu (dùng cho phát triển)","순수익 (추정)":"Lợi nhuận ròng (ước tính)","실집계":"Tổng hợp thực tế","포스트백 확정 기준":"Theo chuẩn postback đã xác nhận","교환 마진":"Biên đổi thưởng","실데이터":"Dữ liệu thật","발행 티켓 (누적 적립)":"Vé đã phát hành (tích lũy)","적립 확정 기준":"Theo chuẩn tích lũy đã xác nhận","미처리 상태":"Trạng thái chưa xử lý","마감 후 미처리":"Đã đóng nhưng chưa xử lý","운영 데이터 없음":"Không có dữ liệu vận hành","운영 누적 데이터 없음 (시계열 집계는 실서비스 운영 후 표시)":"Không có dữ liệu vận hành tích lũy (tổng hợp theo chuỗi thời gian sẽ hiển thị sau khi vận hành dịch vụ thật)","실행 이력 없음 (배치 스케줄러 미가동)":"Không có lịch sử chạy (batch scheduler chưa hoạt động)","닉네임 / 카카오톡 ID / 식별 아이디":"Biệt danh / Kakao ID / ID định danh","총 매출":"Tổng doanh thu","포스트백 + 교환 마진":"Postback + biên đổi thưởng","확정 정산 (집계)":"Quyết toán đã xác nhận (tổng hợp)","집계":"Tổng hợp","포스트백 기준":"Theo chuẩn postback","누적 수익":"Doanh thu tích lũy","차액 사유":"Lý do chênh lệch","—  차이 발생 원인: 환불 누락 · 포스트백 미수신 · 제휴몰별 수수료율 변경 · 부정거래 검증 지연. (실제 차액 데이터는 제휴몰 정산 확정 후 표시)":"—  Nguyên nhân phát sinh chênh lệch: bỏ sót hoàn tiền · không nhận được postback · thay đổi tỷ lệ hoa hồng theo từng cửa hàng LK · chậm xác minh giao dịch gian lận. (Dữ liệu chênh lệch thật sẽ hiển thị sau khi chốt quyết toán với cửa hàng LK)","총":"Tổng","누적 발행 (적립)":"Tổng phát hành (tích lũy)","티켓 소모":"Tiêu dùng vé","전체 원장 레코드":"Toàn bộ bản ghi sổ cái","유효기간 경과":"Quá thời hạn sử dụng","취소·반품":"Hủy·Trả hàng","오늘 기준":"Tính đến hôm nay","매일 행운 룰렛 = 포인트·이벤트티켓을 확률로 지급":"Vòng quay may mắn = cấp điểm·vé sự kiện theo xác suất","— 확률·배분은 정책상 미결이라 운영자가 직접 정합니다. 룰렛은 6칸이며 각 칸을 균등 확률(1/6)로 추첨합니다. 여기서 저장한 설정을 앱이 그대로 읽어 룰렛을 렌더링하고 당첨 보상을 지급합니다.":"— Xác suất·phân bổ chưa chốt trong chính sách nên Vận hành viên tự quyết định. Vòng quay có 6 ô và mỗi ô được quay với xác suất đều nhau (1/6). App đọc nguyên cài đặt lưu ở đây để render vòng quay và cấp thưởng trúng.","룰렛 6칸 설정":"Cài đặt 6 ô vòng quay","칸":"Ô","값":"Giá trị","1칸":"Ô 1","2칸":"Ô 2","3칸":"Ô 3","4칸":"Ô 4","5칸":"Ô 5","6칸":"Ô 6","저장된 설정을 불러왔습니다.":"Đã tải cài đặt đã lưu.","장수":"Số vé","P 액수":"Số điểm P","누적 사용·차감":"Tích lũy sử dụng·trừ","닉네임 또는 취소사유 검색":"Tìm biệt danh hoặc lý do hủy","CSV 파일로 상품 설명을 일괄 등록·수정합니다. 상품코드가 일치하는 항목은 덮어쓰기됩니다.":"Đăng ký·sửa hàng loạt mô tả sản phẩm bằng file CSV. Mục có mã sản phẩm trùng khớp sẽ bị ghi đè.","(CSV만 지원)":"(chỉ hỗ trợ CSV)","CSV 파일을 선택하세요":"Hãy chọn file CSV","지원 형식: .csv (헤더: 상품코드,브랜드,상품명,이모지,카테고리,등급,필요장수,유효일수,이미지경로)":"Định dạng hỗ trợ: .csv (header: mã sản phẩm, thương hiệu, tên sản phẩm, emoji, danh mục, hạng, số vé cần, số ngày hiệu lực, đường dẫn ảnh)","홈 상단 슬라이드 · 카드 순서 드래그로 노출 순서 변경":"Slide đầu trang chủ · kéo thứ tự thẻ để đổi thứ tự hiển thị","전체 공지":"Thông báo toàn bộ","등록 누적":"Tổng đã đăng ký","열람 추적 미구현":"Chưa triển khai theo dõi lượt xem","데모 범위 밖":"Ngoài phạm vi demo","— 실제 FCM/카카오 알림톡 발송 연동은 없고, 발송 내역만 DB에 기록됩니다(대상 인원은 실집계).":"— Không có kết nối gửi FCM/Kakao AlimTalk thật, chỉ ghi lịch sử gửi vào DB (số người nhận là số liệu tổng hợp thật).","답변 완료 기준":"Theo chuẩn đã trả lời xong","닉네임, 제목 검색...":"Tìm biệt danh, tiêu đề...","— 회원이 앱 \"마이 → 계정탈퇴\" 누르면":"— Khi hội viên bấm \"Của tôi → Hủy tài khoản\" trong app thì","그 자리에서 즉시 처리":"xử lý ngay tại chỗ","됩니다(유예·철회 기간 없음). 개인정보는 즉시 삭제되고 회원 문서(레코드)는 유지됩니다. 처리 누락 시 개인정보보호법 위반 소지.":"(không có thời gian ân hạn·rút lại). Thông tin cá nhân được xóa ngay và bản ghi hội viên vẫn được giữ. Bỏ sót xử lý có thể vi phạm Luật bảo vệ thông tin cá nhân.","0명":"0 người","누적 탈퇴 회원":"Tổng hội viên đã hủy","탈퇴 확인":"Xác nhận hủy","앱 마이탭 → 최종 확인":"Tab Của tôi trong app → xác nhận cuối","상태 전환 · 개인정보 삭제 · 기기 로컬데이터 삭제":"Chuyển trạng thái · xóa thông tin cá nhân · xóa dữ liệu cục bộ trên thiết bị","거래 기록 존치":"Giữ lại bản ghi giao dịch","티켓·결제 기록은 레코드 유지 · 5년 보관":"Bản ghi vé·thanh toán được giữ lại · lưu 5 năm","탈퇴 회원 목록":"Danh sách hội viên đã hủy","가입 유형(탈퇴 전)":"Loại đăng ký (trước khi hủy)","탈퇴일시":"Thời điểm hủy","처리 방식":"Cách xử lý","즉시 처리 (유예·철회 없음)":"Xử lý ngay (không ân hạn·không rút lại)","확인 즉시 회원 상태가 '탈퇴'로 전환, 재로그인·복구 불가":"Xác nhận xong là chuyển ngay trạng thái hội viên sang 'đã hủy', không thể đăng nhập lại·khôi phục","개인정보 삭제 항목":"Mục xóa thông tin cá nhân","닉네임, 카카오 닉네임, 카카오 로그인ID":"Biệt danh, biệt danh Kakao, ID đăng nhập Kakao","탈퇴 즉시 제거 (레코드는 유지)":"Xóa ngay khi hủy (bản ghi vẫn giữ)","거래·정산 기록":"Bản ghi giao dịch·quyết toán","DB에 그대로 존치":"Giữ nguyên trong DB","개인정보 없이 회원 식별번호로만 연결 · 전자상거래법 5년 보존":"Chỉ liên kết bằng mã định danh hội viên, không có thông tin cá nhân · lưu 5 năm theo luật TMĐT","식별 아이디 검색...":"Tìm ID định danh...","어뷰징·이상적립 모니터링":"Giám sát lạm dụng·tích lũy bất thường","— 적립형 서비스 부정 사용(다계정·부정적립·환불 어뷰징)을 탐지합니다. 환불 포스트백·정지 계정·티켓 환수 기록을 실시간 집계합니다.":"— Phát hiện việc lạm dụng dịch vụ tích lũy (đa tài khoản·tích lũy gian lận·lạm dụng hoàn tiền). Tổng hợp thời gian thực các bản ghi postback hoàn tiền·tài khoản bị đình chỉ·thu hồi vé.","이상 징후 계정":"Tài khoản có dấu hiệu bất thường","중복 제거":"Đã khử trùng lặp","환불 어뷰징":"Lạm dụng hoàn tiền","환불 포스트백":"Postback hoàn tiền","정지 계정":"Tài khoản bị đình chỉ","운영자 차단":"Admin chặn","티켓 환수":"Thu hồi vé","탐지 케이스":"Trường hợp phát hiện","환불 어뷰징 · 정지 계정 · 티켓 환수 — 최신순":"Lạm dụng hoàn tiền · tài khoản bị đình chỉ · thu hồi vé — mới nhất trước","근거":"Căn cứ","닉네임, 주문번호 검색...":"Tìm biệt danh, mã đơn hàng...","배포 이력 없음":"Không có lịch sử phát hành","키/상태 수정":"Sửa khóa/trạng thái","운영자 수동 갱신 (실제 API 호출 없음)":"Vận hành viên cập nhật thủ công (không gọi API thật)","오늘 사용: 운영 데이터 없음":"Dùng hôm nay: không có dữ liệu vận hành","실제 API 호출 로그 연동 없음":"Không kết nối log gọi API thật","— 실제 정기 실행 엔진은 없습니다. 일시정지/재시작/즉시 실행은 상태·로그를 예약 작업 기록에 실제로 남기는 것까지만 동작합니다.":"— Không có engine chạy định kỳ thật. Tạm dừng/khởi động lại/chạy ngay chỉ hoạt động đến mức ghi thật trạng thái·nhật ký vào bản ghi tác vụ hẹn giờ.","시스템 정의 배치 — 생성·삭제 없음 · 활성/비활성 토글·즉시 실행만 제공":"Batch do hệ thống định nghĩa — không tạo·xóa · chỉ cung cấp toggle bật/tắt·chạy ngay","실행 로그 없음 (배치 스케줄러 미가동)":"Không có log chạy (batch scheduler chưa hoạt động)","VIN 화면 구성예정":"VIN sẽ dựng màn hình","데이터 관리 (개발용)":"Quản lý dữ liệu (dùng cho phát triển)","문의":"Hỏi đáp","교환이력":"Lịch sử đổi","포인트원장":"Sổ cái điểm","클릭":"Click","티켓원장":"Sổ cái vé","초대":"Mời","방문":"Truy cập","시나리오 채우기":"Đổ dữ liệu kịch bản","새로고침":"Làm mới","전체 비우기":"Xóa toàn bộ","[시나리오 채우기]는":"[Đổ dữ liệu kịch bản] sẽ","(scripts/seed-demo.js로 등록)에 등록된 가상 손님대로 데이터를 생성합니다. [전체 비우기]는 가상 데이터만 삭제하고\n          운영 뼈대(관리자 계정 firstadmin · 마스터 데이터 · 기프티콘 상품 · 배너 · 공지 · 시나리오 정의)는 보존합니다.":"(đăng ký qua scripts/seed-demo.js) tạo dữ liệu đúng theo các khách ảo đã đăng ký. [Xóa toàn bộ] chỉ xóa dữ liệu ảo và\n          giữ lại bộ khung vận hành (tài khoản quản trị firstadmin · dữ liệu master · sản phẩm Gifticon · banner · thông báo · định nghĩa kịch bản).","문서 추가 — users":"Thêm document — users","카카오연동":"Liên kết Kakao","카카오 닉네임":"Biệt danh Kakao","카카오 로그인 ID":"ID đăng nhập Kakao","+ 추가":"+ Thêm","오류: Missing or insufficient permissions.":"Lỗi: Missing or insufficient permissions."});
+Object.assign(KO2VI,{"매일 행운 룰렛 설정":"Cài đặt vòng quay may mắn hằng ngày","어뷰징 모니터링":"Giám sát lạm dụng","개발용":"Dùng cho phát triển","데이터 관리(개발용)":"Quản lý dữ liệu (dùng cho phát triển)","순수익 (추정)":"Lợi nhuận ròng (ước tính)","실집계":"Tổng hợp thực tế","포스트백 확정 기준":"Theo chuẩn postback đã xác nhận","교환 마진":"Biên đổi thưởng","실데이터":"Dữ liệu thật","발행 티켓 (누적 적립)":"Vé đã phát hành (tích lũy)","적립 확정 기준":"Theo chuẩn tích lũy đã xác nhận","미처리 상태":"Trạng thái chưa xử lý","마감 후 미처리":"Đã đóng nhưng chưa xử lý","운영 데이터 없음":"Không có dữ liệu vận hành","운영 누적 데이터 없음 (시계열 집계는 실서비스 운영 후 표시)":"Không có dữ liệu vận hành tích lũy (tổng hợp theo chuỗi thời gian sẽ hiển thị sau khi vận hành dịch vụ thật)","실행 이력 없음 (배치 스케줄러 미가동)":"Không có lịch sử chạy (batch scheduler chưa hoạt động)","닉네임 / 카카오톡 ID / 식별 아이디":"Biệt danh / Kakao ID / ID định danh","총 매출":"Tổng doanh thu","포스트백 + 교환 마진":"Postback + biên đổi thưởng","확정 정산 (집계)":"Quyết toán đã xác nhận (tổng hợp)","집계":"Tổng hợp","포스트백 기준":"Theo chuẩn postback","누적 수익":"Doanh thu tích lũy","차액 사유":"Lý do chênh lệch","—  차이 발생 원인: 환불 누락 · 포스트백 미수신 · 제휴몰별 수수료율 변경 · 부정거래 검증 지연. (실제 차액 데이터는 제휴몰 정산 확정 후 표시)":"—  Nguyên nhân phát sinh chênh lệch: bỏ sót hoàn tiền · không nhận được postback · thay đổi tỷ lệ hoa hồng theo từng cửa hàng LK · chậm xác minh giao dịch gian lận. (Dữ liệu chênh lệch thật sẽ hiển thị sau khi chốt quyết toán với cửa hàng LK)","총":"Tổng","누적 발행 (적립)":"Tổng phát hành (tích lũy)","티켓 소모":"Tiêu dùng vé","전체 원장 레코드":"Toàn bộ bản ghi sổ cái","유효기간 경과":"Quá thời hạn sử dụng","취소·반품":"Hủy·Trả hàng","오늘 기준":"Tính đến hôm nay","매일 행운 룰렛 = 포인트·이벤트티켓을 확률로 지급":"Vòng quay may mắn = cấp điểm·vé sự kiện theo xác suất","— 확률·배분은 정책상 미결이라 운영자가 직접 정합니다. 룰렛은 6칸이며 각 칸을 균등 확률(1/6)로 추첨합니다. 여기서 저장한 설정을 앱이 그대로 읽어 룰렛을 렌더링하고 당첨 보상을 지급합니다.":"— Xác suất·phân bổ chưa chốt trong chính sách nên Vận hành viên tự quyết định. Vòng quay có 6 ô và mỗi ô được quay với xác suất đều nhau (1/6). App đọc nguyên cài đặt lưu ở đây để render vòng quay và cấp thưởng trúng.","룰렛 6칸 설정":"Cài đặt 6 ô vòng quay","칸":"Ô","값":"Giá trị","1칸":"Ô 1","2칸":"Ô 2","3칸":"Ô 3","4칸":"Ô 4","5칸":"Ô 5","6칸":"Ô 6","저장된 설정을 불러왔습니다.":"Đã tải cài đặt đã lưu.","장수":"Số vé","P 액수":"Số điểm P","누적 사용·차감":"Tích lũy sử dụng·trừ","닉네임 또는 취소사유 검색":"Tìm biệt danh hoặc lý do hủy","CSV 파일로 상품 설명을 일괄 등록·수정합니다. 상품코드가 일치하는 항목은 덮어쓰기됩니다.":"Đăng ký·sửa hàng loạt mô tả sản phẩm bằng file CSV. Mục có mã sản phẩm trùng khớp sẽ bị ghi đè.","(CSV만 지원)":"(chỉ hỗ trợ CSV)","CSV 파일을 선택하세요":"Hãy chọn file CSV","지원 형식: .csv (헤더: 상품코드,브랜드,상품명,이모지,카테고리,등급,필요장수,유효일수)":"Định dạng hỗ trợ: .csv (header: mã sản phẩm, thương hiệu, tên sản phẩm, emoji, danh mục, hạng, số vé cần, số ngày hiệu lực)","홈 상단 슬라이드 · 카드 순서 드래그로 노출 순서 변경":"Slide đầu trang chủ · kéo thứ tự thẻ để đổi thứ tự hiển thị","전체 공지":"Thông báo toàn bộ","등록 누적":"Tổng đã đăng ký","열람 추적 미구현":"Chưa triển khai theo dõi lượt xem","데모 범위 밖":"Ngoài phạm vi demo","— 실제 FCM/카카오 알림톡 발송 연동은 없고, 발송 내역만 DB에 기록됩니다(대상 인원은 실집계).":"— Không có kết nối gửi FCM/Kakao AlimTalk thật, chỉ ghi lịch sử gửi vào DB (số người nhận là số liệu tổng hợp thật).","답변 완료 기준":"Theo chuẩn đã trả lời xong","닉네임, 제목 검색...":"Tìm biệt danh, tiêu đề...","— 회원이 앱 \"마이 → 계정탈퇴\" 누르면":"— Khi hội viên bấm \"Của tôi → Hủy tài khoản\" trong app thì","그 자리에서 즉시 처리":"xử lý ngay tại chỗ","됩니다(유예·철회 기간 없음). 개인정보는 즉시 삭제되고 회원 문서(레코드)는 유지됩니다. 처리 누락 시 개인정보보호법 위반 소지.":"(không có thời gian ân hạn·rút lại). Thông tin cá nhân được xóa ngay và bản ghi hội viên vẫn được giữ. Bỏ sót xử lý có thể vi phạm Luật bảo vệ thông tin cá nhân.","0명":"0 người","누적 탈퇴 회원":"Tổng hội viên đã hủy","탈퇴 확인":"Xác nhận hủy","앱 마이탭 → 최종 확인":"Tab Của tôi trong app → xác nhận cuối","상태 전환 · 개인정보 삭제 · 기기 로컬데이터 삭제":"Chuyển trạng thái · xóa thông tin cá nhân · xóa dữ liệu cục bộ trên thiết bị","거래 기록 존치":"Giữ lại bản ghi giao dịch","티켓·결제 기록은 레코드 유지 · 5년 보관":"Bản ghi vé·thanh toán được giữ lại · lưu 5 năm","탈퇴 회원 목록":"Danh sách hội viên đã hủy","가입 유형(탈퇴 전)":"Loại đăng ký (trước khi hủy)","탈퇴일시":"Thời điểm hủy","처리 방식":"Cách xử lý","즉시 처리 (유예·철회 없음)":"Xử lý ngay (không ân hạn·không rút lại)","확인 즉시 회원 상태가 '탈퇴'로 전환, 재로그인·복구 불가":"Xác nhận xong là chuyển ngay trạng thái hội viên sang 'đã hủy', không thể đăng nhập lại·khôi phục","개인정보 삭제 항목":"Mục xóa thông tin cá nhân","닉네임, 카카오 닉네임, 카카오 로그인ID":"Biệt danh, biệt danh Kakao, ID đăng nhập Kakao","탈퇴 즉시 제거 (레코드는 유지)":"Xóa ngay khi hủy (bản ghi vẫn giữ)","거래·정산 기록":"Bản ghi giao dịch·quyết toán","DB에 그대로 존치":"Giữ nguyên trong DB","개인정보 없이 회원 식별번호로만 연결 · 전자상거래법 5년 보존":"Chỉ liên kết bằng mã định danh hội viên, không có thông tin cá nhân · lưu 5 năm theo luật TMĐT","식별 아이디 검색...":"Tìm ID định danh...","어뷰징·이상적립 모니터링":"Giám sát lạm dụng·tích lũy bất thường","— 적립형 서비스 부정 사용(다계정·부정적립·환불 어뷰징)을 탐지합니다. 환불 포스트백·정지 계정·티켓 환수 기록을 실시간 집계합니다.":"— Phát hiện việc lạm dụng dịch vụ tích lũy (đa tài khoản·tích lũy gian lận·lạm dụng hoàn tiền). Tổng hợp thời gian thực các bản ghi postback hoàn tiền·tài khoản bị đình chỉ·thu hồi vé.","이상 징후 계정":"Tài khoản có dấu hiệu bất thường","중복 제거":"Đã khử trùng lặp","환불 어뷰징":"Lạm dụng hoàn tiền","환불 포스트백":"Postback hoàn tiền","정지 계정":"Tài khoản bị đình chỉ","운영자 차단":"Admin chặn","티켓 환수":"Thu hồi vé","탐지 케이스":"Trường hợp phát hiện","환불 어뷰징 · 정지 계정 · 티켓 환수 — 최신순":"Lạm dụng hoàn tiền · tài khoản bị đình chỉ · thu hồi vé — mới nhất trước","근거":"Căn cứ","닉네임, 주문번호 검색...":"Tìm biệt danh, mã đơn hàng...","배포 이력 없음":"Không có lịch sử phát hành","키/상태 수정":"Sửa khóa/trạng thái","운영자 수동 갱신 (실제 API 호출 없음)":"Vận hành viên cập nhật thủ công (không gọi API thật)","오늘 사용: 운영 데이터 없음":"Dùng hôm nay: không có dữ liệu vận hành","실제 API 호출 로그 연동 없음":"Không kết nối log gọi API thật","— 실제 정기 실행 엔진은 없습니다. 일시정지/재시작/즉시 실행은 상태·로그를 예약 작업 기록에 실제로 남기는 것까지만 동작합니다.":"— Không có engine chạy định kỳ thật. Tạm dừng/khởi động lại/chạy ngay chỉ hoạt động đến mức ghi thật trạng thái·nhật ký vào bản ghi tác vụ hẹn giờ.","시스템 정의 배치 — 생성·삭제 없음 · 활성/비활성 토글·즉시 실행만 제공":"Batch do hệ thống định nghĩa — không tạo·xóa · chỉ cung cấp toggle bật/tắt·chạy ngay","실행 로그 없음 (배치 스케줄러 미가동)":"Không có log chạy (batch scheduler chưa hoạt động)","VIN 화면 구성예정":"VIN sẽ dựng màn hình","데이터 관리 (개발용)":"Quản lý dữ liệu (dùng cho phát triển)","문의":"Hỏi đáp","교환이력":"Lịch sử đổi","포인트원장":"Sổ cái điểm","클릭":"Click","티켓원장":"Sổ cái vé","초대":"Mời","방문":"Truy cập","시나리오 채우기":"Đổ dữ liệu kịch bản","새로고침":"Làm mới","전체 비우기":"Xóa toàn bộ","[시나리오 채우기]는":"[Đổ dữ liệu kịch bản] sẽ","(scripts/seed-demo.js로 등록)에 등록된 가상 손님대로 데이터를 생성합니다. [전체 비우기]는 가상 데이터만 삭제하고\n          운영 뼈대(관리자 계정 firstadmin · 마스터 데이터 · 기프티콘 상품 · 배너 · 공지 · 시나리오 정의)는 보존합니다.":"(đăng ký qua scripts/seed-demo.js) tạo dữ liệu đúng theo các khách ảo đã đăng ký. [Xóa toàn bộ] chỉ xóa dữ liệu ảo và\n          giữ lại bộ khung vận hành (tài khoản quản trị firstadmin · dữ liệu master · sản phẩm Gifticon · banner · thông báo · định nghĩa kịch bản).","문서 추가 — users":"Thêm document — users","카카오연동":"Liên kết Kakao","카카오 닉네임":"Biệt danh Kakao","카카오 로그인 ID":"ID đăng nhập Kakao","+ 추가":"+ Thêm","오류: Missing or insufficient permissions.":"Lỗi: Missing or insufficient permissions."});
 /* ── i18n 보강 (2026-07-21 재질문 답변 반영) — 탈퇴 정책·탈퇴 상세·공지 관리 UI 변경 ── */
 Object.assign(KO2VI,{"안내":"Hướng dẫn","탈퇴 정책 안내":"Hướng dẫn chính sách hủy TK","고정 정책 — 운영자가 수정할 수 없습니다.":"Chính sách cố định — quản trị viên không thể sửa.","탈퇴 즉시 제거 (레코드는 유지, 고정 정책)":"Xóa ngay khi hủy (bản ghi vẫn giữ, chính sách cố định)","탈퇴 회원 상세":"Chi tiết hội viên đã hủy","식별 아이디":"ID định danh","탈퇴 완료 (즉시 처리 · 유예 없음)":"Đã hủy hoàn tất (xử lý ngay · không ân hạn)","개인정보 처리":"Xử lý thông tin cá nhân","닉네임·카카오 식별값 삭제됨":"Nickname·mã định danh Kakao đã được xóa","레코드는 유지, 거래 기록 참조 무결성 보호":"Bản ghi vẫn giữ, bảo vệ tính toàn vẹn tham chiếu lịch sử giao dịch","공지 수정":"Sửa thông báo"});
 Object.assign(KO2VI,{"답변하기":"Trả lời","답변 수정":"Sửa câu trả lời","작성자":"Người viết","문의를 삭제했습니다.":"Đã xóa hỏi đáp.","공지가 삭제되었습니다.":"Đã xóa thông báo.","공지가 수정되었습니다.":"Thông báo đã được sửa.","공지가 게시되었습니다.":"Thông báo đã được đăng.","제목과 내용을 입력하세요.":"Hãy nhập tiêu đề và nội dung.","작성일":"Ngày viết"});
@@ -7175,11 +7105,6 @@ Object.assign(KO2VI,{
         <label style="font-size:12px;font-weight:600;color:var(--text-2);display:block;margin-bottom:5px;">유효기간 (일)</label>
         <input id="pp-gi-validity" class="form-input" type="number" min="1" max="365" value="90" placeholder="발급 후 유효 일수">
       </div>
-      <div style="grid-column:1/-1;">
-        <label style="font-size:12px;font-weight:600;color:var(--text-2);display:block;margin-bottom:5px;">상품 이미지 경로</label>
-        <input id="pp-gi-image" class="form-input" type="text" placeholder="/app/assets/gifticon/ediya-americano.jpg">
-        <div style="font-size:11px;color:var(--text-3);margin-top:5px;">비워 두면 앱에서 이모지로 표시됩니다.</div>
-      </div>
     </div>
     <div id="pp-gi-error" style="display:none;background:var(--danger-soft);color:var(--danger);border-radius:var(--r-md);padding:10px 14px;font-size:13px;margin-top:14px;"></div>
     <div style="display:flex;gap:10px;margin-top:20px;">
@@ -7502,7 +7427,7 @@ function loadGifticonProducts() {
   db.collection('gifticons').orderBy('created_at', 'desc').limit(20).get()
     .then(function(snap) {
       if (snap.empty) {
-        tbody.innerHTML = '<tr><td colspan="11" style="text-align:center;padding:32px;color:var(--text-3);">등록된 상품이 없습니다. "상품 추가" 버튼으로 등록하세요.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;padding:32px;color:var(--text-3);">등록된 상품이 없습니다. "상품 추가" 버튼으로 등록하세요.</td></tr>';
         /* Update count */
         var countEl = document.querySelector('#sec-gifticon-products .card-header span');
         if (countEl) countEl.textContent = '총 0개 상품';
@@ -7518,12 +7443,8 @@ function loadGifticonProducts() {
         var statusBadge = g.status === 'active'
           ? '<span style="background:var(--success-soft);color:var(--success);padding:3px 8px;border-radius:99px;font-size:11px;font-weight:600;">판매중</span>'
           : '<span style="background:var(--danger-soft);color:var(--danger);padding:3px 8px;border-radius:99px;font-size:11px;font-weight:600;">판매중지</span>';
-        var thumb = g.image_url
-          ? '<img src="' + ppEsc(g.image_url) + '" alt="" style="width:40px;height:40px;object-fit:cover;border-radius:6px;display:block;margin:0 auto;border:1px solid var(--border);" onerror="this.outerHTML=\'<span style=&quot;font-size:20px&quot;>' + (g.emoji || '🎁') + '</span>\'">'
-          : '<span style="font-size:20px;opacity:.55">' + (g.emoji || '🎁') + '</span>';
         rows.push('<tr>'
           + '<td style="text-align:center;color:var(--text-3);">' + n++ + '</td>'
-          + '<td style="text-align:center;cursor:pointer" title="클릭해서 상품 이미지 등록·수정" onclick="giOpenImageEdit(\'' + doc.id + '\')">' + thumb + '</td>'
           + '<td>' + (g.category || '기타') + '</td>'
           + '<td style="font-weight:600;">' + (g.brand || '') + '</td>'
           + '<td>' + (g.emoji || '') + ' ' + (g.name || g.product_name || '') + '</td>'
@@ -7563,13 +7484,12 @@ window.giBulkFileSelected = function(input) {
         grade: GI_GRADE_MAP[r['등급']] || 'bronze',
         count: parseInt(r['필요장수'], 10) || 1,
         validity: parseInt(r['유효일수'], 10) || 90,
-        image: (r['이미지경로'] || '').trim(),
       };
     }).filter(function(r) { return r.code && r.name; });
     if (!GI_BULK_ROWS.length) { toast('유효한 행이 없습니다. 헤더와 필수값(상품코드, 상품명)을 확인하세요.'); return; }
     document.getElementById('gi-bulk-preview-title').textContent = '미리보기 — ' + GI_BULK_ROWS.length + '행';
     document.getElementById('gi-bulk-preview-tbody').innerHTML = GI_BULK_ROWS.map(function(r) {
-      return '<tr><td style="font-family:monospace;font-size:12px">' + r.code + '</td><td>' + r.brand + '</td><td>' + r.name + '</td><td>' + r.grade + '</td><td style="text-align:center">' + r.count + '</td><td style="font-family:monospace;font-size:11px;color:var(--text-3)">' + (r.image || '—') + '</td></tr>';
+      return '<tr><td style="font-family:monospace;font-size:12px">' + r.code + '</td><td>' + r.brand + '</td><td>' + r.name + '</td><td>' + r.grade + '</td><td style="text-align:center">' + r.count + '</td></tr>';
     }).join('');
     document.getElementById('gi-bulk-preview').style.display = 'block';
   };
@@ -7590,7 +7510,6 @@ window.giBulkSubmit = function() {
         b.set(db.collection('gifticons').doc(r.code), {
           brand: r.brand, name: r.name, emoji: r.emoji, category: r.category,
           required_grade: r.grade, required_count: r.count, validity_days: r.validity,
-          image_url: r.image || null,
           status: 'active', updated_at: FS.FieldValue.serverTimestamp(),
           /* created_at도 항상 갱신 — loadGifticonProducts가 orderBy('created_at')로 조회하는데
              이 필드가 없는 문서는 결과에서 통째로 제외되어 방금 등록한 상품이 안 보이는 버그 방지.
@@ -7618,8 +7537,8 @@ window.giBulkSubmit = function() {
 
 window.giBulkDownloadTemplate = function() {
   ppDownloadCsv('gifticon_template.csv',
-    ['상품코드','브랜드','상품명','이모지','카테고리','등급','필요장수','유효일수','이미지경로'],
-    [['ediya-americano','이디야커피','아메리카노','☕','카페','bronze','2','30','/app/assets/gifticon/ediya-americano.jpg']]
+    ['상품코드','브랜드','상품명','이모지','카테고리','등급','필요장수','유효일수'],
+    [['ediya-americano','이디야커피','아메리카노','☕','카페','bronze','2','30']]
   );
 };
 
@@ -14303,7 +14222,7 @@ function openGifticonModal() {
   var modal = document.getElementById('pp-gifticon-modal');
   if (modal) {
     /* Reset form */
-    ['pp-gi-brand','pp-gi-name','pp-gi-emoji','pp-gi-count','pp-gi-validity','pp-gi-image'].forEach(function(id) {
+    ['pp-gi-brand','pp-gi-name','pp-gi-emoji','pp-gi-count','pp-gi-validity'].forEach(function(id) {
       var el = document.getElementById(id);
       if (el) el.value = el.type === 'number' ? el.defaultValue : '';
     });
@@ -14326,7 +14245,6 @@ function submitGifticon() {
   var category = (document.getElementById('pp-gi-category') || {}).value || '';
   var count = parseInt((document.getElementById('pp-gi-count') || {}).value) || 1;
   var validity = parseInt((document.getElementById('pp-gi-validity') || {}).value) || 90;
-  var imageUrl = ((document.getElementById('pp-gi-image') || {}).value || '').trim();
   
   var errEl = document.getElementById('pp-gi-error');
   if (!brand || !name || !emoji) {
@@ -14345,7 +14263,6 @@ function submitGifticon() {
     required_grade: grade,
     required_count: count,
     validity_days: validity,
-    image_url: imageUrl || null,
     status: 'active',
     created_at: FS.FieldValue.serverTimestamp(),
   }).then(function() {
