@@ -1231,7 +1231,6 @@
     display: flex;
     padding-top: 8px;
     padding-bottom: 24px;
-    z-index: 20;
   }
   .tab-item {
     flex: 1;
@@ -4820,11 +4819,9 @@
     background: rgba(0, 0, 0, 0.65);
     color: white;
     font-size: var(--fs-caption); font-weight: 800;
-    padding: 2px 7px;
+    padding: 3px 7px;
     border-radius: 99px;
     z-index: 2;
-    max-width: calc(100% - 12px);
-    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
   }
   .ex-avail-pill {
     position: absolute;
@@ -4832,11 +4829,9 @@
     background: rgba(0, 0, 0, 0.65);
     color: white;
     font-size: var(--fs-caption); font-weight: 800;
-    padding: 2px 7px;
+    padding: 3px 7px;
     border-radius: 99px;
     z-index: 2;
-    max-width: calc(100% - 12px);
-    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
   }
 
   /* 세그먼트 컨트롤 */
@@ -4881,12 +4876,8 @@
     display: flex; gap: 6px;
     padding: 0 16px 12px;
     overflow-x: auto;
-    overflow-y: hidden;
-    max-width: 100%;
-    -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
   }
-  .cat-filter::-webkit-scrollbar { display: none; }
   .cat-filter::-webkit-scrollbar { display: none; }
   .cat-pill {
     flex-shrink: 0;
@@ -10609,7 +10600,7 @@ window.PP_FEATURES = {
             <div class="reward-top-title">기프티샵</div>
           </div>
           <div class="reward-top-actions">
-            <button class="reward-top-btn" data-ip-bound="1" title="교환 내역" onclick="event.stopPropagation();var p=document.getElementById('gx-history');p.style.display='block';p.scrollIntoView({block:'nearest'});"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M20 8.25V18C20 21 18.21 22 16 22H8C5.79 22 4 21 4 18V8.25C4 5 5.79 4.25 8 4.25C8 4.87 8.24997 5.43 8.65997 5.84C9.06997 6.25 9.63 6.5 10.25 6.5H13.75C14.99 6.5 16 5.49 16 4.25C18.21 4.25 20 5 20 8.25Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M16 4.25C16 5.49 14.99 6.5 13.75 6.5H10.25C9.63 6.5 9.06997 6.25 8.65997 5.84C8.24997 5.43 8 4.87 8 4.25C8 3.01 9.01 2 10.25 2H13.75C14.37 2 14.93 2.25 15.34 2.66C15.75 3.07 16 3.63 16 4.25Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+            <button class="reward-top-btn"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M20 8.25V18C20 21 18.21 22 16 22H8C5.79 22 4 21 4 18V8.25C4 5 5.79 4.25 8 4.25C8 4.87 8.24997 5.43 8.65997 5.84C9.06997 6.25 9.63 6.5 10.25 6.5H13.75C14.99 6.5 16 5.49 16 4.25C18.21 4.25 20 5 20 8.25Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M16 4.25C16 5.49 14.99 6.5 13.75 6.5H10.25C9.63 6.5 9.06997 6.25 8.65997 5.84C8.24997 5.43 8 4.87 8 4.25C8 3.01 9.01 2 10.25 2H13.75C14.37 2 14.93 2.25 15.34 2.66C15.75 3.07 16 3.63 16 4.25Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
           </div>
         </div>
 
@@ -10636,7 +10627,7 @@ window.PP_FEATURES = {
         </div>
 
         <!-- 검색 + 정렬 + 교환 내역 -->
-        <div style="flex-shrink:0;padding:8px 16px 0;">
+        <div style="flex-shrink:0;padding:8px 0 0;">
           <div style="display:flex;gap:7px;align-items:center;">
             <input placeholder="상품·브랜드 검색" style="flex:1;height:34px;border:1px solid #E4DBFF;border-radius:9px;padding:0 11px;font-size:var(--fs-caption);box-sizing:border-box;">
             <select style="height:34px;border:1px solid #E4DBFF;border-radius:9px;font-size:var(--fs-caption);padding:0 6px;color:var(--text2);"><option>추천순</option><option>가격 낮은순</option><option>가격 높은순</option><option>교환 가능순</option></select>
