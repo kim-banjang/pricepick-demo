@@ -57,3 +57,5 @@ new-app-icon-source.png
 
 # 약관·개인정보 작업용 원본(실제 반영은 Firestore/코드로, 이 텍스트는 커밋 안 함)
 new-terms-privacy.txt
+
+.vercel

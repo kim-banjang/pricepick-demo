@@ -16876,7 +16876,7 @@ Object.assign(KO2VI, {
     /* 01 스플래시 — 워드마크는 두 span의 굵기 대비를 살려 Price/Pick으로 분리 */
     "프라이스": "Price",
     "픽": "Pick",
-    
+    "CMS 데모 회원으로 보기": "Xem với tư cách thành viên demo CMS",
 
     /* 03b-A 카카오 계정 중복 */
     "유저": "Người dùng",
@@ -17562,6 +17562,42 @@ function ppTryAutoRedeemPendingInvite() {
   });
 }
 
+/* ── 시뮬 로그인 (CMS에서 세팅한 카카오 연동 회원으로 체험) ──
+   flutter 앱의 enterAsPersona/exitPersona와 동일한 개념: PP.uid를
+   실제 익명 인증 uid(REAL_UID) 대신 CMS 회원 문서 ID로 덮어써서 그 회원의
+   실데이터를 그대로 조회한다. 세션 내 메모리만 유지(새로고침 시 초기화). */
+function fetchLinkedKakaoMembers() {
+  return db.collection('users').where('linked_kakao', '==', true).limit(20).get()
+    .then(function(snap) {
+      var out = [];
+      snap.forEach(function(d) { var x = d.data(); x._id = d.id; out.push(x); });
+      return out;
+    }).catch(function(e) { console.error('fetchMembers', e); return []; });
+}
+function enterAsPersona(userId) {
+  PP.personaUserId = userId;
+  PP.uid = userId;
+  PP._actEvents = null;
+  db.collection('users').doc(userId).get().then(function(doc) {
+    PP.user = doc.exists ? doc.data() : { nickname: '회원' };
+    closeDemoLoginPicker();
+    window.showScreen('pw-10', false);
+    refreshHomeData();
+    refreshMyData();
+    updatePersonaBadge();
+  }).catch(function(e) { console.error('enterAsPersona', e); });
+}
+function exitPersona() {
+  PP.personaUserId = null;
+  PP.uid = REAL_UID;
+  PP.user = null;
+  PP._actEvents = null;
+  refreshKakaoBannerVisibility();
+  updatePersonaBadge();
+  window.showScreen('pw-00', false);
+  checkExistingUser();
+}
+window.ppExitPersona = exitPersona;
 
 /* ── 계정 탈퇴 (즉시 처리 — 유예·철회 없음, 2026-07-10 정책 확정) ──
    1) users/{uid}.status='withdrawn' 전환 + PII 필드(닉네임·카카오 닉네임·카카오 로그인ID)
@@ -18931,7 +18967,69 @@ function showToast(msg) {
   setTimeout(function() { t.style.opacity = '0'; setTimeout(function() { t.remove(); }, 400); }, 2100);
 }
 
+/* ── 시뮬 로그인 회원 선택 팝업 ── */
+function ppMemberLine(m) {
+  var kakao = (m.linked_kakao && m.kakao_login_id) ? m.kakao_login_id : '카카오 연동';
+  var idShort = (m._id || '').length > 14 ? (m._id.slice(0, 14) + '…') : (m._id || '');
+  return { nick: m.nickname || '회원', sub: kakao + ' · ' + idShort };
+}
+function closeDemoLoginPicker() {
+  var ov = document.getElementById('pp-demo-login-overlay');
+  if (ov) ov.remove();
+}
+function ppOpenDemoLoginPicker() {
+  closeDemoLoginPicker();
+  var el = document.createElement('div');
+  el.id = 'pp-demo-login-overlay';
+  el.style.cssText = 'position:fixed;inset:0;z-index:10001;display:flex;align-items:flex-end;justify-content:center;background:rgba(0,0,0,.48);';
+  el.innerHTML = '<div style="background:#fff;border-radius:20px 20px 0 0;padding:22px 20px 32px;width:100%;max-width:480px;max-height:78vh;display:flex;flex-direction:column;">'
+    + '<div style="text-align:center;font-size:var(--fs-label);font-weight:800;color:#1A1130;margin-bottom:4px;">카카오 연동 회원 시뮬 로그인</div>'
+    + '<div style="text-align:center;font-size:var(--fs-caption);color:#6B5E8A;margin-bottom:16px;">CMS에서 세팅한 회원을 골라 그 회원의 티켓·포인트를 그대로 볼 수 있어요</div>'
+    + '<div id="pp-demo-login-list" style="overflow-y:auto;flex:1;min-height:60px;"><div style="text-align:center;padding:24px;color:#9A8FB5;font-size:var(--fs-body);">불러오는 중…</div></div>'
+    + '<button id="pp-demo-login-cancel" style="width:100%;height:46px;background:none;border:none;color:#9A8FB5;font-size:var(--fs-body);cursor:pointer;margin-top:10px;font-family:inherit;">취소</button>'
+    + '</div>';
+  document.body.appendChild(el);
+  el.querySelector('#pp-demo-login-cancel').addEventListener('click', closeDemoLoginPicker);
+  fetchLinkedKakaoMembers().then(function(members) {
+    var list = document.getElementById('pp-demo-login-list');
+    if (!list) return;
+    if (!members.length) {
+      list.innerHTML = '<div style="text-align:center;padding:24px;color:#9A8FB5;font-size:var(--fs-body);">CMS에 카카오 연동 회원이 없어요.<br>CMS 데이터관리에서 회원을 먼저 만들어 주세요.</div>';
+      return;
+    }
+    list.innerHTML = members.map(function(m, i) {
+      var line = ppMemberLine(m);
+      return '<div data-i="' + i + '" style="display:flex;align-items:center;justify-content:space-between;padding:13px 6px;border-bottom:1px solid #F0EBFA;cursor:pointer;">'
+        + '<div><div style="font-size:var(--fs-body);font-weight:700;color:#1A1130;">' + ppEsc(line.nick) + '</div>'
+        + '<div style="font-size:var(--fs-caption);color:#9A8FB5;margin-top:2px;">' + ppEsc(line.sub) + '</div></div>'
+        + '<span style="color:#C6AFFF;font-size:var(--fs-label);">›</span></div>';
+    }).join('');
+    list.querySelectorAll('[data-i]').forEach(function(row) {
+      row.addEventListener('click', function() {
+        var m = members[parseInt(row.dataset.i)];
+        enterAsPersona(m._id);
+      });
+    });
+  });
+}
+window.ppOpenDemoLoginPicker = ppOpenDemoLoginPicker;
 
+/* ── 시뮬 로그인 진입점 배지/버튼 ── */
+function updatePersonaBadge() {
+  var badge = document.getElementById('pp-persona-badge');
+  if (PP.personaUserId) {
+    if (!badge) {
+      badge = document.createElement('button');
+      badge.id = 'pp-persona-badge';
+      badge.style.cssText = 'position:fixed;top:10px;left:50%;transform:translateX(-50%);z-index:10002;background:#1A1130;color:#fff;font-size:var(--fs-caption);font-weight:700;padding:6px 12px;border:none;border-radius:99px;cursor:pointer;font-family:inherit;box-shadow:0 2px 8px rgba(0,0,0,.25);';
+      badge.addEventListener('click', function() { exitPersona(); });
+      document.body.appendChild(badge);
+    }
+    badge.textContent = '🎭 시뮬 로그인: ' + ((PP.user && PP.user.nickname) || '회원') + ' · 종료 ✕';
+  } else if (badge) {
+    badge.remove();
+  }
+}
 /* ── 닉네임 진입 화면: 재설치·기기 변경 주의 시트 (시안 원본 05 상태) ── */
 function ppOpenNickNotice() {
   var m = document.getElementById('nick2-warn-modal');
@@ -18986,6 +19084,31 @@ function bindTermsLinks() {
     }, true);
   }
 }
+function bindPersonaEntryPoints() {
+  try { bindTermsLinks(); } catch (e) {}
+  // 20260729 디자인 이식으로 .si 컨테이너가 없어졌다 → 스플래시 루트에 직접 붙인다(밝은 배경이라 색상만 조정)
+  var splash = document.querySelector('#pw-00 .si') || document.querySelector('#pw-00 .phone');
+  if (splash && !splash.dataset.ppPersonaBound) {
+    splash.dataset.ppPersonaBound = '1';
+    var link = document.createElement('button');
+    link.textContent = 'CMS 데모 회원으로 보기';
+    link.style.cssText = 'position:absolute;bottom:14px;left:50%;transform:translateX(-50%);z-index:5;min-height:44px;padding:0 12px;background:none;border:none;color:#9B93B0;font-size:var(--fs-caption);font-weight:600;text-decoration:underline;cursor:pointer;font-family:inherit;';
+    link.addEventListener('click', function(e) { e.stopPropagation(); ppOpenDemoLoginPicker(); });
+    splash.appendChild(link);
+  }
+  var actions = document.querySelector('#pw-30 .my-top-actions');
+  if (actions && !actions.dataset.ppPersonaBound) {
+    actions.dataset.ppPersonaBound = '1';
+    var btn = document.createElement('button');
+    btn.className = 'my-top-btn';
+    btn.title = '시뮬 로그인';
+    btn.textContent = '🎭';
+    btn.style.fontSize = '14px';
+    btn.addEventListener('click', function() { ppOpenDemoLoginPicker(); });
+    actions.appendChild(btn);
+  }
+}
+
 /* ══════════════════════════════════════════════════
    비코어 화면 실데이터 렌더 (활동/알림/초대/구매/티켓/포인트)
    - 로그인 유저(PP.uid)의 실제 Firestore 데이터로 렌더
@@ -21299,7 +21422,7 @@ document.addEventListener('DOMContentLoaded', function() {
   bindPointTicketExchange();
   bindNotifSettings();
   bindKakaoComplete();
-  try { bindTermsLinks(); } catch (e) {}
+  bindPersonaEntryPoints();
 });
 
 })();
