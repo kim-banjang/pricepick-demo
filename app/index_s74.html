@@ -18550,7 +18550,7 @@ function renderExGifticonSummary() {
 function loadGifticons() {
   if (!PP.uid) return;
   renderExGifticonSummary();
-  db.collection('gifticons').where('status', '==', 'active').limit(100).get()
+  db.collection('gifticons').where('status', '==', 'active').limit(12).get()
     .then(function(snap) {
       PP.gifticonList = [];
       snap.forEach(function(doc) {
