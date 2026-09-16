@@ -1046,6 +1046,16 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
 .gip-price-main{font-weight:700;color:var(--text);}
 .gip-price-won{font-size:11px;color:var(--text-3);margin-top:2px;}
 .gip-price-none{font-size:11px;color:var(--danger);margin-top:2px;}
+/* 포인츠허브 검색줄 — 두 줄로 나뉜 조건 칸 */
+.srch{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);
+  padding:14px 16px;margin-bottom:16px;}
+.srch-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.srch-row + .srch-row{margin-top:10px;}
+.srch-row .search-box{width:150px;}
+.srch-date{width:150px;height:var(--ctl-h);}
+.srch-tilde{color:var(--text-3);font-size:13px;}
+/* 두 줄로 적는 칸 — 날짜 아래 시각, 이름 아래 닉네임 */
+.cell-sub{font-size:11px;color:var(--text-3);margin-top:2px;}
 /* 상품 상세 정보 모달 — 포인츠허브 배치(왼쪽 이미지, 오른쪽 2열 격자) */
 .gid-sub{font-size:13px;font-weight:700;color:var(--text);margin:0 0 14px;}
 .gid-body{display:flex;gap:22px;align-items:flex-start;}
@@ -1226,10 +1236,9 @@ window.CMS_FEATURES = {
             <span class="sb-item-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span>
             <span class="sb-item-lbl" id="nav-label-revenue-fee">제휴 수수료 매출</span>
           </button>
-          <button class="sb-item" id="nav-revenue-gifticon" data-label="기프티콘 판매 매출" onclick="go('revenue-gifticon',this)">
-            <span class="sb-item-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z"/><circle cx="7.5" cy="7.5" r="1.5"/></svg></span>
-            <span class="sb-item-lbl" id="nav-label-revenue-gifticon">기프티콘 판매 매출</span>
-          </button>
+          <!-- 「기프티콘 판매 매출」 메뉴 폐기(김반장 2026-09-16) — 기프티콘 교환은 매출이 아니라
+               제휴 수수료로 내준 티켓을 털어내는 자리다. 지급 원가·잔여 부채 화면은 별도 기획 건.
+               섹션(sec-revenue-gifticon)과 로직은 다른 화면이 참조할 수 있어 그대로 둔다. -->
           <button class="sb-item" id="nav-settlement" data-label="정산 내역" onclick="go('settlement',this)">
             <span class="sb-item-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><line x1="12" y1="2" x2="12" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span>
             <span class="sb-item-lbl" id="nav-label-settlement">정산 내역</span>
@@ -2375,27 +2384,33 @@ window.CMS_FEATURES = {
 
     <!-- ── 기프티콘 발급 (신규) ── -->
     <div class="section" id="sec-gifticons">
-      <div class="info-box">
-        기프티콘 구매·사용 내역입니다. 회원이 티켓을 소모해 기프티콘을 교환하면 자동 기록됩니다.
-      </div>
-      <div class="toolbar" style="flex-wrap:wrap;gap:8px">
-        <select class="filter-sel" id="gex-filter-status" onchange="gexApplyFilters()"><option value="">전체 상태</option><option value="used">사용완료</option><option value="cancelled">취소됨</option></select>
-        <input class="search-box" id="gex-search" placeholder="닉네임 검색" style="width:120px" onkeydown="if(event.key==='Enter')gexApplyFilters()">
-        <button class="btn btn-primary btn-sm" onclick="gexApplyFilters()">검색</button>
-        <button class="btn btn-ghost btn-sm" style="margin-left:auto" onclick="csvExportGifticons()">CSV 내보내기</button>
+      <div class="srch">
+        <div class="srch-row">
+          <select class="filter-sel" id="gex-f-status"><option value="">상태 전체</option><option value="used">사용완료</option><option value="cancelled">취소됨</option></select>
+          <input class="search-box" id="gex-f-name" placeholder="이름">
+          <input class="search-box" id="gex-f-nick" placeholder="닉네임">
+          <input class="search-box" id="gex-f-code" placeholder="기프티콘 코드">
+        </div>
+        <div class="srch-row">
+          <select class="filter-sel" id="gex-f-platform"><option value="">플랫폼 전체</option><option value="app">앱</option><option value="web">웹</option></select>
+          <select class="filter-sel" id="gex-f-datekind"><option value="exchanged_at">구매일</option><option value="cancelled_at">상태변경일</option></select>
+          <input class="form-input srch-date" type="date" id="gex-f-from">
+          <span class="srch-tilde">~</span>
+          <input class="form-input srch-date" type="date" id="gex-f-to">
+          <button class="btn btn-primary btn-sm" onclick="gexApplyFilters()">검색</button>
+          <button class="btn btn-ghost btn-sm" style="margin-left:auto" onclick="csvExportGifticons()">CSV 내보내기</button>
+        </div>
       </div>
       <div class="card">
-        <div class="card-header"><div class="card-title">구매/사용 내역</div><span style="font-size:12px;color:var(--text-2)" id="gex-count">—</span></div>
+        <div class="card-header"><div class="card-title">플랫폼별 구매내역</div><span style="font-size:12px;color:var(--text-2)" id="gex-count">—</span></div>
         <table>
           <thead>
             <tr>
-              <th>구매일</th><th>상태변경일</th><th>주문번호</th>
-              <th>닉네임 / 카카오톡 ID / 식별 아이디</th><th>상품명</th><th>상품코드</th>
-              <th>유효기간</th><th>상태</th><th>소모 티켓</th>
+              <th style="width:110px">구매일</th><th>주문번호</th><th>이름</th>
+              <th>상품명</th><th>상품코드</th><th style="width:90px">유효기간</th><th style="width:110px">상태</th>
             </tr>
           </thead>
-          <tbody>
-          </tbody>
+          <tbody></tbody>
         </table>
         <div id="gex-pagination"></div>
       </div>
@@ -4876,7 +4891,12 @@ const I18N = {
     'nav.group.ticket': '티켓 · 보상',
     'nav.tickets': '티켓 내역',
     'nav.weekly-draws': '주간 이벤트 추첨 관리',
-    'nav.gifticons': '구매/사용 내역',
+    'nav.gifticons': '플랫폼별 구매내역',
+    'nav.gifticon-products': '상품 목록',
+    'nav.gifticon-unused': '기프티콘 미사용 취소',
+    'nav.gifticon-cancel': '취소내역',
+    'nav.gifticon-bulk': '상품 설명 일괄 등록',
+    'nav.gifticon-errlog': '다우테크 오류 로그',
     'nav.group.content': '콘텐츠',
     'nav.banners': '배너 관리',
     'nav.invite': '친구초대 관리',
@@ -4908,7 +4928,7 @@ const I18N = {
     'page.members.title': '회원 목록', 'page.members.bc': '회원 관리',
     'page.tickets.title': '티켓 내역', 'page.tickets.bc': '티켓 · 보상',
     'page.weekly-draws.title': '주간 이벤트 추첨 관리', 'page.weekly-draws.bc': '티켓 · 보상',
-    'page.gifticons.title': '구매/사용 내역', 'page.gifticons.bc': '기프티콘 관리', 'page.gifticon-cancel.title': '취소 내역', 'page.gifticon-cancel.bc': '기프티콘 관리', 'page.gifticon-products.title': '상품 목록', 'page.gifticon-products.bc': '기프티콘 관리', 'page.gifticon-bulk.title': '상품설명 일괄등록', 'page.gifticon-bulk.bc': '기프티콘 관리',
+    'page.gifticons.title': '플랫폼별 구매내역', 'page.gifticons.bc': '기프티콘 관리', 'page.gifticon-cancel.title': '취소내역', 'page.gifticon-cancel.bc': '기프티콘 관리', 'page.gifticon-products.title': '상품 목록', 'page.gifticon-products.bc': '기프티콘 관리', 'page.gifticon-bulk.title': '상품 설명 일괄 등록', 'page.gifticon-bulk.bc': '기프티콘 관리', 'page.gifticon-unused.title': '기프티콘 미사용 취소', 'page.gifticon-unused.bc': '기프티콘 관리', 'page.gifticon-errlog.title': '다우테크 오류 로그', 'page.gifticon-errlog.bc': '기프티콘 관리',
     'page.banners.title': '배너 관리', 'page.banners.bc': '콘텐츠',
     'page.invite.title': '친구초대 관리', 'page.invite.bc': '콘텐츠',
     'page.terms.title': '약관 관리', 'page.terms.bc': '운영',
@@ -4984,6 +5004,8 @@ function applyLang() {
     'nav-label-point-attendance': 'nav.point-attendance',
     'nav-label-point-policy': 'nav.point-policy',
     'nav-label-gifticons': 'nav.gifticons',
+    'nav-label-gifticon-unused': 'nav.gifticon-unused',
+    'nav-label-gifticon-errlog': 'nav.gifticon-errlog',
     'nav-group-label-content': 'nav.group.content',
     'nav-label-banners': 'nav.banners',
     'nav-label-invite': 'nav.invite',
@@ -7803,43 +7825,76 @@ window.giBulkDownloadTemplate = function() {
 
 /* ── Gifticon Exchanges ── */
 var GEX_GRADE_KO = { bronze: '브론즈', silver: '실버', gold: '골드' };
+/* ── 2. 플랫폼별 구매내역 (포인츠허브 구조) ──
+   칸: 구매일(날짜 아래 시각) · 주문번호 · 이름(아래 닉네임) · 상품명 · 상품코드 · 유효기간 · 상태 */
+function gexProductName(g) {
+  var pr = GIFTICON_PRODUCTS_CACHE[g.gifticon_id];
+  if (!pr) return ppEsc(g.gifticon_id || '-');
+  return ppEsc(((pr.brand ? pr.brand + ' ' : '') + (pr.name || pr.product_name || '')).trim() || g.gifticon_id);
+}
+function gexTwoLine(top, sub) {
+  return '<div style="font-weight:700;">' + top + '</div>' + (sub ? '<div class="cell-sub">' + sub + '</div>' : '');
+}
 var GEX_CTRL = window.GEX_CTRL = ppMakeListController(20, function(pageItems, state, totalPages) {
   var sec = document.getElementById('sec-gifticons');
   var tbody = sec && sec.querySelector('table tbody');
   var pag = document.getElementById('gex-pagination');
   if (!tbody) return;
-  if (!pageItems.length) { tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:32px;color:var(--text-3);">조건에 맞는 교환 내역이 없습니다.</td></tr>'; if (pag) pag.innerHTML = ''; return; }
+  if (!pageItems.length) { tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:32px;color:var(--text-3);">조건에 맞는 구매내역이 없습니다.</td></tr>'; if (pag) pag.innerHTML = ''; return; }
   tbody.innerHTML = pageItems.map(function(g) {
-    var ts = g.exchanged_at ? (g.exchanged_at.toDate ? g.exchanged_at.toDate() : new Date()) : new Date();
-    var dateStr = ts.toLocaleDateString('ko-KR', { year:'numeric', month:'2-digit', day:'2-digit' });
-    var gradeName = GEX_GRADE_KO[g.grade_used || 'bronze'];
     var isCancelled = g.status === 'cancelled';
     var statusCell = isCancelled
       ? '<span style="background:var(--danger-soft);color:var(--danger);padding:3px 8px;border-radius:99px;font-size:11px;font-weight:600;">취소됨</span>'
       : '<span style="background:var(--success-soft);color:var(--success);padding:3px 8px;border-radius:99px;font-size:11px;font-weight:600;">사용완료</span>'
-        + '<div style="margin-top:4px"><button class="btn btn-ghost btn-sm" style="font-size:10px;padding:2px 6px" onclick="giCancelExchange(\'' + g._id + '\')">취소</button></div>';
+        + '<div style="margin-top:4px"><button class="btn btn-ghost btn-sm" style="font-size:10px;padding:2px 6px" onclick="giCancelExchange(&quot;' + g._id + '&quot;)">취소</button></div>';
+    var u = g._user || {};
     return '<tr>'
-      + '<td style="text-align:center"><div style="font-weight:700;">' + dateStr + '</div></td>'
-      + '<td style="text-align:center">' + (isCancelled ? ppDt(g.cancelled_at) : '-') + '</td>'
-      + '<td style="font-size:11px;font-family:monospace;color:var(--text-3);">' + g._id.slice(0,16) + '…</td>'
-      + '<td>' + renderMemberIdentity(g._user, g.user_id) + '</td>'
-      + '<td>' + (g.gifticon_id || '').slice(0,12) + '…</td>'
-      + '<td style="font-family:monospace;font-size:11px;">PP-XXXX-XXXX</td>'
-      + '<td>90일</td>'
+      + '<td style="text-align:center">' + gexTwoLine(ppDt(g.exchanged_at), ppTm(g.exchanged_at)) + '</td>'
+      + '<td style="font-size:11px;font-family:monospace;color:var(--text-3);">' + ppEsc(g._id) + '</td>'
+      + '<td>' + gexTwoLine(ppEsc(u.name || u.nickname || '—'), ppEsc(u.nickname || '')) + '</td>'
+      + '<td>' + gexProductName(g) + '</td>'
+      + '<td style="font-family:monospace;font-size:11px;color:var(--text-3);">' + ppEsc(g.gifticon_id || '-') + '</td>'
+      + '<td style="text-align:center">' + gexValidity(g) + '</td>'
       + '<td style="text-align:center">' + statusCell + '</td>'
-      + '<td><span style="background:var(--main-soft);color:var(--main);padding:3px 8px;border-radius:99px;font-size:11px;">' + gradeName + ' ' + (g.count_used || 1) + '장</span></td>'
       + '</tr>';
   }).join('');
   if (pag) pag.innerHTML = ppPaginationHtml('GEX_CTRL', state.page, totalPages);
 });
+function gexValidity(g) {
+  var pr = GIFTICON_PRODUCTS_CACHE[g.gifticon_id];
+  if (pr && pr.validity_days) return pr.validity_days + '일';
+  if (g.expires_at && g.exchanged_at && g.expires_at.toMillis && g.exchanged_at.toMillis) {
+    return Math.round((g.expires_at.toMillis() - g.exchanged_at.toMillis()) / 86400000) + '일';
+  }
+  return '—';
+}
+
+function gexDateInRange(g) {
+  var kind = (document.getElementById('gex-f-datekind') || {}).value || 'exchanged_at';
+  var from = (document.getElementById('gex-f-from') || {}).value || '';
+  var to = (document.getElementById('gex-f-to') || {}).value || '';
+  if (!from && !to) return true;
+  var v = g[kind];
+  if (!v || !v.toDate) return false;
+  var d = v.toDate();
+  if (from && d < new Date(from + 'T00:00:00')) return false;
+  if (to && d > new Date(to + 'T23:59:59')) return false;
+  return true;
+}
 
 window.gexApplyFilters = function() {
-  var q = (document.getElementById('gex-search')||{}).value || '';
-  var status = (document.getElementById('gex-filter-status')||{}).value || '';
+  var status = (document.getElementById('gex-f-status') || {}).value || '';
+  var name = (document.getElementById('gex-f-name') || {}).value || '';
+  var nick = (document.getElementById('gex-f-nick') || {}).value || '';
+  var code = (document.getElementById('gex-f-code') || {}).value || '';
   GEX_CTRL.applyFilter(function(g) {
-    if (q && !ppMatch((g._user||{}).nickname, q)) return false;
+    var u = g._user || {};
     if (status === 'used' && g.status === 'cancelled') return false;
     if (status === 'cancelled' && g.status !== 'cancelled') return false;
+    if (name && !ppMatch(u.name || u.nickname, name)) return false;
+    if (nick && !ppMatch(u.nickname, nick)) return false;
+    if (code && !ppMatch(g.code, code)) return false;
+    if (!gexDateInRange(g)) return false;
     return true;
   });
 };
