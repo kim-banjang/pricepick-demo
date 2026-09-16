@@ -1086,23 +1086,25 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
 /* 회원 칸은 늘 세 줄이다 — 닉네임 / 카카오톡 ID / 식별 아이디.
    값이 없어도 줄 자리는 지키고 글자만 안 쓴다(행 높이가 제각각이 되지 않게).
    정렬은 왼쪽으로 못 박는다 — 칸이 가운데 정렬이어도 이 안은 왼쪽이다. */
-.idc{min-width:0;text-align:left;height:52px;}
+.idc{min-width:0;text-align:center;height:52px;}
 /* 기프티콘 세 표(구매내역·미사용 취소·취소내역) 칸 폭·정렬.
    기준 — ① 어느 칸도 말줄임으로 잘리지 않는다 ② 남는 폭을 한 칸에 몰아주지 않고
    고르게 나눈다(상품명에 auto 를 주지 않는다). 폭은 colgroup 의 백분율로 잡는다. */
 #sec-gifticons table,#sec-gifticon-unused table,#sec-gifticon-cancel table{table-layout:fixed;width:100%;}
 #sec-gifticons th,#sec-gifticon-unused th,#sec-gifticon-cancel th{white-space:normal;line-height:1.35;padding-left:8px;padding-right:8px;}
 #sec-gifticons td,#sec-gifticon-unused td,#sec-gifticon-cancel td{padding-left:8px;padding-right:8px;height:76px;box-sizing:border-box;}
-/* 회원 칸만 왼쪽 — 세 줄이 같은 선에서 시작해야 한다. 나머지는 가운데(td 기본). */
+/* 모든 칸 가운데 정렬(김반장 2026-09-16). 줄 자리 고정은 그대로 — 값이 없어도 줄은 둔다. */
 #sec-gifticons td:nth-child(3),#sec-gifticon-unused td:nth-child(3),#sec-gifticon-cancel td:nth-child(3){line-height:0;font-size:0;}
-/* 상품명은 가운데 정렬 · 두 줄까지 접는다 */
+/* 상품명은 두 줄까지 접는다 */
 #sec-gifticons td:nth-child(4),#sec-gifticon-unused td:nth-child(4),#sec-gifticon-cancel td:nth-child(4){
   white-space:normal;line-height:1.4;word-break:keep-all;}
+/* 티켓 칸 — 등급마다 한 줄. 줄간격을 좁혀 세 줄이 한 행에 들어가게 한다. */
+#sec-gifticons .tkc,#sec-gifticon-unused .tkc,#sec-gifticon-cancel .tkc{line-height:1.3;white-space:nowrap;}
 /* 주문번호(PHTRX…)는 길어서 두 줄로 접는다 — 말줄임하지 않는다 */
 #sec-gifticons td.ordno,#sec-gifticon-unused td.ordno,#sec-gifticon-cancel td.ordno{
   white-space:normal;word-break:break-all;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
   font-size:11px;color:var(--text-3);line-height:1.4;}
-.idc-nick,.idc-sub,.idc-uid{display:block;text-align:left;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.idc-nick,.idc-sub,.idc-uid{display:block;text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .idc-nick{font-weight:600;color:var(--text);font-size:13px;line-height:18px;height:18px;}
 .idc-sub{font-size:11px;color:var(--text-3);line-height:15px;height:15px;margin-top:2px;}
 .idc-uid{font-size:11px;color:var(--text-3);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
@@ -2457,7 +2459,7 @@ window.CMS_FEATURES = {
       <div class="card">
         <div class="card-header"><div class="card-title">구매내역</div><span style="font-size:12px;color:var(--text-2)" id="gex-count">—</span></div>
         <table>
-            <colgroup><col style="width:9%"><col style="width:16%"><col style="width:19%"><col style="width:15%"><col style="width:10%"><col style="width:11%"><col style="width:9%"><col style="width:11%"></colgroup>
+            <colgroup><col style="width:9%"><col style="width:17%"><col style="width:20%"><col style="width:16%"><col style="width:10%"><col style="width:11%"><col style="width:8%"><col style="width:9%"></colgroup>
             <thead>
               <tr><th>구매일</th><th>주문번호</th><th>닉네임 / 카카오톡 ID / 식별 아이디</th><th>상품명</th><th>상품코드</th><th>유효기간</th><th>상태</th><th>사용한 티켓</th></tr>
             </thead>
@@ -2488,7 +2490,7 @@ window.CMS_FEATURES = {
       <div class="card">
         <div class="card-header"><div class="card-title">기프티콘 미사용 취소</div><span style="font-size:12px;color:var(--text-2)" id="gun-count">—</span></div>
         <table>
-            <colgroup><col style="width:10%"><col style="width:18%"><col style="width:21%"><col style="width:17%"><col style="width:11%"><col style="width:12%"><col style="width:11%"></colgroup>
+            <colgroup><col style="width:10%"><col style="width:19%"><col style="width:22%"><col style="width:18%"><col style="width:11%"><col style="width:11%"><col style="width:9%"></colgroup>
             <thead>
               <tr><th>구매일</th><th>주문번호</th><th>닉네임 / 카카오톡 ID / 식별 아이디</th><th>상품명</th><th>상품코드</th><th>유효기간</th><th>사용한 티켓</th></tr>
             </thead>
@@ -2519,7 +2521,7 @@ window.CMS_FEATURES = {
       <div class="card">
         <div class="card-header"><div class="card-title">취소내역</div><span style="font-size:12px;color:var(--text-2)" id="gcancel-count">—</span></div>
         <table>
-            <colgroup><col style="width:5%"><col style="width:17%"><col style="width:20%"><col style="width:16%"><col style="width:11%"><col style="width:10%"><col style="width:11%"><col style="width:10%"></colgroup>
+            <colgroup><col style="width:5%"><col style="width:18%"><col style="width:21%"><col style="width:17%"><col style="width:11%"><col style="width:9%"><col style="width:10%"><col style="width:9%"></colgroup>
             <thead>
               <tr><th>No</th><th>주문번호</th><th>닉네임 / 카카오톡 ID / 식별 아이디</th><th>상품명</th><th>취소날짜</th><th>상태</th><th>환불 티켓</th><th>보유 티켓</th></tr>
             </thead>
@@ -8200,7 +8202,7 @@ var GEX_CTRL = window.GEX_CTRL = ppMakeListController(20, function(pageItems, st
       + '<td style="font-family:monospace;font-size:11px;color:var(--text-3);">' + ppEsc(g.gifticon_id || '-') + '</td>'
       + '<td>' + gexValidity(g) + '</td>'
       + '<td>' + statusCell + '</td>'
-      + '<td>' + ticketCell(g.grade_used, g.count_used, false) + '</td>'
+      + '<td>' + usedTicketCell(g, false) + '</td>'
       + '</tr>';
   }).join('');
   if (pag) pag.innerHTML = ppPaginationHtml('GEX_CTRL', state.page, totalPages);
@@ -9952,17 +9954,33 @@ var GCANCEL_GRADE_KO = { bronze:'브론즈', silver:'실버', gold:'골드' };
 function tvUnit(grade) {
   return (GIP_TV && typeof GIP_TV[grade] === 'number') ? GIP_TV[grade] : null;
 }
-function ticketCell(grade, count, negative) {
-  grade = grade || 'bronze';
-  count = count || 0;
-  if (!count) return '<span class="ph-hold">—</span>';
-  var unit = tvUnit(grade);
+/* 티켓 칸은 등급마다 한 줄씩 쓰고 그 아래 원화 환산을 괄호로 붙인다 — 한 줄에 몰아 쓰면
+   「골드 1206 · 실버 133 · 브론즈」처럼 잘린다(김반장 2026-09-16). 가운데 정렬.
+   parts: [{grade, count}, …] 또는 (grade, count) 낱개 둘 다 받는다. */
+function ticketLines(parts, negative) {
+  parts = (parts || []).filter(function(x){ return x && x.count; });
+  if (!parts.length) return '<span class="ph-hold">—</span>';
   var sign = negative ? '−' : '';
-  var main = sign + (GIP_GRADE_KO[grade] || grade) + ' ' + count;
-  var sub = (unit === null)
+  var won = 0, unknown = false;
+  var rows = parts.map(function(x) {
+    var u = tvUnit(x.grade);
+    if (u === null) unknown = true; else won += u * x.count;
+    return '<div>' + sign + (GIP_GRADE_KO[x.grade] || x.grade) + ' ' + x.count + '</div>';
+  }).join('');
+  var sub = unknown
     ? '<div class="gip-price-none">(환산값 미설정)</div>'
-    : '<div class="gip-price-won">(' + sign + (unit * count).toLocaleString('ko-KR') + '원)</div>';
-  return '<div class="' + (negative ? 'ph-minus' : 'gip-price-main') + '">' + main + '</div>' + sub;
+    : '<div class="gip-price-won">(' + sign + won.toLocaleString('ko-KR') + '원)</div>';
+  return '<div class="tkc ' + (negative ? 'ph-minus' : 'gip-price-main') + '">' + rows + '</div>' + sub;
+}
+function ticketCell(grade, count, negative) {
+  return ticketLines([{ grade: grade || 'bronze', count: count || 0 }], negative);
+}
+/* 구매 기록에 조합(tickets_used)이 남아 있으면 등급마다 한 줄로 편다 —
+   큰 등급부터 채우는 규칙이라 한 건에 두세 등급이 섞인다. */
+function usedTicketCell(g, negative) {
+  var tu = (g && g.tickets_used && g.tickets_used.length) ? g.tickets_used : null;
+  if (tu) return ticketLines(tu, negative);
+  return ticketCell(g && g.grade_used, g && g.count_used, negative);
 }
 /* 보유 티켓 — 회원이 지금 들고 있는 등급 티켓(status=active). 등급이 여럿이면 나란히 적고
    환산 원화 합계를 아래에 붙인다. 포인트는 다른 단위라 여기 섞지 않는다. */
@@ -9970,18 +9988,15 @@ var GC_HOLD = {};
 function holdCell(uid) {
   var h = GC_HOLD[uid];
   if (!h) return '<span class="ph-hold">—</span>';
-  var parts = [], won = 0, any = false;
+  var parts = [], any = false;
   ['gold', 'silver', 'bronze'].forEach(function(g) {
     var c = h[g] || 0;
     if (!c) return;
     any = true;
-    parts.push((GIP_GRADE_KO[g] || g) + ' ' + c);
-    var u = tvUnit(g);
-    if (u !== null) won += u * c;
+    parts.push({ grade: g, count: c });
   });
   if (!any) return '<div class="ph-hold">0</div>';
-  return '<div class="gip-price-main" style="font-size:12px">' + parts.join(' · ') + '</div>'
-    + '<div class="gip-price-won">(' + won.toLocaleString('ko-KR') + '원)</div>';
+  return ticketLines(parts, false);
 }
 /* 취소내역에 뜬 회원들의 보유 티켓을 한 번에 읽어 둔다. */
 function loadHoldTickets(uids) {
@@ -10020,7 +10035,7 @@ var GUN_CTRL = window.GUN_CTRL = ppMakeListController(20, function(pageItems, st
       + '<td>' + gexProductName(g) + '</td>'
       + '<td style="font-family:monospace;font-size:11px;color:var(--text-3);">' + ppEsc(g.gifticon_id || '-') + '</td>'
       + '<td>' + gexValidity(g) + '</td>'
-      + '<td>' + ticketCell(g.grade_used, g.count_used, false) + '</td>'
+      + '<td>' + usedTicketCell(g, false) + '</td>'
       + '</tr>';
   }).join('');
   if (pag) pag.innerHTML = ppPaginationHtml('GUN_CTRL', state.page, totalPages);
@@ -10162,7 +10177,7 @@ var GCANCEL_CTRL = window.GCANCEL_CTRL = ppMakeListController(20, function(pageI
       + '<td>' + gexProductName(g) + '</td>'
       + '<td style="text-align:center">' + gexTwoLine(ppDt(g.cancelled_at), ppTm(g.cancelled_at)) + '</td>'
       + '<td style="text-align:center"><span style="background:var(--danger-soft);color:var(--danger);padding:3px 8px;border-radius:99px;font-size:11px;font-weight:600;">' + ppEsc(g.cancel_reason || '관리자 취소') + '</span></td>'
-      + '<td style="text-align:center">' + ticketCell(g.grade_used, g.count_used, true) + '</td>'
+      + '<td style="text-align:center">' + usedTicketCell(g, true) + '</td>'
       + '<td style="text-align:center">' + holdCell(g.user_id) + '</td>'
       + '</tr>';
   }).join('');
