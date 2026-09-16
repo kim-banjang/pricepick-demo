@@ -4891,14 +4891,14 @@
   /* 기프티샵 풀 그리드 */
   /* ══ 기프티샵 — 시안(2026-09-16) 그대로 ══
      자리·크기·여백은 시안에서 잰 값. 주된 보라는 앱 토큰(--main)을 쓰고, 시안이 새로
-     들인 색(티켓 바 남보라 · 교환가능 초록 · 회색조)은 그 값을 그대로 쓴다. */
+     들인 색(티켓 바 남보라 · 구매가능 초록 · 회색조)은 그 값을 그대로 쓴다. */
 
   /* 헤더 */
   .gs-head { flex: none; display: flex; align-items: center; gap: 12px; padding: 10px 20px 8px; background: white; }
   .gs-head-t { flex: 1; font-size: 18px; font-weight: 700; color: #191A20; }
   .gs-icobtn { background: none; border: none; padding: 0; display: flex; align-items: center; color: #191A20; cursor: pointer; }
 
-  /* 탭 — 홈 · 브랜드 · 교환 내역 */
+  /* 탭 — 홈 · 브랜드 · 구매 내역 */
   .gs-tabs { display: grid; grid-template-columns: 1fr 1fr 1fr; background: white; border-bottom: 1px solid #F0F0F4; flex: none; }
   .gs-tab { text-align: center; padding: 13px 0; font-size: 15px; font-weight: 500; color: #9A9AA5; cursor: pointer; }
   .gs-tab.active { font-weight: 700; color: var(--main); box-shadow: inset 0 -2px 0 var(--main); }
@@ -7421,10 +7421,12 @@
   .ex-lack b { font-weight: 700; white-space: nowrap; }
   .ex-deduct { background: #F3F1FC; border-radius: 12px; padding: 11px 14px; text-align: center; font-size: 13px; font-weight: 600; color: #5A44C9; }
   .ex-cta { margin-top: 10px; width: 100%; background: var(--main); border: none; border-radius: 14px; padding: 16px 0; text-align: center; font-size: 16px; font-weight: 700; color: white; font-family: inherit; cursor: pointer; }
+  /* 티켓이 모자라면 회색 — 눌리되 구매는 안 되고 안내만 뜬다(죽은 단추로 두지 않는다). */
+  .ex-cta.off { background: #E4E4EC; color: #9A9AA5; }
   .ex-detail-bottom { border-top: 1px solid var(--border); padding: 12px 16px 32px; }
 
-  /* ── 교환 완료 — 시안(2026-09-16) ── */
-  /* ── 교환 내역 — 시안(2026-09-16) ── */
+  /* ── 구매 완료 — 시안(2026-09-16) ── */
+  /* ── 구매 내역 — 시안(2026-09-16) ── */
   .gxh-screen { height: 100%; display: flex; flex-direction: column; background: #F7F6FB; overflow: hidden; }
   .gxh-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding: 14px 20px; }
   .gxh-list::-webkit-scrollbar { display: none; }
@@ -9696,8 +9698,8 @@ window.PP_FEATURES = {
                 </svg>
               </div>
               <div class="htc-cta-body">
-                <div class="htc-cta-l1">기프티콘 교환</div>
-                <div class="htc-cta-l2">티켓으로 커피·상품권 교환</div>
+                <div class="htc-cta-l1">기프티콘 구매</div>
+                <div class="htc-cta-l2">티켓으로 커피·상품권 구매</div>
               </div>
               <svg class="htc-cta-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </div>
@@ -10557,7 +10559,7 @@ window.PP_FEATURES = {
           </div>
 
           <div class="mtc-cta-row">
-            <button class="mtc-cta primary" data-pp-feature="exchange-entry">기프티콘 교환</button>
+            <button class="mtc-cta primary" data-pp-feature="exchange-entry">기프티콘 구매</button>
             <button class="mtc-cta secondary" data-pp-feature="weekly-raffle">경품 응모 <span class="mtc-cta-badge" id="badge-tip-btn">3</span></button>
           </div>
 
@@ -10721,7 +10723,7 @@ window.PP_FEATURES = {
         <div class="gs-tabs">
           <div class="gs-tab active" data-gs-tab="home">홈</div>
           <div class="gs-tab" data-gs-tab="brand">브랜드</div>
-          <div class="gs-tab" data-gs-tab="history">교환 내역</div>
+          <div class="gs-tab" data-gs-tab="history">구매 내역</div>
         </div>
 
         <!-- 검색 — 헤더 돋보기로 여닫는다 -->
@@ -10748,13 +10750,13 @@ window.PP_FEATURES = {
           </div>
         </div>
 
-        <!-- 브랜드 탭: 정렬과 「교환 가능만」이 한 줄, 구역 제목은 그 아래 -->
+        <!-- 브랜드 탭: 정렬과 「구매 가능만」이 한 줄, 구역 제목은 그 아래 -->
         <div class="gs-row gs-row-brand" id="gs-row-brand" style="display:none;">
           <div class="gs-sort">
             <span data-gs-sort="popular" class="gs-on">인기순</span><span class="gs-sep">·</span><span data-gs-sort="low">낮은가격순</span><span class="gs-sep">·</span><span data-gs-sort="high">높은가격순</span>
           </div>
           <div class="gs-av">
-            <span class="gs-av-l">교환 가능만</span>
+            <span class="gs-av-l">구매 가능만</span>
             <div class="gs-sw" id="gs-avail-sw"></div>
           </div>
         </div>
@@ -12300,9 +12302,9 @@ window.PP_FEATURES = {
           <b style="color:var(--text1);">제1조 (목적)</b>
           <p style="margin:4px 0 14px;">PricePick이 제공하는 제휴몰 경유 쇼핑 리워드 적립 서비스의 이용조건과 권리·의무를 규정합니다.</p>
           <b style="color:var(--text1);">제2조 (정의)</b>
-          <p style="margin:4px 0 4px;">① "서비스" — 티켓 적립·교환·기프티콘 교환 등 모든 기능</p>
+          <p style="margin:4px 0 4px;">① "서비스" — 티켓 적립·교환·기프티콘 구매 등 모든 기능</p>
           <p style="margin:0 0 4px;">② "티켓" — 브론즈·실버·골드 등급의 보상 단위</p>
-          <p style="margin:0 0 14px;">③ "기프티콘" — 티켓 교환으로 지급되는 디지털 상품권</p>
+          <p style="margin:0 0 14px;">③ "기프티콘" — 티켓으로 구매하는 디지털 상품권</p>
           <b style="color:var(--text1);">제3조 (약관의 효력 및 변경)</b>
           <p style="margin:4px 0 4px;">① 서비스 화면 게시 시 효력 발생</p>
           <p style="margin:0 0 14px;">② 개정 시 적용일 7일 전 공지사항으로 고지</p>
@@ -12800,7 +12802,7 @@ window.PP_FEATURES = {
           </div>
           <div class="activity-item">
             <div class="ai-ico use"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v2z"/><line x1="13" y1="5" x2="13" y2="19" stroke-dasharray="3 3"/></svg></div>
-            <div class="ai-info"><div class="ai-title">스타벅스 아메리카노 교환</div><div class="ai-detail">브론즈 티켓 5장 사용</div></div>
+            <div class="ai-info"><div class="ai-title">스타벅스 아메리카노 구매</div><div class="ai-detail">브론즈 티켓 5장 사용</div></div>
             <div class="ai-amount"><div class="ai-ticket use">-5장</div><div class="ai-balance">브론즈 잔여 7장</div></div>
           </div>
           <div class="activity-item">
@@ -12830,7 +12832,7 @@ window.PP_FEATURES = {
       <div class="detail-ex-screen">
         <div class="statusbar"><span>9:41</span><div class="statusbar-icons"><svg width="17" height="12" viewBox="0 0 17 12" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><rect x="0" y="4" width="3" height="8" rx="1"/><rect x="4.5" y="2.5" width="3" height="9.5" rx="1"/><rect x="9" y="1" width="3" height="11" rx="1"/><rect x="13.5" y="0" width="3" height="12" rx="1"/></svg><svg width="16" height="12" viewBox="0 0 16 12" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M8 2.5C10.2 2.5 12.2 3.4 13.6 4.9L15 3.4C13.2 1.5 10.7 0.3 8 0.3C5.3 0.3 2.8 1.5 1 3.4L2.4 4.9C3.8 3.4 5.8 2.5 8 2.5Z"/><path d="M8 5.5C9.4 5.5 10.7 6.1 11.6 7L13 5.5C11.7 4.2 10 3.3 8 3.3C6 3.3 4.3 4.2 3 5.5L4.4 7C5.3 6.1 6.6 5.5 8 5.5Z"/><circle cx="8" cy="10" r="1.8"/></svg><svg width="25" height="12" viewBox="0 0 25 12" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="currentColor" stroke-opacity="0.35"/><rect x="2" y="2" width="17" height="8" rx="2" fill="currentColor"/><path d="M23 4V8C23.8 7.6 24.5 6.9 24.5 6C24.5 5.1 23.8 4.4 23 4Z" fill="currentColor" fill-opacity="0.4"/></svg></div></div>
         <!-- 시안(2026-09-16) 차례: 제목 / 상품 사진 / 브랜드·상품명·티켓·보유 /
-             기프티콘 쿠폰 유의사항 / 차감 안내 + 교환하기.
+             기프티콘 쿠폰 유의사항 / 차감 안내 + 구매하기.
              유의사항은 상품에 딸려 온 원문을 줄 생김새대로만 다듬어 보여 준다. -->
         <div class="gs-head">
           <button class="gs-icobtn" id="exd-back"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M15 5l-7 7 7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
@@ -12852,7 +12854,7 @@ window.PP_FEATURES = {
         <div class="ex-detail-bottom-new">
           <div class="ex-lack" id="exd-lack" style="display:none;" onclick="showScreen('pw-22')"></div>
           <div class="ex-deduct"></div>
-          <button class="ex-cta btn-primary">교환하기</button>
+          <button class="ex-cta btn-primary">구매하기</button>
         </div>
       </div>
     </div>
@@ -13322,7 +13324,7 @@ window.PP_FEATURES = {
   </div>
 
   <div class="phone-wrap" id="pw-24h" data-screen="10a-h">
-    <div class="phone-label"><span class="num">24h</span>기프티콘 교환 내역<span class="pill-cat">기프티샵</span></div>
+    <div class="phone-label"><span class="num">24h</span>기프티콘 구매 내역<span class="pill-cat">기프티샵</span></div>
     <div class="phone">
       <!-- 시안(2026-09-16): 기프티샵 헤더 · 탭(교환 내역) · 회색 바탕에 흰 카드 목록 -->
       <div class="gxh-screen">
@@ -13335,7 +13337,7 @@ window.PP_FEATURES = {
         <div class="gs-tabs">
           <div class="gs-tab" data-gxh-tab="home">홈</div>
           <div class="gs-tab" data-gxh-tab="brand">브랜드</div>
-          <div class="gs-tab active" data-gxh-tab="history">교환 내역</div>
+          <div class="gs-tab active" data-gxh-tab="history">구매 내역</div>
         </div>
         <div class="gxh-list" id="gx-history-list"></div>
       </div>
@@ -13412,8 +13414,8 @@ const SCREEN_MAP = {
   'pw-22':          { id:'22',             name:'티켓 & 포인트 교환소' },
   'pw-23':          { id:'23',             name:'적립 조건 안내' },
   'pw-24':          { id:'24',             name:'기프티샵 (카탈로그)' },
-  'pw-24h':         { id:'24h',            name:'기프티콘 교환 내역' },
-  'pw-25':          { id:'25',             name:'기프티콘 교환 상세' },
+  'pw-24h':         { id:'24h',            name:'기프티콘 구매 내역' },
+  'pw-25':          { id:'25',             name:'기프티콘 구매 상세' },
   'pw-26':          { id:'26',             name:'경품 응모' },
   'pw-30':          { id:'30',             name:'마이페이지' },
   'pw-31':          { id:'31',             name:'설정' },
@@ -13944,8 +13946,8 @@ const SB_SPECS = {
     ]
   },
   "25": {
-    "title": "기프티콘 교환 상세",
-    "purpose": "기프티콘 상세 + 최종 교환 확인.",
+    "title": "기프티콘 구매 상세",
+    "purpose": "기프티콘 상세 + 최종 구매 확인.",
     "specs": [
       {
         "h": "핵심 컨텐츠",
@@ -13953,13 +13955,13 @@ const SB_SPECS = {
           "상품 카드: 이미지 + 브랜드 + 상품명",
           "필요 티켓 / 유효기간 / 보유 비교",
           "차감 미리보기",
-          "\"교환하기\" CTA"
+          "\"구매하기\" CTA"
         ]
       },
       {
         "h": "인터랙션",
         "items": [
-          "\"교환하기\" → 확인 모달 → 완료 토스트 → 20",
+          "\"구매하기\" → 확인 모달 → 완료 토스트 → 20",
           "뒤로 → 24"
         ]
       }
@@ -16464,7 +16466,7 @@ function csCheck() {
 function csSubmitInquiry(btn) {
   if (btn.disabled) return;
   var typeLbl = (document.getElementById('cs-type-lbl') || {}).textContent || '기타';
-  var CAT_KEY = { '티켓 적립':'postback', '기프티콘 교환':'gifticon', '티켓 교환·환수':'postback', '계정·로그인':'account', '기타':'general' };
+  var CAT_KEY = { '티켓 적립':'postback', '기프티콘 구매':'gifticon', '티켓 교환·환수':'postback', '계정·로그인':'account', '기타':'general' };
   var category = CAT_KEY[typeLbl] || 'general';
   var title = (document.getElementById('cs-title') || {}).value || '';
   var body = (document.getElementById('cs-body') || {}).value || '';
@@ -16800,9 +16802,9 @@ Object.assign(KO2VI, {
   "추천순": "Đề xuất",
   "가격 낮은순": "Giá thấp dần",
   "가격 높은순": "Giá cao dần",
-  "교환 가능순": "Đổi được trước",
-  "교환 내역": "Lịch sử đổi",
-  "기프티콘 교환 내역": "Lịch sử đổi Gifticon",
+  
+  "구매 내역": "Lịch sử mua",
+  "기프티콘 구매 내역": "Lịch sử mua Gifticon",
   "초대한 친구가 첫 구매를 완료하면": "Khi bạn được mời hoàn tất lần mua đầu",
   "친구 첫 구매 완료 시 지급": "Cấp khi bạn hoàn tất lần mua đầu",
   "첫 구매 완료 시 지급": "Cấp khi hoàn tất lần mua đầu",
@@ -16952,14 +16954,14 @@ Object.assign(KO2VI, {
     "장 적립됨": "vé đã tích lũy",
     "티켓 사용 안내": "Hướng dẫn dùng vé",
     "구매 확정 후 등급 티켓으로 전환되면 사용 가능해요.": "Sau khi xác nhận mua, vé sẽ chuyển thành vé hạng và dùng được.",
-    "혜택 탭 > 기프티샵에서 기프티콘으로 교환하세요.": "Vào tab Ưu đãi > Gifti Shop để đổi lấy Gifticon.",
+    "혜택 탭 > 기프티샵에서 기프티콘으로 구매하세요.": "Vào tab Ưu đãi > Gifti Shop để mua Gifticon.",
     "원": "₩",
 
     /* ex-done 기프티콘 교환 완료 */
-    "교환 완료!": "Đã đổi xong!",
+    "구매 완료!": "Đã mua xong!",
     "기프티콘이 발급되었어요.": "Gifticon đã được cấp.",
     "아래 코드로 사용하세요.": "Hãy dùng bằng mã bên dưới.",
-    "교환 코드": "Mã đổi"
+    "구매 코드": "Mã mua"
   });
   /* ── 런타임 렌더 문구 보강 (2026-07-30) ────────────────────────────────
      정적 DOM에는 없고 JS가 그려 넣는 앱 UI 카피(빈 상태 안내·출석 진행 문구).
@@ -16969,7 +16971,7 @@ Object.assign(KO2VI, {
     "0장": "0 vé",
     /* 빈 상태 — ppEmpty(제목/설명) 2줄 구조라 줄 단위로 넣는다 */
     "활동 내역이 없어요": "Chưa có lịch sử hoạt động",
-    "티켓을 적립하거나 기프티콘을 교환하면": "Khi bạn tích lũy vé hoặc đổi Gifticon",
+    "티켓을 적립하거나 기프티콘을 구매하면": "Khi bạn tích lũy vé hoặc mua Gifticon",
     "여기에 기록돼요": "sẽ được ghi lại ở đây",
     "구매 내역이 없어요": "Chưa có lịch sử mua",
     "쇼핑몰을 경유해 구매하면": "Khi mua qua cửa hàng liên kết",
@@ -16982,7 +16984,7 @@ Object.assign(KO2VI, {
     "아직 초대한 친구가 없어요": "Bạn chưa mời bạn bè nào",
     "친구를 초대하고 첫 구매가 성사되면": "Mời bạn bè và khi họ mua lần đầu thành công",
     "아직 포인트 적립·사용 내역이 없어요": "Chưa có lịch sử tích lũy·sử dụng điểm",
-    "아직 교환한 기프티콘이 없어요": "Chưa có Gifticon nào đã đổi",
+    "아직 구매한 기프티콘이 없어요": "Chưa có Gifticon nào đã mua",
     "대기 중이거나 최근 전환된 랜덤 티켓이 없어요.": "Không có vé ngẫu nhiên đang chờ hoặc vừa chuyển đổi.",
     "보유한 등급 티켓이 없어요. 쇼핑몰 구매로 티켓을 적립해 보세요.": "Bạn chưa có vé hạng nào. Hãy mua ở cửa hàng để tích lũy vé.",
     "보유 중인 등급 티켓이 없어요.": "Bạn chưa có vé hạng nào.",
@@ -17400,7 +17402,7 @@ function cpkOpen(){var m=document.getElementById('cpk-modal');if(m)m.style.displ
           <div style="background:var(--sub-4);border-radius:12px;padding:14px 16px;font-size:var(--fs-caption);color:var(--main-dark);line-height:1.7;">
             <b>티켓 사용 안내</b><br>
             구매 확정 후 등급 티켓으로 전환되면 사용 가능해요.<br>
-            혜택 탭 &gt; 기프티샵에서 기프티콘으로 교환하세요.
+            혜택 탭 &gt; 기프티샵에서 기프티콘으로 구매하세요.
           </div>
         </div>
         <!-- 하단 CTA -->
@@ -17411,16 +17413,16 @@ function cpkOpen(){var m=document.getElementById('cpk-modal');if(m)m.style.displ
     </div>
   </div>
 
-  <!-- [추가] 기프티콘 교환 완료 화면 -->
+  <!-- [추가] 기프티콘 구매 완료 화면 -->
   <div class="phone-wrap" id="pw-ex-done" data-screen="ex-done">
     <div class="phone">
-      <!-- 시안(2026-09-16) 차례: 초록 체크 / 교환 완료! / 기프티콘 카드(사진·이름·티켓 ·
-           절취선 · 코드·복사·바코드 · 주문번호·교환일·유효기간) / 안내 / 확인 · 홈으로 가기 -->
+      <!-- 시안(2026-09-16) 차례: 초록 체크 / 구매 완료! / 기프티콘 카드(사진·이름·티켓 ·
+           절취선 · 코드·복사·바코드 · 주문번호·구매일·유효기간) / 안내 / 확인 · 홈으로 가기 -->
       <div class="exd-screen">
         <div class="statusbar"><span>9:41</span><div class="statusbar-icons"><svg width="17" height="12" viewBox="0 0 17 12" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><rect x="0" y="4" width="3" height="8" rx="1"/><rect x="4.5" y="2.5" width="3" height="9.5" rx="1"/><rect x="9" y="1" width="3" height="11" rx="1"/><rect x="13.5" y="0" width="3" height="12" rx="1"/></svg><svg width="16" height="12" viewBox="0 0 16 12" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M8 2.5C10.2 2.5 12.2 3.4 13.6 4.9L15 3.4C13.2 1.5 10.7 0.3 8 0.3C5.3 0.3 2.8 1.5 1 3.4L2.4 4.9C3.8 3.4 5.8 2.5 8 2.5Z"/><path d="M8 5.5C9.4 5.5 10.7 6.1 11.6 7L13 5.5C11.7 4.2 10 3.3 8 3.3C6 3.3 4.3 4.2 3 5.5L4.4 7C5.3 6.1 6.6 5.5 8 5.5Z"/><circle cx="8" cy="10" r="1.8"/></svg><svg width="25" height="12" viewBox="0 0 25 12" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="currentColor" stroke-opacity="0.35"/><rect x="2" y="2" width="17" height="8" rx="2" fill="currentColor"/><path d="M23 4V8C23.8 7.6 24.5 6.9 24.5 6C24.5 5.1 23.8 4.4 23 4Z" fill="currentColor" fill-opacity="0.4"/></svg></div></div>
         <div class="exd-top">
           <div class="exd-check"><svg width="34" height="34" viewBox="0 0 24 24" fill="none"><path d="M5 12.5L10 17.5L19 7" stroke="white" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-          <div class="exd-t">교환 완료!</div>
+          <div class="exd-t">구매 완료!</div>
           <div class="exd-s">기프티콘이 발급되었어요. 아래 코드로 사용하세요.</div>
         </div>
 
@@ -17436,20 +17438,20 @@ function cpkOpen(){var m=document.getElementById('cpk-modal');if(m)m.style.displ
           <div class="exd-perf"><span class="exd-notch l"></span><span class="exd-dash"></span><span class="exd-notch r"></span></div>
           <div class="exd-card-bot">
             <div class="exd-code-hd">
-              <div class="exd-code-l">교환 코드</div>
+              <div class="exd-code-l">구매 코드</div>
               <button class="exd-copy" id="ex-done-copy"><svg width="13" height="13" viewBox="0 0 24 24" fill="none"><rect x="9" y="9" width="11" height="11" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M5 15V6a2 2 0 0 1 2-2h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><span>복사</span></button>
             </div>
             <div class="exd-code" id="ex-done-code"></div>
             <div class="exd-barcode" style="background:repeating-linear-gradient(90deg,#191A20 0 2px,transparent 2px 4px,#191A20 4px 7px,transparent 7px 8px,#191A20 8px 9px,transparent 9px 12px,#191A20 12px 14px,transparent 14px 17px);"></div>
             <div class="exd-rows">
               <div class="exd-row" id="ex-done-order-row"><span>주문번호</span><b id="ex-done-order"></b></div>
-              <div class="exd-row" id="ex-done-date-row"><span>교환일</span><b id="ex-done-date"></b></div>
+              <div class="exd-row" id="ex-done-date-row"><span>구매일</span><b id="ex-done-date"></b></div>
               <div class="exd-row" id="ex-done-exp-row"><span>유효기간</span><b class="strong" id="ex-done-exp"></b></div>
             </div>
           </div>
         </div>
 
-        <div class="exd-tip"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" style="flex:none"><circle cx="12" cy="12" r="9" stroke="#5A44C9" stroke-width="1.7"/><path d="M12 11v5M12 7.6v.9" stroke="#5A44C9" stroke-width="1.8" stroke-linecap="round"/></svg><span>발급된 기프티콘은 교환 내역에서 다시 확인할 수 있어요.</span></div>
+        <div class="exd-tip"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" style="flex:none"><circle cx="12" cy="12" r="9" stroke="#5A44C9" stroke-width="1.7"/><path d="M12 11v5M12 7.6v.9" stroke="#5A44C9" stroke-width="1.8" stroke-linecap="round"/></svg><span>발급된 기프티콘은 구매 내역에서 다시 확인할 수 있어요.</span></div>
         <div style="flex:1;"></div>
         <button class="exd-ok btn-primary" data-ip-bound="1" onclick="showScreen('pw-24h')">확인</button>
         <div class="exd-home" data-ip-bound="1" onclick="showScreen('pw-10')">홈으로 가기</div>
@@ -18660,9 +18662,9 @@ function ppGiImgFallback(img) {
 window.ppGiImgFallback = ppGiImgFallback;
 
 /* ── 기프티샵 목록 (pw-24) ──
-   시안(2026-09-16)을 그대로 따른다. 탭은 홈 · 브랜드 · 교환 내역 셋.
-   홈 탭은 「인기상품 + 정렬」이 한 줄, 브랜드 탭은 브랜드 칩 · 「정렬 + 교환 가능만」 ·
-   구역 제목 차례. 칸은 2단이고 상품 사진 위에 「교환가능」 딱지가 붙는다.
+   시안(2026-09-16)을 그대로 따른다. 탭은 홈 · 브랜드 · 구매 내역 셋.
+   홈 탭은 「인기상품 + 정렬」이 한 줄, 브랜드 탭은 브랜드 칩 · 「정렬 + 구매 가능만」 ·
+   구역 제목 차례. 칸은 2단이고 상품 사진 위에 「구매가능」 딱지가 붙는다.
    갈래(카테고리) 칩은 시안에 없어서 뺐다. */
 /* ── 티켓 환산 — 큰 등급부터 채운다 ──
    정책: 적립이 「큰 등급부터 채워 지급」이므로 사용(교환)도 같은 규칙을 쓴다.
@@ -18706,6 +18708,41 @@ function ppComboShort(c) {
   if (!c.length) return '';
   return PP_GRADE_KO[c[0].grade] + ' ' + c[0].count + '장' + (c.length > 1 ? ' +' : '');
 }
+/* 모자란 등급을 다른 등급으로 바꿔 채울 수 있는지 따진다.
+   보유 총 가치가 상품 값에 못 미치면 바꿔도 못 사므로 null 을 돌려준다(교환소로 안 보낸다).
+   채울 수 있으면 「무엇이 몇 장 모자란지」와 「무엇을 몇 장 바꾸면 되는지」를 짧게 적는다. */
+function ppTicketWorth() {
+  return PP_GRADE_ORDER.reduce(function (a, gr) {
+    return a + (PP.tickets[gr] || 0) * (PP_TV[gr] || 0);
+  }, 0);
+}
+function ppSwapPlan(combo) {
+  var lack = ppComboHave(combo);
+  if (!lack.length) return null;
+  var price = combo.reduce(function (a, x) { return a + x.count * (PP_TV[x.grade] || 0); }, 0);
+  if (ppTicketWorth() < price) return null;          /* ③ 다 바꿔도 못 산다 */
+
+  /* 모자란 값을 남는 등급에서 끌어온다 — 작은 등급부터 걷어 큰 등급을 만든다. */
+  var need = lack.reduce(function (a, x) { return a + x.short * (PP_TV[x.grade] || 0); }, 0);
+  var spare = {};
+  PP_GRADE_ORDER.forEach(function (gr) {
+    var used = 0;
+    combo.forEach(function (x) { if (x.grade === gr) used = x.count; });
+    spare[gr] = Math.max(0, (PP.tickets[gr] || 0) - used);
+  });
+  var give = [];
+  ['bronze', 'silver', 'gold'].forEach(function (gr) {
+    if (need <= 0) return;
+    var unit = PP_TV[gr] || 0;
+    if (!unit || !spare[gr]) return;
+    var k = Math.min(spare[gr], Math.ceil(need / unit));
+    if (k > 0) { give.push(PP_GRADE_KO[gr] + ' ' + k + '장'); need -= k * unit; }
+  });
+
+  var short = lack.map(function (x) { return PP_GRADE_KO[x.grade] + '가 ' + x.short + '장 모자랍니다'; }).join(' · ');
+  return { text: short + (give.length ? ' — ' + give.join(' · ') + '을 바꾸면 됩니다' : '') };
+}
+
 function ppComboHave(c) {
   return c.filter(function (x) { return (PP.tickets[x.grade] || 0) < x.count; })
           .map(function (x) { return { grade: x.grade, short: x.count - (PP.tickets[x.grade] || 0) }; });
@@ -18870,9 +18907,9 @@ function renderGifticons() {
   if (!grid) return;
   if (!list.length) {
     var why = PP_GI_Q ? '찾는 말과 맞는 상품이 없어요'
-      : PP_GI_AVAIL_ONLY ? '지금 교환할 수 있는 상품이 없어요'
+      : PP_GI_AVAIL_ONLY ? '지금 구매할 수 있는 상품이 없어요'
       : PP_GI_BRAND ? '이 갈래에는 아직 상품이 없어요'
-      : '교환 가능한 기프티콘이 없어요';
+      : '구매할 수 있는 기프티콘이 없어요';
     var how = PP_GI_Q ? '다른 말로 찾아 보세요'
       : PP_GI_AVAIL_ONLY ? '티켓을 더 모으면 여기에 나타나요'
       : PP_GI_BRAND ? '다른 갈래를 눌러 보세요'
@@ -18887,7 +18924,7 @@ function renderGifticons() {
       : PP_GI_PLACEHOLDER_SVG;
     return '<div class="gs-card" data-pp-gi="' + i + '">'
       + '<div class="gs-card-img">' + img
-      + (ppGiAvail(g) ? '<span class="gs-badge">교환가능</span>' : '')
+      + (ppGiAvail(g) ? '<span class="gs-badge">구매가능</span>' : '')
       + '</div>'
       + '<div class="gs-card-b">'
       + '<div class="gs-brand">' + ppEsc(g.brand || '') + '</div>'
@@ -18993,7 +19030,7 @@ function ppFillExDone(g, x) {
     cp.addEventListener('click', function () {
       var t = (document.getElementById('ex-done-code') || {}).textContent || '';
       if (!t) return;
-      var done = function () { showToast('교환 코드를 복사했어요'); };
+      var done = function () { showToast('구매 코드를 복사했어요'); };
       if (navigator.clipboard && navigator.clipboard.writeText) {
         navigator.clipboard.writeText(t).then(done).catch(function () {});
       } else {
@@ -19037,32 +19074,49 @@ function populateGifticonDetail(g) {
         + '<span>' + PP_GRADE_KO[x.grade] + ' 티켓 ' + x.count + '장</span></span>';
     }).join('<span class="ex-plus">+</span>');
   }
+  /* 보유 티켓은 등급 셋을 다 적는다 — 모자랄 때 회원이 볼 것이 이것뿐이다. */
   var haveEl = s.querySelector('.ex-cost-have');
-  if (haveEl) haveEl.textContent = '현재 보유: ' + combo.map(function (x) {
-    return PP_GRADE_KO[x.grade] + ' ' + (PP.tickets[x.grade] || 0) + '장';
+  if (haveEl) haveEl.textContent = '현재 보유: ' + PP_GRADE_ORDER.slice().reverse().map(function (gr) {
+    return PP_GRADE_KO[gr] + ' ' + (PP.tickets[gr] || 0) + '장';
   }).join(' · ');
 
-  var deduct = s.querySelector('.ex-deduct');
-  if (deduct) deduct.textContent = ppComboText(combo, ' · ') + ' 차감 → 잔여 '
-    + combo.map(function (x) {
-        return PP_GRADE_KO[x.grade] + ' ' + Math.max(0, (PP.tickets[x.grade] || 0) - x.count) + '장';
-      }).join(' · ');
-
-  /* 모자라면 조용히 막지 않고 교환소로 보낸다 — 등급 교환은 양방향이라 바꿔 채울 수 있다. */
+  /* 아래는 셋으로 갈린다.
+       ① 보유로 바로 산다        — 차감 줄 + 구매하기(활성)
+       ② 지금 등급은 모자라지만 총 가치로는 된다 — 모자란 장수·바꿀 장수 + 교환소 링크 + 구매하기(꺼짐)
+       ③ 다 바꿔도 못 산다       — 보유 티켓 수만 + 구매하기(꺼짐)
+     ③에서는 교환소로 보내지 않는다 — 가 봐야 채울 수 없다(김반장 2026-09-16). */
   var lack = ppComboHave(combo);
+  var deduct = s.querySelector('.ex-deduct');
   var warn = document.getElementById('exd-lack');
   var cta = s.querySelector('.ex-cta');
+  var enough = !lack.length;
+
+  if (deduct) {
+    if (enough) {
+      deduct.textContent = ppComboText(combo, ' · ') + ' 차감 → 잔여 '
+        + combo.map(function (x) {
+            return PP_GRADE_KO[x.grade] + ' ' + ((PP.tickets[x.grade] || 0) - x.count) + '장';
+          }).join(' · ');
+      deduct.style.display = '';
+    } else {
+      deduct.style.display = 'none';   /* 모자랄 때는 계산하지 않는다 */
+    }
+  }
+
   if (warn) {
-    if (lack.length) {
-      warn.innerHTML = '<span>' + lack.map(function (x) {
-          return PP_GRADE_KO[x.grade] + '가 ' + x.short + '장 모자랍니다';
-        }).join(' · ') + '</span><b>교환소에서 바꾸기 ›</b>';
+    var swap = enough ? null : ppSwapPlan(combo);
+    if (swap) {
+      warn.innerHTML = '<span>' + swap.text + '</span><b>티켓 &amp; 포인트 교환소에서 바꾸기 ›</b>';
       warn.style.display = '';
     } else {
       warn.style.display = 'none';
     }
   }
-  if (cta) cta.textContent = lack.length ? '교환소에서 티켓 바꾸기' : '교환하기';
+
+  if (cta) {
+    cta.textContent = '구매하기';
+    cta.classList.toggle('off', !enough);
+  }
 
   var html = ppNoticeHtml(g.notice || g.description);
   var nw = document.getElementById('exd-note-wrap');
@@ -19089,7 +19143,7 @@ function bindExchangeBtn() {
     /* 차감도 표시와 같은 규칙(큰 등급부터 채운 조합)이어야 한다 — 다르면 사고다. */
     var combo = ppComboOf(g);
     var lack = ppComboHave(combo);
-    if (lack.length) { window.showScreen('pw-22'); return; }
+    if (lack.length) { showToast('구매할 수 있는 티켓이 부족합니다.'); return; }
     var grade = combo[0].grade;
     var cnt = combo.reduce(function (a, x) { return a + x.count; }, 0);
     btn.disabled = true;
@@ -19159,7 +19213,7 @@ function bindExchangeBtn() {
         ppFillExDone(g, res);
         btn.disabled = false;
         window.showScreen('pw-ex-done');
-      }).catch(function(e){ console.error('exchange', e); showToast('교환 중 오류'); btn.disabled = false; });
+      }).catch(function(e){ console.error('exchange', e); showToast('구매 중 오류'); btn.disabled = false; });
   }, true);
 }
 
@@ -19523,7 +19577,7 @@ function ppRenderActListHtml(ev, filter) {
   var list = filter ? ev.filter(function (e) { return e.ft === filter; }) : ev;
   if (!list.length) {
     return filter ? '<div style="padding:40px 16px;text-align:center;color:var(--text3);font-size:var(--fs-body);">해당 내역이 없어요</div>'
-      : ppEmpty('<span style="display:inline-flex;color:#C9C2DC"><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5.2 5h13.6l1.7 8.5v4a2 2 0 0 1-2 2H5.5a2 2 0 0 1-2-2v-4L5.2 5z"/><path d="M3.5 13.5h4l1.5 3h6l1.5-3h4"/></svg></span>', '활동 내역이 없어요', '티켓을 적립하거나 기프티콘을 교환하면<br>여기에 기록돼요');
+      : ppEmpty('<span style="display:inline-flex;color:#C9C2DC"><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5.2 5h13.6l1.7 8.5v4a2 2 0 0 1-2 2H5.5a2 2 0 0 1-2-2v-4L5.2 5z"/><path d="M3.5 13.5h4l1.5 3h6l1.5-3h4"/></svg></span>', '활동 내역이 없어요', '티켓을 적립하거나 기프티콘을 구매하면<br>여기에 기록돼요');
   }
   var cur = '', parts = [];
   list.forEach(function (e) {
@@ -19569,13 +19623,13 @@ function renderActivity(filter) {
         return;
       }
       if (type === 'earn') ev.push({ d: d, ft: 'earn', ico: 'earn', title: g + ' 티켓 적립', detail: '티켓 적립', amt: '+1장', cls: 'earn', badge: badge, grade: grade, qty: 1 });
-      else if (type === 'use') ev.push({ d: d, ft: 'use', ico: 'use', title: g + ' 티켓 사용', detail: '기프티콘 교환 사용', amt: '-1장', cls: 'use', badge: badge, grade: grade, qty: -1 });
+      else if (type === 'use') ev.push({ d: d, ft: 'use', ico: 'use', title: g + ' 티켓 사용', detail: '기프티콘 구매 사용', amt: '-1장', cls: 'use', badge: badge, grade: grade, qty: -1 });
       else if (type === 'expire') ev.push({ d: d, ft: 'expire', ico: 'return', title: g + ' 티켓 만료 소멸', detail: '유효기간 경과', amt: '-1장', cls: 'return', grade: grade, qty: -1 });
       else if (type === 'clawback') ev.push({ d: d, ft: 'claw', ico: 'return', title: g + ' 티켓 환수', detail: '구매 취소·환불', amt: '-1장', cls: 'return', badge: badge, grade: grade, qty: -1 });
       else ev.push({ d: d, ft: 'swap', ico: 'exchange', title: g + ' 티켓 전환', detail: '등급 전환', amt: '', cls: 'use' });
     });
     gex.forEach(function (x) {
-      ev.push({ d: ppDate(x.exchanged_at), ft: 'use', ico: 'use', title: '기프티콘 교환', detail: (GRADE_KO[x.grade_used] || '') + ' ' + (x.count_used || 1) + '장 사용', amt: '-' + (x.count_used || 1) + '장', cls: 'use', grade: x.grade_used, qty: -(x.count_used || 1) });
+      ev.push({ d: ppDate(x.exchanged_at), ft: 'use', ico: 'use', title: '기프티콘 구매', detail: (GRADE_KO[x.grade_used] || '') + ' ' + (x.count_used || 1) + '장 사용', amt: '-' + (x.count_used || 1) + '장', cls: 'use', grade: x.grade_used, qty: -(x.count_used || 1) });
     });
     ptx.forEach(function (p) {
       var amt = p.amount != null ? p.amount : (p.qty || 0);
@@ -19706,7 +19760,7 @@ function renderNotifications() {
       items.push({ key: 'pb:' + p._id, type: 'pick', dom: p.mall_domain || '', d: ppDate(p.created_at), tag: '구매', head: (p.mall_name || '쇼핑몰') + ' 구매로 티켓 적립', desc: (p.purchase_amount ? p.purchase_amount.toLocaleString('ko-KR') + '원 · ' : '') + (p.status === 'confirmed' ? '적립 완료' : '구매 확정 대기') });
     });
     gex.forEach(function (x) {
-      items.push({ key: 'gx:' + x._id, type: 'ticket', d: ppDate(x.exchanged_at), tag: '티켓', head: '기프티콘 교환 완료', desc: (GRADE_KO[x.grade_used] || '') + ' 티켓 ' + (x.count_used || 1) + '장 사용' });
+      items.push({ key: 'gx:' + x._id, type: 'ticket', d: ppDate(x.exchanged_at), tag: '티켓', head: '기프티콘 구매 완료', desc: (GRADE_KO[x.grade_used] || '') + ' 티켓 ' + (x.count_used || 1) + '장 사용' });
     });
     inv.forEach(function (x) {
       items.push({ key: 'iv:' + x._id, type: 'event', d: ppDate(x.created_at), tag: '이벤트', head: '친구 초대 완료', desc: '초대 보상 지급' });
@@ -20937,7 +20991,7 @@ function ppStripBrand(brand, name) {
 }
 window.ppStripBrand = ppStripBrand;
 
-/* ── 기프티콘 교환 내역 (pw-24) ── */
+/* ── 기프티콘 구매 내역 (pw-24) ── */
 function renderGifticonHistory() {
   if (!PP.uid) return;
   var sc = document.getElementById('pw-24h');
@@ -20971,7 +21025,7 @@ function renderGifticonHistory() {
     ex = ex.filter(function (x) { return ppDate(x.exchanged_at); })
            .sort(function (a, b) { return ppDate(b.exchanged_at) - ppDate(a.exchanged_at); });
     if (!ex.length) {
-      box.innerHTML = ppEmpty(PP_GI_EMPTY_ICON, '아직 교환한 기프티콘이 없어요', '기프티샵에서 티켓으로 교환하면<br>여기에 기록돼요');
+      box.innerHTML = ppEmpty(PP_GI_EMPTY_ICON, '아직 구매한 기프티콘이 없어요', '기프티샵에서 티켓으로 구매하면<br>여기에 기록돼요');
       return;
     }
     box.innerHTML = ex.map(function (x, i) {
@@ -20986,7 +21040,7 @@ function renderGifticonHistory() {
         + '<div class="gxh-hd"><div class="gxh-nm">' + ppEsc(nm) + '</div>'
         + '<span class="gxh-st ' + (done ? 'done' : 'wait') + '">' + (done ? '발급완료' : '처리중') + '</span></div>'
         + '<div class="gxh-rows">'
-        + '<div class="gxh-row"><span>교환일</span><b>' + (d ? ppYmdDot(d) : '') + '</b></div>'
+        + '<div class="gxh-row"><span>구매일</span><b>' + (d ? ppYmdDot(d) : '') + '</b></div>'
         + (used ? '<div class="gxh-row"><span>사용 티켓</span><b>' + used + '</b></div>' : '')
         + (x.code ? '<div class="gxh-row"><span>기프티콘 코드</span><b class="link">코드 보기 ›</b></div>' : '')
         + '</div></div>';
@@ -21025,7 +21079,7 @@ function renderInquiries() {
       box.innerHTML = ppEmpty('<span style="display:inline-flex;color:#C9C2DC"><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 9.9 9.9 0 0 1-2.8-.4L4 21l1.4-4.1A8.2 8.2 0 0 1 3 11.5 8.4 8.4 0 0 1 12 3a8.4 8.4 0 0 1 9 8.5z"/></svg></span>', '문의 내역이 없어요', '궁금한 점이 있으면 1:1 문의를 남겨주세요');
       return;
     }
-    var CAT = { ticket: '티켓 적립', gifticon: '기프티콘 교환', postback: '적립 확인', account: '계정', point: '포인트' };
+    var CAT = { ticket: '티켓 적립', gifticon: '기프티콘 구매', postback: '적립 확인', account: '계정', point: '포인트' };
     box.innerHTML = iq.map(function (x) {
       var answered = (x.status === 'answered' || !!x.answer);
       var badge = answered
