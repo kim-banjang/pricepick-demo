@@ -1095,6 +1095,9 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
 /* 행 높이는 회원 칸(52px) + 위아래 여백으로 고정한다 — 닉네임이 빈 줄이면 글자 상자가
    미세하게 줄어 행마다 0.3px씩 어긋나던 것까지 막는다. */
 #sec-gifticons td,#sec-gifticon-unused td,#sec-gifticon-cancel td{padding-left:12px;padding-right:12px;overflow:hidden;text-overflow:ellipsis;height:76px;box-sizing:border-box;}
+/* 회원 칸은 칸 자체의 글줄 상자를 없앤다 — 닉네임이 비면 그 상자가 줄어 행이 0.5px 어긋난다.
+   안쪽 세 줄은 저마다 line-height 를 갖고 있어 영향 없다. */
+#sec-gifticons td:nth-child(3),#sec-gifticon-unused td:nth-child(3),#sec-gifticon-cancel td:nth-child(3){line-height:0;font-size:0;}
 /* 상품명(넷째 칸)은 넓어진 자리를 두 줄까지 써서 펼친다 — 잘라 버리지 않는다. */
 #sec-gifticons td:nth-child(4),#sec-gifticon-unused td:nth-child(4),#sec-gifticon-cancel td:nth-child(4){
   white-space:normal;text-align:left!important;line-height:1.4;
