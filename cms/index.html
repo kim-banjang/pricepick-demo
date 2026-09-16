@@ -2442,7 +2442,7 @@ window.CMS_FEATURES = {
         <table>
           <thead><tr>
             <th style="width:110px">구매일</th><th>주문번호</th><th>이름</th><th>상품명</th>
-            <th>상품코드</th><th style="width:90px">유효기간</th><th style="width:110px">사용한 PH</th><th style="width:80px">취소</th>
+            <th>상품코드</th><th style="width:90px">유효기간</th><th style="width:120px">사용한 티켓</th><th style="width:80px">취소</th>
           </tr></thead>
           <tbody></tbody>
         </table>
@@ -2473,7 +2473,7 @@ window.CMS_FEATURES = {
         <table>
           <thead><tr>
             <th style="width:52px">No</th><th>주문번호</th><th>이름</th><th>상품명</th>
-            <th style="width:110px">취소날짜</th><th style="width:100px">상태</th><th style="width:110px">환불PH</th><th style="width:110px">보유PH</th>
+            <th style="width:110px">취소날짜</th><th style="width:100px">상태</th><th style="width:120px">환불 티켓</th><th style="width:130px">보유 티켓</th>
           </tr></thead>
           <tbody></tbody>
         </table>
@@ -7898,7 +7898,7 @@ var GEX_CTRL = window.GEX_CTRL = ppMakeListController(20, function(pageItems, st
     return '<tr>'
       + '<td style="text-align:center">' + gexTwoLine(ppDt(g.exchanged_at), ppTm(g.exchanged_at)) + '</td>'
       + '<td style="font-size:11px;font-family:monospace;color:var(--text-3);">' + ppEsc(g._id) + '</td>'
-      + '<td>' + gexTwoLine(ppEsc(u.name || u.nickname || '—'), ppEsc(u.nickname || '')) + '</td>'
+      + '<td>' + gexTwoLine(ppEsc(u.name || u.nickname || '—'), ppEsc(u.name ? (u.nickname || '') : '')) + '</td>'
       + '<td>' + gexProductName(g) + '</td>'
       + '<td style="font-family:monospace;font-size:11px;color:var(--text-3);">' + ppEsc(g.gifticon_id || '-') + '</td>'
       + '<td style="text-align:center">' + gexValidity(g) + '</td>'
@@ -9623,13 +9623,63 @@ window.giCancelExchange = function(id) {
 
 /* ── sec-gifticon-cancel ── gifticon_exchanges where status=='cancelled' */
 var GCANCEL_GRADE_KO = { bronze:'브론즈', silver:'실버', gold:'골드' };
-/* ── PH 칸 ──
-   포인츠허브의 PH(폴센트 열쇠를 전환해 준 포인트)는 프라이스픽에 그대로 대응하는 단위가
-   없다 — 여기엔 등급 티켓과 포인트 둘이 있고 기프티콘 교환에 쓰이는 것은 등급 티켓이다.
-   무엇으로 놓을지 김반장 결정 대기 중이라 칸만 세워 두고 값은 비운다. 정해지면 이 함수만
-   고치면 된다(칸 구조는 그대로). */
-function phCell() {
-  return '<span class="ph-hold">—</span>';
+/* ── PH 자리 = 등급 티켓 (김반장 확정 2026-09-16) ──
+   포인츠허브의 PH 자리에 프라이스픽은 등급 티켓을 놓는다. 기프티콘 교환은 전부 등급
+   티켓으로 이뤄지고(gifticon_exchanges.grade_used·count_used) 포인트로 결제되는 경로는
+   없다. 원화는 판매가격과 같은 방식으로 아래에 병기한다 — 환산 값은 settings/ticket_value
+   한 곳만 읽는다(gipPriceHtml과 같은 출처). */
+function tvUnit(grade) {
+  return (GIP_TV && typeof GIP_TV[grade] === 'number') ? GIP_TV[grade] : null;
+}
+function ticketCell(grade, count, negative) {
+  grade = grade || 'bronze';
+  count = count || 0;
+  if (!count) return '<span class="ph-hold">—</span>';
+  var unit = tvUnit(grade);
+  var sign = negative ? '−' : '';
+  var main = sign + (GIP_GRADE_KO[grade] || grade) + ' ' + count;
+  var sub = (unit === null)
+    ? '<div class="gip-price-none">(환산값 미설정)</div>'
+    : '<div class="gip-price-won">(' + sign + (unit * count).toLocaleString('ko-KR') + '원)</div>';
+  return '<div class="' + (negative ? 'ph-minus' : 'gip-price-main') + '">' + main + '</div>' + sub;
+}
+/* 보유 티켓 — 회원이 지금 들고 있는 등급 티켓(status=active). 등급이 여럿이면 나란히 적고
+   환산 원화 합계를 아래에 붙인다. 포인트는 다른 단위라 여기 섞지 않는다. */
+var GC_HOLD = {};
+function holdCell(uid) {
+  var h = GC_HOLD[uid];
+  if (!h) return '<span class="ph-hold">—</span>';
+  var parts = [], won = 0, any = false;
+  ['gold', 'silver', 'bronze'].forEach(function(g) {
+    var c = h[g] || 0;
+    if (!c) return;
+    any = true;
+    parts.push((GIP_GRADE_KO[g] || g) + ' ' + c);
+    var u = tvUnit(g);
+    if (u !== null) won += u * c;
+  });
+  if (!any) return '<div class="ph-hold">0</div>';
+  return '<div class="gip-price-main" style="font-size:12px">' + parts.join(' · ') + '</div>'
+    + '<div class="gip-price-won">(' + won.toLocaleString('ko-KR') + '원)</div>';
+}
+/* 취소내역에 뜬 회원들의 보유 티켓을 한 번에 읽어 둔다. */
+function loadHoldTickets(uids) {
+  var list = [];
+  (uids || []).forEach(function(u){ if (u && list.indexOf(u) < 0) list.push(u); });
+  if (!list.length) return Promise.resolve({});
+  var chunks = [];
+  for (var i = 0; i < list.length; i += 10) chunks.push(list.slice(i, i + 10));
+  var map = {};
+  return Promise.all(chunks.map(function(chunk) {
+    return db.collection('user_tickets').where('user_id', 'in', chunk).where('status', '==', 'active').get()
+      .then(function(snap) {
+        snap.forEach(function(d) {
+          var t = d.data();
+          if (!map[t.user_id]) map[t.user_id] = {};
+          map[t.user_id][t.grade] = (map[t.user_id][t.grade] || 0) + 1;
+        });
+      }).catch(function(e){ console.error('holdTickets', e); });
+  })).then(function(){ return map; });
 }
 
 /* ── 3. 기프티콘 미사용 취소 ──
@@ -9644,11 +9694,11 @@ var GUN_CTRL = window.GUN_CTRL = ppMakeListController(20, function(pageItems, st
     return '<tr>'
       + '<td style="text-align:center">' + gexTwoLine(ppDt(g.exchanged_at), ppTm(g.exchanged_at)) + '</td>'
       + '<td style="font-size:11px;font-family:monospace;color:var(--text-3);">' + ppEsc(g._id) + '</td>'
-      + '<td>' + gexTwoLine(ppEsc(u.name || u.nickname || '—'), ppEsc(u.nickname || '')) + '</td>'
+      + '<td>' + gexTwoLine(ppEsc(u.name || u.nickname || '—'), ppEsc(u.name ? (u.nickname || '') : '')) + '</td>'
       + '<td>' + gexProductName(g) + '</td>'
       + '<td style="font-family:monospace;font-size:11px;color:var(--text-3);">' + ppEsc(g.gifticon_id || '-') + '</td>'
       + '<td style="text-align:center">' + gexValidity(g) + '</td>'
-      + '<td style="text-align:center">' + phCell() + '</td>'
+      + '<td style="text-align:center">' + ticketCell(g.grade_used, g.count_used, false) + '</td>'
       + '<td style="text-align:center"><button class="btn btn-ghost btn-sm" style="font-size:10px;padding:2px 6px" onclick="giCancelExchange(&quot;' + g._id + '&quot;)">취소</button></td>'
       + '</tr>';
   }).join('');
@@ -9690,7 +9740,8 @@ function loadGifticonUnused() {
     var cnt = document.getElementById('gun-count');
     if (cnt) cnt.textContent = '총 ' + docs.length + '건';
     if (!docs.length) { GUN_CTRL.setRows([]); return; }
-    dmFetchUsersByIds(docs.map(function(d){ return d.data().user_id; })).then(function(userMap) {
+    Promise.all([dmFetchUsersByIds(docs.map(function(d){ return d.data().user_id; })), gipLoadTicketValue()]).then(function(res) {
+      var userMap = res[0];
       GUN_CTRL.setRows(docs.map(function(d) { return Object.assign({ _id: d.id, _user: userMap[d.data().user_id] }, d.data()); }));
     });
   }).catch(function(e){ console.error('gifticonUnused', e); });
@@ -9717,12 +9768,12 @@ var GCANCEL_CTRL = window.GCANCEL_CTRL = ppMakeListController(20, function(pageI
     return '<tr>'
       + '<td style="text-align:center">' + ((state.page-1)*state.pageSize + i + 1) + '</td>'
       + '<td style="font-size:11px;font-family:monospace;color:var(--text-3);">' + ppEsc(g._id) + '</td>'
-      + '<td>' + gexTwoLine(ppEsc(u.name || u.nickname || '—'), ppEsc(u.nickname || '')) + '</td>'
+      + '<td>' + gexTwoLine(ppEsc(u.name || u.nickname || '—'), ppEsc(u.name ? (u.nickname || '') : '')) + '</td>'
       + '<td>' + gexProductName(g) + '</td>'
       + '<td style="text-align:center">' + gexTwoLine(ppDt(g.cancelled_at), ppTm(g.cancelled_at)) + '</td>'
       + '<td style="text-align:center"><span style="background:var(--danger-soft);color:var(--danger);padding:3px 8px;border-radius:99px;font-size:11px;font-weight:600;">' + ppEsc(g.cancel_reason || '관리자 취소') + '</span></td>'
-      + '<td style="text-align:center">' + phCell() + '</td>'
-      + '<td style="text-align:center">' + phCell() + '</td>'
+      + '<td style="text-align:center">' + ticketCell(g.grade_used, g.count_used, true) + '</td>'
+      + '<td style="text-align:center">' + holdCell(g.user_id) + '</td>'
       + '</tr>';
   }).join('');
   if (pag) pag.innerHTML = ppPaginationHtml('GCANCEL_CTRL', state.page, totalPages);
@@ -9768,12 +9819,17 @@ function loadGifticonCancel() {
       var ta = a.data().cancelled_at, tb = b.data().cancelled_at;
       return (tb&&tb.toDate?tb.toDate():new Date(0)) - (ta&&ta.toDate?ta.toDate():new Date(0));
     });
-    dmFetchUsersByIds(docs.map(function(doc){ return doc.data().user_id; })).then(function(userMap) {
+    var uids = docs.map(function(doc){ return doc.data().user_id; });
+    /* 「보유 티켓」 칸을 채우려면 그 회원들이 지금 들고 있는 티켓도 같이 읽어야 한다. */
+    Promise.all([dmFetchUsersByIds(uids), loadHoldTickets(uids), gipLoadTicketValue()]).then(function(res) {
+      var userMap = res[0];
+      GC_HOLD = res[1] || {};
       var items = docs.map(function(doc) { return Object.assign({ _id: doc.id, _user: userMap[doc.data().user_id] }, doc.data()); });
       GCANCEL_CTRL.setRows(items);
     });
   }).catch(function(e){ console.error('loadGifticonCancel', e); tbody.innerHTML = ppEmpty(8,'로드 오류'); });
 }
+window.loadGifticonCancel = loadGifticonCancel;
 
 /* ── sec-banners ── banners collection (실 CRUD) */
 var BANNERS_CACHE = {};
