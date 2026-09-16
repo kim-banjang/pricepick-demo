@@ -18730,9 +18730,13 @@ function ppSwapPlan(combo) {
     combo.forEach(function (x) { if (x.grade === gr) used = x.count; });
     spare[gr] = Math.max(0, (PP.tickets[gr] || 0) - used);
   });
+  /* 바꿀 장수는 적을수록 좋다 — 값이 큰 등급부터 걷는다.
+     모자란 그 등급 자체는 걷지 않는다(있었으면 안 모자랐다). */
+  var shortOf = {};
+  lack.forEach(function (x) { shortOf[x.grade] = 1; });
   var give = [];
-  ['bronze', 'silver', 'gold'].forEach(function (gr) {
-    if (need <= 0) return;
+  PP_GRADE_ORDER.forEach(function (gr) {
+    if (need <= 0 || shortOf[gr]) return;
     var unit = PP_TV[gr] || 0;
     if (!unit || !spare[gr]) return;
     var k = Math.min(spare[gr], Math.ceil(need / unit));
