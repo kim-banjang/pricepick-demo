@@ -4787,9 +4787,6 @@
     white-space: nowrap;
   }
   .ex-cost-tk.zero { display: none; }
-  .ex-cost-tk.short {
-    color: var(--text1);
-  }
   .ex-cost-tk .m {
     display: inline-flex; align-items: center;
     width: 22px; height: 22px;
@@ -4810,33 +4807,6 @@
     color: var(--text3);
     font-size: var(--fs-caption);
     font-weight: 700;
-  }
-  .ex-item.short {
-    opacity: 0.55;
-  }
-  .ex-short-pill {
-    position: absolute;
-    top: 6px; left: 6px;
-    background: rgba(0, 0, 0, 0.65);
-    color: white;
-    font-size: var(--fs-caption); font-weight: 800;
-    padding: 2px 7px;
-    border-radius: 99px;
-    z-index: 2;
-    max-width: calc(100% - 12px);
-    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-  }
-  .ex-avail-pill {
-    position: absolute;
-    top: 6px; left: 6px;
-    background: rgba(0, 0, 0, 0.65);
-    color: white;
-    font-size: var(--fs-caption); font-weight: 800;
-    padding: 2px 7px;
-    border-radius: 99px;
-    z-index: 2;
-    max-width: calc(100% - 12px);
-    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
   }
 
   /* 세그먼트 컨트롤 */
@@ -4915,14 +4885,44 @@
   /* 기프티샵 풀 그리드 */
   .ex-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-    padding: 0 16px 20px;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    padding: 0 14px 20px;
   }
   .ex-grid .ex-item {
     flex: 0 0 auto;
   }
-  .ex-grid .ex-img { height: 110px; }
+  .ex-grid .ex-img { height: 86px; }
+  .ex-grid .ex-body { padding: 7px 7px 9px; }
+  .ex-grid .ex-brand { font-size: 11px; }
+  .ex-grid .ex-name { font-size: 12px; height: 31px; margin-bottom: 5px; }
+  .ex-grid .ex-cost-mix { padding: 4px 2px; margin-top: 0; }
+  .ex-grid .ex-cost-tk { font-size: 12px; }
+  .ex-grid .ex-cost-tk .m svg { width: 16px; height: 16px; }
+  .ex-won { font-size: 11px; color: var(--text3); text-align: center; margin-top: 3px; }
+
+  /* 기프티샵 — 탭 · 정렬 · 구역 제목. 자리는 포인츠허브, 색은 프라이스픽. */
+  .gs-tabs { display: flex; flex-shrink: 0; border-bottom: 1px solid var(--border); background: white; }
+  .gs-tab {
+    flex: 1; text-align: center; padding: 11px 0 9px;
+    font-size: var(--fs-body); font-weight: 700; color: var(--text3);
+    cursor: pointer; position: relative;
+  }
+  .gs-tab.active { color: var(--main); }
+  .gs-tab.active::after {
+    content: ''; position: absolute; left: 0; right: 0; bottom: -1px;
+    height: 2px; background: var(--main);
+  }
+  .gs-search { padding: 10px 16px 0; flex-shrink: 0; }
+  .gs-search.hide { display: none; }
+  .gs-sort {
+    display: flex; align-items: center; justify-content: flex-end; gap: 7px;
+    padding: 10px 16px 2px; flex-shrink: 0;
+  }
+  .gs-sort-item { font-size: var(--fs-caption); color: var(--text3); cursor: pointer; }
+  .gs-sort-item.active { color: var(--text1); font-weight: 700; }
+  .gs-sort-sep { font-size: var(--fs-caption); color: var(--border); }
+  .gs-sec-title { font-size: var(--fs-body); font-weight: 800; color: var(--text1); padding: 4px 16px 10px; }
   .ex-soldout { position: relative; }
   .ex-soldout .ex-img::after {
     content: '품절';
@@ -7351,21 +7351,22 @@
   .done-footer { padding: 12px 20px 32px; }
   /* 10a-detail 기프티콘 교환 상세 */
   .detail-ex-screen { height: 100%; background: white; display: flex; flex-direction: column; overflow: hidden; }
-  .ex-detail-hero { height: 200px; background: var(--sub-4); display: flex; align-items: center; justify-content: center; font-size: var(--fs-number); }
-  .ex-detail-body { flex: 1; overflow-y: auto; padding: 20px 16px; }
+  /* 상세 — 상품 사진은 흰 바탕 가운데. 잘라내지 않고(contain) 통째로 보여 준다. */
+  .ex-detail-scroll { flex: 1; overflow-y: auto; }
+  .ex-detail-scroll::-webkit-scrollbar { display: none; }
+  .ex-detail-hero { height: 220px; background: white; display: flex; align-items: center; justify-content: center; padding: 16px; box-sizing: border-box; }
+  .ex-detail-hero img { max-width: 100%; max-height: 100%; object-fit: contain; }
+  .ex-detail-body { padding: 16px; }
+  .ex-detail-div { height: 8px; background: var(--bg); }
+  .ex-price-row { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
+  .ex-price-won { font-size: var(--fs-body); color: var(--text3); }
+  .ex-cost-have { font-size: var(--fs-caption); color: var(--text3); margin-top: 6px; }
+  .ex-sec-t { font-size: var(--fs-body); font-weight: 800; color: var(--text1); margin-bottom: 10px; }
+  .ex-sec-body { font-size: var(--fs-caption); color: var(--text2); line-height: 1.7; white-space: pre-wrap; word-break: break-word; }
+  .ex-deduct { background: var(--sub-4); border-radius: var(--r); padding: 10px 14px; margin-bottom: 10px; font-size: var(--fs-caption); color: var(--main-dark); }
   .ex-detail-body::-webkit-scrollbar { display: none; }
   .ex-brand-tag { font-size: var(--fs-caption); color: var(--text3); margin-bottom: 4px; }
   .ex-product-name { font-size: var(--fs-title); font-weight: 800; color: var(--text1); letter-spacing: -0.5px; margin-bottom: 16px; }
-  .ex-cost-box { background: var(--sub-4); border-radius: var(--r); padding: 16px; margin-bottom: 16px; }
-  .ex-cost-label { font-size: var(--fs-caption); color: var(--main-dark); margin-bottom: 6px; }
-  .ex-cost-main { display: flex; align-items: center; gap: 8px; }
-  .ex-info-row { display: flex; gap: 10px; margin-bottom: 10px; }
-  .ex-info-chip { flex: 1; background: var(--bg); border-radius: 8px; padding: 10px; text-align: center; }
-  .eic-lbl { font-size: var(--fs-caption); color: var(--text3); margin-bottom: 3px; }
-  .eic-val { font-size: var(--fs-caption); font-weight: 700; color: var(--text1); }
-  .ex-policy-box { background: var(--bg); border-radius: var(--r); padding: 14px; }
-  .ex-policy-t { font-size: var(--fs-caption); font-weight: 700; color: var(--text1); margin-bottom: 8px; }
-  .ex-policy-item { font-size: var(--fs-caption); color: var(--text2); line-height: 1.6; display: flex; gap: 6px; }
   .ex-detail-bottom { border-top: 1px solid var(--border); padding: 12px 16px 32px; }
   /* 10e 적립 조건 안내 */
   .info-screen { height: 100%; background: var(--bg); display: flex; flex-direction: column; overflow: hidden; }
@@ -10602,15 +10603,22 @@ window.PP_FEATURES = {
           <div class="statusbar-icons"><svg width="17" height="12" viewBox="0 0 17 12" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><rect x="0" y="4" width="3" height="8" rx="1"/><rect x="4.5" y="2.5" width="3" height="9.5" rx="1"/><rect x="9" y="1" width="3" height="11" rx="1"/><rect x="13.5" y="0" width="3" height="12" rx="1"/></svg><svg width="16" height="12" viewBox="0 0 16 12" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M8 2.5C10.2 2.5 12.2 3.4 13.6 4.9L15 3.4C13.2 1.5 10.7 0.3 8 0.3C5.3 0.3 2.8 1.5 1 3.4L2.4 4.9C3.8 3.4 5.8 2.5 8 2.5Z"/><path d="M8 5.5C9.4 5.5 10.7 6.1 11.6 7L13 5.5C11.7 4.2 10 3.3 8 3.3C6 3.3 4.3 4.2 3 5.5L4.4 7C5.3 6.1 6.6 5.5 8 5.5Z"/><circle cx="8" cy="10" r="1.8"/></svg><svg width="25" height="12" viewBox="0 0 25 12" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="currentColor" stroke-opacity="0.35"/><rect x="2" y="2" width="17" height="8" rx="2" fill="currentColor"/><path d="M23 4V8C23.8 7.6 24.5 6.9 24.5 6C24.5 5.1 23.8 4.4 23 4Z" fill="currentColor" fill-opacity="0.4"/></svg></div>
         </div>
 
-        <!-- 헤더 -->
+        <!-- 헤더 — 포인츠허브 목록 차례를 따른다: 제목 · 검색 -->
         <div class="reward-top">
           <div style="display:flex;align-items:center;gap:8px;">
-            <button class="reward-top-btn" style="margin-left:-8px;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M15 19L8 12L15 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+            <button class="reward-top-btn" style="margin-left:-8px;"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M11.25 15.5L5.96 10.45C5.17 9.65 5.17 8.35 5.96 7.55L11.25 2.66" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
             <div class="reward-top-title">기프티샵</div>
           </div>
           <div class="reward-top-actions">
-            <button class="reward-top-btn" data-ip-bound="1" title="교환 내역" onclick="event.stopPropagation();showScreen('pw-24h');"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M20 8.25V18C20 21 18.21 22 16 22H8C5.79 22 4 21 4 18V8.25C4 5 5.79 4.25 8 4.25C8 4.87 8.24997 5.43 8.65997 5.84C9.06997 6.25 9.63 6.5 10.25 6.5H13.75C14.99 6.5 16 5.49 16 4.25C18.21 4.25 20 5 20 8.25Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M16 4.25C16 5.49 14.99 6.5 13.75 6.5H10.25C9.63 6.5 9.06997 6.25 8.65997 5.84C8.24997 5.43 8 4.87 8 4.25C8 3.01 9.01 2 10.25 2H13.75C14.37 2 14.93 2.25 15.34 2.66C15.75 3.07 16 3.63 16 4.25Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+            <button class="reward-top-btn" id="gs-search-btn" title="검색" onclick="event.stopPropagation();ppGiToggleSearch();"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg></button>
           </div>
+        </div>
+
+        <!-- 탭 — 포인츠허브의 홈 · 브랜드 · 구매내역 자리. 이름은 우리 말로 쓴다. -->
+        <div class="gs-tabs">
+          <div class="gs-tab active" data-gs-tab="home">홈</div>
+          <div class="gs-tab" data-gs-tab="brand">브랜드</div>
+          <div class="gs-tab" data-gs-tab="history">교환 내역</div>
         </div>
 
         <!-- 보유 티켓 요약 (고정 — 스크롤 밖) -->
@@ -10635,16 +10643,13 @@ window.PP_FEATURES = {
           </div>
         </div>
 
-        <!-- 검색 + 정렬 -->
-        <div style="flex-shrink:0;padding:8px 16px 0;">
-          <div style="display:flex;gap:7px;align-items:center;">
-            <input placeholder="상품·브랜드 검색" style="flex:1;min-width:0;height:34px;border:1px solid #E4DBFF;border-radius:9px;padding:0 11px;font-size:var(--fs-caption);box-sizing:border-box;">
-            <select style="height:34px;min-width:0;flex-shrink:1;border:1px solid #E4DBFF;border-radius:9px;font-size:var(--fs-caption);padding:0 6px;color:var(--text2);"><option>추천순</option><option>가격 낮은순</option><option>가격 높은순</option><option>교환 가능순</option></select>
-          </div>
+        <!-- 검색 — 헤더 아이콘으로 여닫는다 -->
+        <div class="gs-search hide" id="gs-search">
+          <input id="gs-search-input" placeholder="상품·브랜드 검색" style="width:100%;height:34px;border:1px solid #E4DBFF;border-radius:9px;padding:0 11px;font-size:var(--fs-caption);box-sizing:border-box;">
         </div>
 
-        <!-- 카테고리 필터 (고정) -->
-        <div class="cat-filter" style="margin:0;flex-shrink:0;padding-top:10px;">
+        <!-- 갈래 / 브랜드 칩 — 탭에 따라 내용이 바뀐다 -->
+        <div class="cat-filter" id="gs-chips" style="margin:0;flex-shrink:0;padding-top:10px;">
           <div class="cat-pill active" data-cat="">전체</div>
           <div class="cat-pill" data-cat="커피/음료">커피/음료</div>
           <div class="cat-pill" data-cat="피자/버거/치킨">피자/버거/치킨</div>
@@ -10652,6 +10657,15 @@ window.PP_FEATURES = {
           <div class="cat-pill" data-cat="편의점/마트">편의점/마트</div>
           <div class="cat-pill" data-cat="상품권/금액권">상품권/금액권</div>
           <div class="cat-pill" data-cat="문화/생활/기타">문화/생활/기타</div>
+        </div>
+
+        <!-- 정렬 — 포인츠허브처럼 글자 링크를 나란히 -->
+        <div class="gs-sort" id="gs-sort">
+          <span class="gs-sort-item active" data-gs-sort="popular">인기순</span>
+          <span class="gs-sort-sep">|</span>
+          <span class="gs-sort-item" data-gs-sort="low">낮은가격순</span>
+          <span class="gs-sort-sep">|</span>
+          <span class="gs-sort-item" data-gs-sort="high">높은가격순</span>
         </div>
 
         <div class="reward-scroll">
@@ -10662,84 +10676,41 @@ window.PP_FEATURES = {
             <div class="ex-filter-toggle off"></div>
           </div>
 
+          <div class="gs-sec-title" id="gs-sec-title">인기상품</div>
+
           <!-- 기프티샵 그리드 -->
           <div class="ex-grid">
             <div class="ex-item">
-              <span class="ex-avail-pill">구매가능</span>
               <div class="ex-img-wrap">
                 <div class="ex-img"><div class="img-ph" data-img="img_021">아이스 아메리카노</div></div>
               </div>
               <div class="ex-body">
                 <div class="ex-brand">스타벅스</div>
                 <div class="ex-name">아이스 아메리카노 Tall</div>
-                <div class="ex-cost-mix">
-                  <span class="ex-cost-tk"><span class="m"><svg width="40" height="40" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="g10a_2001" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#D8D8D8"/><stop offset="100%" stop-color="#999999"/></linearGradient></defs><path d="M306.6,106.8l-49.5,49.5,2.4,2.4c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-2.4-2.4-138.6,138.6c-3.7,3.7-3.7,9.6,0,13.3l75.5,75.5c3.7,3.7,9.6,3.7,13.3,0l138.6-138.6-2.3-2.3c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l2.3,2.3,49.5-49.5c3.7-3.7,3.7-9.6,0-13.3l-75.5-75.5c-3.7-3.7-9.6-3.7-13.3,0ZM335.6,234.8c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM322.9,222.1c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM310.2,209.4c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM297.6,196.7c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM284.9,184.1c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM272.2,171.4c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7Z" fill="url(#g10a_2001)"/><path d="M316.2,155.8l12.1,6.2c.8.4,1.8.3,2.4-.4l9.6-9.6c1.4-1.4,3.8-.2,3.5,1.8l-2.1,13.5c-.1.9.3,1.8,1.1,2.2l12.1,6.2c1.8.9,1.4,3.6-.6,3.9l-13.5,2.1c-.9.1-1.6.8-1.7,1.7l-2.1,13.5c-.3,2-3,2.4-3.9.6l-6.2-12.1c-.4-.8-1.3-1.3-2.2-1.1l-13.5,2.1c-2,.3-3.2-2.1-1.8-3.5l9.6-9.6c.6-.6.8-1.6.4-2.4l-6.2-12.1c-.9-1.8,1-3.7,2.8-2.8Z" fill="rgba(50,50,50,0.75)"/><path d="M180.7,298.9l-5.2,5.2,27.4,27.4-4.7,4.7-27.4-27.4-5.2,5.2-4.2-4.2,15.1-15.1,4.2,4.2ZM215.3,319.1l-4.7,4.7-31.6-31.6,4.7-4.7,31.6,31.6ZM231.9,296.8c1.9,1.9,1.9,3.9,0,5.8l-9.9,9.9c-1.9,1.9-3.8,1.8-5.7,0l-25.8-25.8c-1.9-1.9-2-3.8-.1-5.7l9.9-9.9c1.9-1.9,3.9-1.9,5.8,0l7.4,7.4-4.7,4.7-6.2-6.2-6.1,6.1,23.5,23.5,6.1-6.1-6.6-6.6,4.7-4.7,7.8,7.8ZM254.4,280l-5.2,5.2-20.1-8.1,14.1,14.1-4.7,4.7-31.6-31.6,4.7-4.7,13.4,13.4-8.1-18.6,5.2-5.2.2.2,8.6,21.4,23.6,9.2ZM269.5,265l-13.1,13.1-31.6-31.6,13-13,4.2,4.2-8.3,8.3,9.2,9.2,7.1-7.1,4.1,4.1-7.1,7.1,9.9,9.9,8.4-8.4,4.2,4.2ZM259,220.6l-5.2,5.2,27.4,27.4-4.7,4.7-27.4-27.4-5.2,5.2-4.2-4.2,15.1-15.1,4.2,4.2Z" fill="rgba(50,50,50,0.75)"/></svg></span>3</span>
-                </div>
+                <div class="ex-cost-mix"><span class="ex-cost-tk">브론즈 3</span></div>
+                <div class="ex-won">4,500원</div>
               </div>
             </div>
-            <div class="ex-item short">
-              <span class="ex-short-pill">티켓 부족</span>
+            <div class="ex-item">
               <div class="ex-img-wrap">
                 <div class="ex-img"><div class="img-ph" data-img="img_022">베이커리</div></div>
               </div>
               <div class="ex-body">
                 <div class="ex-brand">파리바게뜨</div>
                 <div class="ex-name">5,000원 금액권</div>
-                <div class="ex-cost-mix">
-                  <span class="ex-cost-tk short"><span class="m"><svg width="40" height="40" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="g10a_2002" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#D8D8D8"/><stop offset="100%" stop-color="#999999"/></linearGradient></defs><path d="M306.6,106.8l-49.5,49.5,2.4,2.4c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-2.4-2.4-138.6,138.6c-3.7,3.7-3.7,9.6,0,13.3l75.5,75.5c3.7,3.7,9.6,3.7,13.3,0l138.6-138.6-2.3-2.3c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l2.3,2.3,49.5-49.5c3.7-3.7,3.7-9.6,0-13.3l-75.5-75.5c-3.7-3.7-9.6-3.7-13.3,0ZM335.6,234.8c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM322.9,222.1c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM310.2,209.4c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM297.6,196.7c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM284.9,184.1c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM272.2,171.4c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7Z" fill="url(#g10a_2002)"/><path d="M316.2,155.8l12.1,6.2c.8.4,1.8.3,2.4-.4l9.6-9.6c1.4-1.4,3.8-.2,3.5,1.8l-2.1,13.5c-.1.9.3,1.8,1.1,2.2l12.1,6.2c1.8.9,1.4,3.6-.6,3.9l-13.5,2.1c-.9.1-1.6.8-1.7,1.7l-2.1,13.5c-.3,2-3,2.4-3.9.6l-6.2-12.1c-.4-.8-1.3-1.3-2.2-1.1l-13.5,2.1c-2,.3-3.2-2.1-1.8-3.5l9.6-9.6c.6-.6.8-1.6.4-2.4l-6.2-12.1c-.9-1.8,1-3.7,2.8-2.8Z" fill="rgba(50,50,50,0.75)"/><path d="M180.7,298.9l-5.2,5.2,27.4,27.4-4.7,4.7-27.4-27.4-5.2,5.2-4.2-4.2,15.1-15.1,4.2,4.2ZM215.3,319.1l-4.7,4.7-31.6-31.6,4.7-4.7,31.6,31.6ZM231.9,296.8c1.9,1.9,1.9,3.9,0,5.8l-9.9,9.9c-1.9,1.9-3.8,1.8-5.7,0l-25.8-25.8c-1.9-1.9-2-3.8-.1-5.7l9.9-9.9c1.9-1.9,3.9-1.9,5.8,0l7.4,7.4-4.7,4.7-6.2-6.2-6.1,6.1,23.5,23.5,6.1-6.1-6.6-6.6,4.7-4.7,7.8,7.8ZM254.4,280l-5.2,5.2-20.1-8.1,14.1,14.1-4.7,4.7-31.6-31.6,4.7-4.7,13.4,13.4-8.1-18.6,5.2-5.2.2.2,8.6,21.4,23.6,9.2ZM269.5,265l-13.1,13.1-31.6-31.6,13-13,4.2,4.2-8.3,8.3,9.2,9.2,7.1-7.1,4.1,4.1-7.1,7.1,9.9,9.9,8.4-8.4,4.2,4.2ZM259,220.6l-5.2,5.2,27.4,27.4-4.7,4.7-27.4-27.4-5.2,5.2-4.2-4.2,15.1-15.1,4.2,4.2Z" fill="rgba(50,50,50,0.75)"/></svg></span>6</span>
-                </div>
+                <div class="ex-cost-mix"><span class="ex-cost-tk">브론즈 6</span></div>
+                <div class="ex-won">5,000원</div>
               </div>
             </div>
-            <div class="ex-item short">
-              <span class="ex-short-pill">티켓 부족</span>
+            <div class="ex-item">
               <div class="ex-img-wrap">
                 <div class="ex-img"><div class="img-ph" data-img="img_023">빅맥 세트</div></div>
               </div>
               <div class="ex-body">
                 <div class="ex-brand">맥도날드</div>
                 <div class="ex-name">빅맥 세트</div>
-                <div class="ex-cost-mix">
-                  <span class="ex-cost-tk short"><span class="m"><svg width="40" height="40" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="g10a_2003" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#D8D8D8"/><stop offset="100%" stop-color="#999999"/></linearGradient></defs><path d="M306.6,106.8l-49.5,49.5,2.4,2.4c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-2.4-2.4-138.6,138.6c-3.7,3.7-3.7,9.6,0,13.3l75.5,75.5c3.7,3.7,9.6,3.7,13.3,0l138.6-138.6-2.3-2.3c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l2.3,2.3,49.5-49.5c3.7-3.7,3.7-9.6,0-13.3l-75.5-75.5c-3.7-3.7-9.6-3.7-13.3,0ZM335.6,234.8c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM322.9,222.1c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM310.2,209.4c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM297.6,196.7c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM284.9,184.1c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM272.2,171.4c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7Z" fill="url(#g10a_2003)"/><path d="M316.2,155.8l12.1,6.2c.8.4,1.8.3,2.4-.4l9.6-9.6c1.4-1.4,3.8-.2,3.5,1.8l-2.1,13.5c-.1.9.3,1.8,1.1,2.2l12.1,6.2c1.8.9,1.4,3.6-.6,3.9l-13.5,2.1c-.9.1-1.6.8-1.7,1.7l-2.1,13.5c-.3,2-3,2.4-3.9.6l-6.2-12.1c-.4-.8-1.3-1.3-2.2-1.1l-13.5,2.1c-2,.3-3.2-2.1-1.8-3.5l9.6-9.6c.6-.6.8-1.6.4-2.4l-6.2-12.1c-.9-1.8,1-3.7,2.8-2.8Z" fill="rgba(50,50,50,0.75)"/><path d="M180.7,298.9l-5.2,5.2,27.4,27.4-4.7,4.7-27.4-27.4-5.2,5.2-4.2-4.2,15.1-15.1,4.2,4.2ZM215.3,319.1l-4.7,4.7-31.6-31.6,4.7-4.7,31.6,31.6ZM231.9,296.8c1.9,1.9,1.9,3.9,0,5.8l-9.9,9.9c-1.9,1.9-3.8,1.8-5.7,0l-25.8-25.8c-1.9-1.9-2-3.8-.1-5.7l9.9-9.9c1.9-1.9,3.9-1.9,5.8,0l7.4,7.4-4.7,4.7-6.2-6.2-6.1,6.1,23.5,23.5,6.1-6.1-6.6-6.6,4.7-4.7,7.8,7.8ZM254.4,280l-5.2,5.2-20.1-8.1,14.1,14.1-4.7,4.7-31.6-31.6,4.7-4.7,13.4,13.4-8.1-18.6,5.2-5.2.2.2,8.6,21.4,23.6,9.2ZM269.5,265l-13.1,13.1-31.6-31.6,13-13,4.2,4.2-8.3,8.3,9.2,9.2,7.1-7.1,4.1,4.1-7.1,7.1,9.9,9.9,8.4-8.4,4.2,4.2ZM259,220.6l-5.2,5.2,27.4,27.4-4.7,4.7-27.4-27.4-5.2,5.2-4.2-4.2,15.1-15.1,4.2,4.2Z" fill="rgba(50,50,50,0.75)"/></svg></span>8</span>
-                </div>
-              </div>
-            </div>
-            <div class="ex-item">
-              <span class="ex-avail-pill">구매가능</span>
-              <div class="ex-img-wrap">
-                <div class="ex-img"><div class="img-ph" data-img="img_024">편의점</div></div>
-              </div>
-              <div class="ex-body">
-                <div class="ex-brand">GS25</div>
-                <div class="ex-name">3,000원 금액권</div>
-                <div class="ex-cost-mix">
-                  <span class="ex-cost-tk"><span class="m"><svg width="40" height="40" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="g10a_2004" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#C68250"/><stop offset="100%" stop-color="#8B5A2B"/></linearGradient></defs><path d="M306.6,106.8l-49.5,49.5,2.4,2.4c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-2.4-2.4-138.6,138.6c-3.7,3.7-3.7,9.6,0,13.3l75.5,75.5c3.7,3.7,9.6,3.7,13.3,0l138.6-138.6-2.3-2.3c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l2.3,2.3,49.5-49.5c3.7-3.7,3.7-9.6,0-13.3l-75.5-75.5c-3.7-3.7-9.6-3.7-13.3,0ZM335.6,234.8c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM322.9,222.1c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM310.2,209.4c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM297.6,196.7c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM284.9,184.1c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM272.2,171.4c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7Z" fill="url(#g10a_2004)"/><path d="M316.2,155.8l12.1,6.2c.8.4,1.8.3,2.4-.4l9.6-9.6c1.4-1.4,3.8-.2,3.5,1.8l-2.1,13.5c-.1.9.3,1.8,1.1,2.2l12.1,6.2c1.8.9,1.4,3.6-.6,3.9l-13.5,2.1c-.9.1-1.6.8-1.7,1.7l-2.1,13.5c-.3,2-3,2.4-3.9.6l-6.2-12.1c-.4-.8-1.3-1.3-2.2-1.1l-13.5,2.1c-2,.3-3.2-2.1-1.8-3.5l9.6-9.6c.6-.6.8-1.6.4-2.4l-6.2-12.1c-.9-1.8,1-3.7,2.8-2.8Z" fill="rgba(255,255,255,0.95)"/><path d="M180.7,298.9l-5.2,5.2,27.4,27.4-4.7,4.7-27.4-27.4-5.2,5.2-4.2-4.2,15.1-15.1,4.2,4.2ZM215.3,319.1l-4.7,4.7-31.6-31.6,4.7-4.7,31.6,31.6ZM231.9,296.8c1.9,1.9,1.9,3.9,0,5.8l-9.9,9.9c-1.9,1.9-3.8,1.8-5.7,0l-25.8-25.8c-1.9-1.9-2-3.8-.1-5.7l9.9-9.9c1.9-1.9,3.9-1.9,5.8,0l7.4,7.4-4.7,4.7-6.2-6.2-6.1,6.1,23.5,23.5,6.1-6.1-6.6-6.6,4.7-4.7,7.8,7.8ZM254.4,280l-5.2,5.2-20.1-8.1,14.1,14.1-4.7,4.7-31.6-31.6,4.7-4.7,13.4,13.4-8.1-18.6,5.2-5.2.2.2,8.6,21.4,23.6,9.2ZM269.5,265l-13.1,13.1-31.6-31.6,13-13,4.2,4.2-8.3,8.3,9.2,9.2,7.1-7.1,4.1,4.1-7.1,7.1,9.9,9.9,8.4-8.4,4.2,4.2ZM259,220.6l-5.2,5.2,27.4,27.4-4.7,4.7-27.4-27.4-5.2,5.2-4.2-4.2,15.1-15.1,4.2,4.2Z" fill="rgba(255,255,255,0.95)"/></svg></span>12</span>
-                </div>
-              </div>
-            </div>
-            <div class="ex-item short">
-              <span class="ex-short-pill">티켓 부족</span>
-              <div class="ex-img-wrap">
-                <div class="ex-img"><div class="img-ph" data-img="img_025">치킨</div></div>
-              </div>
-              <div class="ex-body">
-                <div class="ex-brand">BHC</div>
-                <div class="ex-name">뿌링클 + 콜라 1.25L</div>
-                <div class="ex-cost-mix">
-                  <span class="ex-cost-tk short"><span class="m"><svg width="40" height="40" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="g10a_2005" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#FFD93B"/><stop offset="100%" stop-color="#E6A800"/></linearGradient></defs><path d="M306.6,106.8l-49.5,49.5,2.4,2.4c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-2.4-2.4-138.6,138.6c-3.7,3.7-3.7,9.6,0,13.3l75.5,75.5c3.7,3.7,9.6,3.7,13.3,0l138.6-138.6-2.3-2.3c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l2.3,2.3,49.5-49.5c3.7-3.7,3.7-9.6,0-13.3l-75.5-75.5c-3.7-3.7-9.6-3.7-13.3,0ZM335.6,234.8c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM322.9,222.1c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM310.2,209.4c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM297.6,196.7c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM284.9,184.1c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM272.2,171.4c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7Z" fill="url(#g10a_2005)"/><path d="M316.2,155.8l12.1,6.2c.8.4,1.8.3,2.4-.4l9.6-9.6c1.4-1.4,3.8-.2,3.5,1.8l-2.1,13.5c-.1.9.3,1.8,1.1,2.2l12.1,6.2c1.8.9,1.4,3.6-.6,3.9l-13.5,2.1c-.9.1-1.6.8-1.7,1.7l-2.1,13.5c-.3,2-3,2.4-3.9.6l-6.2-12.1c-.4-.8-1.3-1.3-2.2-1.1l-13.5,2.1c-2,.3-3.2-2.1-1.8-3.5l9.6-9.6c.6-.6.8-1.6.4-2.4l-6.2-12.1c-.9-1.8,1-3.7,2.8-2.8Z" fill="rgba(255,255,255,0.95)"/><path d="M180.7,298.9l-5.2,5.2,27.4,27.4-4.7,4.7-27.4-27.4-5.2,5.2-4.2-4.2,15.1-15.1,4.2,4.2ZM215.3,319.1l-4.7,4.7-31.6-31.6,4.7-4.7,31.6,31.6ZM231.9,296.8c1.9,1.9,1.9,3.9,0,5.8l-9.9,9.9c-1.9,1.9-3.8,1.8-5.7,0l-25.8-25.8c-1.9-1.9-2-3.8-.1-5.7l9.9-9.9c1.9-1.9,3.9-1.9,5.8,0l7.4,7.4-4.7,4.7-6.2-6.2-6.1,6.1,23.5,23.5,6.1-6.1-6.6-6.6,4.7-4.7,7.8,7.8ZM254.4,280l-5.2,5.2-20.1-8.1,14.1,14.1-4.7,4.7-31.6-31.6,4.7-4.7,13.4,13.4-8.1-18.6,5.2-5.2.2.2,8.6,21.4,23.6,9.2ZM269.5,265l-13.1,13.1-31.6-31.6,13-13,4.2,4.2-8.3,8.3,9.2,9.2,7.1-7.1,4.1,4.1-7.1,7.1,9.9,9.9,8.4-8.4,4.2,4.2ZM259,220.6l-5.2,5.2,27.4,27.4-4.7,4.7-27.4-27.4-5.2,5.2-4.2-4.2,15.1-15.1,4.2,4.2Z" fill="rgba(255,255,255,0.95)"/></svg></span>11</span>
-                </div>
-              </div>
-            </div>
-            <div class="ex-item short">
-              <span class="ex-short-pill">티켓 부족</span>
-              <div class="ex-img-wrap">
-                <div class="ex-img"><div class="img-ph" data-img="img_026">피자</div></div>
-              </div>
-              <div class="ex-body">
-                <div class="ex-brand">도미노피자</div>
-                <div class="ex-name">포테이토 피자 (M)</div>
-                <div class="ex-cost-mix">
-                  <span class="ex-cost-tk short"><span class="m"><svg width="40" height="40" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="g10a_2006" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#FFD93B"/><stop offset="100%" stop-color="#E6A800"/></linearGradient></defs><path d="M306.6,106.8l-49.5,49.5,2.4,2.4c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-2.4-2.4-138.6,138.6c-3.7,3.7-3.7,9.6,0,13.3l75.5,75.5c3.7,3.7,9.6,3.7,13.3,0l138.6-138.6-2.3-2.3c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l2.3,2.3,49.5-49.5c3.7-3.7,3.7-9.6,0-13.3l-75.5-75.5c-3.7-3.7-9.6-3.7-13.3,0ZM335.6,234.8c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM322.9,222.1c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM310.2,209.4c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM297.6,196.7c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM284.9,184.1c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM272.2,171.4c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7Z" fill="url(#g10a_2006)"/><path d="M316.2,155.8l12.1,6.2c.8.4,1.8.3,2.4-.4l9.6-9.6c1.4-1.4,3.8-.2,3.5,1.8l-2.1,13.5c-.1.9.3,1.8,1.1,2.2l12.1,6.2c1.8.9,1.4,3.6-.6,3.9l-13.5,2.1c-.9.1-1.6.8-1.7,1.7l-2.1,13.5c-.3,2-3,2.4-3.9.6l-6.2-12.1c-.4-.8-1.3-1.3-2.2-1.1l-13.5,2.1c-2,.3-3.2-2.1-1.8-3.5l9.6-9.6c.6-.6.8-1.6.4-2.4l-6.2-12.1c-.9-1.8,1-3.7,2.8-2.8Z" fill="rgba(255,255,255,0.95)"/><path d="M180.7,298.9l-5.2,5.2,27.4,27.4-4.7,4.7-27.4-27.4-5.2,5.2-4.2-4.2,15.1-15.1,4.2,4.2ZM215.3,319.1l-4.7,4.7-31.6-31.6,4.7-4.7,31.6,31.6ZM231.9,296.8c1.9,1.9,1.9,3.9,0,5.8l-9.9,9.9c-1.9,1.9-3.8,1.8-5.7,0l-25.8-25.8c-1.9-1.9-2-3.8-.1-5.7l9.9-9.9c1.9-1.9,3.9-1.9,5.8,0l7.4,7.4-4.7,4.7-6.2-6.2-6.1,6.1,23.5,23.5,6.1-6.1-6.6-6.6,4.7-4.7,7.8,7.8ZM254.4,280l-5.2,5.2-20.1-8.1,14.1,14.1-4.7,4.7-31.6-31.6,4.7-4.7,13.4,13.4-8.1-18.6,5.2-5.2.2.2,8.6,21.4,23.6,9.2ZM269.5,265l-13.1,13.1-31.6-31.6,13-13,4.2,4.2-8.3,8.3,9.2,9.2,7.1-7.1,4.1,4.1-7.1,7.1,9.9,9.9,8.4-8.4,4.2,4.2ZM259,220.6l-5.2,5.2,27.4,27.4-4.7,4.7-27.4-27.4-5.2,5.2-4.2-4.2,15.1-15.1,4.2,4.2Z" fill="rgba(255,255,255,0.95)"/></svg></span>8</span>
-                </div>
+                <div class="ex-cost-mix"><span class="ex-cost-tk">브론즈 8</span></div>
+                <div class="ex-won">7,400원</div>
               </div>
             </div>
           </div>
@@ -10751,47 +10722,6 @@ window.PP_FEATURES = {
           <div class="tab-item"><div class="tab-ico"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" class="ico-line"><path d="M9.02 2.83821L3.63 7.03821C2.73 7.73821 2 9.22821 2 10.3582V17.7682C2 20.0882 3.89 21.9882 6.21 21.9882H17.79C20.11 21.9882 22 20.0882 22 17.7782V10.4982C22 9.28821 21.19 7.73821 20.2 7.04821L14.02 2.71821C12.62 1.73821 10.37 1.78821 9.02 2.83821Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 17.9922V14.9922" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg><svg width="24" height="24" viewBox="0 0 24 24" fill="none" class="ico-solid"><path d="M20.0383 6.81774L14.2783 2.78774C12.7083 1.68774 10.2983 1.74774 8.78828 2.91774L3.77828 6.82774C2.77828 7.60774 1.98828 9.20774 1.98828 10.4677V17.3677C1.98828 19.9177 4.05828 21.9977 6.60828 21.9977H17.3883C19.9383 21.9977 22.0083 19.9277 22.0083 17.3777V10.5977C22.0083 9.24774 21.1383 7.58774 20.0383 6.81774ZM12.7483 17.9977C12.7483 18.4077 12.4083 18.7477 11.9983 18.7477C11.5883 18.7477 11.2483 18.4077 11.2483 17.9977V14.9977C11.2483 14.5877 11.5883 14.2477 11.9983 14.2477C12.4083 14.2477 12.7483 14.5877 12.7483 14.9977V17.9977Z" fill="currentColor"/></svg></div><div class="tab-lbl">홈</div></div>
           <div class="tab-item"><div class="tab-ico"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" class="ico-line"><path d="M19.5 12.5C19.5 11.12 20.62 10 22 10V9C22 5 21 4 17 4H7C3 4 2 5 2 9V9.5C3.38 9.5 4.5 10.62 4.5 12C4.5 13.38 3.38 14.5 2 14.5V15C2 19 3 20 7 20H17C21 20 22 19 22 15C20.62 15 19.5 13.88 19.5 12.5Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M10 4L10 20" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="5 5"/></svg><svg width="24" height="24" viewBox="0 0 24 24" fill="none" class="ico-solid"><path d="M22 10.75C22.41 10.75 22.75 10.41 22.75 10V9C22.75 4.59 21.41 3.25 17 3.25H10.75V5.5C10.75 5.91 10.41 6.25 10 6.25C9.59 6.25 9.25 5.91 9.25 5.5V3.25H7C2.59 3.25 1.25 4.59 1.25 9V9.5C1.25 9.91 1.59 10.25 2 10.25C2.96 10.25 3.75 11.04 3.75 12C3.75 12.96 2.96 13.75 2 13.75C1.59 13.75 1.25 14.09 1.25 14.5V15C1.25 19.41 2.59 20.75 7 20.75H9.25V18.5C9.25 18.09 9.59 17.75 10 17.75C10.41 17.75 10.75 18.09 10.75 18.5V20.75H17C21.41 20.75 22.75 19.41 22.75 15C22.75 14.59 22.41 14.25 22 14.25C21.04 14.25 20.25 13.46 20.25 12.5C20.25 11.54 21.04 10.75 22 10.75ZM10.75 14.17C10.75 14.58 10.41 14.92 10 14.92C9.59 14.92 9.25 14.58 9.25 14.17V9.83C9.25 9.42 9.59 9.08 10 9.08C10.41 9.08 10.75 9.42 10.75 9.83V14.17Z" fill="currentColor"/></svg></div><div class="tab-lbl">혜택</div></div>
           <div class="tab-item active"><div class="tab-ico"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="ico-line"><path d="M8.40002 6.5H15.6C19 6.5 19.34 8.09 19.57 10.03L20.47 17.53C20.76 19.99 20 22 16.5 22H7.51003C4.00003 22 3.24002 19.99 3.54002 17.53L4.44003 10.03C4.66003 8.09 5.00002 6.5 8.40002 6.5Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 8V4.5C8 3 9 2 10.5 2H13.5C15 2 16 3 16 4.5V8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M20.41 17.0298H8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="ico-solid"><path d="M16 8.75C15.59 8.75 15.25 8.41 15.25 8V4.5C15.25 3.42 14.58 2.75 13.5 2.75H10.5C9.42 2.75 8.75 3.42 8.75 4.5V8C8.75 8.41 8.41 8.75 8 8.75C7.59 8.75 7.25 8.41 7.25 8V4.5C7.25 2.59 8.59 1.25 10.5 1.25H13.5C15.41 1.25 16.75 2.59 16.75 4.5V8C16.75 8.41 16.41 8.75 16 8.75Z" fill="currentColor"/><path d="M7.99984 17.78C7.58984 17.78 7.24984 17.44 7.24984 17.03C7.24984 16.61 7.58984 16.28 7.99984 16.28H19.7598C20.0598 16.28 20.2898 16.02 20.2598 15.72L19.5798 10.03C19.3398 8.09 18.9998 6.5 15.5998 6.5H8.39984C4.99984 6.5 4.65984 8.09 4.42984 10.03L3.52984 17.53C3.23984 19.99 3.99984 22 7.50984 22H16.4898C19.6498 22 20.5798 20.37 20.5298 18.25C20.5198 17.98 20.2998 17.78 20.0298 17.78H7.99984Z" fill="currentColor"/></svg></div><div class="tab-lbl">기프티샵</div></div><div class="tab-item"><div class="tab-ico"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" class="ico-line"><path d="M12 12.75C8.83 12.75 6.25 10.17 6.25 7C6.25 3.83 8.83 1.25 12 1.25C15.17 1.25 17.75 3.83 17.75 7C17.75 10.17 15.17 12.75 12 12.75ZM12 2.75C9.66 2.75 7.75 4.66 7.75 7C7.75 9.34 9.66 11.25 12 11.25C14.34 11.25 16.25 9.34 16.25 7C16.25 4.66 14.34 2.75 12 2.75Z" fill="currentColor"/><path d="M20.5901 22.75C20.1801 22.75 19.8401 22.41 19.8401 22C19.8401 18.55 16.3202 15.75 12.0002 15.75C7.68015 15.75 4.16016 18.55 4.16016 22C4.16016 22.41 3.82016 22.75 3.41016 22.75C3.00016 22.75 2.66016 22.41 2.66016 22C2.66016 17.73 6.85015 14.25 12.0002 14.25C17.1502 14.25 21.3401 17.73 21.3401 22C21.3401 22.41 21.0001 22.75 20.5901 22.75Z" fill="currentColor"/></svg><svg width="24" height="24" viewBox="0 0 24 24" fill="none" class="ico-solid"><path d="M12 12C14.7614 12 17 9.76142 17 7C17 4.23858 14.7614 2 12 2C9.23858 2 7 4.23858 7 7C7 9.76142 9.23858 12 12 12Z" fill="currentColor"/><path d="M12.0002 14.5C6.99016 14.5 2.91016 17.86 2.91016 22C2.91016 22.28 3.13016 22.5 3.41016 22.5H20.5902C20.8702 22.5 21.0902 22.28 21.0902 22C21.0902 17.86 17.0102 14.5 12.0002 14.5Z" fill="currentColor"/></svg></div><div class="tab-lbl">마이</div></div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="phone-wrap" id="phone-10adetail">
-    <div class="phone">
-      <div class="detail-ex-screen">
-        <div class="statusbar"><span>9:41</span><div class="statusbar-icons"><svg width="17" height="12" viewBox="0 0 17 12" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><rect x="0" y="4" width="3" height="8" rx="1"/><rect x="4.5" y="2.5" width="3" height="9.5" rx="1"/><rect x="9" y="1" width="3" height="11" rx="1"/><rect x="13.5" y="0" width="3" height="12" rx="1"/></svg><svg width="16" height="12" viewBox="0 0 16 12" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M8 2.5C10.2 2.5 12.2 3.4 13.6 4.9L15 3.4C13.2 1.5 10.7 0.3 8 0.3C5.3 0.3 2.8 1.5 1 3.4L2.4 4.9C3.8 3.4 5.8 2.5 8 2.5Z"/><path d="M8 5.5C9.4 5.5 10.7 6.1 11.6 7L13 5.5C11.7 4.2 10 3.3 8 3.3C6 3.3 4.3 4.2 3 5.5L4.4 7C5.3 6.1 6.6 5.5 8 5.5Z"/><circle cx="8" cy="10" r="1.8"/></svg><svg width="25" height="12" viewBox="0 0 25 12" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="currentColor" stroke-opacity="0.35"/><rect x="2" y="2" width="17" height="8" rx="2" fill="currentColor"/><path d="M23 4V8C23.8 7.6 24.5 6.9 24.5 6C24.5 5.1 23.8 4.4 23 4Z" fill="currentColor" fill-opacity="0.4"/></svg></div></div>
-        <div class="detail-top">
-          <button class="back-btn"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M11.25 15.5L5.96 10.45C5.17 9.65 5.17 8.35 5.96 7.55L11.25 2.66" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
-          <div class="detail-title-bar">기프티콘 교환</div>
-        </div>
-        <div class="ex-detail-hero" style="display:flex;align-items:center;justify-content:center;overflow:hidden;"></div>
-        <div class="ex-detail-body">
-          <div class="ex-brand-tag">스타벅스</div>
-          <div class="ex-product-name">아메리카노 Tall</div>
-          <div class="ex-cost-box">
-            <div class="ex-cost-label">필요 티켓</div>
-            <div class="ex-cost-main">
-              <div class="ex-cost-tk" style="font-size:var(--fs-body);padding:6px 12px;">
-                <svg width="18" height="18" viewBox="0 0 512 512"><defs><linearGradient id="exd1" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#C68250"/><stop offset="100%" stop-color="#8B5A2B"/></linearGradient></defs><path d="M306.6,106.8l-49.5,49.5,2.4,2.4c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-2.4-2.4-138.6,138.6c-3.7,3.7-3.7,9.6,0,13.3l75.5,75.5c3.7,3.7,9.6,3.7,13.3,0l138.6-138.6-2.3-2.3c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l2.3,2.3,49.5-49.5c3.7-3.7,3.7-9.6,0-13.3l-75.5-75.5c-3.7-3.7-9.6-3.7-13.3,0Z" fill="url(#exd1)"/></svg>
-                브론즈 티켓 5장
-              </div>
-              <span class="ex-cost-have" style="font-size:var(--fs-caption);color:var(--text3);margin-left:8px;">현재 보유: 12장</span>
-            </div>
-          </div>
-          <div class="ex-info-row">
-            <div class="ex-info-chip"><div class="eic-lbl">유효기간</div><div class="eic-val">발급 후 90일</div></div>
-            <div class="ex-info-chip"><div class="eic-lbl">사용처</div><div class="eic-val">스타벅스 전 매장</div></div>
-          </div>
-          <div class="ex-policy-box">
-            <div class="ex-policy-t">교환 정책</div>
-            <div class="ex-policy-item">•<span>교환 후 취소 불가. 분실 시 재발급 없음.</span></div>
-            <div class="ex-policy-item">•<span>유효기간 이후 사용 불가, 환불 대상 아님.</span></div>
-            <div class="ex-policy-item">•<span>카카오톡 선물함으로 발송됩니다.</span></div>
-          </div>
-        </div>
-        <div class="ex-detail-bottom">
-          <div style="background:var(--sub-4);border-radius:var(--r);padding:10px 14px;margin-bottom:10px;font-size:var(--fs-caption);color:var(--main-dark);">브론즈 티켓 5장 차감 → 잔여 7장</div>
-          <button class="btn-primary">교환하기</button>
         </div>
       </div>
     </div>
@@ -12859,37 +12789,43 @@ window.PP_FEATURES = {
     <div class="phone">
       <div class="detail-ex-screen">
         <div class="statusbar"><span>9:41</span><div class="statusbar-icons"><svg width="17" height="12" viewBox="0 0 17 12" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><rect x="0" y="4" width="3" height="8" rx="1"/><rect x="4.5" y="2.5" width="3" height="9.5" rx="1"/><rect x="9" y="1" width="3" height="11" rx="1"/><rect x="13.5" y="0" width="3" height="12" rx="1"/></svg><svg width="16" height="12" viewBox="0 0 16 12" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M8 2.5C10.2 2.5 12.2 3.4 13.6 4.9L15 3.4C13.2 1.5 10.7 0.3 8 0.3C5.3 0.3 2.8 1.5 1 3.4L2.4 4.9C3.8 3.4 5.8 2.5 8 2.5Z"/><path d="M8 5.5C9.4 5.5 10.7 6.1 11.6 7L13 5.5C11.7 4.2 10 3.3 8 3.3C6 3.3 4.3 4.2 3 5.5L4.4 7C5.3 6.1 6.6 5.5 8 5.5Z"/><circle cx="8" cy="10" r="1.8"/></svg><svg width="25" height="12" viewBox="0 0 25 12" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="currentColor" stroke-opacity="0.35"/><rect x="2" y="2" width="17" height="8" rx="2" fill="currentColor"/><path d="M23 4V8C23.8 7.6 24.5 6.9 24.5 6C24.5 5.1 23.8 4.4 23 4Z" fill="currentColor" fill-opacity="0.4"/></svg></div></div>
+        <!-- 상세 차례는 포인츠허브를 따른다: 제목 / 상품 사진 / 브랜드·상품명·가격 /
+             구분선 / 쿠폰 사용안내 / 유의사항 / 전폭 버튼.
+             유의사항은 상품에 딸려 온 원문(notice)을 그대로 보여 준다 — 문구를 지어내지 않는다. -->
         <div class="detail-top">
           <button class="back-btn"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M11.25 15.5L5.96 10.45C5.17 9.65 5.17 8.35 5.96 7.55L11.25 2.66" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
-          <div class="detail-title-bar">기프티콘 교환</div>
+          <div class="detail-title-bar">상품 상세</div>
         </div>
-        <div class="ex-detail-hero" style="display:flex;align-items:center;justify-content:center;overflow:hidden;"></div>
-        <div class="ex-detail-body">
-          <div class="ex-brand-tag">스타벅스</div>
-          <div class="ex-product-name">아메리카노 Tall</div>
-          <div class="ex-cost-box">
-            <div class="ex-cost-label">필요 티켓</div>
-            <div class="ex-cost-main">
-              <div class="ex-cost-tk" style="font-size:var(--fs-body);padding:6px 12px;">
-                <svg width="18" height="18" viewBox="0 0 512 512"><defs><linearGradient id="exd1" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#C68250"/><stop offset="100%" stop-color="#8B5A2B"/></linearGradient></defs><path d="M306.6,106.8l-49.5,49.5,2.4,2.4c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-2.4-2.4-138.6,138.6c-3.7,3.7-3.7,9.6,0,13.3l75.5,75.5c3.7,3.7,9.6,3.7,13.3,0l138.6-138.6-2.3-2.3c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l2.3,2.3,49.5-49.5c3.7-3.7,3.7-9.6,0-13.3l-75.5-75.5c-3.7-3.7-9.6-3.7-13.3,0Z" fill="url(#exd1)"/></svg>
-                브론즈 티켓 5장
+        <div class="ex-detail-scroll">
+          <div class="ex-detail-hero"></div>
+          <div class="ex-detail-body">
+            <div class="ex-brand-tag">스타벅스</div>
+            <div class="ex-product-name">아메리카노 Tall</div>
+            <div class="ex-price-row">
+              <div class="ex-cost-tk" style="font-size:var(--fs-body);">
+                <span class="m"></span>브론즈 티켓 5장
               </div>
-              <span class="ex-cost-have" style="font-size:var(--fs-caption);color:var(--text3);margin-left:8px;">현재 보유: 12장</span>
+              <div class="ex-price-won"></div>
+            </div>
+            <div class="ex-cost-have"></div>
+          </div>
+          <div id="ex-usage-sec">
+            <div class="ex-detail-div"></div>
+            <div class="ex-detail-body">
+              <div class="ex-sec-t">쿠폰 사용안내</div>
+              <div class="ex-sec-body" id="ex-usage"></div>
             </div>
           </div>
-          <div class="ex-info-row">
-            <div class="ex-info-chip"><div class="eic-lbl">유효기간</div><div class="eic-val">발급 후 90일</div></div>
-            <div class="ex-info-chip"><div class="eic-lbl">사용처</div><div class="eic-val">스타벅스 전 매장</div></div>
-          </div>
-          <div class="ex-policy-box">
-            <div class="ex-policy-t">교환 정책</div>
-            <div class="ex-policy-item">•<span>교환 후 취소 불가. 분실 시 재발급 없음.</span></div>
-            <div class="ex-policy-item">•<span>유효기간 이후 사용 불가, 환불 대상 아님.</span></div>
-            <div class="ex-policy-item">•<span>카카오톡 선물함으로 발송됩니다.</span></div>
+          <div id="ex-notice-sec">
+            <div class="ex-detail-div"></div>
+            <div class="ex-detail-body">
+              <div class="ex-sec-t">기프티콘 쿠폰 유의사항</div>
+              <div class="ex-sec-body" id="ex-notice"></div>
+            </div>
           </div>
         </div>
         <div class="ex-detail-bottom">
-          <div style="background:var(--sub-4);border-radius:var(--r);padding:10px 14px;margin-bottom:10px;font-size:var(--fs-caption);color:var(--main-dark);">브론즈 티켓 5장 차감 → 잔여 7장</div>
+          <div class="ex-deduct"></div>
           <button class="btn-primary">교환하기</button>
         </div>
       </div>
@@ -17465,7 +17401,7 @@ function cpkOpen(){var m=document.getElementById('cpk-modal');if(m)m.style.displ
             <div style="font-size:var(--fs-body);color:var(--text2);line-height:1.7;margin-bottom:24px;">기프티콘이 발급되었어요.<br>아래 코드로 사용하세요.</div>
             <!-- 기프티콘 카드 -->
             <div style="width:100%;background:white;border:1.5px solid var(--border);border-radius:18px;padding:20px;margin-bottom:16px;">
-              <div style="font-size:56px;margin-bottom:12px;" id="ex-done-emoji">☕</div>
+              <div id="ex-done-emoji" style="width:72px;height:72px;border-radius:12px;margin:0 auto 12px;overflow:hidden;"></div>
               <div style="font-size:var(--fs-caption);font-weight:700;color:var(--main);margin-bottom:4px;" id="ex-done-brand">스타벅스</div>
               <div style="font-size:var(--fs-label);font-weight:800;color:var(--text1);letter-spacing:-0.3px;margin-bottom:16px;" id="ex-done-name">아이스 아메리카노</div>
               <!-- 바코드 영역 -->
@@ -18672,6 +18608,16 @@ function loadGifticons() {
    (디자인 규칙 2026-09-16 — 이모지를 화면에 쓰지 않는다). */
 var PP_GI_PLACEHOLDER_STYLE = 'display:flex;align-items:center;justify-content:center;color:#C9C2DC;background:#F7F5FC;';
 var PP_GI_PLACEHOLDER_SVG = '<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="13" rx="2"/><path d="M3 12h18"/><path d="M12 8v13"/><path d="M12 8S10.5 4 8 4a2.5 2.5 0 0 0 0 5h4z"/><path d="M12 8s1.5-4 4-4a2.5 2.5 0 0 1 0 5h-4z"/></svg>';
+/* 상품 사진 한 칸 — 사진이 있으면 사진, 없으면 라인아트. 교환 완료·교환 내역이 같이 쓴다. */
+function ppGiSetThumb(el, g, px) {
+  if (!el) return;
+  el.setAttribute('style', PP_GI_PLACEHOLDER_STYLE + 'width:' + px + 'px;height:' + px + 'px;border-radius:12px;margin:0 auto 12px;overflow:hidden;');
+  el.innerHTML = (g && g.image_url)
+    ? '<img src="' + ppEsc(g.image_url) + '" alt="" style="width:100%;height:100%;object-fit:cover;" onerror="ppGiImgFallback(this)">'
+    : PP_GI_PLACEHOLDER_SVG;
+}
+var PP_GI_EMPTY_ICON = '<span style="display:inline-flex;color:#C9C2DC">' + PP_GI_PLACEHOLDER_SVG.replace('width="40" height="40"', 'width="44" height="44"') + '</span>';
+
 function ppGiImgFallback(img) {
   var box = img.parentNode;
   if (!box) return;
@@ -18698,57 +18644,179 @@ function ppGiCatMatch(cat, pick) {
   if (pick.indexOf('커피') === 0 && cat.indexOf('카페') >= 0) return true;
   return false;
 }
-function bindGifticonCats() {
-  var wrap = document.querySelector('#pw-24 .cat-filter');
-  if (!wrap || wrap.dataset.ppCatBound) return;
-  wrap.dataset.ppCatBound = '1';
-  wrap.querySelectorAll('.cat-pill').forEach(function (el) {
+/* ── 기프티샵 목록 (pw-24) ──
+   차례는 포인츠허브 목록 화면을 따른다 — 제목·검색 / 탭(홈·브랜드·구매내역) / 정렬 /
+   구역 제목 / 3단 그리드. 색과 모양은 프라이스픽 것을 쓴다.
+
+   브랜드 탭은 포인츠허브에 있는 자리라 살렸다. 우리는 브랜드 색인 화면이 따로 없으므로
+   칩 줄의 내용을 갈래에서 브랜드로 바꾸는 것으로 같은 일을 시킨다 — 화면을 새로 만들지
+   않고도 브랜드로 골라 볼 수 있다. 구매내역 탭은 이미 있는 교환 내역(pw-24h)으로 보낸다. */
+var PP_GI_BRAND = '';
+var PP_GI_SORT = 'popular';
+var PP_GI_Q = '';
+var PP_GI_TAB = 'home';
+
+var PP_GI_CATS = ['커피/음료', '피자/버거/치킨', '베이커리/떡', '편의점/마트', '상품권/금액권', '문화/생활/기타'];
+
+function ppGiToggleSearch() {
+  var box = document.getElementById('gs-search');
+  if (!box) return;
+  box.classList.toggle('hide');
+  var inp = document.getElementById('gs-search-input');
+  if (!box.classList.contains('hide') && inp) { inp.focus(); return; }
+  if (inp && inp.value) { inp.value = ''; PP_GI_Q = ''; renderGifticons(); }
+}
+window.ppGiToggleSearch = ppGiToggleSearch;
+
+/* 브랜드 칩은 실제 카탈로그에 있는 브랜드만 쓴다 — 없는 브랜드를 지어내지 않는다.
+   상품 수가 많은 차례로 20개까지. */
+function ppGiBrands() {
+  var cnt = {};
+  (PP.gifticonList || []).forEach(function (g) {
+    var b = (g.brand || '').trim();
+    if (b) cnt[b] = (cnt[b] || 0) + 1;
+  });
+  return Object.keys(cnt).sort(function (a, b) {
+    return cnt[b] - cnt[a] || a.localeCompare(b, 'ko');
+  }).slice(0, 20);
+}
+
+function ppGiRenderChips() {
+  var wrap = document.getElementById('gs-chips');
+  if (!wrap) return;
+  var items, cur, attr;
+  if (PP_GI_TAB === 'brand') {
+    items = ppGiBrands(); cur = PP_GI_BRAND; attr = 'data-brand';
+  } else {
+    items = PP_GI_CATS; cur = PP_GI_CAT; attr = 'data-cat';
+  }
+  wrap.innerHTML = '<div class="cat-pill' + (cur ? '' : ' active') + '" ' + attr + '="">전체</div>'
+    + items.map(function (v) {
+        return '<div class="cat-pill' + (cur === v ? ' active' : '') + '" ' + attr + '="' + ppEsc(v) + '">' + ppEsc(v) + '</div>';
+      }).join('');
+  wrap.scrollLeft = 0;
+}
+
+function bindGifticonShop() {
+  var sc = document.getElementById('pw-24');
+  if (!sc || sc.dataset.ppShopBound) return;
+  sc.dataset.ppShopBound = '1';
+
+  /* 탭 */
+  sc.querySelectorAll('.gs-tab').forEach(function (el) {
     el.addEventListener('click', function () {
-      wrap.querySelectorAll('.cat-pill').forEach(function (x) { x.classList.remove('active'); });
+      var t = el.getAttribute('data-gs-tab');
+      if (t === 'history') { window.showScreen('pw-24h'); return; }
+      PP_GI_TAB = t;
+      sc.querySelectorAll('.gs-tab').forEach(function (x) { x.classList.remove('active'); });
       el.classList.add('active');
-      PP_GI_CAT = el.getAttribute('data-cat') || '';
+      /* 탭을 옮기면 반대쪽 고르개는 푼다 — 두 벌이 겹쳐 걸리면 무엇으로 걸러졌는지 안 보인다 */
+      if (t === 'brand') PP_GI_CAT = ''; else PP_GI_BRAND = '';
+      ppGiRenderChips();
       renderGifticons();
-    }, true);
+    });
+  });
+
+  /* 칩 — 내용이 바뀌므로 줄에 한 번만 걸어 두고 눌린 칩을 찾아 쓴다 */
+  var chips = document.getElementById('gs-chips');
+  if (chips) {
+    chips.addEventListener('click', function (e) {
+      var el = e.target.closest ? e.target.closest('.cat-pill') : null;
+      if (!el || !chips.contains(el)) return;
+      chips.querySelectorAll('.cat-pill').forEach(function (x) { x.classList.remove('active'); });
+      el.classList.add('active');
+      if (PP_GI_TAB === 'brand') PP_GI_BRAND = el.getAttribute('data-brand') || '';
+      else PP_GI_CAT = el.getAttribute('data-cat') || '';
+      renderGifticons();
+    });
+  }
+
+  /* 정렬 */
+  sc.querySelectorAll('.gs-sort-item').forEach(function (el) {
+    el.addEventListener('click', function () {
+      PP_GI_SORT = el.getAttribute('data-gs-sort') || 'popular';
+      sc.querySelectorAll('.gs-sort-item').forEach(function (x) { x.classList.remove('active'); });
+      el.classList.add('active');
+      renderGifticons();
+    });
+  });
+
+  /* 검색 */
+  var inp = document.getElementById('gs-search-input');
+  if (inp) {
+    inp.addEventListener('input', function () {
+      PP_GI_Q = (inp.value || '').trim().toLowerCase();
+      renderGifticons();
+    });
+  }
+}
+
+function ppGiWon(g) {
+  var w = (typeof g.price === 'number') ? g.price : 0;
+  return w > 0 ? w.toLocaleString('ko-KR') + '원' : '';
+}
+
+function ppGiSorted(list) {
+  if (PP_GI_SORT === 'popular') return list;   /* 카탈로그에 담긴 차례 그대로 */
+  var dir = (PP_GI_SORT === 'high') ? -1 : 1;
+  return list.slice().sort(function (a, b) {
+    return ((a.price || 0) - (b.price || 0)) * dir;
   });
 }
 
 function renderGifticons() {
-  bindGifticonCats();
-  var list = (PP.gifticonList || []).filter(function (g) { return ppGiCatMatch(g.category, PP_GI_CAT); });
+  bindGifticonShop();
+  var secT = document.getElementById('gs-sec-title');
+  if (secT) secT.textContent = { popular: '인기상품', low: '낮은가격순', high: '높은가격순' }[PP_GI_SORT] || '인기상품';
+
+  var list = (PP.gifticonList || []).filter(function (g) {
+    if (PP_GI_TAB === 'brand') {
+      if (PP_GI_BRAND && (g.brand || '').trim() !== PP_GI_BRAND) return false;
+    } else if (!ppGiCatMatch(g.category, PP_GI_CAT)) return false;
+    if (PP_GI_Q) {
+      var hay = ((g.brand || '') + ' ' + (g.name || g.product_name || '')).toLowerCase();
+      if (hay.indexOf(PP_GI_Q) < 0) return false;
+    }
+    return true;
+  });
+  list = ppGiSorted(list);
+
   var grid = document.querySelector('#pw-24 .ex-grid');
   if (!grid) return;
   if (!list.length) {
+    var why = PP_GI_Q ? '찾는 말과 맞는 상품이 없어요'
+      : (PP_GI_BRAND || PP_GI_CAT) ? '여기에는 아직 상품이 없어요'
+      : '교환 가능한 기프티콘이 없어요';
+    var how = PP_GI_Q ? '다른 말로 찾아 보세요'
+      : (PP_GI_BRAND || PP_GI_CAT) ? '다른 칩을 눌러 보세요'
+      : '관리자가 상품을 등록하면 여기에 나타나요';
     grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px 16px;color:var(--text3);">'
-      + '<div style="font-size:var(--fs-number);margin-bottom:12px;">🎁</div>'
-      + '<div style="font-weight:700;color:var(--text1);margin-bottom:6px;">'
-      + (PP_GI_CAT ? '이 갈래에는 아직 상품이 없어요' : '교환 가능한 기프티콘이 없어요') + '</div>'
-      + '<div style="font-size:var(--fs-body);">' + (PP_GI_CAT ? '다른 갈래를 눌러 보세요' : '관리자가 상품을 등록하면 여기에 나타나요') + '</div>'
+      + '<div style="' + PP_GI_PLACEHOLDER_STYLE + 'margin-bottom:12px;">' + PP_GI_PLACEHOLDER_SVG + '</div>'
+      + '<div style="font-weight:700;color:var(--text1);margin-bottom:6px;">' + why + '</div>'
+      + '<div style="font-size:var(--fs-body);">' + how + '</div>'
       + '</div>';
     return;
   }
-  grid.innerHTML = list.map(function(g, i) {
-    /* 상품 사진이 정본이다. 없으면 라인아트 자리표시로 채운다. */
-    var gradeName = { bronze: '브론즈', silver: '실버', gold: '골드' }[g.required_grade || 'bronze'];
+  grid.innerHTML = list.map(function (g, i) {
+    /* 칸은 이미지 · 브랜드 · 상품명 · 가격. 「구매가능 / 티켓 부족」 딱지는 뺐다 —
+       포인츠허브 칸에는 없고, 모자란지는 상세에서 알려 준다. */
     var cnt = g.required_count || 1;
-    var have = PP.tickets[g.required_grade || 'bronze'] || 0;
-    var ok = have >= cnt;
-    /* 상품 이미지(CMS 상품 목록에서 등록)가 있으면 이미지, 없으면 이모지 — 이모지 경로는 그대로 남긴다.
-       .ex-img img 규칙(width/height 100% · object-fit:cover)은 데모에 이미 있는 상품 카드 방식 그대로. */
     var imgUrl = g.image_url || '';
     var imgBox = imgUrl
       ? '<div class="ex-img"><img src="' + ppEsc(imgUrl) + '" alt="" loading="lazy" onerror="ppGiImgFallback(this)"></div>'
       : '<div class="ex-img" style="' + PP_GI_PLACEHOLDER_STYLE + '">' + PP_GI_PLACEHOLDER_SVG + '</div>';
+    var won = ppGiWon(g);
     return '<div class="ex-item" data-pp-gi="' + i + '" style="cursor:pointer;">'
-      + (ok ? '<span class="ex-avail-pill">구매가능</span>' : '')
       + '<div class="ex-img-wrap">' + imgBox + '</div>'
       + '<div class="ex-body">'
-      + '<div class="ex-brand">' + (g.brand || '') + '</div>'
-      + '<div class="ex-name">' + (g.name || g.product_name || '') + '</div>'
+      + '<div class="ex-brand">' + ppEsc(g.brand || '') + '</div>'
+      + '<div class="ex-name">' + ppEsc(ppBrandName(g.brand, g.name || g.product_name)) + '</div>'
       + '<div class="ex-cost-mix"><span class="ex-cost-tk"><span class="m">' + ticketIcon(g.required_grade || 'bronze') + '</span>' + cnt + '</span></div>'
+      + (won ? '<div class="ex-won">' + won + '</div>' : '')
       + '</div></div>';
   }).join('');
-  grid.querySelectorAll('.ex-item').forEach(function(el) {
-    el.addEventListener('click', function() {
+  grid.querySelectorAll('.ex-item').forEach(function (el) {
+    el.addEventListener('click', function () {
       var gi = parseInt(el.dataset.ppGi);
       PP.currentGifticon = list[gi];
       populateGifticonDetail(PP.currentGifticon);
@@ -18757,29 +18825,59 @@ function renderGifticons() {
   });
 }
 
+/* 상세 채우기 — 상품 문서에 실제로 있는 값만 쓴다.
+   없는 값은 줄째로 감춘다(문장으로 지어 채우지 않는다). */
 function populateGifticonDetail(g) {
   var s = document.getElementById('pw-25');
   if (!s) return;
+
   var hero = s.querySelector('.ex-detail-hero');
-  if (hero) { hero.setAttribute('style', PP_GI_PLACEHOLDER_STYLE + 'width:100%;height:100%;'); hero.innerHTML = g.image_url ? '<img src="' + ppEsc(g.image_url) + '" alt="" style="width:100%;height:100%;object-fit:cover;" onerror="ppGiImgFallback(this)">' : PP_GI_PLACEHOLDER_SVG; }
+  if (hero) {
+    if (g.image_url) {
+      hero.setAttribute('style', '');
+      hero.innerHTML = '<img src="' + ppEsc(g.image_url) + '" alt="" onerror="ppGiImgFallback(this)">';
+    } else {
+      hero.setAttribute('style', PP_GI_PLACEHOLDER_STYLE);
+      hero.innerHTML = PP_GI_PLACEHOLDER_SVG;
+    }
+  }
+
   var brand = s.querySelector('.ex-brand-tag');
   if (brand) brand.textContent = g.brand || '';
   var name = s.querySelector('.ex-product-name');
-  if (name) name.textContent = g.name || g.product_name || '';
-  var gradeName = { bronze: '브론즈', silver: '실버', gold: '골드' }[g.required_grade || 'bronze'];
+  if (name) name.textContent = ppBrandName(g.brand, g.name || g.product_name);
+
+  var grade = g.required_grade || 'bronze';
+  var gradeName = { bronze: '브론즈', silver: '실버', gold: '골드' }[grade] || '브론즈';
   var cnt = g.required_count || 1;
-  var cost = s.querySelector('.ex-cost-tk');
-  if (cost) cost.innerHTML = '<span class="m">' + ticketIcon(g.required_grade || 'bronze') + '</span>' + gradeName + ' 티켓 ' + cnt + '장';
-  var haveEl = s.querySelector('.ex-cost-main .ex-cost-have');
-  if (haveEl) haveEl.textContent = '현재 보유: ' + (PP.tickets[g.required_grade || 'bronze'] || 0) + '장';
-  var noticeEl = s.querySelector('.ex-detail-bottom > div[style*="sub-4"]');
-  if (noticeEl) noticeEl.textContent = gradeName + ' 티켓 ' + cnt + '장 차감 → 잔여 ' + Math.max(0, (PP.tickets[g.required_grade || 'bronze'] || 0) - cnt) + '장';
-  /* 유효기간·사용처 — 실제 상품 데이터로 바인딩(이전엔 스타벅스 하드코딩값이 모든 상품에 고정 표시되던 버그).
-     사용처는 매장/온라인 등 상세 위치 데이터가 스키마에 없어 실제 존재하는 brand 필드로 대체 —
-     가짜 매장 정보를 만들지 않는다. 교환정책 3개 항목은 전 상품 공통 정책 문구라 그대로 둔다. */
-  var chips = s.querySelectorAll('.ex-info-chip .eic-val');
-  if (chips[0]) chips[0].textContent = g.validity_days ? ('발급 후 ' + g.validity_days + '일') : '유효기간 안내 예정';
-  if (chips[1]) chips[1].textContent = g.brand ? (g.brand + ' 사용 가능') : '사용처 안내 예정';
+
+  var cost = s.querySelector('.ex-price-row .ex-cost-tk');
+  if (cost) cost.innerHTML = '<span class="m">' + ticketIcon(grade) + '</span>' + gradeName + ' 티켓 ' + cnt + '장';
+  var wonEl = s.querySelector('.ex-price-won');
+  if (wonEl) wonEl.textContent = ppGiWon(g);
+
+  var have = PP.tickets[grade] || 0;
+  var haveEl = s.querySelector('.ex-cost-have');
+  if (haveEl) haveEl.textContent = '현재 보유: ' + have + '장';
+  var deduct = s.querySelector('.ex-deduct');
+  if (deduct) deduct.textContent = gradeName + ' 티켓 ' + cnt + '장 차감 → 잔여 ' + Math.max(0, have - cnt) + '장';
+
+  /* 유효기간 — 상품에 실린 값이 말이 될 때만 쓴다.
+     포인츠허브 원본의 limitDate는 455건 모두 361589로 같다(판매 종료일 2999-12-30까지의
+     날수지 상품별 유효기간이 아니다). 그 값이 그대로 들어온 상품은 유효기간을 안 보여 준다. */
+  var vd = parseInt(g.validity_days, 10);
+  var usage = (vd > 0 && vd <= 1825) ? ('유효기간 : ' + vd + '일') : '';
+  var uSec = document.getElementById('ex-usage-sec');
+  var uBody = document.getElementById('ex-usage');
+  if (uBody) uBody.textContent = usage;
+  if (uSec) uSec.style.display = usage ? '' : 'none';
+
+  /* 유의사항 — 상품에 딸려 온 원문 그대로 */
+  var notice = (g.notice || g.description || '').trim();
+  var nSec = document.getElementById('ex-notice-sec');
+  var nBody = document.getElementById('ex-notice');
+  if (nBody) nBody.textContent = notice;
+  if (nSec) nSec.style.display = notice ? '' : 'none';
 }
 
 /* ── pw-25 exchange ──
@@ -18841,7 +18939,7 @@ function bindExchangeBtn() {
         renderMyTicketCard();
         /* 교환 완료 화면 */
         var ej = document.getElementById('ex-done-emoji');
-        if (ej) { ej.setAttribute('style', PP_GI_PLACEHOLDER_STYLE + 'width:64px;height:64px;border-radius:12px;'); ej.innerHTML = g.image_url ? '<img src="' + ppEsc(g.image_url) + '" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:12px;">' : PP_GI_PLACEHOLDER_SVG; }
+        ppGiSetThumb(ej, g, 72);
         var eb = document.getElementById('ex-done-brand');
         if (eb) eb.textContent = g.brand || '';
         var en = document.getElementById('ex-done-name');
@@ -20618,20 +20716,20 @@ function renderGifticonHistory() {
   ppQuery('gifticon_exchanges', 'user_id', PP.uid).then(function (ex) {
     ex = ex.filter(function (x) { return ppDate(x.exchanged_at); }).sort(function (a, b) { return ppDate(b.exchanged_at) - ppDate(a.exchanged_at); });
     if (!ex.length) {
-      box.innerHTML = ppEmpty('🎁', '아직 교환한 기프티콘이 없어요', '기프티샵에서 티켓으로 교환하면<br>여기에 기록돼요');
+      box.innerHTML = ppEmpty(PP_GI_EMPTY_ICON, '아직 교환한 기프티콘이 없어요', '기프티샵에서 티켓으로 교환하면<br>여기에 기록돼요');
       return;
     }
     box.innerHTML = ex.map(function (x, i) {
-      var nm = '기프티콘', emoji = '🎁', brand = '';
+      var nm = '기프티콘', brand = '';
       if (PP.gifticonList && PP.gifticonList.length) {
         var g = PP.gifticonList.filter(function (it) { return it._id === x.gifticon_id; })[0];
-        if (g) { nm = g.name || g.product_name || nm; brand = g.brand || ''; emoji = g.emoji || emoji; }
+        if (g) { nm = g.name || g.product_name || nm; brand = g.brand || ''; }
       }
       var done = (x.status === 'completed' || x.status === 'issued');
       var stc = done ? '#1A7A4A' : '#B26A00', stbg = done ? '#E8F7EF' : '#FFF3E0';
       return '<div data-gx="' + i + '" style="margin:8px 16px;background:#fff;border:1px solid var(--border);border-radius:14px;overflow:hidden;cursor:' + (x.code ? 'pointer' : 'default') + ';">'
         + '<div style="display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border-bottom:1px solid var(--border);">'
-        + '<div style="display:flex;align-items:center;gap:7px;min-width:0;"><span style="font-size:var(--fs-caption);">' + emoji + '</span>'
+        + '<div style="display:flex;align-items:center;gap:7px;min-width:0;">'
         + '<span style="font-size:var(--fs-caption);font-weight:400;color:var(--text1);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + ppEsc(ppBrandName(brand, nm)) + '</span></div>'
         + '<span style="flex-shrink:0;font-size:var(--fs-caption);font-weight:400;color:' + stc + ';background:' + stbg + ';padding:3px 9px;border-radius:20px;">' + (done ? '발급완료' : '처리중') + '</span></div>'
         + '<div style="padding:12px 14px;">'
@@ -20645,7 +20743,7 @@ function renderGifticonHistory() {
         var x = ex[parseInt(row.dataset.gx)];
         if (!x.code) return;
         var g = (PP.gifticonList || []).filter(function (it) { return it._id === x.gifticon_id; })[0] || {};
-        var ej = document.getElementById('ex-done-emoji'); if (ej) ej.textContent = g.emoji || '🎁';
+        ppGiSetThumb(document.getElementById('ex-done-emoji'), g, 72);
         var eb = document.getElementById('ex-done-brand'); if (eb) eb.textContent = g.brand || '';
         var en = document.getElementById('ex-done-name'); if (en) en.textContent = g.name || g.product_name || '기프티콘';
         var ec = document.getElementById('ex-done-code'); if (ec) ec.textContent = x.code;
