@@ -1059,6 +1059,19 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
 /* PH 칸 — 프라이스픽에 그대로 대응하는 단위가 없어 비워 둔 자리(형님 결정 대기) */
 .ph-hold{color:var(--text-3);font-size:12px;}
 .ph-minus{color:var(--danger);font-weight:700;}
+/* 상태 토글 — 포인츠허브 상품 목록의 켜고 끄는 스위치 */
+.tgl{display:inline-block;position:relative;width:40px;height:22px;cursor:pointer;vertical-align:middle;}
+.tgl input{opacity:0;width:0;height:0;position:absolute;}
+.tgl .tgl-sl{position:absolute;inset:0;background:var(--text-3);border-radius:99px;transition:background .18s;}
+.tgl .tgl-sl::before{content:"";position:absolute;width:16px;height:16px;left:3px;top:3px;
+  background:#fff;border-radius:50%;transition:transform .18s;box-shadow:0 1px 3px rgba(0,0,0,.25);}
+.tgl input:checked + .tgl-sl{background:var(--success);}
+.tgl input:checked + .tgl-sl::before{transform:translateX(18px);}
+/* 상품 목록 검색 — 입력이 가로 전체, 단추는 그 아래 오른쪽 */
+.gip-srch{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);
+  padding:14px 16px;margin-bottom:16px;}
+.gip-srch .search-box{width:100%;}
+.gip-srch-btns{display:flex;justify-content:flex-end;margin-top:10px;}
 /* 상품 상세 정보 모달 — 포인츠허브 배치(왼쪽 이미지, 오른쪽 2열 격자) */
 .gid-sub{font-size:13px;font-weight:700;color:var(--text);margin:0 0 14px;}
 .gid-body{display:flex;gap:22px;align-items:flex-start;}
@@ -2442,7 +2455,7 @@ window.CMS_FEATURES = {
         <table>
           <thead><tr>
             <th style="width:110px">구매일</th><th>주문번호</th><th>이름</th><th>상품명</th>
-            <th>상품코드</th><th style="width:90px">유효기간</th><th style="width:120px">사용한 티켓</th><th style="width:80px">취소</th>
+            <th>상품코드</th><th style="width:90px">유효기간</th><th style="width:120px">사용한 티켓</th>
           </tr></thead>
           <tbody></tbody>
         </table>
@@ -2482,10 +2495,10 @@ window.CMS_FEATURES = {
     </div>
 
     <div class="section" id="sec-gifticon-products">
-      <div class="toolbar" style="flex-wrap:wrap;gap:8px">
-        <input class="search-box" id="gip-search" placeholder="상품명을 입력하세요." style="width:260px" onkeydown="if(event.key==='Enter')gipApplyFilters()">
-        <button class="btn btn-primary btn-sm" onclick="gipApplyFilters()">검색</button>
-        <button class="btn btn-primary btn-sm" id="pp-gi-add-btn" style="margin-left:auto" onclick="openGifticonModal()">+ 상품 추가</button>
+      <!-- 포인츠허브 상품 목록에는 「상품 추가」 단추가 없다 — 상품은 일괄 등록으로 들어온다. -->
+      <div class="gip-srch">
+        <input class="search-box" id="gip-search" placeholder="상품명을 입력하세요." onkeydown="if(event.key==='Enter')gipApplyFilters()">
+        <div class="gip-srch-btns"><button class="btn btn-primary btn-sm" onclick="gipApplyFilters()">검색</button></div>
       </div>
       <div class="card">
         <div class="card-header"><div class="card-title">상품 목록</div><span style="font-size:12px;color:var(--text-2)" id="gip-count">—</span></div>
@@ -7694,6 +7707,26 @@ function gipPriceHtml(g) {
   return '<div class="gip-price-main">' + main + '</div>' + sub;
 }
 
+/* 상품판매종료일 — 파일이 주는 값은 2999-12-30T15:00:00Z 꼴이다. 포인츠허브 표기대로
+   2999/12/30 으로 적는다. 날짜만 적힌 값(2999-12-30)도 그대로 받는다. */
+function gipSaleEnd(v) {
+  if (!v) return '—';
+  var str = String(v);
+  var m = str.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (m) return m[1] + '/' + m[2] + '/' + m[3];
+  return ppEsc(str);
+}
+window.gipToggleStatus = function(id, on) {
+  db.collection('gifticons').doc(id).set({ status: on ? 'active' : 'inactive', updated_at: FS.FieldValue.serverTimestamp() }, { merge: true })
+    .then(function() {
+      toast(on ? '판매중으로 바꿨습니다.' : '판매중지로 바꿨습니다.');
+      logAdmin('기프티콘 상태 변경: ' + id + ' → ' + (on ? 'active' : 'inactive'));
+      if (GIFTICON_PRODUCTS_CACHE[id]) GIFTICON_PRODUCTS_CACHE[id].status = on ? 'active' : 'inactive';
+      GIP_ROWS.forEach(function(r){ if (r._id === id) r.status = on ? 'active' : 'inactive'; });
+    })
+    .catch(function(e) { console.error('gipToggleStatus', e); toast('상태 변경 실패: ' + (e.message || e)); loadGifticonProducts(); });
+};
+
 var GIP_ROWS = [];
 var GIP_PAGE = 1;
 var GIP_SIZE = 10;
@@ -7731,9 +7764,11 @@ function gipRender() {
       + (GIP_Q ? '조건에 맞는 상품이 없습니다.' : '등록된 상품이 없습니다. 「+ 상품 추가」로 등록하세요.') + '</td></tr>';
   } else {
     tbody.innerHTML = page.map(function(g, i) {
-      var statusBadge = g.status === 'active'
-        ? '<span style="background:var(--success-soft);color:var(--success);padding:3px 8px;border-radius:99px;font-size:11px;font-weight:600;">판매중</span>'
-        : '<span style="background:var(--danger-soft);color:var(--danger);padding:3px 8px;border-radius:99px;font-size:11px;font-weight:600;">판매중지</span>';
+      /* 포인츠허브는 상태를 딱지가 아니라 켜고 끄는 토글로 둔다. */
+      var on = g.status === 'active';
+      var statusBadge = '<label class="tgl" title="' + (on ? '판매중' : '판매중지') + '" onclick="event.stopPropagation()">'
+        + '<input type="checkbox"' + (on ? ' checked' : '') + ' onchange="gipToggleStatus(&quot;' + g._id + '&quot;,this.checked)">'
+        + '<span class="tgl-sl"></span></label>';
       var thumb = g.image_url
         ? '<img src="' + ppEsc(g.image_url) + '" alt="" style="width:40px;height:40px;object-fit:cover;border-radius:6px;display:block;margin:0 auto;border:1px solid var(--border);">'
         : '<span style="font-size:20px;opacity:.55">' + (g.emoji || '\u{1F381}') + '</span>';
@@ -7744,7 +7779,7 @@ function gipRender() {
         + '<td style="text-align:center">' + thumb + '</td>'
         + '<td>' + ppEsc(g.name || g.product_name || '') + '</td>'
         + '<td style="font-family:monospace;font-size:11px;color:var(--text-3);">' + ppEsc(g._id) + '</td>'
-        + '<td style="color:var(--text-3);">' + ppEsc(g.sale_end_date || '—') + '</td>'
+        + '<td style="color:var(--text-3);">' + gipSaleEnd(g.sale_end_date) + '</td>'
         + '<td>' + (g.validity_days || 90) + '일</td>'
         + '<td>' + gipPriceHtml(g) + '</td>'
         + '<td style="text-align:center">' + statusBadge + '</td>'
@@ -7890,10 +7925,10 @@ var GEX_CTRL = window.GEX_CTRL = ppMakeListController(20, function(pageItems, st
   if (!pageItems.length) { tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:32px;color:var(--text-3);">조건에 맞는 구매내역이 없습니다.</td></tr>'; if (pag) pag.innerHTML = ''; return; }
   tbody.innerHTML = pageItems.map(function(g) {
     var isCancelled = g.status === 'cancelled';
+    /* 취소는 「기프티콘 미사용 취소」 화면이 맡는다 — 여기 정리에는 취소 단추가 없다. */
     var statusCell = isCancelled
       ? '<span style="background:var(--danger-soft);color:var(--danger);padding:3px 8px;border-radius:99px;font-size:11px;font-weight:600;">취소됨</span>'
-      : '<span style="background:var(--success-soft);color:var(--success);padding:3px 8px;border-radius:99px;font-size:11px;font-weight:600;">사용완료</span>'
-        + '<div style="margin-top:4px"><button class="btn btn-ghost btn-sm" style="font-size:10px;padding:2px 6px" onclick="giCancelExchange(&quot;' + g._id + '&quot;)">취소</button></div>';
+      : '<span style="background:var(--success-soft);color:var(--success);padding:3px 8px;border-radius:99px;font-size:11px;font-weight:600;">사용완료</span>';
     var u = g._user || {};
     return '<tr>'
       + '<td style="text-align:center">' + gexTwoLine(ppDt(g.exchanged_at), ppTm(g.exchanged_at)) + '</td>'
@@ -9688,10 +9723,11 @@ var GUN_CTRL = window.GUN_CTRL = ppMakeListController(20, function(pageItems, st
   var tbody = document.querySelector('#sec-gifticon-unused table tbody');
   var pag = document.getElementById('gun-pagination');
   if (!tbody) return;
-  if (!pageItems.length) { tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:32px;color:var(--text-3);">조건에 맞는 미사용 기프티콘이 없습니다.</td></tr>'; if (pag) pag.innerHTML = ''; return; }
+  if (!pageItems.length) { tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:32px;color:var(--text-3);">조건에 맞는 미사용 기프티콘이 없습니다.</td></tr>'; if (pag) pag.innerHTML = ''; return; }
   tbody.innerHTML = pageItems.map(function(g) {
     var u = g._user || {};
-    return '<tr>'
+    /* 칸은 포인츠허브 정리 그대로 일곱이다. 취소는 칸을 늘리지 않고 행을 눌러서 한다. */
+    return '<tr style="cursor:pointer" title="눌러서 이 건을 취소" onclick="giCancelExchange(&quot;' + g._id + '&quot;)">'
       + '<td style="text-align:center">' + gexTwoLine(ppDt(g.exchanged_at), ppTm(g.exchanged_at)) + '</td>'
       + '<td style="font-size:11px;font-family:monospace;color:var(--text-3);">' + ppEsc(g._id) + '</td>'
       + '<td>' + gexTwoLine(ppEsc(u.name || u.nickname || '—'), ppEsc(u.name ? (u.nickname || '') : '')) + '</td>'
@@ -9699,7 +9735,6 @@ var GUN_CTRL = window.GUN_CTRL = ppMakeListController(20, function(pageItems, st
       + '<td style="font-family:monospace;font-size:11px;color:var(--text-3);">' + ppEsc(g.gifticon_id || '-') + '</td>'
       + '<td style="text-align:center">' + gexValidity(g) + '</td>'
       + '<td style="text-align:center">' + ticketCell(g.grade_used, g.count_used, false) + '</td>'
-      + '<td style="text-align:center"><button class="btn btn-ghost btn-sm" style="font-size:10px;padding:2px 6px" onclick="giCancelExchange(&quot;' + g._id + '&quot;)">취소</button></td>'
       + '</tr>';
   }).join('');
   if (pag) pag.innerHTML = ppPaginationHtml('GUN_CTRL', state.page, totalPages);
