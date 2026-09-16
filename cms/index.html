@@ -4090,12 +4090,17 @@ window.CMS_FEATURES = {
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
             전체 비우기
           </button>
+          <button class="btn" style="background:var(--warning-soft);color:#92400E;border:none;cursor:pointer;" onclick="dmCleanUnlinkedExchanges()" id="dm-unlinked-btn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14" stroke-linecap="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg>
+            미연동 계정 교환 내역 정리
+          </button>
         </div>
 
         <!-- 보호 컬렉션 안내 -->
         <div style="padding:10px 20px;background:var(--warning-soft);color:#92400E;font-size:12px;border-bottom:1px solid var(--border);">
           [시나리오 채우기]는 <strong>demo_scenarios</strong>(scripts/seed-demo.js로 등록)에 등록된 가상 손님대로 데이터를 생성합니다. [전체 비우기]는 가상 데이터만 삭제하고
           운영 뼈대(관리자 계정 firstadmin · 마스터 데이터 · 기프티콘 상품 · 배너 · 공지 · 시나리오 정의)는 보존합니다.
+          <br>[미연동 계정 교환 내역 정리]는 카카오 미연동 회원에게 남은 기프티콘 교환 건을 지웁니다 — 미연동 회원은 기프티샵을 쓸 수 없으므로(정책 2026-09-16) 그런 기록이 남아 있으면 안 됩니다.
         </div>
       </div>
 
@@ -8057,6 +8062,7 @@ function loadGifticonExchanges() {
     var el = document.getElementById('gex-count'); if (el) el.textContent = '총 ' + s.size + '건';
   }).catch(function(){});
 }
+window.loadGifticonExchanges = loadGifticonExchanges;
 
 /* ── Members ── */
 // 회원 목록/상세 팝업의 상태 한글 라벨 (저장값 active/suspended/withdrawn은 그대로)
@@ -16134,6 +16140,68 @@ window.dmEditPostbackSave = function() {
 // ──────────────────────────────────────────
 // 초기화 모달
 // ──────────────────────────────────────────
+/* ── 미연동 계정 교환 내역 정리 ──
+   카카오 미연동 회원은 기프티샵을 쓸 수 없다(정책 2026-09-16). 그런데 시연 데이터를
+   넣을 때 연동 여부를 보지 않아 미연동 계정에도 교환 건이 들어갔다. 그대로 두면
+   「연동 없이도 된다」는 화면이 되므로 지운다.
+
+   티켓은 건드리지 않는다 — 이 교환 건들은 시연용으로 문서만 만든 것이라 애초에
+   티켓을 차감하지 않았다(대응하는 ticket_transactions가 없다). 그래서 지워도 잔액이
+   어긋나지 않는다. 실제 앱 교환으로 생긴 건이 섞여 있으면 티켓 원장이 함께 있으므로
+   그런 건은 건너뛴다. */
+window.dmCleanUnlinkedExchanges = function() {
+  var btn = document.getElementById('dm-unlinked-btn');
+  if (btn) { btn.disabled = true; btn.textContent = '살펴보는 중…'; }
+  db.collection('gifticon_exchanges').get().then(function(exSnap) {
+    var uids = Array.from(new Set(exSnap.docs.map(function(d){ return d.data().user_id; }).filter(Boolean)));
+    return dmFetchUsersByIds(uids).then(function(userMap) {
+      /* 회원 문서가 없거나 linked_kakao가 true가 아니면 미연동으로 본다. */
+      var targets = exSnap.docs.filter(function(d) {
+        var u = userMap[d.data().user_id];
+        return !(u && u.linked_kakao === true);
+      });
+      if (!targets.length) { toast('지울 미연동 교환 건이 없습니다.'); return null; }
+      /* 티켓을 실제로 쓴 건(원장이 있는 건)은 손대지 않는다. */
+      return db.collection('ticket_transactions').where('type', '==', 'use').get().then(function(txSnap) {
+        var usedBy = {};
+        txSnap.forEach(function(t){ usedBy[t.data().user_id] = true; });
+        var safe = targets.filter(function(d){ return !usedBy[d.data().user_id]; });
+        var skipped = targets.length - safe.length;
+        var names = Array.from(new Set(safe.map(function(d) {
+          var u = userMap[d.data().user_id] || {};
+          return u.nickname || d.data().user_id;
+        })));
+        if (!confirm('미연동 계정의 기프티콘 교환 ' + safe.length + '건을 지웁니다.\n대상: ' + names.join(', ')
+          + (skipped ? '\n\n티켓을 실제로 쓴 계정 ' + skipped + '건은 건너뜁니다.' : '')
+          + '\n\n되돌릴 수 없습니다. 진행할까요?')) return null;
+        var chain = Promise.resolve();
+        for (var i = 0; i < safe.length; i += 400) {
+          (function(chunk) {
+            chain = chain.then(function() {
+              var b = db.batch();
+              chunk.forEach(function(d){ b.delete(d.ref); });
+              return b.commit();
+            });
+          })(safe.slice(i, i + 400));
+        }
+        return chain.then(function() {
+          toast('미연동 계정 교환 내역 ' + safe.length + '건을 지웠습니다.');
+          logAdmin('미연동 계정 기프티콘 교환 내역 정리: ' + safe.length + '건 · 대상 ' + names.join(', '));
+          if (window.loadGifticonExchanges) window.loadGifticonExchanges();
+          if (window.loadGifticonUnused) window.loadGifticonUnused();
+          if (window.loadGifticonCancel) window.loadGifticonCancel();
+          if (window.dmLoadStats) window.dmLoadStats();
+        });
+      });
+    });
+  }).catch(function(e) {
+    console.error('dmCleanUnlinkedExchanges', e);
+    toast('정리 실패: ' + (e.message || e));
+  }).finally(function() {
+    if (btn) { btn.disabled = false; btn.textContent = '미연동 계정 교환 내역 정리'; }
+  });
+};
+
 window.dmShowResetModal = function() {
   var m = document.getElementById('dm-reset-modal');
   if (m) { m.style.display = 'flex'; document.getElementById('dm-reset-confirm-input').value = ''; document.getElementById('dm-reset-confirm-btn').disabled = true; document.getElementById('dm-reset-confirm-btn').style.opacity = '.4'; }
