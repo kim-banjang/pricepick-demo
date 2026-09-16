@@ -7835,7 +7835,7 @@ function gipRender() {
         + '<td>' + ppEsc(g.name || g.product_name || '') + '</td>'
         + '<td style="font-family:monospace;font-size:11px;color:var(--text-3);">' + ppEsc(g._id) + '</td>'
         + '<td style="color:var(--text-3);">' + gipSaleEnd(g.sale_end_date) + '</td>'
-        + '<td>' + (g.validity_days || 90) + '일</td>'
+        + '<td>' + (gipValidDays(g.validity_days) ? gipValidDays(g.validity_days) + '일' : '—') + '</td>'
         + '<td>' + gipPriceHtml(g) + '</td>'
         + '<td style="text-align:center">' + statusBadge + '</td>'
         + '</tr>';
@@ -7951,7 +7951,9 @@ window.giBulkFileSelected = function(input) {
             name: x.name || '',
             category: x.category || '',
             price: (typeof x.price === 'number') ? x.price : parseInt(x.price, 10) || 0,
-            validity: parseInt(x.limitDate, 10) || 90,
+            /* limitDate는 상품별 유효기간이 아니다(455건 모두 같은 값) — 옮기지 않는다.
+               유효일수는 CMS 상품 편집에서 채운다. */
+            validity: null,
             saleEnd: x.periodEnd || '',
             image: x.image || '',
             description: x.description || '',
@@ -8013,7 +8015,7 @@ window.giBulkSubmit = function() {
         var data = {
           brand: r.brand, name: r.name, category: r.category,
           price: r.price || null,
-          validity_days: r.validity,
+          validity_days: gipValidDays(r.validity) || null,
           sale_end_date: r.saleEnd || null,
           image_url: btLocalImage(r.image),
           notice: r.description || null,
@@ -8155,9 +8157,17 @@ var GEX_CTRL = window.GEX_CTRL = ppMakeListController(20, function(pageItems, st
   }).join('');
   if (pag) pag.innerHTML = ppPaginationHtml('GEX_CTRL', state.page, totalPages);
 });
+/* 포인츠허브 원본의 limitDate는 455건 모두 361589(판매종료일 2999-12-30까지의 날수)라
+   상품별 유효기간이 아니다. 그래서 일괄 등록에서 이 값을 유효일수로 옮기지 않고,
+   화면에서도 말이 되는 값(5년 이내)일 때만 보여 준다. */
+function gipValidDays(v) {
+  v = parseInt(v, 10);
+  return (v > 0 && v <= 1825) ? v : 0;
+}
+
 function gexValidity(g) {
   var pr = GIFTICON_PRODUCTS_CACHE[g.gifticon_id];
-  if (pr && pr.validity_days) return pr.validity_days + '일';
+  if (pr && gipValidDays(pr.validity_days)) return gipValidDays(pr.validity_days) + '일';
   if (g.expires_at && g.exchanged_at && g.expires_at.toMillis && g.exchanged_at.toMillis) {
     return Math.round((g.expires_at.toMillis() - g.exchanged_at.toMillis()) / 86400000) + '일';
   }

@@ -16930,8 +16930,7 @@ Object.assign(KO2VI, {
     "교환 완료!": "Đã đổi xong!",
     "기프티콘이 발급되었어요.": "Gifticon đã được cấp.",
     "아래 코드로 사용하세요.": "Hãy dùng bằng mã bên dưới.",
-    "교환 코드": "Mã đổi",
-    "발급일로부터 90일 유효": "Có hiệu lực 90 ngày kể từ ngày cấp"
+    "교환 코드": "Mã đổi"
   });
   /* ── 런타임 렌더 문구 보강 (2026-07-30) ────────────────────────────────
      정적 DOM에는 없고 JS가 그려 넣는 앱 UI 카피(빈 상태 안내·출석 진행 문구).
@@ -17401,7 +17400,7 @@ function cpkOpen(){var m=document.getElementById('cpk-modal');if(m)m.style.displ
             <div style="font-size:var(--fs-body);color:var(--text2);line-height:1.7;margin-bottom:24px;">기프티콘이 발급되었어요.<br>아래 코드로 사용하세요.</div>
             <!-- 기프티콘 카드 -->
             <div style="width:100%;background:white;border:1.5px solid var(--border);border-radius:18px;padding:20px;margin-bottom:16px;">
-              <div id="ex-done-emoji" style="width:72px;height:72px;border-radius:12px;margin:0 auto 12px;overflow:hidden;"></div>
+              <div id="ex-done-thumb" style="width:72px;height:72px;border-radius:12px;margin:0 auto 12px;overflow:hidden;display:none;"></div>
               <div style="font-size:var(--fs-caption);font-weight:700;color:var(--main);margin-bottom:4px;" id="ex-done-brand">스타벅스</div>
               <div style="font-size:var(--fs-label);font-weight:800;color:var(--text1);letter-spacing:-0.3px;margin-bottom:16px;" id="ex-done-name">아이스 아메리카노</div>
               <!-- 바코드 영역 -->
@@ -17413,7 +17412,7 @@ function cpkOpen(){var m=document.getElementById('cpk-modal');if(m)m.style.displ
                   <div style="width:2px;height:36px;background:#1A1130;"></div><div style="width:1px;height:28px;background:#1A1130;"></div><div style="width:3px;height:36px;background:#1A1130;"></div><div style="width:1px;height:30px;background:#1A1130;"></div><div style="width:2px;height:36px;background:#1A1130;"></div><div style="width:1px;height:22px;background:#1A1130;"></div><div style="width:3px;height:36px;background:#1A1130;"></div><div style="width:2px;height:28px;background:#1A1130;"></div><div style="width:1px;height:36px;background:#1A1130;"></div><div style="width:2px;height:24px;background:#1A1130;"></div><div style="width:3px;height:36px;background:#1A1130;"></div><div style="width:1px;height:30px;background:#1A1130;"></div><div style="width:2px;height:36px;background:#1A1130;"></div><div style="width:3px;height:20px;background:#1A1130;"></div><div style="width:1px;height:36px;background:#1A1130;"></div><div style="width:2px;height:26px;background:#1A1130;"></div><div style="width:1px;height:36px;background:#1A1130;"></div><div style="width:3px;height:30px;background:#1A1130;"></div>
                 </div>
               </div>
-              <div style="font-size:var(--fs-caption);color:var(--text3);">발급일로부터 90일 유효</div>
+              <div style="font-size:var(--fs-caption);color:var(--text3);" id="ex-done-exp"></div>
             </div>
           </div>
           <!-- 하단 CTA -->
@@ -18608,14 +18607,6 @@ function loadGifticons() {
    (디자인 규칙 2026-09-16 — 이모지를 화면에 쓰지 않는다). */
 var PP_GI_PLACEHOLDER_STYLE = 'display:flex;align-items:center;justify-content:center;color:#C9C2DC;background:#F7F5FC;';
 var PP_GI_PLACEHOLDER_SVG = '<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="13" rx="2"/><path d="M3 12h18"/><path d="M12 8v13"/><path d="M12 8S10.5 4 8 4a2.5 2.5 0 0 0 0 5h4z"/><path d="M12 8s1.5-4 4-4a2.5 2.5 0 0 1 0 5h-4z"/></svg>';
-/* 상품 사진 한 칸 — 사진이 있으면 사진, 없으면 라인아트. 교환 완료·교환 내역이 같이 쓴다. */
-function ppGiSetThumb(el, g, px) {
-  if (!el) return;
-  el.setAttribute('style', PP_GI_PLACEHOLDER_STYLE + 'width:' + px + 'px;height:' + px + 'px;border-radius:12px;margin:0 auto 12px;overflow:hidden;');
-  el.innerHTML = (g && g.image_url)
-    ? '<img src="' + ppEsc(g.image_url) + '" alt="" style="width:100%;height:100%;object-fit:cover;" onerror="ppGiImgFallback(this)">'
-    : PP_GI_PLACEHOLDER_SVG;
-}
 var PP_GI_EMPTY_ICON = '<span style="display:inline-flex;color:#C9C2DC">' + PP_GI_PLACEHOLDER_SVG.replace('width="40" height="40"', 'width="44" height="44"') + '</span>';
 
 function ppGiImgFallback(img) {
@@ -18748,6 +18739,56 @@ function bindGifticonShop() {
       PP_GI_Q = (inp.value || '').trim().toLowerCase();
       renderGifticons();
     });
+  }
+}
+
+/* 상품에 실린 유효일수 — 쓸 수 있는 값일 때만 돌려준다.
+   포인츠허브 원본의 limitDate는 455건 모두 361589(판매종료일 2999-12-30까지의 날수)라
+   상품별 유효기간이 아니다. 그 값이 그대로 들어온 상품은 0을 돌려 유효기간을 감춘다. */
+function ppGiValidDays(g) {
+  var v = parseInt(g && g.validity_days, 10);
+  return (v > 0 && v <= 1825) ? v : 0;
+}
+
+function ppYmdDot(d) {
+  return d.getFullYear() + '.' + ('0' + (d.getMonth() + 1)).slice(-2) + '.' + ('0' + d.getDate()).slice(-2);
+}
+
+/* 교환 완료 화면(pw-ex-done) 채우기 — 교환 직후와 교환 내역에서 코드 볼 때 둘 다 여기로 온다.
+   화면 짜임(초록 체크 · 교환 완료! · 코드 · 바코드 · 확인/홈으로)은 그대로 두고 값만 읽어 넣는다.
+   상품 사진이 없으면 자리 자체를 감춘다 — 도형이나 이모지로 대신 채우지 않는다. */
+function ppFillExDone(g, code, expiresAt) {
+  g = g || {};
+  var thumb = document.getElementById('ex-done-thumb');
+  if (thumb) {
+    if (g.image_url) {
+      thumb.style.display = '';
+      thumb.innerHTML = '<img src="' + ppEsc(g.image_url) + '" alt="" style="width:100%;height:100%;object-fit:cover;"'
+        + ' onerror="var b=this.parentNode; if(b){b.style.display=\'none\';b.innerHTML=\'\';}">';
+    } else {
+      thumb.style.display = 'none';
+      thumb.innerHTML = '';
+    }
+  }
+  var eb = document.getElementById('ex-done-brand');
+  if (eb) {
+    eb.textContent = g.brand || '';
+    eb.style.display = g.brand ? '' : 'none';
+  }
+  var en = document.getElementById('ex-done-name');
+  if (en) en.textContent = ppStripBrand(g.brand, g.name || g.product_name);
+  var ec = document.getElementById('ex-done-code');
+  if (ec) ec.textContent = code || '';
+
+  /* 유효기간 — 교환 기록에 만료일이 있으면 그 날짜를, 없으면 상품의 유효일수를 쓴다.
+     둘 다 없으면 줄째로 감춘다(고정값을 지어 넣지 않는다). */
+  var exp = document.getElementById('ex-done-exp');
+  if (exp) {
+    var d = ppDate(expiresAt);
+    var vd = ppGiValidDays(g);
+    var txt = d ? (ppYmdDot(d) + '까지 사용 가능') : (vd ? ('발급일로부터 ' + vd + '일 유효') : '');
+    exp.textContent = txt;
+    exp.style.display = txt ? '' : 'none';
   }
 }
 
@@ -18916,7 +18957,10 @@ function bindExchangeBtn() {
         var code = 'PP-' + Math.random().toString(36).slice(2,6).toUpperCase() + '-'
           + Math.random().toString(36).slice(2,6).toUpperCase() + '-'
           + Math.random().toString(36).slice(2,6).toUpperCase();
-        var expiresAt = FS.Timestamp.fromMillis(Date.now() + 90 * 86400000);
+        /* 만료일은 상품의 유효일수로 잡는다 — 90일 고정이었다. 쓸 수 있는 값이 없으면
+           만료일을 남기지 않는다(없는 날짜를 지어 쓰지 않는다). */
+        var validDays = ppGiValidDays(g);
+        var expiresAt = validDays ? FS.Timestamp.fromMillis(Date.now() + validDays * 86400000) : null;
         var batch = db.batch();
         docs.slice(0, cnt).forEach(function(doc) {
           batch.update(doc.ref, { status: 'used', used_at: now });
@@ -18929,23 +18973,15 @@ function bindExchangeBtn() {
           user_id: PP.uid, gifticon_id: g._id, grade_used: grade, count_used: cnt,
           status: 'completed', code: code, expires_at: expiresAt, exchanged_at: now,
         });
-        return batch.commit().then(function() { return code; });
+        return batch.commit().then(function() { return { code: code, expires_at: expiresAt }; });
       })
-      .then(function(code) {
-        if (!code) return;
+      .then(function(res) {
+        if (!res) return;
         PP.tickets[grade] -= cnt;
         PP.tickets.total -= cnt;
         renderHomeTickets();
         renderMyTicketCard();
-        /* 교환 완료 화면 */
-        var ej = document.getElementById('ex-done-emoji');
-        ppGiSetThumb(ej, g, 72);
-        var eb = document.getElementById('ex-done-brand');
-        if (eb) eb.textContent = g.brand || '';
-        var en = document.getElementById('ex-done-name');
-        if (en) en.textContent = g.name || g.product_name || '';
-        var ec = document.getElementById('ex-done-code');
-        if (ec) ec.textContent = code;
+        ppFillExDone(g, res.code, res.expires_at);
         btn.disabled = false;
         window.showScreen('pw-ex-done');
       }).catch(function(e){ console.error('exchange', e); showToast('교환 중 오류'); btn.disabled = false; });
@@ -20761,10 +20797,7 @@ function renderGifticonHistory() {
         var x = ex[parseInt(row.dataset.gx)];
         if (!x.code) return;
         var g = (PP.gifticonList || []).filter(function (it) { return it._id === x.gifticon_id; })[0] || {};
-        ppGiSetThumb(document.getElementById('ex-done-emoji'), g, 72);
-        var eb = document.getElementById('ex-done-brand'); if (eb) eb.textContent = g.brand || '';
-        var en = document.getElementById('ex-done-name'); if (en) en.textContent = g.name || g.product_name || '기프티콘';
-        var ec = document.getElementById('ex-done-code'); if (ec) ec.textContent = x.code;
+        ppFillExDone(g, x.code, x.expires_at);
         window.showScreen('pw-ex-done');
       });
     });
