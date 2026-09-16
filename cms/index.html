@@ -1072,6 +1072,16 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
   padding:14px 16px;margin-bottom:16px;}
 .gip-srch .search-box{width:100%;}
 .gip-srch-btns{display:flex;justify-content:flex-end;margin-top:10px;}
+/* 상품 설명 일괄 등록 — 새로 / 히스토리 탭 */
+.bt-tabs{display:flex;gap:2px;border-bottom:1px solid var(--border);margin-bottom:16px;}
+.bt-tab{padding:10px 18px;font-size:13px;font-weight:700;color:var(--text-3);cursor:pointer;
+  border:none;background:none;border-bottom:2px solid transparent;font-family:inherit;}
+.bt-tab.on{color:var(--main);border-bottom-color:var(--main);}
+.bt-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;
+  padding:14px 18px;border-bottom:1px solid var(--border);}
+.bt-sum{font-size:13px;font-weight:700;color:var(--text);}
+.bt-empty{text-align:center;padding:52px 18px;color:var(--text-3);}
+.bt-empty-ico{font-size:40px;opacity:.35;margin-bottom:10px;}
 /* 「이름」 칸 — 닉네임 / 카카오톡 아이디 / User 아이디 (없는 줄은 그리지 않는다) */
 .idc{min-width:0;}
 .idc-nick{font-weight:600;color:var(--text);}
@@ -2542,31 +2552,33 @@ window.CMS_FEATURES = {
 </div>
 
 <div class="section" id="sec-gifticon-bulk">
-      <div class="info-box">CSV 파일로 상품 설명을 일괄 등록·수정합니다. 상품코드가 일치하는 항목은 덮어쓰기됩니다. <strong>(CSV만 지원)</strong></div>
-      <div class="card">
-        <div class="card-header"><div class="card-title">상품설명 일괄등록</div></div>
-        <div style="padding:24px">
-          <div style="border:2px dashed var(--border);border-radius:var(--r-md);padding:40px;text-align:center;margin-bottom:20px">
-            <div style="font-size:32px;margin-bottom:12px;color:var(--text-3)">↑</div>
-            <div style="font-size:14px;font-weight:600;margin-bottom:6px">CSV 파일을 선택하세요</div>
-            <div style="font-size:12px;color:var(--text-2);margin-bottom:16px">지원 형식: .csv (헤더: 상품코드,브랜드,상품명,이모지,카테고리,등급,필요장수,유효일수,이미지경로)</div>
-            <input type="file" id="gi-bulk-file" accept=".csv" style="display:none" onchange="giBulkFileSelected(this)">
-            <button class="btn btn-primary" onclick="document.getElementById('gi-bulk-file').click()">파일 선택</button>
-            <div id="gi-bulk-filename" style="margin-top:10px;font-size:12px;color:var(--text-2)"></div>
-          </div>
-          <div id="gi-bulk-preview" style="display:none;margin-bottom:16px">
-            <div style="font-size:13px;font-weight:600;margin-bottom:8px" id="gi-bulk-preview-title"></div>
-            <div style="max-height:240px;overflow:auto;border:1px solid var(--border);border-radius:var(--r-md)">
-              <table><thead><tr><th>상품코드</th><th>브랜드</th><th>상품명</th><th>등급</th><th>필요장수</th><th>이미지경로</th></tr></thead><tbody id="gi-bulk-preview-tbody"></tbody></table>
-            </div>
-            <button class="btn btn-primary" style="margin-top:12px" id="gi-bulk-submit-btn" onclick="giBulkSubmit()">일괄 등록 실행</button>
-          </div>
-          <div class="warn-box"><strong>주의:</strong> 상품코드가 일치하는 기존 데이터는 덮어쓰기됩니다. 등록 전 백업을 권장합니다.</div>
-          <div style="margin-top:16px">
-            <div style="font-size:13px;font-weight:600;margin-bottom:8px">템플릿 다운로드</div>
-            <button class="btn btn-ghost btn-sm" onclick="giBulkDownloadTemplate()">샘플 CSV 다운로드</button>
-          </div>
+      <div class="bt-tabs">
+        <button class="bt-tab on" id="bt-tab-new" onclick="btTab('new')">새로</button>
+        <button class="bt-tab" id="bt-tab-hist" onclick="btTab('hist')">히스토리</button>
+      </div>
+
+      <div class="card" id="bt-pane-new">
+        <div class="bt-head">
+          <span class="bt-sum" id="bt-sum">대량 가져오기 (총 0 / 성공 0 , 실패 0)</span>
+          <span style="display:flex;gap:8px">
+            <input type="file" id="gi-bulk-file" accept=".json,.csv" style="display:none" onchange="giBulkFileSelected(this)">
+            <button class="btn btn-primary btn-sm" onclick="document.getElementById('gi-bulk-file').click()">파일 추가</button>
+            <button class="btn btn-ghost btn-sm" id="bt-submit" style="display:none" onclick="giBulkSubmit()">등록 실행</button>
+          </span>
         </div>
+        <table>
+          <thead><tr><th style="width:56px">No.</th><th style="width:110px">코드</th><th>이름</th><th>설명</th><th style="width:96px">상태</th></tr></thead>
+          <tbody id="gi-bulk-preview-tbody"><tr><td colspan="5" class="bt-empty"><div class="bt-empty-ico">🗂</div>No data</td></tr></tbody>
+        </table>
+        <div id="bt-pager"></div>
+      </div>
+
+      <div class="card" id="bt-pane-hist" style="display:none">
+        <div class="bt-head"><span class="bt-sum">가져오기 이력</span></div>
+        <table>
+          <thead><tr><th style="width:150px">일시</th><th>파일</th><th style="width:90px">총</th><th style="width:90px">성공</th><th style="width:90px">실패</th></tr></thead>
+          <tbody id="bt-hist-tbody"><tr><td colspan="5" class="bt-empty"><div class="bt-empty-ico">🗂</div>No data</td></tr></tbody>
+        </table>
       </div>
     </div>
     <!-- ── 배너 관리 ── -->
@@ -7863,43 +7875,129 @@ window.loadGifticonProducts = loadGifticonProducts;
 
 /* ── sec-gifticon-bulk ── CSV 일괄 등록/수정 (gifticons, doc.id = 상품코드) ── */
 var GI_BULK_ROWS = [];
+var GI_BULK_FILE = '';
+var GI_BULK_PAGE = 1;
+var GI_BULK_SIZE = 20;
 var GI_GRADE_MAP = { '브론즈':'bronze', '실버':'silver', '골드':'gold', bronze:'bronze', silver:'silver', gold:'gold' };
+
+window.btTab = function(which) {
+  var isNew = which === 'new';
+  document.getElementById('bt-tab-new').classList.toggle('on', isNew);
+  document.getElementById('bt-tab-hist').classList.toggle('on', !isNew);
+  document.getElementById('bt-pane-new').style.display = isNew ? '' : 'none';
+  document.getElementById('bt-pane-hist').style.display = isNew ? 'none' : '';
+  if (!isNew) btLoadHistory();
+};
+
+function btSetSummary(total, ok, fail) {
+  var el = document.getElementById('bt-sum');
+  if (el) el.textContent = '대량 가져오기 (총 ' + total + ' / 성공 ' + ok + ' , 실패 ' + fail + ')';
+}
+function btEmpty() {
+  return '<tr><td colspan="5" class="bt-empty"><div class="bt-empty-ico">\u{1F5C2}</div>No data</td></tr>';
+}
+function btRender() {
+  var tb = document.getElementById('gi-bulk-preview-tbody');
+  var pager = document.getElementById('bt-pager');
+  if (!tb) return;
+  if (!GI_BULK_ROWS.length) { tb.innerHTML = btEmpty(); if (pager) pager.innerHTML = ''; return; }
+  var pages = Math.max(1, Math.ceil(GI_BULK_ROWS.length / GI_BULK_SIZE));
+  if (GI_BULK_PAGE > pages) GI_BULK_PAGE = pages;
+  var from = (GI_BULK_PAGE - 1) * GI_BULK_SIZE;
+  tb.innerHTML = GI_BULK_ROWS.slice(from, from + GI_BULK_SIZE).map(function(r, i) {
+    var st = r._err
+      ? '<span style="background:var(--danger-soft);color:var(--danger);padding:2px 8px;border-radius:99px;font-size:11px;font-weight:600;">실패</span>'
+      : (r._done
+        ? '<span style="background:var(--success-soft);color:var(--success);padding:2px 8px;border-radius:99px;font-size:11px;font-weight:600;">성공</span>'
+        : '<span style="background:var(--surface-2);color:var(--text-3);padding:2px 8px;border-radius:99px;font-size:11px;font-weight:600;">대기</span>');
+    return '<tr>'
+      + '<td style="text-align:center;color:var(--text-3)">' + (from + i + 1) + '</td>'
+      + '<td style="font-family:ui-monospace,monospace;font-size:12px">' + ppEsc(r.code) + '</td>'
+      + '<td>' + ppEsc((r.brand ? r.brand + ' ' : '') + r.name) + '</td>'
+      + '<td style="white-space:normal;color:var(--text-2);font-size:12px;max-width:420px">' + ppEsc((r.description || '').slice(0, 90)) + ((r.description || '').length > 90 ? '…' : '') + '</td>'
+      + '<td style="text-align:center">' + st + '</td>'
+      + '</tr>';
+  }).join('');
+  if (pager) pager.innerHTML = ppPaginationHtml('__BT', GI_BULK_PAGE, pages);
+}
+/* ppPaginationHtml이 만든 단추가 부르는 이름 */
+window.__BT = {
+  prevPage: function() { if (GI_BULK_PAGE > 1) { GI_BULK_PAGE--; btRender(); } },
+  nextPage: function() { GI_BULK_PAGE++; btRender(); }
+};
+
+/* 포인츠허브에서 받은 JSON(객체 배열)과 예전 CSV 둘 다 받는다. */
 window.giBulkFileSelected = function(input) {
   var file = input.files && input.files[0];
   if (!file) return;
-  document.getElementById('gi-bulk-filename').textContent = file.name;
+  GI_BULK_FILE = file.name;
   var reader = new FileReader();
   reader.onload = function(e) {
-    var parsed;
-    try { parsed = ppParseCsv(e.target.result); }
-    catch (err) { toast('CSV 파싱 실패: ' + err.message); return; }
-    GI_BULK_ROWS = parsed.map(function(r) {
-      return {
-        code: r['상품코드'] || '',
-        brand: r['브랜드'] || '',
-        name: r['상품명'] || '',
-        emoji: r['이모지'] || '',
-        category: r['카테고리'] || '',
-        grade: GI_GRADE_MAP[r['등급']] || 'bronze',
-        count: parseInt(r['필요장수'], 10) || 1,
-        validity: parseInt(r['유효일수'], 10) || 90,
-        image: (r['이미지경로'] || '').trim(),
-      };
-    }).filter(function(r) { return r.code && r.name; });
-    if (!GI_BULK_ROWS.length) { toast('유효한 행이 없습니다. 헤더와 필수값(상품코드, 상품명)을 확인하세요.'); return; }
-    document.getElementById('gi-bulk-preview-title').textContent = '미리보기 — ' + GI_BULK_ROWS.length + '행';
-    document.getElementById('gi-bulk-preview-tbody').innerHTML = GI_BULK_ROWS.map(function(r) {
-      return '<tr><td style="font-family:monospace;font-size:12px">' + r.code + '</td><td>' + r.brand + '</td><td>' + r.name + '</td><td>' + r.grade + '</td><td style="text-align:center">' + r.count + '</td><td style="font-family:monospace;font-size:11px;color:var(--text-3)">' + (r.image || '—') + '</td></tr>';
-    }).join('');
-    document.getElementById('gi-bulk-preview').style.display = 'block';
+    var text = e.target.result;
+    var rows = [];
+    try {
+      if (/^\s*[\[{]/.test(text)) {
+        var j = JSON.parse(text);
+        var arr = Array.isArray(j) ? j : (j.rows || []);
+        rows = arr.map(function(x) {
+          return {
+            code: String(x.code || '').trim(),
+            brand: x.brand || '',
+            name: x.name || '',
+            category: x.category || '',
+            price: (typeof x.price === 'number') ? x.price : parseInt(x.price, 10) || 0,
+            validity: parseInt(x.limitDate, 10) || 90,
+            saleEnd: x.periodEnd || '',
+            image: x.image || '',
+            description: x.description || '',
+            active: x.isActive !== false,
+          };
+        });
+      } else {
+        rows = ppParseCsv(text).map(function(r) {
+          return {
+            code: (r['상품코드'] || '').trim(), brand: r['브랜드'] || '', name: r['상품명'] || '',
+            category: r['카테고리'] || '', price: parseInt(r['판매가격'], 10) || 0,
+            validity: parseInt(r['유효일수'], 10) || 90, saleEnd: r['판매종료일'] || '',
+            image: (r['이미지경로'] || '').trim(), description: r['설명'] || '', active: true,
+            grade: GI_GRADE_MAP[r['등급']] || null, count: parseInt(r['필요장수'], 10) || null,
+          };
+        });
+      }
+    } catch (err) { toast('파일을 읽지 못했습니다: ' + err.message); return; }
+
+    rows = rows.filter(function(r) { return r.code && r.name; });
+    /* 같은 상품코드가 겹치면 뒤엣것이 앞엣것을 덮어쓰므로 미리 하나로 줄인다. */
+    var seen = {}, uniq = [];
+    rows.forEach(function(r) { if (!seen[r.code]) { seen[r.code] = 1; uniq.push(r); } });
+    var dup = rows.length - uniq.length;
+    GI_BULK_ROWS = uniq;
+    GI_BULK_PAGE = 1;
+    if (!GI_BULK_ROWS.length) { toast('읽을 수 있는 줄이 없습니다.'); btSetSummary(0, 0, 0); btRender(); return; }
+    btSetSummary(GI_BULK_ROWS.length, 0, 0);
+    btRender();
+    document.getElementById('bt-submit').style.display = '';
+    toast(file.name + ' — ' + GI_BULK_ROWS.length + '건 읽음' + (dup ? ' (상품코드 중복 ' + dup + '건 제외)' : ''));
   };
   reader.readAsText(file, 'utf-8');
 };
 
+/* 포인츠허브 이미지는 미리 내려받아 저장소에 넣어 뒀다. 파일명으로 그 경로를 만든다
+   — 핫링크하지 않는다. */
+function btLocalImage(url) {
+  if (!url) return null;
+  var last = String(url).split('/').pop();
+  if (!last) return null;
+  var stem = last.replace(/\.[^.]+$/, '');
+  if (/^https?:/i.test(url) && /pointshub|r2\.dev/i.test(url)) return '/app/assets/gifticon/ph/' + stem + '.jpg';
+  return url;
+}
+
 window.giBulkSubmit = function() {
   if (!GI_BULK_ROWS.length) return;
-  var btn = document.getElementById('gi-bulk-submit-btn');
+  var btn = document.getElementById('bt-submit');
   if (btn) { btn.disabled = true; btn.textContent = '등록 중…'; }
+  var okCount = 0, failCount = 0;
   var chunks = [];
   for (var i = 0; i < GI_BULK_ROWS.length; i += 400) chunks.push(GI_BULK_ROWS.slice(i, i + 400));
   var chain = Promise.resolve();
@@ -7907,39 +8005,74 @@ window.giBulkSubmit = function() {
     chain = chain.then(function() {
       var b = db.batch();
       chunk.forEach(function(r) {
-        b.set(db.collection('gifticons').doc(r.code), {
-          brand: r.brand, name: r.name, emoji: r.emoji, category: r.category,
-          required_grade: r.grade, required_count: r.count, validity_days: r.validity,
-          image_url: r.image || null,
-          status: 'active', updated_at: FS.FieldValue.serverTimestamp(),
-          /* created_at도 항상 갱신 — loadGifticonProducts가 orderBy('created_at')로 조회하는데
-             이 필드가 없는 문서는 결과에서 통째로 제외되어 방금 등록한 상품이 안 보이는 버그 방지.
-             기존 코드 재업로드 시 등록일이 최신으로 갱신되는 것은 "최근 일괄등록일" 의미로 감수. */
+        var data = {
+          brand: r.brand, name: r.name, category: r.category,
+          price: r.price || null,
+          validity_days: r.validity,
+          sale_end_date: r.saleEnd || null,
+          image_url: btLocalImage(r.image),
+          notice: r.description || null,
+          status: r.active ? 'active' : 'inactive',
+          updated_at: FS.FieldValue.serverTimestamp(),
+          /* created_at도 넣는다 — 상품 목록이 orderBy('created_at')으로 읽어서 이 값이 없으면
+             방금 넣은 상품이 목록에서 통째로 빠진다. */
           created_at: FS.FieldValue.serverTimestamp(),
-        }, { merge: true });
+        };
+        /* 앱은 등급 티켓으로 교환한다. 원화에서 환산한 값을 같이 남긴다(사람이 넣는 값 아님). */
+        var tk = (r.grade && r.count) ? { grade: r.grade, count: r.count } : gipTicketsFromWon(r.price);
+        if (tk) { data.required_grade = tk.grade; data.required_count = tk.count; }
+        b.set(db.collection('gifticons').doc(r.code), data, { merge: true });
       });
-      return b.commit();
+      return b.commit().then(function() {
+        chunk.forEach(function(r){ r._done = true; okCount++; });
+      }).catch(function(e) {
+        chunk.forEach(function(r){ r._err = true; failCount++; });
+        throw e;
+      });
     });
   });
   chain.then(function() {
-    toast(GI_BULK_ROWS.length + '개 상품이 일괄 등록되었습니다.');
-    logAdmin('기프티콘 상품설명 일괄등록: ' + GI_BULK_ROWS.length + '건');
-    GI_BULK_ROWS = [];
-    document.getElementById('gi-bulk-preview').style.display = 'none';
-    document.getElementById('gi-bulk-file').value = '';
-    document.getElementById('gi-bulk-filename').textContent = '';
-    loadGifticonProducts();
+    btSetSummary(GI_BULK_ROWS.length, okCount, failCount);
+    btRender();
+    toast(okCount + '개 상품을 등록했습니다.');
+    logAdmin('기프티콘 상품 일괄 등록: ' + GI_BULK_FILE + ' · 총 ' + GI_BULK_ROWS.length + ' / 성공 ' + okCount + ' / 실패 ' + failCount);
+    db.collection('gifticon_bulk_history').add({
+      file: GI_BULK_FILE, total: GI_BULK_ROWS.length, ok: okCount, fail: failCount,
+      created_at: FS.FieldValue.serverTimestamp(),
+    }).catch(function(){});
+    if (window.loadGifticonProducts) loadGifticonProducts();
   }).catch(function(e) {
-    toast('일괄 등록 실패: ' + (e.message||e));
+    btSetSummary(GI_BULK_ROWS.length, okCount, failCount);
+    btRender();
+    toast('일괄 등록 실패: ' + (e.message || e));
   }).finally(function() {
-    if (btn) { btn.disabled = false; btn.textContent = '일괄 등록 실행'; }
+    if (btn) { btn.disabled = false; btn.textContent = '등록 실행'; }
   });
 };
 
+function btLoadHistory() {
+  var tb = document.getElementById('bt-hist-tbody');
+  if (!tb) return;
+  db.collection('gifticon_bulk_history').orderBy('created_at', 'desc').limit(50).get().then(function(snap) {
+    if (snap.empty) { tb.innerHTML = btEmpty(); return; }
+    tb.innerHTML = snap.docs.map(function(d) {
+      var h = d.data();
+      return '<tr><td style="text-align:center">' + ppDt(h.created_at) + ' ' + ppTm(h.created_at) + '</td>'
+        + '<td>' + ppEsc(h.file || '—') + '</td>'
+        + '<td style="text-align:center">' + (h.total || 0) + '</td>'
+        + '<td style="text-align:center;color:var(--success);font-weight:700">' + (h.ok || 0) + '</td>'
+        + '<td style="text-align:center;color:' + (h.fail ? 'var(--danger)' : 'var(--text-3)') + ';font-weight:700">' + (h.fail || 0) + '</td></tr>';
+    }).join('');
+  }).catch(function(e) {
+    console.warn('bulkHistory', e && e.code);
+    tb.innerHTML = btEmpty();
+  });
+}
+
 window.giBulkDownloadTemplate = function() {
   ppDownloadCsv('gifticon_template.csv',
-    ['상품코드','브랜드','상품명','이모지','카테고리','등급','필요장수','유효일수','이미지경로'],
-    [['ediya-americano','이디야커피','아메리카노','☕','카페','bronze','2','30','/app/assets/gifticon/ediya-americano.jpg']]
+    ['상품코드','브랜드','상품명','카테고리','판매가격','유효일수','판매종료일','이미지경로','설명'],
+    [['ediya-americano','이디야커피','아메리카노','커피/음료','2000','30','2999-12-30','/app/assets/gifticon/ediya-americano.jpg','[유의사항] ...']]
   );
 };
 
