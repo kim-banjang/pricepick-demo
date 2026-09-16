@@ -1087,21 +1087,21 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
    값이 없어도 줄 자리는 지키고 글자만 안 쓴다(행 높이가 제각각이 되지 않게).
    정렬은 왼쪽으로 못 박는다 — 칸이 가운데 정렬이어도 이 안은 왼쪽이다. */
 .idc{min-width:0;text-align:left;height:52px;}
-/* 기프티콘 세 표(구매내역·미사용 취소·취소내역)는 칸 폭을 못 박는다.
-   회원 칸은 식별 아이디 한 줄이 들어갈 만큼만(210px) 주고, 남는 폭은 상품명에 돌린다.
-   제목이 길어(「닉네임 / 카카오톡 ID / 식별 아이디」) 칸을 밀어내던 것을 두 줄로 접는다. */
-#sec-gifticons table,#sec-gifticon-unused table,#sec-gifticon-cancel table{table-layout:fixed;}
-#sec-gifticons th,#sec-gifticon-unused th,#sec-gifticon-cancel th{white-space:normal;line-height:1.35;padding-left:12px;padding-right:12px;}
-/* 행 높이는 회원 칸(52px) + 위아래 여백으로 고정한다 — 닉네임이 빈 줄이면 글자 상자가
-   미세하게 줄어 행마다 0.3px씩 어긋나던 것까지 막는다. */
-#sec-gifticons td,#sec-gifticon-unused td,#sec-gifticon-cancel td{padding-left:12px;padding-right:12px;overflow:hidden;text-overflow:ellipsis;height:76px;box-sizing:border-box;}
-/* 회원 칸은 칸 자체의 글줄 상자를 없앤다 — 닉네임이 비면 그 상자가 줄어 행이 0.5px 어긋난다.
-   안쪽 세 줄은 저마다 line-height 를 갖고 있어 영향 없다. */
+/* 기프티콘 세 표(구매내역·미사용 취소·취소내역) 칸 폭·정렬.
+   기준 — ① 어느 칸도 말줄임으로 잘리지 않는다 ② 남는 폭을 한 칸에 몰아주지 않고
+   고르게 나눈다(상품명에 auto 를 주지 않는다). 폭은 colgroup 의 백분율로 잡는다. */
+#sec-gifticons table,#sec-gifticon-unused table,#sec-gifticon-cancel table{table-layout:fixed;width:100%;}
+#sec-gifticons th,#sec-gifticon-unused th,#sec-gifticon-cancel th{white-space:normal;line-height:1.35;padding-left:8px;padding-right:8px;}
+#sec-gifticons td,#sec-gifticon-unused td,#sec-gifticon-cancel td{padding-left:8px;padding-right:8px;height:76px;box-sizing:border-box;}
+/* 회원 칸만 왼쪽 — 세 줄이 같은 선에서 시작해야 한다. 나머지는 가운데(td 기본). */
 #sec-gifticons td:nth-child(3),#sec-gifticon-unused td:nth-child(3),#sec-gifticon-cancel td:nth-child(3){line-height:0;font-size:0;}
-/* 상품명(넷째 칸)은 넓어진 자리를 두 줄까지 써서 펼친다 — 잘라 버리지 않는다. */
+/* 상품명은 가운데 정렬 · 두 줄까지 접는다 */
 #sec-gifticons td:nth-child(4),#sec-gifticon-unused td:nth-child(4),#sec-gifticon-cancel td:nth-child(4){
-  white-space:normal;text-align:left!important;line-height:1.4;
-  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;}
+  white-space:normal;line-height:1.4;word-break:keep-all;}
+/* 주문번호(PHTRX…)는 길어서 두 줄로 접는다 — 말줄임하지 않는다 */
+#sec-gifticons td.ordno,#sec-gifticon-unused td.ordno,#sec-gifticon-cancel td.ordno{
+  white-space:normal;word-break:break-all;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+  font-size:11px;color:var(--text-3);line-height:1.4;}
 .idc-nick,.idc-sub,.idc-uid{display:block;text-align:left;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .idc-nick{font-weight:600;color:var(--text);font-size:13px;line-height:18px;height:18px;}
 .idc-sub{font-size:11px;color:var(--text-3);line-height:15px;height:15px;margin-top:2px;}
@@ -2445,7 +2445,7 @@ window.CMS_FEATURES = {
           <input class="search-box" id="gex-f-code" placeholder="기프티콘 코드">
         </div>
         <div class="srch-row">
-          <select class="filter-sel" id="gex-f-platform"><option value="">플랫폼 전체</option><option value="app">앱</option><option value="web">웹</option></select>
+          
           <select class="filter-sel" id="gex-f-datekind"><option value="exchanged_at">구매일</option><option value="cancelled_at">상태변경일</option></select>
           <input class="form-input srch-date" type="date" id="gex-f-from">
           <span class="srch-tilde">~</span>
@@ -2457,13 +2457,10 @@ window.CMS_FEATURES = {
       <div class="card">
         <div class="card-header"><div class="card-title">플랫폼별 구매내역</div><span style="font-size:12px;color:var(--text-2)" id="gex-count">—</span></div>
         <table>
-            <colgroup><col style="width:100px"><col style="width:120px"><col style="width:210px"><col><col style="width:110px"><col style="width:90px"><col style="width:100px"></colgroup>
-          <thead>
-            <tr>
-              <th>구매일</th><th>주문번호</th><th>닉네임 / 카카오톡 ID / 식별 아이디</th>
-              <th>상품명</th><th>상품코드</th><th>유효기간</th><th>상태</th>
-            </tr>
-          </thead>
+            <colgroup><col style="width:9%"><col style="width:16%"><col style="width:19%"><col style="width:15%"><col style="width:10%"><col style="width:11%"><col style="width:9%"><col style="width:11%"></colgroup>
+            <thead>
+              <tr><th>구매일</th><th>주문번호</th><th>닉네임 / 카카오톡 ID / 식별 아이디</th><th>상품명</th><th>상품코드</th><th>유효기간</th><th>상태</th><th>사용한 티켓</th></tr>
+            </thead>
           <tbody></tbody>
         </table>
         <div id="gex-pagination"></div>
@@ -2491,11 +2488,10 @@ window.CMS_FEATURES = {
       <div class="card">
         <div class="card-header"><div class="card-title">기프티콘 미사용 취소</div><span style="font-size:12px;color:var(--text-2)" id="gun-count">—</span></div>
         <table>
-            <colgroup><col style="width:100px"><col style="width:120px"><col style="width:210px"><col><col style="width:110px"><col style="width:90px"><col style="width:110px"></colgroup>
-          <thead><tr>
-            <th>구매일</th><th>주문번호</th><th>닉네임 / 카카오톡 ID / 식별 아이디</th><th>상품명</th>
-            <th>상품코드</th><th>유효기간</th><th>사용한 티켓</th>
-          </tr></thead>
+            <colgroup><col style="width:10%"><col style="width:18%"><col style="width:21%"><col style="width:17%"><col style="width:11%"><col style="width:12%"><col style="width:11%"></colgroup>
+            <thead>
+              <tr><th>구매일</th><th>주문번호</th><th>닉네임 / 카카오톡 ID / 식별 아이디</th><th>상품명</th><th>상품코드</th><th>유효기간</th><th>사용한 티켓</th></tr>
+            </thead>
           <tbody></tbody>
         </table>
         <div id="gun-pagination"></div>
@@ -2523,11 +2519,10 @@ window.CMS_FEATURES = {
       <div class="card">
         <div class="card-header"><div class="card-title">취소내역</div><span style="font-size:12px;color:var(--text-2)" id="gcancel-count">—</span></div>
         <table>
-            <colgroup><col style="width:56px"><col style="width:120px"><col style="width:210px"><col><col style="width:100px"><col style="width:90px"><col style="width:100px"><col style="width:100px"></colgroup>
-          <thead><tr>
-            <th>No</th><th>주문번호</th><th>닉네임 / 카카오톡 ID / 식별 아이디</th><th>상품명</th>
-            <th>취소날짜</th><th>상태</th><th>환불 티켓</th><th>보유 티켓</th>
-          </tr></thead>
+            <colgroup><col style="width:5%"><col style="width:17%"><col style="width:20%"><col style="width:16%"><col style="width:11%"><col style="width:10%"><col style="width:11%"><col style="width:10%"></colgroup>
+            <thead>
+              <tr><th>No</th><th>주문번호</th><th>닉네임 / 카카오톡 ID / 식별 아이디</th><th>상품명</th><th>취소날짜</th><th>상태</th><th>환불 티켓</th><th>보유 티켓</th></tr>
+            </thead>
           <tbody></tbody>
         </table>
         <div id="gcancel-pagination"></div>
@@ -4137,6 +4132,10 @@ window.CMS_FEATURES = {
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14" stroke-linecap="round"><path d="M4 7h16M9.5 7V5h5v2"/><path d="M6.5 7l1 12h9l1-12"/></svg>
             확인 자국 정리
           </button>
+          <button class="btn" style="background:var(--main-soft);color:var(--main-hover);border:none;cursor:pointer;" onclick="dmFillOrderNo()" id="dm-ordno-btn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14" stroke-linecap="round"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>
+            주문번호 채우기
+          </button>
         </div>
 
         <!-- 보호 컬렉션 안내 -->
@@ -4144,6 +4143,7 @@ window.CMS_FEATURES = {
           [시나리오 채우기]는 <strong>demo_scenarios</strong>(scripts/seed-demo.js로 등록)에 등록된 가상 손님대로 데이터를 생성합니다. [전체 비우기]는 가상 데이터만 삭제하고
           운영 뼈대(관리자 계정 firstadmin · 마스터 데이터 · 기프티콘 상품 · 배너 · 공지 · 시나리오 정의)는 보존합니다.
           <br>[미연동 계정 구매 내역 정리]는 카카오 미연동 회원에게 남은 기프티콘 구매 건을 지웁니다 — 미연동 회원은 기프티샵을 쓸 수 없으므로(정책 2026-09-16) 그런 기록이 남아 있으면 안 됩니다.
+          <br>[주문번호 채우기]는 주문번호(order_no)가 비어 있는 구매 기록에 <strong>발급 API와 같은 형식</strong>(PHTRX + 날짜시각 + 꼬리)으로 값을 넣습니다. 구매일시가 있으면 그 시각을 씁니다. 이미 값이 있는 건은 건드리지 않습니다.
           <br>[확인 자국 정리]는 화면을 확인하느라 만들어진 <strong>명부에 없는 임시 계정</strong>과 그 계정의 티켓·티켓원장·구매 내역, 그리고 <strong>시험용 상품(test-item…)이 물린 구매 내역</strong>을 지웁니다. 명부(demo_accounts)에 등록된 계정의 정상 내역은 건드리지 않습니다.
           <br>[기존 데모 상품 정리]는 포인츠허브 상품이 들어오기 전부터 있던 이모지 상품을 <strong>전부 지웁니다</strong>. 그 상품을 물고 있는 구매·취소 내역은 먼저 포인츠허브 상품으로 갈아끼운 뒤 지우므로 내역이 깨지지 않습니다. 갈아끼울 상품은 값이 같은 것을 우선해 고릅니다.
         </div>
@@ -8140,6 +8140,12 @@ function cmsBrandName(brand, name) {
   return brand + ' ' + name;
 }
 
+/* 주문번호는 기프티콘 발급 API가 주는 값(order_no)이다 — 문서 ID가 아니다.
+   ⚠ API 연동 전까지는 앱이 같은 형식(PHTRX+YYYYMMDDHHmmss+꼬리)으로 만들어 넣는다. */
+function gexOrderNo(g) {
+  return g && g.order_no ? ppEsc(g.order_no) : '<span style="color:var(--text-3)">—</span>';
+}
+
 function gexProductName(g) {
   var pr = GIFTICON_PRODUCTS_CACHE[g.gifticon_id];
   if (!pr) return ppEsc(g.gifticon_id || '-');
@@ -8178,7 +8184,7 @@ var GEX_CTRL = window.GEX_CTRL = ppMakeListController(20, function(pageItems, st
   var tbody = sec && sec.querySelector('table tbody');
   var pag = document.getElementById('gex-pagination');
   if (!tbody) return;
-  if (!pageItems.length) { tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:32px;color:var(--text-3);">조건에 맞는 구매내역이 없습니다.</td></tr>'; if (pag) pag.innerHTML = ''; return; }
+  if (!pageItems.length) { tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:32px;color:var(--text-3);">조건에 맞는 구매내역이 없습니다.</td></tr>'; if (pag) pag.innerHTML = ''; return; }
   tbody.innerHTML = pageItems.map(function(g) {
     var isCancelled = g.status === 'cancelled';
     /* 취소는 「기프티콘 미사용 취소」 화면이 맡는다 — 여기 정리에는 취소 단추가 없다. */
@@ -8188,12 +8194,13 @@ var GEX_CTRL = window.GEX_CTRL = ppMakeListController(20, function(pageItems, st
     var u = g._user || {};
     return '<tr>'
       + '<td style="text-align:center">' + gexTwoLine(ppDt(g.exchanged_at), ppTm(g.exchanged_at)) + '</td>'
-      + '<td style="font-size:11px;font-family:monospace;color:var(--text-3);">' + ppEsc(g._id) + '</td>'
+      + '<td class="ordno">' + gexOrderNo(g) + '</td>'
       + '<td>' + identityCell(u, g.user_id) + '</td>'
       + '<td>' + gexProductName(g) + '</td>'
       + '<td style="font-family:monospace;font-size:11px;color:var(--text-3);">' + ppEsc(g.gifticon_id || '-') + '</td>'
-      + '<td style="text-align:center">' + gexValidity(g) + '</td>'
-      + '<td style="text-align:center">' + statusCell + '</td>'
+      + '<td>' + gexValidity(g) + '</td>'
+      + '<td>' + statusCell + '</td>'
+      + '<td>' + ticketCell(g.grade_used, g.count_used, false) + '</td>'
       + '</tr>';
   }).join('');
   if (pag) pag.innerHTML = ppPaginationHtml('GEX_CTRL', state.page, totalPages);
@@ -10008,12 +10015,12 @@ var GUN_CTRL = window.GUN_CTRL = ppMakeListController(20, function(pageItems, st
     /* 칸은 포인츠허브 정리 그대로 일곱이다. 취소는 칸을 늘리지 않고 행을 눌러서 한다. */
     return '<tr style="cursor:pointer" title="눌러서 이 건을 취소" onclick="giCancelExchange(&quot;' + g._id + '&quot;)">'
       + '<td style="text-align:center">' + gexTwoLine(ppDt(g.exchanged_at), ppTm(g.exchanged_at)) + '</td>'
-      + '<td style="font-size:11px;font-family:monospace;color:var(--text-3);">' + ppEsc(g._id) + '</td>'
+      + '<td class="ordno">' + gexOrderNo(g) + '</td>'
       + '<td>' + identityCell(u, g.user_id) + '</td>'
       + '<td>' + gexProductName(g) + '</td>'
       + '<td style="font-family:monospace;font-size:11px;color:var(--text-3);">' + ppEsc(g.gifticon_id || '-') + '</td>'
-      + '<td style="text-align:center">' + gexValidity(g) + '</td>'
-      + '<td style="text-align:center">' + ticketCell(g.grade_used, g.count_used, false) + '</td>'
+      + '<td>' + gexValidity(g) + '</td>'
+      + '<td>' + ticketCell(g.grade_used, g.count_used, false) + '</td>'
       + '</tr>';
   }).join('');
   if (pag) pag.innerHTML = ppPaginationHtml('GUN_CTRL', state.page, totalPages);
@@ -10135,7 +10142,7 @@ window.csvExportGifticonUnused = function() {
   ppDownloadCsv('gifticon_unused.csv',
     ['구매일','주문번호','닉네임','카카오톡 아이디','User 아이디','상품명','상품코드','유효기간'],
     rows.map(function(g){ var u = g._user || {};
-      return [ppDt(g.exchanged_at) + ' ' + ppTm(g.exchanged_at), g._id, u.nickname || '', u.kakao_login_id || '', g.user_id || '',
+      return [ppDt(g.exchanged_at) + ' ' + ppTm(g.exchanged_at), g.order_no || '', u.nickname || '', u.kakao_login_id || '', g.user_id || '',
         (GIFTICON_PRODUCTS_CACHE[g.gifticon_id] || {}).name || g.gifticon_id || '', g.gifticon_id || '', gexValidity(g)];
     }));
 };
@@ -10150,7 +10157,7 @@ var GCANCEL_CTRL = window.GCANCEL_CTRL = ppMakeListController(20, function(pageI
     var u = g._user || {};
     return '<tr>'
       + '<td style="text-align:center">' + ((state.page-1)*state.pageSize + i + 1) + '</td>'
-      + '<td style="font-size:11px;font-family:monospace;color:var(--text-3);">' + ppEsc(g._id) + '</td>'
+      + '<td class="ordno">' + gexOrderNo(g) + '</td>'
       + '<td>' + identityCell(u, g.user_id) + '</td>'
       + '<td>' + gexProductName(g) + '</td>'
       + '<td style="text-align:center">' + gexTwoLine(ppDt(g.cancelled_at), ppTm(g.cancelled_at)) + '</td>'
@@ -16417,6 +16424,58 @@ window.dmCleanUnlinkedExchanges = function() {
 
    시험용 상품(test-item…)이 물린 교환 내역은 계정을 가리지 않고 지운다 — 상품 자체가
    확인용이라 명부 계정에 붙어 있어도 남길 이유가 없다. */
+/* ── 주문번호 채우기 ──
+   주문번호는 기프티콘 발급 API가 내려주는 값이다(PHTRX20260825083627efc8f00d 꼴).
+   ⚠ API 연동은 아직 대기 건이라, 그 전에 쌓인 시연용 구매 기록에는 값이 없다.
+   연동되면 이 단추는 필요 없다 — 응답의 주문번호가 그대로 들어온다. */
+window.dmFillOrderNo = function() {
+  var NL = String.fromCharCode(10);
+  var btn = document.getElementById('dm-ordno-btn');
+  if (btn) { btn.disabled = true; btn.textContent = '살펴보는 중…'; }
+  db.collection('gifticon_exchanges').get().then(function(snap) {
+    var todo = snap.docs.filter(function(d){ return !d.data().order_no; });
+    if (!todo.length) { toast('주문번호가 빈 구매 기록이 없습니다.'); return null; }
+    if (!confirm('주문번호가 비어 있는 구매 기록 ' + todo.length + '건에' + NL
+      + '발급 API와 같은 형식(PHTRX + 날짜시각 + 꼬리)으로 값을 넣습니다.' + NL + NL
+      + '이미 값이 있는 건은 건드리지 않습니다. 진행할까요?')) return null;
+
+    var p2 = function(v){ return ('0' + v).slice(-2); };
+    var make = function(d) {
+      var stamp = d.getFullYear() + p2(d.getMonth() + 1) + p2(d.getDate())
+        + p2(d.getHours()) + p2(d.getMinutes()) + p2(d.getSeconds());
+      var tail = '';
+      while (tail.length < 8) tail += Math.floor(Math.random() * 16).toString(16);
+      return 'PHTRX' + stamp + tail;
+    };
+    var chain = Promise.resolve();
+    for (var i = 0; i < todo.length; i += 400) {
+      (function(chunk) {
+        chain = chain.then(function() {
+          var b = db.batch();
+          chunk.forEach(function(d) {
+            var x = d.data();
+            var when = (x.exchanged_at && x.exchanged_at.toDate) ? x.exchanged_at.toDate() : new Date();
+            b.set(d.ref, { order_no: make(when) }, { merge: true });
+          });
+          return b.commit();
+        });
+      })(todo.slice(i, i + 400));
+    }
+    return chain.then(function() {
+      toast('주문번호 ' + todo.length + '건을 채웠습니다.');
+      logAdmin('주문번호 채우기: ' + todo.length + '건');
+      if (window.loadGifticonExchanges) loadGifticonExchanges();
+      if (window.loadGifticonUnused) loadGifticonUnused();
+      if (window.loadGifticonCancel) loadGifticonCancel();
+    });
+  }).catch(function(e) {
+    console.error('dmFillOrderNo', e);
+    toast('채우기 실패: ' + (e.message || e));
+  }).finally(function() {
+    if (btn) { btn.disabled = false; btn.textContent = '주문번호 채우기'; }
+  });
+};
+
 window.dmCleanQaTraces = function() {
   var NL = String.fromCharCode(10);
   var btn = document.getElementById('dm-qa-btn');

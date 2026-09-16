@@ -7415,13 +7415,14 @@
   .ex-note a { color: var(--main); word-break: break-all; }
   .ex-note-t { font-weight: 600; color: #4B4B55; }
   .ex-note-sub { display: inline-block; padding-left: 11px; }
-  .ex-detail-bottom-new { flex: none; padding: 12px 20px 8px; border-top: 1px solid #F0F0F4; background: white; }
+  .ex-detail-bottom-new { flex: none; padding: 12px 20px 8px; border-top: 1px solid #F0F0F4; background: #FFFFFF; }
   .ex-plus { font-size: 14px; font-weight: 700; color: #9A9AA5; }
-  /* 안내는 두 줄로 — 375px에서 한 줄에 우겨 넣으면 세 줄로 접혀 읽기 나쁘다. */
-  .ex-lack { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; background: #FFF4F4; border-radius: 12px; padding: 11px 14px; margin-bottom: 8px; font-size: 13px; line-height: 1.45; color: #C0392B; cursor: pointer; }
-  .ex-lack b { font-weight: 700; white-space: nowrap; }
+  /* 안내 박스는 하나다 — 충분할 때도 모자랄 때도 같은 연보라 박스에 글만 바뀐다.
+     값은 시안에서 잰 그대로(김반장 2026-09-16). 빨간 박스를 따로 만들지 않는다. */
   .ex-deduct { background: #F3F1FC; border-radius: 12px; padding: 11px 14px; text-align: center; font-size: 13px; font-weight: 600; color: #5A44C9; }
-  .ex-cta { margin-top: 10px; width: 100%; background: var(--main); border: none; border-radius: 14px; padding: 16px 0; text-align: center; font-size: 16px; font-weight: 700; color: white; font-family: inherit; cursor: pointer; }
+  /* 교환소 링크는 박스 밖, 단추 위에 한 줄 */
+  .ex-lack { margin-top: 8px; text-align: center; font-size: 13px; font-weight: 600; color: #5A44C9; cursor: pointer; }
+  .ex-cta { margin-top: 10px; width: 100%; background: #6C55E0; border: none; border-radius: 14px; padding: 16px 0; text-align: center; font-size: 16px; font-weight: 700; color: #FFFFFF; font-family: inherit; cursor: pointer; }
   /* 티켓이 모자라면 회색 — 눌리되 구매는 안 되고 안내만 뜬다(죽은 단추로 두지 않는다). */
   .ex-cta.off { background: #E4E4EC; color: #9A9AA5; }
   .ex-detail-bottom { border-top: 1px solid var(--border); padding: 12px 16px 32px; }
@@ -12853,8 +12854,8 @@ window.PP_FEATURES = {
           </div>
         </div>
         <div class="ex-detail-bottom-new">
-          <div class="ex-lack" id="exd-lack" style="display:none;" onclick="showScreen('pw-22')"></div>
           <div class="ex-deduct"></div>
+          <div class="ex-lack" id="exd-lack" style="display:none;" onclick="showScreen('pw-22')">티켓 &amp; 포인트 교환소에서 바꾸기 ›</div>
           <button class="ex-cta btn-primary">구매하기</button>
         </div>
       </div>
@@ -18745,7 +18746,7 @@ function ppSwapPlan(combo) {
   });
 
   var short = lack.map(function (x) { return PP_GRADE_KO[x.grade] + '가 ' + x.short + '장 모자랍니다'; }).join(' · ');
-  return { text: short + (give.length ? ' — ' + give.join(' · ') + '을 바꾸면 됩니다' : '') };
+  return { text: short + (give.length ? ' · ' + give.join(' · ') + '을 바꾸면 됩니다' : '') };
 }
 
 function ppComboHave(c) {
@@ -18982,6 +18983,18 @@ function ppGiValidDays(g) {
   var v = parseInt(g && g.validity_days, 10);
   return (v > 0 && v <= 1825) ? v : 0;
 }
+/* 주문번호 — 기프티콘 발급 API가 내려주는 형식(PHTRX20260825083627efc8f00d).
+   ⚠ API 연동 전까지만 여기서 만든다. 연동되면 응답 값을 그대로 쓴다. */
+function ppMakeOrderNo() {
+  var d = new Date();
+  var p2 = function (v) { return ('0' + v).slice(-2); };
+  var stamp = d.getFullYear() + p2(d.getMonth() + 1) + p2(d.getDate())
+    + p2(d.getHours()) + p2(d.getMinutes()) + p2(d.getSeconds());
+  var tail = '';
+  while (tail.length < 8) tail += Math.floor(Math.random() * 16).toString(16);
+  return 'PHTRX' + stamp + tail;
+}
+
 function ppYmdDot(d) {
   return d.getFullYear() + '.' + ('0' + (d.getMonth() + 1)).slice(-2) + '.' + ('0' + d.getDate()).slice(-2);
 }
@@ -19096,27 +19109,22 @@ function populateGifticonDetail(g) {
   var cta = s.querySelector('.ex-cta');
   var enough = !lack.length;
 
+  /* 박스는 하나. 글만 세 갈래로 바뀐다. 모자랄 때는 차감 계산을 하지 않는다. */
+  var swap = enough ? null : ppSwapPlan(combo);
   if (deduct) {
     if (enough) {
       deduct.textContent = ppComboText(combo, ' · ') + ' 차감 → 잔여 '
         + combo.map(function (x) {
             return PP_GRADE_KO[x.grade] + ' ' + ((PP.tickets[x.grade] || 0) - x.count) + '장';
           }).join(' · ');
-      deduct.style.display = '';
+    } else if (swap) {
+      deduct.textContent = swap.text;
     } else {
-      deduct.style.display = 'none';   /* 모자랄 때는 계산하지 않는다 */
+      deduct.textContent = haveEl ? haveEl.textContent : '';
     }
   }
-
-  if (warn) {
-    var swap = enough ? null : ppSwapPlan(combo);
-    if (swap) {
-      warn.innerHTML = '<span>' + swap.text + '</span><b>티켓 &amp; 포인트 교환소에서 바꾸기 ›</b>';
-      warn.style.display = '';
-    } else {
-      warn.style.display = 'none';
-    }
-  }
+  /* 교환소 링크는 바꿔서 채울 수 있을 때만, 박스 밖 한 줄로 */
+  if (warn) warn.style.display = swap ? '' : 'none';
 
   if (cta) {
     cta.textContent = '구매하기';
@@ -19183,11 +19191,10 @@ function bindExchangeBtn() {
            만료일을 남기지 않는다(없는 날짜를 지어 쓰지 않는다). */
         var validDays = ppGiValidDays(g);
         var expiresAt = validDays ? FS.Timestamp.fromMillis(Date.now() + validDays * 86400000) : null;
-        /* 주문번호 — 시안에 있는 칸이다. 교환 기록에 없던 값이라 교환할 때 만들어 남긴다
-           (교환 코드와 같은 방식). 이 뒤로는 기록에서 읽는다. */
-        var od = new Date();
-        var orderNo = ppYmdDot(od).replace(/\./g, '') + '-'
-          + String(Math.floor(Math.random() * 1000000)).padStart(6, '0');
+        /* 주문번호 — 기프티콘 발급 API가 주는 값이다. 연동 전까지는 같은 형식으로 만들어 둔다.
+           ⚠ API 연동이 붙으면 이 블록을 지우고 응답의 주문번호를 그대로 넣는다.
+           형식: PHTRX + YYYYMMDDHHmmss + 무작위 꼬리(hex 8자) */
+        var orderNo = ppMakeOrderNo();
         var batch = db.batch();
         docs.forEach(function(doc) {
           batch.update(doc.ref, { status: 'used', used_at: now });
