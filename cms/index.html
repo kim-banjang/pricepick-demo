@@ -2429,7 +2429,7 @@ window.CMS_FEATURES = {
         <table>
           <thead>
             <tr>
-              <th style="width:110px">구매일</th><th>주문번호</th><th>이름</th>
+              <th style="width:110px">구매일</th><th>주문번호</th><th>닉네임 / 카카오톡 ID / 식별 아이디</th>
               <th>상품명</th><th>상품코드</th><th style="width:90px">유효기간</th><th style="width:110px">상태</th>
             </tr>
           </thead>
@@ -2461,7 +2461,7 @@ window.CMS_FEATURES = {
         <div class="card-header"><div class="card-title">기프티콘 미사용 취소</div><span style="font-size:12px;color:var(--text-2)" id="gun-count">—</span></div>
         <table>
           <thead><tr>
-            <th style="width:110px">구매일</th><th>주문번호</th><th>이름</th><th>상품명</th>
+            <th style="width:110px">구매일</th><th>주문번호</th><th>닉네임 / 카카오톡 ID / 식별 아이디</th><th>상품명</th>
             <th>상품코드</th><th style="width:90px">유효기간</th><th style="width:120px">사용한 티켓</th>
           </tr></thead>
           <tbody></tbody>
@@ -2492,7 +2492,7 @@ window.CMS_FEATURES = {
         <div class="card-header"><div class="card-title">취소내역</div><span style="font-size:12px;color:var(--text-2)" id="gcancel-count">—</span></div>
         <table>
           <thead><tr>
-            <th style="width:52px">No</th><th>주문번호</th><th>이름</th><th>상품명</th>
+            <th style="width:52px">No</th><th>주문번호</th><th>닉네임 / 카카오톡 ID / 식별 아이디</th><th>상품명</th>
             <th style="width:110px">취소날짜</th><th style="width:100px">상태</th><th style="width:120px">환불 티켓</th><th style="width:130px">보유 티켓</th>
           </tr></thead>
           <tbody></tbody>
@@ -7947,20 +7947,9 @@ function gexProductName(g) {
   if (!pr) return ppEsc(g.gifticon_id || '-');
   return ppEsc(((pr.brand ? pr.brand + ' ' : '') + (pr.name || pr.product_name || '')).trim() || g.gifticon_id);
 }
-/* ── 「이름」 칸 ──
-   프라이스픽은 실명을 받지 않는다. 그래서 포인츠허브가 이름/닉네임을 쌓던 자리에
-   닉네임 · 카카오톡 아이디 · User 아이디를 쌓는다(칸 제목은 「이름」 그대로).
-   기존 renderMemberIdentity와 같은 글자 규격을 쓰되, 없는 값은 줄을 만들지 않는다 —
-   빈 줄이 자리를 차지하면 표가 들쭉날쭉해진다. */
-function identityCell(u, uid) {
-  u = u || {};
-  var out = '';
-  if (u.nickname) out += '<div class="idc-nick">' + ppEsc(u.nickname) + '</div>';
-  if (u.linked_kakao && u.kakao_login_id) out += '<div class="idc-sub">' + ppEsc(u.kakao_login_id) + '</div>';
-  if (uid) out += '<div class="idc-uid" title="눌러서 User 아이디 전체 복사" onclick="event.stopPropagation();ppCopyId(this,&quot;' + ppEsc(uid) + '&quot;)">' + ppEsc(uid) + '</div>';
-  return out ? '<div class="idc">' + out + '</div>' : '<span style="color:var(--text-3)">—</span>';
-}
-/* User 아이디는 길어 말줄임되므로 눌러서 통째로 복사할 수 있게 둔다. */
+/* 회원 표기는 CMS 공용 renderMemberIdentity 하나로 쓴다 — 기프티콘 화면도 같은 규격이다. */
+function identityCell(u, uid) { return renderMemberIdentity(u, uid); }
+/* 식별 아이디는 길어 말줄임되므로 눌러서 통째로 복사할 수 있게 둔다. */
 window.ppCopyId = function(el, text) {
   var done = function() { toast('User 아이디를 복사했습니다.'); };
   if (navigator.clipboard && navigator.clipboard.writeText) {
@@ -8499,6 +8488,8 @@ var MALL_RATES = { '쿠팡':0.03, '11번가':0.035, 'G마켓':0.03, '알리익�
    ───────────────────────────────────────────────────────────── */
 // 카카오톡 ID 표기 — 연동+kakao_login_id 있으면 그 값, 아니면 "게스트(비연동)"
 function memberKakaoLabel(u) {
+  /* 회원 목록 배지 등에서만 쓴다. 표의 회원 칸은 renderMemberIdentity가 맡고,
+     거기서는 없는 값을 적어 넣지 않는다. */
   return (u && u.linked_kakao && u.kakao_login_id) ? u.kakao_login_id : '게스트(비연동)';
 }
 function memberIdShort(docId, len) {
@@ -8508,10 +8499,16 @@ function memberIdShort(docId, len) {
 }
 // 세로 3행용 — 닉네임 / 카카오톡ID(또는 게스트) / 식별 아이디(내부 users 문서ID)
 function renderMemberIdentity(u, docId) {
+  /* 없는 값은 줄을 만들지 않는다 — 「닉네임없음」·「게스트(비연동)」처럼 없다는 말을 적어
+     넣지 않는다(김반장 2026-09-16). 없다는 사실은 줄이 없는 것으로 이미 드러난다.
+     카카오 ID 줄이 있으면 연동, 없으면 미연동이다.
+     식별 아이디는 길어 말줄임하므로 눌러서 통째로 복사할 수 있게 둔다. */
   u = u || {};
-  return '<div style="font-weight:500;">' + (u.nickname || '닉네임없음') + '</div>'
-    + '<div style="font-size:11px;color:var(--text-3);">' + memberKakaoLabel(u) + '</div>'
-    + '<div style="font-size:11px;color:var(--text-3);font-family:monospace;">' + memberIdShort(docId) + '</div>';
+  var out = '';
+  if (u.nickname) out += '<div class="idc-nick">' + ppEsc(u.nickname) + '</div>';
+  if (u.linked_kakao && u.kakao_login_id) out += '<div class="idc-sub">' + ppEsc(u.kakao_login_id) + '</div>';
+  if (docId) out += '<div class="idc-uid" title="눌러서 식별 아이디 전체 복사" onclick="event.stopPropagation();ppCopyId(this,&quot;' + ppEsc(docId) + '&quot;)">' + ppEsc(docId) + '</div>';
+  return out ? '<div class="idc">' + out + '</div>' : '<span style="color:var(--text-3)">—</span>';
 }
 // 회원 목록 리스트 전용 — 세로 2행(닉네임 / 카카오ID). 식별 아이디(내부 문서ID)는 상세에서만 노출.
 // 카카오 연동 회원은 카카오 로그인 ID, 미연동(게스트) 회원은 "미연동"으로 표기.
