@@ -65,13 +65,24 @@ tr:hover td{background:var(--surface-2);}
 .uid-chip{display:inline-flex;align-items:center;gap:6px;max-width:100%;
   background:var(--main-soft);border:1px solid var(--main-line);color:var(--main-hover);
   border-radius:99px;padding:5px 11px;font-size:12px;font-weight:700;cursor:pointer;
-  font-family:ui-monospace,SFMono-Regular,Menlo,monospace;transition:all .15s;}
+  font-family:ui-monospace,SFMono-Regular,Menlo,monospace;transition:all .15s;
+  white-space:nowrap;}
 .uid-chip:hover{background:rgba(132,94,238,.16);}
 .uid-chip:active{transform:scale(.97);}
 .uid-chip .ico{width:12px;height:12px;flex-shrink:0;}
 .uid-none{color:var(--text-3);font-size:12px;}
 
 /* 닉네임 + 계정 ID를 한 칸에 위아래로 — 칸을 더 늘리면 가로가 좁아진다 */
+/* 닉네임·카카오는 계정 ID로 회원 데이터에서 읽어 보여주는 값이다(입력 칸 아님) */
+.nick-txt{font-size:12px;font-weight:600;color:var(--text);}
+.nick-none{font-size:12px;color:var(--text-3);}
+.kk{display:inline-block;white-space:nowrap;padding:2px 8px;border-radius:99px;font-size:11px;font-weight:600;}
+.kk-on{background:var(--main-soft);color:var(--main-hover);}
+.kk-off{background:var(--warning-soft);color:var(--warning);}
+.lookup-hint{font-size:11px;color:var(--text-2);margin-top:6px;line-height:1.5;min-height:16px;}
+.lookup-hint b{color:var(--main-hover);}
+.lookup-hint.bad{color:var(--danger);}
+
 /* 같은 사람의 계정 행들은 이름 칸을 rowspan으로 합쳐 붙인다 */
 .nm-cell{font-weight:700;vertical-align:middle;background:var(--surface-2);}
 .nm-sub{display:block;font-size:11px;font-weight:600;color:var(--text-3);margin-top:3px;}
@@ -119,7 +130,7 @@ textarea.form-input{resize:vertical;min-height:64px;}
   .rc-name{font-size:14px;font-weight:700;letter-spacing:-.2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
   .rc-acts{display:flex;gap:6px;flex-shrink:0;}
   .rc-line{display:flex;align-items:center;gap:8px;margin-bottom:7px;min-width:0;}
-  .rc-line .uid-chip{min-width:0;overflow:hidden;}
+  .rc-line .uid-chip{min-width:0;white-space:normal;word-break:break-all;text-align:left;border-radius:12px;}
   .rc-acc{border-top:1px dashed var(--border);margin-top:11px;padding-top:11px;}
   .rc-acc:first-of-type{border-top:none;margin-top:0;padding-top:0;}
   .rc-acc-top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px;}
@@ -143,9 +154,9 @@ textarea.form-input{resize:vertical;min-height:64px;}
   <div class="info-box">
     <strong>쓰는 법</strong> — <strong>계정 하나가 한 줄</strong>입니다. 테스트 기기가 여러 대면 같은 이름으로 줄을 여러 개 넣으세요 —
     <strong>이름이 같으면 자동으로 묶여</strong> 이름 칸이 하나로 합쳐집니다.
-    계정 ID는 앱 <strong>마이 화면 상단의 ID 「복사」</strong> 단추로 얻습니다. 여기 적힌 ID 칩을 누르면 전체 ID가 복사됩니다.
-    <br>닉네임은 앱이 지어 준 이름(예: 꼼꼼한햄스터94)이거나 알아보시려고 적는 구분용 이름(예: 아이폰15 테스트)입니다.
-    <strong>표시일 뿐이고 비워 둬도 됩니다</strong> — 실제로 쓰는 값은 계정 ID입니다.
+    넣으실 것은 <strong>이름 · 계정 ID · 메모</strong> 셋입니다. 계정 ID는 앱 <strong>마이 화면 상단의 ID 「복사」</strong> 단추로 얻습니다.
+    <br><strong>닉네임과 카카오 연동 여부는 계정 ID로 회원 정보에서 찾아 그때그때 보여줍니다</strong> — 적어 넣지 않으셔도 되고,
+    앱에서 바뀌면 여기도 바로 따라 바뀝니다. 회원을 못 찾으면 「닉네임 없음」으로 두니 ID를 다시 확인해 주세요.
   </div>
 
   <div class="warn-box" id="rule-warn">
@@ -162,9 +173,9 @@ textarea.form-input{resize:vertical;min-height:64px;}
     <div class="tablewrap">
       <table>
         <thead>
-          <tr><th style="width:130px">이름</th><th style="width:150px">닉네임</th><th>계정 ID</th><th>메모</th><th style="width:66px">수정</th><th style="width:66px">삭제</th></tr>
+          <tr><th style="width:120px">이름</th><th style="width:130px">닉네임</th><th>계정 ID</th><th style="width:78px">카카오</th><th style="width:130px">메모</th><th style="width:62px">수정</th><th style="width:62px">삭제</th></tr>
         </thead>
-        <tbody id="tbody"><tr><td colspan="6" class="empty">불러오는 중…</td></tr></tbody>
+        <tbody id="tbody"><tr><td colspan="7" class="empty">불러오는 중…</td></tr></tbody>
       </table>
     </div>
 
@@ -189,12 +200,9 @@ textarea.form-input{resize:vertical;min-height:64px;}
         <input class="form-input" id="f-name" type="text" placeholder="예: MrKim (같은 이름으로 넣으면 그 사람 아래 묶입니다)" autocomplete="off">
       </div>
       <div class="form-group">
-        <label class="form-label" for="f-nick">닉네임</label>
-        <input class="form-input" id="f-nick" type="text" placeholder="비워 둬도 됩니다 (예: 꼼꼼한햄스터94 · 아이폰15 테스트)" autocomplete="off">
-      </div>
-      <div class="form-group">
         <label class="form-label" for="f-acc">계정 ID *</label>
         <input class="form-input mono" id="f-acc" type="text" placeholder="앱 마이 화면에서 복사한 ID" autocomplete="off" spellcheck="false">
+        <div class="lookup-hint" id="f-acc-hint"></div>
       </div>
       <div class="form-group" style="margin-bottom:0">
         <label class="form-label" for="f-memo">메모</label>
@@ -230,6 +238,7 @@ textarea.form-input{resize:vertical;min-height:64px;}
 <div id="toast-el"></div>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script>
 'use strict';
@@ -286,27 +295,68 @@ function copyText(text) {
   }
   return copyFallback(text);
 }
-function shortUid(uid) { return uid && uid.length > 14 ? uid.slice(0, 12) + '…' : (uid || ''); }
+/* 계정 ID는 통째로 보여준다 — 칸 폭이 넉넉하고, 잘라 놓으면 어느 계정인지 눈으로 못 가린다. */
 
 var COPY_ICO = '<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>';
 
 function uidChip(uid) {
   if (!uid) return '<span class="uid-none">―</span>';
   return '<button type="button" class="uid-chip" data-copy="' + esc(uid) + '" title="눌러서 전체 ID 복사">'
-    + '<span>' + esc(shortUid(uid)) + '</span>' + COPY_ICO + '</button>';
+    + '<span>' + esc(uid) + '</span>' + COPY_ICO + '</button>';
 }
 
-/* 한 문서 = 계정 하나 = 한 행. 칸이 PC·모바일로 갈려 있던 예전 문서도 그대로 읽히게
-   여기서 새 모양으로 맞춰 준다 — 옮기기 전이라도 화면이 비지 않는다.
+/* 한 문서 = 계정 하나 = 한 행. 명부가 갖는 값은 이름·계정 ID·메모 셋뿐이다.
+   닉네임과 카카오 연동 여부는 여기 저장하지 않는다 — 계정 ID로 회원 정보에서 그때그때 읽는다.
    조회·매칭은 언제나 account_id로 한다. 이름·닉네임으로 하지 않는다. */
 function normRow(r) {
   return {
     _id: r._id,
     name: r.name || '',
-    nickname: (r.nickname != null ? r.nickname : (r.pc_nickname || r.mobile_nickname || '')) || '',
-    account_id: (r.account_id != null ? r.account_id : (r.pc_uid || r.mobile_uid || '')) || '',
+    account_id: r.account_id || '',
     memo: r.memo || ''
   };
+}
+
+/* 계정 ID로 찾은 회원 정보. 그릴 때마다 다시 읽고 여기에만 둔다(명부에 저장하지 않는다). */
+var USERS = {};
+
+/* 회원 조회는 로그인한 상태여야 열린다(firestore.rules: users read = isSignedIn).
+   앱(/app)이 쓰는 것과 같은 익명 로그인을 그대로 쓴다. */
+function ensureSignedIn() {
+  var auth = firebase.auth();
+  if (auth.currentUser) return Promise.resolve(auth.currentUser);
+  return auth.signInAnonymously().then(function (c) { return c.user; });
+}
+
+/* CMS 회원 목록의 dmFetchUsersByIds와 같은 방식 — documentId in 청크(10개)로 users를 읽는다. */
+function fetchUsersByIds(ids) {
+  var list = [];
+  (ids || []).forEach(function (x) { if (x && list.indexOf(x) < 0) list.push(x); });
+  if (!list.length) return Promise.resolve({});
+  return ensureSignedIn().then(function () {
+    var chunks = [];
+    for (var i = 0; i < list.length; i += 10) chunks.push(list.slice(i, i + 10));
+    var map = {};
+    return Promise.all(chunks.map(function (chunk) {
+      return db.collection('users')
+        .where(firebase.firestore.FieldPath.documentId(), 'in', chunk).get()
+        .then(function (snap) { snap.forEach(function (d) { map[d.id] = d.data(); }); });
+    })).then(function () { return map; });
+  });
+}
+
+/* 못 찾은 회원과 「연동 안 함」은 다르다 — 못 찾으면 카카오 칸은 비워 둔다(단정하지 않는다). */
+function nickHtml(uid) {
+  var u = USERS[uid];
+  if (u && u.nickname) return '<span class="nick-txt">' + esc(u.nickname) + '</span>';
+  return '<span class="nick-none">닉네임 없음</span>';
+}
+function kakaoHtml(uid) {
+  var u = USERS[uid];
+  if (!u) return '<span class="uid-none">―</span>';
+  return u.linked_kakao === true
+    ? '<span class="kk kk-on">연동</span>'
+    : '<span class="kk kk-off">미연동</span>';
 }
 
 /* 이름이 같은 계정끼리 묶는다. 순서는 먼저 나온 이름부터 — 넣은 순서가 뒤집히지 않게. */
@@ -333,7 +383,7 @@ function render() {
   document.getElementById('cnt').textContent = '총 ' + rows.length + '개 계정 · ' + groups.length + '명';
 
   if (!rows.length) {
-    tb.innerHTML = '<tr><td colspan="6" class="empty">등록된 계정이 없습니다. 「+ 계정 추가」로 넣으세요.</td></tr>';
+    tb.innerHTML = '<tr><td colspan="7" class="empty">등록된 계정이 없습니다. 「+ 계정 추가」로 넣으세요.</td></tr>';
     rc.innerHTML = '<div class="empty">등록된 계정이 없습니다. 「+ 계정 추가」로 넣으세요.</div>';
     return;
   }
@@ -346,8 +396,9 @@ function render() {
             ? '<td class="nm-cell" rowspan="' + g.rows.length + '">' + esc(g.name)
               + (g.rows.length > 1 ? '<span class="nm-sub">계정 ' + g.rows.length + '개</span>' : '') + '</td>'
             : '')
-        + '<td>' + (esc(r.nickname) || '<span class="uid-none">―</span>') + '</td>'
+        + '<td>' + nickHtml(r.account_id) + '</td>'
         + '<td>' + uidChip(r.account_id) + '</td>'
+        + '<td>' + kakaoHtml(r.account_id) + '</td>'
         + memoCell(r.memo)
         + '<td><button class="btn btn-ghost btn-sm" data-edit="' + esc(r._id) + '">수정</button></td>'
         + '<td><button class="btn btn-danger btn-sm" data-del="' + esc(r._id) + '">삭제</button></td>'
@@ -364,7 +415,7 @@ function render() {
       + '</div></div>'
       + g.rows.map(function (r) {
           return '<div class="rc-acc">'
-            + '<div class="rc-acc-top"><div class="rc-nick">' + (esc(r.nickname) || '<span class="uid-none">닉네임 없음</span>') + '</div>'
+            + '<div class="rc-acc-top"><div class="rc-nick">' + nickHtml(r.account_id) + ' ' + kakaoHtml(r.account_id) + '</div>'
             + '<div class="rc-acts">'
             + '<button class="btn btn-ghost btn-sm" data-edit="' + esc(r._id) + '">수정</button>'
             + '<button class="btn btn-danger btn-sm" data-del="' + esc(r._id) + '">삭제</button>'
@@ -388,13 +439,21 @@ function load() {
         var x = d.data(); x._id = d.id; return x;
       });
       showRuleWarn(false);
-      render();
+      /* 닉네임·카카오는 저장해 둔 값을 쓰지 않는다 — 그릴 때마다 회원 정보를 새로 읽는다. */
+      return fetchUsersByIds(ROWS.map(function (r) { return normRow(r).account_id; }))
+        .then(function (map) { USERS = map; })
+        .catch(function (e) {
+          console.error('회원 조회', e);
+          USERS = {};
+          toast('회원 정보를 읽지 못했습니다 — 닉네임·카카오 칸이 빕니다.');
+        })
+        .then(function () { render(); });
     })
     .catch(function (e) {
       console.error('load', e);
       if (e && e.code === 'permission-denied') {
         showRuleWarn(true);
-        document.getElementById('tbody').innerHTML = '<tr><td colspan="6" class="empty">규칙이 게시되면 여기에 명부가 뜹니다.</td></tr>';
+        document.getElementById('tbody').innerHTML = '<tr><td colspan="7" class="empty">규칙이 게시되면 여기에 명부가 뜹니다.</td></tr>';
         document.getElementById('rowcards').innerHTML = '<div class="empty">규칙이 게시되면 여기에 명부가 뜹니다.</div>';
         document.getElementById('cnt').textContent = '—';
       } else {
@@ -410,8 +469,8 @@ function openAcc(id) {
   document.getElementById('f-id').value = r ? r._id : '';
   document.getElementById('f-name').value = r ? (r.name || '') : '';
   var nr = r ? normRow(r) : null;
-  document.getElementById('f-nick').value = nr ? nr.nickname : '';
   document.getElementById('f-acc').value = nr ? nr.account_id : '';
+  refreshAccHint();
   document.getElementById('f-memo').value = r ? (r.memo || '') : '';
   document.getElementById('m-acc-err').style.display = 'none';
   openModal('m-acc');
@@ -421,7 +480,6 @@ function openAcc(id) {
 function saveAcc() {
   var id = document.getElementById('f-id').value;
   var name = document.getElementById('f-name').value.trim();
-  var nick = document.getElementById('f-nick').value.trim();
   var acc = document.getElementById('f-acc').value.trim();
   var memo = document.getElementById('f-memo').value.trim();
   var err = document.getElementById('m-acc-err');
@@ -433,11 +491,10 @@ function saveAcc() {
   var btn = document.getElementById('m-acc-save');
   btn.disabled = true; btn.textContent = '저장 중…';
 
-  var data = { name: name, nickname: nick, account_id: acc, memo: memo, updated_at: FS.FieldValue.serverTimestamp() };
-  /* 고칠 때 예전 PC·모바일 칸은 지워 둔다 — 값이 두 군데 남아 어긋나는 것을 막는다.
-     없는 칸을 지우는 것은 Firestore에서 그냥 넘어간다. */
-  var legacy = { pc_uid: FS.FieldValue.delete(), mobile_uid: FS.FieldValue.delete(),
-    pc_nickname: FS.FieldValue.delete(), mobile_nickname: FS.FieldValue.delete() };
+  var data = { name: name, account_id: acc, memo: memo, updated_at: FS.FieldValue.serverTimestamp() };
+  /* 닉네임은 명부에 저장하지 않는다 — 계정 ID로 회원 정보에서 그때그때 읽는 값이라
+     적어 두면 앱에서 바뀌었을 때 명부만 옛 값을 붙들고 있게 된다. 예전에 적어 둔 값은 지운다. */
+  var legacy = { nickname: FS.FieldValue.delete() };
   var p = id
     ? db.collection(COL).doc(id).update(Object.assign({}, data, legacy))
     : db.collection(COL).add(Object.assign({ created_at: FS.FieldValue.serverTimestamp() }, data));
@@ -482,6 +539,40 @@ function doDel() {
     btn.disabled = false; btn.textContent = '삭제';
   });
 }
+
+/* ── 계정 ID를 넣는 자리에서 바로 닉네임을 보여준다 ──
+   맞는 ID를 넣으셨는지 저장 전에 그 자리에서 아시라고. 읽어 보여줄 뿐 저장하지 않는다. */
+var ACC_HINT_SEQ = 0;
+function refreshAccHint() {
+  var el = document.getElementById('f-acc-hint');
+  if (!el) return;
+  var uid = document.getElementById('f-acc').value.trim();
+  var seq = ++ACC_HINT_SEQ;
+  el.className = 'lookup-hint';
+  if (!uid) { el.innerHTML = '계정 ID를 넣으면 닉네임과 카카오 연동 여부를 찾아 보여드립니다.'; return; }
+  el.innerHTML = '회원 정보를 찾는 중…';
+  fetchUsersByIds([uid]).then(function (map) {
+    if (seq !== ACC_HINT_SEQ) return;   // 그 사이 더 입력하셨으면 이 결과는 버린다
+    var u = map[uid];
+    if (!u) {
+      el.className = 'lookup-hint bad';
+      el.innerHTML = '이 계정 ID로 회원을 찾지 못했습니다 — ID를 다시 확인해 주세요.';
+      return;
+    }
+    el.innerHTML = '닉네임 <b>' + esc(u.nickname || '(없음)') + '</b> · 카카오 '
+      + (u.linked_kakao === true ? '<b>연동</b>' : '<b>미연동</b>');
+  }).catch(function (e) {
+    if (seq !== ACC_HINT_SEQ) return;
+    console.error('조회', e);
+    el.className = 'lookup-hint bad';
+    el.innerHTML = '회원 정보를 읽지 못했습니다.';
+  });
+}
+var ACC_HINT_TIMER = null;
+document.getElementById('f-acc').addEventListener('input', function () {
+  clearTimeout(ACC_HINT_TIMER);
+  ACC_HINT_TIMER = setTimeout(refreshAccHint, 400);
+});
 
 /* ── 바인딩 ── */
 document.getElementById('btn-add').addEventListener('click', function () { openAcc(null); });
