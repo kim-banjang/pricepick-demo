@@ -113,12 +113,38 @@ textarea.form-input{resize:vertical;min-height:64px;}
 .form-err{display:none;background:var(--danger-soft);color:var(--danger);border-radius:var(--r-md);
   padding:9px 12px;font-size:12px;font-weight:600;margin-bottom:12px;}
 
+/* 사용자 칸 — 골라 넣기와 쳐 넣기 겸용. datalist는 브라우저마다 안 열려서 직접 만든다. */
+.pick-wrap{position:relative;}
+.pick-wrap .form-input{padding-right:40px;}
+.pick-btn{position:absolute;right:5px;top:5px;width:28px;height:28px;border:none;background:transparent;
+  color:var(--text-2);cursor:pointer;border-radius:var(--r-sm);display:flex;align-items:center;justify-content:center;}
+.pick-btn:hover{background:var(--main-soft);color:var(--main);}
+.pick-btn svg{width:14px;height:14px;transition:transform .15s;}
+.pick-wrap.open .pick-btn svg{transform:rotate(180deg);}
+.pick-list{display:none;position:absolute;left:0;right:0;top:calc(100% + 5px);z-index:6;
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--r-md);
+  box-shadow:var(--shadow-lg);max-height:196px;overflow-y:auto;padding:4px;}
+.pick-wrap.open .pick-list{display:block;}
+.pick-head{padding:7px 10px 5px;font-size:10px;font-weight:700;color:var(--text-3);
+  text-transform:uppercase;letter-spacing:.4px;}
+.pick-item{padding:9px 11px;font-size:13px;font-weight:600;color:var(--text);cursor:pointer;
+  border-radius:var(--r-sm);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.pick-item:hover{background:var(--main-soft);color:var(--main-hover);}
+.pick-empty{padding:10px 11px;font-size:12px;color:var(--text-3);}
+
 #toast-el{position:fixed;left:50%;bottom:28px;transform:translateX(-50%) translateY(12px);
   background:#1A1130;color:#fff;padding:10px 18px;border-radius:99px;font-size:13px;font-weight:600;
   opacity:0;pointer-events:none;transition:all .2s;z-index:400;white-space:nowrap;max-width:90vw;}
 #toast-el.show{opacity:1;transform:translateX(-50%);}
 
 .empty{text-align:center;padding:38px 18px;color:var(--text-3);font-size:13px;}
+
+/* 한/베 토글 — CMS(#ip-lang-toggle)와 같은 규격을 그대로 쓴다 */
+#ip-lang-toggle{display:inline-flex;align-items:center;gap:0;background:#ffffff;border:1px solid #E3E0EC;border-radius:999px;padding:3px;cursor:pointer;font-family:inherit;box-shadow:0 2px 10px rgba(90,60,150,0.12);}
+#ip-lang-toggle span{font-size:12px;font-weight:700;letter-spacing:.4px;color:#9890ad;padding:3px 12px;border-radius:999px;line-height:1.4;transition:background .15s,color .15s;}
+#ip-lang-toggle span.on{background:#845EEE;color:#fff;}
+#ip-lang-toggle:hover{border-color:#845EEE;}
+.pg-acts{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
 
 /* ── 375px — 표를 카드 줄로 접는다 ── */
 .rowcards{display:none;}
@@ -150,13 +176,16 @@ textarea.form-input{resize:vertical;min-height:64px;}
       <div class="pg-title">데모 계정 관리</div>
       <div class="pg-sub">데모에서 앱을 테스트할 때 가상 데이터를 어느 계정에 넣을지 여기서 확인합니다.</div>
     </div>
-    <button class="btn btn-primary" id="btn-add">+ 계정 추가</button>
+    <div class="pg-acts">
+      <button id="ip-lang-toggle" data-lang="ko" type="button" title="KO / VI" aria-label="KO/VI"><span data-l="ko" class="on">KO</span><span data-l="vi">VI</span></button>
+      <button class="btn btn-primary" id="btn-add">+ 계정 추가</button>
+    </div>
   </div>
 
   <div class="info-box">
-    <strong>쓰는 법</strong> — <strong>계정 하나가 한 줄</strong>입니다. 테스트 기기가 여러 대면 같은 이름으로 줄을 여러 개 넣으세요 —
-    <strong>이름이 같으면 자동으로 묶여</strong> 이름 칸이 하나로 합쳐집니다.
-    넣으실 것은 <strong>이름 · 계정 ID · 메모</strong> 셋입니다. 계정 ID는 앱 <strong>마이 화면 상단의 ID 「복사」</strong> 단추로 얻습니다.
+    <strong>쓰는 법</strong> — <strong>계정 하나가 한 줄</strong>입니다. 테스트 기기가 여러 대면 같은 사용자로 줄을 여러 개 넣으세요 —
+    <strong>사용자가 같으면 자동으로 묶여</strong> 사용자 칸이 하나로 합쳐집니다.
+    넣으실 것은 <strong>사용자 · 계정 ID · 메모</strong> 셋입니다. 계정 ID는 앱 <strong>마이 화면 상단의 ID 「복사」</strong> 단추로 얻습니다.
     <br><strong>닉네임과 카카오 연동 여부는 계정 ID로 회원 정보에서 찾아 그때그때 보여줍니다</strong> — 적어 넣지 않으셔도 되고,
     앱에서 바뀌면 여기도 바로 따라 바뀝니다. 회원을 못 찾으면 「닉네임 없음」으로 두니 ID를 다시 확인해 주세요.
   </div>
@@ -175,7 +204,7 @@ textarea.form-input{resize:vertical;min-height:64px;}
     <div class="tablewrap">
       <table>
         <thead>
-          <tr><th style="width:120px">이름</th><th style="width:130px">닉네임</th><th>계정 ID</th><th style="width:78px">카카오</th><th style="width:130px">메모</th><th style="width:62px">수정</th><th style="width:62px">삭제</th></tr>
+          <tr><th style="width:120px">사용자</th><th style="width:130px">닉네임</th><th>계정 ID</th><th style="width:78px">카카오</th><th style="width:130px">메모</th><th style="width:62px">수정</th><th style="width:62px">삭제</th></tr>
         </thead>
         <tbody id="tbody"><tr><td colspan="7" class="empty">불러오는 중…</td></tr></tbody>
       </table>
@@ -198,8 +227,14 @@ textarea.form-input{resize:vertical;min-height:64px;}
       <div class="form-err" id="m-acc-err"></div>
       <input type="hidden" id="f-id">
       <div class="form-group">
-        <label class="form-label" for="f-name">이름 *</label>
-        <input class="form-input" id="f-name" type="text" placeholder="예: MrKim (같은 이름으로 넣으면 그 사람 아래 묶입니다)" autocomplete="off">
+        <label class="form-label" for="f-name">사용자 *</label>
+        <div class="pick-wrap" id="f-name-wrap">
+          <input class="form-input" id="f-name" type="text" placeholder="고르거나 새로 적으세요" autocomplete="off">
+          <button type="button" class="pick-btn" id="f-name-pick" aria-label="등록된 사용자 고르기" title="등록된 사용자 고르기">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="pick-list" id="f-name-list"></div>
+        </div>
       </div>
       <div class="form-group">
         <label class="form-label" for="f-acc">계정 ID *</label>
@@ -394,6 +429,9 @@ function groupByName(rows) {
   return order.map(function (k) { return map[k]; });
 }
 
+/* 숫자가 끼어 있는 문구는 사전(전체 일치)으로 못 잡는다 — 지금 언어를 보고 직접 만든다. */
+function L(ko, vi) { return (window.ipGetLang && window.ipGetLang() === 'vi') ? vi : ko; }
+
 function memoCell(memo) {
   return '<td style="white-space:normal;text-align:left;color:var(--text-2);font-size:12px;max-width:200px">'
     + (esc(memo) || '<span class="uid-none">―</span>') + '</td>';
@@ -404,7 +442,9 @@ function render() {
   var rc = document.getElementById('rowcards');
   var rows = ROWS.map(normRow);
   var groups = groupByName(rows);
-  document.getElementById('cnt').textContent = '총 ' + rows.length + '개 계정 · ' + groups.length + '명';
+  document.getElementById('cnt').textContent = L(
+    '총 ' + rows.length + '개 계정 · ' + groups.length + '명',
+    'Tổng ' + rows.length + ' tài khoản · ' + groups.length + ' người');
 
   if (!rows.length) {
     tb.innerHTML = '<tr><td colspan="7" class="empty">등록된 계정이 없습니다. 「+ 계정 추가」로 넣으세요.</td></tr>';
@@ -418,7 +458,7 @@ function render() {
       html += '<tr>'
         + (i === 0
             ? '<td class="nm-cell" rowspan="' + g.rows.length + '">' + esc(g.name)
-              + (g.rows.length > 1 ? '<span class="nm-sub">계정 ' + g.rows.length + '개</span>' : '') + '</td>'
+              + (g.rows.length > 1 ? '<span class="nm-sub">' + L('계정 ' + g.rows.length + '개', g.rows.length + ' tài khoản') + '</span>' : '') + '</td>'
             : '')
         + '<td>' + nickHtml(r.account_id) + '</td>'
         + '<td>' + uidChip(r.account_id) + '</td>'
@@ -435,7 +475,7 @@ function render() {
   rc.innerHTML = groups.map(function (g) {
     return '<div class="rc">'
       + '<div class="rc-top"><div class="rc-name">' + esc(g.name)
-      + (g.rows.length > 1 ? ' <span style="font-size:11px;font-weight:600;color:var(--text-3)">· 계정 ' + g.rows.length + '개</span>' : '')
+      + (g.rows.length > 1 ? ' <span style="font-size:11px;font-weight:600;color:var(--text-3)">· ' + L('계정 ' + g.rows.length + '개', g.rows.length + ' tài khoản') + '</span>' : '')
       + '</div></div>'
       + g.rows.map(function (r) {
           return '<div class="rc-acc">'
@@ -481,7 +521,7 @@ function load() {
         document.getElementById('rowcards').innerHTML = '<div class="empty">규칙이 게시되면 여기에 명부가 뜹니다.</div>';
         document.getElementById('cnt').textContent = '—';
       } else {
-        toast('불러오기 실패: ' + (e.message || e));
+        toast(L('불러오기 실패: ', 'Tải thất bại: ') + (e.message || e));
       }
     });
 }
@@ -497,6 +537,7 @@ function openAcc(id) {
   refreshAccHint();
   document.getElementById('f-memo').value = r ? (r.memo || '') : '';
   document.getElementById('m-acc-err').style.display = 'none';
+  pickOpen(false);
   openModal('m-acc');
   setTimeout(function () { document.getElementById('f-name').focus(); }, 60);
 }
@@ -508,8 +549,8 @@ function saveAcc() {
   var memo = document.getElementById('f-memo').value.trim();
   var err = document.getElementById('m-acc-err');
 
-  /* 이름 중복은 막지 않는다 — 같은 이름으로 넣는 것이 그 사람 아래 계정을 늘리는 방법이다. */
-  if (!name) { err.textContent = '이름은 반드시 넣어야 합니다.'; err.style.display = 'block'; return; }
+  /* 사용자 중복은 막지 않는다 — 같은 사용자로 넣는 것이 그 사람 아래 계정을 늘리는 방법이다. */
+  if (!name) { err.textContent = '사용자는 반드시 넣어야 합니다.'; err.style.display = 'block'; return; }
   if (!acc) { err.textContent = '계정 ID는 반드시 넣어야 합니다.'; err.style.display = 'block'; return; }
 
   var btn = document.getElementById('m-acc-save');
@@ -531,7 +572,7 @@ function saveAcc() {
     console.error('save', e);
     err.textContent = (e && e.code === 'permission-denied')
       ? '저장이 막혀 있습니다 — demo_accounts 규칙이 아직 게시되지 않았습니다.'
-      : '저장 실패: ' + (e.message || e);
+      : L('저장 실패: ', 'Lưu thất bại: ') + (e.message || e);
     err.style.display = 'block';
   }).finally(function () {
     btn.disabled = false; btn.textContent = '저장';
@@ -558,11 +599,53 @@ function doDel() {
     return load();
   }).catch(function (e) {
     console.error('delete', e);
-    toast((e && e.code === 'permission-denied') ? '삭제가 막혀 있습니다 — 규칙 게시가 필요합니다.' : '삭제 실패: ' + (e.message || e));
+    toast((e && e.code === 'permission-denied') ? '삭제가 막혀 있습니다 — 규칙 게시가 필요합니다.' : L('삭제 실패: ', 'Xóa thất bại: ') + (e.message || e));
   }).finally(function () {
     btn.disabled = false; btn.textContent = '삭제';
   });
 }
+
+/* ── 사용자 펼침 목록 ──
+   명부에 이미 있는 사용자를 눌러 고르게 한다. 오타로 같은 사람이 두 줄로 갈라지는 것을 막는
+   것이 목적이라, 고르는 것과 별개로 새 사용자를 그대로 쳐 넣는 것도 막지 않는다.
+   datalist는 브라우저에 따라 열리지 않아 직접 만든다. */
+function userNames() {
+  var seen = {}, out = [];
+  ROWS.map(normRow).forEach(function (r) {
+    var nm = (r.name || '').trim();
+    if (nm && !seen[nm]) { seen[nm] = 1; out.push(nm); }
+  });
+  return out.sort(function (a, b) { return a.localeCompare(b, 'ko'); });
+}
+function pickOpen(on) {
+  var w = document.getElementById('f-name-wrap');
+  if (!w) return;
+  if (on) {
+    var names = userNames();
+    document.getElementById('f-name-list').innerHTML = names.length
+      ? '<div class="pick-head">등록된 사용자</div>' + names.map(function (nm) {
+          return '<div class="pick-item" data-pick="' + esc(nm) + '">' + esc(nm) + '</div>';
+        }).join('')
+      : '<div class="pick-empty">아직 등록된 사용자가 없습니다. 새로 적어 주세요.</div>';
+  }
+  w.classList.toggle('open', !!on);
+}
+document.getElementById('f-name-pick').addEventListener('click', function (e) {
+  e.stopPropagation();
+  pickOpen(!document.getElementById('f-name-wrap').classList.contains('open'));
+});
+document.getElementById('f-name').addEventListener('focus', function () { pickOpen(true); });
+document.getElementById('f-name-list').addEventListener('click', function (e) {
+  var it = e.target.closest('[data-pick]');
+  if (!it) return;
+  e.stopPropagation();
+  document.getElementById('f-name').value = it.getAttribute('data-pick');
+  pickOpen(false);
+});
+document.addEventListener('click', function (e) {
+  var w = document.getElementById('f-name-wrap');
+  if (w && w.classList.contains('open') && !w.contains(e.target)) pickOpen(false);
+});
 
 /* ── 계정 ID를 넣는 자리에서 바로 닉네임을 보여준다 ──
    맞는 ID를 넣으셨는지 저장 전에 그 자리에서 아시라고. 읽어 보여줄 뿐 저장하지 않는다. */
@@ -640,6 +723,235 @@ document.addEventListener('click', function (e) {
 });
 
 load();
+</script>
+
+<!-- 한/베 토글 — 엔진은 CMS(cms/index.html)의 번역기를 그대로 가져왔다.
+     사전(KO2VI)에 있는 문자열만, 그것도 트림한 값이 통째로 일치할 때만 바꾼다.
+     그래서 계정 ID·사용자 이름·앱이 만든 닉네임·형님이 적으신 메모는 건드리지 않는다.
+     표는 매번 다시 그려지므로 MutationObserver가 새로 생긴 노드까지 따라간다. -->
+<script>
+(function(){
+  var KO2VI = {
+  "데모 계정 관리": "Quản lý tài khoản demo",
+  "데모에서 앱을 테스트할 때 가상 데이터를 어느 계정에 넣을지 여기서 확인합니다.": "Nơi xác nhận sẽ đưa dữ liệu giả vào tài khoản nào khi kiểm thử ứng dụng trong bản demo.",
+  "+ 계정 추가": "+ Thêm tài khoản",
+  "쓰는 법": "Cách dùng",
+  "계정 하나가 한 줄": "Mỗi tài khoản là một dòng",
+  "입니다. 테스트 기기가 여러 대면 같은 사용자로 줄을 여러 개 넣으세요 —": ". Nếu có nhiều thiết bị kiểm thử, hãy thêm nhiều dòng với cùng một người dùng —",
+  "사용자가 같으면 자동으로 묶여": "người dùng trùng nhau sẽ tự động được gộp",
+  "사용자 칸이 하나로 합쳐집니다.\n    넣으실 것은": ", ô người dùng hợp thành một. Bạn cần nhập",
+  "사용자 · 계정 ID · 메모": "Người dùng · ID tài khoản · Ghi chú",
+  "셋입니다. 계정 ID는 앱": "là ba mục này. ID tài khoản lấy từ",
+  "마이 화면 상단의 ID 「복사」": "nút 「Sao chép」 ID ở đầu màn hình Của tôi",
+  "단추로 얻습니다.": "trong ứng dụng.",
+  "닉네임과 카카오 연동 여부는 계정 ID로 회원 정보에서 찾아 그때그때 보여줍니다": "Biệt danh và trạng thái liên kết Kakao được tra từ thông tin thành viên theo ID tài khoản và hiển thị tức thời",
+  "— 적어 넣지 않으셔도 되고,\n    앱에서 바뀌면 여기도 바로 따라 바뀝니다. 회원을 못 찾으면 「닉네임 없음」으로 두니 ID를 다시 확인해 주세요.": "— bạn không cần nhập tay, và khi thay đổi trong ứng dụng thì ở đây cũng đổi theo ngay. Nếu không tìm thấy thành viên sẽ để là 「Không có biệt danh」, hãy kiểm tra lại ID.",
+  "저장이 막혀 있습니다.": "Việc lưu đang bị chặn.",
+  "Firestore 규칙에": "Quy tắc công khai",
+  "공개 규칙이 아직 게시되지 않았습니다.\n    저장소의": "trong quy tắc Firestore chưa được phát hành. Quy tắc đã có trong",
+  "에 규칙은 들어가 있으니, Firebase 콘솔 → Firestore Database → 규칙에서 한 번 게시하면 바로 열립니다.": "của kho mã, chỉ cần phát hành một lần tại Firebase Console → Firestore Database → Rules là mở ngay.",
+  "계정 명부": "Danh bạ tài khoản",
+  "사용자": "Người dùng",
+  "닉네임": "Biệt danh",
+  "계정 ID": "ID tài khoản",
+  "카카오": "Kakao",
+  "· 카카오": "· Kakao",
+  "메모": "Ghi chú",
+  "수정": "Chỉnh sửa",
+  "삭제": "Xóa",
+  "연동": "Liên kết",
+  "미연동": "Chưa LK",
+  "탈퇴한 계정": "Tài khoản đã rút",
+  "정지된 계정": "Tài khoản bị đình chỉ",
+  "없는 계정": "Tài khoản không tồn tại",
+  "닉네임 없음": "Không có biệt danh",
+  "계정 추가": "Thêm tài khoản",
+  "계정 수정": "Sửa tài khoản",
+  "사용자 *": "Người dùng *",
+  "계정 ID *": "ID tài khoản *",
+  "등록된 사용자": "Người dùng đã đăng ký",
+  "아직 등록된 사용자가 없습니다. 새로 적어 주세요.": "Chưa có người dùng nào được đăng ký. Hãy nhập mới.",
+  "계정 ID를 넣으면 닉네임과 카카오 연동 여부를 찾아 보여드립니다.": "Nhập ID tài khoản sẽ tra và hiển thị biệt danh cùng trạng thái liên kết Kakao.",
+  "취소": "Hủy",
+  "저장": "Lưu",
+  "계정 삭제": "Xóa tài khoản",
+  "줄을 지웁니다. 되돌릴 수 없습니다.": "sẽ bị xóa. Không thể hoàn tác.",
+  "이 계정": "tài khoản này",
+  "등록된 계정이 없습니다. 「+ 계정 추가」로 넣으세요.": "Chưa có tài khoản nào. Hãy thêm bằng 「+ Thêm tài khoản」.",
+  "규칙이 게시되면 여기에 명부가 뜹니다.": "Danh bạ sẽ hiện ở đây khi quy tắc được phát hành.",
+  "불러오는 중…": "Đang tải…",
+  "저장 중…": "Đang lưu…",
+  "삭제 중…": "Đang xóa…",
+  "회원 정보를 찾는 중…": "Đang tìm thông tin thành viên…",
+  "이 계정 ID로 회원을 찾지 못했습니다 — ID를 다시 확인해 주세요.": "Không tìm thấy thành viên với ID tài khoản này — hãy kiểm tra lại ID.",
+  "입니다 — 이 ID로는 앱에 다시 들어갈 수 없어 시연에 쓸 수 없습니다.": " — không thể vào lại ứng dụng bằng ID này nên không dùng được cho demo.",
+  "입니다 · 닉네임": " · Biệt danh",
+  "(없음)": "(không có)",
+  "사용자는 반드시 넣어야 합니다.": "Bắt buộc phải nhập người dùng.",
+  "계정 ID는 반드시 넣어야 합니다.": "Bắt buộc phải nhập ID tài khoản.",
+  "저장이 막혀 있습니다 — demo_accounts 규칙이 아직 게시되지 않았습니다.": "Việc lưu đang bị chặn — quy tắc demo_accounts chưa được phát hành.",
+  "삭제가 막혀 있습니다 — 규칙 게시가 필요합니다.": "Việc xóa đang bị chặn — cần phát hành quy tắc.",
+  "고쳤습니다.": "Đã sửa.",
+  "넣었습니다.": "Đã thêm.",
+  "지웠습니다.": "Đã xóa.",
+  "계정 ID를 복사했습니다.": "Đã sao chép ID tài khoản.",
+  "복사에 실패했습니다.": "Sao chép thất bại.",
+  "회원 정보를 읽지 못했습니다 — 닉네임·카카오 칸이 빕니다.": "Không đọc được thông tin thành viên — ô biệt danh·Kakao sẽ trống.",
+  "회원 정보를 읽지 못했습니다.": "Không đọc được thông tin thành viên.",
+  "고르거나 새로 적으세요": "Chọn hoặc nhập mới",
+  "앱 마이 화면에서 복사한 ID": "ID đã sao chép từ màn hình Của tôi",
+  "비워 둬도 됩니다": "Có thể để trống",
+  "눌러서 전체 ID 복사": "Nhấn để sao chép toàn bộ ID",
+  "등록된 사용자 고르기": "Chọn người dùng đã đăng ký",
+  "닫기": "Đóng"
+};
+  var _orig=new Map(), _tracked=new Set(), _applying=false;
+  function hasKo(s){ return /[가-힯ᄀ-ᇿ㄰-㆏]/.test(s); }
+  function tcore(s){
+    var t=s.trim(); if(!t||!hasKo(t)) return null;
+    var vi=KO2VI[t]; if(vi!=null) return s.replace(t,vi);
+    return null;
+  }
+  /* ── 숫자-단위 붙음 방지(VI 공통) ──
+     한국어는 "11건"처럼 숫자와 단위를 붙여 쓰지만 베트남어는 "11 trường hợp"처럼 띄어 써야 한다.
+     사전은 단위 텍스트 노드만 치환하므로("건"→"trường hợp") 그대로 두면 "11trường hợp"이 된다.
+     그래서 번역 결과가 문자로 시작하고 바로 앞 인라인 내용이 숫자로 끝나면 공백 한 칸을 끼워 넣는다.
+     특정 화면 땜질이 아니라 번역 엔진 공통 처리라 전 메뉴에 한 번에 적용된다. */
+  function prevInlineChar(n){
+    var cur=n, guard=0;
+    while(cur&&guard++<64){
+      var p=cur.previousSibling;
+      while(p){
+        if(p.nodeType===3){ if(p.nodeValue) return p.nodeValue.slice(-1); }
+        else if(p.nodeType===1){
+          var t=p.textContent;
+          if(t) return isInlineEl(p) ? t.slice(-1) : '';
+        }
+        p=p.previousSibling;
+      }
+      cur=cur.parentNode;
+      if(!cur||cur.nodeType!==1||cur===document.body||!isInlineEl(cur)) break;
+    }
+    return '';
+  }
+  function isInlineEl(el){
+    var d;
+    try{ d=getComputedStyle(el).display; }catch(e){ return false; }
+    return d.indexOf('inline')===0||d==='contents';
+  }
+  function viPad(n,out){
+    if(!/^[0-9A-Za-zÀ-ỹĐđ]/.test(out)) return out;
+    return /[0-9]$/.test(prevInlineChar(n)) ? ' '+out : out;
+  }
+  function trNode(n){
+    var out=tcore(n.nodeValue);
+    if(out!=null&&out!==n.nodeValue){
+      out=viPad(n,out);
+      if(!_orig.has(n)) _orig.set(n,n.nodeValue);
+      _tracked.add(n); n.nodeValue=out;
+    }
+  }
+  function walk(root){
+    if(!root) return;
+    if(root.nodeType===3){trNode(root);return;}
+    if(root.nodeType!==1&&root.nodeType!==11) return;
+    var w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT,{acceptNode:function(nd){
+      var p=nd.parentNode; if(!p) return NodeFilter.FILTER_REJECT;
+      var t=p.nodeName; if(t==='SCRIPT'||t==='STYLE'||t==='NOSCRIPT') return NodeFilter.FILTER_REJECT;
+      return NodeFilter.FILTER_ACCEPT;
+    }});
+    var arr=[],n; while(n=w.nextNode()) arr.push(n);
+    for(var i=0;i<arr.length;i++) trNode(arr[i]);
+  }
+  var ATTRS=['placeholder','title','value','alt','aria-label'];
+  function attrSweep(){
+    var els=document.querySelectorAll('['+ATTRS.join('],[')+']');
+    for(var i=0;i<els.length;i++){var el=els[i];
+      for(var j=0;j<ATTRS.length;j++){var a=ATTRS[j];
+        if(!el.hasAttribute(a)) continue;
+        var v=el.getAttribute(a); if(!hasKo(v)) continue;
+        var core=v.trim(),vi=KO2VI[core]; if(vi==null) continue;
+        var k='_ipa_'+a; if(el[k]==null) el[k]=v;
+        var p=v.indexOf(core);
+        el.setAttribute(a, v.slice(0,p)+vi+v.slice(p+core.length));
+      }
+    }
+  }
+  function attrRestore(){
+    var els=document.querySelectorAll('*');
+    for(var i=0;i<els.length;i++){var el=els[i];
+      for(var j=0;j<ATTRS.length;j++){var k='_ipa_'+ATTRS[j];
+        if(el[k]!=null){el.setAttribute(ATTRS[j],el[k]);el[k]=null;}
+      }
+    }
+  }
+  function restore(){
+    _tracked.forEach(function(n){var o=_orig.get(n); if(o!=null) n.nodeValue=o;});
+    _tracked.clear(); attrRestore();
+  }
+  var _obs=null;
+  function startObs(){
+    if(_obs||!window.MutationObserver) return;
+    _obs=new MutationObserver(function(muts){
+      if(IPLANG!=='vi'||_applying) return;
+      _applying=true;
+      for(var i=0;i<muts.length;i++){var m=muts[i];
+        if(m.type==='characterData'){trNode(m.target);}
+        else if(m.addedNodes){for(var j=0;j<m.addedNodes.length;j++){var nd=m.addedNodes[j];
+          if(nd.nodeType===3) trNode(nd); else if(nd.nodeType===1){walk(nd);attrSweep();}}}
+      }
+      _applying=false;
+    });
+    _obs.observe(document.body,{childList:true,characterData:true,subtree:true});
+  }
+  var IPLANG='ko';
+  window.ipSetLang=function(lang){
+    lang=(lang==='vi')?'vi':'ko';
+    if(lang===IPLANG) return;
+    IPLANG=lang; document.documentElement.lang=lang;
+    _applying=true;
+    if(lang==='vi'){walk(document.body);attrSweep();} else {restore();}
+    _applying=false;
+    var t=document.getElementById('ip-lang-toggle');
+    if(t){t.setAttribute('data-lang',lang);
+      var ko=t.querySelector('[data-l="ko"]'),vi=t.querySelector('[data-l="vi"]');
+      if(ko) ko.className=(lang==='ko')?'on':'';
+      if(vi) vi.className=(lang==='vi')?'on':'';
+    }
+  };
+  window.ipGetLang=function(){return IPLANG;};
+  function bind(){
+    startObs();
+    var t=document.getElementById('ip-lang-toggle');
+    if(t&&!t.dataset.b){t.dataset.b='1';
+      t.addEventListener('click',function(e){
+        e.stopPropagation();
+        var next=IPLANG==='vi'?'ko':'vi';
+        if(next==='ko'){
+          if(window.ipSetLang) window.ipSetLang('ko');
+          if(typeof applyLang==='function') applyLang();
+        } else {
+          if(typeof applyLang==='function') applyLang();
+          if(window.ipSetLang) window.ipSetLang('vi');
+        }
+      });
+    }
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',bind);
+  else bind();
+})();
+
+</script>
+<script>
+/* 숫자가 낀 문구는 사전으로 못 잡아 render()가 직접 만든다 — 언어를 바꾸면 다시 그린다. */
+(function(){
+  var orig = window.ipSetLang;
+  if (!orig) return;
+  window.ipSetLang = function(lang){
+    orig(lang);
+    if (typeof render === 'function') { try { render(); } catch(e) { console.error('render', e); } }
+  };
+})();
 </script>
 </body>
 </html>
