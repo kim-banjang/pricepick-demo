@@ -1087,11 +1087,21 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
    값이 없어도 줄 자리는 지키고 글자만 안 쓴다(행 높이가 제각각이 되지 않게).
    정렬은 왼쪽으로 못 박는다 — 칸이 가운데 정렬이어도 이 안은 왼쪽이다. */
 .idc{min-width:0;text-align:left;height:52px;}
+/* 기프티콘 세 표(구매내역·미사용 취소·취소내역)는 칸 폭을 못 박는다.
+   회원 칸은 식별 아이디 한 줄이 들어갈 만큼만(210px) 주고, 남는 폭은 상품명에 돌린다.
+   제목이 길어(「닉네임 / 카카오톡 ID / 식별 아이디」) 칸을 밀어내던 것을 두 줄로 접는다. */
+#sec-gifticons table,#sec-gifticon-unused table,#sec-gifticon-cancel table{table-layout:fixed;}
+#sec-gifticons th,#sec-gifticon-unused th,#sec-gifticon-cancel th{white-space:normal;line-height:1.35;padding-left:12px;padding-right:12px;}
+#sec-gifticons td,#sec-gifticon-unused td,#sec-gifticon-cancel td{padding-left:12px;padding-right:12px;overflow:hidden;text-overflow:ellipsis;}
+/* 상품명(넷째 칸)은 넓어진 자리를 두 줄까지 써서 펼친다 — 잘라 버리지 않는다. */
+#sec-gifticons td:nth-child(4),#sec-gifticon-unused td:nth-child(4),#sec-gifticon-cancel td:nth-child(4){
+  white-space:normal;text-align:left!important;line-height:1.4;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;}
 .idc-nick,.idc-sub,.idc-uid{display:block;text-align:left;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .idc-nick{font-weight:600;color:var(--text);font-size:13px;line-height:18px;height:18px;}
 .idc-sub{font-size:11px;color:var(--text-3);line-height:15px;height:15px;margin-top:2px;}
 .idc-uid{font-size:11px;color:var(--text-3);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
-  line-height:15px;height:15px;margin-top:2px;cursor:pointer;max-width:200px;}
+  line-height:15px;height:15px;margin-top:2px;cursor:pointer;max-width:100%;}
 .idc-uid:empty,.idc-sub:empty,.idc-nick:empty{cursor:default;}
 .idc-uid:not(:empty):hover{color:var(--main);text-decoration:underline;}
 /* 상품 상세 정보 모달 — 포인츠허브 배치(왼쪽 이미지, 오른쪽 2열 격자) */
@@ -2442,10 +2452,11 @@ window.CMS_FEATURES = {
       <div class="card">
         <div class="card-header"><div class="card-title">플랫폼별 구매내역</div><span style="font-size:12px;color:var(--text-2)" id="gex-count">—</span></div>
         <table>
+            <colgroup><col style="width:100px"><col style="width:120px"><col style="width:210px"><col><col style="width:110px"><col style="width:90px"><col style="width:100px"></colgroup>
           <thead>
             <tr>
-              <th style="width:110px">구매일</th><th>주문번호</th><th>닉네임 / 카카오톡 ID / 식별 아이디</th>
-              <th>상품명</th><th>상품코드</th><th style="width:90px">유효기간</th><th style="width:110px">상태</th>
+              <th>구매일</th><th>주문번호</th><th>닉네임 / 카카오톡 ID / 식별 아이디</th>
+              <th>상품명</th><th>상품코드</th><th>유효기간</th><th>상태</th>
             </tr>
           </thead>
           <tbody></tbody>
@@ -2475,9 +2486,10 @@ window.CMS_FEATURES = {
       <div class="card">
         <div class="card-header"><div class="card-title">기프티콘 미사용 취소</div><span style="font-size:12px;color:var(--text-2)" id="gun-count">—</span></div>
         <table>
+            <colgroup><col style="width:100px"><col style="width:120px"><col style="width:210px"><col><col style="width:110px"><col style="width:90px"><col style="width:110px"></colgroup>
           <thead><tr>
-            <th style="width:110px">구매일</th><th>주문번호</th><th>닉네임 / 카카오톡 ID / 식별 아이디</th><th>상품명</th>
-            <th>상품코드</th><th style="width:90px">유효기간</th><th style="width:120px">사용한 티켓</th>
+            <th>구매일</th><th>주문번호</th><th>닉네임 / 카카오톡 ID / 식별 아이디</th><th>상품명</th>
+            <th>상품코드</th><th>유효기간</th><th>사용한 티켓</th>
           </tr></thead>
           <tbody></tbody>
         </table>
@@ -2506,9 +2518,10 @@ window.CMS_FEATURES = {
       <div class="card">
         <div class="card-header"><div class="card-title">취소내역</div><span style="font-size:12px;color:var(--text-2)" id="gcancel-count">—</span></div>
         <table>
+            <colgroup><col style="width:56px"><col style="width:120px"><col style="width:210px"><col><col style="width:100px"><col style="width:90px"><col style="width:100px"><col style="width:100px"></colgroup>
           <thead><tr>
-            <th style="width:52px">No</th><th>주문번호</th><th>닉네임 / 카카오톡 ID / 식별 아이디</th><th>상품명</th>
-            <th style="width:110px">취소날짜</th><th style="width:100px">상태</th><th style="width:120px">환불 티켓</th><th style="width:130px">보유 티켓</th>
+            <th>No</th><th>주문번호</th><th>닉네임 / 카카오톡 ID / 식별 아이디</th><th>상품명</th>
+            <th>취소날짜</th><th>상태</th><th>환불 티켓</th><th>보유 티켓</th>
           </tr></thead>
           <tbody></tbody>
         </table>
