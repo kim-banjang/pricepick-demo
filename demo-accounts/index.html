@@ -76,6 +76,8 @@ tr:hover td{background:var(--surface-2);}
 /* 닉네임·카카오는 계정 ID로 회원 데이터에서 읽어 보여주는 값이다(입력 칸 아님) */
 .nick-txt{font-size:12px;font-weight:600;color:var(--text);}
 .nick-none{font-size:12px;color:var(--text-3);}
+.bad-txt{font-size:12px;font-weight:700;color:var(--danger);}
+.warn-txt{font-size:12px;font-weight:700;color:var(--warning);}
 .kk{display:inline-block;white-space:nowrap;padding:2px 8px;border-radius:99px;font-size:11px;font-weight:600;}
 .kk-on{background:var(--main-soft);color:var(--main-hover);}
 .kk-off{background:var(--warning-soft);color:var(--warning);}
@@ -345,16 +347,38 @@ function fetchUsersByIds(ids) {
   });
 }
 
-/* 못 찾은 회원과 「연동 안 함」은 다르다 — 못 찾으면 카카오 칸은 비워 둔다(단정하지 않는다). */
-function nickHtml(uid) {
+/* 계정 ID 하나로 회원 문서를 한 번 읽고, 닉네임과 카카오를 그 한 문서에서 같이 꺼낸다.
+   따로 읽지 않으므로 한쪽만 잡히는 일은 생기지 않는다.
+
+   구분해야 할 상태가 넷이다 — 뭉뚱그리면 「닉네임 없음 + 카카오 연동」처럼 앞뒤 안 맞아
+   보이는 줄이 나온다(실제로 그렇게 보인 적이 있다):
+     없는 계정   회원 문서가 없다. 닉네임도 카카오도 말할 수 없다 → 둘 다 비운다.
+     탈퇴한 계정 앱 탈퇴(performWithdraw)가 nickname·kakao_login_id를 지우고 status를
+                 withdrawn으로 바꾼다. 그런데 linked_kakao는 지우지 않아 옛 값이 남는다.
+                 그 잔재를 「연동」이라 내보이면 거짓이 되니 카카오도 비운다.
+     정지된 계정 status=suspended. 회원 정보는 살아 있으니 카카오는 그대로 보여준다.
+     정상        닉네임이 비어 있을 수 있다(가입 중) → 그때만 「닉네임 없음」. */
+function userState(uid) {
   var u = USERS[uid];
-  if (u && u.nickname) return '<span class="nick-txt">' + esc(u.nickname) + '</span>';
-  return '<span class="nick-none">닉네임 없음</span>';
+  if (!u) return { kind: 'missing' };
+  var st = u.status || 'active';
+  if (st === 'withdrawn') return { kind: 'withdrawn', u: u };
+  if (st === 'suspended') return { kind: 'suspended', u: u };
+  return { kind: 'ok', u: u };
+}
+function nickHtml(uid) {
+  var s = userState(uid);
+  if (s.kind === 'missing') return '<span class="bad-txt">없는 계정</span>';
+  if (s.kind === 'withdrawn') return '<span class="bad-txt">탈퇴한 계정</span>';
+  if (s.kind === 'suspended') return '<span class="warn-txt">정지된 계정</span>';
+  return s.u.nickname
+    ? '<span class="nick-txt">' + esc(s.u.nickname) + '</span>'
+    : '<span class="nick-none">닉네임 없음</span>';
 }
 function kakaoHtml(uid) {
-  var u = USERS[uid];
-  if (!u) return '<span class="uid-none">―</span>';
-  return u.linked_kakao === true
+  var s = userState(uid);
+  if (s.kind === 'missing' || s.kind === 'withdrawn') return '<span class="uid-none">―</span>';
+  return s.u.linked_kakao === true
     ? '<span class="kk kk-on">연동</span>'
     : '<span class="kk kk-off">미연동</span>';
 }
@@ -557,6 +581,17 @@ function refreshAccHint() {
     if (!u) {
       el.className = 'lookup-hint bad';
       el.innerHTML = '이 계정 ID로 회원을 찾지 못했습니다 — ID를 다시 확인해 주세요.';
+      return;
+    }
+    var st = u.status || 'active';
+    if (st === 'withdrawn') {
+      el.className = 'lookup-hint bad';
+      el.innerHTML = '<b>탈퇴한 계정</b>입니다 — 이 ID로는 앱에 다시 들어갈 수 없어 시연에 쓸 수 없습니다.';
+      return;
+    }
+    if (st === 'suspended') {
+      el.className = 'lookup-hint bad';
+      el.innerHTML = '<b>정지된 계정</b>입니다 · 닉네임 <b>' + esc(u.nickname || '(없음)') + '</b>';
       return;
     }
     el.innerHTML = '닉네임 <b>' + esc(u.nickname || '(없음)') + '</b> · 카카오 '
