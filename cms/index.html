@@ -15081,10 +15081,43 @@ window.dmMemberDetailGrant = function() {
   });
 };
 
+/* ── 닉네임 규칙 ──
+   앱이 걸어 둔 규칙과 같다: 「한글·영문·숫자 조합, 2~10자」(app/index.html 가입·마이 화면).
+   CMS 회원 상세에서도 닉네임을 고칠 수 있으므로 같은 규칙을 여기서도 지킨다 —
+   한쪽만 막으면 다른 쪽으로 공백이 들어온다. */
+var CMS_NICK_MAX = 10;
+function cmsCleanNick(v) {
+  return String(v == null ? '' : v).replace(/[^가-힣a-zA-Z0-9]/g, '').slice(0, CMS_NICK_MAX);
+}
+/* 한글 조합 중에는 손대지 않고, 조합이 끝난 뒤 걷어낸다. 공백은 키가 눌릴 때 막는다. */
+function cmsBindNickInput(el) {
+  if (!el || el.dataset.cmsNickClean) return;
+  el.dataset.cmsNickClean = '1';
+  el.setAttribute('maxlength', String(CMS_NICK_MAX));
+  var composing = false;
+  function clean() {
+    if (composing) return;
+    var c = cmsCleanNick(el.value);
+    if (c !== el.value) el.value = c;
+  }
+  el.addEventListener('compositionstart', function () { composing = true; });
+  el.addEventListener('compositionend', function () { composing = false; clean(); });
+  el.addEventListener('input', clean);
+  el.addEventListener('blur', function () { composing = false; clean(); });
+  el.addEventListener('keydown', function (e) { if (e.key === ' ' || e.key === 'Spacebar') e.preventDefault(); });
+  el.addEventListener('paste', function () { setTimeout(function () { composing = false; clean(); }, 0); });
+}
+function cmsBindAllNickInputs() {
+  ['m-name', 'dmue-nickname'].forEach(function (id) { cmsBindNickInput(document.getElementById(id)); });
+}
+if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', cmsBindAllNickInputs);
+else cmsBindAllNickInputs();
+
 window.dmMemberDetailSave = function() {
   var userId = document.getElementById('m-member-id').value;
   if (!userId) return;
-  var nickname = document.getElementById('m-name').value.trim();
+  var nickname = cmsCleanNick(document.getElementById('m-name').value);
+  document.getElementById('m-name').value = nickname;
   if (!nickname) { dmShowToast('닉네임을 입력하세요.', true); return; }
   var statusEn = MEMBER_STATUS_KO_TO_EN[document.getElementById('m-status').value] || 'active';
   db.collection('users').doc(userId).set({ nickname: nickname, status: statusEn, updated_at: FS.Timestamp.now() }, { merge: true }).then(function() {
@@ -15288,7 +15321,8 @@ window.dmEditUserOpen = function(id) {
 window.dmEditUserSave = function() {
   var id = document.getElementById('dmue-id').value;
   if (!id) return;
-  var nickname = document.getElementById('dmue-nickname').value.trim();
+  var nickname = cmsCleanNick(document.getElementById('dmue-nickname').value);
+  document.getElementById('dmue-nickname').value = nickname;
   if (!nickname) { dmShowToast('닉네임을 입력하세요.', true); return; }
   var linked = document.getElementById('dmue-linked').value === 'true';
   var kakaoNickname = document.getElementById('dmue-kakao_nickname').value.trim();
