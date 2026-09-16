@@ -15609,7 +15609,6 @@ function bindCatchAll() {
         if (isToggle(el)) {
           el.classList.toggle('on');
           el.classList.toggle('off');
-          ipToast('설정이 변경되었어요 (프로토타입)');
           return;
         }
         // 선택형(칩/필터/탭): 같은 그룹 내 active 토글
@@ -15623,7 +15622,6 @@ function bindCatchAll() {
             });
           }
           el.classList.add('active');
-          ipToast('필터가 적용되었어요 (프로토타입)');
           return;
         }
         // 그 외: 연결된 화면 없음 — 토스트 없이 무시
@@ -17321,15 +17319,15 @@ function cpkOpen(){var m=document.getElementById('cpk-modal');if(m)m.style.displ
   var deferred=null, sheetOpen=false;
   function L(){ try{ return (window.ipGetLang&&window.ipGetLang()==='vi')?'vi':'ko'; }catch(e){ return 'ko'; } }
   var T={
-    ko:{ title:"홈 화면에 프로토타입 추가",
-         sub:"PricePick 프로토타입을 홈 화면 / 바탕화면 아이콘으로 추가해요. 브라우저를 안 거치고 바로 열려요.",
+    ko:{ title:"홈 화면에 추가",
+         sub:"PricePick을 홈 화면 / 바탕화면 아이콘으로 추가해요. 브라우저를 안 거치고 바로 열려요.",
          install:"지금 설치", close:"닫기",
          ios_h:"iPhone · iPad (Safari)", ios_1:"하단 공유 버튼 누르기", ios_2:"'홈 화면에 추가' 선택", ios_3:"오른쪽 위 '추가' 누르기",
          mac_h:"Mac (Safari)", mac_1:"상단 공유 버튼 (또는 파일 메뉴)", mac_2:"'Dock에 추가' 선택",
          and_h:"설치 안내", and_1:"브라우저 메뉴(점 3개) 열기", and_2:"'홈 화면에 추가' 또는 '앱 설치' 선택",
          done:"이미 홈 화면 아이콘에서 실행 중이에요." },
-    vi:{ title:"Thêm prototype vào màn hình chính",
-         sub:"Thêm PricePick Prototype thành biểu tượng trên màn hình chính / desktop. Mở trực tiếp, không qua trình duyệt.",
+    vi:{ title:"Thêm vào màn hình chính",
+         sub:"Thêm PricePick thành biểu tượng trên màn hình chính / desktop. Mở trực tiếp, không qua trình duyệt.",
          install:"Cài đặt ngay", close:"Đóng",
          ios_h:"iPhone · iPad (Safari)", ios_1:"Nhấn nút Chia sẻ ở dưới", ios_2:"Chọn 'Thêm vào MH chính'", ios_3:"Nhấn 'Thêm' ở góc trên phải",
          mac_h:"Mac (Safari)", mac_1:"Nút Chia sẻ trên cùng (hoặc menu Tệp)", mac_2:"Chọn 'Thêm vào Dock'",
