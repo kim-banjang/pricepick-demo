@@ -439,6 +439,14 @@ tr:hover td{background:var(--surface-2);}
 #sec-revenue-fee .stat-card{padding:16px 14px;}
 #sec-revenue-fee .stat-value{font-size:clamp(15px,1.5vw,22px);letter-spacing:-.5px;white-space:nowrap;}
 #sec-revenue-fee th{text-align:center!important;}
+/* 기프티샵 판매 매출 — 제휴 수수료 매출과 같은 규격 */
+#sec-revenue-gifti .stats-grid{gap:10px;}
+#sec-revenue-gifti .stat-card{padding:16px 14px;}
+#sec-revenue-gifti .stat-value{font-size:clamp(15px,1.5vw,22px);letter-spacing:-.5px;white-space:nowrap;}
+#sec-revenue-gifti th{text-align:center!important;}
+#sec-revenue-gifti table{table-layout:fixed;width:100%;}
+#sec-revenue-gifti td{text-align:center!important;}
+#sec-revenue-gifti .tkc{line-height:1.3;white-space:nowrap;}
 #rf-od-table td:nth-child(2),
 #rf-od-table td:nth-child(3),
 #rf-mall-table td:nth-child(1),
@@ -1290,6 +1298,10 @@ window.CMS_FEATURES = {
           <button class="sb-item" id="nav-revenue-fee" data-label="제휴 수수료 매출" onclick="go('revenue-fee',this)">
             <span class="sb-item-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span>
             <span class="sb-item-lbl" id="nav-label-revenue-fee">제휴 수수료 매출</span>
+          </button>
+          <button class="sb-item" id="nav-revenue-gifti" data-label="기프티샵 판매 매출" onclick="go('revenue-gifti',this)">
+            <span class="sb-item-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="13" rx="2"/><path d="M3 12h18M12 8v13"/><path d="M12 8S10.5 4 8 4a2.5 2.5 0 0 0 0 5h4z"/><path d="M12 8s1.5-4 4-4a2.5 2.5 0 0 1 0 5h-4z"/></svg></span>
+            <span class="sb-item-lbl" id="nav-label-revenue-gifti">기프티샵 판매 매출</span>
           </button>
           <!-- 「기프티콘 판매 매출」 메뉴 폐기(김반장 2026-09-16) — 기프티콘 교환은 매출이 아니라
                제휴 수수료로 내준 티켓을 털어내는 자리다. 지급 원가·잔여 부채 화면은 별도 기획 건.
@@ -3754,6 +3766,57 @@ window.CMS_FEATURES = {
     </div>
 
     <!-- ── 정산 내역 (신규) ── -->
+    <!-- ══ 기프티샵 판매 매출 ══
+         답할 것은 둘뿐이다 — 하루에 얼마나 나갔나 · 어느 달이 많았나.
+         구성·규격은 「제휴 수수료 매출」(sec-revenue-fee)을 그대로 따른다.
+         원화 환산은 settings/ticket_value 하나만 읽는다(숫자를 박지 않는다).
+         취소 건은 합계에서 뺀다 — 건수만 요약 카드에 따로 적는다. -->
+    <div class="section" id="sec-revenue-gifti">
+      <div class="toolbar">
+        <span class="rf-tb-label">조회 기간</span>
+        <select class="filter-sel" id="gs-period-mode" onchange="gsPeriodModeChanged()">
+          <option value="day">하루</option>
+          <option value="month">한 달</option>
+          <option value="range" selected>기간 지정</option>
+        </select>
+        <input class="form-input" type="date" id="gs-period-day" style="width:150px;display:none" onchange="gsReload()">
+        <input class="form-input" type="month" id="gs-period-month" style="width:150px;display:none" onchange="gsReload()">
+        <span id="gs-period-range" style="display:inline-flex;align-items:center;gap:8px">
+          <input class="form-input" type="date" id="gs-period-from" style="width:150px" onchange="gsReload()">
+          <span style="font-size:13px;color:var(--text-2)">~</span>
+          <input class="form-input" type="date" id="gs-period-to" style="width:150px" onchange="gsReload()">
+        </span>
+        <button class="btn btn-primary btn-sm" onclick="gsReload()">조회</button>
+        <span style="font-size:12px;color:var(--text-3)" id="gs-period-label">—</span>
+      </div>
+
+      <div class="stats-grid" style="grid-template-columns:repeat(3,1fr)">
+        <div class="stat-card blue"><div class="stat-label">판매 건수</div><div class="stat-value" id="gs-kpi-count">—</div><div class="stat-change neutral" id="gs-kpi-count-sub">—</div></div>
+        <div class="stat-card purple"><div class="stat-label">원화 환산액</div><div class="stat-value" id="gs-kpi-won">—</div><div class="stat-change neutral" id="gs-kpi-won-sub">—</div></div>
+        <div class="stat-card amber"><div class="stat-label">취소 건수</div><div class="stat-value" id="gs-kpi-cancel">—</div><div class="stat-change neutral" id="gs-kpi-cancel-sub">—</div></div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div><div class="card-title"><span id="gs-bd-title">월별 내역</span></div><div class="card-sub" id="gs-bd-sub">—</div></div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <select class="filter-sel" id="gs-view" onchange="gsViewChanged()">
+              <option value="month" selected>월별</option>
+              <option value="day">일별</option>
+            </select>
+          </div>
+        </div>
+        <table id="gs-bd-table">
+          <colgroup><col style="width:22%"><col style="width:14%"><col style="width:34%"><col style="width:30%"></colgroup>
+          <thead>
+            <tr><th>기간</th><th>판매 건수</th><th>소진 티켓</th><th>원화 환산액</th></tr>
+          </thead>
+          <tbody id="gs-bd-tbody"></tbody>
+        </table>
+        <div id="gs-bd-pagination"></div>
+      </div>
+    </div>
+
     <div class="section" id="sec-settlement">
       <div class="data-source-bar">
         <span class="ds-label">데이터 출처</span>
@@ -5081,7 +5144,9 @@ const I18N = {
     'page.withdrawal.title': '계정 탈퇴 처리', 'page.withdrawal.bc': '운영',
     'page.abuse.title': '어뷰징·이상적립 모니터링', 'page.abuse.bc': '운영',
     'page.stats.title': '수익 분석', 'page.stats.bc': '매출 · 수익',
-    'nav.revenue-fee': '제휴 수수료 매출', 'page.revenue-fee.title': '제휴 수수료 매출', 'page.revenue-fee.bc': '매출 · 수익',
+    'nav.revenue-fee': '제휴 수수료 매출',
+    'nav.revenue-gifti': '기프티샵 판매 매출', 'page.revenue-fee.title': '제휴 수수료 매출', 'page.revenue-fee.bc': '매출 · 수익',
+    'page.revenue-gifti.title': '기프티샵 판매 매출', 'page.revenue-gifti.bc': '매출 · 수익',
     'nav.revenue-gifticon': '기프티콘 판매 매출', 'page.revenue-gifticon.title': '기프티콘 판매 매출', 'page.revenue-gifticon.bc': '매출 · 수익',
     'page.settlement.title': '정산 내역', 'page.settlement.bc': '매출 · 수익',
     'page.postback.title': '포스트백 로그', 'page.postback.bc': '시스템',
@@ -5164,6 +5229,7 @@ function applyLang() {
     'nav-group-label-system': 'nav.group.system',
     'nav-label-stats': 'nav.stats',
     'nav-label-revenue-fee': 'nav.revenue-fee',
+    'nav-label-revenue-gifti': 'nav.revenue-gifti',
     'nav-label-revenue-gifticon': 'nav.revenue-gifticon',
     'nav-label-settlement': 'nav.settlement',
     'nav-label-postback': 'nav.postback',
@@ -5372,6 +5438,7 @@ function go(id, navEl) {
   if (id === 'ticket-value' && window.tvLoad) window.tvLoad();
   if (id === 'ticket-accrual' && window.taLoad) window.taLoad();
   if (id === 'revenue-fee' && window.rfLoad) window.rfLoad();
+  if (id === 'revenue-gifti' && window.gsRevLoad) window.gsRevLoad();
   if (id === 'roulette-settings' && window.rltLoad) window.rltLoad('daily');
   if (id === 'jackpot-roulette' && window.rltLoad) window.rltLoad('jackpot');
   if (id === 'giftbox-daily' && window.rltLoad) window.rltLoad('giftDaily');
@@ -5725,7 +5792,7 @@ function giSaveTicketEdit() {
     "관리자 계정":"Tài khoản quản trị","운영 정책":"Chính sách vận hành",
     "환수 이력":"Lịch sử thu hồi","포인트 내역":"Lịch sử điểm",
     "출석체크 설정":"Cài đặt điểm danh","포인트 정책":"Chính sách điểm",
-    "포인트 관리":"Quản lý điểm","구매내역":"Lịch sử mua","취소내역":"Lịch sử hủy","기프티콘 관리":"Quản lý Gifticon",
+    "포인트 관리":"Quản lý điểm","기프티샵 판매 매출":"Doanh thu bán Gifti Shop","판매 건수":"Số lượt bán","원화 환산액":"Giá trị quy đổi ra won","취소 건수":"Số lượt hủy","매출에서 뺀 건":"Đã trừ khỏi doanh thu","소진 티켓":"Vé đã tiêu","해당 기간에 판매가 없습니다.":"Không có lượt bán trong kỳ này.","구매내역":"Lịch sử mua","취소내역":"Lịch sử hủy","기프티콘 관리":"Quản lý Gifticon",
     "회원 관리":"Quản lý thành viên","티켓 · 보상":"Vé · Phần thưởng",
     "콘텐츠":"Nội dung","운영":"Vận hành","매출 · 수익":"Doanh thu · Lợi nhuận",
     "시스템":"Hệ thống","계정 관리":"Quản lý tài khoản",
@@ -10016,6 +10083,136 @@ function loadHoldTickets(uids) {
         });
       }).catch(function(e){ console.error('holdTickets', e); });
   })).then(function(){ return map; });
+}
+
+/* ══ 기프티샵 판매 매출 ══
+   답할 것은 둘 — 하루에 얼마나 나갔나 · 어느 달이 많았나.
+   원장은 gifticon_exchanges 하나다. 취소 건(status='cancelled')은 매출에서 빼고
+   건수만 따로 센다. 원화 환산은 settings/ticket_value 하나만 읽는다.
+
+   소진 티켓은 구매 기록에 남은 조합(tickets_used)을 그대로 더한다 — 큰 등급부터
+   채우는 규칙이라 한 건에 두세 등급이 섞인다. 조합이 없는 옛 기록은 grade_used·
+   count_used 한 벌로 본다. */
+var GSREV_ROWS = [];
+
+function gsPeriodModeChanged() {
+  var m = (document.getElementById('gs-period-mode') || {}).value || 'range';
+  var show = function (id, on) { var e = document.getElementById(id); if (e) e.style.display = on ? '' : 'none'; };
+  show('gs-period-day', m === 'day');
+  show('gs-period-month', m === 'month');
+  show('gs-period-range', m === 'range');
+  gsReload();
+}
+window.gsPeriodModeChanged = gsPeriodModeChanged;
+
+function gsViewChanged() {
+  var v = (document.getElementById('gs-view') || {}).value || 'month';
+  var t = document.getElementById('gs-bd-title');
+  if (t) t.textContent = (v === 'day') ? '일별 내역' : '월별 내역';
+  gsRender();
+}
+window.gsViewChanged = gsViewChanged;
+
+/* 조회 기간 — 제휴 수수료 매출과 같은 방식(하루 · 한 달 · 기간 지정) */
+function gsRange() {
+  var m = (document.getElementById('gs-period-mode') || {}).value || 'range';
+  var v = function (id) { return (document.getElementById(id) || {}).value || ''; };
+  if (m === 'day') {
+    var d = v('gs-period-day');
+    return d ? { from: d, to: d, label: d } : null;
+  }
+  if (m === 'month') {
+    var mo = v('gs-period-month');
+    if (!mo) return null;
+    var y = +mo.slice(0, 4), mm = +mo.slice(5, 7);
+    var last = new Date(y, mm, 0).getDate();
+    return { from: mo + '-01', to: mo + '-' + ('0' + last).slice(-2), label: mo };
+  }
+  var f = v('gs-period-from'), t = v('gs-period-to');
+  if (!f && !t) return { from: '', to: '', label: '전체' };
+  return { from: f, to: t, label: (f || '처음') + ' ~ (' + (t || '지금') + ')' };
+}
+
+function gsKey(d, view) {
+  var p2 = function (x) { return ('0' + x).slice(-2); };
+  var ym = d.getFullYear() + '-' + p2(d.getMonth() + 1);
+  return (view === 'day') ? (ym + '-' + p2(d.getDate())) : ym;
+}
+
+window.gsRevLoad = function () {
+  return Promise.all([
+    db.collection('gifticon_exchanges').get(),
+    (typeof gipLoadTicketValue === 'function') ? gipLoadTicketValue() : Promise.resolve()
+  ]).then(function (res) {
+    GSREV_ROWS = res[0].docs.map(function (d) { return Object.assign({ _id: d.id }, d.data()); });
+    gsRender();
+  }).catch(function (e) {
+    console.error('gsRevLoad', e);
+    toast('기프티샵 판매 매출을 불러오지 못했습니다.');
+  });
+};
+function gsReload() { gsRender(); }
+window.gsReload = gsReload;
+
+function gsRender() {
+  var r = gsRange();
+  var view = (document.getElementById('gs-view') || {}).value || 'month';
+  var lbl = document.getElementById('gs-period-label');
+  if (lbl) lbl.textContent = r ? r.label : '기간을 고르세요';
+
+  var inRange = function (d) {
+    if (!r) return false;
+    if (r.from && d < new Date(r.from + 'T00:00:00')) return false;
+    if (r.to && d > new Date(r.to + 'T23:59:59')) return false;
+    return true;
+  };
+
+  var buckets = {}, sum = { cnt: 0, won: 0, gold: 0, silver: 0, bronze: 0 }, cancelled = 0;
+  GSREV_ROWS.forEach(function (x) {
+    var d = (x.exchanged_at && x.exchanged_at.toDate) ? x.exchanged_at.toDate() : null;
+    if (!d || !inRange(d)) return;
+    if (x.status === 'cancelled') { cancelled++; return; }   /* 취소 건은 매출에서 뺀다 */
+    var parts = (x.tickets_used && x.tickets_used.length)
+      ? x.tickets_used
+      : (x.grade_used ? [{ grade: x.grade_used, count: x.count_used || 1 }] : []);
+    var k = gsKey(d, view);
+    var b = buckets[k] || (buckets[k] = { key: k, cnt: 0, gold: 0, silver: 0, bronze: 0, won: 0 });
+    b.cnt++; sum.cnt++;
+    parts.forEach(function (t) {
+      var c = t.count || 0;
+      if (b[t.grade] === undefined) return;
+      b[t.grade] += c; sum[t.grade] += c;
+      var u = tvUnit(t.grade);
+      if (u !== null) { b.won += u * c; sum.won += u * c; }
+    });
+  });
+
+  var keys = Object.keys(buckets).sort().reverse();
+  var set = function (id, v) { var e = document.getElementById(id); if (e) e.textContent = v; };
+  set('gs-kpi-count', sum.cnt.toLocaleString('ko-KR') + '건');
+  set('gs-kpi-count-sub', r ? r.label : '—');
+  set('gs-kpi-won', sum.won.toLocaleString('ko-KR') + '원');
+  set('gs-kpi-won-sub', '골드 ' + sum.gold + ' · 실버 ' + sum.silver + ' · 브론즈 ' + sum.bronze);
+  set('gs-kpi-cancel', cancelled.toLocaleString('ko-KR') + '건');
+  set('gs-kpi-cancel-sub', '매출에서 뺀 건');
+  set('gs-bd-sub', keys.length ? (keys.length + (view === 'day' ? '일' : '개월')) : '—');
+
+  var tbody = document.getElementById('gs-bd-tbody');
+  if (!tbody) return;
+  if (!keys.length) {
+    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:32px;color:var(--text-3);">해당 기간에 판매가 없습니다.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = keys.map(function (k) {
+    var b = buckets[k];
+    var parts = [{ grade: 'gold', count: b.gold }, { grade: 'silver', count: b.silver }, { grade: 'bronze', count: b.bronze }];
+    return '<tr>'
+      + '<td>' + ppEsc(b.key) + '</td>'
+      + '<td>' + b.cnt.toLocaleString('ko-KR') + '</td>'
+      + '<td>' + ticketLines(parts, false) + '</td>'
+      + '<td>' + b.won.toLocaleString('ko-KR') + '원</td>'
+      + '</tr>';
+  }).join('');
 }
 
 /* ── 3. 기프티콘 미사용 취소 ──
