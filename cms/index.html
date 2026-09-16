@@ -5924,8 +5924,8 @@ function giSaveTicketEdit() {
     "티켓 등급 간 교환 정책":"Chính sách đổi giữa các hạng vé",
     "조회 전용 — 교환 비율은 등급별 적립 기준(환산가치)에서 자동 산출":"Chỉ xem — Tỷ lệ đổi được tính tự động từ tiêu chuẩn tích lũy",
     
-    "상향 단방향 등가 교환. 브론즈를 모아 실버로 승급합니다. 실버를 브론즈로 되돌리는 교환은 없습니다.":"Đổi tương đương hai chiều. Gom Đồng để lên Bạc hoặc tách Bạc dùng cho dòng giá thấp.",
-    "상향 단방향 등가 교환. 실버를 모아 골드로 승급합니다. 골드를 실버로 되돌리는 교환은 없습니다.":"Đổi tương đương hai chiều. Gom Bạc lên Vàng. Cũng có thể tách Vàng dùng cho dòng giá trung/thấp.",
+    "양방향 등가 교환. 브론즈를 모아 실버로 올릴 수도, 실버를 브론즈로 내릴 수도 있습니다.":"Đổi tương đương hai chiều. Gom Đồng để lên Bạc hoặc tách Bạc dùng cho dòng giá thấp.",
+    "양방향 등가 교환. 실버를 모아 골드로 올릴 수도, 골드를 실버로 내릴 수도 있습니다.":"Đổi tương đương hai chiều. Gom Bạc lên Vàng. Cũng có thể tách Vàng dùng cho dòng giá trung/thấp.",
     "환산가치 기준":"Theo giá trị quy đổi","기프티콘 교환 카탈로그 (단일 등급)":"Danh mục đổi Gifticon (một hạng)",
     "설계 원칙":"Nguyên tắc thiết kế","평균 마진:":"Magin trung bình:","교환 방식:":"Phương thức đổi:",
     "단일 등급만 사용 (등급 간 사전 교환은 위 정책 참조)":"Chỉ dùng một hạng (đổi trước giữa hạng xem chính sách trên)",
@@ -7723,16 +7723,30 @@ var GIP_GRADE_KO = { bronze:'브론즈', silver:'실버', gold:'골드' };
    (「교환 비율은 환산가치 1:1 등가」 — 티켓 가치 설정 화면), 나누어떨어지는 가장 높은
    등급을 써서 장수를 가장 적게 보인다. 어느 등급으로도 딱 떨어지지 않으면 가장 작은
    단위(브론즈)로 올린다. */
-function gipTicketsFromWon(won) {
-  if (!GIP_TV || typeof won !== 'number' || won <= 0) return null;
-  var order = ['gold', 'silver', 'bronze'];
-  for (var i = 0; i < order.length; i++) {
-    var g = order[i], unit = GIP_TV[g];
-    if (typeof unit === 'number' && unit > 0 && won % unit === 0) return { grade: g, count: won / unit };
+/* 원화 → 티켓 환산은 큰 등급부터 채운다(골드 → 실버 → 브론즈). 앱과 같은 규칙이다.
+   예) 6,300원 → 골드 31장 + 실버 1장 · 4,500원 → 골드 22장 + 실버 1장 */
+function gipComboFromWon(won) {
+  if (!GIP_TV || typeof won !== 'number' || won <= 0) return [];
+  var rest = Math.round(won), out = [];
+  ['gold', 'silver', 'bronze'].forEach(function(g) {
+    var unit = GIP_TV[g];
+    if (typeof unit !== 'number' || unit <= 0 || rest < unit) return;
+    var k = Math.floor(rest / unit);
+    out.push({ grade: g, count: k });
+    rest -= k * unit;
+  });
+  if (rest > 0) {
+    var b = out.filter(function(x){ return x.grade === 'bronze'; })[0];
+    if (b) b.count += 1; else out.push({ grade: 'bronze', count: 1 });
   }
-  var b = GIP_TV.bronze;
-  if (typeof b === 'number' && b > 0) return { grade: 'bronze', count: Math.ceil(won / b) };
-  return null;
+  return out;
+}
+function gipComboText(c) {
+  return c.map(function(x){ return (GIP_GRADE_KO[x.grade] || x.grade) + ' ' + x.count; }).join(' + ');
+}
+function gipTicketsFromWon(won) {
+  var c = gipComboFromWon(won);
+  return c.length ? c[0] : null;
 }
 /* 원화가 없는 옛 상품은 저장된 등급·장수를 그대로 쓰고 원화를 거꾸로 환산해 병기한다. */
 function gipPriceParts(g) {
@@ -7750,9 +7764,10 @@ function gipPriceParts(g) {
 function gipPriceHtml(g) {
   var pr = gipPriceParts(g);
   if (pr.won === null && !pr.tk) return '<span style="color:var(--text-3)">—</span>';
-  var main = pr.tk
-    ? (GIP_GRADE_KO[pr.tk.grade] || pr.tk.grade) + ' ' + pr.tk.count
-    : '—';
+  /* 판매가격 병기는 조합 전체로 — 앱 상세와 같은 방식 */
+  var combo = (pr.won !== null) ? gipComboFromWon(pr.won) : [];
+  var main = combo.length ? gipComboText(combo)
+    : (pr.tk ? (GIP_GRADE_KO[pr.tk.grade] || pr.tk.grade) + ' ' + pr.tk.count : '—');
   var sub = (pr.won === null)
     ? '<div class="gip-price-none">(환산값 미설정)</div>'
     : '<div class="gip-price-won">(' + pr.won.toLocaleString('ko-KR') + '원)</div>';
