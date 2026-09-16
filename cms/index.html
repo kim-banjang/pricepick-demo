@@ -1056,6 +1056,9 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
 .srch-tilde{color:var(--text-3);font-size:13px;}
 /* 두 줄로 적는 칸 — 날짜 아래 시각, 이름 아래 닉네임 */
 .cell-sub{font-size:11px;color:var(--text-3);margin-top:2px;}
+/* PH 칸 — 프라이스픽에 그대로 대응하는 단위가 없어 비워 둔 자리(형님 결정 대기) */
+.ph-hold{color:var(--text-3);font-size:12px;}
+.ph-minus{color:var(--danger);font-weight:700;}
 /* 상품 상세 정보 모달 — 포인츠허브 배치(왼쪽 이미지, 오른쪽 2열 격자) */
 .gid-sub{font-size:13px;font-weight:700;color:var(--text);margin:0 0 14px;}
 .gid-body{display:flex;gap:22px;align-items:flex-start;}
@@ -2417,19 +2420,62 @@ window.CMS_FEATURES = {
     </div>
 
     <!-- ── 기프티콘 취소 내역 ── -->
-    <div class="section" id="sec-gifticon-cancel">
-      <div class="info-box">기프티콘 취소 처리 내역입니다. 관리자 취소 또는 시스템 취소 건이 기록됩니다.</div>
-      <div class="toolbar" style="flex-wrap:wrap;gap:8px">
-        <input class="search-box" id="gcancel-search" placeholder="닉네임 또는 취소사유 검색" style="width:200px" onkeydown="if(event.key==='Enter')gcancelApplyFilters()">
-        <button class="btn btn-primary btn-sm" onclick="gcancelApplyFilters()">검색</button>
-        <button class="btn btn-ghost btn-sm" style="margin-left:auto" onclick="csvExportGifticonCancel()">CSV 내보내기</button>
+    <!-- 3. 기프티콘 미사용 취소 — 아직 쓰지 않은 기프티콘을 골라 취소하는 자리 -->
+    <div class="section" id="sec-gifticon-unused">
+      <div class="srch">
+        <div class="srch-row">
+          <input class="search-box" id="gun-f-name" placeholder="이름">
+          <input class="search-box" id="gun-f-nick" placeholder="닉네임">
+          <input class="search-box" id="gun-f-code" placeholder="기프티콘 코드">
+        </div>
+        <div class="srch-row">
+          <select class="filter-sel" id="gun-f-datekind"><option value="exchanged_at">구매일</option><option value="expires_at">유효기간 만료일</option></select>
+          <input class="form-input srch-date" type="date" id="gun-f-from">
+          <span class="srch-tilde">~</span>
+          <input class="form-input srch-date" type="date" id="gun-f-to">
+          <button class="btn btn-primary btn-sm" onclick="gunApplyFilters()">검색</button>
+          <button class="btn btn-ghost btn-sm" style="margin-left:auto" onclick="csvExportGifticonUnused()">CSV 내보내기</button>
+        </div>
       </div>
       <div class="card">
-        <div class="card-header"><div class="card-title">취소 내역</div><span style="font-size:12px;color:var(--text-2)" id="gcancel-count">—</span></div>
+        <div class="card-header"><div class="card-title">기프티콘 미사용 취소</div><span style="font-size:12px;color:var(--text-2)" id="gun-count">—</span></div>
         <table>
-          <thead><tr><th>No</th><th>주문번호</th><th>닉네임 / 카카오톡 ID / 식별 아이디</th><th>상품명</th><th>취소날짜</th><th>취소사유</th><th>환불 티켓</th><th>잔여 티켓</th></tr></thead>
-          <tbody>
-          </tbody>
+          <thead><tr>
+            <th style="width:110px">구매일</th><th>주문번호</th><th>이름</th><th>상품명</th>
+            <th>상품코드</th><th style="width:90px">유효기간</th><th style="width:110px">사용한 PH</th><th style="width:80px">취소</th>
+          </tr></thead>
+          <tbody></tbody>
+        </table>
+        <div id="gun-pagination"></div>
+      </div>
+    </div>
+
+    <!-- 4. 취소내역 -->
+    <div class="section" id="sec-gifticon-cancel">
+      <div class="srch">
+        <div class="srch-row">
+          <input class="search-box" id="gcancel-f-name" placeholder="이름">
+          <input class="search-box" id="gcancel-f-nick" placeholder="닉네임">
+          <input class="search-box" id="gcancel-f-order" placeholder="주문번호">
+        </div>
+        <div class="srch-row">
+          <input class="search-box" id="gcancel-f-product" placeholder="상품명">
+          <input class="form-input srch-date" type="date" id="gcancel-f-from">
+          <span class="srch-tilde">~</span>
+          <input class="form-input srch-date" type="date" id="gcancel-f-to">
+          <select class="filter-sel" id="gcancel-f-reason"><option value="">취소사유 전체</option><option value="고객 요청">고객 요청</option><option value="관리자 취소">관리자 취소</option><option value="회원 요청 취소">회원 요청 취소</option><option value="상품 재고 소진">상품 재고 소진</option></select>
+          <button class="btn btn-primary btn-sm" onclick="gcancelApplyFilters()">검색</button>
+          <button class="btn btn-ghost btn-sm" style="margin-left:auto" onclick="csvExportGifticonCancel()">CSV 내보내기</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><div class="card-title">취소내역</div><span style="font-size:12px;color:var(--text-2)" id="gcancel-count">—</span></div>
+        <table>
+          <thead><tr>
+            <th style="width:52px">No</th><th>주문번호</th><th>이름</th><th>상품명</th>
+            <th style="width:110px">취소날짜</th><th style="width:100px">상태</th><th style="width:110px">환불PH</th><th style="width:110px">보유PH</th>
+          </tr></thead>
+          <tbody></tbody>
         </table>
         <div id="gcancel-pagination"></div>
       </div>
@@ -7470,6 +7516,7 @@ function loadAllData() {
     loadTickets();
     loadDraws();
     loadGifticonCancel();
+    loadGifticonUnused();
     loadBanners();
     loadInvites();
     loadTerms();
@@ -9576,29 +9623,136 @@ window.giCancelExchange = function(id) {
 
 /* ── sec-gifticon-cancel ── gifticon_exchanges where status=='cancelled' */
 var GCANCEL_GRADE_KO = { bronze:'브론즈', silver:'실버', gold:'골드' };
+/* ── PH 칸 ──
+   포인츠허브의 PH(폴센트 열쇠를 전환해 준 포인트)는 프라이스픽에 그대로 대응하는 단위가
+   없다 — 여기엔 등급 티켓과 포인트 둘이 있고 기프티콘 교환에 쓰이는 것은 등급 티켓이다.
+   무엇으로 놓을지 김반장 결정 대기 중이라 칸만 세워 두고 값은 비운다. 정해지면 이 함수만
+   고치면 된다(칸 구조는 그대로). */
+function phCell() {
+  return '<span class="ph-hold">—</span>';
+}
+
+/* ── 3. 기프티콘 미사용 취소 ──
+   아직 쓰지 않은(취소되지 않은) 교환 건을 골라 취소하는 자리. */
+var GUN_CTRL = window.GUN_CTRL = ppMakeListController(20, function(pageItems, state, totalPages) {
+  var tbody = document.querySelector('#sec-gifticon-unused table tbody');
+  var pag = document.getElementById('gun-pagination');
+  if (!tbody) return;
+  if (!pageItems.length) { tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:32px;color:var(--text-3);">조건에 맞는 미사용 기프티콘이 없습니다.</td></tr>'; if (pag) pag.innerHTML = ''; return; }
+  tbody.innerHTML = pageItems.map(function(g) {
+    var u = g._user || {};
+    return '<tr>'
+      + '<td style="text-align:center">' + gexTwoLine(ppDt(g.exchanged_at), ppTm(g.exchanged_at)) + '</td>'
+      + '<td style="font-size:11px;font-family:monospace;color:var(--text-3);">' + ppEsc(g._id) + '</td>'
+      + '<td>' + gexTwoLine(ppEsc(u.name || u.nickname || '—'), ppEsc(u.nickname || '')) + '</td>'
+      + '<td>' + gexProductName(g) + '</td>'
+      + '<td style="font-family:monospace;font-size:11px;color:var(--text-3);">' + ppEsc(g.gifticon_id || '-') + '</td>'
+      + '<td style="text-align:center">' + gexValidity(g) + '</td>'
+      + '<td style="text-align:center">' + phCell() + '</td>'
+      + '<td style="text-align:center"><button class="btn btn-ghost btn-sm" style="font-size:10px;padding:2px 6px" onclick="giCancelExchange(&quot;' + g._id + '&quot;)">취소</button></td>'
+      + '</tr>';
+  }).join('');
+  if (pag) pag.innerHTML = ppPaginationHtml('GUN_CTRL', state.page, totalPages);
+});
+
+function gunDateInRange(g) {
+  var kind = (document.getElementById('gun-f-datekind') || {}).value || 'exchanged_at';
+  var from = (document.getElementById('gun-f-from') || {}).value || '';
+  var to = (document.getElementById('gun-f-to') || {}).value || '';
+  if (!from && !to) return true;
+  var v = g[kind];
+  if (!v || !v.toDate) return false;
+  var d = v.toDate();
+  if (from && d < new Date(from + 'T00:00:00')) return false;
+  if (to && d > new Date(to + 'T23:59:59')) return false;
+  return true;
+}
+window.gunApplyFilters = function() {
+  var name = (document.getElementById('gun-f-name') || {}).value || '';
+  var nick = (document.getElementById('gun-f-nick') || {}).value || '';
+  var code = (document.getElementById('gun-f-code') || {}).value || '';
+  GUN_CTRL.applyFilter(function(g) {
+    var u = g._user || {};
+    if (name && !ppMatch(u.name || u.nickname, name)) return false;
+    if (nick && !ppMatch(u.nickname, nick)) return false;
+    if (code && !ppMatch(g.code, code)) return false;
+    if (!gunDateInRange(g)) return false;
+    return true;
+  });
+};
+
+function loadGifticonUnused() {
+  var tbody = document.querySelector('#sec-gifticon-unused table tbody');
+  if (!tbody) return;
+  /* 아직 취소되지 않은 건만 — 취소된 것은 「취소내역」에서 본다. */
+  db.collection('gifticon_exchanges').orderBy('exchanged_at', 'desc').limit(300).get().then(function(snap) {
+    var docs = snap.docs.filter(function(d){ return d.data().status !== 'cancelled'; });
+    var cnt = document.getElementById('gun-count');
+    if (cnt) cnt.textContent = '총 ' + docs.length + '건';
+    if (!docs.length) { GUN_CTRL.setRows([]); return; }
+    dmFetchUsersByIds(docs.map(function(d){ return d.data().user_id; })).then(function(userMap) {
+      GUN_CTRL.setRows(docs.map(function(d) { return Object.assign({ _id: d.id, _user: userMap[d.data().user_id] }, d.data()); }));
+    });
+  }).catch(function(e){ console.error('gifticonUnused', e); });
+}
+window.loadGifticonUnused = loadGifticonUnused;
+window.csvExportGifticonUnused = function() {
+  var rows = (GUN_CTRL.state && GUN_CTRL.state.filtered) || [];
+  ppDownloadCsv('gifticon_unused.csv',
+    ['구매일','주문번호','이름','닉네임','상품명','상품코드','유효기간'],
+    rows.map(function(g){ var u = g._user || {};
+      return [ppDt(g.exchanged_at) + ' ' + ppTm(g.exchanged_at), g._id, u.name || '', u.nickname || '',
+        (GIFTICON_PRODUCTS_CACHE[g.gifticon_id] || {}).name || g.gifticon_id || '', g.gifticon_id || '', gexValidity(g)];
+    }));
+};
+
+/* ── 4. 취소내역 (포인츠허브 구조) ── */
 var GCANCEL_CTRL = window.GCANCEL_CTRL = ppMakeListController(20, function(pageItems, state, totalPages) {
   var tbody = document.querySelector('#sec-gifticon-cancel table tbody');
   var pag = document.getElementById('gcancel-pagination');
   if (!tbody) return;
-  if (!pageItems.length) { tbody.innerHTML = ppEmpty(8,'조건에 맞는 취소 내역이 없습니다.'); if (pag) pag.innerHTML = ''; return; }
+  if (!pageItems.length) { tbody.innerHTML = ppEmpty(8,'조건에 맞는 취소내역이 없습니다.'); if (pag) pag.innerHTML = ''; return; }
   tbody.innerHTML = pageItems.map(function(g, i) {
-    var refund = (GCANCEL_GRADE_KO[g.grade_used] || '브론즈') + ' ' + (g.count_used||1) + '장';
-    return '<tr><td style="text-align:center">' + ((state.page-1)*state.pageSize + i + 1) + '</td>'
-      + '<td style="font-size:11px;font-family:monospace;color:var(--text-3);">' + g._id.slice(0,16) + '…</td>'
-      + '<td>' + renderMemberIdentity(g._user, g.user_id) + '</td>'
-      + '<td>' + (g.gifticon_id||'').slice(0,12) + '…</td>'
-      + '<td>' + ppDt(g.cancelled_at) + '</td>'
-      + '<td>' + (g.cancel_reason||'관리자 취소') + '</td>'
-      + '<td>' + refund + '</td>'
-      + '<td>—</td></tr>';
+    var u = g._user || {};
+    return '<tr>'
+      + '<td style="text-align:center">' + ((state.page-1)*state.pageSize + i + 1) + '</td>'
+      + '<td style="font-size:11px;font-family:monospace;color:var(--text-3);">' + ppEsc(g._id) + '</td>'
+      + '<td>' + gexTwoLine(ppEsc(u.name || u.nickname || '—'), ppEsc(u.nickname || '')) + '</td>'
+      + '<td>' + gexProductName(g) + '</td>'
+      + '<td style="text-align:center">' + gexTwoLine(ppDt(g.cancelled_at), ppTm(g.cancelled_at)) + '</td>'
+      + '<td style="text-align:center"><span style="background:var(--danger-soft);color:var(--danger);padding:3px 8px;border-radius:99px;font-size:11px;font-weight:600;">' + ppEsc(g.cancel_reason || '관리자 취소') + '</span></td>'
+      + '<td style="text-align:center">' + phCell() + '</td>'
+      + '<td style="text-align:center">' + phCell() + '</td>'
+      + '</tr>';
   }).join('');
   if (pag) pag.innerHTML = ppPaginationHtml('GCANCEL_CTRL', state.page, totalPages);
 });
 
 window.gcancelApplyFilters = function() {
-  var q = (document.getElementById('gcancel-search')||{}).value || '';
+  var name = (document.getElementById('gcancel-f-name') || {}).value || '';
+  var nick = (document.getElementById('gcancel-f-nick') || {}).value || '';
+  var order = (document.getElementById('gcancel-f-order') || {}).value || '';
+  var product = (document.getElementById('gcancel-f-product') || {}).value || '';
+  var reason = (document.getElementById('gcancel-f-reason') || {}).value || '';
+  var from = (document.getElementById('gcancel-f-from') || {}).value || '';
+  var to = (document.getElementById('gcancel-f-to') || {}).value || '';
   GCANCEL_CTRL.applyFilter(function(g) {
-    if (q && !ppMatch((g._user||{}).nickname, q) && !ppMatch(g.cancel_reason, q)) return false;
+    var u = g._user || {};
+    if (name && !ppMatch(u.name || u.nickname, name)) return false;
+    if (nick && !ppMatch(u.nickname, nick)) return false;
+    if (order && !ppMatch(g._id, order)) return false;
+    if (product) {
+      var pr = GIFTICON_PRODUCTS_CACHE[g.gifticon_id] || {};
+      if (!ppMatch((pr.brand || '') + ' ' + (pr.name || pr.product_name || g.gifticon_id || ''), product)) return false;
+    }
+    if (reason && (g.cancel_reason || '관리자 취소').indexOf(reason) < 0) return false;
+    if (from || to) {
+      var v = g.cancelled_at;
+      if (!v || !v.toDate) return false;
+      var d = v.toDate();
+      if (from && d < new Date(from + 'T00:00:00')) return false;
+      if (to && d > new Date(to + 'T23:59:59')) return false;
+    }
     return true;
   });
 };
