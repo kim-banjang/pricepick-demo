@@ -17949,7 +17949,7 @@ function ppShowKakaoGate() {
     box.id = id;
     box.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(26,17,48,.45);display:flex;align-items:center;justify-content:center;padding:24px;';
     box.innerHTML = '<div style="background:#fff;border-radius:18px;padding:24px 22px;width:100%;max-width:300px;text-align:center;box-shadow:0 18px 48px rgba(0,0,0,.22);">'
-      + '<div style="font-size:34px;margin-bottom:10px;">💬</div>'
+      + '<div style="display:flex;justify-content:center;margin-bottom:10px;color:#C9C2DC;"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 9.9 9.9 0 0 1-2.8-.4L4 21l1.4-4.1A8.2 8.2 0 0 1 3 11.5 8.4 8.4 0 0 1 12 3a8.4 8.4 0 0 1 9 8.5z"/></svg></div>'
       + '<div style="font-size:16px;font-weight:800;color:#1A1130;margin-bottom:6px;">카카오 연동이 필요해요</div>'
       + '<div style="font-size:13px;color:#5A5370;line-height:1.55;margin-bottom:18px;">기프티콘은 카카오톡으로 보내드려요.</div>'
       + '<button type="button" id="pp-kakao-gate-go" style="width:100%;padding:13px;border:none;border-radius:12px;background:#FEE500;color:#3C1E1E;font-size:14px;font-weight:800;cursor:pointer;font-family:inherit;">카카오 연동하기</button>'
@@ -18810,7 +18810,7 @@ function renderGifticons() {
       + '<div class="ex-img-wrap">' + imgBox + '</div>'
       + '<div class="ex-body">'
       + '<div class="ex-brand">' + ppEsc(g.brand || '') + '</div>'
-      + '<div class="ex-name">' + ppEsc(ppBrandName(g.brand, g.name || g.product_name)) + '</div>'
+      + '<div class="ex-name">' + ppEsc(ppStripBrand(g.brand, g.name || g.product_name)) + '</div>'
       + '<div class="ex-cost-mix"><span class="ex-cost-tk"><span class="m">' + ticketIcon(g.required_grade || 'bronze') + '</span>' + cnt + '</span></div>'
       + (won ? '<div class="ex-won">' + won + '</div>' : '')
       + '</div></div>';
@@ -18845,7 +18845,7 @@ function populateGifticonDetail(g) {
   var brand = s.querySelector('.ex-brand-tag');
   if (brand) brand.textContent = g.brand || '';
   var name = s.querySelector('.ex-product-name');
-  if (name) name.textContent = ppBrandName(g.brand, g.name || g.product_name);
+  if (name) name.textContent = ppStripBrand(g.brand, g.name || g.product_name);
 
   var grade = g.required_grade || 'bronze';
   var gradeName = { bronze: '브론즈', silver: '실버', gold: '골드' }[grade] || '브론즈';
@@ -20707,6 +20707,24 @@ function ppBrandName(brand, name) {
   return brand + ' ' + name;
 }
 window.ppBrandName = ppBrandName;
+
+/* 브랜드를 따로 한 줄 쓰는 자리(카드·상세)에서는 상품명 앞머리의 브랜드를 뗀다 —
+   안 그러면 「파리바게뜨 / 파리바게뜨 교환권 3,000원」처럼 두 줄이 겹쳐 읽힌다. */
+function ppStripBrand(brand, name) {
+  brand = (brand || '').trim();
+  name = (name || '').trim();
+  if (!brand || !name) return name || brand;
+  var heads = [brand, brand.split(/[\[\(]/)[0].trim()];
+  for (var i = 0; i < heads.length; i++) {
+    var h = heads[i];
+    if (h && name.indexOf(h) === 0) {
+      var rest = name.slice(h.length).replace(/^[\s\-\u00b7:]+/, '').trim();
+      if (rest) return rest;
+    }
+  }
+  return name;
+}
+window.ppStripBrand = ppStripBrand;
 
 /* ── 기프티콘 교환 내역 (pw-24) ── */
 function renderGifticonHistory() {
