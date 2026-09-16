@@ -5491,7 +5491,7 @@ function giOpenTicketEdit(id) {
   var g = GIFTICON_PRODUCTS_CACHE[id];
   if (!g) return;
   document.getElementById('te-doc-id').value = id;
-  document.getElementById('te-name').textContent = (g.emoji||'') + ' ' + (g.name||g.product_name||'');
+  document.getElementById('te-name').textContent = cmsBrandName(g.brand, g.name || g.product_name);
   document.getElementById('te-grade-select').value = g.required_grade || 'bronze';
   document.getElementById('te-qty-input').value = g.required_count || 1;
   openModal('m-ticket-edit');
@@ -5504,7 +5504,7 @@ function giOpenImageEdit(id) {
   var g = GIFTICON_PRODUCTS_CACHE[id];
   if (!g) return;
   document.getElementById('gie-doc-id').value = id;
-  document.getElementById('gie-name').textContent = (g.emoji || '') + ' ' + (g.name || g.product_name || '');
+  document.getElementById('gie-name').textContent = cmsBrandName(g.brand, g.name || g.product_name);
   document.getElementById('gie-url-input').value = g.image_url || '';
   giImagePreview();
   openModal('m-gi-image');
@@ -7826,7 +7826,7 @@ function gipRender() {
         + '<span class="tgl-sl"></span></label>';
       var thumb = g.image_url
         ? '<img src="' + ppEsc(g.image_url) + '" alt="" style="width:40px;height:40px;object-fit:cover;border-radius:6px;display:block;margin:0 auto;border:1px solid var(--border);">'
-        : '<span style="font-size:20px;opacity:.55">' + (g.emoji || '\u{1F381}') + '</span>';
+        : '<span style="display:inline-flex;color:#C9C2DC"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="13" rx="2"/><path d="M3 12h18"/><path d="M12 8v13"/><path d="M12 8S10.5 4 8 4a2.5 2.5 0 0 0 0 5h4z"/><path d="M12 8s1.5-4 4-4a2.5 2.5 0 0 1 0 5h-4z"/></svg></span>';
       return '<tr style="cursor:pointer" onclick="giOpenDetail(&quot;' + g._id + '&quot;)">'
         + '<td style="text-align:center;color:var(--text-3);">' + (from + i + 1) + '</td>'
         + '<td>' + ppEsc(g.category || '기타') + '</td>'
@@ -8085,10 +8085,22 @@ window.giBulkDownloadTemplate = function() {
 var GEX_GRADE_KO = { bronze: '브론즈', silver: '실버', gold: '골드' };
 /* ── 2. 플랫폼별 구매내역 (포인츠허브 구조) ──
    칸: 구매일(날짜 아래 시각) · 주문번호 · 이름(아래 닉네임) · 상품명 · 상품코드 · 유효기간 · 상태 */
+/* 상품명에 브랜드가 이미 들어 있으면 또 붙이지 않는다 — 「GS25 GS25 3,000원 금액권」처럼 겹친다. */
+function cmsBrandName(brand, name) {
+  brand = String(brand || '').trim();
+  name = String(name || '').trim();
+  if (!brand) return name;
+  if (!name) return brand;
+  if (name.indexOf(brand) >= 0) return name;
+  var head = brand.split(/[\[\(]/)[0].trim();
+  if (head && name.indexOf(head) >= 0) return name;
+  return brand + ' ' + name;
+}
+
 function gexProductName(g) {
   var pr = GIFTICON_PRODUCTS_CACHE[g.gifticon_id];
   if (!pr) return ppEsc(g.gifticon_id || '-');
-  return ppEsc(((pr.brand ? pr.brand + ' ' : '') + (pr.name || pr.product_name || '')).trim() || g.gifticon_id);
+  return ppEsc(cmsBrandName(pr.brand, pr.name || pr.product_name) || g.gifticon_id);
 }
 /* 회원 표기는 CMS 공용 renderMemberIdentity 하나로 쓴다 — 기프티콘 화면도 같은 규격이다. */
 function identityCell(u, uid) { return renderMemberIdentity(u, uid); }
