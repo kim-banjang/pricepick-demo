@@ -7247,13 +7247,8 @@ Object.assign(KO2VI,{
 
         <div class="gid-f"><label class="form-label">상품판매종료일</label>
           <input id="pp-gid-saleend" class="form-input" type="date"></div>
-        <div class="gid-f"><label class="form-label">판매가격</label>
-          <div class="gid-price-row">
-            <select id="pp-gid-grade" class="form-input" style="appearance:auto;flex:1;">
-              <option value="bronze">브론즈</option><option value="silver">실버</option><option value="gold">골드</option>
-            </select>
-            <input id="pp-gid-count" class="form-input" type="number" min="1" max="999" style="width:92px;text-align:right;">
-          </div>
+        <div class="gid-f"><label class="form-label">판매가격 (원)</label>
+          <input id="pp-gid-price" class="form-input" type="number" min="0" step="10" style="text-align:right;">
           <div class="gid-won" id="pp-gid-won"></div></div>
 
         <div class="gid-f"><label class="form-label">브랜드</label>
@@ -7584,16 +7579,50 @@ function gipLoadTicketValue() {
     .catch(function(e){ console.error('ticket_value', e); GIP_TV = null; return null; });
 }
 var GIP_GRADE_KO = { bronze:'브론즈', silver:'실버', gold:'골드' };
-/* 포인츠허브는 판매가격을 원화로 받지만 우리는 등급 티켓으로 받고 원화는 환산해 보여만 준다.
-   두 번 받으면 어긋나므로 원화는 입력받지 않는다. */
-function gipPriceHtml(grade, count) {
-  grade = grade || 'bronze';
-  count = count || 1;
-  var unit = (GIP_TV && typeof GIP_TV[grade] === 'number') ? GIP_TV[grade] : null;
-  var sub = (unit === null)
+
+/* ── 판매가격 ──
+   포인츠허브와 똑같이 판매가격은 원화로 받고 원화로 저장한다. 티켓은 화면에서 계산해
+   병기만 한다 — 두 군데서 받으면 어긋난다.
+
+   등급을 고르는 규칙: 환산가치가 1:1 등가라 어느 등급으로 적어도 값은 같으므로
+   (「교환 비율은 환산가치 1:1 등가」 — 티켓 가치 설정 화면), 나누어떨어지는 가장 높은
+   등급을 써서 장수를 가장 적게 보인다. 어느 등급으로도 딱 떨어지지 않으면 가장 작은
+   단위(브론즈)로 올린다. */
+function gipTicketsFromWon(won) {
+  if (!GIP_TV || typeof won !== 'number' || won <= 0) return null;
+  var order = ['gold', 'silver', 'bronze'];
+  for (var i = 0; i < order.length; i++) {
+    var g = order[i], unit = GIP_TV[g];
+    if (typeof unit === 'number' && unit > 0 && won % unit === 0) return { grade: g, count: won / unit };
+  }
+  var b = GIP_TV.bronze;
+  if (typeof b === 'number' && b > 0) return { grade: 'bronze', count: Math.ceil(won / b) };
+  return null;
+}
+/* 원화가 없는 옛 상품은 저장된 등급·장수를 그대로 쓰고 원화를 거꾸로 환산해 병기한다. */
+function gipPriceParts(g) {
+  var won = (typeof g.price === 'number') ? g.price : null;
+  var tk = null;
+  if (won !== null) {
+    tk = gipTicketsFromWon(won);
+  } else if (g.required_grade || g.required_count) {
+    tk = { grade: g.required_grade || 'bronze', count: g.required_count || 1 };
+    var u = GIP_TV && GIP_TV[tk.grade];
+    if (typeof u === 'number') won = u * tk.count;
+  }
+  return { won: won, tk: tk };
+}
+function gipPriceHtml(g) {
+  var pr = gipPriceParts(g);
+  if (pr.won === null && !pr.tk) return '<span style="color:var(--text-3)">—</span>';
+  var main = pr.tk
+    ? (GIP_GRADE_KO[pr.tk.grade] || pr.tk.grade) + ' ' + pr.tk.count
+    : '—';
+  var sub = (pr.won === null)
     ? '<div class="gip-price-none">(환산값 미설정)</div>'
-    : '<div class="gip-price-won">(' + (unit * count).toLocaleString('ko-KR') + '원)</div>';
-  return '<div class="gip-price-main">' + (GIP_GRADE_KO[grade] || grade) + ' ' + count + '</div>' + sub;
+    : '<div class="gip-price-won">(' + pr.won.toLocaleString('ko-KR') + '원)</div>';
+  if (!pr.tk) return '<div class="gip-price-main">' + (pr.won === null ? '—' : pr.won.toLocaleString('ko-KR') + '원') + '</div><div class="gip-price-none">(환산값 미설정)</div>';
+  return '<div class="gip-price-main">' + main + '</div>' + sub;
 }
 
 var GIP_ROWS = [];
@@ -7648,7 +7677,7 @@ function gipRender() {
         + '<td style="font-family:monospace;font-size:11px;color:var(--text-3);">' + ppEsc(g._id) + '</td>'
         + '<td style="color:var(--text-3);">' + ppEsc(g.sale_end_date || '—') + '</td>'
         + '<td>' + (g.validity_days || 90) + '일</td>'
-        + '<td>' + gipPriceHtml(g.required_grade, g.required_count) + '</td>'
+        + '<td>' + gipPriceHtml(g) + '</td>'
         + '<td style="text-align:center">' + statusBadge + '</td>'
         + '</tr>';
     }).join('');
@@ -14450,15 +14479,16 @@ window.csvExportGifticonCancel = function() {
 /* ── Gifticon Modal ── */
 /* ── 상품 상세 정보 (포인츠허브: 목록에서 행을 누르면 뜬다) ── */
 var GID_ID = null;
+/* 입력은 원화 한 칸. 그 아래에 티켓으로 환산한 값을 병기해 보여준다. */
 function gidWonRefresh() {
-  var grade = (document.getElementById('pp-gid-grade') || {}).value || 'bronze';
-  var count = parseInt((document.getElementById('pp-gid-count') || {}).value, 10) || 1;
   var el = document.getElementById('pp-gid-won');
   if (!el) return;
-  var unit = (GIP_TV && typeof GIP_TV[grade] === 'number') ? GIP_TV[grade] : null;
-  if (unit === null) { el.className = 'gid-won none'; el.textContent = '(환산값 미설정 — 티켓 가치 설정에서 등급별 환산가치를 먼저 넣어 주세요)'; return; }
+  var won = parseInt((document.getElementById('pp-gid-price') || {}).value, 10);
+  if (!won || won <= 0) { el.className = 'gid-won'; el.textContent = ''; return; }
+  var tk = gipTicketsFromWon(won);
+  if (!tk) { el.className = 'gid-won none'; el.textContent = '티켓 환산값이 설정되지 않았습니다 — 「티켓 가치 설정」에서 등급별 환산가치를 먼저 넣어 주세요.'; return; }
   el.className = 'gid-won';
-  el.textContent = '(' + (unit * count).toLocaleString('ko-KR') + '원)';
+  el.textContent = (GIP_GRADE_KO[tk.grade] || tk.grade) + ' ' + tk.count + ' (' + won.toLocaleString('ko-KR') + '원)';
 }
 function gidImgRefresh() {
   var box = document.getElementById('pp-gid-img');
@@ -14477,8 +14507,7 @@ window.giOpenDetail = function(id) {
   set('pp-gid-validity', g.validity_days || 90);
   set('pp-gid-name', g.name || g.product_name || '');
   set('pp-gid-saleend', g.sale_end_date || '');
-  set('pp-gid-grade', g.required_grade || 'bronze');
-  set('pp-gid-count', g.required_count || 1);
+  set('pp-gid-price', (typeof g.price === 'number') ? g.price : (gipPriceParts(g).won || ''));
   set('pp-gid-brand', g.brand || '');
   set('pp-gid-emoji', g.emoji || '');
   set('pp-gid-image', g.image_url || '');
@@ -14498,6 +14527,12 @@ function gidSave() {
     if (err) { err.textContent = '브랜드와 상품명은 반드시 넣어야 합니다.'; err.style.display = 'block'; }
     return;
   }
+  var won = parseInt(v('pp-gid-price'), 10);
+  if (!won || won <= 0) {
+    if (err) { err.textContent = '판매가격은 0보다 큰 원화 금액이어야 합니다.'; err.style.display = 'block'; }
+    return;
+  }
+  var tk = gipTicketsFromWon(won);
   var btn = document.getElementById('pp-gid-save');
   if (btn) { btn.disabled = true; btn.textContent = '저장 중…'; }
   db.collection('gifticons').doc(GID_ID).set({
@@ -14505,8 +14540,11 @@ function gidSave() {
     validity_days: parseInt(v('pp-gid-validity'), 10) || 90,
     name: name,
     sale_end_date: (v('pp-gid-saleend') || '').trim() || null,
-    required_grade: v('pp-gid-grade') || 'bronze',
-    required_count: parseInt(v('pp-gid-count'), 10) || 1,
+    price: won,
+    /* 앱은 등급 티켓으로 교환하므로 원화에서 환산한 값을 같이 남긴다 — 입력은 원화 하나뿐이고
+       이 둘은 그 원화에서 계산된 파생값이다(사람이 따로 넣지 않는다). */
+    required_grade: tk ? tk.grade : 'bronze',
+    required_count: tk ? tk.count : 1,
     brand: brand,
     emoji: (v('pp-gid-emoji') || '').trim(),
     image_url: (v('pp-gid-image') || '').trim() || null,
@@ -14532,10 +14570,8 @@ document.addEventListener('DOMContentLoaded', function() {
   document.getElementById('pp-gid-img-btn').addEventListener('click', function() {
     var i = document.getElementById('pp-gid-image'); if (i) { i.focus(); i.select(); }
   });
-  ['pp-gid-grade','pp-gid-count'].forEach(function(id) {
-    var e = document.getElementById(id); if (e) e.addEventListener('input', gidWonRefresh);
-    if (e) e.addEventListener('change', gidWonRefresh);
-  });
+  var pe = document.getElementById('pp-gid-price');
+  if (pe) { pe.addEventListener('input', gidWonRefresh); pe.addEventListener('change', gidWonRefresh); }
   ['pp-gid-image','pp-gid-emoji'].forEach(function(id) {
     var e = document.getElementById(id); if (e) e.addEventListener('input', gidImgRefresh);
   });
