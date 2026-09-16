@@ -4935,8 +4935,9 @@
   .gs-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 10px 20px 16px; }
   .gs-card { border: 1px solid #F0F0F4; border-radius: 16px; overflow: hidden; background: white; cursor: pointer; }
   .gs-card-img { position: relative; aspect-ratio: 1.586; margin: 10px; border-radius: 10px; overflow: hidden; background: #F7F6FB; display: flex; align-items: center; justify-content: center; }
-  /* 상품 사진은 잘라내지 않는다 — 금액이 그림에 박혀 있어서 잘리면 정보가 사라진다. */
-  .gs-card-img img { width: 100%; height: 100%; object-fit: contain; }
+  /* 칸에서는 시안처럼 사진이 틀을 꽉 채운다(cover). 상품 사진이 250x250 정사각인데
+     가운데에 가로 상품권이 들어 있어서 위아래 여백만 깎인다. 온전한 사진은 상세에서 본다. */
+  .gs-card-img img { width: 100%; height: 100%; object-fit: cover; }
   .gs-search.hide { display: none !important; }
   .gs-badge { position: absolute; top: 7px; right: 7px; font-size: 10px; font-weight: 700; color: white; background: #1B9E55; border-radius: 100px; padding: 3px 8px; box-shadow: 0 2px 6px rgba(0,0,0,.2); z-index: 2; }
   .gs-card-b { padding: 2px 12px 12px; }
