@@ -1083,12 +1083,17 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
 .bt-empty{text-align:center;padding:52px 18px;color:var(--text-3);}
 .bt-empty-ico{font-size:40px;opacity:.35;margin-bottom:10px;}
 /* 「이름」 칸 — 닉네임 / 카카오톡 아이디 / User 아이디 (없는 줄은 그리지 않는다) */
-.idc{min-width:0;}
-.idc-nick{font-weight:600;color:var(--text);}
-.idc-sub{font-size:11px;color:var(--text-3);margin-top:2px;}
+/* 회원 칸은 늘 세 줄이다 — 닉네임 / 카카오톡 ID / 식별 아이디.
+   값이 없어도 줄 자리는 지키고 글자만 안 쓴다(행 높이가 제각각이 되지 않게).
+   정렬은 왼쪽으로 못 박는다 — 칸이 가운데 정렬이어도 이 안은 왼쪽이다. */
+.idc{min-width:0;text-align:left;}
+.idc-nick,.idc-sub,.idc-uid{display:block;text-align:left;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.idc-nick{font-weight:600;color:var(--text);font-size:13px;line-height:18px;height:18px;}
+.idc-sub{font-size:11px;color:var(--text-3);line-height:15px;height:15px;margin-top:2px;}
 .idc-uid{font-size:11px;color:var(--text-3);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
-  margin-top:2px;cursor:pointer;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.idc-uid:hover{color:var(--main);text-decoration:underline;}
+  line-height:15px;height:15px;margin-top:2px;cursor:pointer;max-width:200px;}
+.idc-uid:empty,.idc-sub:empty,.idc-nick:empty{cursor:default;}
+.idc-uid:not(:empty):hover{color:var(--main);text-decoration:underline;}
 /* 상품 상세 정보 모달 — 포인츠허브 배치(왼쪽 이미지, 오른쪽 2열 격자) */
 .gid-sub{font-size:13px;font-weight:700;color:var(--text);margin:0 0 14px;}
 .gid-body{display:flex;gap:22px;align-items:flex-start;}
@@ -8683,16 +8688,22 @@ function memberIdShort(docId, len) {
 }
 // 세로 3행용 — 닉네임 / 카카오톡ID(또는 게스트) / 식별 아이디(내부 users 문서ID)
 function renderMemberIdentity(u, docId) {
-  /* 없는 값은 줄을 만들지 않는다 — 「닉네임없음」·「게스트(비연동)」처럼 없다는 말을 적어
-     넣지 않는다(김반장 2026-09-16). 없다는 사실은 줄이 없는 것으로 이미 드러난다.
-     카카오 ID 줄이 있으면 연동, 없으면 미연동이다.
+  /* 줄 자리는 늘 셋을 지키고, 없는 값은 빈 채로 둔다 — 줄 수가 1·2·3으로 들쭉날쭉하면
+     행 높이가 제각각이 된다(김반장 2026-09-16). 없다는 말(「닉네임없음」·「게스트(비연동)」)은
+     적어 넣지 않는다. 카카오 ID 줄이 차 있으면 연동, 비어 있으면 미연동이다.
      식별 아이디는 길어 말줄임하므로 눌러서 통째로 복사할 수 있게 둔다. */
   u = u || {};
-  var out = '';
-  if (u.nickname) out += '<div class="idc-nick">' + ppEsc(u.nickname) + '</div>';
-  if (u.linked_kakao && u.kakao_login_id) out += '<div class="idc-sub">' + ppEsc(u.kakao_login_id) + '</div>';
-  if (docId) out += '<div class="idc-uid" title="눌러서 식별 아이디 전체 복사" onclick="event.stopPropagation();ppCopyId(this,&quot;' + ppEsc(docId) + '&quot;)">' + ppEsc(docId) + '</div>';
-  return out ? '<div class="idc">' + out + '</div>' : '<span style="color:var(--text-3)">—</span>';
+  var nick = u.nickname || '';
+  var kakao = (u.linked_kakao && u.kakao_login_id) ? u.kakao_login_id : '';
+  var uid = docId || '';
+  var uidAttr = uid
+    ? ' title="눌러서 식별 아이디 전체 복사" onclick="event.stopPropagation();ppCopyId(this,&quot;' + ppEsc(uid) + '&quot;)"'
+    : '';
+  return '<div class="idc">'
+    + '<div class="idc-nick">' + ppEsc(nick) + '</div>'
+    + '<div class="idc-sub">' + ppEsc(kakao) + '</div>'
+    + '<div class="idc-uid"' + uidAttr + '>' + ppEsc(uid) + '</div>'
+    + '</div>';
 }
 // 회원 목록 리스트 전용 — 세로 2행(닉네임 / 카카오ID). 식별 아이디(내부 문서ID)는 상세에서만 노출.
 // 카카오 연동 회원은 카카오 로그인 ID, 미연동(게스트) 회원은 "미연동"으로 표기.
