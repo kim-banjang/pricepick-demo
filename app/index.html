@@ -12612,7 +12612,7 @@ window.PP_FEATURES = {
               </div>
             </div>
             <button data-ip-bound="1" style="padding:6px 12px;background:#FEE500;border:none;border-radius:8px;font-size:var(--fs-caption);font-weight:700;color:#3C1E1E;cursor:pointer;"
-              onclick="(function(){var inp=document.getElementById('nick-input');if(!inp)return;var kn=(window.ppGetKakaoNickname&&window.ppGetKakaoNickname())||'마크김';inp.value=kn;var cnt=document.getElementById('nick-cnt');if(cnt)cnt.textContent=kn.length+'/10';var btn=document.getElementById('nick-save');if(btn){btn.disabled=false;btn.style.background='var(--main)';btn.style.cursor='pointer';}})()">가져오기</button>
+              onclick="(function(){var inp=document.getElementById('nick-input');if(!inp)return;var kn=(window.ppGetKakaoNickname&&window.ppGetKakaoNickname())||'마크김';kn=(window.ppCleanNick?window.ppCleanNick(kn):kn);inp.value=kn;var cnt=document.getElementById('nick-cnt');if(cnt)cnt.textContent=kn.length+'/10';var btn=document.getElementById('nick-save');if(btn){btn.disabled=false;btn.style.background='var(--main)';btn.style.cursor='pointer';}})()">가져오기</button>
           </div>
           <button id="nick-save" data-orig="" data-ip-bound="1" disabled
             style="width:100%;padding:15px;background:var(--text4);border:none;border-radius:14px;font-size:var(--fs-label);font-weight:800;color:#fff;cursor:not-allowed;margin-top:8px;">저장</button>
@@ -17963,7 +17963,7 @@ function onScreenShown(id) {
     var nick = (PP.user && PP.user.nickname) || '유저';
     var nb = document.getElementById('nick-big'); if (nb) nb.textContent = nick;
     var nuv = document.getElementById('nick-uid-value'); if (nuv) nuv.textContent = ppShortUid(PP.uid);
-    var ni = document.getElementById('nick-input'); if (ni) ni.value = nick;
+    var ni = document.getElementById('nick-input'); if (ni) ni.value = ppCleanNick(nick);
     var ns = document.getElementById('nick-save'); if (ns) { ns.dataset.orig = nick; ns.disabled = true; ns.style.background = 'var(--text4)'; ns.style.cursor = 'not-allowed'; }
     var cnt = document.getElementById('nick-cnt'); if (cnt) cnt.textContent = nick.length + '/10';
     var kp = document.getElementById('kakao-nick-preview');
@@ -18078,6 +18078,62 @@ function refreshNickSuggestion(force) {
 }
 window.ppRefreshNickSuggestion = refreshNickSuggestion;
 
+/* ── 닉네임 규칙 ──
+   화면이 스스로 걸어 둔 안내 그대로다: 「한글·영문·숫자 조합, 2~10자」
+   (가입 pw-02-nick, 마이 pw-30-nick 두 화면에 같은 문구가 적혀 있다).
+   지금까지 길이(maxlength=10 · 2자 미만 저장 거부)만 코드로 막고 허용 문자는 안내만 있었다.
+   그래서 「김반장 갤플립」처럼 띄어쓰기가 들어간 닉네임이 저장됐다 — 실제 앱은 공백을
+   허용하지 않으므로 데모도 맞춘다.
+
+   저장할 때 조용히 지우지 않고 입력 칸에서 바로 걷어낸다. 저장 뒤에야 값이 달라져 있으면
+   넣은 것과 다른 게 저장돼 혼란스럽다. */
+var NICK_MAX = 10;
+function ppCleanNick(v) {
+  return String(v == null ? '' : v).replace(/[^가-힣a-zA-Z0-9]/g, '').slice(0, NICK_MAX);
+}
+window.ppCleanNick = ppCleanNick;
+
+/* 한글은 조합 중(ㄱ, 가...)에는 손대면 안 된다 — 조합이 끝난 뒤에 걷어낸다. */
+function ppBindNickInput(el, onAfter) {
+  if (!el || el.dataset.ppNickClean) return;
+  el.dataset.ppNickClean = '1';
+  var composing = false;
+  function clean() {
+    if (composing) return;
+    var c = ppCleanNick(el.value);
+    if (c !== el.value) {
+      var atEnd = el.selectionStart === el.value.length;
+      el.value = c;
+      if (atEnd) { try { el.setSelectionRange(c.length, c.length); } catch (e) {} }
+    }
+  }
+  el.addEventListener('compositionstart', function () { composing = true; });
+  el.addEventListener('compositionend', function () { composing = false; clean(); if (onAfter) onAfter(); });
+  el.addEventListener('input', function () { clean(); if (onAfter) onAfter(); });
+  el.addEventListener('blur', function () { composing = false; clean(); if (onAfter) onAfter(); });
+  /* 공백은 키가 눌리는 순간 막는다 — 칸에 잠깐이라도 들어갔다 사라지면 눈에 거슬린다. */
+  el.addEventListener('keydown', function (e) { if (e.key === ' ' || e.key === 'Spacebar') e.preventDefault(); });
+  el.addEventListener('paste', function () { setTimeout(function () { composing = false; clean(); if (onAfter) onAfter(); }, 0); });
+}
+
+/* 가입 칸과 마이 수정 칸 둘 다. 각 칸의 글자수·단추 상태 갱신은 원래 인라인 핸들러가
+   하고 있으므로 그대로 한 번 더 태워 준다. */
+function ppBindAllNickInputs() {
+  var a = document.getElementById('nick2-input');
+  if (a) ppBindNickInput(a, function () {
+    var c = document.getElementById('nick2-cnt'); if (c) c.textContent = a.value.length + '/' + NICK_MAX;
+    var b = document.getElementById('nick2-start');
+    if (b) { var ok = a.value.trim().length >= 2; b.disabled = !ok; b.style.opacity = ok ? '1' : '0.5'; b.style.cursor = ok ? 'pointer' : 'not-allowed'; }
+  });
+  var m = document.getElementById('nick-input');
+  if (m) ppBindNickInput(m, function () {
+    var c = document.getElementById('nick-cnt'); if (c) c.textContent = m.value.length + '/' + NICK_MAX;
+    var b = document.getElementById('nick-save');
+    if (b) { var changed = m.value.trim().length >= 2 && m.value !== b.dataset.orig;
+      b.disabled = !changed; b.style.background = changed ? 'var(--main)' : 'var(--text4)'; b.style.cursor = changed ? 'pointer' : 'not-allowed'; }
+  });
+}
+
 function bindNickname() {
   var screen = document.getElementById('pw-02-nick');
   if (!screen || screen.dataset.ppNick) return;
@@ -18089,7 +18145,8 @@ function bindNickname() {
     e.preventDefault();
     if (btn.disabled) return;
     var input = document.getElementById('nick2-input');
-    var nickname = (input && input.value && input.value.trim()) || '';
+    var nickname = ppCleanNick(input && input.value);
+    if (input && input.value !== nickname) input.value = nickname;
     if (nickname.length < 2 || !PP.uid) return;
     var prevText = btn.textContent;
     btn.disabled = true;
@@ -18125,7 +18182,8 @@ function bindNickSave() {
     e.preventDefault();
     if (btn.disabled) return;
     var input = document.getElementById('nick-input');
-    var nickname = (input && input.value && input.value.trim()) || '';
+    var nickname = ppCleanNick(input && input.value);
+    if (input && input.value !== nickname) input.value = nickname;
     if (nickname.length < 2 || !PP.uid) return;
     var prevText = btn.textContent;
     btn.disabled = true;
@@ -21333,6 +21391,7 @@ document.addEventListener('DOMContentLoaded', function() {
   hookSplashTimer();
   hookSelectMall();
   bindNickname();
+  ppBindAllNickInputs();
   bindNickSave();
   bindUidCopyButtons();
   bindExchangeBtn();

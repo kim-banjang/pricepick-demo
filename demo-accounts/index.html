@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>데모 계정 관리 · PricePick</title>
+<title>프라이스픽 데모 계정 관리</title>
 <link rel="icon" href="/cms/favicon-32.png" sizes="32x32">
 <link rel="apple-touch-icon" href="/cms/apple-touch-icon.png">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
@@ -76,8 +76,11 @@ tr:hover td{background:var(--surface-2);}
 /* 닉네임·카카오는 계정 ID로 회원 데이터에서 읽어 보여주는 값이다(입력 칸 아님) */
 .nick-txt{font-size:12px;font-weight:600;color:var(--text);}
 .nick-none{font-size:12px;color:var(--text-3);}
-.bad-txt{font-size:12px;font-weight:700;color:var(--danger);}
-.warn-txt{font-size:12px;font-weight:700;color:var(--warning);}
+/* 못 쓰는 계정은 계정 ID 옆에 딱지로 붙인다 — 닉네임 칸은 값을 넣는 자리지 설명하는 자리가 아니다 */
+.tag{display:inline-block;white-space:nowrap;padding:2px 7px;border-radius:99px;font-size:10px;font-weight:700;margin-left:6px;vertical-align:middle;}
+.tag-bad{background:var(--danger-soft);color:var(--danger);}
+.tag-warn{background:var(--warning-soft);color:var(--warning);}
+.row-dim .uid-chip{opacity:.55;}
 .kk{display:inline-block;white-space:nowrap;padding:2px 8px;border-radius:99px;font-size:11px;font-weight:600;}
 .kk-on{background:var(--main-soft);color:var(--main-hover);}
 .kk-off{background:var(--warning-soft);color:var(--warning);}
@@ -173,7 +176,7 @@ textarea.form-input{resize:vertical;min-height:64px;}
 <div class="wrap">
   <div class="pg-head">
     <div>
-      <div class="pg-title">데모 계정 관리</div>
+      <div class="pg-title">프라이스픽 데모 계정 관리</div>
       <div class="pg-sub">데모에서 앱을 테스트할 때 가상 데이터를 어느 계정에 넣을지 여기서 확인합니다.</div>
     </div>
     <div class="pg-acts">
@@ -187,7 +190,7 @@ textarea.form-input{resize:vertical;min-height:64px;}
     <strong>사용자가 같으면 자동으로 묶여</strong> 사용자 칸이 하나로 합쳐집니다.
     넣으실 것은 <strong>사용자 · 계정 ID · 메모</strong> 셋입니다. 계정 ID는 앱 <strong>마이 화면 상단의 ID 「복사」</strong> 단추로 얻습니다.
     <br><strong>닉네임과 카카오 연동 여부는 계정 ID로 회원 정보에서 찾아 그때그때 보여줍니다</strong> — 적어 넣지 않으셔도 되고,
-    앱에서 바뀌면 여기도 바로 따라 바뀝니다. 회원을 못 찾으면 「닉네임 없음」으로 두니 ID를 다시 확인해 주세요.
+    앱에서 바뀌면 여기도 바로 따라 바뀝니다. 회원을 못 찾으면 계정 ID 옆에 딱지가 붙으니 ID를 다시 확인해 주세요.
   </div>
 
   <div class="warn-box" id="rule-warn">
@@ -386,13 +389,14 @@ function fetchUsersByIds(ids) {
    따로 읽지 않으므로 한쪽만 잡히는 일은 생기지 않는다.
 
    구분해야 할 상태가 넷이다 — 뭉뚱그리면 「닉네임 없음 + 카카오 연동」처럼 앞뒤 안 맞아
-   보이는 줄이 나온다(실제로 그렇게 보인 적이 있다):
+   보이는 줄이 나온다(실제로 그렇게 보인 적이 있다). 갈라 놓되 그 사실은 계정 ID 옆
+   딱지로 알리고, 닉네임·카카오 칸은 값이 없으면 그냥 비운다:
      없는 계정   회원 문서가 없다. 닉네임도 카카오도 말할 수 없다 → 둘 다 비운다.
      탈퇴한 계정 앱 탈퇴(performWithdraw)가 nickname·kakao_login_id를 지우고 status를
                  withdrawn으로 바꾼다. 그런데 linked_kakao는 지우지 않아 옛 값이 남는다.
                  그 잔재를 「연동」이라 내보이면 거짓이 되니 카카오도 비운다.
      정지된 계정 status=suspended. 회원 정보는 살아 있으니 카카오는 그대로 보여준다.
-     정상        닉네임이 비어 있을 수 있다(가입 중) → 그때만 「닉네임 없음」. */
+     정상        닉네임이 비어 있을 수 있다(가입 중) → 그때도 칸은 「―」로 비운다. */
 function userState(uid) {
   var u = USERS[uid];
   if (!u) return { kind: 'missing' };
@@ -401,14 +405,24 @@ function userState(uid) {
   if (st === 'suspended') return { kind: 'suspended', u: u };
   return { kind: 'ok', u: u };
 }
+/* 닉네임 칸에는 닉네임만 쓴다. 값이 없으면 메모 칸과 똑같이 「—」로 비운다.
+   못 쓰는 계정이라는 사실은 계정 ID 옆 딱지로 알린다 — 닉네임 자리에 설명을 써 두면
+   그것만 띄어쓰기가 있어 실제 닉네임처럼 보이다 만다. */
 function nickHtml(uid) {
   var s = userState(uid);
-  if (s.kind === 'missing') return '<span class="bad-txt">없는 계정</span>';
-  if (s.kind === 'withdrawn') return '<span class="bad-txt">탈퇴한 계정</span>';
-  if (s.kind === 'suspended') return '<span class="warn-txt">정지된 계정</span>';
-  return s.u.nickname
-    ? '<span class="nick-txt">' + esc(s.u.nickname) + '</span>'
-    : '<span class="nick-none">닉네임 없음</span>';
+  if (s.kind !== 'ok' || !s.u.nickname) return '<span class="uid-none">―</span>';
+  return '<span class="nick-txt">' + esc(s.u.nickname) + '</span>';
+}
+function accTag(uid) {
+  var s = userState(uid);
+  if (s.kind === 'missing') return '<span class="tag tag-bad">없는 계정</span>';
+  if (s.kind === 'withdrawn') return '<span class="tag tag-bad">탈퇴</span>';
+  if (s.kind === 'suspended') return '<span class="tag tag-warn">정지</span>';
+  return '';
+}
+function rowDim(uid) {
+  var k = userState(uid).kind;
+  return (k === 'missing' || k === 'withdrawn') ? ' class="row-dim"' : '';
 }
 function kakaoHtml(uid) {
   var s = userState(uid);
@@ -461,7 +475,7 @@ function render() {
               + (g.rows.length > 1 ? '<span class="nm-sub">' + L('계정 ' + g.rows.length + '개', g.rows.length + ' tài khoản') + '</span>' : '') + '</td>'
             : '')
         + '<td>' + nickHtml(r.account_id) + '</td>'
-        + '<td>' + uidChip(r.account_id) + '</td>'
+        + '<td' + rowDim(r.account_id) + '>' + uidChip(r.account_id) + accTag(r.account_id) + '</td>'
         + '<td>' + kakaoHtml(r.account_id) + '</td>'
         + memoCell(r.memo)
         + '<td><button class="btn btn-ghost btn-sm" data-edit="' + esc(r._id) + '">수정</button></td>'
@@ -479,12 +493,12 @@ function render() {
       + '</div></div>'
       + g.rows.map(function (r) {
           return '<div class="rc-acc">'
-            + '<div class="rc-acc-top"><div class="rc-nick">' + nickHtml(r.account_id) + ' ' + kakaoHtml(r.account_id) + '</div>'
+            + '<div class="rc-acc-top"><div class="rc-nick">' + nickHtml(r.account_id) + ' ' + kakaoHtml(r.account_id) + accTag(r.account_id) + '</div>'
             + '<div class="rc-acts">'
             + '<button class="btn btn-ghost btn-sm" data-edit="' + esc(r._id) + '">수정</button>'
             + '<button class="btn btn-danger btn-sm" data-del="' + esc(r._id) + '">삭제</button>'
             + '</div></div>'
-            + '<div class="rc-line">' + uidChip(r.account_id) + '</div>'
+            + '<div class="rc-line"' + rowDim(r.account_id) + '>' + uidChip(r.account_id) + '</div>'
             + (r.memo ? '<div class="rc-memo">' + esc(r.memo) + '</div>' : '')
             + '</div>';
         }).join('')
@@ -732,7 +746,6 @@ load();
 <script>
 (function(){
   var KO2VI = {
-  "데모 계정 관리": "Quản lý tài khoản demo",
   "데모에서 앱을 테스트할 때 가상 데이터를 어느 계정에 넣을지 여기서 확인합니다.": "Nơi xác nhận sẽ đưa dữ liệu giả vào tài khoản nào khi kiểm thử ứng dụng trong bản demo.",
   "+ 계정 추가": "+ Thêm tài khoản",
   "쓰는 법": "Cách dùng",
@@ -745,7 +758,6 @@ load();
   "마이 화면 상단의 ID 「복사」": "nút 「Sao chép」 ID ở đầu màn hình Của tôi",
   "단추로 얻습니다.": "trong ứng dụng.",
   "닉네임과 카카오 연동 여부는 계정 ID로 회원 정보에서 찾아 그때그때 보여줍니다": "Biệt danh và trạng thái liên kết Kakao được tra từ thông tin thành viên theo ID tài khoản và hiển thị tức thời",
-  "— 적어 넣지 않으셔도 되고,\n    앱에서 바뀌면 여기도 바로 따라 바뀝니다. 회원을 못 찾으면 「닉네임 없음」으로 두니 ID를 다시 확인해 주세요.": "— bạn không cần nhập tay, và khi thay đổi trong ứng dụng thì ở đây cũng đổi theo ngay. Nếu không tìm thấy thành viên sẽ để là 「Không có biệt danh」, hãy kiểm tra lại ID.",
   "저장이 막혀 있습니다.": "Việc lưu đang bị chặn.",
   "Firestore 규칙에": "Quy tắc công khai",
   "공개 규칙이 아직 게시되지 않았습니다.\n    저장소의": "trong quy tắc Firestore chưa được phát hành. Quy tắc đã có trong",
@@ -764,7 +776,6 @@ load();
   "탈퇴한 계정": "Tài khoản đã rút",
   "정지된 계정": "Tài khoản bị đình chỉ",
   "없는 계정": "Tài khoản không tồn tại",
-  "닉네임 없음": "Không có biệt danh",
   "계정 추가": "Thêm tài khoản",
   "계정 수정": "Sửa tài khoản",
   "사용자 *": "Người dùng *",
@@ -803,7 +814,11 @@ load();
   "비워 둬도 됩니다": "Có thể để trống",
   "눌러서 전체 ID 복사": "Nhấn để sao chép toàn bộ ID",
   "등록된 사용자 고르기": "Chọn người dùng đã đăng ký",
-  "닫기": "Đóng"
+  "닫기": "Đóng",
+  "프라이스픽 데모 계정 관리": "Quản lý tài khoản demo PricePick",
+  "탈퇴": "Đã rút",
+  "정지": "Bị đình chỉ",
+  "— 적어 넣지 않으셔도 되고,\n    앱에서 바뀌면 여기도 바로 따라 바뀝니다. 회원을 못 찾으면 계정 ID 옆에 딱지가 붙으니 ID를 다시 확인해 주세요.": "— bạn không cần nhập tay, và khi thay đổi trong ứng dụng thì ở đây cũng đổi theo ngay. Nếu không tìm thấy thành viên sẽ có nhãn cạnh ID tài khoản, hãy kiểm tra lại ID."
 };
   var _orig=new Map(), _tracked=new Set(), _applying=false;
   function hasKo(s){ return /[가-힯ᄀ-ᇿ㄰-㆏]/.test(s); }
