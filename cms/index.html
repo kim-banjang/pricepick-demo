@@ -1072,6 +1072,13 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
   padding:14px 16px;margin-bottom:16px;}
 .gip-srch .search-box{width:100%;}
 .gip-srch-btns{display:flex;justify-content:flex-end;margin-top:10px;}
+/* 「이름」 칸 — 닉네임 / 카카오톡 아이디 / User 아이디 (없는 줄은 그리지 않는다) */
+.idc{min-width:0;}
+.idc-nick{font-weight:600;color:var(--text);}
+.idc-sub{font-size:11px;color:var(--text-3);margin-top:2px;}
+.idc-uid{font-size:11px;color:var(--text-3);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+  margin-top:2px;cursor:pointer;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.idc-uid:hover{color:var(--main);text-decoration:underline;}
 /* 상품 상세 정보 모달 — 포인츠허브 배치(왼쪽 이미지, 오른쪽 2열 격자) */
 .gid-sub{font-size:13px;font-weight:700;color:var(--text);margin:0 0 14px;}
 .gid-body{display:flex;gap:22px;align-items:flex-start;}
@@ -2509,6 +2516,31 @@ window.CMS_FEATURES = {
         <div class="gip-pager" id="gip-pager"></div>
       </div>
     </div>
+<!-- 6. 다우테크 오류 로그 — 기프티콘 발급 연동에서 난 오류를 모아 보는 자리.
+     프라이스픽은 아직 다우테크 연동이 없어 쌓이는 기록이 없다(칸만 세워 둔다). -->
+<div class="section" id="sec-gifticon-errlog">
+  <div class="srch">
+    <div class="srch-row">
+      <input class="search-box" id="gerr-f-q" placeholder="이름 / 이메일 / 전화번호" style="width:260px">
+      <input class="form-input srch-date" type="date" id="gerr-f-from">
+      <span class="srch-tilde">~</span>
+      <input class="form-input srch-date" type="date" id="gerr-f-to">
+      <button class="btn btn-primary btn-sm" onclick="gerrApplyFilters()">검색</button>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-header"><div class="card-title">다우테크 오류 로그</div><span style="font-size:12px;color:var(--text-2)" id="gerr-count">—</span></div>
+    <table>
+      <thead><tr>
+        <th style="width:120px">발생일시</th><th>이름</th><th>상품명</th><th style="width:110px">액션</th>
+        <th style="width:110px">에러 코드</th><th>에러 메시지</th><th style="width:120px">기기</th><th style="width:90px">상세</th>
+      </tr></thead>
+      <tbody></tbody>
+    </table>
+    <div id="gerr-pagination"></div>
+  </div>
+</div>
+
 <div class="section" id="sec-gifticon-bulk">
       <div class="info-box">CSV 파일로 상품 설명을 일괄 등록·수정합니다. 상품코드가 일치하는 항목은 덮어쓰기됩니다. <strong>(CSV만 지원)</strong></div>
       <div class="card">
@@ -7530,6 +7562,7 @@ function loadAllData() {
     loadDraws();
     loadGifticonCancel();
     loadGifticonUnused();
+    loadGifticonErrLog();
     loadBanners();
     loadInvites();
     loadTerms();
@@ -7914,6 +7947,42 @@ function gexProductName(g) {
   if (!pr) return ppEsc(g.gifticon_id || '-');
   return ppEsc(((pr.brand ? pr.brand + ' ' : '') + (pr.name || pr.product_name || '')).trim() || g.gifticon_id);
 }
+/* ── 「이름」 칸 ──
+   프라이스픽은 실명을 받지 않는다. 그래서 포인츠허브가 이름/닉네임을 쌓던 자리에
+   닉네임 · 카카오톡 아이디 · User 아이디를 쌓는다(칸 제목은 「이름」 그대로).
+   기존 renderMemberIdentity와 같은 글자 규격을 쓰되, 없는 값은 줄을 만들지 않는다 —
+   빈 줄이 자리를 차지하면 표가 들쭉날쭉해진다. */
+function identityCell(u, uid) {
+  u = u || {};
+  var out = '';
+  if (u.nickname) out += '<div class="idc-nick">' + ppEsc(u.nickname) + '</div>';
+  if (u.linked_kakao && u.kakao_login_id) out += '<div class="idc-sub">' + ppEsc(u.kakao_login_id) + '</div>';
+  if (uid) out += '<div class="idc-uid" title="눌러서 User 아이디 전체 복사" onclick="event.stopPropagation();ppCopyId(this,&quot;' + ppEsc(uid) + '&quot;)">' + ppEsc(uid) + '</div>';
+  return out ? '<div class="idc">' + out + '</div>' : '<span style="color:var(--text-3)">—</span>';
+}
+/* User 아이디는 길어 말줄임되므로 눌러서 통째로 복사할 수 있게 둔다. */
+window.ppCopyId = function(el, text) {
+  var done = function() { toast('User 아이디를 복사했습니다.'); };
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(done).catch(function(){ ppCopyFallback(text, done); });
+  } else { ppCopyFallback(text, done); }
+};
+function ppCopyFallback(text, done) {
+  try {
+    var ta = document.createElement('textarea');
+    ta.value = text; ta.style.position = 'fixed'; ta.style.left = '-9999px';
+    document.body.appendChild(ta); ta.focus(); ta.select();
+    document.execCommand('copy'); document.body.removeChild(ta); done();
+  } catch (e) { toast('복사에 실패했습니다.'); }
+}
+/* 「이름」 검색은 닉네임·카카오톡 아이디·User 아이디 셋을 한꺼번에 훑는다 —
+   실명이 없어 하나만 잡으면 못 찾는 경우가 생긴다. */
+function identityMatch(u, uid, q) {
+  if (!q) return true;
+  u = u || {};
+  return ppMatch(u.nickname, q) || ppMatch(u.kakao_login_id, q) || ppMatch(uid, q);
+}
+
 function gexTwoLine(top, sub) {
   return '<div style="font-weight:700;">' + top + '</div>' + (sub ? '<div class="cell-sub">' + sub + '</div>' : '');
 }
@@ -7933,7 +8002,7 @@ var GEX_CTRL = window.GEX_CTRL = ppMakeListController(20, function(pageItems, st
     return '<tr>'
       + '<td style="text-align:center">' + gexTwoLine(ppDt(g.exchanged_at), ppTm(g.exchanged_at)) + '</td>'
       + '<td style="font-size:11px;font-family:monospace;color:var(--text-3);">' + ppEsc(g._id) + '</td>'
-      + '<td>' + gexTwoLine(ppEsc(u.name || u.nickname || '—'), ppEsc(u.name ? (u.nickname || '') : '')) + '</td>'
+      + '<td>' + identityCell(u, g.user_id) + '</td>'
       + '<td>' + gexProductName(g) + '</td>'
       + '<td style="font-family:monospace;font-size:11px;color:var(--text-3);">' + ppEsc(g.gifticon_id || '-') + '</td>'
       + '<td style="text-align:center">' + gexValidity(g) + '</td>'
@@ -7973,7 +8042,7 @@ window.gexApplyFilters = function() {
     var u = g._user || {};
     if (status === 'used' && g.status === 'cancelled') return false;
     if (status === 'cancelled' && g.status !== 'cancelled') return false;
-    if (name && !ppMatch(u.name || u.nickname, name)) return false;
+    if (!identityMatch(u, g.user_id, name)) return false;
     if (nick && !ppMatch(u.nickname, nick)) return false;
     if (code && !ppMatch(g.code, code)) return false;
     if (!gexDateInRange(g)) return false;
@@ -9730,7 +9799,7 @@ var GUN_CTRL = window.GUN_CTRL = ppMakeListController(20, function(pageItems, st
     return '<tr style="cursor:pointer" title="눌러서 이 건을 취소" onclick="giCancelExchange(&quot;' + g._id + '&quot;)">'
       + '<td style="text-align:center">' + gexTwoLine(ppDt(g.exchanged_at), ppTm(g.exchanged_at)) + '</td>'
       + '<td style="font-size:11px;font-family:monospace;color:var(--text-3);">' + ppEsc(g._id) + '</td>'
-      + '<td>' + gexTwoLine(ppEsc(u.name || u.nickname || '—'), ppEsc(u.name ? (u.nickname || '') : '')) + '</td>'
+      + '<td>' + identityCell(u, g.user_id) + '</td>'
       + '<td>' + gexProductName(g) + '</td>'
       + '<td style="font-family:monospace;font-size:11px;color:var(--text-3);">' + ppEsc(g.gifticon_id || '-') + '</td>'
       + '<td style="text-align:center">' + gexValidity(g) + '</td>'
@@ -9758,13 +9827,82 @@ window.gunApplyFilters = function() {
   var code = (document.getElementById('gun-f-code') || {}).value || '';
   GUN_CTRL.applyFilter(function(g) {
     var u = g._user || {};
-    if (name && !ppMatch(u.name || u.nickname, name)) return false;
+    if (!identityMatch(u, g.user_id, name)) return false;
     if (nick && !ppMatch(u.nickname, nick)) return false;
     if (code && !ppMatch(g.code, code)) return false;
     if (!gunDateInRange(g)) return false;
     return true;
   });
 };
+
+/* ── 6. 다우테크 오류 로그 ──
+   기프티콘 발급 연동(다우테크)에서 난 오류를 모아 보는 자리. 프라이스픽은 아직 그 연동이
+   없어 쌓이는 기록이 없다 — 칸과 검색은 포인츠허브 정리대로 세워 두고, 기록이 생기면
+   gifticon_error_logs 를 읽어 그대로 그린다. */
+var GERR_CTRL = window.GERR_CTRL = ppMakeListController(20, function(pageItems, state, totalPages) {
+  var tbody = document.querySelector('#sec-gifticon-errlog table tbody');
+  var pag = document.getElementById('gerr-pagination');
+  if (!tbody) return;
+  if (!pageItems.length) { tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:40px;color:var(--text-3);">No data</td></tr>'; if (pag) pag.innerHTML = ''; return; }
+  tbody.innerHTML = pageItems.map(function(e) {
+    return '<tr>'
+      + '<td style="text-align:center">' + gexTwoLine(ppDt(e.created_at), ppTm(e.created_at)) + '</td>'
+      + '<td>' + identityCell(e._user, e.user_id) + '</td>'
+      + '<td>' + ppEsc(e.product_name || '—') + '</td>'
+      + '<td style="text-align:center">' + ppEsc(e.action || '—') + '</td>'
+      + '<td style="text-align:center;color:var(--danger);font-weight:700;">' + ppEsc(e.error_code || '—') + '</td>'
+      + '<td style="white-space:normal">' + ppEsc(e.error_message || '—') + '</td>'
+      + '<td style="text-align:center;font-size:11px;color:var(--text-3)">' + ppEsc(e.device || '—') + '</td>'
+      + '<td style="text-align:center"><button class="btn btn-ghost btn-sm" onclick="gerrDetail(&quot;' + e._id + '&quot;)">상세보기</button></td>'
+      + '</tr>';
+  }).join('');
+  if (pag) pag.innerHTML = ppPaginationHtml('GERR_CTRL', state.page, totalPages);
+});
+window.gerrApplyFilters = function() {
+  var q = (document.getElementById('gerr-f-q') || {}).value || '';
+  var from = (document.getElementById('gerr-f-from') || {}).value || '';
+  var to = (document.getElementById('gerr-f-to') || {}).value || '';
+  GERR_CTRL.applyFilter(function(e) {
+    if (!identityMatch(e._user, e.user_id, q)) return false;
+    if (from || to) {
+      var v = e.created_at;
+      if (!v || !v.toDate) return false;
+      var d = v.toDate();
+      if (from && d < new Date(from + 'T00:00:00')) return false;
+      if (to && d > new Date(to + 'T23:59:59')) return false;
+    }
+    return true;
+  });
+};
+window.gerrDetail = function(id) {
+  var rows = (GERR_CTRL.state && GERR_CTRL.state.rows) || [];
+  var e = rows.filter(function(x){ return x._id === id; })[0];
+  if (!e) return;
+  var NL = String.fromCharCode(10);
+  alert('발생일시: ' + ppDt(e.created_at) + ' ' + ppTm(e.created_at)
+    + NL + '액션: ' + (e.action || '—')
+    + NL + '에러 코드: ' + (e.error_code || '—')
+    + NL + '에러 메시지: ' + (e.error_message || '—')
+    + NL + '기기: ' + (e.device || '—'));
+};
+function loadGifticonErrLog() {
+  var tbody = document.querySelector('#sec-gifticon-errlog table tbody');
+  if (!tbody) return;
+  db.collection('gifticon_error_logs').orderBy('created_at', 'desc').limit(300).get().then(function(snap) {
+    var cnt = document.getElementById('gerr-count');
+    if (cnt) cnt.textContent = '총 ' + snap.size + '건';
+    if (snap.empty) { GERR_CTRL.setRows([]); return; }
+    dmFetchUsersByIds(snap.docs.map(function(d){ return d.data().user_id; })).then(function(userMap) {
+      GERR_CTRL.setRows(snap.docs.map(function(d) { return Object.assign({ _id: d.id, _user: userMap[d.data().user_id] }, d.data()); }));
+    });
+  }).catch(function(e) {
+    /* 컬렉션이 아직 없으면 조용히 빈 표로 둔다 — 없는 것과 오류는 다르다. */
+    console.warn('gifticonErrLog', e && e.code);
+    var cnt = document.getElementById('gerr-count'); if (cnt) cnt.textContent = '총 0건';
+    GERR_CTRL.setRows([]);
+  });
+}
+window.loadGifticonErrLog = loadGifticonErrLog;
 
 function loadGifticonUnused() {
   var tbody = document.querySelector('#sec-gifticon-unused table tbody');
@@ -9785,9 +9923,9 @@ window.loadGifticonUnused = loadGifticonUnused;
 window.csvExportGifticonUnused = function() {
   var rows = (GUN_CTRL.state && GUN_CTRL.state.filtered) || [];
   ppDownloadCsv('gifticon_unused.csv',
-    ['구매일','주문번호','이름','닉네임','상품명','상품코드','유효기간'],
+    ['구매일','주문번호','닉네임','카카오톡 아이디','User 아이디','상품명','상품코드','유효기간'],
     rows.map(function(g){ var u = g._user || {};
-      return [ppDt(g.exchanged_at) + ' ' + ppTm(g.exchanged_at), g._id, u.name || '', u.nickname || '',
+      return [ppDt(g.exchanged_at) + ' ' + ppTm(g.exchanged_at), g._id, u.nickname || '', u.kakao_login_id || '', g.user_id || '',
         (GIFTICON_PRODUCTS_CACHE[g.gifticon_id] || {}).name || g.gifticon_id || '', g.gifticon_id || '', gexValidity(g)];
     }));
 };
@@ -9803,7 +9941,7 @@ var GCANCEL_CTRL = window.GCANCEL_CTRL = ppMakeListController(20, function(pageI
     return '<tr>'
       + '<td style="text-align:center">' + ((state.page-1)*state.pageSize + i + 1) + '</td>'
       + '<td style="font-size:11px;font-family:monospace;color:var(--text-3);">' + ppEsc(g._id) + '</td>'
-      + '<td>' + gexTwoLine(ppEsc(u.name || u.nickname || '—'), ppEsc(u.name ? (u.nickname || '') : '')) + '</td>'
+      + '<td>' + identityCell(u, g.user_id) + '</td>'
       + '<td>' + gexProductName(g) + '</td>'
       + '<td style="text-align:center">' + gexTwoLine(ppDt(g.cancelled_at), ppTm(g.cancelled_at)) + '</td>'
       + '<td style="text-align:center"><span style="background:var(--danger-soft);color:var(--danger);padding:3px 8px;border-radius:99px;font-size:11px;font-weight:600;">' + ppEsc(g.cancel_reason || '관리자 취소') + '</span></td>'
@@ -9824,7 +9962,7 @@ window.gcancelApplyFilters = function() {
   var to = (document.getElementById('gcancel-f-to') || {}).value || '';
   GCANCEL_CTRL.applyFilter(function(g) {
     var u = g._user || {};
-    if (name && !ppMatch(u.name || u.nickname, name)) return false;
+    if (!identityMatch(u, g.user_id, name)) return false;
     if (nick && !ppMatch(u.nickname, nick)) return false;
     if (order && !ppMatch(g._id, order)) return false;
     if (product) {
