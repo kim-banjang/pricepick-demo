@@ -1037,6 +1037,32 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
    티켓 가치 설정 전용 (cms/ticket-value.html 이식, 2026-08-12)
    기존 토큰만 재사용 — 새 색·새 컴포넌트 없음.
    ───────────────────────────────────────────── */
+/* 포인츠허브 목록 하단 — 「페이지 당 행:」 · 「1-10 / 455」 · 이전/다음 */
+.gip-pager{display:flex;align-items:center;justify-content:flex-end;gap:14px;
+  padding:12px 18px;border-top:1px solid var(--border);font-size:12px;color:var(--text-2);}
+.gip-pager .filter-sel{height:30px;padding:0 8px;font-size:12px;}
+.gip-pager-range{font-variant-numeric:tabular-nums;}
+/* 판매가격 - 등급.장수 위, 환산 원화 아래 */
+.gip-price-main{font-weight:700;color:var(--text);}
+.gip-price-won{font-size:11px;color:var(--text-3);margin-top:2px;}
+.gip-price-none{font-size:11px;color:var(--danger);margin-top:2px;}
+/* 상품 상세 정보 모달 — 포인츠허브 배치(왼쪽 이미지, 오른쪽 2열 격자) */
+.gid-sub{font-size:13px;font-weight:700;color:var(--text);margin:0 0 14px;}
+.gid-body{display:flex;gap:22px;align-items:flex-start;}
+.gid-img-col{width:150px;flex-shrink:0;text-align:center;}
+.gid-img{width:150px;height:150px;border:1px solid var(--border);border-radius:var(--r-md);
+  background:var(--surface-2);display:flex;align-items:center;justify-content:center;
+  font-size:52px;overflow:hidden;margin-bottom:10px;}
+.gid-img img{width:100%;height:100%;object-fit:cover;}
+.gid-grid{flex:1;display:grid;grid-template-columns:1fr 1fr;gap:12px 16px;min-width:0;}
+.gid-f{min-width:0;}
+.gid-f .form-label{font-size:11px;font-weight:700;color:var(--text-2);margin-bottom:5px;display:block;}
+.gid-price-row{display:flex;gap:8px;}
+.gid-price-row .form-input{min-width:0;}
+.gid-won{font-size:12px;color:var(--text-2);margin-top:6px;}
+.gid-won.none{color:var(--danger);}
+.gid-note{margin-top:22px;padding-top:18px;border-top:1px solid var(--border);}
+
 #sec-ticket-value th{font-size:13px;font-weight:700;text-transform:none;letter-spacing:0;}
 #sec-ticket-value .btn{font-size:13px;font-weight:700;padding:7px 14px;}
 #sec-ticket-value .info-box{font-size:13px;}
@@ -1299,21 +1325,29 @@ window.CMS_FEATURES = {
           <span class="sb-chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></span>
         </div>
         <div class="sb-grp-items">
-          <button class="sb-item" id="nav-gifticons" data-label="구매/사용 내역" onclick="go('gifticons',this)">
-            <span class="sb-item-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6"/><path d="M9 16h4"/></svg></span>
-            <span class="sb-item-lbl" id="nav-label-gifticons">구매/사용 내역</span>
-          </button>
-          <button class="sb-item" id="nav-gifticon-cancel" data-label="취소 내역" onclick="go('gifticon-cancel',this)">
-            <span class="sb-item-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg></span>
-            <span class="sb-item-lbl" id="nav-label-gifticon-cancel">취소 내역</span>
-          </button>
           <button class="sb-item" id="nav-gifticon-products" data-label="상품 목록" onclick="go('gifticon-products',this)">
             <span class="sb-item-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg></span>
             <span class="sb-item-lbl" id="nav-label-gifticon-products">상품 목록</span>
           </button>
-          <button class="sb-item" id="nav-gifticon-bulk" data-label="상품설명 일괄등록" onclick="go('gifticon-bulk',this)">
+          <button class="sb-item" id="nav-gifticons" data-label="플랫폼별 구매내역" onclick="go('gifticons',this)">
+            <span class="sb-item-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6"/><path d="M9 16h4"/></svg></span>
+            <span class="sb-item-lbl" id="nav-label-gifticons">플랫폼별 구매내역</span>
+          </button>
+          <button class="sb-item" id="nav-gifticon-unused" data-label="기프티콘 미사용 취소" onclick="go('gifticon-unused',this)">
+            <span class="sb-item-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M3 12a9 9 0 1 0 3-6.7"/><polyline points="3 4 3 9 8 9"/></svg></span>
+            <span class="sb-item-lbl" id="nav-label-gifticon-unused">기프티콘 미사용 취소</span>
+          </button>
+          <button class="sb-item" id="nav-gifticon-cancel" data-label="취소내역" onclick="go('gifticon-cancel',this)">
+            <span class="sb-item-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg></span>
+            <span class="sb-item-lbl" id="nav-label-gifticon-cancel">취소내역</span>
+          </button>
+          <button class="sb-item" id="nav-gifticon-bulk" data-label="상품 설명 일괄 등록" onclick="go('gifticon-bulk',this)">
             <span class="sb-item-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></span>
-            <span class="sb-item-lbl" id="nav-label-gifticon-bulk">상품설명 일괄등록</span>
+            <span class="sb-item-lbl" id="nav-label-gifticon-bulk">상품 설명 일괄 등록</span>
+          </button>
+          <button class="sb-item" id="nav-gifticon-errlog" data-label="다우테크 오류 로그" onclick="go('gifticon-errlog',this)">
+            <span class="sb-item-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span>
+            <span class="sb-item-lbl" id="nav-label-gifticon-errlog">다우테크 오류 로그</span>
           </button>
         </div>
       </div>
@@ -2387,25 +2421,18 @@ window.CMS_FEATURES = {
     </div>
 
     <div class="section" id="sec-gifticon-products">
-      <div class="info-box">기프티콘 연동 상품 목록입니다. 교환 티켓은 보상정책 기준으로 자동 계산됩니다. 교환 티켓 칩을 클릭하면 수량을, 이미지 칸을 클릭하면 상품 이미지를 수정할 수 있습니다.</div>
       <div class="toolbar" style="flex-wrap:wrap;gap:8px">
-        <select class="filter-sel"><option>전체 카테고리</option><option>커피/음료</option><option>문화/생활</option><option>편의점</option><option>외식</option><option>쇼핑</option></select>
-        <select class="filter-sel"><option>전체 상태</option><option>판매중</option><option>품절</option><option>판매중지</option></select>
-        <input class="search-box" placeholder="상품명 검색" style="width:160px">
-        <button class="btn btn-primary btn-sm" onclick="toast('검색 완료')">검색</button>
+        <input class="search-box" id="gip-search" placeholder="상품명을 입력하세요." style="width:260px" onkeydown="if(event.key==='Enter')gipApplyFilters()">
+        <button class="btn btn-primary btn-sm" onclick="gipApplyFilters()">검색</button>
+        <button class="btn btn-primary btn-sm" id="pp-gi-add-btn" style="margin-left:auto" onclick="openGifticonModal()">+ 상품 추가</button>
       </div>
       <div class="card">
-        <div class="card-header"><div class="card-title">상품 목록</div><span style="font-size:12px;color:var(--text-2)">총 455개 상품</span></div>
+        <div class="card-header"><div class="card-title">상품 목록</div><span style="font-size:12px;color:var(--text-2)" id="gip-count">—</span></div>
         <table>
-          <thead><tr><th>No</th><th>이미지</th><th>카테고리</th><th>브랜드</th><th>상품명</th><th>상품코드</th><th>판매종료일</th><th>유효기간</th><th>판매 가격</th><th>교환 티켓</th><th>상태</th></tr></thead>
+          <thead><tr><th style="width:52px">No</th><th>카테고리</th><th>브랜드</th><th style="width:70px">이미지</th><th>상품명</th><th>상품코드</th><th>상품판매종료일</th><th>유효기간</th><th>판매가격</th><th style="width:96px">상태</th></tr></thead>
           <tbody id="gifticon-tbody"></tbody>
         </table>
-        <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 18px;border-top:1px solid var(--border)">
-          <div style="display:flex;gap:4px;">
-            <button class="btn btn-ghost btn-sm" disabled>이전</button>
-            <button class="btn btn-ghost btn-sm" onclick="toast('다음 페이지')">다음</button>
-          </div>
-        </div>
+        <div class="gip-pager" id="gip-pager"></div>
       </div>
     </div>
 <div class="section" id="sec-gifticon-bulk">
@@ -7189,6 +7216,69 @@ Object.assign(KO2VI,{
   </div>
 </div>
 
+<!-- [추가] 상품 상세 정보 모달 — 포인츠허브 「상품 상세 정보」 구조 그대로.
+     판매가격만 등급 티켓으로 받고 원화는 환산해 보여준다. -->
+<div id="pp-gid-modal" style="display:none;position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,.45);align-items:center;justify-content:center;">
+  <div style="background:var(--surface);border-radius:var(--r-xl);padding:26px;width:100%;max-width:720px;margin:16px;max-height:90vh;overflow-y:auto;box-shadow:var(--shadow-lg);">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;">
+      <div style="font-size:16px;font-weight:700;">상품 상세 정보</div>
+      <button id="pp-gid-close" class="btn btn-ghost btn-sm" type="button">닫기</button>
+    </div>
+
+    <div class="gid-sub">기본 정보</div>
+    <div class="gid-body">
+      <div class="gid-img-col">
+        <div class="gid-img" id="pp-gid-img"></div>
+        <button class="btn btn-ghost btn-sm" type="button" id="pp-gid-img-btn" style="width:100%">이미지 변경</button>
+      </div>
+      <div class="gid-grid">
+        <div class="gid-f"><label class="form-label">카테고리</label>
+          <select id="pp-gid-category" class="form-input" style="appearance:auto;">
+            <option value="커피/음료">커피/음료</option><option value="편의점">편의점</option>
+            <option value="외식">외식</option><option value="문화/생활">문화/생활</option><option value="쇼핑">쇼핑</option>
+          </select></div>
+        <div class="gid-f"><label class="form-label">상품코드</label>
+          <input id="pp-gid-code" class="form-input" type="text" readonly style="background:var(--surface-2);font-family:ui-monospace,monospace;font-size:12px;"></div>
+
+        <div class="gid-f"><label class="form-label">유효기간 (일)</label>
+          <input id="pp-gid-validity" class="form-input" type="number" min="1" max="365"></div>
+        <div class="gid-f"><label class="form-label">상품명</label>
+          <input id="pp-gid-name" class="form-input" type="text"></div>
+
+        <div class="gid-f"><label class="form-label">상품판매종료일</label>
+          <input id="pp-gid-saleend" class="form-input" type="date"></div>
+        <div class="gid-f"><label class="form-label">판매가격</label>
+          <div class="gid-price-row">
+            <select id="pp-gid-grade" class="form-input" style="appearance:auto;flex:1;">
+              <option value="bronze">브론즈</option><option value="silver">실버</option><option value="gold">골드</option>
+            </select>
+            <input id="pp-gid-count" class="form-input" type="number" min="1" max="999" style="width:92px;text-align:right;">
+          </div>
+          <div class="gid-won" id="pp-gid-won"></div></div>
+
+        <div class="gid-f"><label class="form-label">브랜드</label>
+          <input id="pp-gid-brand" class="form-input" type="text"></div>
+        <div class="gid-f"><label class="form-label">이모지</label>
+          <input id="pp-gid-emoji" class="form-input" type="text" maxlength="4" style="font-size:20px;text-align:center;"></div>
+
+        <div class="gid-f" style="grid-column:1 / -1"><label class="form-label">상품 이미지 경로</label>
+          <input id="pp-gid-image" class="form-input" type="text" placeholder="/app/assets/gifticon/ediya-americano.jpg"></div>
+      </div>
+    </div>
+
+    <div id="pp-gid-error" style="display:none;background:var(--danger-soft);color:var(--danger);border-radius:var(--r-md);padding:10px 14px;font-size:13px;margin-top:14px;"></div>
+    <div style="display:flex;justify-content:flex-end;margin-top:18px;">
+      <button id="pp-gid-save" class="btn btn-primary" type="button">저장</button>
+    </div>
+
+    <div class="gid-note">
+      <div class="gid-sub">기프팅 쿠폰 유의사항</div>
+      <textarea id="pp-gid-notice" class="form-input" rows="6" style="resize:vertical;line-height:1.6;"
+        placeholder="이 상품의 유의사항을 적어 주세요."></textarea>
+    </div>
+  </div>
+</div>
+
 <!-- ════ PRICEPICK CMS: FIREBASE INJECTION ════ -->
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
@@ -7483,63 +7573,122 @@ function updateStatValue(selector, value) {
 }
 
 /* ── Gifticon Products ── */
+/* ── 등급별 환산 값 ──
+   값을 여기 박지 않는다. 「티켓 가치 설정」 화면이 읽고 쓰는 settings/ticket_value
+   한 곳만 읽는다 — 문서마다 옛 교환비가 남아 있어 어느 것을 고를지 정하는 문제를
+   만들지 않기 위해서다. 설정이 비어 있으면 원화를 지어내지 않고 「환산값 미설정」으로 둔다. */
+var GIP_TV = null;
+function gipLoadTicketValue() {
+  return db.collection('settings').doc('ticket_value').get()
+    .then(function(d){ GIP_TV = (d.exists && d.data()) || null; return GIP_TV; })
+    .catch(function(e){ console.error('ticket_value', e); GIP_TV = null; return null; });
+}
+var GIP_GRADE_KO = { bronze:'브론즈', silver:'실버', gold:'골드' };
+/* 포인츠허브는 판매가격을 원화로 받지만 우리는 등급 티켓으로 받고 원화는 환산해 보여만 준다.
+   두 번 받으면 어긋나므로 원화는 입력받지 않는다. */
+function gipPriceHtml(grade, count) {
+  grade = grade || 'bronze';
+  count = count || 1;
+  var unit = (GIP_TV && typeof GIP_TV[grade] === 'number') ? GIP_TV[grade] : null;
+  var sub = (unit === null)
+    ? '<div class="gip-price-none">(환산값 미설정)</div>'
+    : '<div class="gip-price-won">(' + (unit * count).toLocaleString('ko-KR') + '원)</div>';
+  return '<div class="gip-price-main">' + (GIP_GRADE_KO[grade] || grade) + ' ' + count + '</div>' + sub;
+}
+
+var GIP_ROWS = [];
+var GIP_PAGE = 1;
+var GIP_SIZE = 10;
+var GIP_Q = '';
+
+window.gipApplyFilters = function() {
+  GIP_Q = ((document.getElementById('gip-search') || {}).value || '').trim();
+  GIP_PAGE = 1;
+  gipRender();
+};
+window.gipSetSize = function(v) { GIP_SIZE = parseInt(v, 10) || 10; GIP_PAGE = 1; gipRender(); };
+window.gipGo = function(d) { GIP_PAGE += d; gipRender(); };
+
+function gipFiltered() {
+  if (!GIP_Q) return GIP_ROWS;
+  return GIP_ROWS.filter(function(r){ return ppMatch(r.name || r.product_name, GIP_Q); });
+}
+
+function gipRender() {
+  var tbody = document.getElementById('gifticon-tbody');
+  if (!tbody) return;
+  var list = gipFiltered();
+  var total = list.length;
+  var pages = Math.max(1, Math.ceil(total / GIP_SIZE));
+  if (GIP_PAGE > pages) GIP_PAGE = pages;
+  if (GIP_PAGE < 1) GIP_PAGE = 1;
+  var from = (GIP_PAGE - 1) * GIP_SIZE;
+  var page = list.slice(from, from + GIP_SIZE);
+
+  var cnt = document.getElementById('gip-count');
+  if (cnt) cnt.textContent = '총 ' + total + '개 상품';
+
+  if (!page.length) {
+    tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;padding:32px;color:var(--text-3);">'
+      + (GIP_Q ? '조건에 맞는 상품이 없습니다.' : '등록된 상품이 없습니다. 「+ 상품 추가」로 등록하세요.') + '</td></tr>';
+  } else {
+    tbody.innerHTML = page.map(function(g, i) {
+      var statusBadge = g.status === 'active'
+        ? '<span style="background:var(--success-soft);color:var(--success);padding:3px 8px;border-radius:99px;font-size:11px;font-weight:600;">판매중</span>'
+        : '<span style="background:var(--danger-soft);color:var(--danger);padding:3px 8px;border-radius:99px;font-size:11px;font-weight:600;">판매중지</span>';
+      var thumb = g.image_url
+        ? '<img src="' + ppEsc(g.image_url) + '" alt="" style="width:40px;height:40px;object-fit:cover;border-radius:6px;display:block;margin:0 auto;border:1px solid var(--border);">'
+        : '<span style="font-size:20px;opacity:.55">' + (g.emoji || '\u{1F381}') + '</span>';
+      return '<tr style="cursor:pointer" onclick="giOpenDetail(&quot;' + g._id + '&quot;)">'
+        + '<td style="text-align:center;color:var(--text-3);">' + (from + i + 1) + '</td>'
+        + '<td>' + ppEsc(g.category || '기타') + '</td>'
+        + '<td style="font-weight:600;">' + ppEsc(g.brand || '') + '</td>'
+        + '<td style="text-align:center">' + thumb + '</td>'
+        + '<td>' + ppEsc(g.name || g.product_name || '') + '</td>'
+        + '<td style="font-family:monospace;font-size:11px;color:var(--text-3);">' + ppEsc(g._id) + '</td>'
+        + '<td style="color:var(--text-3);">' + ppEsc(g.sale_end_date || '—') + '</td>'
+        + '<td>' + (g.validity_days || 90) + '일</td>'
+        + '<td>' + gipPriceHtml(g.required_grade, g.required_count) + '</td>'
+        + '<td style="text-align:center">' + statusBadge + '</td>'
+        + '</tr>';
+    }).join('');
+  }
+
+  var pager = document.getElementById('gip-pager');
+  if (pager) {
+    var lo = total ? from + 1 : 0;
+    var hi = Math.min(from + GIP_SIZE, total);
+    pager.innerHTML = '<span>페이지 당 행:</span>'
+      + '<select class="filter-sel" onchange="gipSetSize(this.value)">'
+      + [10,25,50,100].map(function(v){ return '<option value="' + v + '"' + (v===GIP_SIZE?' selected':'') + '>' + v + '</option>'; }).join('')
+      + '</select>'
+      + '<span class="gip-pager-range">' + lo + '\u2013' + hi + ' / ' + total + '</span>'
+      + '<span style="display:flex;gap:4px;">'
+      + '<button class="btn btn-ghost btn-sm" ' + (GIP_PAGE<=1?'disabled':'onclick="gipGo(-1)"') + '>이전</button>'
+      + '<button class="btn btn-ghost btn-sm" ' + (GIP_PAGE>=pages?'disabled':'onclick="gipGo(1)"') + '>다음</button>'
+      + '</span>';
+  }
+}
+
 function loadGifticonProducts() {
   var tbody = document.getElementById('gifticon-tbody');
   if (!tbody) return;
-  
-  /* Add "상품 추가" button to toolbar */
-  var toolbar = document.querySelector('#sec-gifticon-products .toolbar');
-  if (toolbar && !toolbar.querySelector('#pp-gi-add-btn')) {
-    var addBtn = document.createElement('button');
-    addBtn.id = 'pp-gi-add-btn';
-    addBtn.className = 'btn btn-primary btn-sm';
-    addBtn.style.marginLeft = 'auto';
-    addBtn.textContent = '+ 상품 추가';
-    addBtn.addEventListener('click', function() { openGifticonModal(); });
-    toolbar.appendChild(addBtn);
-  }
-
-  db.collection('gifticons').orderBy('created_at', 'desc').limit(20).get()
-    .then(function(snap) {
-      if (snap.empty) {
-        tbody.innerHTML = '<tr><td colspan="11" style="text-align:center;padding:32px;color:var(--text-3);">등록된 상품이 없습니다. "상품 추가" 버튼으로 등록하세요.</td></tr>';
-        /* Update count */
-        var countEl = document.querySelector('#sec-gifticon-products .card-header span');
-        if (countEl) countEl.textContent = '총 0개 상품';
-        return;
-      }
-      var rows = [];
-      var n = 1;
-      GIFTICON_PRODUCTS_CACHE = {};
-      snap.forEach(function(doc) {
-        var g = doc.data();
-        GIFTICON_PRODUCTS_CACHE[doc.id] = g;
-        var gradeName = { bronze: '브론즈', silver: '실버', gold: '골드' }[g.required_grade || 'bronze'];
-        var statusBadge = g.status === 'active'
-          ? '<span style="background:var(--success-soft);color:var(--success);padding:3px 8px;border-radius:99px;font-size:11px;font-weight:600;">판매중</span>'
-          : '<span style="background:var(--danger-soft);color:var(--danger);padding:3px 8px;border-radius:99px;font-size:11px;font-weight:600;">판매중지</span>';
-        var thumb = g.image_url
-          ? '<img src="' + ppEsc(g.image_url) + '" alt="" style="width:40px;height:40px;object-fit:cover;border-radius:6px;display:block;margin:0 auto;border:1px solid var(--border);" onerror="this.outerHTML=\'<span style=&quot;font-size:20px&quot;>' + (g.emoji || '🎁') + '</span>\'">'
-          : '<span style="font-size:20px;opacity:.55">' + (g.emoji || '🎁') + '</span>';
-        rows.push('<tr>'
-          + '<td style="text-align:center;color:var(--text-3);">' + n++ + '</td>'
-          + '<td style="text-align:center;cursor:pointer" title="클릭해서 상품 이미지 등록·수정" onclick="giOpenImageEdit(\'' + doc.id + '\')">' + thumb + '</td>'
-          + '<td>' + (g.category || '기타') + '</td>'
-          + '<td style="font-weight:600;">' + (g.brand || '') + '</td>'
-          + '<td>' + (g.emoji || '') + ' ' + (g.name || g.product_name || '') + '</td>'
-          + '<td style="font-family:monospace;font-size:11px;color:var(--text-3);">' + doc.id.slice(0,12) + '…</td>'
-          + '<td style="color:var(--text-3);">-</td>'
-          + '<td>' + (g.validity_days || 90) + '일</td>'
-          + '<td>-</td>'
-          + '<td><span style="background:var(--main-soft);color:var(--main);padding:3px 8px;border-radius:99px;font-size:11px;font-weight:700;cursor:pointer" onclick="giOpenTicketEdit(\'' + doc.id + '\')">' + gradeName + ' ' + (g.required_count || 1) + '장</span></td>'
-          + '<td>' + statusBadge + '</td>'
-          + '</tr>');
-      });
-      tbody.innerHTML = rows.join('');
-      var countEl2 = document.querySelector('#sec-gifticon-products .card-header span');
-      if (countEl2) countEl2.textContent = '총 ' + snap.size + '개 상품';
-    }).catch(function(e){ console.error('gifticonProducts', e); });
+  Promise.all([
+    db.collection('gifticons').orderBy('created_at', 'desc').limit(500).get(),
+    gipLoadTicketValue()
+  ]).then(function(res) {
+    var snap = res[0];
+    GIFTICON_PRODUCTS_CACHE = {};
+    GIP_ROWS = snap.docs.map(function(doc) {
+      var g = doc.data();
+      GIFTICON_PRODUCTS_CACHE[doc.id] = g;
+      return Object.assign({ _id: doc.id }, g);
+    });
+    gipRender();
+  }).catch(function(e){ console.error('gifticonProducts', e); });
 }
+/* giOpenImageEdit 등과 같이 밖에서도 부를 수 있게 둔다(다른 화면의 저장 후 새로고침용). */
+window.loadGifticonProducts = loadGifticonProducts;
 
 /* ── sec-gifticon-bulk ── CSV 일괄 등록/수정 (gifticons, doc.id = 상품코드) ── */
 var GI_BULK_ROWS = [];
@@ -14299,6 +14448,100 @@ window.csvExportGifticonCancel = function() {
 };
 
 /* ── Gifticon Modal ── */
+/* ── 상품 상세 정보 (포인츠허브: 목록에서 행을 누르면 뜬다) ── */
+var GID_ID = null;
+function gidWonRefresh() {
+  var grade = (document.getElementById('pp-gid-grade') || {}).value || 'bronze';
+  var count = parseInt((document.getElementById('pp-gid-count') || {}).value, 10) || 1;
+  var el = document.getElementById('pp-gid-won');
+  if (!el) return;
+  var unit = (GIP_TV && typeof GIP_TV[grade] === 'number') ? GIP_TV[grade] : null;
+  if (unit === null) { el.className = 'gid-won none'; el.textContent = '(환산값 미설정 — 티켓 가치 설정에서 등급별 환산가치를 먼저 넣어 주세요)'; return; }
+  el.className = 'gid-won';
+  el.textContent = '(' + (unit * count).toLocaleString('ko-KR') + '원)';
+}
+function gidImgRefresh() {
+  var box = document.getElementById('pp-gid-img');
+  if (!box) return;
+  var url = ((document.getElementById('pp-gid-image') || {}).value || '').trim();
+  var emoji = ((document.getElementById('pp-gid-emoji') || {}).value || '').trim() || '\u{1F381}';
+  box.innerHTML = url ? '<img src="' + ppEsc(url) + '" alt="">' : emoji;
+}
+window.giOpenDetail = function(id) {
+  var g = GIFTICON_PRODUCTS_CACHE[id];
+  if (!g) return;
+  GID_ID = id;
+  var set = function(el, v) { var e = document.getElementById(el); if (e) e.value = v == null ? '' : v; };
+  set('pp-gid-category', g.category || '커피/음료');
+  set('pp-gid-code', id);
+  set('pp-gid-validity', g.validity_days || 90);
+  set('pp-gid-name', g.name || g.product_name || '');
+  set('pp-gid-saleend', g.sale_end_date || '');
+  set('pp-gid-grade', g.required_grade || 'bronze');
+  set('pp-gid-count', g.required_count || 1);
+  set('pp-gid-brand', g.brand || '');
+  set('pp-gid-emoji', g.emoji || '');
+  set('pp-gid-image', g.image_url || '');
+  set('pp-gid-notice', g.notice || '');
+  var err = document.getElementById('pp-gid-error'); if (err) err.style.display = 'none';
+  gidWonRefresh(); gidImgRefresh();
+  var m = document.getElementById('pp-gid-modal'); if (m) m.style.display = 'flex';
+};
+function gidClose() { var m = document.getElementById('pp-gid-modal'); if (m) m.style.display = 'none'; GID_ID = null; }
+function gidSave() {
+  if (!GID_ID) return;
+  var v = function(el) { var e = document.getElementById(el); return e ? e.value : ''; };
+  var name = (v('pp-gid-name') || '').trim();
+  var brand = (v('pp-gid-brand') || '').trim();
+  var err = document.getElementById('pp-gid-error');
+  if (!name || !brand) {
+    if (err) { err.textContent = '브랜드와 상품명은 반드시 넣어야 합니다.'; err.style.display = 'block'; }
+    return;
+  }
+  var btn = document.getElementById('pp-gid-save');
+  if (btn) { btn.disabled = true; btn.textContent = '저장 중…'; }
+  db.collection('gifticons').doc(GID_ID).set({
+    category: v('pp-gid-category'),
+    validity_days: parseInt(v('pp-gid-validity'), 10) || 90,
+    name: name,
+    sale_end_date: (v('pp-gid-saleend') || '').trim() || null,
+    required_grade: v('pp-gid-grade') || 'bronze',
+    required_count: parseInt(v('pp-gid-count'), 10) || 1,
+    brand: brand,
+    emoji: (v('pp-gid-emoji') || '').trim(),
+    image_url: (v('pp-gid-image') || '').trim() || null,
+    notice: (v('pp-gid-notice') || '').trim() || null,
+    updated_at: FS.FieldValue.serverTimestamp(),
+  }, { merge: true }).then(function() {
+    toast('상품 정보를 저장했습니다.');
+    logAdmin('기프티콘 상품 수정: ' + GID_ID + ' · ' + name);
+    gidClose();
+    loadGifticonProducts();
+  }).catch(function(e) {
+    console.error('gidSave', e);
+    if (err) { err.textContent = '저장 실패: ' + (e.message || e); err.style.display = 'block'; }
+  }).finally(function() {
+    if (btn) { btn.disabled = false; btn.textContent = '저장'; }
+  });
+}
+document.addEventListener('DOMContentLoaded', function() {
+  var m = document.getElementById('pp-gid-modal');
+  if (!m) return;
+  document.getElementById('pp-gid-close').addEventListener('click', gidClose);
+  document.getElementById('pp-gid-save').addEventListener('click', gidSave);
+  document.getElementById('pp-gid-img-btn').addEventListener('click', function() {
+    var i = document.getElementById('pp-gid-image'); if (i) { i.focus(); i.select(); }
+  });
+  ['pp-gid-grade','pp-gid-count'].forEach(function(id) {
+    var e = document.getElementById(id); if (e) e.addEventListener('input', gidWonRefresh);
+    if (e) e.addEventListener('change', gidWonRefresh);
+  });
+  ['pp-gid-image','pp-gid-emoji'].forEach(function(id) {
+    var e = document.getElementById(id); if (e) e.addEventListener('input', gidImgRefresh);
+  });
+  m.addEventListener('click', function(e) { if (e.target === m) gidClose(); });
+});
+
 function openGifticonModal() {
   var modal = document.getElementById('pp-gifticon-modal');
   if (modal) {
