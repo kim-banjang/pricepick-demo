@@ -4110,6 +4110,10 @@ window.CMS_FEATURES = {
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
             기존 데모 상품 정리
           </button>
+          <button class="btn" style="background:var(--danger-soft,#FEE2E2);color:#B91C1C;border:none;cursor:pointer;" onclick="dmCleanQaTraces()" id="dm-qa-btn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14" stroke-linecap="round"><path d="M4 7h16M9.5 7V5h5v2"/><path d="M6.5 7l1 12h9l1-12"/></svg>
+            확인 자국 정리
+          </button>
         </div>
 
         <!-- 보호 컬렉션 안내 -->
@@ -4117,6 +4121,7 @@ window.CMS_FEATURES = {
           [시나리오 채우기]는 <strong>demo_scenarios</strong>(scripts/seed-demo.js로 등록)에 등록된 가상 손님대로 데이터를 생성합니다. [전체 비우기]는 가상 데이터만 삭제하고
           운영 뼈대(관리자 계정 firstadmin · 마스터 데이터 · 기프티콘 상품 · 배너 · 공지 · 시나리오 정의)는 보존합니다.
           <br>[미연동 계정 교환 내역 정리]는 카카오 미연동 회원에게 남은 기프티콘 교환 건을 지웁니다 — 미연동 회원은 기프티샵을 쓸 수 없으므로(정책 2026-09-16) 그런 기록이 남아 있으면 안 됩니다.
+          <br>[확인 자국 정리]는 화면을 확인하느라 만들어진 <strong>명부에 없는 임시 계정</strong>과 그 계정의 티켓·티켓원장·교환 내역, 그리고 <strong>시험용 상품(test-item…)이 물린 교환 내역</strong>을 지웁니다. 명부(demo_accounts)에 등록된 계정의 정상 내역은 건드리지 않습니다.
           <br>[기존 데모 상품 정리]는 포인츠허브 상품이 들어오기 전부터 있던 이모지 상품을 <strong>전부 지웁니다</strong>. 그 상품을 물고 있는 교환·구매·취소 내역은 먼저 포인츠허브 상품으로 갈아끼운 뒤 지우므로 내역이 깨지지 않습니다. 갈아끼울 상품은 값이 같은 것을 우선해 고릅니다.
         </div>
       </div>
@@ -16368,6 +16373,90 @@ window.dmCleanUnlinkedExchanges = function() {
     toast('정리 실패: ' + (e.message || e));
   }).finally(function() {
     if (btn) { btn.disabled = false; btn.textContent = '미연동 계정 교환 내역 정리'; }
+  });
+};
+
+/* ── 확인 자국 정리 ──
+   화면을 확인하려고 만든 임시 계정·티켓·교환 건을 걷어낸다. 앱은 익명 로그인이라
+   브라우저마다 uid가 다른데, 그 uid로 확인을 하면 명부에 없는 계정과 그 내역이
+   CMS 목록에 그대로 쌓인다. 형님이 보시는 화면이므로 남기지 않는다.
+
+   지우는 것을 고르는 기준(이 셋 중 하나라도 걸리면 임시 계정으로 본다):
+     · users 문서에 qa_trace 표식이 있다
+     · user_tickets 에 reason='demo-verify' 가 있다
+   그리고 위 기준에 걸려도 demo_accounts(명부)에 등록된 계정이면 건드리지 않는다.
+
+   시험용 상품(test-item…)이 물린 교환 내역은 계정을 가리지 않고 지운다 — 상품 자체가
+   확인용이라 명부 계정에 붙어 있어도 남길 이유가 없다. */
+window.dmCleanQaTraces = function() {
+  var NL = String.fromCharCode(10);
+  var btn = document.getElementById('dm-qa-btn');
+  if (btn) { btn.disabled = true; btn.textContent = '살펴보는 중…'; }
+  Promise.all([
+    db.collection('demo_accounts').get(),
+    db.collection('users').get(),
+    db.collection('user_tickets').get(),
+    db.collection('ticket_transactions').get(),
+    db.collection('gifticon_exchanges').get()
+  ]).then(function(res) {
+    var roster = {};
+    res[0].docs.forEach(function(d){ var a = d.data().account_id; if (a) roster[a] = 1; });
+
+    var suspect = {};
+    res[1].docs.forEach(function(d){ if (d.data().qa_trace === true) suspect[d.id] = 1; });
+    res[2].docs.forEach(function(d){ var x = d.data(); if (x.reason === 'demo-verify' && x.user_id) suspect[x.user_id] = 1; });
+    Object.keys(roster).forEach(function(u){ delete suspect[u]; });   /* 명부 계정은 뺀다 */
+
+    var uids = Object.keys(suspect);
+    var isQa = function(u){ return !!suspect[u]; };
+    var isTestItem = function(id){ return String(id || '').indexOf('test-item') === 0; };
+
+    var delUsers = res[1].docs.filter(function(d){ return isQa(d.id); });
+    var delTickets = res[2].docs.filter(function(d){ return isQa(d.data().user_id); });
+    var delTx = res[3].docs.filter(function(d){ return isQa(d.data().user_id); });
+    var delEx = res[4].docs.filter(function(d){ return isQa(d.data().user_id) || isTestItem(d.data().gifticon_id); });
+
+    var total = delUsers.length + delTickets.length + delTx.length + delEx.length;
+    if (!total) { toast('지울 확인 자국이 없습니다.'); return null; }
+
+    var names = delUsers.map(function(d){
+      var x = d.data();
+      return '  · ' + (x.nickname || x.name || '(이름 없음)') + '  ' + d.id;
+    }).join(NL);
+
+    var msg = '화면 확인용으로 남은 자국을 지웁니다.' + NL + NL
+      + '계정 ' + delUsers.length + '건' + (names ? NL + names : '') + NL
+      + '티켓 ' + delTickets.length + '건 · 티켓원장 ' + delTx.length + '건' + NL
+      + '교환 내역 ' + delEx.length + '건 (시험용 상품이 물린 건 포함)' + NL + NL
+      + '명부(demo_accounts)에 등록된 계정의 내역은 건드리지 않습니다.' + NL
+      + '되돌릴 수 없습니다. 진행할까요?';
+    if (!confirm(msg)) return null;
+
+    var all = [].concat(delEx, delTx, delTickets, delUsers);
+    var chain = Promise.resolve();
+    for (var i = 0; i < all.length; i += 400) {
+      (function(chunk) {
+        chain = chain.then(function() {
+          var b = db.batch();
+          chunk.forEach(function(d){ b.delete(d.ref); });
+          return b.commit();
+        });
+      })(all.slice(i, i + 400));
+    }
+    return chain.then(function() {
+      toast('확인 자국 ' + total + '건을 지웠습니다.');
+      logAdmin('확인 자국 정리: 계정 ' + delUsers.length + ' · 티켓 ' + delTickets.length
+        + ' · 티켓원장 ' + delTx.length + ' · 교환 내역 ' + delEx.length);
+      if (window.loadGifticonExchanges) loadGifticonExchanges();
+      if (window.loadGifticonUnused) loadGifticonUnused();
+      if (window.loadGifticonCancel) loadGifticonCancel();
+      if (window.dmLoadStats) dmLoadStats();
+    });
+  }).catch(function(e) {
+    console.error('dmCleanQaTraces', e);
+    toast('정리 실패: ' + (e.message || e));
+  }).finally(function() {
+    if (btn) { btn.disabled = false; btn.textContent = '확인 자국 정리'; }
   });
 };
 
