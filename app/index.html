@@ -10645,12 +10645,13 @@ window.PP_FEATURES = {
 
         <!-- 카테고리 필터 (고정) -->
         <div class="cat-filter" style="margin:0;flex-shrink:0;padding-top:10px;">
-          <div class="cat-pill active">전체</div>
-          <div class="cat-pill">☕ 카페</div>
-          <div class="cat-pill">🍔 패스트푸드</div>
-          <div class="cat-pill">🥖 베이커리</div>
-          <div class="cat-pill">🏪 편의점</div>
-          <div class="cat-pill">💳 금액권</div>
+          <div class="cat-pill active" data-cat="">전체</div>
+          <div class="cat-pill" data-cat="커피/음료">☕ 커피/음료</div>
+          <div class="cat-pill" data-cat="피자/버거/치킨">🍔 피자/버거/치킨</div>
+          <div class="cat-pill" data-cat="베이커리/떡">🥖 베이커리/떡</div>
+          <div class="cat-pill" data-cat="편의점/마트">🏪 편의점/마트</div>
+          <div class="cat-pill" data-cat="상품권/금액권">💳 상품권/금액권</div>
+          <div class="cat-pill" data-cat="문화/생활/기타">🎁 문화/생활/기타</div>
         </div>
 
         <div class="reward-scroll">
@@ -18657,7 +18658,7 @@ function renderExGifticonSummary() {
 function loadGifticons() {
   if (!PP.uid) return;
   renderExGifticonSummary();
-  db.collection('gifticons').where('status', '==', 'active').limit(100).get()
+  db.collection('gifticons').where('status', '==', 'active').limit(600).get()
     .then(function(snap) {
       PP.gifticonList = [];
       snap.forEach(function(doc) {
@@ -18678,15 +18679,49 @@ function ppGiImgFallback(img) {
 }
 window.ppGiImgFallback = ppGiImgFallback;
 
+/* ── 기프티샵 카테고리 거르기 ──
+   칩은 포인츠허브 카테고리 여섯 그대로다. 상품의 category 값이 데모에 먼저 들어간 것들
+   (「편의점」·「외식」·「쇼핑」·「문화/생활」)과 포인츠허브 것(「편의점/마트」 등)이 섞여 있어,
+   칩 이름을 「/」로 쪼갠 조각 중 하나라도 들어 있으면 그 갈래로 본다. */
+var PP_GI_CAT = '';
+function ppGiCatMatch(cat, pick) {
+  if (!pick) return true;
+  cat = String(cat || '');
+  var parts = pick.split('/');
+  for (var i = 0; i < parts.length; i++) {
+    if (parts[i] && cat.indexOf(parts[i]) >= 0) return true;
+  }
+  /* 데모에 먼저 들어간 이름들 — 갈래는 같은데 낱말이 다르다. */
+  if (pick.indexOf('피자') === 0 && cat.indexOf('외식') >= 0) return true;
+  if (pick.indexOf('상품권') === 0 && cat.indexOf('쇼핑') >= 0) return true;
+  if (pick.indexOf('커피') === 0 && cat.indexOf('카페') >= 0) return true;
+  return false;
+}
+function bindGifticonCats() {
+  var wrap = document.querySelector('#pw-24 .cat-filter');
+  if (!wrap || wrap.dataset.ppCatBound) return;
+  wrap.dataset.ppCatBound = '1';
+  wrap.querySelectorAll('.cat-pill').forEach(function (el) {
+    el.addEventListener('click', function () {
+      wrap.querySelectorAll('.cat-pill').forEach(function (x) { x.classList.remove('active'); });
+      el.classList.add('active');
+      PP_GI_CAT = el.getAttribute('data-cat') || '';
+      renderGifticons();
+    }, true);
+  });
+}
+
 function renderGifticons() {
-  var list = PP.gifticonList;
+  bindGifticonCats();
+  var list = (PP.gifticonList || []).filter(function (g) { return ppGiCatMatch(g.category, PP_GI_CAT); });
   var grid = document.querySelector('#pw-24 .ex-grid');
   if (!grid) return;
   if (!list.length) {
     grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px 16px;color:var(--text3);">'
       + '<div style="font-size:var(--fs-number);margin-bottom:12px;">🎁</div>'
-      + '<div style="font-weight:700;color:var(--text1);margin-bottom:6px;">교환 가능한 기프티콘이 없어요</div>'
-      + '<div style="font-size:var(--fs-body);">관리자가 상품을 등록하면 여기에 나타나요</div>'
+      + '<div style="font-weight:700;color:var(--text1);margin-bottom:6px;">'
+      + (PP_GI_CAT ? '이 갈래에는 아직 상품이 없어요' : '교환 가능한 기프티콘이 없어요') + '</div>'
+      + '<div style="font-size:var(--fs-body);">' + (PP_GI_CAT ? '다른 갈래를 눌러 보세요' : '관리자가 상품을 등록하면 여기에 나타나요') + '</div>'
       + '</div>';
     return;
   }
