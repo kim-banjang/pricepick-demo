@@ -7406,6 +7406,44 @@
   .ex-deduct { background: #F3F1FC; border-radius: 12px; padding: 11px 14px; text-align: center; font-size: 13px; font-weight: 600; color: #5A44C9; }
   .ex-cta { margin-top: 10px; width: 100%; background: var(--main); border: none; border-radius: 14px; padding: 16px 0; text-align: center; font-size: 16px; font-weight: 700; color: white; font-family: inherit; cursor: pointer; }
   .ex-detail-bottom { border-top: 1px solid var(--border); padding: 12px 16px 32px; }
+
+  /* ── 교환 완료 — 시안(2026-09-16) ── */
+  .exd-screen { height: 100%; display: flex; flex-direction: column; padding: 0 0 20px; box-sizing: border-box; background: #F7F6FB; overflow-y: auto; }
+  .exd-screen::-webkit-scrollbar { display: none; }
+  .exd-top { display: flex; flex-direction: column; align-items: center; padding-top: 28px; flex: none; }
+  .exd-check { width: 70px; height: 70px; border-radius: 50%; background: #2BB259; box-shadow: 0 0 0 10px rgba(43,178,89,.12), 0 10px 24px rgba(43,178,89,.3); display: flex; align-items: center; justify-content: center; }
+  .exd-t { margin-top: 16px; font-size: 22px; font-weight: 800; color: #191A20; }
+  .exd-s { margin-top: 6px; font-size: 14px; color: #6E6E78; text-align: center; padding: 0 24px; }
+  .exd-card { margin: 22px 24px 0; background: white; border-radius: 20px; box-shadow: 0 6px 24px rgba(25,26,32,.08); flex: none; }
+  .exd-card-top { padding: 20px 20px 0; display: flex; gap: 14px; align-items: center; }
+  .exd-thumb { flex: none; width: 106px; aspect-ratio: 1.586; border-radius: 10px; box-shadow: 0 6px 14px rgba(30,42,86,.25); overflow: hidden; background: #F7F6FB; display: flex; align-items: center; justify-content: center; }
+  .exd-thumb img { width: 100%; height: 100%; object-fit: cover; }
+  .exd-brand { font-size: 12px; font-weight: 600; color: var(--main); }
+  .exd-name { margin-top: 2px; font-size: 16px; font-weight: 800; color: #191A20; line-height: 1.3; }
+  .exd-used { margin-top: 7px; display: inline-flex; align-items: center; gap: 4px; background: #F3F1FC; border-radius: 100px; padding: 4px 10px; }
+  .exd-used svg { width: 17px; height: 17px; }
+  .exd-used span { font-size: 11px; font-weight: 700; color: #5A44C9; }
+  .exd-perf { margin-top: 18px; display: flex; align-items: center; }
+  .exd-notch { flex: none; width: 11px; height: 22px; background: #F7F6FB; }
+  .exd-notch.l { border-radius: 0 11px 11px 0; }
+  .exd-notch.r { border-radius: 11px 0 0 11px; }
+  .exd-dash { flex: 1; border-top: 1.5px dashed #E0DCF0; margin: 0 6px; }
+  .exd-card-bot { padding: 14px 20px 20px; }
+  .exd-code-hd { display: flex; align-items: center; justify-content: space-between; }
+  .exd-code-l { font-size: 12px; color: #9A9AA5; }
+  .exd-copy { display: inline-flex; align-items: center; gap: 5px; border: 1px solid #E4E4EC; border-radius: 100px; padding: 5px 11px; background: white; color: #4B4B55; font-family: inherit; cursor: pointer; }
+  .exd-copy span { font-size: 11px; font-weight: 600; }
+  .exd-code { margin-top: 8px; font-size: 18px; font-weight: 800; letter-spacing: .1em; color: #191A20; font-family: 'SF Mono', Menlo, Consolas, monospace; }
+  .exd-barcode { margin-top: 14px; height: 52px; border-radius: 8px; }
+  .exd-rows { margin-top: 14px; display: flex; flex-direction: column; gap: 7px; font-size: 13px; }
+  .exd-row { display: flex; justify-content: space-between; }
+  .exd-row span { color: #9A9AA5; }
+  .exd-row b { font-weight: 400; color: #4B4B55; }
+  .exd-row b.strong { font-weight: 700; color: #191A20; }
+  .exd-tip { margin: 14px 24px 0; display: flex; align-items: center; gap: 8px; background: #F3F1FC; border-radius: 12px; padding: 11px 14px; flex: none; }
+  .exd-tip span { font-size: 12px; color: #5A44C9; line-height: 1.45; }
+  .exd-ok { margin: 0 24px; width: auto; background: var(--main); border: none; border-radius: 14px; padding: 16px 0; text-align: center; font-size: 16px; font-weight: 700; color: white; font-family: inherit; cursor: pointer; flex: none; }
+  .exd-home { margin: 14px 24px 8px; text-align: center; font-size: 14px; font-weight: 600; color: #8A8A95; cursor: pointer; flex: none; }
   /* 10e 적립 조건 안내 */
   .info-screen { height: 100%; background: var(--bg); display: flex; flex-direction: column; overflow: hidden; }
   .info-hero { background: linear-gradient(135deg, #2a1f4a, #4a3380); padding: 24px 20px; }
@@ -17340,42 +17378,45 @@ function cpkOpen(){var m=document.getElementById('cpk-modal');if(m)m.style.displ
   <!-- [추가] 기프티콘 교환 완료 화면 -->
   <div class="phone-wrap" id="pw-ex-done" data-screen="ex-done">
     <div class="phone">
-      <div class="login-screen">
+      <!-- 시안(2026-09-16) 차례: 초록 체크 / 교환 완료! / 기프티콘 카드(사진·이름·티켓 ·
+           절취선 · 코드·복사·바코드 · 주문번호·교환일·유효기간) / 안내 / 확인 · 홈으로 가기 -->
+      <div class="exd-screen">
         <div class="statusbar">
-          <span>9:41</span>
-          <div class="statusbar-icons"><svg width="17" height="12" viewBox="0 0 17 12" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><rect x="0" y="4" width="3" height="8" rx="1"/><rect x="4.5" y="2.5" width="3" height="9.5" rx="1"/><rect x="9" y="1" width="3" height="11" rx="1"/><rect x="13.5" y="0" width="3" height="12" rx="1"/></svg><svg width="16" height="12" viewBox="0 0 16 12" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M8 2.5C10.2 2.5 12.2 3.4 13.6 4.9L15 3.4C13.2 1.5 10.7 0.3 8 0.3C5.3 0.3 2.8 1.5 1 3.4L2.4 4.9C3.8 3.4 5.8 2.5 8 2.5Z"/><path d="M8 5.5C9.4 5.5 10.7 6.1 11.6 7L13 5.5C11.7 4.2 10 3.3 8 3.3C6 3.3 4.3 4.2 3 5.5L4.4 7C5.3 6.1 6.6 5.5 8 5.5Z"/><circle cx="8" cy="10" r="1.8"/></svg><svg width="25" height="12" viewBox="0 0 25 12" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="currentColor" stroke-opacity="0.35"/><rect x="2" y="2" width="17" height="8" rx="2" fill="currentColor"/><path d="M23 4V8C23.8 7.6 24.5 6.9 24.5 6C24.5 5.1 23.8 4.4 23 4Z" fill="currentColor" fill-opacity="0.4"/></svg></div>
+        <div class="exd-top">
+          <div class="exd-check"><svg width="34" height="34" viewBox="0 0 24 24" fill="none"><path d="M5 12.5L10 17.5L19 7" stroke="white" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div class="exd-t">교환 완료!</div>
+          <div class="exd-s">기프티콘이 발급되었어요. 아래 코드로 사용하세요.</div>
         </div>
-        <div class="login-content" style="padding:32px 24px 24px;display:flex;flex-direction:column;height:100%;box-sizing:border-box;">
-          <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;">
-            <!-- 성공 아이콘 -->
-            <div style="width:80px;height:80px;background:linear-gradient(135deg,#22C55E,#16A34A);border-radius:50%;display:flex;align-items:center;justify-content:center;margin-bottom:20px;box-shadow:0 8px 24px rgba(34,197,94,0.3);">
-              <svg width="38" height="38" viewBox="0 0 24 24" fill="none"><path d="M5 12L10 17L20 7" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </div>
-            <div style="font-size:var(--fs-title);font-weight:800;color:var(--text1);letter-spacing:-0.5px;margin-bottom:8px;">교환 완료!</div>
-            <div style="font-size:var(--fs-body);color:var(--text2);line-height:1.7;margin-bottom:24px;">기프티콘이 발급되었어요.<br>아래 코드로 사용하세요.</div>
-            <!-- 기프티콘 카드 -->
-            <div style="width:100%;background:white;border:1.5px solid var(--border);border-radius:18px;padding:20px;margin-bottom:16px;">
-              <div id="ex-done-thumb" style="width:72px;height:72px;border-radius:12px;margin:0 auto 12px;overflow:hidden;display:none;"></div>
-              <div style="font-size:var(--fs-caption);font-weight:700;color:var(--main);margin-bottom:4px;" id="ex-done-brand">스타벅스</div>
-              <div style="font-size:var(--fs-label);font-weight:800;color:var(--text1);letter-spacing:-0.3px;margin-bottom:16px;" id="ex-done-name">아이스 아메리카노</div>
-              <!-- 바코드 영역 -->
-              <div style="background:#F8F7FF;border:1px dashed #C6AFFF;border-radius:12px;padding:16px;margin-bottom:10px;">
-                <div style="font-size:var(--fs-caption);font-weight:600;color:var(--text3);letter-spacing:0.5px;margin-bottom:8px;">교환 코드</div>
-                <div style="font-family:'Courier New',monospace;font-size:var(--fs-body);font-weight:700;color:var(--text1);letter-spacing:2px;" id="ex-done-code">PP-XXXX-XXXX-XXXX</div>
-                <!-- 바코드 시각 -->
-                <div style="margin-top:12px;height:36px;display:flex;gap:2px;align-items:flex-end;justify-content:center;">
-                  <div style="width:2px;height:36px;background:#1A1130;"></div><div style="width:1px;height:28px;background:#1A1130;"></div><div style="width:3px;height:36px;background:#1A1130;"></div><div style="width:1px;height:30px;background:#1A1130;"></div><div style="width:2px;height:36px;background:#1A1130;"></div><div style="width:1px;height:22px;background:#1A1130;"></div><div style="width:3px;height:36px;background:#1A1130;"></div><div style="width:2px;height:28px;background:#1A1130;"></div><div style="width:1px;height:36px;background:#1A1130;"></div><div style="width:2px;height:24px;background:#1A1130;"></div><div style="width:3px;height:36px;background:#1A1130;"></div><div style="width:1px;height:30px;background:#1A1130;"></div><div style="width:2px;height:36px;background:#1A1130;"></div><div style="width:3px;height:20px;background:#1A1130;"></div><div style="width:1px;height:36px;background:#1A1130;"></div><div style="width:2px;height:26px;background:#1A1130;"></div><div style="width:1px;height:36px;background:#1A1130;"></div><div style="width:3px;height:30px;background:#1A1130;"></div>
-                </div>
-              </div>
-              <div style="font-size:var(--fs-caption);color:var(--text3);" id="ex-done-exp"></div>
+
+        <div class="exd-card">
+          <div class="exd-card-top">
+            <div class="exd-thumb" id="ex-done-thumb"></div>
+            <div style="min-width:0;">
+              <div class="exd-brand" id="ex-done-brand"></div>
+              <div class="exd-name" id="ex-done-name"></div>
+              <div class="exd-used" id="ex-done-used"></div>
             </div>
           </div>
-          <!-- 하단 CTA -->
-          <div style="padding-bottom:8px;">
-            <button class="btn-primary" data-ip-bound="1" onclick="showScreen('pw-20')" style="cursor:pointer;width:100%;margin-bottom:10px;">확인</button>
-            <button data-ip-bound="1" onclick="showScreen('pw-10')" style="width:100%;height:44px;background:none;border:none;color:var(--text3);font-size:var(--fs-body);cursor:pointer;font-family:inherit;">홈으로 가기</button>
+          <div class="exd-perf"><span class="exd-notch l"></span><span class="exd-dash"></span><span class="exd-notch r"></span></div>
+          <div class="exd-card-bot">
+            <div class="exd-code-hd">
+              <div class="exd-code-l">교환 코드</div>
+              <button class="exd-copy" id="ex-done-copy"><svg width="13" height="13" viewBox="0 0 24 24" fill="none"><rect x="9" y="9" width="11" height="11" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M5 15V6a2 2 0 0 1 2-2h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><span>복사</span></button>
+            </div>
+            <div class="exd-code" id="ex-done-code"></div>
+            <div class="exd-barcode" style="background:repeating-linear-gradient(90deg,#191A20 0 2px,transparent 2px 4px,#191A20 4px 7px,transparent 7px 8px,#191A20 8px 9px,transparent 9px 12px,#191A20 12px 14px,transparent 14px 17px);"></div>
+            <div class="exd-rows">
+              <div class="exd-row" id="ex-done-order-row"><span>주문번호</span><b id="ex-done-order"></b></div>
+              <div class="exd-row" id="ex-done-date-row"><span>교환일</span><b id="ex-done-date"></b></div>
+              <div class="exd-row" id="ex-done-exp-row"><span>유효기간</span><b class="strong" id="ex-done-exp"></b></div>
+            </div>
           </div>
         </div>
+
+        <div class="exd-tip"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" style="flex:none"><circle cx="12" cy="12" r="9" stroke="#5A44C9" stroke-width="1.7"/><path d="M12 11v5M12 7.6v.9" stroke="#5A44C9" stroke-width="1.8" stroke-linecap="round"/></svg><span>발급된 기프티콘은 교환 내역에서 다시 확인할 수 있어요.</span></div>
+        <div style="flex:1;"></div>
+        <button class="exd-ok btn-primary" data-ip-bound="1" onclick="showScreen('pw-24h')">확인</button>
+        <div class="exd-home" data-ip-bound="1" onclick="showScreen('pw-10')">홈으로 가기</div>
       </div>
     </div>
   </div>
@@ -18802,14 +18843,15 @@ function ppYmdDot(d) {
   return d.getFullYear() + '.' + ('0' + (d.getMonth() + 1)).slice(-2) + '.' + ('0' + d.getDate()).slice(-2);
 }
 
-/* 교환 완료 화면(pw-ex-done) 채우기 — 교환 직후와 교환 내역에서 코드 볼 때 둘 다 여기로 온다. */
-function ppFillExDone(g, code, expiresAt) {
-  g = g || {};
+/* 교환 완료 화면(pw-ex-done) 채우기 — 교환 직후와 교환 내역에서 코드 볼 때 둘 다 여기로 온다.
+   짜임은 시안 그대로 두고 값만 상품·교환 기록에서 읽는다. 값이 없는 줄은 감춘다. */
+function ppFillExDone(g, x) {
+  g = g || {}; x = x || {};
   var thumb = document.getElementById('ex-done-thumb');
   if (thumb) {
     if (g.image_url) {
       thumb.style.display = '';
-      thumb.innerHTML = '<img src="' + ppEsc(g.image_url) + '" alt="" style="width:100%;height:100%;object-fit:cover;"'
+      thumb.innerHTML = '<img src="' + ppEsc(g.image_url) + '" alt=""'
         + ' onerror="var b=this.parentNode; if(b){b.style.display=\'none\';b.innerHTML=\'\';}">';
     } else {
       thumb.style.display = 'none';
@@ -18820,15 +18862,45 @@ function ppFillExDone(g, code, expiresAt) {
   if (eb) { eb.textContent = g.brand || ''; eb.style.display = g.brand ? '' : 'none'; }
   var en = document.getElementById('ex-done-name');
   if (en) en.textContent = ppStripBrand(g.brand, g.name || g.product_name);
+
+  /* 사용한 티켓 — 교환 기록에 남은 값이 정본(그 뒤 상품 값이 바뀌어도 기록은 그대로다). */
+  var grade = x.grade_used || g.required_grade || 'bronze';
+  var cnt = x.count_used || g.required_count || 1;
+  var gradeName = { bronze: '브론즈', silver: '실버', gold: '골드' }[grade] || '브론즈';
+  var used = document.getElementById('ex-done-used');
+  if (used) used.innerHTML = ticketIcon(grade) + '<span>' + gradeName + ' ' + cnt + '장 사용</span>';
+
   var ec = document.getElementById('ex-done-code');
-  if (ec) ec.textContent = code || '';
-  var exp = document.getElementById('ex-done-exp');
-  if (exp) {
-    var d = ppDate(expiresAt);
-    var vd = ppGiValidDays(g);
-    var txt = d ? (ppYmdDot(d) + '까지 사용 가능') : (vd ? ('발급일로부터 ' + vd + '일 유효') : '');
-    exp.textContent = txt;
-    exp.style.display = txt ? '' : 'none';
+  if (ec) ec.textContent = x.code || '';
+
+  var row = function (id, val) {
+    var r = document.getElementById(id + '-row'), b = document.getElementById(id);
+    if (b) b.textContent = val || '';
+    if (r) r.style.display = val ? '' : 'none';
+  };
+  row('ex-done-order', x.order_no || '');
+  var ex = ppDate(x.exchanged_at);
+  row('ex-done-date', ex ? ppYmdDot(ex) : '');
+  /* 유효기간 — 만료일과 유효일수가 다 있을 때만 「…까지 (N일)」로 쓴다. */
+  var d = ppDate(x.expires_at), vd = ppGiValidDays(g);
+  row('ex-done-exp', d ? (ppYmdDot(d) + '까지' + (vd ? ' (' + vd + '일)' : '')) : '');
+
+  var cp = document.getElementById('ex-done-copy');
+  if (cp && !cp.dataset.ppBound) {
+    cp.dataset.ppBound = '1';
+    cp.addEventListener('click', function () {
+      var t = (document.getElementById('ex-done-code') || {}).textContent || '';
+      if (!t) return;
+      var done = function () { showToast('교환 코드를 복사했어요'); };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(t).then(done).catch(function () {});
+      } else {
+        var ta = document.createElement('textarea');
+        ta.value = t; document.body.appendChild(ta); ta.select();
+        try { document.execCommand('copy'); done(); } catch (e) {}
+        document.body.removeChild(ta);
+      }
+    });
   }
 }
 
@@ -18913,6 +18985,11 @@ function bindExchangeBtn() {
            만료일을 남기지 않는다(없는 날짜를 지어 쓰지 않는다). */
         var validDays = ppGiValidDays(g);
         var expiresAt = validDays ? FS.Timestamp.fromMillis(Date.now() + validDays * 86400000) : null;
+        /* 주문번호 — 시안에 있는 칸이다. 교환 기록에 없던 값이라 교환할 때 만들어 남긴다
+           (교환 코드와 같은 방식). 이 뒤로는 기록에서 읽는다. */
+        var od = new Date();
+        var orderNo = ppYmdDot(od).replace(/\./g, '') + '-'
+          + String(Math.floor(Math.random() * 1000000)).padStart(6, '0');
         var batch = db.batch();
         docs.slice(0, cnt).forEach(function(doc) {
           batch.update(doc.ref, { status: 'used', used_at: now });
@@ -18923,9 +19000,13 @@ function bindExchangeBtn() {
         var exRef = db.collection('gifticon_exchanges').doc();
         batch.set(exRef, {
           user_id: PP.uid, gifticon_id: g._id, grade_used: grade, count_used: cnt,
-          status: 'completed', code: code, expires_at: expiresAt, exchanged_at: now,
+          status: 'completed', code: code, order_no: orderNo,
+          expires_at: expiresAt, exchanged_at: now,
         });
-        return batch.commit().then(function() { return { code: code, expires_at: expiresAt }; });
+        return batch.commit().then(function() {
+          return { code: code, order_no: orderNo, expires_at: expiresAt,
+                   grade_used: grade, count_used: cnt, exchanged_at: new Date() };
+        });
       })
       .then(function(res) {
         if (!res) return;
@@ -18933,7 +19014,7 @@ function bindExchangeBtn() {
         PP.tickets.total -= cnt;
         renderHomeTickets();
         renderMyTicketCard();
-        ppFillExDone(g, res.code, res.expires_at);
+        ppFillExDone(g, res);
         btn.disabled = false;
         window.showScreen('pw-ex-done');
       }).catch(function(e){ console.error('exchange', e); showToast('교환 중 오류'); btn.disabled = false; });
@@ -20749,7 +20830,7 @@ function renderGifticonHistory() {
         var x = ex[parseInt(row.dataset.gx)];
         if (!x.code) return;
         var g = (PP.gifticonList || []).filter(function (it) { return it._id === x.gifticon_id; })[0] || {};
-        ppFillExDone(g, x.code, x.expires_at);
+        ppFillExDone(g, x);
         window.showScreen('pw-ex-done');
       });
     });
