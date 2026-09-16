@@ -17995,6 +17995,55 @@ function onScreenShown(id) {
   if (id === 'pw-30-terms') renderTermsFromCms();
 }
 
+/* ── 기프티샵 관문 ──
+   카카오 미연동 회원은 기프티샵을 쓸 수 없다. 기프티콘이 카카오톡으로 발송되므로
+   연동이 없으면 받을 방법이 없다(정책: 교환·등급 전환 「이용 조건」, 2026-09-16).
+
+   상품 하나하나에서 막지 않고 화면 진입에서 막는다. 탭·배너·버튼·직접 호출이 모두
+   showScreen을 거치므로 여기 한 곳이면 샌 길이 없다. 탭은 숨기지 않는다 — 그런 기능이
+   있다는 것은 보이고, 누르면 연동으로 데려간다. */
+var GIFTISHOP_SCREENS = ['pw-24', 'pw-24h', 'pw-25', 'pw-ex-done'];
+function ppKakaoLinked() {
+  return !!(PP.user && PP.user.linked_kakao);
+}
+function ppShowKakaoGate() {
+  var id = 'pp-kakao-gate';
+  var box = document.getElementById(id);
+  if (!box) {
+    box = document.createElement('div');
+    box.id = id;
+    box.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(26,17,48,.45);display:flex;align-items:center;justify-content:center;padding:24px;';
+    box.innerHTML = '<div style="background:#fff;border-radius:18px;padding:24px 22px;width:100%;max-width:300px;text-align:center;box-shadow:0 18px 48px rgba(0,0,0,.22);">'
+      + '<div style="font-size:34px;margin-bottom:10px;">💬</div>'
+      + '<div style="font-size:16px;font-weight:800;color:#1A1130;margin-bottom:6px;">카카오 연동이 필요해요</div>'
+      + '<div style="font-size:13px;color:#5A5370;line-height:1.55;margin-bottom:18px;">기프티콘은 카카오톡으로 보내드려요.</div>'
+      + '<button type="button" id="pp-kakao-gate-go" style="width:100%;padding:13px;border:none;border-radius:12px;background:#FEE500;color:#3C1E1E;font-size:14px;font-weight:800;cursor:pointer;font-family:inherit;">카카오 연동하기</button>'
+      + '<button type="button" id="pp-kakao-gate-close" style="width:100%;padding:11px;margin-top:8px;border:none;border-radius:12px;background:transparent;color:#9B93B0;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">닫기</button>'
+      + '</div>';
+    document.body.appendChild(box);
+    box.addEventListener('click', function(e) { if (e.target === box) box.style.display = 'none'; });
+    box.querySelector('#pp-kakao-gate-close').addEventListener('click', function() { box.style.display = 'none'; });
+    box.querySelector('#pp-kakao-gate-go').addEventListener('click', function() {
+      box.style.display = 'none';
+      if (window.showScreen) window.showScreen('pw-02-K');
+    });
+  }
+  box.style.display = 'flex';
+}
+/* showScreen을 감싸 기프티샵 계열 진입을 가로챈다. 조용히 실패하지 않는다 —
+   반드시 안내를 띄우고 연동으로 갈 길을 준다. */
+(function () {
+  var orig = window.showScreen;
+  if (typeof orig !== 'function') return;
+  window.showScreen = function (id) {
+    if (GIFTISHOP_SCREENS.indexOf(id) >= 0 && !ppKakaoLinked()) {
+      ppShowKakaoGate();
+      return;
+    }
+    return orig.apply(this, arguments);
+  };
+})();
+
 /* ── Auth ── */
 auth.onAuthStateChanged(function(user) {
   if (user) {
