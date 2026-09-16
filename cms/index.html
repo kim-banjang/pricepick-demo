@@ -4106,6 +4106,10 @@ window.CMS_FEATURES = {
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14" stroke-linecap="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg>
             미연동 계정 교환 내역 정리
           </button>
+          <button class="btn" style="background:var(--main-soft);color:var(--main-hover);border:none;cursor:pointer;" onclick="dmTidyLegacyProducts()" id="dm-tidy-btn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+            기존 데모 상품 정리
+          </button>
         </div>
 
         <!-- 보호 컬렉션 안내 -->
@@ -4113,6 +4117,7 @@ window.CMS_FEATURES = {
           [시나리오 채우기]는 <strong>demo_scenarios</strong>(scripts/seed-demo.js로 등록)에 등록된 가상 손님대로 데이터를 생성합니다. [전체 비우기]는 가상 데이터만 삭제하고
           운영 뼈대(관리자 계정 firstadmin · 마스터 데이터 · 기프티콘 상품 · 배너 · 공지 · 시나리오 정의)는 보존합니다.
           <br>[미연동 계정 교환 내역 정리]는 카카오 미연동 회원에게 남은 기프티콘 교환 건을 지웁니다 — 미연동 회원은 기프티샵을 쓸 수 없으므로(정책 2026-09-16) 그런 기록이 남아 있으면 안 됩니다.
+          <br>[기존 데모 상품 정리]는 포인츠허브 상품이 들어오기 전부터 있던 이모지 상품을 손봅니다. 같은 브랜드 상품이 포인츠허브에 있으면 그 이미지를 채우고, 교환 내역이 없으면서 겹치는 것은 지웁니다. <strong>교환·구매 내역이 물린 상품은 지우지 않습니다.</strong>
         </div>
       </div>
 
@@ -16332,6 +16337,90 @@ window.dmCleanUnlinkedExchanges = function() {
     toast('정리 실패: ' + (e.message || e));
   }).finally(function() {
     if (btn) { btn.disabled = false; btn.textContent = '미연동 계정 교환 내역 정리'; }
+  });
+};
+
+/* ── 기존 데모 상품 정리 ──
+   포인츠허브 446건이 실물 사진으로 들어온 뒤, 그 전부터 있던 상품만 이모지라 섞이면
+   어색하다. 같은 브랜드 상품이 포인츠허브에 있으면 그 이미지를 채우고, 교환 내역이
+   없으면서 브랜드가 겹치는 것은 사실상 중복이라 지운다.
+
+   교환·구매 내역이 물린 상품은 지우지 않는다 — 지우면 그 내역의 상품명이 깨진다.
+   그런 것은 이미지만 채우고 남긴다. 포인츠허브에 같은 브랜드가 없으면 이모지 그대로 둔다. */
+window.dmTidyLegacyProducts = function() {
+  var btn = document.getElementById('dm-tidy-btn');
+  if (btn) { btn.disabled = true; btn.textContent = '살펴보는 중…'; }
+  var PH = '/app/assets/gifticon/ph/';
+  Promise.all([
+    db.collection('gifticons').get(),
+    db.collection('gifticon_exchanges').get()
+  ]).then(function(res) {
+    var all = res[0].docs.map(function(d){ return Object.assign({ _id: d.id, _ref: d.ref }, d.data()); });
+    var usedBy = {};
+    res[1].forEach(function(d){ var g = d.data().gifticon_id; usedBy[g] = (usedBy[g] || 0) + 1; });
+
+    var ph = all.filter(function(g){ return (g.image_url || '').indexOf(PH) === 0; });
+    var legacy = all.filter(function(g){ return (g.image_url || '').indexOf(PH) !== 0; });
+    if (!ph.length) { toast('포인츠허브 상품이 아직 없습니다. 먼저 일괄 등록을 해 주세요.'); return null; }
+
+    /* 같은 브랜드에서 이름이 가장 비슷한 상품의 이미지를 쓴다. */
+    function pickImage(g) {
+      var b = String(g.brand || '');
+      if (!b) return null;
+      var cands = ph.filter(function(x) {
+        var xb = String(x.brand || '');
+        return xb.indexOf(b) >= 0 || b.indexOf(xb) >= 0;
+      });
+      if (!cands.length) return null;
+      /* 금액권은 액면가가 다르면 그림도 다르다 — 값이 같은 것을 먼저 고른다. */
+      if (typeof g.price === 'number' && g.price > 0) {
+        var same = cands.filter(function(x){ return x.price === g.price; });
+        if (same.length) cands = same;
+      }
+      var words = String(g.name || '').split(/[\s(),]+/).filter(function(w){ return w.length >= 2; });
+      var best = cands[0], score = -1;
+      cands.forEach(function(x) {
+        var sc = 0;
+        words.forEach(function(w){ if (String(x.name || '').indexOf(w) >= 0) sc++; });
+        if (sc > score) { score = sc; best = x; }
+      });
+      return best.image_url;
+    }
+
+    var toDelete = [], toFill = [], leftAlone = [];
+    legacy.forEach(function(g) {
+      var img = pickImage(g);
+      var hits = usedBy[g._id] || 0;
+      if (!hits && img) { toDelete.push({ g: g, why: '교환 내역 없음 · 같은 브랜드 있음' }); return; }
+      if (img) { toFill.push({ g: g, img: img, hits: hits }); return; }
+      leftAlone.push({ g: g, hits: hits });
+    });
+
+    var msg = '기존 데모 상품 정리\n\n'
+      + '· 지울 상품 ' + toDelete.length + '건'
+      + (toDelete.length ? '\n   ' + toDelete.map(function(x){ return x.g.brand + ' ' + x.g.name; }).join('\n   ') : '')
+      + '\n\n· 이미지 채울 상품 ' + toFill.length + '건'
+      + (toFill.length ? '\n   ' + toFill.map(function(x){ return x.g.brand + ' ' + x.g.name + ' (교환 ' + x.hits + '건)'; }).join('\n   ') : '')
+      + '\n\n· 그대로 둘 상품 ' + leftAlone.length + '건 (포인츠허브에 같은 브랜드 없음)'
+      + (leftAlone.length ? '\n   ' + leftAlone.map(function(x){ return x.g.brand + ' ' + x.g.name; }).join('\n   ') : '')
+      + '\n\n진행할까요?';
+    if (!confirm(msg)) return null;
+
+    var b = db.batch();
+    toDelete.forEach(function(x){ b.delete(x.g._ref); });
+    toFill.forEach(function(x){ b.set(x.g._ref, { image_url: x.img, updated_at: FS.FieldValue.serverTimestamp() }, { merge: true }); });
+    return b.commit().then(function() {
+      toast('상품 ' + toDelete.length + '건 삭제 · ' + toFill.length + '건 이미지 채움');
+      logAdmin('기존 데모 상품 정리: 삭제 ' + toDelete.length + ' · 이미지 ' + toFill.length
+        + ' · 유지 ' + leftAlone.length);
+      if (window.loadGifticonProducts) loadGifticonProducts();
+      if (window.dmLoadStats) dmLoadStats();
+    });
+  }).catch(function(e) {
+    console.error('dmTidyLegacyProducts', e);
+    toast('정리 실패: ' + (e.message || e));
+  }).finally(function() {
+    if (btn) { btn.disabled = false; btn.textContent = '기존 데모 상품 정리'; }
   });
 };
 
