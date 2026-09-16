@@ -4883,46 +4883,74 @@
   }
 
   /* 기프티샵 풀 그리드 */
-  .ex-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 8px;
-    padding: 0 14px 20px;
-  }
-  .ex-grid .ex-item {
-    flex: 0 0 auto;
-  }
-  .ex-grid .ex-img { height: 86px; }
-  .ex-grid .ex-body { padding: 7px 7px 9px; }
-  .ex-grid .ex-brand { font-size: 11px; }
-  .ex-grid .ex-name { font-size: 12px; height: 31px; margin-bottom: 5px; }
-  .ex-grid .ex-cost-mix { padding: 4px 2px; margin-top: 0; }
-  .ex-grid .ex-cost-tk { font-size: 12px; }
-  .ex-grid .ex-cost-tk .m svg { width: 16px; height: 16px; }
-  .ex-won { font-size: 11px; color: var(--text3); text-align: center; margin-top: 3px; }
+  /* ══ 기프티샵 — 시안(2026-09-16) 그대로 ══
+     자리·크기·여백은 시안에서 잰 값. 주된 보라는 앱 토큰(--main)을 쓰고, 시안이 새로
+     들인 색(티켓 바 남보라 · 교환가능 초록 · 회색조)은 그 값을 그대로 쓴다. */
 
-  /* 기프티샵 — 탭 · 정렬 · 구역 제목. 자리는 포인츠허브, 색은 프라이스픽. */
-  .gs-tabs { display: flex; flex-shrink: 0; border-bottom: 1px solid var(--border); background: white; }
-  .gs-tab {
-    flex: 1; text-align: center; padding: 11px 0 9px;
-    font-size: var(--fs-body); font-weight: 700; color: var(--text3);
-    cursor: pointer; position: relative;
-  }
-  .gs-tab.active { color: var(--main); }
-  .gs-tab.active::after {
-    content: ''; position: absolute; left: 0; right: 0; bottom: -1px;
-    height: 2px; background: var(--main);
-  }
-  .gs-search { padding: 10px 16px 0; flex-shrink: 0; }
-  .gs-search.hide { display: none; }
-  .gs-sort {
-    display: flex; align-items: center; justify-content: flex-end; gap: 7px;
-    padding: 10px 16px 2px; flex-shrink: 0;
-  }
-  .gs-sort-item { font-size: var(--fs-caption); color: var(--text3); cursor: pointer; }
-  .gs-sort-item.active { color: var(--text1); font-weight: 700; }
-  .gs-sort-sep { font-size: var(--fs-caption); color: var(--border); }
-  .gs-sec-title { font-size: var(--fs-body); font-weight: 800; color: var(--text1); padding: 4px 16px 10px; }
+  /* 헤더 */
+  .gs-head { flex: none; display: flex; align-items: center; gap: 12px; padding: 10px 20px 8px; background: white; }
+  .gs-head-t { flex: 1; font-size: 18px; font-weight: 700; color: #191A20; }
+  .gs-icobtn { background: none; border: none; padding: 0; display: flex; align-items: center; color: #191A20; cursor: pointer; }
+
+  /* 탭 — 홈 · 브랜드 · 교환 내역 */
+  .gs-tabs { display: grid; grid-template-columns: 1fr 1fr 1fr; background: white; border-bottom: 1px solid #F0F0F4; flex: none; }
+  .gs-tab { text-align: center; padding: 13px 0; font-size: 15px; font-weight: 500; color: #9A9AA5; cursor: pointer; }
+  .gs-tab.active { font-weight: 700; color: var(--main); box-shadow: inset 0 -2px 0 var(--main); }
+
+  /* 내 티켓 바 */
+  .gs-tk { display: flex; align-items: center; justify-content: space-between; margin: 16px 20px 0; background: #3F3565; border-radius: 14px; padding: 12px 16px; flex: none; }
+  .gs-tk-t { font-size: 13px; font-weight: 700; color: white; }
+  .gs-tk-list { display: flex; align-items: center; gap: 14px; }
+  .gs-tk-one { display: flex; align-items: center; gap: 4px; }
+  .gs-tk-one svg { width: 24px; height: 24px; }
+  .gs-tk-g { font-size: 12px; font-weight: 600; color: rgba(255,255,255,.72); }
+  .gs-tk-n { font-size: 14px; font-weight: 800; color: white; }
+
+  /* 정렬 · 구역 제목 · 토글 */
+  .gs-row { display: flex; align-items: center; justify-content: space-between; flex: none; }
+  .gs-row-home { padding: 20px 20px 4px; }
+  .gs-row-brand { padding: 14px 20px 0; }
+  .gs-sec { font-size: 16px; font-weight: 700; color: #191A20; }
+  .gs-sec-line { padding: 20px 20px 4px; font-size: 16px; font-weight: 700; color: #191A20; flex: none; }
+  .gs-sort { display: flex; align-items: center; gap: 7px; font-size: 13px; color: #6E6E78; }
+  .gs-sort span[data-gs-sort] { cursor: pointer; }
+  .gs-sort .gs-on { font-weight: 700; color: #191A20; }
+  .gs-sep { color: #D6D6DE; }
+  .gs-av { display: flex; align-items: center; gap: 6px; }
+  .gs-av-l { font-size: 12px; color: #6E6E78; }
+  .gs-sw { width: 36px; height: 21px; border-radius: 100px; background: #DCDCE4; position: relative; cursor: pointer; transition: background .2s; }
+  .gs-sw::after { content: ''; position: absolute; top: 2.5px; left: 2.5px; width: 16px; height: 16px; border-radius: 50%; background: white; box-shadow: 0 1px 3px rgba(0,0,0,.2); transition: left .2s; }
+  .gs-sw.on { background: var(--main); }
+  .gs-sw.on::after { left: 17px; }
+
+  /* 브랜드 칩 */
+  .gs-brands { position: relative; margin-top: 14px; flex: none; }
+  .gs-brands-in { display: flex; gap: 8px; padding: 0 20px; overflow-x: auto; scrollbar-width: none; }
+  .gs-brands-in::-webkit-scrollbar { display: none; }
+  .gs-chip { flex: none; padding: 8px 16px; border-radius: 100px; background: white; border: 1px solid #E4E4EC; color: #4B4B55; font-size: 13px; font-weight: 500; cursor: pointer; white-space: nowrap; }
+  .gs-chip.active { background: #191A20; border-color: #191A20; color: white; font-weight: 600; }
+  .gs-brands-fade { position: absolute; top: 0; right: 0; bottom: 0; width: 56px; background: linear-gradient(90deg, rgba(255,255,255,0), #FFFFFF 80%); pointer-events: none; display: flex; align-items: center; justify-content: flex-end; padding-right: 8px; }
+
+  /* 상품 칸 */
+  .gs-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 10px 20px 16px; }
+  .gs-card { border: 1px solid #F0F0F4; border-radius: 16px; overflow: hidden; background: white; cursor: pointer; }
+  .gs-card-img { position: relative; aspect-ratio: 1.586; margin: 10px; border-radius: 10px; overflow: hidden; background: #F7F6FB; display: flex; align-items: center; justify-content: center; }
+  .gs-card-img img { width: 100%; height: 100%; object-fit: cover; }
+  .gs-badge { position: absolute; top: 7px; right: 7px; font-size: 10px; font-weight: 700; color: white; background: #1B9E55; border-radius: 100px; padding: 3px 8px; box-shadow: 0 2px 6px rgba(0,0,0,.2); z-index: 2; }
+  .gs-card-b { padding: 2px 12px 12px; }
+  .gs-brand { font-size: 11px; color: #9A9AA5; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .gs-name { margin-top: 2px; font-size: 13px; font-weight: 600; color: #191A20; line-height: 1.35; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; min-height: 35px; }
+  .gs-card-tk { margin-top: 8px; display: flex; justify-content: flex-end; }
+  .gs-tkchip { display: inline-flex; align-items: center; gap: 5px; background: #F7F6FB; border-radius: 8px; padding: 5px 9px; }
+  .gs-tkchip svg { width: 20px; height: 20px; }
+  .gs-tkchip span { font-size: 12px; font-weight: 700; color: #191A20; white-space: nowrap; }
+
+  .gs-scroll { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+  .gs-scroll::-webkit-scrollbar { display: none; }
+  .gs-empty { grid-column: 1/-1; text-align: center; padding: 48px 20px; color: #9A9AA5; }
+  .gs-empty-t { font-size: 15px; font-weight: 700; color: #191A20; margin-bottom: 6px; }
+  .gs-empty-s { font-size: 13px; }
+
   .ex-soldout { position: relative; }
   .ex-soldout .ex-img::after {
     content: '품절';
@@ -10597,131 +10625,63 @@ window.PP_FEATURES = {
 
   <div class="phone-wrap" id="pw-24" data-screen="10a">
     <div class="phone">
-      <div class="reward-screen">
+      <div class="reward-screen" style="background:white;">
         <div class="statusbar">
           <span>9:41</span>
           <div class="statusbar-icons"><svg width="17" height="12" viewBox="0 0 17 12" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><rect x="0" y="4" width="3" height="8" rx="1"/><rect x="4.5" y="2.5" width="3" height="9.5" rx="1"/><rect x="9" y="1" width="3" height="11" rx="1"/><rect x="13.5" y="0" width="3" height="12" rx="1"/></svg><svg width="16" height="12" viewBox="0 0 16 12" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M8 2.5C10.2 2.5 12.2 3.4 13.6 4.9L15 3.4C13.2 1.5 10.7 0.3 8 0.3C5.3 0.3 2.8 1.5 1 3.4L2.4 4.9C3.8 3.4 5.8 2.5 8 2.5Z"/><path d="M8 5.5C9.4 5.5 10.7 6.1 11.6 7L13 5.5C11.7 4.2 10 3.3 8 3.3C6 3.3 4.3 4.2 3 5.5L4.4 7C5.3 6.1 6.6 5.5 8 5.5Z"/><circle cx="8" cy="10" r="1.8"/></svg><svg width="25" height="12" viewBox="0 0 25 12" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="currentColor" stroke-opacity="0.35"/><rect x="2" y="2" width="17" height="8" rx="2" fill="currentColor"/><path d="M23 4V8C23.8 7.6 24.5 6.9 24.5 6C24.5 5.1 23.8 4.4 23 4Z" fill="currentColor" fill-opacity="0.4"/></svg></div>
         </div>
 
-        <!-- 헤더 — 포인츠허브 목록 차례를 따른다: 제목 · 검색 -->
-        <div class="reward-top">
-          <div style="display:flex;align-items:center;gap:8px;">
-            <button class="reward-top-btn" style="margin-left:-8px;"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M11.25 15.5L5.96 10.45C5.17 9.65 5.17 8.35 5.96 7.55L11.25 2.66" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
-            <div class="reward-top-title">기프티샵</div>
-          </div>
-          <div class="reward-top-actions">
-            <button class="reward-top-btn" id="gs-search-btn" title="검색" onclick="event.stopPropagation();ppGiToggleSearch();"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg></button>
-          </div>
+        <!-- 헤더 · 탭 · 내 티켓 · 정렬 · 상품 — 시안(2026-09-16) 차례 그대로 -->
+        <div class="gs-head">
+          <button class="gs-icobtn" id="gs-back"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M15 5l-7 7 7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <div class="gs-head-t">기프티샵</div>
+          <button class="gs-icobtn" id="gs-search-btn" title="검색"><svg width="21" height="21" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/><path d="M20 20l-3.5-3.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
         </div>
 
-        <!-- 탭 — 포인츠허브의 홈 · 브랜드 · 구매내역 자리. 이름은 우리 말로 쓴다. -->
         <div class="gs-tabs">
           <div class="gs-tab active" data-gs-tab="home">홈</div>
           <div class="gs-tab" data-gs-tab="brand">브랜드</div>
           <div class="gs-tab" data-gs-tab="history">교환 내역</div>
         </div>
 
-        <!-- 보유 티켓 요약 (고정 — 스크롤 밖) -->
-        <div style="margin:12px 16px 8px;background:white;border:1px solid var(--border);border-radius:12px;display:grid;grid-template-columns:1fr 1fr 1fr;overflow:hidden;flex-shrink:0;">
-          <div style="padding:12px 0 10px;text-align:center;position:relative;border-right:1px solid var(--border);">
-            <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#C68250,#8B5A2B);"></div>
-            <div style="font-size:var(--fs-caption);font-weight:700;color:var(--text2);margin-bottom:5px;">브론즈</div>
-            <div><span id="ex-sum-bronze" style="font-size:var(--fs-title);font-weight:800;color:var(--text1);letter-spacing:-1px;line-height:1;">0</span><span style="font-size:var(--fs-caption);font-weight:600;color:var(--text2);"> 장</span></div>
-            <div style="font-size:var(--fs-caption);color:var(--text3);margin-top:3px;"></div>
-          </div>
-          <div style="padding:12px 0 10px;text-align:center;position:relative;border-right:1px solid var(--border);">
-            <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#D0D0D0,#999);"></div>
-            <div style="font-size:var(--fs-caption);font-weight:700;color:var(--text2);margin-bottom:5px;">실버</div>
-            <div><span id="ex-sum-silver" style="font-size:var(--fs-title);font-weight:800;color:var(--text1);letter-spacing:-1px;line-height:1;">0</span><span style="font-size:var(--fs-caption);font-weight:600;color:var(--text2);"> 장</span></div>
-            <div style="font-size:var(--fs-caption);color:var(--text3);margin-top:3px;"></div>
-          </div>
-          <div style="padding:12px 0 10px;text-align:center;position:relative;">
-            <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#FFD93B,#E6A800);"></div>
-            <div style="font-size:var(--fs-caption);font-weight:700;color:var(--text2);margin-bottom:5px;">골드</div>
-            <div><span id="ex-sum-gold" style="font-size:var(--fs-title);font-weight:800;color:var(--text1);letter-spacing:-1px;line-height:1;">0</span><span style="font-size:var(--fs-caption);font-weight:600;color:var(--text2);"> 장</span></div>
-            <div style="font-size:var(--fs-caption);color:var(--text3);margin-top:3px;"></div>
+        <!-- 검색 — 헤더 돋보기로 여닫는다 -->
+        <div class="gs-search hide" id="gs-search" style="padding:10px 20px 0;flex:none;">
+          <input id="gs-search-input" placeholder="상품·브랜드 검색" style="width:100%;height:36px;border:1px solid #E4E4EC;border-radius:10px;padding:0 12px;font-size:13px;box-sizing:border-box;font-family:inherit;">
+        </div>
+
+        <div class="gs-tk">
+          <div class="gs-tk-t">내 티켓</div>
+          <div class="gs-tk-list" id="gs-tk-list"></div>
+        </div>
+
+        <!-- 브랜드 탭에서만 나오는 브랜드 칩 -->
+        <div class="gs-brands" id="gs-brands" style="display:none;">
+          <div class="gs-brands-in" id="gs-brands-in"></div>
+          <div class="gs-brands-fade"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M9 5l7 7-7 7" stroke="#9A9AA5" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        </div>
+
+        <!-- 홈 탭: 구역 제목과 정렬이 한 줄 -->
+        <div class="gs-row gs-row-home" id="gs-row-home">
+          <div class="gs-sec">인기상품</div>
+          <div class="gs-sort">
+            <span data-gs-sort="popular" class="gs-on">인기순</span><span class="gs-sep">·</span><span data-gs-sort="low">낮은가격순</span><span class="gs-sep">·</span><span data-gs-sort="high">높은가격순</span>
           </div>
         </div>
 
-        <!-- 검색 — 헤더 아이콘으로 여닫는다 -->
-        <div class="gs-search hide" id="gs-search">
-          <input id="gs-search-input" placeholder="상품·브랜드 검색" style="width:100%;height:34px;border:1px solid #E4DBFF;border-radius:9px;padding:0 11px;font-size:var(--fs-caption);box-sizing:border-box;">
-        </div>
-
-        <!-- 갈래 / 브랜드 칩 — 탭에 따라 내용이 바뀐다 -->
-        <div class="cat-filter" id="gs-chips" style="margin:0;flex-shrink:0;padding-top:10px;">
-          <div class="cat-pill active" data-cat="">전체</div>
-          <div class="cat-pill" data-cat="커피/음료">커피/음료</div>
-          <div class="cat-pill" data-cat="피자/버거/치킨">피자/버거/치킨</div>
-          <div class="cat-pill" data-cat="베이커리/떡">베이커리/떡</div>
-          <div class="cat-pill" data-cat="편의점/마트">편의점/마트</div>
-          <div class="cat-pill" data-cat="상품권/금액권">상품권/금액권</div>
-          <div class="cat-pill" data-cat="문화/생활/기타">문화/생활/기타</div>
-        </div>
-
-        <!-- 정렬 — 포인츠허브처럼 글자 링크를 나란히 -->
-        <div class="gs-sort" id="gs-sort">
-          <span class="gs-sort-item active" data-gs-sort="popular">인기순</span>
-          <span class="gs-sort-sep">|</span>
-          <span class="gs-sort-item" data-gs-sort="low">낮은가격순</span>
-          <span class="gs-sort-sep">|</span>
-          <span class="gs-sort-item" data-gs-sort="high">높은가격순</span>
-        </div>
-
-        <div class="reward-scroll">
-
-          <!-- 보유 가능 필터 토글 -->
-          <div class="ex-filter">
-            <span class="ex-filter-lbl">내 티켓으로 <b>지금 교환 가능한 상품</b>만</span>
-            <div class="ex-filter-toggle off"></div>
+        <!-- 브랜드 탭: 정렬과 「교환 가능만」이 한 줄, 구역 제목은 그 아래 -->
+        <div class="gs-row gs-row-brand" id="gs-row-brand" style="display:none;">
+          <div class="gs-sort">
+            <span data-gs-sort="popular" class="gs-on">인기순</span><span class="gs-sep">·</span><span data-gs-sort="low">낮은가격순</span><span class="gs-sep">·</span><span data-gs-sort="high">높은가격순</span>
           </div>
-
-          <div class="gs-sec-title" id="gs-sec-title">인기상품</div>
-
-          <!-- 기프티샵 그리드 -->
-          <div class="ex-grid">
-            <div class="ex-item">
-              <div class="ex-img-wrap">
-                <div class="ex-img"><div class="img-ph" data-img="img_021">아이스 아메리카노</div></div>
-              </div>
-              <div class="ex-body">
-                <div class="ex-brand">스타벅스</div>
-                <div class="ex-name">아이스 아메리카노 Tall</div>
-                <div class="ex-cost-mix"><span class="ex-cost-tk">브론즈 3</span></div>
-                <div class="ex-won">4,500원</div>
-              </div>
-            </div>
-            <div class="ex-item">
-              <div class="ex-img-wrap">
-                <div class="ex-img"><div class="img-ph" data-img="img_022">베이커리</div></div>
-              </div>
-              <div class="ex-body">
-                <div class="ex-brand">파리바게뜨</div>
-                <div class="ex-name">5,000원 금액권</div>
-                <div class="ex-cost-mix"><span class="ex-cost-tk">브론즈 6</span></div>
-                <div class="ex-won">5,000원</div>
-              </div>
-            </div>
-            <div class="ex-item">
-              <div class="ex-img-wrap">
-                <div class="ex-img"><div class="img-ph" data-img="img_023">빅맥 세트</div></div>
-              </div>
-              <div class="ex-body">
-                <div class="ex-brand">맥도날드</div>
-                <div class="ex-name">빅맥 세트</div>
-                <div class="ex-cost-mix"><span class="ex-cost-tk">브론즈 8</span></div>
-                <div class="ex-won">7,400원</div>
-              </div>
-            </div>
+          <div class="gs-av">
+            <span class="gs-av-l">교환 가능만</span>
+            <div class="gs-sw" id="gs-avail-sw"></div>
           </div>
-
         </div>
+        <div class="gs-sec-line" id="gs-sec-brand" style="display:none;">인기상품</div>
 
-
-<div class="tabbar">
-          <div class="tab-item"><div class="tab-ico"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" class="ico-line"><path d="M9.02 2.83821L3.63 7.03821C2.73 7.73821 2 9.22821 2 10.3582V17.7682C2 20.0882 3.89 21.9882 6.21 21.9882H17.79C20.11 21.9882 22 20.0882 22 17.7782V10.4982C22 9.28821 21.19 7.73821 20.2 7.04821L14.02 2.71821C12.62 1.73821 10.37 1.78821 9.02 2.83821Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 17.9922V14.9922" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg><svg width="24" height="24" viewBox="0 0 24 24" fill="none" class="ico-solid"><path d="M20.0383 6.81774L14.2783 2.78774C12.7083 1.68774 10.2983 1.74774 8.78828 2.91774L3.77828 6.82774C2.77828 7.60774 1.98828 9.20774 1.98828 10.4677V17.3677C1.98828 19.9177 4.05828 21.9977 6.60828 21.9977H17.3883C19.9383 21.9977 22.0083 19.9277 22.0083 17.3777V10.5977C22.0083 9.24774 21.1383 7.58774 20.0383 6.81774ZM12.7483 17.9977C12.7483 18.4077 12.4083 18.7477 11.9983 18.7477C11.5883 18.7477 11.2483 18.4077 11.2483 17.9977V14.9977C11.2483 14.5877 11.5883 14.2477 11.9983 14.2477C12.4083 14.2477 12.7483 14.5877 12.7483 14.9977V17.9977Z" fill="currentColor"/></svg></div><div class="tab-lbl">홈</div></div>
-          <div class="tab-item"><div class="tab-ico"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" class="ico-line"><path d="M19.5 12.5C19.5 11.12 20.62 10 22 10V9C22 5 21 4 17 4H7C3 4 2 5 2 9V9.5C3.38 9.5 4.5 10.62 4.5 12C4.5 13.38 3.38 14.5 2 14.5V15C2 19 3 20 7 20H17C21 20 22 19 22 15C20.62 15 19.5 13.88 19.5 12.5Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M10 4L10 20" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="5 5"/></svg><svg width="24" height="24" viewBox="0 0 24 24" fill="none" class="ico-solid"><path d="M22 10.75C22.41 10.75 22.75 10.41 22.75 10V9C22.75 4.59 21.41 3.25 17 3.25H10.75V5.5C10.75 5.91 10.41 6.25 10 6.25C9.59 6.25 9.25 5.91 9.25 5.5V3.25H7C2.59 3.25 1.25 4.59 1.25 9V9.5C1.25 9.91 1.59 10.25 2 10.25C2.96 10.25 3.75 11.04 3.75 12C3.75 12.96 2.96 13.75 2 13.75C1.59 13.75 1.25 14.09 1.25 14.5V15C1.25 19.41 2.59 20.75 7 20.75H9.25V18.5C9.25 18.09 9.59 17.75 10 17.75C10.41 17.75 10.75 18.09 10.75 18.5V20.75H17C21.41 20.75 22.75 19.41 22.75 15C22.75 14.59 22.41 14.25 22 14.25C21.04 14.25 20.25 13.46 20.25 12.5C20.25 11.54 21.04 10.75 22 10.75ZM10.75 14.17C10.75 14.58 10.41 14.92 10 14.92C9.59 14.92 9.25 14.58 9.25 14.17V9.83C9.25 9.42 9.59 9.08 10 9.08C10.41 9.08 10.75 9.42 10.75 9.83V14.17Z" fill="currentColor"/></svg></div><div class="tab-lbl">혜택</div></div>
-          <div class="tab-item active"><div class="tab-ico"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="ico-line"><path d="M8.40002 6.5H15.6C19 6.5 19.34 8.09 19.57 10.03L20.47 17.53C20.76 19.99 20 22 16.5 22H7.51003C4.00003 22 3.24002 19.99 3.54002 17.53L4.44003 10.03C4.66003 8.09 5.00002 6.5 8.40002 6.5Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 8V4.5C8 3 9 2 10.5 2H13.5C15 2 16 3 16 4.5V8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M20.41 17.0298H8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="ico-solid"><path d="M16 8.75C15.59 8.75 15.25 8.41 15.25 8V4.5C15.25 3.42 14.58 2.75 13.5 2.75H10.5C9.42 2.75 8.75 3.42 8.75 4.5V8C8.75 8.41 8.41 8.75 8 8.75C7.59 8.75 7.25 8.41 7.25 8V4.5C7.25 2.59 8.59 1.25 10.5 1.25H13.5C15.41 1.25 16.75 2.59 16.75 4.5V8C16.75 8.41 16.41 8.75 16 8.75Z" fill="currentColor"/><path d="M7.99984 17.78C7.58984 17.78 7.24984 17.44 7.24984 17.03C7.24984 16.61 7.58984 16.28 7.99984 16.28H19.7598C20.0598 16.28 20.2898 16.02 20.2598 15.72L19.5798 10.03C19.3398 8.09 18.9998 6.5 15.5998 6.5H8.39984C4.99984 6.5 4.65984 8.09 4.42984 10.03L3.52984 17.53C3.23984 19.99 3.99984 22 7.50984 22H16.4898C19.6498 22 20.5798 20.37 20.5298 18.25C20.5198 17.98 20.2998 17.78 20.0298 17.78H7.99984Z" fill="currentColor"/></svg></div><div class="tab-lbl">기프티샵</div></div><div class="tab-item"><div class="tab-ico"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" class="ico-line"><path d="M12 12.75C8.83 12.75 6.25 10.17 6.25 7C6.25 3.83 8.83 1.25 12 1.25C15.17 1.25 17.75 3.83 17.75 7C17.75 10.17 15.17 12.75 12 12.75ZM12 2.75C9.66 2.75 7.75 4.66 7.75 7C7.75 9.34 9.66 11.25 12 11.25C14.34 11.25 16.25 9.34 16.25 7C16.25 4.66 14.34 2.75 12 2.75Z" fill="currentColor"/><path d="M20.5901 22.75C20.1801 22.75 19.8401 22.41 19.8401 22C19.8401 18.55 16.3202 15.75 12.0002 15.75C7.68015 15.75 4.16016 18.55 4.16016 22C4.16016 22.41 3.82016 22.75 3.41016 22.75C3.00016 22.75 2.66016 22.41 2.66016 22C2.66016 17.73 6.85015 14.25 12.0002 14.25C17.1502 14.25 21.3401 17.73 21.3401 22C21.3401 22.41 21.0001 22.75 20.5901 22.75Z" fill="currentColor"/></svg><svg width="24" height="24" viewBox="0 0 24 24" fill="none" class="ico-solid"><path d="M12 12C14.7614 12 17 9.76142 17 7C17 4.23858 14.7614 2 12 2C9.23858 2 7 4.23858 7 7C7 9.76142 9.23858 12 12 12Z" fill="currentColor"/><path d="M12.0002 14.5C6.99016 14.5 2.91016 17.86 2.91016 22C2.91016 22.28 3.13016 22.5 3.41016 22.5H20.5902C20.8702 22.5 21.0902 22.28 21.0902 22C21.0902 17.86 17.0102 14.5 12.0002 14.5Z" fill="currentColor"/></svg></div><div class="tab-lbl">마이</div></div>
+        <div class="gs-scroll">
+          <div class="gs-grid" id="gs-grid"></div>
         </div>
       </div>
     </div>
@@ -18584,9 +18544,8 @@ function processPurchase(amount, overlay) {
 
 /* ── Gifticons ── */
 function renderExGifticonSummary() {
-  var b = document.getElementById('ex-sum-bronze'); if (b) b.textContent = PP.tickets.bronze || 0;
-  var s = document.getElementById('ex-sum-silver'); if (s) s.textContent = PP.tickets.silver || 0;
-  var g = document.getElementById('ex-sum-gold'); if (g) g.textContent = PP.tickets.gold || 0;
+  /* 보유 티켓은 시안의 「내 티켓」 바 하나로 모였다 — ppGiRenderTickets가 그린다. */
+  if (window.ppGiRenderTickets) ppGiRenderTickets();
 }
 function loadGifticons() {
   if (!PP.uid) return;
@@ -18617,50 +18576,28 @@ function ppGiImgFallback(img) {
 }
 window.ppGiImgFallback = ppGiImgFallback;
 
-/* ── 기프티샵 카테고리 거르기 ──
-   칩은 포인츠허브 카테고리 여섯 그대로다. 상품의 category 값이 데모에 먼저 들어간 것들
-   (「편의점」·「외식」·「쇼핑」·「문화/생활」)과 포인츠허브 것(「편의점/마트」 등)이 섞여 있어,
-   칩 이름을 「/」로 쪼갠 조각 중 하나라도 들어 있으면 그 갈래로 본다. */
-var PP_GI_CAT = '';
-function ppGiCatMatch(cat, pick) {
-  if (!pick) return true;
-  cat = String(cat || '');
-  var parts = pick.split('/');
-  for (var i = 0; i < parts.length; i++) {
-    if (parts[i] && cat.indexOf(parts[i]) >= 0) return true;
-  }
-  /* 데모에 먼저 들어간 이름들 — 갈래는 같은데 낱말이 다르다. */
-  if (pick.indexOf('피자') === 0 && cat.indexOf('외식') >= 0) return true;
-  if (pick.indexOf('상품권') === 0 && cat.indexOf('쇼핑') >= 0) return true;
-  if (pick.indexOf('커피') === 0 && cat.indexOf('카페') >= 0) return true;
-  return false;
-}
 /* ── 기프티샵 목록 (pw-24) ──
-   차례는 포인츠허브 목록 화면을 따른다 — 제목·검색 / 탭(홈·브랜드·구매내역) / 정렬 /
-   구역 제목 / 3단 그리드. 색과 모양은 프라이스픽 것을 쓴다.
-
-   브랜드 탭은 포인츠허브에 있는 자리라 살렸다. 우리는 브랜드 색인 화면이 따로 없으므로
-   칩 줄의 내용을 갈래에서 브랜드로 바꾸는 것으로 같은 일을 시킨다 — 화면을 새로 만들지
-   않고도 브랜드로 골라 볼 수 있다. 구매내역 탭은 이미 있는 교환 내역(pw-24h)으로 보낸다. */
+   시안(2026-09-16)을 그대로 따른다. 탭은 홈 · 브랜드 · 교환 내역 셋.
+   홈 탭은 「인기상품 + 정렬」이 한 줄, 브랜드 탭은 브랜드 칩 · 「정렬 + 교환 가능만」 ·
+   구역 제목 차례. 칸은 2단이고 상품 사진 위에 「교환가능」 딱지가 붙는다.
+   갈래(카테고리) 칩은 시안에 없어서 뺐다. */
 var PP_GI_BRAND = '';
 var PP_GI_SORT = 'popular';
 var PP_GI_Q = '';
 var PP_GI_TAB = 'home';
-
-var PP_GI_CATS = ['커피/음료', '피자/버거/치킨', '베이커리/떡', '편의점/마트', '상품권/금액권', '문화/생활/기타'];
+var PP_GI_AVAIL_ONLY = false;
 
 function ppGiToggleSearch() {
   var box = document.getElementById('gs-search');
   if (!box) return;
   box.classList.toggle('hide');
   var inp = document.getElementById('gs-search-input');
-  if (!box.classList.contains('hide') && inp) { inp.focus(); return; }
+  if (!box.classList.contains('hide')) { if (inp) inp.focus(); return; }
   if (inp && inp.value) { inp.value = ''; PP_GI_Q = ''; renderGifticons(); }
 }
 window.ppGiToggleSearch = ppGiToggleSearch;
 
-/* 브랜드 칩은 실제 카탈로그에 있는 브랜드만 쓴다 — 없는 브랜드를 지어내지 않는다.
-   상품 수가 많은 차례로 20개까지. */
+/* 브랜드 칩은 카탈로그에 실제로 있는 브랜드만 쓴다 — 없는 브랜드를 지어내지 않는다. */
 function ppGiBrands() {
   var cnt = {};
   (PP.gifticonList || []).forEach(function (g) {
@@ -18672,20 +18609,36 @@ function ppGiBrands() {
   }).slice(0, 20);
 }
 
-function ppGiRenderChips() {
-  var wrap = document.getElementById('gs-chips');
+function ppGiRenderBrands() {
+  var wrap = document.getElementById('gs-brands-in');
   if (!wrap) return;
-  var items, cur, attr;
-  if (PP_GI_TAB === 'brand') {
-    items = ppGiBrands(); cur = PP_GI_BRAND; attr = 'data-brand';
-  } else {
-    items = PP_GI_CATS; cur = PP_GI_CAT; attr = 'data-cat';
-  }
-  wrap.innerHTML = '<div class="cat-pill' + (cur ? '' : ' active') + '" ' + attr + '="">전체</div>'
-    + items.map(function (v) {
-        return '<div class="cat-pill' + (cur === v ? ' active' : '') + '" ' + attr + '="' + ppEsc(v) + '">' + ppEsc(v) + '</div>';
-      }).join('');
-  wrap.scrollLeft = 0;
+  wrap.innerHTML = '<div class="gs-chip' + (PP_GI_BRAND ? '' : ' active') + '" data-brand="">전체</div>'
+    + ppGiBrands().map(function (v) {
+        return '<div class="gs-chip' + (PP_GI_BRAND === v ? ' active' : '') + '" data-brand="' + ppEsc(v) + '">' + ppEsc(v) + '</div>';
+      }).join('')
+    + '<div style="flex:none;width:12px;"></div>';
+}
+
+/* 내 티켓 바 — 브론즈 · 실버 · 골드 */
+function ppGiRenderTickets() {
+  var box = document.getElementById('gs-tk-list');
+  if (!box) return;
+  box.innerHTML = [['bronze', '브론즈'], ['silver', '실버'], ['gold', '골드']].map(function (g) {
+    return '<div class="gs-tk-one">' + ticketIcon(g[0])
+      + '<span class="gs-tk-g">' + g[1] + '</span>'
+      + '<span class="gs-tk-n">' + (PP.tickets[g[0]] || 0) + '</span></div>';
+  }).join('');
+}
+
+window.ppGiRenderTickets = ppGiRenderTickets;
+
+function ppGiTabLayout() {
+  var brand = (PP_GI_TAB === 'brand');
+  var set = function (id, on) { var el = document.getElementById(id); if (el) el.style.display = on ? '' : 'none'; };
+  set('gs-brands', brand);
+  set('gs-row-brand', brand);
+  set('gs-sec-brand', brand);
+  set('gs-row-home', !brand);
 }
 
 function bindGifticonShop() {
@@ -18693,7 +18646,11 @@ function bindGifticonShop() {
   if (!sc || sc.dataset.ppShopBound) return;
   sc.dataset.ppShopBound = '1';
 
-  /* 탭 */
+  var back = document.getElementById('gs-back');
+  if (back) back.addEventListener('click', function () { window.showScreen('pw-20'); });
+  var sb = document.getElementById('gs-search-btn');
+  if (sb) sb.addEventListener('click', function (e) { e.stopPropagation(); ppGiToggleSearch(); });
+
   sc.querySelectorAll('.gs-tab').forEach(function (el) {
     el.addEventListener('click', function () {
       var t = el.getAttribute('data-gs-tab');
@@ -18701,119 +18658,67 @@ function bindGifticonShop() {
       PP_GI_TAB = t;
       sc.querySelectorAll('.gs-tab').forEach(function (x) { x.classList.remove('active'); });
       el.classList.add('active');
-      /* 탭을 옮기면 반대쪽 고르개는 푼다 — 두 벌이 겹쳐 걸리면 무엇으로 걸러졌는지 안 보인다 */
-      if (t === 'brand') PP_GI_CAT = ''; else PP_GI_BRAND = '';
-      ppGiRenderChips();
+      if (t !== 'brand') PP_GI_BRAND = '';
+      ppGiTabLayout();
+      ppGiRenderBrands();
       renderGifticons();
     });
   });
 
-  /* 칩 — 내용이 바뀌므로 줄에 한 번만 걸어 두고 눌린 칩을 찾아 쓴다 */
-  var chips = document.getElementById('gs-chips');
-  if (chips) {
-    chips.addEventListener('click', function (e) {
-      var el = e.target.closest ? e.target.closest('.cat-pill') : null;
-      if (!el || !chips.contains(el)) return;
-      chips.querySelectorAll('.cat-pill').forEach(function (x) { x.classList.remove('active'); });
-      el.classList.add('active');
-      if (PP_GI_TAB === 'brand') PP_GI_BRAND = el.getAttribute('data-brand') || '';
-      else PP_GI_CAT = el.getAttribute('data-cat') || '';
-      renderGifticons();
-    });
-  }
+  var bi = document.getElementById('gs-brands-in');
+  if (bi) bi.addEventListener('click', function (e) {
+    var el = e.target.closest ? e.target.closest('.gs-chip') : null;
+    if (!el || !bi.contains(el)) return;
+    PP_GI_BRAND = el.getAttribute('data-brand') || '';
+    bi.querySelectorAll('.gs-chip').forEach(function (x) { x.classList.remove('active'); });
+    el.classList.add('active');
+    renderGifticons();
+  });
 
-  /* 정렬 */
-  sc.querySelectorAll('.gs-sort-item').forEach(function (el) {
+  /* 정렬 링크는 홈·브랜드 두 줄에 같이 있다 — 어느 쪽을 눌러도 둘 다 표시를 맞춘다. */
+  sc.querySelectorAll('.gs-sort span[data-gs-sort]').forEach(function (el) {
     el.addEventListener('click', function () {
       PP_GI_SORT = el.getAttribute('data-gs-sort') || 'popular';
-      sc.querySelectorAll('.gs-sort-item').forEach(function (x) { x.classList.remove('active'); });
-      el.classList.add('active');
+      sc.querySelectorAll('.gs-sort span[data-gs-sort]').forEach(function (x) {
+        x.classList.toggle('gs-on', x.getAttribute('data-gs-sort') === PP_GI_SORT);
+      });
       renderGifticons();
     });
   });
 
-  /* 검색 */
+  var sw = document.getElementById('gs-avail-sw');
+  if (sw) sw.addEventListener('click', function () {
+    PP_GI_AVAIL_ONLY = !PP_GI_AVAIL_ONLY;
+    sw.classList.toggle('on', PP_GI_AVAIL_ONLY);
+    renderGifticons();
+  });
+
   var inp = document.getElementById('gs-search-input');
-  if (inp) {
-    inp.addEventListener('input', function () {
-      PP_GI_Q = (inp.value || '').trim().toLowerCase();
-      renderGifticons();
-    });
-  }
-}
-
-/* 상품에 실린 유효일수 — 쓸 수 있는 값일 때만 돌려준다.
-   포인츠허브 원본의 limitDate는 455건 모두 361589(판매종료일 2999-12-30까지의 날수)라
-   상품별 유효기간이 아니다. 그 값이 그대로 들어온 상품은 0을 돌려 유효기간을 감춘다. */
-function ppGiValidDays(g) {
-  var v = parseInt(g && g.validity_days, 10);
-  return (v > 0 && v <= 1825) ? v : 0;
-}
-
-function ppYmdDot(d) {
-  return d.getFullYear() + '.' + ('0' + (d.getMonth() + 1)).slice(-2) + '.' + ('0' + d.getDate()).slice(-2);
-}
-
-/* 교환 완료 화면(pw-ex-done) 채우기 — 교환 직후와 교환 내역에서 코드 볼 때 둘 다 여기로 온다.
-   화면 짜임(초록 체크 · 교환 완료! · 코드 · 바코드 · 확인/홈으로)은 그대로 두고 값만 읽어 넣는다.
-   상품 사진이 없으면 자리 자체를 감춘다 — 도형이나 이모지로 대신 채우지 않는다. */
-function ppFillExDone(g, code, expiresAt) {
-  g = g || {};
-  var thumb = document.getElementById('ex-done-thumb');
-  if (thumb) {
-    if (g.image_url) {
-      thumb.style.display = '';
-      thumb.innerHTML = '<img src="' + ppEsc(g.image_url) + '" alt="" style="width:100%;height:100%;object-fit:cover;"'
-        + ' onerror="var b=this.parentNode; if(b){b.style.display=\'none\';b.innerHTML=\'\';}">';
-    } else {
-      thumb.style.display = 'none';
-      thumb.innerHTML = '';
-    }
-  }
-  var eb = document.getElementById('ex-done-brand');
-  if (eb) {
-    eb.textContent = g.brand || '';
-    eb.style.display = g.brand ? '' : 'none';
-  }
-  var en = document.getElementById('ex-done-name');
-  if (en) en.textContent = ppStripBrand(g.brand, g.name || g.product_name);
-  var ec = document.getElementById('ex-done-code');
-  if (ec) ec.textContent = code || '';
-
-  /* 유효기간 — 교환 기록에 만료일이 있으면 그 날짜를, 없으면 상품의 유효일수를 쓴다.
-     둘 다 없으면 줄째로 감춘다(고정값을 지어 넣지 않는다). */
-  var exp = document.getElementById('ex-done-exp');
-  if (exp) {
-    var d = ppDate(expiresAt);
-    var vd = ppGiValidDays(g);
-    var txt = d ? (ppYmdDot(d) + '까지 사용 가능') : (vd ? ('발급일로부터 ' + vd + '일 유효') : '');
-    exp.textContent = txt;
-    exp.style.display = txt ? '' : 'none';
-  }
-}
-
-function ppGiWon(g) {
-  var w = (typeof g.price === 'number') ? g.price : 0;
-  return w > 0 ? w.toLocaleString('ko-KR') + '원' : '';
+  if (inp) inp.addEventListener('input', function () {
+    PP_GI_Q = (inp.value || '').trim().toLowerCase();
+    renderGifticons();
+  });
 }
 
 function ppGiSorted(list) {
   if (PP_GI_SORT === 'popular') return list;   /* 카탈로그에 담긴 차례 그대로 */
   var dir = (PP_GI_SORT === 'high') ? -1 : 1;
-  return list.slice().sort(function (a, b) {
-    return ((a.price || 0) - (b.price || 0)) * dir;
-  });
+  return list.slice().sort(function (a, b) { return ((a.price || 0) - (b.price || 0)) * dir; });
+}
+
+function ppGiAvail(g) {
+  return (PP.tickets[g.required_grade || 'bronze'] || 0) >= (g.required_count || 1);
 }
 
 function renderGifticons() {
   bindGifticonShop();
-  var secT = document.getElementById('gs-sec-title');
-  if (secT) secT.textContent = { popular: '인기상품', low: '낮은가격순', high: '높은가격순' }[PP_GI_SORT] || '인기상품';
+  ppGiRenderTickets();
+  ppGiTabLayout();
+  if (PP_GI_TAB === 'brand' && !document.querySelector('#gs-brands-in .gs-chip')) ppGiRenderBrands();
 
   var list = (PP.gifticonList || []).filter(function (g) {
-    if (PP_GI_TAB === 'brand') {
-      if (PP_GI_BRAND && (g.brand || '').trim() !== PP_GI_BRAND) return false;
-    } else if (!ppGiCatMatch(g.category, PP_GI_CAT)) return false;
+    if (PP_GI_TAB === 'brand' && PP_GI_BRAND && (g.brand || '').trim() !== PP_GI_BRAND) return false;
+    if (PP_GI_TAB === 'brand' && PP_GI_AVAIL_ONLY && !ppGiAvail(g)) return false;
     if (PP_GI_Q) {
       var hay = ((g.brand || '') + ' ' + (g.name || g.product_name || '')).toLowerCase();
       if (hay.indexOf(PP_GI_Q) < 0) return false;
@@ -18822,52 +18727,47 @@ function renderGifticons() {
   });
   list = ppGiSorted(list);
 
-  var grid = document.querySelector('#pw-24 .ex-grid');
+  var grid = document.getElementById('gs-grid');
   if (!grid) return;
   if (!list.length) {
     var why = PP_GI_Q ? '찾는 말과 맞는 상품이 없어요'
-      : (PP_GI_BRAND || PP_GI_CAT) ? '여기에는 아직 상품이 없어요'
+      : PP_GI_AVAIL_ONLY ? '지금 교환할 수 있는 상품이 없어요'
+      : PP_GI_BRAND ? '이 브랜드에는 아직 상품이 없어요'
       : '교환 가능한 기프티콘이 없어요';
     var how = PP_GI_Q ? '다른 말로 찾아 보세요'
-      : (PP_GI_BRAND || PP_GI_CAT) ? '다른 칩을 눌러 보세요'
+      : PP_GI_AVAIL_ONLY ? '티켓을 더 모으면 여기에 나타나요'
+      : PP_GI_BRAND ? '다른 브랜드를 눌러 보세요'
       : '관리자가 상품을 등록하면 여기에 나타나요';
-    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px 16px;color:var(--text3);">'
-      + '<div style="' + PP_GI_PLACEHOLDER_STYLE + 'margin-bottom:12px;">' + PP_GI_PLACEHOLDER_SVG + '</div>'
-      + '<div style="font-weight:700;color:var(--text1);margin-bottom:6px;">' + why + '</div>'
-      + '<div style="font-size:var(--fs-body);">' + how + '</div>'
-      + '</div>';
+    grid.innerHTML = '<div class="gs-empty"><div class="gs-empty-t">' + why + '</div><div class="gs-empty-s">' + how + '</div></div>';
     return;
   }
   grid.innerHTML = list.map(function (g, i) {
-    /* 칸은 이미지 · 브랜드 · 상품명 · 가격. 「구매가능 / 티켓 부족」 딱지는 뺐다 —
-       포인츠허브 칸에는 없고, 모자란지는 상세에서 알려 준다. */
+    var grade = g.required_grade || 'bronze';
+    var gradeName = { bronze: '브론즈', silver: '실버', gold: '골드' }[grade] || '브론즈';
     var cnt = g.required_count || 1;
-    var imgUrl = g.image_url || '';
-    var imgBox = imgUrl
-      ? '<div class="ex-img"><img src="' + ppEsc(imgUrl) + '" alt="" loading="lazy" onerror="ppGiImgFallback(this)"></div>'
-      : '<div class="ex-img" style="' + PP_GI_PLACEHOLDER_STYLE + '">' + PP_GI_PLACEHOLDER_SVG + '</div>';
-    var won = ppGiWon(g);
-    return '<div class="ex-item" data-pp-gi="' + i + '" style="cursor:pointer;">'
-      + '<div class="ex-img-wrap">' + imgBox + '</div>'
-      + '<div class="ex-body">'
-      + '<div class="ex-brand">' + ppEsc(g.brand || '') + '</div>'
-      + '<div class="ex-name">' + ppEsc(ppStripBrand(g.brand, g.name || g.product_name)) + '</div>'
-      + '<div class="ex-cost-mix"><span class="ex-cost-tk"><span class="m">' + ticketIcon(g.required_grade || 'bronze') + '</span>' + cnt + '</span></div>'
-      + (won ? '<div class="ex-won">' + won + '</div>' : '')
+    var img = g.image_url
+      ? '<img src="' + ppEsc(g.image_url) + '" alt="" loading="lazy" onerror="ppGiImgFallback(this)">'
+      : PP_GI_PLACEHOLDER_SVG;
+    return '<div class="gs-card" data-pp-gi="' + i + '">'
+      + '<div class="gs-card-img">' + img
+      + (ppGiAvail(g) ? '<span class="gs-badge">교환가능</span>' : '')
+      + '</div>'
+      + '<div class="gs-card-b">'
+      + '<div class="gs-brand">' + ppEsc(g.brand || '') + '</div>'
+      + '<div class="gs-name">' + ppEsc(ppStripBrand(g.brand, g.name || g.product_name)) + '</div>'
+      + '<div class="gs-card-tk"><span class="gs-tkchip">' + ticketIcon(grade)
+      + '<span>' + gradeName + ' ' + cnt + '장</span></span></div>'
       + '</div></div>';
   }).join('');
-  grid.querySelectorAll('.ex-item').forEach(function (el) {
+  grid.querySelectorAll('.gs-card').forEach(function (el) {
     el.addEventListener('click', function () {
-      var gi = parseInt(el.dataset.ppGi);
-      PP.currentGifticon = list[gi];
+      PP.currentGifticon = list[parseInt(el.dataset.ppGi)];
       populateGifticonDetail(PP.currentGifticon);
       window.showScreen('pw-25');
     });
   });
 }
 
-/* 상세 채우기 — 상품 문서에 실제로 있는 값만 쓴다.
-   없는 값은 줄째로 감춘다(문장으로 지어 채우지 않는다). */
 function populateGifticonDetail(g) {
   var s = document.getElementById('pw-25');
   if (!s) return;
