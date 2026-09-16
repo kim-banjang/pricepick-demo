@@ -18602,10 +18602,13 @@ function renderExGifticonSummary() {
   /* 보유 티켓은 시안의 「내 티켓」 바 하나로 모였다 — ppGiRenderTickets가 그린다. */
   if (window.ppGiRenderTickets) ppGiRenderTickets();
 }
+/* 카탈로그는 한 번만 읽고 그 약속을 들고 있는다 — 교환 내역이 상품명을 붙이려면
+   이게 끝나 있어야 한다(먼저 그려서 「기프티콘」으로 뜨던 것을 막는다). */
+var PP_GI_LOAD = null;
 function loadGifticons() {
-  if (!PP.uid) return;
+  if (!PP.uid) return Promise.resolve();
   renderExGifticonSummary();
-  db.collection('gifticons').where('status', '==', 'active').limit(600).get()
+  PP_GI_LOAD = db.collection('gifticons').where('status', '==', 'active').limit(600).get()
     .then(function(snap) {
       PP.gifticonList = [];
       snap.forEach(function(doc) {
@@ -18614,6 +18617,11 @@ function loadGifticons() {
       });
       renderGifticons();
     }).catch(function(e){ console.error('gifticons', e); });
+  return PP_GI_LOAD;
+}
+function ppGiReady() {
+  if (PP.gifticonList && PP.gifticonList.length) return Promise.resolve();
+  return PP_GI_LOAD || loadGifticons() || Promise.resolve();
 }
 
 /* 상품 이미지가 깨지면 이모지로 되돌린다 — 이모지가 기본값이고 이미지는 덧입힘이다. */
@@ -20843,7 +20851,8 @@ function renderGifticonHistory() {
 
   var box = document.getElementById('gx-history-list');
   if (!box) return;
-  ppQuery('gifticon_exchanges', 'user_id', PP.uid).then(function (ex) {
+  Promise.all([ppGiReady(), ppQuery('gifticon_exchanges', 'user_id', PP.uid)]).then(function (r) {
+    var ex = r[1];
     ex = ex.filter(function (x) { return ppDate(x.exchanged_at); })
            .sort(function (a, b) { return ppDate(b.exchanged_at) - ppDate(a.exchanged_at); });
     if (!ex.length) {
