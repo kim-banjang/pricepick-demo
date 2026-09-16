@@ -1391,9 +1391,9 @@ window.CMS_FEATURES = {
             <span class="sb-item-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg></span>
             <span class="sb-item-lbl" id="nav-label-gifticon-products">상품 목록</span>
           </button>
-          <button class="sb-item" id="nav-gifticons" data-label="플랫폼별 구매내역" onclick="go('gifticons',this)">
+          <button class="sb-item" id="nav-gifticons" data-label="구매내역" onclick="go('gifticons',this)">
             <span class="sb-item-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6"/><path d="M9 16h4"/></svg></span>
-            <span class="sb-item-lbl" id="nav-label-gifticons">플랫폼별 구매내역</span>
+            <span class="sb-item-lbl" id="nav-label-gifticons">구매내역</span>
           </button>
           <button class="sb-item" id="nav-gifticon-unused" data-label="기프티콘 미사용 취소" onclick="go('gifticon-unused',this)">
             <span class="sb-item-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M3 12a9 9 0 1 0 3-6.7"/><polyline points="3 4 3 9 8 9"/></svg></span>
@@ -2455,7 +2455,7 @@ window.CMS_FEATURES = {
         </div>
       </div>
       <div class="card">
-        <div class="card-header"><div class="card-title">플랫폼별 구매내역</div><span style="font-size:12px;color:var(--text-2)" id="gex-count">—</span></div>
+        <div class="card-header"><div class="card-title">구매내역</div><span style="font-size:12px;color:var(--text-2)" id="gex-count">—</span></div>
         <table>
             <colgroup><col style="width:9%"><col style="width:16%"><col style="width:19%"><col style="width:15%"><col style="width:10%"><col style="width:11%"><col style="width:9%"><col style="width:11%"></colgroup>
             <thead>
@@ -5032,7 +5032,7 @@ const I18N = {
     'nav.group.ticket': '티켓 · 보상',
     'nav.tickets': '티켓 내역',
     'nav.weekly-draws': '주간 이벤트 추첨 관리',
-    'nav.gifticons': '플랫폼별 구매내역',
+    'nav.gifticons': '구매내역',
     'nav.gifticon-products': '상품 목록',
     'nav.gifticon-unused': '기프티콘 미사용 취소',
     'nav.gifticon-cancel': '취소내역',
@@ -5069,7 +5069,7 @@ const I18N = {
     'page.members.title': '회원 목록', 'page.members.bc': '회원 관리',
     'page.tickets.title': '티켓 내역', 'page.tickets.bc': '티켓 · 보상',
     'page.weekly-draws.title': '주간 이벤트 추첨 관리', 'page.weekly-draws.bc': '티켓 · 보상',
-    'page.gifticons.title': '플랫폼별 구매내역', 'page.gifticons.bc': '기프티콘 관리', 'page.gifticon-cancel.title': '취소내역', 'page.gifticon-cancel.bc': '기프티콘 관리', 'page.gifticon-products.title': '상품 목록', 'page.gifticon-products.bc': '기프티콘 관리', 'page.gifticon-bulk.title': '상품 설명 일괄 등록', 'page.gifticon-bulk.bc': '기프티콘 관리', 'page.gifticon-unused.title': '기프티콘 미사용 취소', 'page.gifticon-unused.bc': '기프티콘 관리', 'page.gifticon-errlog.title': '다우테크 오류 로그', 'page.gifticon-errlog.bc': '기프티콘 관리',
+    'page.gifticons.title': '구매내역', 'page.gifticons.bc': '기프티콘 관리', 'page.gifticon-cancel.title': '취소내역', 'page.gifticon-cancel.bc': '기프티콘 관리', 'page.gifticon-products.title': '상품 목록', 'page.gifticon-products.bc': '기프티콘 관리', 'page.gifticon-bulk.title': '상품 설명 일괄 등록', 'page.gifticon-bulk.bc': '기프티콘 관리', 'page.gifticon-unused.title': '기프티콘 미사용 취소', 'page.gifticon-unused.bc': '기프티콘 관리', 'page.gifticon-errlog.title': '다우테크 오류 로그', 'page.gifticon-errlog.bc': '기프티콘 관리',
     'page.banners.title': '배너 관리', 'page.banners.bc': '콘텐츠',
     'page.invite.title': '친구초대 관리', 'page.invite.bc': '콘텐츠',
     'page.terms.title': '약관 관리', 'page.terms.bc': '운영',
@@ -8126,7 +8126,7 @@ window.giBulkDownloadTemplate = function() {
 
 /* ── Gifticon Exchanges ── */
 var GEX_GRADE_KO = { bronze: '브론즈', silver: '실버', gold: '골드' };
-/* ── 2. 플랫폼별 구매내역 (포인츠허브 구조) ──
+/* ── 2. 구매내역 (포인츠허브 구조) ──
    칸: 구매일(날짜 아래 시각) · 주문번호 · 이름(아래 닉네임) · 상품명 · 상품코드 · 유효기간 · 상태 */
 /* 상품명에 브랜드가 이미 들어 있으면 또 붙이지 않는다 — 「GS25 GS25 3,000원 금액권」처럼 겹친다. */
 function cmsBrandName(brand, name) {
