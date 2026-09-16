@@ -4940,10 +4940,9 @@
   /* 상품 칸 */
   .gs-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 10px 20px 16px; }
   .gs-card { border: 1px solid #F0F0F4; border-radius: 16px; overflow: hidden; background: white; cursor: pointer; }
-  .gs-card-img { position: relative; aspect-ratio: 1.586; margin: 10px; border-radius: 10px; overflow: hidden; background: #F7F6FB; display: flex; align-items: center; justify-content: center; }
-  /* 칸에서는 시안처럼 사진이 틀을 꽉 채운다(cover). 상품 사진이 250x250 정사각인데
-     가운데에 가로 상품권이 들어 있어서 위아래 여백만 깎인다. 온전한 사진은 상세에서 본다. */
-  .gs-card-img img { width: 100%; height: 100%; object-fit: cover; }
+  /* 상품 사진은 정사각 틀에 통째로 — 잘라내지 않는다(김반장 2026-09-16). */
+  .gs-card-img { position: relative; aspect-ratio: 1; margin: 10px; border-radius: 10px; overflow: hidden; background: #F7F6FB; display: flex; align-items: center; justify-content: center; }
+  .gs-card-img img { width: 100%; height: 100%; object-fit: contain; }
   .gs-search.hide { display: none !important; }
   .gs-badge { position: absolute; top: 7px; right: 7px; font-size: 10px; font-weight: 700; color: white; background: #1B9E55; border-radius: 100px; padding: 3px 8px; box-shadow: 0 2px 6px rgba(0,0,0,.2); z-index: 2; }
   .gs-card-b { padding: 2px 12px 12px; }
@@ -7397,9 +7396,10 @@
   /* ── 상품 상세 — 시안(2026-09-16) ── */
   .ex-detail-scroll { flex: 1; overflow-y: auto; }
   .ex-detail-scroll::-webkit-scrollbar { display: none; }
-  .ex-detail-hero { background: #F7F6FB; padding: 36px 0; display: flex; align-items: center; justify-content: center; flex: none; }
-  .ex-hero-card { width: 196px; aspect-ratio: 1.586; border-radius: 14px; box-shadow: 0 12px 28px rgba(30,42,86,.28); overflow: hidden; background: white; display: flex; align-items: center; justify-content: center; }
-  .ex-hero-card img { width: 100%; height: 100%; object-fit: cover; }
+  /* 흰 카드·그림자 없이 사진만 정사각 틀에 통째로 놓는다(김반장 2026-09-16). */
+  .ex-detail-hero { background: #F7F6FB; padding: 24px 0; display: flex; align-items: center; justify-content: center; flex: none; }
+  .ex-hero-card { width: 220px; aspect-ratio: 1; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+  .ex-hero-card img { width: 100%; height: 100%; object-fit: contain; }
   .ex-detail-body { padding: 20px 20px 16px; border-bottom: 8px solid #F7F6FB; }
   .ex-brand-tag { font-size: 13px; color: #9A9AA5; }
   .ex-product-name { margin-top: 4px; font-size: 21px; font-weight: 800; color: #191A20; letter-spacing: -0.4px; line-height: 1.3; }
@@ -7415,6 +7415,9 @@
   .ex-note-t { font-weight: 600; color: #4B4B55; }
   .ex-note-sub { display: inline-block; padding-left: 11px; }
   .ex-detail-bottom-new { flex: none; padding: 12px 20px 8px; border-top: 1px solid #F0F0F4; background: white; }
+  .ex-plus { font-size: 14px; font-weight: 700; color: #9A9AA5; }
+  .ex-lack { display: flex; align-items: center; justify-content: space-between; gap: 8px; background: #FFF4F4; border-radius: 12px; padding: 11px 14px; margin-bottom: 8px; font-size: 13px; color: #C0392B; cursor: pointer; }
+  .ex-lack b { font-weight: 700; white-space: nowrap; }
   .ex-deduct { background: #F3F1FC; border-radius: 12px; padding: 11px 14px; text-align: center; font-size: 13px; font-weight: 600; color: #5A44C9; }
   .ex-cta { margin-top: 10px; width: 100%; background: var(--main); border: none; border-radius: 14px; padding: 16px 0; text-align: center; font-size: 16px; font-weight: 700; color: white; font-family: inherit; cursor: pointer; }
   .ex-detail-bottom { border-top: 1px solid var(--border); padding: 12px 16px 32px; }
@@ -7444,8 +7447,8 @@
   .exd-s { margin-top: 6px; font-size: 14px; color: #6E6E78; text-align: center; padding: 0 24px; }
   .exd-card { margin: 22px 24px 0; background: white; border-radius: 20px; box-shadow: 0 6px 24px rgba(25,26,32,.08); flex: none; }
   .exd-card-top { padding: 20px 20px 0; display: flex; gap: 14px; align-items: center; }
-  .exd-thumb { flex: none; width: 106px; aspect-ratio: 1.586; border-radius: 10px; box-shadow: 0 6px 14px rgba(30,42,86,.25); overflow: hidden; background: #F7F6FB; display: flex; align-items: center; justify-content: center; }
-  .exd-thumb img { width: 100%; height: 100%; object-fit: cover; }
+  .exd-thumb { flex: none; width: 96px; aspect-ratio: 1; border-radius: 10px; overflow: hidden; background: #F7F6FB; display: flex; align-items: center; justify-content: center; }
+  .exd-thumb img { width: 100%; height: 100%; object-fit: contain; }
   .exd-brand { font-size: 12px; font-weight: 600; color: var(--main); }
   .exd-name { margin-top: 2px; font-size: 16px; font-weight: 800; color: #191A20; line-height: 1.3; }
   .exd-used { margin-top: 7px; display: inline-flex; align-items: center; gap: 4px; background: #F3F1FC; border-radius: 100px; padding: 4px 10px; }
@@ -12846,6 +12849,7 @@ window.PP_FEATURES = {
           </div>
         </div>
         <div class="ex-detail-bottom-new">
+          <div class="ex-lack" id="exd-lack" style="display:none;" onclick="showScreen('pw-22')"></div>
           <div class="ex-deduct"></div>
           <button class="ex-cta btn-primary">교환하기</button>
         </div>
@@ -17720,7 +17724,10 @@ window.ppLoadTicketValue = function() {
       event: typeof d.event === 'number' ? d.event : PP_TICKET_VALUE_DEFAULT.event,
     };
     PP_TICKET_VALUE_CACHE = v;
+    /* 기프티샵 환산도 이 값 하나만 본다 — 숫자를 코드에 박지 않는다. */
+    if (window.PP_TV) { PP_TV.bronze = v.bronze; PP_TV.silver = v.silver; PP_TV.gold = v.gold; }
     if (typeof ppApplyTicketValue === 'function') ppApplyTicketValue(v);
+    if (typeof renderGifticons === 'function' && PP.gifticonList && PP.gifticonList.length) renderGifticons();
     return v;
   }).catch(function(e) {
     console.error('ppLoadTicketValue', e);
@@ -18656,6 +18663,53 @@ window.ppGiImgFallback = ppGiImgFallback;
    홈 탭은 「인기상품 + 정렬」이 한 줄, 브랜드 탭은 브랜드 칩 · 「정렬 + 교환 가능만」 ·
    구역 제목 차례. 칸은 2단이고 상품 사진 위에 「교환가능」 딱지가 붙는다.
    갈래(카테고리) 칩은 시안에 없어서 뺐다. */
+/* ── 티켓 환산 — 큰 등급부터 채운다 ──
+   정책: 적립이 「큰 등급부터 채워 지급」이므로 사용(교환)도 같은 규칙을 쓴다.
+   골드 → 실버 → 브론즈 차례로 채우고 자투리는 아래 등급으로 내린다.
+   예) 6,300원 → 골드 31 + 실버 1 · 4,500원 → 골드 22 + 실버 1 · 3,000원 → 골드 15
+   ⚠ 보유 티켓과 무관하게 상품 가격만으로 정한다. */
+var PP_TV = { bronze: 10, silver: 100, gold: 200 };
+window.PP_TV = PP_TV;
+var PP_GRADE_KO = { bronze: '브론즈', silver: '실버', gold: '골드' };
+var PP_GRADE_ORDER = ['gold', 'silver', 'bronze'];
+
+function ppTicketCombo(won) {
+  var rest = Math.max(0, Math.round(Number(won) || 0));
+  var out = [];
+  PP_GRADE_ORDER.forEach(function (g) {
+    var v = PP_TV[g];
+    if (!v || rest < v) return;
+    var k = Math.floor(rest / v);
+    out.push({ grade: g, count: k });
+    rest -= k * v;
+  });
+  /* 가장 작은 등급으로도 안 떨어지는 자투리는 브론즈 한 장을 더 받는다(손해 보지 않게). */
+  if (rest > 0) {
+    var b = out.filter(function (x) { return x.grade === 'bronze'; })[0];
+    if (b) b.count += 1; else out.push({ grade: 'bronze', count: 1 });
+  }
+  return out;
+}
+
+/* 상품 하나의 환산 — 가격(원)이 정본이다. 가격이 없으면 예전 방식(단일 등급) 값을 쓴다. */
+function ppComboOf(g) {
+  var won = (g && typeof g.price === 'number') ? g.price : 0;
+  if (won > 0) return ppTicketCombo(won);
+  return [{ grade: (g && g.required_grade) || 'bronze', count: (g && g.required_count) || 1 }];
+}
+function ppComboText(c, sep) {
+  return c.map(function (x) { return PP_GRADE_KO[x.grade] + ' ' + x.count + '장'; }).join(sep || ' + ');
+}
+/* 칸에는 짧게 — 대표 등급 하나, 자투리가 있으면 뒤에 「+」 */
+function ppComboShort(c) {
+  if (!c.length) return '';
+  return PP_GRADE_KO[c[0].grade] + ' ' + c[0].count + '장' + (c.length > 1 ? ' +' : '');
+}
+function ppComboHave(c) {
+  return c.filter(function (x) { return (PP.tickets[x.grade] || 0) < x.count; })
+          .map(function (x) { return { grade: x.grade, short: x.count - (PP.tickets[x.grade] || 0) }; });
+}
+
 var PP_GI_BRAND = '';
 var PP_GI_SORT = 'popular';
 var PP_GI_Q = '';
@@ -18672,23 +18726,16 @@ function ppGiToggleSearch() {
 }
 window.ppGiToggleSearch = ppGiToggleSearch;
 
-/* 브랜드 칩은 카탈로그에 실제로 있는 브랜드만 쓴다 — 없는 브랜드를 지어내지 않는다. */
-function ppGiBrands() {
-  var cnt = {};
-  (PP.gifticonList || []).forEach(function (g) {
-    var b = (g.brand || '').trim();
-    if (b) cnt[b] = (cnt[b] || 0) + 1;
-  });
-  return Object.keys(cnt).sort(function (a, b) {
-    return cnt[b] - cnt[a] || a.localeCompare(b, 'ko');
-  }).slice(0, 20);
-}
+/* 「브랜드」 탭의 칩 줄에는 카테고리를 넣는다 — 포인츠허브의 브랜드 탭이 실제로는
+   카테고리 여섯 갈래다(김반장 확인 2026-09-16). 탭 이름은 「브랜드」 그대로 둔다.
+   이름은 포인츠허브 값을 슬래시까지 그대로 쓴다. */
+var PP_GI_CATS = ['문화/생활/기타', '베이커리/떡', '상품권/금액권', '커피/음료', '편의점/마트', '피자/버거/치킨'];
 
 function ppGiRenderBrands() {
   var wrap = document.getElementById('gs-brands-in');
   if (!wrap) return;
   wrap.innerHTML = '<div class="gs-chip' + (PP_GI_BRAND ? '' : ' active') + '" data-brand="">전체</div>'
-    + ppGiBrands().map(function (v) {
+    + PP_GI_CATS.map(function (v) {
         return '<div class="gs-chip' + (PP_GI_BRAND === v ? ' active' : '') + '" data-brand="' + ppEsc(v) + '">' + ppEsc(v) + '</div>';
       }).join('')
     + '<div style="flex:none;width:12px;"></div>';
@@ -18781,8 +18828,24 @@ function ppGiSorted(list) {
   return list.slice().sort(function (a, b) { return ((a.price || 0) - (b.price || 0)) * dir; });
 }
 
+/* 상품의 category 값이 데모에 먼저 들어간 이름(「편의점」·「외식」·「쇼핑」·「카페」)과
+   포인츠허브 것(「편의점/마트」…)이 섞여 있다. 칩 이름을 「/」로 쪼갠 조각 중 하나라도
+   들어 있으면 그 갈래로 본다. */
+function ppGiCatMatch(cat, pick) {
+  if (!pick) return true;
+  cat = String(cat || '');
+  var parts = pick.split('/');
+  for (var i = 0; i < parts.length; i++) {
+    if (parts[i] && cat.indexOf(parts[i]) >= 0) return true;
+  }
+  if (pick.indexOf('피자') === 0 && cat.indexOf('외식') >= 0) return true;
+  if (pick.indexOf('상품권') === 0 && cat.indexOf('쇼핑') >= 0) return true;
+  if (pick.indexOf('커피') === 0 && cat.indexOf('카페') >= 0) return true;
+  return false;
+}
+
 function ppGiAvail(g) {
-  return (PP.tickets[g.required_grade || 'bronze'] || 0) >= (g.required_count || 1);
+  return !ppComboHave(ppComboOf(g)).length;
 }
 
 function renderGifticons() {
@@ -18792,7 +18855,7 @@ function renderGifticons() {
   if (PP_GI_TAB === 'brand' && !document.querySelector('#gs-brands-in .gs-chip')) ppGiRenderBrands();
 
   var list = (PP.gifticonList || []).filter(function (g) {
-    if (PP_GI_TAB === 'brand' && PP_GI_BRAND && (g.brand || '').trim() !== PP_GI_BRAND) return false;
+    if (PP_GI_TAB === 'brand' && PP_GI_BRAND && !ppGiCatMatch(g.category, PP_GI_BRAND)) return false;
     if (PP_GI_TAB === 'brand' && PP_GI_AVAIL_ONLY && !ppGiAvail(g)) return false;
     if (PP_GI_Q) {
       var hay = ((g.brand || '') + ' ' + (g.name || g.product_name || '')).toLowerCase();
@@ -18807,19 +18870,17 @@ function renderGifticons() {
   if (!list.length) {
     var why = PP_GI_Q ? '찾는 말과 맞는 상품이 없어요'
       : PP_GI_AVAIL_ONLY ? '지금 교환할 수 있는 상품이 없어요'
-      : PP_GI_BRAND ? '이 브랜드에는 아직 상품이 없어요'
+      : PP_GI_BRAND ? '이 갈래에는 아직 상품이 없어요'
       : '교환 가능한 기프티콘이 없어요';
     var how = PP_GI_Q ? '다른 말로 찾아 보세요'
       : PP_GI_AVAIL_ONLY ? '티켓을 더 모으면 여기에 나타나요'
-      : PP_GI_BRAND ? '다른 브랜드를 눌러 보세요'
+      : PP_GI_BRAND ? '다른 갈래를 눌러 보세요'
       : '관리자가 상품을 등록하면 여기에 나타나요';
     grid.innerHTML = '<div class="gs-empty"><div class="gs-empty-t">' + why + '</div><div class="gs-empty-s">' + how + '</div></div>';
     return;
   }
   grid.innerHTML = list.map(function (g, i) {
-    var grade = g.required_grade || 'bronze';
-    var gradeName = { bronze: '브론즈', silver: '실버', gold: '골드' }[grade] || '브론즈';
-    var cnt = g.required_count || 1;
+    var combo = ppComboOf(g);
     var img = g.image_url
       ? '<img src="' + ppEsc(g.image_url) + '" alt="" loading="lazy" onerror="ppGiImgFallback(this)">'
       : PP_GI_PLACEHOLDER_SVG;
@@ -18830,8 +18891,8 @@ function renderGifticons() {
       + '<div class="gs-card-b">'
       + '<div class="gs-brand">' + ppEsc(g.brand || '') + '</div>'
       + '<div class="gs-name">' + ppEsc(ppStripBrand(g.brand, g.name || g.product_name)) + '</div>'
-      + '<div class="gs-card-tk"><span class="gs-tkchip">' + ticketIcon(grade)
-      + '<span>' + gradeName + ' ' + cnt + '장</span></span></div>'
+      + '<div class="gs-card-tk"><span class="gs-tkchip">' + ticketIcon(combo[0].grade)
+      + '<span>' + ppComboShort(combo) + '</span></span></div>'
       + '</div></div>';
   }).join('');
   grid.querySelectorAll('.gs-card').forEach(function (el) {
@@ -18903,11 +18964,12 @@ function ppFillExDone(g, x) {
   if (en) en.textContent = ppStripBrand(g.brand, g.name || g.product_name);
 
   /* 사용한 티켓 — 교환 기록에 남은 값이 정본(그 뒤 상품 값이 바뀌어도 기록은 그대로다). */
-  var grade = x.grade_used || g.required_grade || 'bronze';
-  var cnt = x.count_used || g.required_count || 1;
-  var gradeName = { bronze: '브론즈', silver: '실버', gold: '골드' }[grade] || '브론즈';
+  /* 조합이 남아 있으면 조합 그대로, 없으면(예전 기록) 단일 등급으로 */
+  var tu = (x.tickets_used && x.tickets_used.length) ? x.tickets_used
+         : [{ grade: x.grade_used || g.required_grade || 'bronze', count: x.count_used || g.required_count || 1 }];
   var used = document.getElementById('ex-done-used');
-  if (used) used.innerHTML = ticketIcon(grade) + '<span>' + gradeName + ' ' + cnt + '장 사용</span>';
+  if (used) used.innerHTML = ticketIcon(tu[0].grade) + '<span>'
+    + tu.map(function (t) { return PP_GRADE_KO[t.grade] + ' ' + t.count + '장'; }).join(' · ') + ' 사용</span>';
 
   var ec = document.getElementById('ex-done-code');
   if (ec) ec.textContent = x.code || '';
@@ -18957,7 +19019,7 @@ function populateGifticonDetail(g) {
     box.innerHTML = g.image_url
       ? '<img src="' + ppEsc(g.image_url) + '" alt="" onerror="ppGiImgFallback(this)">'
       : PP_GI_PLACEHOLDER_SVG;
-    if (!g.image_url) box.setAttribute('style', PP_GI_PLACEHOLDER_STYLE + 'width:196px;aspect-ratio:1.586;border-radius:14px;');
+    if (!g.image_url) box.setAttribute('style', PP_GI_PLACEHOLDER_STYLE + 'width:220px;aspect-ratio:1;border-radius:12px;');
   }
 
   var brand = s.querySelector('.ex-brand-tag');
@@ -18965,17 +19027,41 @@ function populateGifticonDetail(g) {
   var name = s.querySelector('.ex-product-name');
   if (name) name.textContent = ppStripBrand(g.brand, g.name || g.product_name);
 
-  var grade = g.required_grade || 'bronze';
-  var gradeName = { bronze: '브론즈', silver: '실버', gold: '골드' }[grade] || '브론즈';
-  var cnt = g.required_count || 1;
-  var have = PP.tickets[grade] || 0;
-
-  var tk = s.querySelector('.ex-price-tk');
-  if (tk) tk.innerHTML = ticketIcon(grade) + '<span>' + gradeName + ' 티켓 ' + cnt + '장</span>';
+  /* 값은 조합 전체를 쓴다 — 큰 등급부터 채운 결과 그대로 */
+  var combo = ppComboOf(g);
+  var row = s.querySelector('.ex-price-row');
+  if (row) {
+    row.innerHTML = combo.map(function (x) {
+      return '<span class="ex-price-tk">' + ticketIcon(x.grade)
+        + '<span>' + PP_GRADE_KO[x.grade] + ' 티켓 ' + x.count + '장</span></span>';
+    }).join('<span class="ex-plus">+</span>');
+  }
   var haveEl = s.querySelector('.ex-cost-have');
-  if (haveEl) haveEl.textContent = '현재 보유: ' + have + '장';
+  if (haveEl) haveEl.textContent = '현재 보유: ' + combo.map(function (x) {
+    return PP_GRADE_KO[x.grade] + ' ' + (PP.tickets[x.grade] || 0) + '장';
+  }).join(' · ');
+
   var deduct = s.querySelector('.ex-deduct');
-  if (deduct) deduct.textContent = gradeName + ' 티켓 ' + cnt + '장 차감 → 잔여 ' + Math.max(0, have - cnt) + '장';
+  if (deduct) deduct.textContent = ppComboText(combo, ' · ') + ' 차감 → 잔여 '
+    + combo.map(function (x) {
+        return PP_GRADE_KO[x.grade] + ' ' + Math.max(0, (PP.tickets[x.grade] || 0) - x.count) + '장';
+      }).join(' · ');
+
+  /* 모자라면 조용히 막지 않고 교환소로 보낸다 — 등급 교환은 양방향이라 바꿔 채울 수 있다. */
+  var lack = ppComboHave(combo);
+  var warn = document.getElementById('exd-lack');
+  var cta = s.querySelector('.ex-cta');
+  if (warn) {
+    if (lack.length) {
+      warn.innerHTML = '<span>' + lack.map(function (x) {
+          return PP_GRADE_KO[x.grade] + '가 ' + x.short + '장 모자랍니다';
+        }).join(' · ') + '</span><b>교환소에서 바꾸기 ›</b>';
+      warn.style.display = '';
+    } else {
+      warn.style.display = 'none';
+    }
+  }
+  if (cta) cta.textContent = lack.length ? '교환소에서 티켓 바꾸기' : '교환하기';
 
   var html = ppNoticeHtml(g.notice || g.description);
   var nw = document.getElementById('exd-note-wrap');
@@ -18999,23 +19085,36 @@ function bindExchangeBtn() {
     e.stopPropagation();
     var g = PP.currentGifticon;
     if (!g || !PP.uid) return;
-    var grade = g.required_grade || 'bronze';
-    var cnt = g.required_count || 1;
-    if ((PP.tickets[grade] || 0) < cnt) { showToast('티켓이 부족합니다'); return; }
+    /* 차감도 표시와 같은 규칙(큰 등급부터 채운 조합)이어야 한다 — 다르면 사고다. */
+    var combo = ppComboOf(g);
+    var lack = ppComboHave(combo);
+    if (lack.length) { window.showScreen('pw-22'); return; }
+    var grade = combo[0].grade;
+    var cnt = combo.reduce(function (a, x) { return a + x.count; }, 0);
     btn.disabled = true;
     db.collection('user_tickets')
       .where('user_id', '==', PP.uid)
-      .where('grade', '==', grade)
       .where('status', '==', 'active')
       .get()
       .then(function(snap) {
-        var docs = snap.docs.slice().sort(function(a, b) {
-          var ea = a.data().earned_at, eb = b.data().earned_at;
-          var ta = (ea && ea.toMillis) ? ea.toMillis() : 0;
-          var tb = (eb && eb.toMillis) ? eb.toMillis() : 0;
-          return ta - tb;
+        /* 등급별로 만료 임박(적립일이 오래된) 것부터 빼낸다. */
+        var byGrade = {};
+        snap.docs.forEach(function (d) {
+          var gd = d.data().grade;
+          (byGrade[gd] = byGrade[gd] || []).push(d);
         });
-        if (docs.length < cnt) { showToast('티켓이 부족합니다'); btn.disabled = false; return null; }
+        Object.keys(byGrade).forEach(function (k) {
+          byGrade[k].sort(function (a, b) {
+            var ea = a.data().earned_at, eb = b.data().earned_at;
+            return ((ea && ea.toMillis) ? ea.toMillis() : 0) - ((eb && eb.toMillis) ? eb.toMillis() : 0);
+          });
+        });
+        var docs = [];
+        for (var i = 0; i < combo.length; i++) {
+          var list = byGrade[combo[i].grade] || [];
+          if (list.length < combo[i].count) { showToast('티켓이 부족합니다'); btn.disabled = false; return null; }
+          docs = docs.concat(list.slice(0, combo[i].count));
+        }
         var now = FS.FieldValue.serverTimestamp();
         var code = 'PP-' + Math.random().toString(36).slice(2,6).toUpperCase() + '-'
           + Math.random().toString(36).slice(2,6).toUpperCase() + '-'
@@ -19030,26 +19129,29 @@ function bindExchangeBtn() {
         var orderNo = ppYmdDot(od).replace(/\./g, '') + '-'
           + String(Math.floor(Math.random() * 1000000)).padStart(6, '0');
         var batch = db.batch();
-        docs.slice(0, cnt).forEach(function(doc) {
+        docs.forEach(function(doc) {
           batch.update(doc.ref, { status: 'used', used_at: now });
           batch.set(db.collection('ticket_transactions').doc(), {
-            user_id: PP.uid, ticket_grade: grade, type: 'use', postback_id: null, created_at: now,
+            user_id: PP.uid, ticket_grade: doc.data().grade, type: 'use', postback_id: null, created_at: now,
           });
         });
         var exRef = db.collection('gifticon_exchanges').doc();
         batch.set(exRef, {
           user_id: PP.uid, gifticon_id: g._id, grade_used: grade, count_used: cnt,
+          /* 조합 전체도 남긴다 — 나중에 교환 내역·완료 화면이 그대로 읽는다. */
+          tickets_used: combo.map(function (x) { return { grade: x.grade, count: x.count }; }),
           status: 'completed', code: code, order_no: orderNo,
           expires_at: expiresAt, exchanged_at: now,
         });
         return batch.commit().then(function() {
           return { code: code, order_no: orderNo, expires_at: expiresAt,
-                   grade_used: grade, count_used: cnt, exchanged_at: new Date() };
+                   grade_used: grade, count_used: cnt, tickets_used: combo,
+                   exchanged_at: new Date() };
         });
       })
       .then(function(res) {
         if (!res) return;
-        PP.tickets[grade] -= cnt;
+        combo.forEach(function (x) { PP.tickets[x.grade] = (PP.tickets[x.grade] || 0) - x.count; });
         PP.tickets.total -= cnt;
         renderHomeTickets();
         renderMyTicketCard();
@@ -20875,8 +20977,9 @@ function renderGifticonHistory() {
       var g = (PP.gifticonList || []).filter(function (it) { return it._id === x.gifticon_id; })[0] || {};
       var nm = ppBrandName(g.brand, g.name || g.product_name) || '기프티콘';
       var done = (x.status === 'completed' || x.status === 'issued');
-      var gradeName = { bronze: '브론즈', silver: '실버', gold: '골드' }[x.grade_used] || '';
-      var used = gradeName ? (gradeName + ' ' + (x.count_used || 1) + '장') : '';
+      var tu = (x.tickets_used && x.tickets_used.length) ? x.tickets_used
+             : (x.grade_used ? [{ grade: x.grade_used, count: x.count_used || 1 }] : []);
+      var used = tu.map(function (t) { return PP_GRADE_KO[t.grade] + ' ' + t.count + '장'; }).join(' · ');
       var d = ppDate(x.exchanged_at);
       return '<div class="gxh-card" data-gx="' + i + '">'
         + '<div class="gxh-hd"><div class="gxh-nm">' + ppEsc(nm) + '</div>'
