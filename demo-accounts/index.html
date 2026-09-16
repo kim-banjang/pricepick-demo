@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>데모 계정 관리 · PricePick</title>
+<link rel="icon" href="/cms/favicon-32.png" sizes="32x32">
+<link rel="apple-touch-icon" href="/cms/apple-touch-icon.png">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<style>
+/* CMS 데모와 같은 토큰·규격을 그대로 쓴다 (cms/index.html) */
+:root{
+  --main:#845EEE; --main-dark:#6C4AB6; --main-hover:#6C4AB6;
+  --main-soft:rgba(132,94,238,.08); --main-line:rgba(132,94,238,.22);
+  --bg:#F4F1FB; --surface:#FFFFFF; --surface-2:#F8F7FC; --border:#E4DFF0;
+  --text:#1A1130; --text-2:#5A5370; --text-3:#9B93B0;
+  --success:#16A34A; --success-soft:rgba(22,163,74,.1);
+  --danger:#DC2626; --danger-soft:rgba(220,38,38,.1);
+  --warning:#D97706; --warning-soft:rgba(217,119,6,.1);
+  --r-sm:6px; --r-md:10px; --r-lg:14px; --r-xl:18px;
+  --shadow-sm:0 1px 3px rgba(0,0,0,.08); --shadow-lg:0 12px 36px rgba(0,0,0,.14);
+  --font:'Pretendard Variable','Pretendard',-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo',system-ui,sans-serif;
+}
+*{box-sizing:border-box;}
+body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font);
+  -webkit-text-size-adjust:100%;}
+.wrap{max-width:1000px;margin:0 auto;padding:22px 16px 60px;}
+.pg-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px;}
+.pg-title{font-size:19px;font-weight:800;letter-spacing:-.3px;}
+.pg-sub{font-size:12px;color:var(--text-2);margin-top:3px;}
+
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;margin-bottom:16px;}
+.card-header{padding:15px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;}
+.card-title{font-size:14px;font-weight:700;}
+
+table{width:100%;border-collapse:collapse;}
+th{text-align:center;padding:10px 14px;font-size:11px;color:var(--text-2);font-weight:600;
+  text-transform:uppercase;letter-spacing:.4px;border-bottom:1px solid var(--border);
+  background:var(--surface-2);white-space:nowrap;position:relative;}
+th:not(:last-child)::after{content:"";position:absolute;right:0;top:30%;height:40%;width:1px;background:rgba(0,0,0,.13);}
+td{padding:12px 14px;font-size:13px;border-bottom:1px solid var(--border);white-space:nowrap;
+  font-variant-numeric:tabular-nums;text-align:center;}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:var(--surface-2);}
+
+.btn{padding:7px 14px;border-radius:var(--r-md);font-size:12px;font-weight:600;cursor:pointer;border:none;
+  transition:all .15s;font-family:var(--font);white-space:nowrap;display:inline-flex;align-items:center;justify-content:center;gap:5px;}
+.btn-primary{background:var(--main);color:#fff;}
+.btn-primary:hover{background:var(--main-dark);}
+.btn-ghost{background:transparent;color:var(--text-2);border:1px solid var(--border);}
+.btn-ghost:hover{color:var(--text);border-color:var(--text-2);}
+.btn-danger{background:var(--danger-soft);color:var(--danger);}
+.btn-sm{padding:5px 10px;font-size:11px;border-radius:var(--r-sm);}
+.btn[disabled]{opacity:.4;cursor:not-allowed;}
+
+.info-box{background:var(--main-soft);border:1px solid var(--main-line);border-radius:var(--r-md);
+  padding:12px 16px;font-size:12px;color:var(--text-2);margin-bottom:14px;line-height:1.6;}
+.info-box strong{color:var(--main-hover);}
+.warn-box{background:var(--danger-soft);border:1px solid rgba(239,68,68,.28);border-radius:var(--r-md);
+  padding:12px 16px;font-size:12px;color:var(--text-2);margin-bottom:14px;line-height:1.6;display:none;}
+.warn-box strong{color:var(--danger);}
+.warn-box code{background:rgba(0,0,0,.05);padding:1px 5px;border-radius:4px;font-size:11px;}
+
+/* 계정 ID 칩 — 앱 마이 화면의 ID 복사 방식(짧게 보여주고 전체를 복사)과 같다 */
+.uid-chip{display:inline-flex;align-items:center;gap:6px;max-width:100%;
+  background:var(--main-soft);border:1px solid var(--main-line);color:var(--main-hover);
+  border-radius:99px;padding:5px 11px;font-size:12px;font-weight:700;cursor:pointer;
+  font-family:ui-monospace,SFMono-Regular,Menlo,monospace;transition:all .15s;}
+.uid-chip:hover{background:rgba(132,94,238,.16);}
+.uid-chip:active{transform:scale(.97);}
+.uid-chip .ico{width:12px;height:12px;flex-shrink:0;}
+.uid-none{color:var(--text-3);font-size:12px;}
+
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(26,17,48,.35);z-index:200;
+  align-items:center;justify-content:center;backdrop-filter:blur(2px);padding:14px;}
+.modal-overlay.open{display:flex;}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-xl);
+  width:480px;max-width:100%;max-height:88vh;overflow-y:auto;box-shadow:var(--shadow-lg);}
+.modal-header{padding:18px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;
+  justify-content:space-between;position:sticky;top:0;background:var(--surface);z-index:1;}
+.modal-title{font-size:15px;font-weight:700;letter-spacing:-.2px;}
+.modal-close{cursor:pointer;background:transparent;border:none;color:var(--text-2);
+  width:30px;height:30px;border-radius:var(--r-md);display:flex;align-items:center;justify-content:center;}
+.modal-close:hover{color:var(--text);background:var(--surface-2);}
+.modal-body{padding:20px 22px;}
+.modal-footer{padding:14px 22px;border-top:1px solid var(--border);display:flex;gap:10px;justify-content:flex-end;}
+.form-group{margin-bottom:14px;}
+.form-label{font-size:11px;font-weight:700;color:var(--text-2);margin-bottom:5px;display:block;
+  text-transform:uppercase;letter-spacing:.4px;}
+.form-input{width:100%;background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r-md);
+  padding:10px 13px;color:var(--text);font-size:13px;outline:none;font-family:var(--font);transition:border-color .15s;}
+.form-input:focus{border-color:var(--main);}
+.form-input.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;}
+textarea.form-input{resize:vertical;min-height:64px;}
+.form-err{display:none;background:var(--danger-soft);color:var(--danger);border-radius:var(--r-md);
+  padding:9px 12px;font-size:12px;font-weight:600;margin-bottom:12px;}
+
+#toast-el{position:fixed;left:50%;bottom:28px;transform:translateX(-50%) translateY(12px);
+  background:#1A1130;color:#fff;padding:10px 18px;border-radius:99px;font-size:13px;font-weight:600;
+  opacity:0;pointer-events:none;transition:all .2s;z-index:400;white-space:nowrap;max-width:90vw;}
+#toast-el.show{opacity:1;transform:translateX(-50%);}
+
+.empty{text-align:center;padding:38px 18px;color:var(--text-3);font-size:13px;}
+
+/* ── 375px — 표를 카드 줄로 접는다 ── */
+.rowcards{display:none;}
+@media (max-width:640px){
+  .wrap{padding:16px 12px 56px;}
+  .tablewrap{display:none;}
+  .rowcards{display:block;}
+  .rc{padding:14px 16px;border-bottom:1px solid var(--border);}
+  .rc:last-child{border-bottom:none;}
+  .rc-top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px;}
+  .rc-name{font-size:14px;font-weight:700;letter-spacing:-.2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .rc-acts{display:flex;gap:6px;flex-shrink:0;}
+  .rc-line{display:flex;align-items:center;gap:8px;margin-bottom:7px;min-width:0;}
+  .rc-k{font-size:11px;font-weight:700;color:var(--text-3);width:52px;flex-shrink:0;}
+  .rc-line .uid-chip{min-width:0;overflow:hidden;}
+  .rc-memo{font-size:12px;color:var(--text-2);line-height:1.5;margin-top:8px;white-space:pre-wrap;word-break:break-word;}
+}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="pg-head">
+    <div>
+      <div class="pg-title">데모 계정 관리</div>
+      <div class="pg-sub">데모에서 앱을 테스트할 때 가상 데이터를 어느 계정에 넣을지 여기서 확인합니다.</div>
+    </div>
+    <button class="btn btn-primary" id="btn-add">+ 계정 추가</button>
+  </div>
+
+  <div class="info-box">
+    <strong>쓰는 법</strong> — 사람마다 한 줄. PC와 모바일에서 각각 쓰는 계정 ID를 적어 둡니다.
+    계정 ID는 앱 <strong>마이 화면 상단의 ID 「복사」</strong> 단추로 얻습니다. 여기 적힌 ID 칩을 누르면 전체 ID가 복사됩니다.
+  </div>
+
+  <div class="warn-box" id="rule-warn">
+    <strong>저장이 막혀 있습니다.</strong> Firestore 규칙에 <code>demo_accounts</code> 공개 규칙이 아직 게시되지 않았습니다.
+    저장소의 <code>firestore.rules</code>에 규칙은 들어가 있으니, Firebase 콘솔 → Firestore Database → 규칙에서 한 번 게시하면 바로 열립니다.
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">계정 명부</div>
+      <span style="font-size:12px;color:var(--text-2)" id="cnt">—</span>
+    </div>
+
+    <div class="tablewrap">
+      <table>
+        <thead>
+          <tr><th style="width:130px">이름</th><th>PC 계정 ID</th><th>모바일 계정 ID</th><th>메모</th><th style="width:130px">관리</th></tr>
+        </thead>
+        <tbody id="tbody"><tr><td colspan="5" class="empty">불러오는 중…</td></tr></tbody>
+      </table>
+    </div>
+
+    <div class="rowcards" id="rowcards"><div class="empty">불러오는 중…</div></div>
+  </div>
+</div>
+
+<!-- 추가 · 수정 모달 -->
+<div class="modal-overlay" id="m-acc">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="m-acc-title">계정 추가</div>
+      <button class="modal-close" id="m-acc-x" aria-label="닫기">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="form-err" id="m-acc-err"></div>
+      <input type="hidden" id="f-id">
+      <div class="form-group">
+        <label class="form-label" for="f-name">이름 *</label>
+        <input class="form-input" id="f-name" type="text" placeholder="예: MrKim" autocomplete="off">
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="f-pc">PC 계정 ID</label>
+        <input class="form-input mono" id="f-pc" type="text" placeholder="앱 마이 화면에서 복사한 ID" autocomplete="off" spellcheck="false">
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="f-mo">모바일 계정 ID</label>
+        <input class="form-input mono" id="f-mo" type="text" placeholder="앱 마이 화면에서 복사한 ID" autocomplete="off" spellcheck="false">
+      </div>
+      <div class="form-group" style="margin-bottom:0">
+        <label class="form-label" for="f-memo">메모</label>
+        <textarea class="form-input" id="f-memo" placeholder="비워 둬도 됩니다"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" id="m-acc-cancel">취소</button>
+      <button class="btn btn-primary" id="m-acc-save">저장</button>
+    </div>
+  </div>
+</div>
+
+<!-- 삭제 확인 모달 -->
+<div class="modal-overlay" id="m-del">
+  <div class="modal" style="width:400px">
+    <div class="modal-header">
+      <div class="modal-title">계정 삭제</div>
+      <button class="modal-close" id="m-del-x" aria-label="닫기">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body" style="font-size:13px;color:var(--text-2);line-height:1.6">
+      <span id="m-del-name" style="font-weight:700;color:var(--text)"></span> 줄을 지웁니다. 되돌릴 수 없습니다.
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" id="m-del-cancel">취소</button>
+      <button class="btn btn-danger" id="m-del-ok">삭제</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast-el"></div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script>
+'use strict';
+
+/* 프픽 데모와 같은 Firestore를 쓴다. 컬렉션은 demo_accounts 하나뿐이고,
+   그 컬렉션만 로그인 없이 읽고 쓰도록 규칙을 열었다(firestore.rules 참고).
+   보안이 필요 없는 명부라 공개로 둔다 — 김반장 확정. */
+firebase.initializeApp({
+  apiKey: "AIzaSyCElUPJAitnMZxttVYjboV0j4s_qpErAgA",
+  authDomain: "pricepick-demo.firebaseapp.com",
+  projectId: "pricepick-demo",
+  storageBucket: "pricepick-demo.firebasestorage.app",
+  messagingSenderId: "505137396208",
+  appId: "1:505137396208:web:cea9d208c7745854e14535"
+});
+var db = firebase.firestore();
+var FS = firebase.firestore;
+var COL = 'demo_accounts';
+var ROWS = [];
+
+function esc(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+    return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+  });
+}
+function toast(msg) {
+  var t = document.getElementById('toast-el');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(function () { t.classList.remove('show'); }, 2400);
+}
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+/* 앱 마이 화면의 ID 복사와 같은 방식 — Clipboard API + execCommand 폴백 */
+function copyFallback(text) {
+  return new Promise(function (resolve, reject) {
+    try {
+      var ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.left = '-9999px';
+      document.body.appendChild(ta);
+      ta.focus(); ta.select();
+      var ok = document.execCommand('copy');
+      document.body.removeChild(ta);
+      ok ? resolve() : reject(new Error('copy failed'));
+    } catch (e) { reject(e); }
+  });
+}
+function copyText(text) {
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    return navigator.clipboard.writeText(text).catch(function () { return copyFallback(text); });
+  }
+  return copyFallback(text);
+}
+function shortUid(uid) { return uid && uid.length > 14 ? uid.slice(0, 12) + '…' : (uid || ''); }
+
+var COPY_ICO = '<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>';
+
+function uidChip(uid) {
+  if (!uid) return '<span class="uid-none">―</span>';
+  return '<button type="button" class="uid-chip" data-copy="' + esc(uid) + '" title="눌러서 전체 ID 복사">'
+    + '<span>' + esc(shortUid(uid)) + '</span>' + COPY_ICO + '</button>';
+}
+
+function render() {
+  var tb = document.getElementById('tbody');
+  var rc = document.getElementById('rowcards');
+  document.getElementById('cnt').textContent = '총 ' + ROWS.length + '명';
+
+  if (!ROWS.length) {
+    tb.innerHTML = '<tr><td colspan="5" class="empty">등록된 계정이 없습니다. 「+ 계정 추가」로 넣으세요.</td></tr>';
+    rc.innerHTML = '<div class="empty">등록된 계정이 없습니다. 「+ 계정 추가」로 넣으세요.</div>';
+    return;
+  }
+
+  tb.innerHTML = ROWS.map(function (r) {
+    return '<tr>'
+      + '<td style="font-weight:700">' + esc(r.name) + '</td>'
+      + '<td>' + uidChip(r.pc_uid) + '</td>'
+      + '<td>' + uidChip(r.mobile_uid) + '</td>'
+      + '<td style="white-space:normal;text-align:left;color:var(--text-2);font-size:12px;max-width:220px">' + (esc(r.memo) || '<span class="uid-none">―</span>') + '</td>'
+      + '<td><div style="display:flex;gap:6px;justify-content:center">'
+      + '<button class="btn btn-ghost btn-sm" data-edit="' + esc(r._id) + '">수정</button>'
+      + '<button class="btn btn-danger btn-sm" data-del="' + esc(r._id) + '">삭제</button>'
+      + '</div></td></tr>';
+  }).join('');
+
+  rc.innerHTML = ROWS.map(function (r) {
+    return '<div class="rc">'
+      + '<div class="rc-top"><div class="rc-name">' + esc(r.name) + '</div>'
+      + '<div class="rc-acts">'
+      + '<button class="btn btn-ghost btn-sm" data-edit="' + esc(r._id) + '">수정</button>'
+      + '<button class="btn btn-danger btn-sm" data-del="' + esc(r._id) + '">삭제</button>'
+      + '</div></div>'
+      + '<div class="rc-line"><span class="rc-k">PC</span>' + uidChip(r.pc_uid) + '</div>'
+      + '<div class="rc-line"><span class="rc-k">모바일</span>' + uidChip(r.mobile_uid) + '</div>'
+      + (r.memo ? '<div class="rc-memo">' + esc(r.memo) + '</div>' : '')
+      + '</div>';
+  }).join('');
+}
+
+function showRuleWarn(on) {
+  document.getElementById('rule-warn').style.display = on ? 'block' : 'none';
+}
+
+function load() {
+  return db.collection(COL).orderBy('created_at', 'asc').get()
+    .then(function (snap) {
+      ROWS = snap.docs.map(function (d) {
+        var x = d.data(); x._id = d.id; return x;
+      });
+      showRuleWarn(false);
+      render();
+    })
+    .catch(function (e) {
+      console.error('load', e);
+      if (e && e.code === 'permission-denied') {
+        showRuleWarn(true);
+        document.getElementById('tbody').innerHTML = '<tr><td colspan="5" class="empty">규칙이 게시되면 여기에 명부가 뜹니다.</td></tr>';
+        document.getElementById('rowcards').innerHTML = '<div class="empty">규칙이 게시되면 여기에 명부가 뜹니다.</div>';
+        document.getElementById('cnt').textContent = '—';
+      } else {
+        toast('불러오기 실패: ' + (e.message || e));
+      }
+    });
+}
+
+/* ── 추가 · 수정 ── */
+function openAcc(id) {
+  var r = id ? ROWS.filter(function (x) { return x._id === id; })[0] : null;
+  document.getElementById('m-acc-title').textContent = r ? '계정 수정' : '계정 추가';
+  document.getElementById('f-id').value = r ? r._id : '';
+  document.getElementById('f-name').value = r ? (r.name || '') : '';
+  document.getElementById('f-pc').value = r ? (r.pc_uid || '') : '';
+  document.getElementById('f-mo').value = r ? (r.mobile_uid || '') : '';
+  document.getElementById('f-memo').value = r ? (r.memo || '') : '';
+  document.getElementById('m-acc-err').style.display = 'none';
+  openModal('m-acc');
+  setTimeout(function () { document.getElementById('f-name').focus(); }, 60);
+}
+
+function saveAcc() {
+  var id = document.getElementById('f-id').value;
+  var name = document.getElementById('f-name').value.trim();
+  var pc = document.getElementById('f-pc').value.trim();
+  var mo = document.getElementById('f-mo').value.trim();
+  var memo = document.getElementById('f-memo').value.trim();
+  var err = document.getElementById('m-acc-err');
+
+  if (!name) { err.textContent = '이름은 반드시 넣어야 합니다.'; err.style.display = 'block'; return; }
+  if (!pc && !mo) { err.textContent = 'PC·모바일 계정 ID 가운데 적어도 하나는 넣어야 합니다.'; err.style.display = 'block'; return; }
+
+  var btn = document.getElementById('m-acc-save');
+  btn.disabled = true; btn.textContent = '저장 중…';
+
+  var data = { name: name, pc_uid: pc, mobile_uid: mo, memo: memo, updated_at: FS.FieldValue.serverTimestamp() };
+  var p = id
+    ? db.collection(COL).doc(id).update(data)
+    : db.collection(COL).add(Object.assign({ created_at: FS.FieldValue.serverTimestamp() }, data));
+
+  p.then(function () {
+    closeModal('m-acc');
+    toast(id ? '고쳤습니다.' : '넣었습니다.');
+    return load();
+  }).catch(function (e) {
+    console.error('save', e);
+    err.textContent = (e && e.code === 'permission-denied')
+      ? '저장이 막혀 있습니다 — demo_accounts 규칙이 아직 게시되지 않았습니다.'
+      : '저장 실패: ' + (e.message || e);
+    err.style.display = 'block';
+  }).finally(function () {
+    btn.disabled = false; btn.textContent = '저장';
+  });
+}
+
+/* ── 삭제 ── */
+var DEL_ID = null;
+function openDel(id) {
+  var r = ROWS.filter(function (x) { return x._id === id; })[0];
+  if (!r) return;
+  DEL_ID = id;
+  document.getElementById('m-del-name').textContent = r.name || '이 계정';
+  openModal('m-del');
+}
+function doDel() {
+  if (!DEL_ID) return;
+  var btn = document.getElementById('m-del-ok');
+  btn.disabled = true; btn.textContent = '삭제 중…';
+  db.collection(COL).doc(DEL_ID).delete().then(function () {
+    closeModal('m-del');
+    toast('지웠습니다.');
+    DEL_ID = null;
+    return load();
+  }).catch(function (e) {
+    console.error('delete', e);
+    toast((e && e.code === 'permission-denied') ? '삭제가 막혀 있습니다 — 규칙 게시가 필요합니다.' : '삭제 실패: ' + (e.message || e));
+  }).finally(function () {
+    btn.disabled = false; btn.textContent = '삭제';
+  });
+}
+
+/* ── 바인딩 ── */
+document.getElementById('btn-add').addEventListener('click', function () { openAcc(null); });
+document.getElementById('m-acc-x').addEventListener('click', function () { closeModal('m-acc'); });
+document.getElementById('m-acc-cancel').addEventListener('click', function () { closeModal('m-acc'); });
+document.getElementById('m-acc-save').addEventListener('click', saveAcc);
+document.getElementById('m-del-x').addEventListener('click', function () { closeModal('m-del'); });
+document.getElementById('m-del-cancel').addEventListener('click', function () { closeModal('m-del'); });
+document.getElementById('m-del-ok').addEventListener('click', doDel);
+['m-acc', 'm-del'].forEach(function (id) {
+  document.getElementById(id).addEventListener('click', function (e) {
+    if (e.target === this) closeModal(id);
+  });
+});
+document.addEventListener('keydown', function (e) {
+  if (e.key === 'Escape') { closeModal('m-acc'); closeModal('m-del'); }
+});
+document.addEventListener('click', function (e) {
+  var chip = e.target.closest('[data-copy]');
+  if (chip) {
+    copyText(chip.getAttribute('data-copy'))
+      .then(function () { toast('계정 ID를 복사했습니다.'); })
+      .catch(function () { toast('복사에 실패했습니다.'); });
+    return;
+  }
+  var ed = e.target.closest('[data-edit]');
+  if (ed) { openAcc(ed.getAttribute('data-edit')); return; }
+  var dl = e.target.closest('[data-del]');
+  if (dl) { openDel(dl.getAttribute('data-del')); return; }
+});
+
+load();
+</script>
+</body>
+</html>
