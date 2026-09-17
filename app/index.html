@@ -13435,7 +13435,9 @@ const FLOW_MAP = [
   ['pw-01b', '.ios-modal-btn', 'pw-02-nick', 'ATT 허용/거부 → 닉네임 설정'],
   ['pw-02-nick', '.nick-start-btn', 'pw-10', '시작하기 → 홈'],
   // 02 소셜 로그인 (3-button) — bindSocialLogin()에서 처리
-  ['pw-02-K', '.kakao-app-allow', 'pw-02-K-existing', '허용 → 기존 계정 발견 (기본)'],
+  /* 허용하면 늘 신규 연동이다 — 예전에 연동했던 값을 끌어오지 않는다(김반장 2026-09-17).
+     「기존 계정 발견」 화면(pw-02-K-existing)은 마크업·이동표만 남겨 둔다. */
+  ['pw-02-K', '.kakao-app-allow', 'pw-02-K-new', '허용 → 신규 연동 완료'],
   // 취소: 'pw-02'(소셜 로그인 진입) 화면은 v5.5에서 제거돼 실제 마크업이 없음 — 진입 지점(홈/마이)으로 되돌아가야 하므로 null(ipGoBack)
   ['pw-02-K', '.kakao-app-cancel', null, '취소 → 이전 화면으로'],
   ['pw-02-K-existing', 'button, .btn-primary, [style*="cursor"]', 'pw-10', '연동하기 → 홈'],
@@ -19416,14 +19418,23 @@ function ppRenderPastRaffleWinners() {
 }
 
 /* ── Kakao mock complete ──
-   실제 Kakao SDK 연동이 없으므로 kakao_login_id·kakao_nickname도 그럴듯한 값으로
-   자동 생성해 저장한다 (CMS 회원목록/상세가 이 필드를 카카오ID·닉네임으로 그대로 표기함).
-   재연동 등으로 이미 값이 있으면 덮어쓰지 않고 유지한다. */
+   실제 Kakao SDK 연동이 없으므로 kakao_login_id·kakao_nickname을 그럴듯한 값으로
+   만들어 저장한다 (CMS 회원목록/상세가 이 필드를 카카오ID·닉네임으로 그대로 표기함).
+   ⚠ 누를 때마다 「새」 아이디를 만든다 — 예전에 연동했던 값을 끌어오지 않는다
+   (김반장 2026-09-17). 해제했다 다시 누르면 또 다른 아이디가 생긴다. */
 var KAKAO_ID_CHARS = 'abcdefghijklmnopqrstuvwxyz0123456789';
 function randomKakaoLoginId() {
   var local = '';
   for (var i = 0; i < 9; i++) local += KAKAO_ID_CHARS[Math.floor(Math.random() * KAKAO_ID_CHARS.length)];
   return local + '@kakao.com';
+}
+/* 이미 쓰고 있는 아이디와 겹치지 않을 때까지 다시 뽑는다(최대 다섯 번). */
+function ppFreshKakaoLoginId(tries) {
+  var id = randomKakaoLoginId();
+  if ((tries || 0) >= 5) return Promise.resolve(id);
+  return db.collection('users').where('kakao_login_id', '==', id).limit(1).get()
+    .then(function(snap) { return snap.empty ? id : ppFreshKakaoLoginId((tries || 0) + 1); })
+    .catch(function() { return id; });
 }
 var KAKAO_SURNAMES = ['김', '이', '박', '최', '정', '강', '조', '윤', '장', '임'];
 var KAKAO_GIVEN = ['민준', '서연', '도윤', '하윤', '시우', '지우', '예준', '서윤', '주원', '수아', '건우', '다은', '현우', '지호', '유나', '지안', '서준', '하은'];
@@ -19449,12 +19460,9 @@ function bindKakaoComplete() {
     btn.addEventListener('click', function() {
       if (!PP.uid) return;
       var uid = PP.uid;
-      db.collection('users').doc(uid).get().then(function(doc) {
-        var existing = doc.exists ? doc.data() : {};
-        var payload = { linked_kakao: true };
-        payload.kakao_login_id = existing.kakao_login_id || randomKakaoLoginId();
-        payload.kakao_nickname = existing.kakao_nickname || randomKakaoNickname();
-        return db.collection('users').doc(uid).update(payload).then(function() {
+      ppFreshKakaoLoginId(0).then(function(freshId) {
+        var payload = { linked_kakao: true, kakao_login_id: freshId, kakao_nickname: randomKakaoNickname() };
+        return db.collection('users').doc(uid).set(payload, { merge: true }).then(function() {
           if (PP.user) {
             PP.user.linked_kakao = true;
             PP.user.kakao_login_id = payload.kakao_login_id;

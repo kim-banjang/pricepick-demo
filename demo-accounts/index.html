@@ -72,6 +72,29 @@ tr:hover td{background:var(--surface-2);}
 /* 닉네임 + 계정 ID를 한 칸에 위아래로 — 칸을 더 늘리면 가로가 좁아진다 */
 /* 닉네임·카카오는 계정 ID로 회원 데이터에서 읽어 보여주는 값이다(입력 칸 아님) */
 .nick-txt{font-size:12px;font-weight:600;color:var(--text);}
+/* 닉네임 칸은 누르면 그 계정에 넣은 가상 데이터를 보여 준다 — 눌린다는 것만 모양으로 알린다. */
+.nick-open{cursor:pointer;color:var(--main);font-weight:700;}
+.nick-open:hover{text-decoration:underline;}
+.ai-sec{margin-bottom:16px;}
+.ai-sec:last-child{margin-bottom:0;}
+.ai-h{font-size:12px;font-weight:700;color:var(--text-2);margin-bottom:6px;}
+.ai-kv{display:grid;grid-template-columns:96px 1fr;gap:4px 10px;font-size:13px;}
+.ai-kv dt{color:var(--text-3);}
+.ai-kv dd{margin:0;color:var(--text);word-break:break-all;}
+.ai-tk{display:flex;gap:8px;flex-wrap:wrap;}
+.ai-tk-one{flex:1;min-width:88px;background:var(--surface-2);border-radius:8px;padding:9px 10px;text-align:center;}
+.ai-tk-g{font-size:11px;color:var(--text-3);}
+.ai-tk-n{font-size:15px;font-weight:800;color:var(--text);}
+.ai-won{margin-top:6px;font-size:12px;color:var(--text-3);text-align:right;}
+.ai-chips{display:flex;gap:6px;flex-wrap:wrap;font-size:12px;}
+.ai-chip{background:var(--surface-2);border-radius:99px;padding:4px 10px;color:var(--text-2);}
+.ai-chip b{color:var(--text);}
+.ai-list{max-height:240px;overflow-y:auto;border:1px solid var(--border);border-radius:8px;}
+.ai-list table{width:100%;border-collapse:collapse;}
+.ai-list th,.ai-list td{padding:8px 10px;font-size:12px;text-align:center;border-bottom:1px solid var(--border);}
+.ai-list th{background:var(--surface-2);color:var(--text-2);font-weight:600;position:sticky;top:0;}
+.ai-list tr:last-child td{border-bottom:none;}
+.ai-empty{padding:18px;text-align:center;color:var(--text-3);font-size:12px;}
 .nick-none{font-size:12px;color:var(--text-3);}
 /* 못 쓰는 계정은 계정 ID 옆에 딱지로 붙인다 — 닉네임 칸은 값을 넣는 자리지 설명하는 자리가 아니다 */
 .tag{display:inline-block;white-space:nowrap;padding:2px 7px;border-radius:99px;font-size:10px;font-weight:700;margin-left:6px;vertical-align:middle;}
@@ -245,6 +268,22 @@ textarea.form-input{resize:vertical;min-height:64px;}
   </div>
 </div>
 
+<!-- 계정 상세 — 닉네임을 누르면 뜬다. 규격은 위 계정 추가·수정 모달 그대로. -->
+<div class="modal-overlay" id="m-info">
+  <div class="modal" style="width:560px">
+    <div class="modal-header">
+      <div class="modal-title" id="m-info-title">계정 상세</div>
+      <button class="modal-close" id="m-info-x" aria-label="닫기">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body" id="m-info-body"></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" id="m-info-close">닫기</button>
+    </div>
+  </div>
+</div>
+
 <!-- 삭제 확인 모달 -->
 <div class="modal-overlay" id="m-del">
   <div class="modal" style="width:400px">
@@ -399,8 +438,11 @@ function userState(uid) {
    그것만 띄어쓰기가 있어 실제 닉네임처럼 보이다 만다. */
 function nickHtml(uid) {
   var s = userState(uid);
-  if (s.kind !== 'ok' || !s.u.nickname) return '<span class="uid-none">―</span>';
-  return '<span class="nick-txt">' + esc(s.u.nickname) + '</span>';
+  /* 닉네임이 없어도 누르면 열려야 한다 — 계정 ID로 조회한다(김반장 2026-09-17). */
+  var inner = (s.kind === 'ok' && s.u.nickname)
+    ? '<span class="nick-txt nick-open">' + esc(s.u.nickname) + '</span>'
+    : '<span class="uid-none nick-open">―</span>';
+  return '<span data-info="' + esc(uid) + '">' + inner + '</span>';
 }
 function accTag(uid) {
   var s = userState(uid);
@@ -582,6 +624,123 @@ function saveAcc() {
   });
 }
 
+/* ── 계정 상세 — 그 계정에 넣은 가상 데이터를 한자리에 보여 준다 ──
+   보유 티켓(user_tickets status=active) · 구매 내역(gifticon_exchanges)을 계정 ID로 읽는다.
+   회원 문서를 못 찾으면 값을 문장으로 채우지 않고 「—」로 비운다. */
+var TV_CACHE = null, GI_CACHE = null;
+function infoTicketValue() {
+  if (TV_CACHE) return Promise.resolve(TV_CACHE);
+  return ensureSignedIn()
+    .then(function () { return db.collection('settings').doc('ticket_value').get(); })
+    .then(function (d) {
+      var v = (d.exists && d.data()) || {};
+      TV_CACHE = { bronze: v.bronze || 10, silver: v.silver || 100, gold: v.gold || 200 };
+      return TV_CACHE;
+    }).catch(function () { TV_CACHE = { bronze: 10, silver: 100, gold: 200 }; return TV_CACHE; });
+}
+function infoProducts() {
+  if (GI_CACHE) return Promise.resolve(GI_CACHE);
+  return ensureSignedIn()
+    .then(function () { return db.collection('gifticons').get(); })
+    .then(function (snap) { GI_CACHE = {}; snap.forEach(function (d) { GI_CACHE[d.id] = d.data(); }); return GI_CACHE; })
+    .catch(function () { GI_CACHE = {}; return GI_CACHE; });
+}
+var GRADE_KO = { gold: '골드', silver: '실버', bronze: '브론즈' };
+var GRADE_VI = { gold: 'Vàng', silver: 'Bạc', bronze: 'Đồng' };
+function gKo(g) { return L(GRADE_KO[g] || g, GRADE_VI[g] || g); }
+function dash() { return '<span class="uid-none">—</span>'; }
+
+function openInfo(uid) {
+  var row = ROWS.map(normRow).filter(function (r) { return r.account_id === uid; })[0] || {};
+  var st = userState(uid);
+  var u = st.u || {};
+  document.getElementById('m-info-title').textContent = L('계정 상세', 'Chi tiết tài khoản');
+  var body = document.getElementById('m-info-body');
+  body.innerHTML = '<div class="ai-empty">' + L('불러오는 중…', 'Đang tải…') + '</div>';
+  openModal('m-info');
+
+  var head = '<div class="ai-sec"><dl class="ai-kv">'
+    + '<dt>' + L('사용자', 'Người dùng') + '</dt><dd>' + (row.name ? esc(row.name) : dash()) + '</dd>'
+    + '<dt>' + L('닉네임', 'Biệt danh') + '</dt><dd>' + ((st.kind === 'ok' && u.nickname) ? esc(u.nickname) : dash()) + '</dd>'
+    + '<dt>' + L('계정 ID', 'ID tài khoản') + '</dt><dd class="mono">' + esc(uid) + '</dd>'
+    + '<dt>' + L('카카오 연동', 'Liên kết Kakao') + '</dt><dd>' + kakaoHtml(uid)
+    + ((st.kind === 'ok' && u.linked_kakao && u.kakao_login_id) ? ' <span class="uid-none">' + esc(u.kakao_login_id) + '</span>' : '')
+    + '</dd></dl></div>';
+
+  Promise.all([
+    ensureSignedIn().then(function () {
+      return db.collection('user_tickets').where('user_id', '==', uid).where('status', '==', 'active').get();
+    }),
+    ensureSignedIn().then(function () {
+      return db.collection('gifticon_exchanges').where('user_id', '==', uid).get();
+    }),
+    infoTicketValue(), infoProducts()
+  ]).then(function (res) {
+    var tv = res[2], prod = res[3];
+    var tk = { gold: 0, silver: 0, bronze: 0 };
+    res[0].forEach(function (d) { var g = d.data().grade; if (tk[g] !== undefined) tk[g]++; });
+    var won = tk.gold * tv.gold + tk.silver * tv.silver + tk.bronze * tv.bronze;
+
+    var tkHtml = '<div class="ai-sec"><div class="ai-h">' + L('보유 티켓', 'Vé đang giữ') + '</div>'
+      + '<div class="ai-tk">' + ['gold', 'silver', 'bronze'].map(function (g) {
+          return '<div class="ai-tk-one"><div class="ai-tk-g">' + gKo(g) + '</div><div class="ai-tk-n">' + tk[g] + '</div></div>';
+        }).join('') + '</div>'
+      + '<div class="ai-won">' + won.toLocaleString('ko-KR') + L('원', ' won') + '</div></div>';
+
+    var ex = res[1].docs.map(function (d) { return d.data(); })
+      .filter(function (x) { return x.exchanged_at && x.exchanged_at.toDate; })
+      .sort(function (a, b) { return b.exchanged_at.toMillis() - a.exchanged_at.toMillis(); });
+    var cnt = { issued: 0, used: 0, cancelled: 0 };
+    ex.forEach(function (x) {
+      if (x.status === 'cancelled') cnt.cancelled++;
+      else if (x.status === 'used') cnt.used++;
+      else cnt.issued++;
+    });
+
+    var sumHtml = '<div class="ai-sec"><div class="ai-h">' + L('구매 내역', 'Lịch sử mua') + '</div>'
+      + '<div class="ai-chips">'
+      + '<span class="ai-chip">' + L('총', 'Tổng') + ' <b>' + ex.length + '</b></span>'
+      + '<span class="ai-chip">' + L('발급완료', 'Đã cấp') + ' <b>' + cnt.issued + '</b></span>'
+      + '<span class="ai-chip">' + L('사용완료', 'Đã dùng') + ' <b>' + cnt.used + '</b></span>'
+      + '<span class="ai-chip">' + L('취소', 'Đã hủy') + ' <b>' + cnt.cancelled + '</b></span>'
+      + '</div></div>';
+
+    var listHtml;
+    if (!ex.length) {
+      listHtml = '<div class="ai-sec"><div class="ai-list"><div class="ai-empty">'
+        + L('구매 내역이 없습니다.', 'Không có lịch sử mua.') + '</div></div></div>';
+    } else {
+      listHtml = '<div class="ai-sec"><div class="ai-list"><table><thead><tr>'
+        + '<th>' + L('구매일', 'Ngày mua') + '</th><th>' + L('상품명', 'Tên sản phẩm') + '</th>'
+        + '<th>' + L('사용한 티켓', 'Vé đã dùng') + '</th><th>' + L('상태', 'Trạng thái') + '</th>'
+        + '</tr></thead><tbody>'
+        + ex.map(function (x) {
+            var d = x.exchanged_at.toDate();
+            var p2 = function (v) { return ('0' + v).slice(-2); };
+            var day = d.getFullYear() + '.' + p2(d.getMonth() + 1) + '.' + p2(d.getDate());
+            var g = prod[x.gifticon_id] || {};
+            var nm = [g.brand, g.name || g.product_name].filter(Boolean).join(' ');
+            if (g.name && g.brand && g.name.indexOf(g.brand) >= 0) nm = g.name;
+            var parts = (x.tickets_used && x.tickets_used.length)
+              ? x.tickets_used
+              : (x.grade_used ? [{ grade: x.grade_used, count: x.count_used || 1 }] : []);
+            var tkTxt = parts.length
+              ? parts.map(function (t) { return gKo(t.grade) + ' ' + t.count; }).join('<br>')
+              : '—';
+            var stTxt = (x.status === 'cancelled') ? L('취소', 'Đã hủy')
+              : (x.status === 'used') ? L('사용완료', 'Đã dùng') : L('발급완료', 'Đã cấp');
+            return '<tr><td>' + day + '</td><td>' + (nm ? esc(nm) : dash()) + '</td>'
+              + '<td>' + tkTxt + '</td><td>' + stTxt + '</td></tr>';
+          }).join('')
+        + '</tbody></table></div></div>';
+    }
+    body.innerHTML = head + tkHtml + sumHtml + listHtml;
+  }).catch(function (e) {
+    console.error('openInfo', e);
+    body.innerHTML = head + '<div class="ai-empty">' + L('불러오지 못했습니다.', 'Không tải được.') + '</div>';
+  });
+}
+
 /* ── 삭제 ── */
 var DEL_ID = null;
 function openDel(id) {
@@ -700,16 +859,18 @@ document.getElementById('btn-add').addEventListener('click', function () { openA
 document.getElementById('m-acc-x').addEventListener('click', function () { closeModal('m-acc'); });
 document.getElementById('m-acc-cancel').addEventListener('click', function () { closeModal('m-acc'); });
 document.getElementById('m-acc-save').addEventListener('click', saveAcc);
+document.getElementById('m-info-x').addEventListener('click', function () { closeModal('m-info'); });
+document.getElementById('m-info-close').addEventListener('click', function () { closeModal('m-info'); });
 document.getElementById('m-del-x').addEventListener('click', function () { closeModal('m-del'); });
 document.getElementById('m-del-cancel').addEventListener('click', function () { closeModal('m-del'); });
 document.getElementById('m-del-ok').addEventListener('click', doDel);
-['m-acc', 'm-del'].forEach(function (id) {
+['m-acc', 'm-del', 'm-info'].forEach(function (id) {
   document.getElementById(id).addEventListener('click', function (e) {
     if (e.target === this) closeModal(id);
   });
 });
 document.addEventListener('keydown', function (e) {
-  if (e.key === 'Escape') { closeModal('m-acc'); closeModal('m-del'); }
+  if (e.key === 'Escape') { closeModal('m-acc'); closeModal('m-del'); closeModal('m-info'); }
 });
 document.addEventListener('click', function (e) {
   var chip = e.target.closest('[data-copy]');
@@ -719,6 +880,8 @@ document.addEventListener('click', function (e) {
       .catch(function () { toast('복사에 실패했습니다.'); });
     return;
   }
+  var inf = e.target.closest('[data-info]');
+  if (inf) { openInfo(inf.getAttribute('data-info')); return; }
   var ed = e.target.closest('[data-edit]');
   if (ed) { openAcc(ed.getAttribute('data-edit')); return; }
   var dl = e.target.closest('[data-del]');
@@ -734,7 +897,7 @@ load();
      표는 매번 다시 그려지므로 MutationObserver가 새로 생긴 노드까지 따라간다. -->
 <script>
 (function(){
-  var KO2VI = {
+  var KO2VI = {"계정 상세":"Chi tiết tài khoản","보유 티켓":"Vé đang giữ","구매 내역":"Lịch sử mua","불러오지 못했습니다.":"Không tải được.","구매 내역이 없습니다.":"Không có lịch sử mua.",
   "데모에서 앱을 테스트할 때 가상 데이터를 어느 계정에 넣을지 여기서 확인합니다.": "Nơi xác nhận sẽ đưa dữ liệu giả vào tài khoản nào khi kiểm thử ứng dụng trong bản demo.",
   "+ 계정 추가": "+ Thêm tài khoản",
   "저장이 막혀 있습니다.": "Việc lưu đang bị chặn.",
