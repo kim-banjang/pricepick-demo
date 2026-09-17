@@ -612,6 +612,8 @@ td.rf-net-col{font-weight:700;color:var(--success);}
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(26,17,48,.35);z-index:200;
   align-items:center;justify-content:center;backdrop-filter:blur(2px);}
 .modal-overlay.open{display:flex;animation:overlayIn .18s ease-out;}
+/* 상품 이미지 모달은 상품 상세 정보 모달(#pp-gid-modal, z-index 9000) 위에서 열린다 */
+#m-gi-image{z-index:9100;}
 @keyframes overlayIn{from{opacity:0}to{opacity:1}}
 .modal{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-xl);
   width:500px;max-width:95vw;max-height:88vh;overflow-y:auto;box-shadow:var(--shadow-lg);
@@ -5600,29 +5602,32 @@ function startClock() {
       rows.appendChild(row);
     }
   
-// === 기프티콘 "교환 티켓" 칩 수정 — 실 Firestore(gifticons) 연동 ===
-// gifticon-tbody는 loadGifticonProducts()(Firestore 실쿼리)가 렌더링한다. 이 칩을 누르면
-// m-ticket-edit 모달로 해당 상품의 required_grade/required_count를 직접 수정·저장한다.
+/* 상품 캐시 — loadGifticonProducts()(Firestore 실쿼리)가 채운다.
+   판매가격은 원화 하나로만 받고 티켓은 거기서 환산해 보여 준다. 그래서 티켓을
+   손으로 고치는 자리는 두지 않는다(포인츠허브에도 그런 단추가 없다, 김반장 확정 2026-09-17). */
 var GIFTICON_PRODUCTS_CACHE = {};
-function giOpenTicketEdit(id) {
-  var g = GIFTICON_PRODUCTS_CACHE[id];
-  if (!g) return;
-  document.getElementById('te-doc-id').value = id;
-  document.getElementById('te-name').textContent = cmsBrandName(g.brand, g.name || g.product_name);
-  document.getElementById('te-grade-select').value = g.required_grade || 'bronze';
-  document.getElementById('te-qty-input').value = g.required_count || 1;
-  openModal('m-ticket-edit');
+
+/* 상품명에 브랜드가 이미 들어 있으면 또 붙이지 않는다.
+   같은 일을 하는 cmsBrandName()이 뒤쪽 script 블록에 있는데 이 블록에서는 안 보인다 —
+   그래서 여기서 쓸 것은 여기 둔다(예전에 이것 때문에 이미지 모달이 죽어 있었다). */
+function giBrandName(brand, name) {
+  brand = String(brand || '').trim();
+  name = String(name || '').trim();
+  if (!brand) return name;
+  if (!name) return brand;
+  return (name.indexOf(brand) >= 0) ? name : (brand + ' ' + name);
 }
 
-/* ── 상품 이미지 등록·수정 (상품 목록의 섬네일 칸에서 실행) ──
+/* ── 상품 이미지 바꾸기 — 상품 상세 정보 모달의 「이미지 변경」이 연다 ──
    실제 기프티콘 공급사 API 연동 전까지 쓰는 시연용 이미지 경로다.
-   저장소에 넣은 파일 경로(/app/assets/gifticon/…)를 넣는다. 비우면 이모지로 돌아간다. */
-function giOpenImageEdit(id) {
+   저장소에 넣은 파일 경로(/app/assets/gifticon/…)를 넣는다. 비우면 자리표시 그림으로 돌아간다.
+   cur 은 상세 모달에서 지금 손대고 있는 경로다 — 저장 전 값이라도 그대로 이어 받는다. */
+function giOpenImageEdit(id, cur) {
   var g = GIFTICON_PRODUCTS_CACHE[id];
   if (!g) return;
   document.getElementById('gie-doc-id').value = id;
-  document.getElementById('gie-name').textContent = cmsBrandName(g.brand, g.name || g.product_name);
-  document.getElementById('gie-url-input').value = g.image_url || '';
+  document.getElementById('gie-name').textContent = giBrandName(g.brand, g.name || g.product_name);
+  document.getElementById('gie-url-input').value = (cur == null) ? (g.image_url || '') : cur;
   giImagePreview();
   openModal('m-gi-image');
 }
@@ -5646,31 +5651,15 @@ function giSaveImageEdit() {
     image_url: url || null,
     updated_at: window.FS.FieldValue.serverTimestamp(),
   }).then(function() {
-    toast(url ? '상품 이미지를 저장했습니다.' : '상품 이미지를 비웠습니다(이모지로 표시).');
+    toast(url ? '상품 이미지를 저장했습니다.' : '상품 이미지를 비웠습니다.');
     logAdmin('기프티콘 상품 이미지 수정: ' + id + ' → ' + (url || '(비움)'));
     closeModal('m-gi-image');
-    loadGifticonProducts();
+    /* 목록을 다시 읽지 않는다 — 한 칸 바꾸자고 500건을 다시 읽을 일이 아니다.
+       캐시와 상세 모달만 고쳐 그 자리에서 반영한다. */
+    if (window.gipPatchImage) window.gipPatchImage(id, url);
   }).catch(function(e) { toast('저장 실패: ' + (e.message || e)); });
 }
 window.giSaveImageEdit = giSaveImageEdit;
-
-function giSaveTicketEdit() {
-  var id = document.getElementById('te-doc-id').value;
-  if (!id) return;
-  var qty = parseInt(document.getElementById('te-qty-input').value, 10);
-  if (isNaN(qty) || qty < 1) { toast('수량을 올바르게 입력해주세요.'); return; }
-  var grade = document.getElementById('te-grade-select').value;
-  window.db.collection('gifticons').doc(id).update({
-    required_grade: grade,
-    required_count: qty,
-    updated_at: window.FS.FieldValue.serverTimestamp(),
-  }).then(function() {
-    toast('저장되었습니다.');
-    logAdmin('기프티콘 구매 티켓 수정: ' + id + ' → ' + grade + ' ' + qty + '장');
-    closeModal('m-ticket-edit');
-    loadGifticonProducts();
-  }).catch(function(e) { toast('저장 실패: ' + (e.message||e)); });
-}
 
 </script>
 
@@ -5700,34 +5689,6 @@ function giSaveTicketEdit() {
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModal('m-gi-image')">취소</button>
       <button class="btn btn-primary" onclick="giSaveImageEdit()">저장</button>
-    </div>
-  </div>
-</div>
-
-<!-- 구매 티켓 수정 모달 -->
-<div class="modal-overlay" id="m-ticket-edit">
-  <div class="modal" style="width:440px">
-    <div class="modal-header">
-      <div class="modal-title">구매 티켓 수정</div>
-      <button class="modal-close" onclick="closeModal('m-ticket-edit')"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
-    </div>
-    <div class="modal-body" style="display:flex;flex-direction:column;gap:16px">
-      <input type="hidden" id="te-doc-id">
-      <div>
-        <div style="font-size:12px;color:var(--text-2);margin-bottom:4px">상품명</div>
-        <div id="te-name" style="font-weight:600;font-size:14px"></div>
-      </div>
-      <div class="form-group"><label class="form-label">필요 등급</label><select class="form-select" id="te-grade-select"><option value="bronze">브론즈</option><option value="silver">실버</option><option value="gold">골드</option></select></div>
-      <div>
-        <label style="font-size:12px;color:var(--text-2);font-weight:600;display:block;margin-bottom:6px">구매 티켓 수량</label>
-        <div style="display:flex;align-items:center;gap:10px">
-          <input type="number" id="te-qty-input" min="1" max="999" style="width:100px;padding:8px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:15px;font-weight:600;text-align:center;background:var(--bg);color:var(--text-1)">
-        </div>
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="closeModal('m-ticket-edit')">취소</button>
-      <button class="btn btn-primary" onclick="giSaveTicketEdit()">저장</button>
     </div>
   </div>
 </div>
@@ -7306,9 +7267,10 @@ Object.assign(KO2VI,{
   "문화/생활/기타":"Văn hóa/Đời sống/Khác","베이커리/떡":"Bánh/Bánh gạo",
   "상품권/금액권":"Phiếu quà tặng/Phiếu tiền","편의점/마트":"Cửa hàng tiện lợi/Siêu thị",
   "피자/버거/치킨":"Pizza/Burger/Gà rán",
-  /* 티켓 수정 · 이미지 변경 모달 */
-  "필요 등급":"Hạng cần có","구매 티켓 수량":"Số vé để mua",
+  /* 상품 이미지 모달 */
+  "상품 이미지":"Hình ảnh sản phẩm",
   "이미지 경로":"Đường dẫn hình ảnh","미리보기":"Xem trước",
+  "이미지 없음 — 앱에서 이모지로 표시됩니다":"Không có hình ảnh",
   "저장소에 올린 파일 경로를 넣습니다. 비우면 이모지로 표시됩니다.":"Hãy nhập đường dẫn tệp đã tải lên kho. Để trống thì hiển thị bằng emoji.",
   /* 기프티샵 판매 매출 — 파고들기 자국 */
   "월별 내역":"Lịch sử theo tháng"
@@ -7681,7 +7643,7 @@ var fbApp = firebase.initializeApp({
 var auth = firebase.auth();
 var db = firebase.firestore();
 var FS = firebase.firestore;
-window.db = db; window.FS = FS; // giSaveTicketEdit(더 이른 별도 script 블록)이 참조 — 2026-08-12 발견, 여태 저장 시 "db is not defined"로 조용히 실패하던 버그
+window.db = db; window.FS = FS; // giSaveImageEdit(더 이른 별도 script 블록)이 참조 — 2026-08-12 발견, 여태 저장 시 "db is not defined"로 조용히 실패하던 버그
 var ADMIN_EMAIL = 'sgkim.mixit@gmail.com';
 var _authed = false;
 
@@ -12476,7 +12438,7 @@ function logAdmin(action) {
     });
   } catch (e) { console.error('logAdmin', e); }
 }
-window.logAdmin = logAdmin; // giSaveTicketEdit(더 이른 별도 script 블록)이 참조 — window.db/FS와 같은 이유로 노출
+window.logAdmin = logAdmin; // giSaveImageEdit(더 이른 별도 script 블록)이 참조 — window.db/FS와 같은 이유로 노출
 
 /* ── sec-abuse ── 어뷰징·이상적립 모니터링 (postbacks/users/ticket_transactions 집계) */
 function loadAbuse() {
@@ -15605,6 +15567,18 @@ function gidWonRefresh() {
   el.className = 'gid-won';
   el.textContent = (GIP_GRADE_KO[tk.grade] || tk.grade) + ' ' + tk.count + ' (' + won.toLocaleString('ko-KR') + '원)';
 }
+/* 이미지 모달이 저장한 값을 그 자리에서 반영한다 — Firestore를 다시 읽지 않는다. */
+window.gipPatchImage = function(id, url) {
+  var v = url || null;
+  if (GIFTICON_PRODUCTS_CACHE[id]) GIFTICON_PRODUCTS_CACHE[id].image_url = v;
+  for (var i = 0; i < GIP_ROWS.length; i++) { if (GIP_ROWS[i]._id === id) GIP_ROWS[i].image_url = v; }
+  gipRender();
+  if (GID_ID === id) {
+    var e = document.getElementById('pp-gid-image');
+    if (e) e.value = url || '';
+    gidImgRefresh();
+  }
+};
 function gidImgRefresh() {
   var box = document.getElementById('pp-gid-img');
   if (!box) return;
@@ -15681,7 +15655,10 @@ document.addEventListener('DOMContentLoaded', function() {
   document.getElementById('pp-gid-close').addEventListener('click', gidClose);
   document.getElementById('pp-gid-save').addEventListener('click', gidSave);
   document.getElementById('pp-gid-img-btn').addEventListener('click', function() {
-    var i = document.getElementById('pp-gid-image'); if (i) { i.focus(); i.select(); }
+    /* 포인츠허브와 같은 자리(이미지 바로 아래)다. 경로 칸에 손댄 값이 있으면 그것을 이어 받는다. */
+    if (!GID_ID || !window.giOpenImageEdit) return;
+    var cur = ((document.getElementById('pp-gid-image') || {}).value || '').trim();
+    window.giOpenImageEdit(GID_ID, cur);
   });
   var pe = document.getElementById('pp-gid-price');
   if (pe) { pe.addEventListener('input', gidWonRefresh); pe.addEventListener('change', gidWonRefresh); }
