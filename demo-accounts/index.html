@@ -95,6 +95,17 @@ tr:hover td{background:var(--surface-2);}
 .ai-list th{background:var(--surface-2);color:var(--text-2);font-weight:600;position:sticky;top:0;}
 .ai-list tr:last-child td{border-bottom:none;}
 .ai-empty{padding:18px;text-align:center;color:var(--text-3);font-size:12px;}
+.sd-row{display:flex;gap:14px;flex-wrap:wrap;}
+.sd-opt{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--text);cursor:pointer;}
+.sd-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
+.sd-lbl{display:block;font-size:11px;color:var(--text-3);margin-bottom:3px;}
+.sd-picks{margin-top:8px;max-height:150px;overflow-y:auto;border:1px solid var(--border);border-radius:8px;padding:8px;}
+.sd-pick{display:flex;align-items:center;gap:7px;font-size:12px;padding:3px 0;cursor:pointer;}
+.sd-pick .mono{color:var(--text-3);font-size:11px;}
+.sd-result{margin-top:14px;border-top:1px solid var(--border);padding-top:12px;font-size:12px;line-height:1.7;color:var(--text-2);max-height:190px;overflow-y:auto;}
+.sd-result b{color:var(--text);}
+.sd-skip{color:var(--warn,#B45309);}
+.sd-bad{color:var(--danger);}
 .nick-none{font-size:12px;color:var(--text-3);}
 /* 못 쓰는 계정은 계정 ID 옆에 딱지로 붙인다 — 닉네임 칸은 값을 넣는 자리지 설명하는 자리가 아니다 */
 .tag{display:inline-block;white-space:nowrap;padding:2px 7px;border-radius:99px;font-size:10px;font-weight:700;margin-left:6px;vertical-align:middle;}
@@ -201,6 +212,7 @@ textarea.form-input{resize:vertical;min-height:64px;}
     </div>
     <div class="pg-acts">
       <button id="ip-lang-toggle" data-lang="ko" type="button" title="KO / VI" aria-label="KO/VI"><span data-l="ko" class="on">KO</span><span data-l="vi">VI</span></button>
+      <button class="btn btn-ghost" id="btn-seed">가상 데이터 넣기</button>
       <button class="btn btn-primary" id="btn-add">+ 계정 추가</button>
     </div>
   </div>
@@ -264,6 +276,62 @@ textarea.form-input{resize:vertical;min-height:64px;}
     <div class="modal-footer">
       <button class="btn btn-ghost" id="m-acc-cancel">취소</button>
       <button class="btn btn-primary" id="m-acc-save">저장</button>
+    </div>
+  </div>
+</div>
+
+<!-- 가상 데이터 넣기 -->
+<div class="modal-overlay" id="m-seed">
+  <div class="modal" style="width:560px">
+    <div class="modal-header">
+      <div class="modal-title">가상 데이터 넣기</div>
+      <button class="modal-close" id="m-seed-x" aria-label="닫기">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="form-err" id="m-seed-err"></div>
+
+      <div class="form-group">
+        <label class="form-label">대상</label>
+        <div class="sd-row">
+          <label class="sd-opt"><input type="radio" name="sd-target" value="all" checked> 전체 계정</label>
+          <label class="sd-opt"><input type="radio" name="sd-target" value="pick"> 고른 계정만</label>
+        </div>
+        <div class="sd-picks" id="sd-picks" style="display:none"></div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">무엇을</label>
+        <div class="sd-row">
+          <label class="sd-opt"><input type="checkbox" id="sd-do-ticket" checked> 티켓</label>
+          <label class="sd-opt"><input type="checkbox" id="sd-do-buy" checked> 구매 내역</label>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">얼마나</label>
+        <div class="sd-grid">
+          <div><span class="sd-lbl">구매 건수</span><input class="form-input" id="sd-n-buy" type="number" min="0" max="50" value="10"></div>
+          <div><span class="sd-lbl">골드</span><input class="form-input" id="sd-n-gold" type="number" min="0" max="2000" value="40"></div>
+          <div><span class="sd-lbl">실버</span><input class="form-input" id="sd-n-silver" type="number" min="0" max="2000" value="60"></div>
+          <div><span class="sd-lbl">브론즈</span><input class="form-input" id="sd-n-bronze" type="number" min="0" max="2000" value="100"></div>
+        </div>
+      </div>
+
+      <div class="form-group" style="margin-bottom:0">
+        <label class="form-label">기존 것</label>
+        <div class="sd-row">
+          <label class="sd-opt"><input type="radio" name="sd-mode" value="wipe" checked> 비우고 새로</label>
+          <label class="sd-opt"><input type="radio" name="sd-mode" value="add"> 더하기</label>
+        </div>
+      </div>
+
+      <div class="sd-result" id="sd-result" style="display:none"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" id="m-seed-cancel">닫기</button>
+      <button class="btn btn-primary" id="m-seed-run">넣기</button>
     </div>
   </div>
 </div>
@@ -509,7 +577,8 @@ function render() {
         + '<td' + rowDim(r.account_id) + '>' + uidChip(r.account_id) + accTag(r.account_id) + '</td>'
         + '<td>' + kakaoHtml(r.account_id) + '</td>'
         + memoCell(r.memo)
-        + '<td><button class="btn btn-ghost btn-sm" data-edit="' + esc(r._id) + '">수정</button></td>'
+        + '<td><button class="btn btn-ghost btn-sm" data-wipe="' + esc(r.account_id) + '">비우기</button>'
+        + ' <button class="btn btn-ghost btn-sm" data-edit="' + esc(r._id) + '">수정</button></td>'
         + '<td><button class="btn btn-danger btn-sm" data-del="' + esc(r._id) + '">삭제</button></td>'
         + '</tr>';
     });
@@ -526,6 +595,7 @@ function render() {
           return '<div class="rc-acc">'
             + '<div class="rc-acc-top"><div class="rc-nick">' + nickHtml(r.account_id) + ' ' + kakaoHtml(r.account_id) + accTag(r.account_id) + '</div>'
             + '<div class="rc-acts">'
+            + '<button class="btn btn-ghost btn-sm" data-wipe="' + esc(r.account_id) + '">비우기</button>'
             + '<button class="btn btn-ghost btn-sm" data-edit="' + esc(r._id) + '">수정</button>'
             + '<button class="btn btn-danger btn-sm" data-del="' + esc(r._id) + '">삭제</button>'
             + '</div></div>'
@@ -741,6 +811,276 @@ function openInfo(uid) {
   });
 }
 
+/* ══ 가상 데이터 넣기 ══
+   형님이 CMS에서 손으로 넣던 방식을 화면으로 옮긴 것이다.
+
+   규칙(김반장 2026-09-17)
+     · 기본 구매 10건 — 발급완료 4 · 사용완료 4 · 취소 2
+     · 기본 티켓 골드 40 · 실버 60 · 브론즈 100
+     · 상품은 브랜드와 가격대를 고르게 — 한 브랜드에 몰리지 않게,
+       가격대 다섯 구간(1천 이하·5천 이하·2만 이하·5만 이하·그 위)을 돌아가며
+     · 날짜는 최근 석 달에 흩는다
+     · 티켓 환산은 큰 등급부터(골드→실버→브론즈), 단가는 settings/ticket_value
+     · 주문번호는 PHTRX + YYYYMMDDHHmmss + 무작위 꼬리
+
+   ⚠ 카카오 미연동·탈퇴 계정에는 구매 내역을 넣지 않는다 — 미연동은 기프티샵을
+     쓸 수 없는 것이 정책이라 넣으면 앞뒤가 안 맞는다. 티켓만 넣는다. */
+var SEED_BUCKETS = [1000, 5000, 20000, 50000, Infinity];
+
+function seedOrderNo(d) {
+  var p2 = function (v) { return ('0' + v).slice(-2); };
+  var stamp = d.getFullYear() + p2(d.getMonth() + 1) + p2(d.getDate())
+    + p2(d.getHours()) + p2(d.getMinutes()) + p2(d.getSeconds());
+  var tail = '';
+  while (tail.length < 8) tail += Math.floor(Math.random() * 16).toString(16);
+  return 'PHTRX' + stamp + tail;
+}
+/* 큰 등급부터 채운다 — 앱·CMS와 같은 규칙 */
+function seedCombo(won, tv) {
+  var rest = Math.max(0, Math.round(won || 0)), out = [];
+  ['gold', 'silver', 'bronze'].forEach(function (g) {
+    var u = tv[g];
+    if (!u || rest < u) return;
+    var k = Math.floor(rest / u);
+    out.push({ grade: g, count: k });
+    rest -= k * u;
+  });
+  if (rest > 0) {
+    var b = out.filter(function (x) { return x.grade === 'bronze'; })[0];
+    if (b) b.count += 1; else out.push({ grade: 'bronze', count: 1 });
+  }
+  return out;
+}
+/* 브랜드와 가격대를 고르게 — 가격 구간을 돌아가며, 그 구간에서 아직 안 쓴 브랜드를 고른다 */
+function seedPickProducts(prodMap, howMany) {
+  var list = Object.keys(prodMap).map(function (id) {
+    return Object.assign({ _id: id }, prodMap[id]);
+  }).filter(function (g) { return typeof g.price === 'number' && g.price > 0; });
+  if (!list.length) return [];
+  var byBucket = SEED_BUCKETS.map(function () { return []; });
+  list.forEach(function (g) {
+    for (var i = 0; i < SEED_BUCKETS.length; i++) {
+      if (g.price <= SEED_BUCKETS[i]) { byBucket[i].push(g); return; }
+    }
+  });
+  byBucket.forEach(function (arr) { arr.sort(function () { return Math.random() - 0.5; }); });
+  var picked = [], usedBrand = {}, bi = 0, guard = 0;
+  while (picked.length < howMany && guard++ < howMany * 40) {
+    var arr = byBucket[bi % byBucket.length]; bi++;
+    if (!arr.length) continue;
+    var hit = null;
+    for (var i = 0; i < arr.length; i++) {
+      var b = (arr[i].brand || '').trim();
+      if (!usedBrand[b]) { hit = arr.splice(i, 1)[0]; usedBrand[b] = 1; break; }
+    }
+    if (!hit) { usedBrand = {}; hit = arr.shift(); }   /* 브랜드를 다 썼으면 한 바퀴 다시 */
+    if (hit) picked.push(hit);
+  }
+  return picked;
+}
+/* 최근 석 달에 흩는다 — 같은 날 몰지 않게 날짜를 겹치지 않게 뽑는다 */
+function seedDates(cnt) {
+  var span = 90, used = {}, out = [];
+  for (var i = 0; i < cnt; i++) {
+    var off, guard = 0;
+    do { off = Math.floor(Math.random() * span); } while (used[off] && guard++ < span);
+    used[off] = 1;
+    var d = new Date();
+    d.setDate(d.getDate() - off);
+    d.setHours(9 + Math.floor(Math.random() * 12), Math.floor(Math.random() * 60), Math.floor(Math.random() * 60), 0);
+    out.push(d);
+  }
+  return out.sort(function (a, b) { return b - a; });
+}
+/* 발급완료 4 · 사용완료 4 · 취소 2 비율을 건수에 맞춰 나눈다 */
+function seedStatuses(cnt) {
+  var out = [], mix = [['completed', 4], ['used', 4], ['cancelled', 2]];
+  var unit = Math.max(1, Math.round(cnt / 10));
+  mix.forEach(function (m) { for (var i = 0; i < m[1] * unit && out.length < cnt; i++) out.push(m[0]); });
+  while (out.length < cnt) out.push('completed');
+  return out.slice(0, cnt);
+}
+
+function seedTargets() {
+  var mode = (document.querySelector('input[name="sd-target"]:checked') || {}).value || 'all';
+  var rows = ROWS.map(normRow);
+  if (mode === 'all') return rows;
+  var on = {};
+  Array.prototype.forEach.call(document.querySelectorAll('#sd-picks input:checked'), function (c) { on[c.value] = 1; });
+  return rows.filter(function (r) { return on[r.account_id]; });
+}
+function seedRenderPicks() {
+  var box = document.getElementById('sd-picks');
+  if (!box) return;
+  box.innerHTML = ROWS.map(normRow).map(function (r) {
+    var st = userState(r.account_id);
+    var nick = (st.kind === 'ok' && st.u.nickname) ? st.u.nickname : '—';
+    return '<label class="sd-pick"><input type="checkbox" value="' + esc(r.account_id) + '">'
+      + '<span>' + esc(r.name) + ' · ' + esc(nick) + '</span>'
+      + '<span class="mono">' + esc(r.account_id.slice(0, 10)) + '…</span></label>';
+  }).join('');
+}
+
+function seedLog(html) {
+  var box = document.getElementById('sd-result');
+  box.style.display = 'block';
+  box.innerHTML += html;
+  box.scrollTop = box.scrollHeight;
+}
+
+window.runSeed = function () {
+  var btn = document.getElementById('m-seed-run');
+  var err = document.getElementById('m-seed-err');
+  err.style.display = 'none';
+  document.getElementById('sd-result').innerHTML = '';
+  var targets = seedTargets();
+  if (!targets.length) { err.textContent = L('넣을 계정을 고르세요.', 'Hãy chọn tài khoản.'); err.style.display = 'block'; return; }
+
+  var doTicket = document.getElementById('sd-do-ticket').checked;
+  var doBuy = document.getElementById('sd-do-buy').checked;
+  if (!doTicket && !doBuy) { err.textContent = L('넣을 것을 고르세요.', 'Hãy chọn dữ liệu cần thêm.'); err.style.display = 'block'; return; }
+  var nBuy = parseInt(document.getElementById('sd-n-buy').value, 10) || 0;
+  var want = {
+    gold: parseInt(document.getElementById('sd-n-gold').value, 10) || 0,
+    silver: parseInt(document.getElementById('sd-n-silver').value, 10) || 0,
+    bronze: parseInt(document.getElementById('sd-n-bronze').value, 10) || 0
+  };
+  var wipe = ((document.querySelector('input[name="sd-mode"]:checked') || {}).value || 'wipe') === 'wipe';
+
+  btn.disabled = true; btn.textContent = L('넣는 중…', 'Đang thêm…');
+  var okAcc = 0, okBuy = 0, okTk = 0, denied = [];
+
+  Promise.all([infoTicketValue(), infoProducts(), ensureSignedIn()]).then(function (res) {
+    var tv = res[0], prod = res[1];
+    var chain = Promise.resolve();
+    targets.forEach(function (r) {
+      chain = chain.then(function () { return seedOne(r, prod, tv); });
+    });
+    return chain;
+  }).then(function () {
+    seedLog('<div style="margin-top:8px"><b>' + L('끝났습니다', 'Xong') + '</b> — '
+      + L('계정 ', 'Tài khoản ') + okAcc + L('개 · 구매 ', ' · Mua ') + okBuy
+      + L('건 · 티켓 ', ' · Vé ') + okTk + L('장', '') + '</div>');
+    if (denied.length) {
+      seedLog('<div class="sd-bad" style="margin-top:6px">' + denied.join('<br>') + '</div>');
+    }
+    return load();
+  }).catch(function (e) {
+    console.error('runSeed', e);
+    seedLog('<div class="sd-bad">' + esc(String(e.message || e)) + '</div>');
+  }).finally(function () {
+    btn.disabled = false; btn.textContent = L('넣기', 'Thêm');
+  });
+
+  function seedOne(r, prod, tv) {
+    var uid = r.account_id, st = userState(uid);
+    var label = esc(r.name) + ' · ' + esc((st.u && st.u.nickname) || uid.slice(0, 8));
+    /* 구매 내역을 넣지 못하는 계정 — 정책이다. 티켓은 그대로 넣는다. */
+    var buyBlock = null;
+    if (st.kind === 'missing') buyBlock = L('회원 문서가 없습니다', 'Không có hồ sơ hội viên');
+    else if (st.kind === 'withdrawn') buyBlock = L('탈퇴 계정', 'Tài khoản đã hủy');
+    else if (!(st.u && st.u.linked_kakao === true)) buyBlock = L('카카오 미연동', 'Chưa liên kết Kakao');
+
+    var jobs = Promise.resolve();
+    var myBuy = 0, myTk = 0, notes = [];
+
+    if (doBuy && nBuy > 0) {
+      if (buyBlock) {
+        notes.push('<span class="sd-skip">' + L('구매 내역 건너뜀 — ', 'Bỏ qua lịch sử mua — ') + buyBlock + '</span>');
+      } else {
+        jobs = jobs.then(function () {
+          var picks = seedPickProducts(prod, nBuy);
+          if (!picks.length) { notes.push('<span class="sd-skip">' + L('등록된 상품이 없습니다', 'Không có sản phẩm') + '</span>'); return; }
+          var dates = seedDates(picks.length), sts = seedStatuses(picks.length);
+          var batch = db.batch();
+          picks.forEach(function (g, i) {
+            var combo = seedCombo(g.price, tv);
+            var d = dates[i] || new Date();
+            batch.set(db.collection('gifticon_exchanges').doc(), {
+              user_id: uid, gifticon_id: g._id,
+              grade_used: combo[0] ? combo[0].grade : 'bronze',
+              count_used: combo.reduce(function (a, x) { return a + x.count; }, 0),
+              tickets_used: combo,
+              status: sts[i], code: seedCode(),
+              order_no: seedOrderNo(d),
+              expires_at: null,
+              exchanged_at: firebase.firestore.Timestamp.fromDate(d),
+              cancelled_at: (sts[i] === 'cancelled') ? firebase.firestore.Timestamp.fromDate(d) : null,
+              seeded: true
+            });
+          });
+          myBuy = picks.length;
+          return batch.commit().catch(function (e) {
+            myBuy = 0;
+            denied.push(L('구매 내역 쓰기 실패', 'Ghi lịch sử mua thất bại') + ' (' + label + ') — ' + (e.code || e.message));
+          });
+        });
+      }
+    }
+
+    if (doTicket) {
+      jobs = jobs.then(function () {
+        var batch = db.batch(), total = 0;
+        ['gold', 'silver', 'bronze'].forEach(function (g) {
+          for (var i = 0; i < want[g]; i++) {
+            total++;
+            batch.set(db.collection('user_tickets').doc(), {
+              user_id: uid, grade: g, status: 'active',
+              earned_at: firebase.firestore.FieldValue.serverTimestamp(),
+              expires_at: null, manual: true, postback_id: null, reason: 'demo-seed', seeded: true
+            });
+          }
+        });
+        if (!total) return;
+        return batch.commit().then(function () { myTk = total; }).catch(function (e) {
+          denied.push(L('티켓 쓰기 실패', 'Ghi vé thất bại') + ' (' + label + ') — ' + (e.code || e.message));
+        });
+      });
+    }
+
+    return jobs.then(function () {
+      okAcc++; okBuy += myBuy; okTk += myTk;
+      seedLog('<div><b>' + label + '</b> — '
+        + L('구매 ', 'Mua ') + myBuy + L('건 · 티켓 ', ' · Vé ') + myTk + L('장', '')
+        + (notes.length ? ' · ' + notes.join(' · ') : '') + '</div>');
+    });
+  }
+
+  function seedCode() {
+    var p = function () { return Math.random().toString(36).slice(2, 6).toUpperCase(); };
+    return 'PP-' + p() + '-' + p() + '-' + p();
+  }
+};
+
+/* 한 계정만 비우기 — 지우기는 관리자 권한이 필요하다(규칙: delete if isAdmin). */
+window.wipeOne = function (uid) {
+  if (!confirm(L('이 계정의 가상 티켓·구매 내역을 지웁니다. 되돌릴 수 없습니다.',
+                 'Sẽ xóa vé·lịch sử mua ảo của tài khoản này. Không thể hoàn tác.'))) return;
+  ensureSignedIn().then(function () {
+    return Promise.all([
+      db.collection('user_tickets').where('user_id', '==', uid).get(),
+      db.collection('gifticon_exchanges').where('user_id', '==', uid).get()
+    ]);
+  }).then(function (res) {
+    var docs = res[0].docs.concat(res[1].docs);
+    if (!docs.length) { toast(L('지울 것이 없습니다.', 'Không có gì để xóa.')); return; }
+    var chain = Promise.resolve();
+    for (var i = 0; i < docs.length; i += 400) {
+      (function (chunk) {
+        chain = chain.then(function () {
+          var b = db.batch();
+          chunk.forEach(function (d) { b.delete(d.ref); });
+          return b.commit();
+        });
+      })(docs.slice(i, i + 400));
+    }
+    return chain.then(function () { toast(L(docs.length + '건을 지웠습니다.', 'Đã xóa ' + docs.length + ' mục.')); return load(); });
+  }).catch(function (e) {
+    console.error('wipeOne', e);
+    toast(L('지우지 못했습니다 — ', 'Không xóa được — ') + (e.code || e.message));
+  });
+};
+
 /* ── 삭제 ── */
 var DEL_ID = null;
 function openDel(id) {
@@ -859,18 +1199,33 @@ document.getElementById('btn-add').addEventListener('click', function () { openA
 document.getElementById('m-acc-x').addEventListener('click', function () { closeModal('m-acc'); });
 document.getElementById('m-acc-cancel').addEventListener('click', function () { closeModal('m-acc'); });
 document.getElementById('m-acc-save').addEventListener('click', saveAcc);
+document.getElementById('btn-seed').addEventListener('click', function () {
+  document.getElementById('m-seed-err').style.display = 'none';
+  document.getElementById('sd-result').style.display = 'none';
+  document.getElementById('sd-result').innerHTML = '';
+  seedRenderPicks();
+  openModal('m-seed');
+});
+document.getElementById('m-seed-x').addEventListener('click', function () { closeModal('m-seed'); });
+document.getElementById('m-seed-cancel').addEventListener('click', function () { closeModal('m-seed'); });
+document.getElementById('m-seed-run').addEventListener('click', runSeed);
+Array.prototype.forEach.call(document.querySelectorAll('input[name="sd-target"]'), function (el) {
+  el.addEventListener('change', function () {
+    document.getElementById('sd-picks').style.display = (this.value === 'pick') ? 'block' : 'none';
+  });
+});
 document.getElementById('m-info-x').addEventListener('click', function () { closeModal('m-info'); });
 document.getElementById('m-info-close').addEventListener('click', function () { closeModal('m-info'); });
 document.getElementById('m-del-x').addEventListener('click', function () { closeModal('m-del'); });
 document.getElementById('m-del-cancel').addEventListener('click', function () { closeModal('m-del'); });
 document.getElementById('m-del-ok').addEventListener('click', doDel);
-['m-acc', 'm-del', 'm-info'].forEach(function (id) {
+['m-acc', 'm-del', 'm-info', 'm-seed'].forEach(function (id) {
   document.getElementById(id).addEventListener('click', function (e) {
     if (e.target === this) closeModal(id);
   });
 });
 document.addEventListener('keydown', function (e) {
-  if (e.key === 'Escape') { closeModal('m-acc'); closeModal('m-del'); closeModal('m-info'); }
+  if (e.key === 'Escape') { closeModal('m-acc'); closeModal('m-del'); closeModal('m-info'); closeModal('m-seed'); }
 });
 document.addEventListener('click', function (e) {
   var chip = e.target.closest('[data-copy]');
@@ -880,6 +1235,8 @@ document.addEventListener('click', function (e) {
       .catch(function () { toast('복사에 실패했습니다.'); });
     return;
   }
+  var wp = e.target.closest('[data-wipe]');
+  if (wp) { wipeOne(wp.getAttribute('data-wipe')); return; }
   var inf = e.target.closest('[data-info]');
   if (inf) { openInfo(inf.getAttribute('data-info')); return; }
   var ed = e.target.closest('[data-edit]');
@@ -897,7 +1254,7 @@ load();
      표는 매번 다시 그려지므로 MutationObserver가 새로 생긴 노드까지 따라간다. -->
 <script>
 (function(){
-  var KO2VI = {"계정 상세":"Chi tiết tài khoản","보유 티켓":"Vé đang giữ","구매 내역":"Lịch sử mua","불러오지 못했습니다.":"Không tải được.","구매 내역이 없습니다.":"Không có lịch sử mua.",
+  var KO2VI = {"가상 데이터 넣기":"Thêm dữ liệu ảo","대상":"Đối tượng","전체 계정":"Toàn bộ tài khoản","고른 계정만":"Chỉ tài khoản đã chọn","무엇을":"Thêm gì","티켓":"Vé","얼마나":"Bao nhiêu","구매 건수":"Số lượt mua","골드":"Vàng","실버":"Bạc","브론즈":"Đồng","기존 것":"Dữ liệu cũ","비우고 새로":"Xóa rồi thêm mới","더하기":"Thêm vào","넣기":"Thêm","비우기":"Xóa sạch","계정 상세":"Chi tiết tài khoản","보유 티켓":"Vé đang giữ","구매 내역":"Lịch sử mua","불러오지 못했습니다.":"Không tải được.","구매 내역이 없습니다.":"Không có lịch sử mua.",
   "데모에서 앱을 테스트할 때 가상 데이터를 어느 계정에 넣을지 여기서 확인합니다.": "Nơi xác nhận sẽ đưa dữ liệu giả vào tài khoản nào khi kiểm thử ứng dụng trong bản demo.",
   "+ 계정 추가": "+ Thêm tài khoản",
   "저장이 막혀 있습니다.": "Việc lưu đang bị chặn.",

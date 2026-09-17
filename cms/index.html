@@ -16828,7 +16828,10 @@ window.dmCleanQaTraces = function() {
     var delUsers = res[1].docs.filter(function(d){ return isQa(d.id); });
     var delTickets = res[2].docs.filter(function(d){ return isQa(d.data().user_id); });
     var delTx = res[3].docs.filter(function(d){ return isQa(d.data().user_id); });
-    var delEx = res[4].docs.filter(function(d){ return isQa(d.data().user_id) || isTestItem(d.data().gifticon_id); });
+    /* zz- 로 시작하는 문서는 권한을 살펴보느라 만든 시험 문서다 — 계정을 가리지 않고 지운다.
+       exchanged_at 이 없는 문서도 같다(정상 구매는 반드시 이 값을 갖는다). */
+    var isProbe = function(d){ return String(d.id || '').indexOf('zz-') === 0 || !d.data().exchanged_at; };
+    var delEx = res[4].docs.filter(function(d){ return isQa(d.data().user_id) || isTestItem(d.data().gifticon_id) || isProbe(d); });
 
     var total = delUsers.length + delTickets.length + delTx.length + delEx.length;
     if (!total) { toast('지울 확인 자국이 없습니다.'); return null; }
