@@ -111,13 +111,11 @@ service cloud.firestore {
     // ──────────────────────────────────────────
     // D. User Assets
     // ──────────────────────────────────────────
-    // 앱은 이 컬렉션을 읽기만 한다(가지급 묶음 노출, persona 지원 위해 read만 완화) —
-    // 등급 확정으로 인한 생성/전환은 백엔드 몫이라 create/update는 owner-uid 검증을 유지한다.
+    // 데모 — /demo-accounts 의 「가상 데이터 넣기」가 남의 uid 앞으로 티켓을 넣고 비운다.
+    // 시연용 저장소라 로그인 없이 쓰기·지우기를 연다(demo_accounts 와 같은 취급).
     match /user_tickets/{docId} {
       allow read: if isSignedIn();
-      allow create: if isAdmin() || (isSignedIn() && request.resource.data.user_id == request.auth.uid);
-      allow update: if isAdmin() || (isSignedIn() && resource.data.user_id == request.auth.uid);
-      allow delete: if isAdmin();
+      allow create, update, delete: if true;
     }
     match /user_points/{userId} {
       allow read: if isSignedIn();
@@ -148,11 +146,10 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
     match /gifticon_exchanges/{docId} {
-      // create를 isSignedIn()까지 완화: 시뮬 로그인 지원 + 앱은 "요청(requested)"만 남기고
-      // 실제 차감·완료 처리는 백엔드가 담당 — 그래서 update는 admin(백엔드/CMS) 전용으로 유지한다.
+      // 데모 — /demo-accounts 의 「가상 데이터 넣기」가 남의 uid 앞으로 구매 내역을 넣고 비운다.
+      // 시연용 저장소라 로그인 없이 쓰기·지우기를 연다(demo_accounts 와 같은 취급).
       allow read: if isSignedIn();
-      allow create: if isSignedIn();
-      allow update, delete: if isAdmin();
+      allow create, update, delete: if true;
     }
 
     // ──────────────────────────────────────────

@@ -106,12 +106,6 @@ tr:hover td{background:var(--surface-2);}
 .sd-result b{color:var(--text);}
 .sd-skip{color:var(--warn,#B45309);}
 .sd-bad{color:var(--danger);}
-/* 티켓 쓰기와 지우기는 Firestore 규칙이 관리자에게만 열어 둔 일이다.
-   이 자리에서 관리자로 로그인하면 그 둘까지 된다. 비밀번호는 저장하지 않는다. */
-.sd-admin{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:14px;padding-top:12px;border-top:1px solid var(--border);}
-.sd-admin .form-input{flex:1;min-width:130px;}
-.sd-adm-st{font-size:11px;color:var(--text-3);}
-.sd-adm-st.on{color:var(--success);}
 .nick-none{font-size:12px;color:var(--text-3);}
 /* 못 쓰는 계정은 계정 ID 옆에 딱지로 붙인다 — 닉네임 칸은 값을 넣는 자리지 설명하는 자리가 아니다 */
 .tag{display:inline-block;white-space:nowrap;padding:2px 7px;border-radius:99px;font-size:10px;font-weight:700;margin-left:6px;vertical-align:middle;}
@@ -331,13 +325,6 @@ textarea.form-input{resize:vertical;min-height:64px;}
           <label class="sd-opt"><input type="radio" name="sd-mode" value="wipe" checked> 비우고 새로</label>
           <label class="sd-opt"><input type="radio" name="sd-mode" value="add"> 더하기</label>
         </div>
-      </div>
-
-      <div class="sd-admin">
-        <input class="form-input" id="sd-adm-id" type="text" placeholder="아이디" autocomplete="username">
-        <input class="form-input" id="sd-adm-pw" type="password" placeholder="비밀번호" autocomplete="current-password">
-        <button class="btn btn-ghost btn-sm" id="sd-adm-btn">관리자 로그인</button>
-        <span class="sd-adm-st" id="sd-adm-st"></span>
       </div>
 
       <div class="sd-result" id="sd-result" style="display:none"></div>
@@ -1094,47 +1081,6 @@ window.runSeed = function () {
 };
 
 /* 한 계정만 비우기 — 지우기는 관리자 권한이 필요하다(규칙: delete if isAdmin). */
-/* 관리자로 바꿔 로그인한다 — 티켓 쓰기·지우기가 관리자 전용이라 그것만 풀린다.
-
-   ⚠ 방식은 CMS 로그인(cms/index.html doLogin)을 그대로 따른다. 짐작하지 말 것:
-     · 받는 것은 이메일이 아니라 「아이디」다 — 뒤에 @pricepick-cms.internal 을 붙인다
-     · 비밀번호는 그대로 넘기지 않고 SHA-256 16진 문자열로 바꿔 넘긴다
-     · 그 다음 admin_accounts 에서 그 아이디를 찾고 status 가 inactive 면 막는다
-   비밀번호는 어디에도 저장하지 않는다. */
-var ADMIN_DOMAIN = '@pricepick-cms.internal';
-function admHash(str) {
-  return crypto.subtle.digest('SHA-256', new TextEncoder().encode(str)).then(function (buf) {
-    return Array.from(new Uint8Array(buf)).map(function (b) { return b.toString(16).padStart(2, '0'); }).join('');
-  });
-}
-window.seedAdminLogin = function () {
-  var idEl = document.getElementById('sd-adm-id');
-  var pwEl = document.getElementById('sd-adm-pw');
-  var st = document.getElementById('sd-adm-st');
-  var setSt = function (msg, ok) { st.className = 'sd-adm-st' + (ok ? ' on' : ''); st.textContent = msg; };
-  var id = (idEl.value || '').trim(), pw = pwEl.value || '';
-  if (!id || !pw) { setSt(L('아이디와 비밀번호를 넣으세요.', 'Hãy nhập ID và mật khẩu.')); return; }
-  setSt(L('로그인 중…', 'Đang đăng nhập…'));
-
-  admHash(pw).then(function (hash) {
-    return firebase.auth().signInWithEmailAndPassword(id + ADMIN_DOMAIN, hash);
-  }).then(function () {
-    return db.collection('admin_accounts').where('username', '==', id).limit(1).get();
-  }).then(function (snap) {
-    if (snap.empty) { firebase.auth().signOut(); throw { code: 'no-account' }; }
-    if ((snap.docs[0].data().status) === 'inactive') { firebase.auth().signOut(); throw { code: 'inactive' }; }
-    pwEl.value = '';
-    setSt(L('관리자로 로그인됨', 'Đã đăng nhập quản trị') + ' · ' + id, true);
-  }).catch(function (e) {
-    console.error('seedAdminLogin', e);
-    var c = e.code || '';
-    var msg = (c === 'no-account') ? L('계정 정보가 없습니다.', 'Không có thông tin tài khoản.')
-      : (c === 'inactive') ? L('비활성화된 계정입니다.', 'Tài khoản đã bị vô hiệu hóa.')
-      : L('아이디 또는 비밀번호가 올바르지 않습니다.', 'ID hoặc mật khẩu không đúng.');
-    setSt(msg);
-  });
-};
-
 window.wipeOne = function (uid) {
   if (!confirm(L('이 계정의 가상 티켓·구매 내역을 지웁니다. 되돌릴 수 없습니다.',
                  'Sẽ xóa vé·lịch sử mua ảo của tài khoản này. Không thể hoàn tác.'))) return;
@@ -1291,7 +1237,6 @@ document.getElementById('btn-seed').addEventListener('click', function () {
 document.getElementById('m-seed-x').addEventListener('click', function () { closeModal('m-seed'); });
 document.getElementById('m-seed-cancel').addEventListener('click', function () { closeModal('m-seed'); });
 document.getElementById('m-seed-run').addEventListener('click', runSeed);
-document.getElementById('sd-adm-btn').addEventListener('click', seedAdminLogin);
 Array.prototype.forEach.call(document.querySelectorAll('input[name="sd-target"]'), function (el) {
   el.addEventListener('change', function () {
     document.getElementById('sd-picks').style.display = (this.value === 'pick') ? 'block' : 'none';
