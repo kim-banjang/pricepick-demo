@@ -1282,7 +1282,7 @@ load();
      표는 매번 다시 그려지므로 MutationObserver가 새로 생긴 노드까지 따라간다. -->
 <script>
 (function(){
-  var KO2VI = {"아이디":"ID","아이디와 비밀번호를 넣으세요.":"Hãy nhập ID và mật khẩu.","아이디 또는 비밀번호가 올바르지 않습니다.":"ID hoặc mật khẩu không đúng.","계정 정보가 없습니다.":"Không có thông tin tài khoản.","비활성화된 계정입니다.":"Tài khoản đã bị vô hiệu hóa.","관리자 로그인":"Đăng nhập quản trị","비밀번호":"Mật khẩu","가상 데이터 넣기":"Thêm dữ liệu ảo","대상":"Đối tượng","전체 계정":"Toàn bộ tài khoản","고른 계정만":"Chỉ tài khoản đã chọn","무엇을":"Thêm gì","티켓":"Vé","얼마나":"Bao nhiêu","구매 건수":"Số lượt mua","골드":"Vàng","실버":"Bạc","브론즈":"Đồng","기존 것":"Dữ liệu cũ","비우고 새로":"Xóa rồi thêm mới","더하기":"Thêm vào","넣기":"Thêm","비우기":"Xóa sạch","계정 상세":"Chi tiết tài khoản","보유 티켓":"Vé đang giữ","구매 내역":"Lịch sử mua","불러오지 못했습니다.":"Không tải được.","구매 내역이 없습니다.":"Không có lịch sử mua.",
+  var KO2VI = {"가상 데이터 넣기":"Thêm dữ liệu ảo","대상":"Đối tượng","전체 계정":"Toàn bộ tài khoản","고른 계정만":"Chỉ tài khoản đã chọn","무엇을":"Thêm gì","티켓":"Vé","얼마나":"Bao nhiêu","구매 건수":"Số lượt mua","골드":"Vàng","실버":"Bạc","브론즈":"Đồng","기존 것":"Dữ liệu cũ","비우고 새로":"Xóa rồi thêm mới","더하기":"Thêm vào","넣기":"Thêm","비우기":"Xóa sạch","계정 상세":"Chi tiết tài khoản","보유 티켓":"Vé đang giữ","구매 내역":"Lịch sử mua","불러오지 못했습니다.":"Không tải được.","구매 내역이 없습니다.":"Không có lịch sử mua.",
   "데모에서 앱을 테스트할 때 가상 데이터를 어느 계정에 넣을지 여기서 확인합니다.": "Nơi xác nhận sẽ đưa dữ liệu giả vào tài khoản nào khi kiểm thử ứng dụng trong bản demo.",
   "+ 계정 추가": "+ Thêm tài khoản",
   "저장이 막혀 있습니다.": "Việc lưu đang bị chặn.",
@@ -1348,10 +1348,98 @@ load();
 };
   var _orig=new Map(), _tracked=new Set(), _applying=false;
   function hasKo(s){ return /[가-힯ᄀ-ᇿ㄰-㆏]/.test(s); }
+  /* ── 규칙층 ─────────────────────────────────────────────────────────
+     「골드 15장」·「(3,000원)」·「총 54건」처럼 숫자가 매번 달라지는 말은
+     사전에 다 적어 둘 수가 없다. 그래서 사전에서 못 찾았을 때만 여기서 한 번 더 본다.
+
+     ⚠ 상품명·브랜드명·닉네임·주문번호는 데이터다 — 번역 대상이 아니다.
+     그래서 규칙은 「글자열 전체가 규칙에 딱 맞을 때만」 바꾼다. 가운데 낱말 하나만
+     집어 바꾸는 일은 하지 않는다. 「떠먹는 스초생 + 아메리카노 R 2잔」 같은 상품명이
+     조각조각 깨지는 것을 막기 위해서다(조각 하나라도 모르면 통째로 포기한다).
+
+     등급 이름과 화폐 표기는 이 파일 사전에서 그대로 끌어 쓴다 — 화면마다
+     Gold/Vàng, ₩/won 이 다른데 규칙이 제 값을 따로 들고 있으면 어긋난다. */
+  var VI_UNIT = { '장':'vé', '일':'ngày', '개월':'tháng', '건':'trường hợp', '회':'lần' };
+  function viWord(ko){ var v = KO2VI[ko]; return (v == null) ? ko : v; }
+  function viNum(s){ return String(s).replace(/,/g, '.'); }   /* 1,000 → 1.000 (베트남 자릿점) */
+  function viJoin(n, u){ return /^[0-9A-Za-zÀ-ỹĐđ]/.test(u) ? (n + ' ' + u) : (n + u); }
+  function viAtom(t){
+    if (!t) return t;
+    if (!hasKo(t)) return t;                 /* 숫자·영문 조각은 그대로 통과 */
+    var d = KO2VI[t]; if (d != null) return d;
+    var m;
+    /* 등급 — 「골드 15」·「골드 15장」·「−골드 141」·「잔여 골드 33장」·「골드 15장 사용」 */
+    m = t.match(/^(잔여\s+)?([-\u2212])?(골드|실버|브론즈)\s+([\d,]+)(장)?(?:\s+(사용|차감))?$/);
+    if (m) {
+      var s = (m[2] || '') + viWord(m[3]) + ' ' + viNum(m[4]) + (m[5] ? ' vé' : '');
+      if (m[1]) s = 'Còn lại ' + s;
+      if (m[6] === '사용') s += ' đã dùng';
+      if (m[6] === '차감') s += ' bị trừ';
+      return s;
+    }
+    /* 「골드 티켓 15장」 */
+    m = t.match(/^(골드|실버|브론즈) 티켓 ([\d,]+)장$/);
+    if (m) return viWord(m[1]) + ' ' + viNum(m[2]) + ' vé';
+    /* 금액 — 「3,000원」·「(3,000원)」·「(−28,200원)」 */
+    m = t.match(/^(\()?([-\u2212])?([\d,]+)원(\))?$/);
+    if (m && !m[1] === !m[4]) {
+      return (m[1] || '') + (m[2] || '') + viJoin(viNum(m[3]), viWord('원')) + (m[4] || '');
+    }
+    /* 낱낱의 단위 — 「90일」·「3개월」·「43건」·「15장」 */
+    m = t.match(/^([\d,]+)(장|일|개월|건|회)$/);
+    if (m) return viNum(m[1]) + ' ' + VI_UNIT[m[2]];
+    /* 「총 54건」·「총 446개 상품」 */
+    m = t.match(/^총 ([\d,]+)건$/);       if (m) return 'Tổng ' + viNum(m[1]) + ' mục';
+    m = t.match(/^총 ([\d,]+)개 상품$/);  if (m) return 'Tổng ' + viNum(m[1]) + ' sản phẩm';
+    /* 「1 / 3 페이지」 */
+    m = t.match(/^([\d,]+) \/ ([\d,]+) 페이지$/);
+    if (m) return 'Trang ' + viNum(m[1]) + ' / ' + viNum(m[2]);
+    /* 「대량 가져오기 (총 0 / 성공 0 , 실패 0)」 */
+    m = t.match(/^대량 가져오기 \(총 ([\d,]+) \/ 성공 ([\d,]+) , 실패 ([\d,]+)\)$/);
+    if (m) return 'Nhập hàng loạt (Tổng ' + viNum(m[1]) + ' / Thành công ' + viNum(m[2]) + ' , Thất bại ' + viNum(m[3]) + ')';
+    /* 「현재 보유: 브론즈 132장 · 실버 79장」 */
+    m = t.match(/^현재 보유: (.+)$/);
+    if (m) { var r = viSplit(m[1]); if (r == null) r = viAtom(m[1]); return (r == null) ? null : 'Hiện có: ' + r; }
+    /* 「2026.09.17까지」·「2026.09.17까지 (90일)」 */
+    m = t.match(/^([\d.\-\/]+)까지(?: \(([\d,]+)일\))?$/);
+    if (m) return 'Đến ' + m[1] + (m[2] ? ' (' + viNum(m[2]) + ' ngày)' : '');
+    /* 「골드 15 (3,000원)」 — 조합과 금액을 한 칸에 같이 적는 자리 */
+    m = t.match(/^(.+) (\([\d,\u2212-]+원\))$/);
+    if (m) {
+      var a = viAtom(m[1]); if (a == null) a = viSplit(m[1]);
+      var b = viAtom(m[2]);
+      return (a == null || b == null) ? null : (a + ' ' + b);
+    }
+    return null;
+  }
+  /* 「 · 」·「 + 」·「 / 」·「 › 」·「 → 」로 이어 붙인 말.
+     조각이 하나도 빠짐없이 번역돼야만 바꾼다 — 하나라도 모르면 상품명일 수 있다. */
+  var VI_SEPS = [' · ', ' + ', ' / ', ' › ', ' → '];
+  function viSplit(t){
+    for (var i = 0; i < VI_SEPS.length; i++) {
+      var sep = VI_SEPS[i];
+      if (t.indexOf(sep) < 0) continue;
+      var parts = t.split(sep), out = [], ok = true;
+      for (var j = 0; j < parts.length; j++) {
+        var p = viAtom(parts[j].trim());
+        if (p == null) { ok = false; break; }
+        out.push(p);
+      }
+      if (ok) return out.join(sep);
+    }
+    return null;
+  }
+  function viPattern(t){
+    var v = viAtom(t);
+    if (v != null && v !== t) return v;
+    v = viSplit(t);
+    return (v != null && v !== t) ? v : null;
+  }
   function tcore(s){
     var t=s.trim(); if(!t||!hasKo(t)) return null;
-    var vi=KO2VI[t]; if(vi!=null) return s.replace(t,vi);
-    return null;
+    var vi=KO2VI[t]; if(vi==null) vi=viPattern(t);
+    if(vi==null) return null;
+    return s.replace(t,vi);
   }
   /* ── 숫자-단위 붙음 방지(VI 공통) ──
      한국어는 "11건"처럼 숫자와 단위를 붙여 쓰지만 베트남어는 "11 trường hợp"처럼 띄어 써야 한다.

@@ -17054,17 +17054,128 @@ Object.assign(KO2VI, {
     "전환 후 환수": "Thu hồi sau chuyển đổi",
     "부분 환수": "Thu hồi một phần"
   });
+  Object.assign(KO2VI, {
+    /* ── 기프티샵(앱) ── */
+    "브랜드": "Thương hiệu", "인기상품": "Sản phẩm phổ biến",
+    "인기순": "Phổ biến nhất", "낮은가격순": "Giá thấp trước", "높은가격순": "Giá cao trước",
+    "구매 가능만": "Chỉ hàng mua được",
+    /* 브랜드 탭 = 분류(카테고리). 분류 이름은 번역하고 브랜드·상품명은 그대로 둔다. */
+    "문화/생활/기타": "Văn hóa/Đời sống/Khác", "베이커리/떡": "Bánh/Bánh gạo",
+    "상품권/금액권": "Phiếu quà tặng/Phiếu tiền", "커피/음료": "Cà phê/Đồ uống",
+    "편의점/마트": "Cửa hàng tiện lợi/Siêu thị", "피자/버거/치킨": "Pizza/Burger/Gà rán",
+    /* 상품 상세 */
+    "상품 상세": "Chi tiết sản phẩm", "기프티콘 쿠폰 유의사항": "Lưu ý phiếu gifticon",
+    "티켓 & 포인트 교환소에서 바꾸기 ›": "Đổi tại Quầy đổi vé & điểm ›",
+    "구매하기": "Mua ngay", "유효기간": "Hạn dùng", "교환 안내": "Hướng dẫn đổi",
+    /* 구매 내역 */
+    "발급완료": "Đã phát hành", "처리중": "Đang xử lý",
+    "구매일": "Ngày mua", "사용 티켓": "Vé đã dùng",
+    "기프티콘 코드": "Mã gifticon", "코드 보기 ›": "Xem mã ›",
+    /* 구매 완료 */
+    "주문번호": "Số đơn hàng",
+    "기프티콘이 발급되었어요. 아래 코드로 사용하세요.": "Gifticon đã được phát hành. Hãy dùng bằng mã bên dưới.",
+    "발급된 기프티콘은 구매 내역에서 다시 확인할 수 있어요.": "Gifticon đã phát hành có thể xem lại ở Lịch sử mua."
+  });
   var IPLANG='ko';
   var KO_RE=/[\uac00-\ud7a3]/;
   var _orig=new Map();
   var _tracked=new Set();
   var _applying=false;
   function hasKo(s){return KO_RE.test(s);}
+
+  /* ── 규칙층 ─────────────────────────────────────────────────────────
+     「골드 15장」·「(3,000원)」·「총 54건」처럼 숫자가 매번 달라지는 말은
+     사전에 다 적어 둘 수가 없다. 그래서 사전에서 못 찾았을 때만 여기서 한 번 더 본다.
+
+     ⚠ 상품명·브랜드명·닉네임·주문번호는 데이터다 — 번역 대상이 아니다.
+     그래서 규칙은 「글자열 전체가 규칙에 딱 맞을 때만」 바꾼다. 가운데 낱말 하나만
+     집어 바꾸는 일은 하지 않는다. 「떠먹는 스초생 + 아메리카노 R 2잔」 같은 상품명이
+     조각조각 깨지는 것을 막기 위해서다(조각 하나라도 모르면 통째로 포기한다).
+
+     등급 이름과 화폐 표기는 이 파일 사전에서 그대로 끌어 쓴다 — 화면마다
+     Gold/Vàng, ₩/won 이 다른데 규칙이 제 값을 따로 들고 있으면 어긋난다. */
+  var VI_UNIT = { '장':'vé', '일':'ngày', '개월':'tháng', '건':'trường hợp', '회':'lần' };
+  function viWord(ko){ var v = KO2VI[ko]; return (v == null) ? ko : v; }
+  function viNum(s){ return String(s).replace(/,/g, '.'); }   /* 1,000 → 1.000 (베트남 자릿점) */
+  function viJoin(n, u){ return /^[0-9A-Za-zÀ-ỹĐđ]/.test(u) ? (n + ' ' + u) : (n + u); }
+  function viAtom(t){
+    if (!t) return t;
+    if (!hasKo(t)) return t;                 /* 숫자·영문 조각은 그대로 통과 */
+    var d = KO2VI[t]; if (d != null) return d;
+    var m;
+    /* 등급 — 「골드 15」·「골드 15장」·「−골드 141」·「잔여 골드 33장」·「골드 15장 사용」 */
+    m = t.match(/^(잔여\s+)?([-\u2212])?(골드|실버|브론즈)\s+([\d,]+)(장)?(?:\s+(사용|차감))?$/);
+    if (m) {
+      var s = (m[2] || '') + viWord(m[3]) + ' ' + viNum(m[4]) + (m[5] ? ' vé' : '');
+      if (m[1]) s = 'Còn lại ' + s;
+      if (m[6] === '사용') s += ' đã dùng';
+      if (m[6] === '차감') s += ' bị trừ';
+      return s;
+    }
+    /* 「골드 티켓 15장」 */
+    m = t.match(/^(골드|실버|브론즈) 티켓 ([\d,]+)장$/);
+    if (m) return viWord(m[1]) + ' ' + viNum(m[2]) + ' vé';
+    /* 금액 — 「3,000원」·「(3,000원)」·「(−28,200원)」 */
+    m = t.match(/^(\()?([-\u2212])?([\d,]+)원(\))?$/);
+    if (m && !m[1] === !m[4]) {
+      return (m[1] || '') + (m[2] || '') + viJoin(viNum(m[3]), viWord('원')) + (m[4] || '');
+    }
+    /* 낱낱의 단위 — 「90일」·「3개월」·「43건」·「15장」 */
+    m = t.match(/^([\d,]+)(장|일|개월|건|회)$/);
+    if (m) return viNum(m[1]) + ' ' + VI_UNIT[m[2]];
+    /* 「총 54건」·「총 446개 상품」 */
+    m = t.match(/^총 ([\d,]+)건$/);       if (m) return 'Tổng ' + viNum(m[1]) + ' mục';
+    m = t.match(/^총 ([\d,]+)개 상품$/);  if (m) return 'Tổng ' + viNum(m[1]) + ' sản phẩm';
+    /* 「1 / 3 페이지」 */
+    m = t.match(/^([\d,]+) \/ ([\d,]+) 페이지$/);
+    if (m) return 'Trang ' + viNum(m[1]) + ' / ' + viNum(m[2]);
+    /* 「대량 가져오기 (총 0 / 성공 0 , 실패 0)」 */
+    m = t.match(/^대량 가져오기 \(총 ([\d,]+) \/ 성공 ([\d,]+) , 실패 ([\d,]+)\)$/);
+    if (m) return 'Nhập hàng loạt (Tổng ' + viNum(m[1]) + ' / Thành công ' + viNum(m[2]) + ' , Thất bại ' + viNum(m[3]) + ')';
+    /* 「현재 보유: 브론즈 132장 · 실버 79장」 */
+    m = t.match(/^현재 보유: (.+)$/);
+    if (m) { var r = viSplit(m[1]); if (r == null) r = viAtom(m[1]); return (r == null) ? null : 'Hiện có: ' + r; }
+    /* 「2026.09.17까지」·「2026.09.17까지 (90일)」 */
+    m = t.match(/^([\d.\-\/]+)까지(?: \(([\d,]+)일\))?$/);
+    if (m) return 'Đến ' + m[1] + (m[2] ? ' (' + viNum(m[2]) + ' ngày)' : '');
+    /* 「골드 15 (3,000원)」 — 조합과 금액을 한 칸에 같이 적는 자리 */
+    m = t.match(/^(.+) (\([\d,\u2212-]+원\))$/);
+    if (m) {
+      var a = viAtom(m[1]); if (a == null) a = viSplit(m[1]);
+      var b = viAtom(m[2]);
+      return (a == null || b == null) ? null : (a + ' ' + b);
+    }
+    return null;
+  }
+  /* 「 · 」·「 + 」·「 / 」·「 › 」·「 → 」로 이어 붙인 말.
+     조각이 하나도 빠짐없이 번역돼야만 바꾼다 — 하나라도 모르면 상품명일 수 있다. */
+  var VI_SEPS = [' · ', ' + ', ' / ', ' › ', ' → '];
+  function viSplit(t){
+    for (var i = 0; i < VI_SEPS.length; i++) {
+      var sep = VI_SEPS[i];
+      if (t.indexOf(sep) < 0) continue;
+      var parts = t.split(sep), out = [], ok = true;
+      for (var j = 0; j < parts.length; j++) {
+        var p = viAtom(parts[j].trim());
+        if (p == null) { ok = false; break; }
+        out.push(p);
+      }
+      if (ok) return out.join(sep);
+    }
+    return null;
+  }
+  function viPattern(t){
+    var v = viAtom(t);
+    if (v != null && v !== t) return v;
+    v = viSplit(t);
+    return (v != null && v !== t) ? v : null;
+  }
   function tcore(raw){
     if(raw==null) return null;
     var core=(''+raw).trim();
     if(!core||!hasKo(core)) return null;
     var vi=KO2VI[core];
+    if(vi==null) vi=viPattern(core);
     if(vi==null) return null;
     var i=raw.indexOf(core);
     return raw.slice(0,i)+vi+raw.slice(i+core.length);
