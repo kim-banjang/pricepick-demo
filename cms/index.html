@@ -447,6 +447,14 @@ tr:hover td{background:var(--surface-2);}
 #sec-revenue-gifti table{table-layout:fixed;width:100%;}
 #sec-revenue-gifti td{text-align:center!important;}
 #sec-revenue-gifti .tkc{line-height:1.3;white-space:nowrap;}
+/* 파고들 수 있는 「기간」 칸 — 누를 수 있다는 것이 보여야 한다(설명 문구는 안 쓴다) */
+#sec-revenue-gifti td.gs-drillable{color:var(--main);font-weight:700;cursor:pointer;}
+#sec-revenue-gifti td.gs-drillable:hover{text-decoration:underline;}
+#sec-revenue-gifti #gs-dt-table td{height:76px;box-sizing:border-box;padding-left:8px;padding-right:8px;}
+#sec-revenue-gifti #gs-dt-table th{white-space:normal;line-height:1.35;padding-left:8px;padding-right:8px;}
+#sec-revenue-gifti #gs-dt-table td:nth-child(3){line-height:0;font-size:0;}
+#sec-revenue-gifti #gs-dt-table td.ordno{white-space:normal;word-break:break-all;
+  font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;color:var(--text-3);line-height:1.4;}
 #rf-od-table td:nth-child(2),
 #rf-od-table td:nth-child(3),
 #rf-mall-table td:nth-child(1),
@@ -3796,6 +3804,12 @@ window.CMS_FEATURES = {
         <div class="stat-card amber"><div class="stat-label">취소 건수</div><div class="stat-value" id="gs-kpi-cancel">—</div><div class="stat-change neutral" id="gs-kpi-cancel-sub">—</div></div>
       </div>
 
+      <div class="rf-drill" id="gs-drill" style="display:none">
+        <span class="rf-drill-mark">▸</span>
+        <span id="gs-drill-text">—</span>
+        <button class="btn btn-ghost btn-sm" onclick="gsDrillUp()">되돌아가기</button>
+      </div>
+
       <div class="card">
         <div class="card-header">
           <div><div class="card-title"><span id="gs-bd-title">월별 내역</span></div><div class="card-sub" id="gs-bd-sub">—</div></div>
@@ -3813,7 +3827,13 @@ window.CMS_FEATURES = {
           </thead>
           <tbody id="gs-bd-tbody"></tbody>
         </table>
-        <div id="gs-bd-pagination"></div>
+        <table id="gs-dt-table" style="display:none">
+          <colgroup><col style="width:11%"><col style="width:17%"><col style="width:20%"><col style="width:17%"><col style="width:13%"><col style="width:12%"><col style="width:10%"></colgroup>
+          <thead>
+            <tr><th>구매일</th><th>주문번호</th><th>닉네임 / 카카오톡 ID / 식별 아이디</th><th>상품명</th><th>사용한 티켓</th><th>원화 환산액</th><th>상태</th></tr>
+          </thead>
+          <tbody id="gs-dt-tbody"></tbody>
+        </table>
       </div>
     </div>
 
@@ -5792,7 +5812,7 @@ function giSaveTicketEdit() {
     "관리자 계정":"Tài khoản quản trị","운영 정책":"Chính sách vận hành",
     "환수 이력":"Lịch sử thu hồi","포인트 내역":"Lịch sử điểm",
     "출석체크 설정":"Cài đặt điểm danh","포인트 정책":"Chính sách điểm",
-    "포인트 관리":"Quản lý điểm","기프티샵 판매 매출":"Doanh thu bán Gifti Shop","판매 건수":"Số lượt bán","원화 환산액":"Giá trị quy đổi ra won","취소 건수":"Số lượt hủy","매출에서 뺀 건":"Đã trừ khỏi doanh thu","소진 티켓":"Vé đã tiêu","해당 기간에 판매가 없습니다.":"Không có lượt bán trong kỳ này.","구매내역":"Lịch sử mua","취소내역":"Lịch sử hủy","기프티콘 관리":"Quản lý Gifticon",
+    "포인트 관리":"Quản lý điểm","기프티샵 판매 매출":"Doanh thu bán Gifti Shop","판매 건수":"Số lượt bán","원화 환산액":"Giá trị quy đổi ra won","취소 건수":"Số lượt hủy","매출에서 뺀 건":"Đã trừ khỏi doanh thu","소진 티켓":"Vé đã tiêu","해당 기간에 판매가 없습니다.":"Không có lượt bán trong kỳ này.","되돌아가기":"Quay lại","해당 날짜에 판매가 없습니다.":"Không có lượt bán trong ngày này.","구매내역":"Lịch sử mua","취소내역":"Lịch sử hủy","기프티콘 관리":"Quản lý Gifticon",
     "회원 관리":"Quản lý thành viên","티켓 · 보상":"Vé · Phần thưởng",
     "콘텐츠":"Nội dung","운영":"Vận hành","매출 · 수익":"Doanh thu · Lợi nhuận",
     "시스템":"Hệ thống","계정 관리":"Quản lý tài khoản",
@@ -10105,13 +10125,28 @@ function gsPeriodModeChanged() {
 }
 window.gsPeriodModeChanged = gsPeriodModeChanged;
 
+/* 지금 무엇을 보고 있나 — 'month'(전체를 달로) · 'day'(한 달을 날로) · 'detail'(하루의 건별).
+   월별 표의 「기간」을 누르면 day, 일별 표의 「기간」을 누르면 detail 로 내려간다. */
+var GSREV_LV = { level: 'month', month: '', day: '' };
+
 function gsViewChanged() {
   var v = (document.getElementById('gs-view') || {}).value || 'month';
-  var t = document.getElementById('gs-bd-title');
-  if (t) t.textContent = (v === 'day') ? '일별 내역' : '월별 내역';
+  /* 선택칸을 직접 바꾸면 파고든 자리를 빠져나온다 — 전체 범위로 되돌린다. */
+  GSREV_LV = { level: (v === 'day') ? 'day' : 'month', month: '', day: '' };
   gsRender();
 }
 window.gsViewChanged = gsViewChanged;
+
+window.gsDrillTo = function(kind, key) {
+  if (kind === 'day') GSREV_LV = { level: 'day', month: key, day: '' };
+  else GSREV_LV = { level: 'detail', month: key.slice(0, 7), day: key };
+  gsRender();
+};
+window.gsDrillUp = function() {
+  if (GSREV_LV.level === 'detail') GSREV_LV = { level: 'day', month: GSREV_LV.month, day: '' };
+  else GSREV_LV = { level: 'month', month: '', day: '' };
+  gsRender();
+};
 
 /* 조회 기간 — 제휴 수수료 매출과 같은 방식(하루 · 한 달 · 기간 지정) */
 function gsRange() {
@@ -10130,7 +10165,7 @@ function gsRange() {
   }
   var f = v('gs-period-from'), t = v('gs-period-to');
   if (!f && !t) return { from: '', to: '', label: '전체' };
-  return { from: f, to: t, label: (f || '처음') + ' ~ (' + (t || '지금') + ')' };
+  return { from: f, to: t, label: (f || '처음') + ' ~ ' + (t || '지금') };
 }
 
 function gsKey(d, view) {
@@ -10142,43 +10177,72 @@ function gsKey(d, view) {
 window.gsRevLoad = function () {
   return Promise.all([
     db.collection('gifticon_exchanges').get(),
-    (typeof gipLoadTicketValue === 'function') ? gipLoadTicketValue() : Promise.resolve()
+    (typeof gipLoadTicketValue === 'function') ? gipLoadTicketValue() : Promise.resolve(),
+    (typeof dmFetchUsersByIds === 'function') ? Promise.resolve() : Promise.resolve()
   ]).then(function (res) {
     GSREV_ROWS = res[0].docs.map(function (d) { return Object.assign({ _id: d.id }, d.data()); });
+    /* 건별 상세가 회원 칸을 그리려면 users 와 이어야 한다 — 한 번만 읽어 둔다. */
+    if (typeof dmFetchUsersByIds === 'function') {
+      return dmFetchUsersByIds(GSREV_ROWS.map(function (x) { return x.user_id; })).then(function (map) {
+        GSREV_ROWS.forEach(function (x) { x._user = map[x.user_id]; });
+      });
+    }
+  }).then(function () {
+    if (typeof loadGifticonProducts === 'function' && !Object.keys(GIFTICON_PRODUCTS_CACHE || {}).length) {
+      return db.collection('gifticons').get().then(function (gs) {
+        gs.forEach(function (d) { GIFTICON_PRODUCTS_CACHE[d.id] = d.data(); });
+      }).catch(function () {});
+    }
+  }).then(function () {
     gsRender();
   }).catch(function (e) {
     console.error('gsRevLoad', e);
     toast('기프티샵 판매 매출을 불러오지 못했습니다.');
   });
 };
-function gsReload() { gsRender(); }
+function gsReload() { GSREV_LV = { level: 'month', month: '', day: '' }; gsRender(); }
 window.gsReload = gsReload;
+
+/* 한 건이 쓴 티켓 조합 — 기록에 조합이 있으면 그대로, 없으면 단일 등급 한 벌 */
+function gsParts(x) {
+  return (x.tickets_used && x.tickets_used.length)
+    ? x.tickets_used
+    : (x.grade_used ? [{ grade: x.grade_used, count: x.count_used || 1 }] : []);
+}
+function gsWon(x) {
+  return gsParts(x).reduce(function (a, t) {
+    var u = tvUnit(t.grade);
+    return a + ((u === null) ? 0 : u * (t.count || 0));
+  }, 0);
+}
 
 function gsRender() {
   var r = gsRange();
-  var view = (document.getElementById('gs-view') || {}).value || 'month';
   var lbl = document.getElementById('gs-period-label');
   if (lbl) lbl.textContent = r ? r.label : '기간을 고르세요';
 
-  var inRange = function (d) {
+  var lv = GSREV_LV.level;
+  /* 지금 보고 있는 범위 — 요약 카드는 늘 이 범위의 값이다. */
+  var inScope = function (d) {
     if (!r) return false;
     if (r.from && d < new Date(r.from + 'T00:00:00')) return false;
     if (r.to && d > new Date(r.to + 'T23:59:59')) return false;
+    if (GSREV_LV.month && gsKey(d, 'month') !== GSREV_LV.month) return false;
+    if (GSREV_LV.day && gsKey(d, 'day') !== GSREV_LV.day) return false;
     return true;
   };
 
-  var buckets = {}, sum = { cnt: 0, won: 0, gold: 0, silver: 0, bronze: 0 }, cancelled = 0;
+  var view = (lv === 'month') ? 'month' : 'day';
+  var buckets = {}, sum = { cnt: 0, won: 0, gold: 0, silver: 0, bronze: 0 }, cancelled = 0, rows = [];
   GSREV_ROWS.forEach(function (x) {
     var d = (x.exchanged_at && x.exchanged_at.toDate) ? x.exchanged_at.toDate() : null;
-    if (!d || !inRange(d)) return;
+    if (!d || !inScope(d)) return;
     if (x.status === 'cancelled') { cancelled++; return; }   /* 취소 건은 매출에서 뺀다 */
-    var parts = (x.tickets_used && x.tickets_used.length)
-      ? x.tickets_used
-      : (x.grade_used ? [{ grade: x.grade_used, count: x.count_used || 1 }] : []);
+    rows.push(x);
     var k = gsKey(d, view);
     var b = buckets[k] || (buckets[k] = { key: k, cnt: 0, gold: 0, silver: 0, bronze: 0, won: 0 });
     b.cnt++; sum.cnt++;
-    parts.forEach(function (t) {
+    gsParts(x).forEach(function (t) {
       var c = t.count || 0;
       if (b[t.grade] === undefined) return;
       b[t.grade] += c; sum[t.grade] += c;
@@ -10187,16 +10251,65 @@ function gsRender() {
     });
   });
 
-  var keys = Object.keys(buckets).sort().reverse();
   var set = function (id, v) { var e = document.getElementById(id); if (e) e.textContent = v; };
+  var scopeLabel = GSREV_LV.day || GSREV_LV.month || (r ? r.label : '—');
   set('gs-kpi-count', sum.cnt.toLocaleString('ko-KR') + '건');
-  set('gs-kpi-count-sub', r ? r.label : '—');
+  set('gs-kpi-count-sub', scopeLabel);
   set('gs-kpi-won', sum.won.toLocaleString('ko-KR') + '원');
   set('gs-kpi-won-sub', '골드 ' + sum.gold + ' · 실버 ' + sum.silver + ' · 브론즈 ' + sum.bronze);
   set('gs-kpi-cancel', cancelled.toLocaleString('ko-KR') + '건');
   set('gs-kpi-cancel-sub', '매출에서 뺀 건');
-  set('gs-bd-sub', keys.length ? (keys.length + (view === 'day' ? '일' : '개월')) : '—');
 
+  /* 선택칸과 제목이 지금 보고 있는 단계를 드러낸다 */
+  var sel = document.getElementById('gs-view');
+  if (sel) sel.value = (lv === 'month') ? 'month' : 'day';
+  set('gs-bd-title', (lv === 'month') ? '월별 내역' : (lv === 'day') ? '일별 내역' : '건별 내역');
+
+  /* 되돌아갈 길 — CMS 에 이미 있는 파고들기 띠(rf-drill)를 그대로 쓴다 */
+  var drill = document.getElementById('gs-drill');
+  if (drill) {
+    if (lv === 'month') { drill.style.display = 'none'; }
+    else {
+      drill.style.display = 'flex';
+      set('gs-drill-text', (lv === 'day')
+        ? ('월별 내역 › ' + GSREV_LV.month)
+        : ('월별 내역 › ' + GSREV_LV.month + ' › ' + GSREV_LV.day));
+    }
+  }
+
+  var bdT = document.getElementById('gs-bd-table');
+  var dtT = document.getElementById('gs-dt-table');
+  if (bdT) bdT.style.display = (lv === 'detail') ? 'none' : '';
+  if (dtT) dtT.style.display = (lv === 'detail') ? '' : 'none';
+
+  if (lv === 'detail') {
+    set('gs-bd-sub', rows.length ? (rows.length + '건') : '—');
+    var tb = document.getElementById('gs-dt-tbody');
+    if (!tb) return;
+    if (!rows.length) {
+      tb.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:32px;color:var(--text-3);">해당 날짜에 판매가 없습니다.</td></tr>';
+      return;
+    }
+    rows.sort(function (a, b) { return b.exchanged_at.toMillis() - a.exchanged_at.toMillis(); });
+    tb.innerHTML = rows.map(function (g) {
+      var done = (g.status === 'completed' || g.status === 'issued' || g.status === 'used');
+      var badge = '<span style="background:' + (done ? 'var(--success-soft);color:var(--success)' : 'var(--warning-soft);color:#92400E')
+        + ';padding:3px 8px;border-radius:99px;font-size:11px;font-weight:600;">' + (done ? '사용완료' : '처리중') + '</span>';
+      return '<tr>'
+        + '<td>' + gexTwoLine(ppDt(g.exchanged_at), ppTm(g.exchanged_at)) + '</td>'
+        + '<td class="ordno">' + gexOrderNo(g) + '</td>'
+        + '<td>' + identityCell(g._user || {}, g.user_id) + '</td>'
+        + '<td>' + gexProductName(g) + '</td>'
+        + '<td>' + usedTicketCell(g, false) + '</td>'
+        + '<td>' + gsWon(g).toLocaleString('ko-KR') + '원</td>'
+        + '<td>' + badge + '</td>'
+        + '</tr>';
+    }).join('');
+    return;
+  }
+
+  var keys = Object.keys(buckets).sort().reverse();
+  set('gs-bd-sub', keys.length ? (keys.length + (view === 'day' ? '일' : '개월')) : '—');
   var tbody = document.getElementById('gs-bd-tbody');
   if (!tbody) return;
   if (!keys.length) {
@@ -10206,8 +10319,9 @@ function gsRender() {
   tbody.innerHTML = keys.map(function (k) {
     var b = buckets[k];
     var parts = [{ grade: 'gold', count: b.gold }, { grade: 'silver', count: b.silver }, { grade: 'bronze', count: b.bronze }];
+    var next = (lv === 'month') ? 'day' : 'detail';
     return '<tr>'
-      + '<td>' + ppEsc(b.key) + '</td>'
+      + '<td class="gs-drillable" onclick="gsDrillTo(&quot;' + next + '&quot;,&quot;' + ppEsc(b.key) + '&quot;)">' + ppEsc(b.key) + '</td>'
       + '<td>' + b.cnt.toLocaleString('ko-KR') + '</td>'
       + '<td>' + ticketLines(parts, false) + '</td>'
       + '<td>' + b.won.toLocaleString('ko-KR') + '원</td>'
