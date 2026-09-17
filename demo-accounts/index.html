@@ -106,6 +106,12 @@ tr:hover td{background:var(--surface-2);}
 .sd-result b{color:var(--text);}
 .sd-skip{color:var(--warn,#B45309);}
 .sd-bad{color:var(--danger);}
+/* 티켓 쓰기와 지우기는 Firestore 규칙이 관리자에게만 열어 둔 일이다.
+   이 자리에서 관리자로 로그인하면 그 둘까지 된다. 비밀번호는 저장하지 않는다. */
+.sd-admin{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:14px;padding-top:12px;border-top:1px solid var(--border);}
+.sd-admin .form-input{flex:1;min-width:130px;}
+.sd-adm-st{font-size:11px;color:var(--text-3);}
+.sd-adm-st.on{color:var(--success);}
 .nick-none{font-size:12px;color:var(--text-3);}
 /* 못 쓰는 계정은 계정 ID 옆에 딱지로 붙인다 — 닉네임 칸은 값을 넣는 자리지 설명하는 자리가 아니다 */
 .tag{display:inline-block;white-space:nowrap;padding:2px 7px;border-radius:99px;font-size:10px;font-weight:700;margin-left:6px;vertical-align:middle;}
@@ -325,6 +331,13 @@ textarea.form-input{resize:vertical;min-height:64px;}
           <label class="sd-opt"><input type="radio" name="sd-mode" value="wipe" checked> 비우고 새로</label>
           <label class="sd-opt"><input type="radio" name="sd-mode" value="add"> 더하기</label>
         </div>
+      </div>
+
+      <div class="sd-admin">
+        <input class="form-input" id="sd-adm-id" type="email" placeholder="관리자 이메일" autocomplete="username">
+        <input class="form-input" id="sd-adm-pw" type="password" placeholder="비밀번호" autocomplete="current-password">
+        <button class="btn btn-ghost btn-sm" id="sd-adm-btn">관리자 로그인</button>
+        <span class="sd-adm-st" id="sd-adm-st"></span>
       </div>
 
       <div class="sd-result" id="sd-result" style="display:none"></div>
@@ -984,6 +997,34 @@ window.runSeed = function () {
     var jobs = Promise.resolve();
     var myBuy = 0, myTk = 0, notes = [];
 
+    /* 「비우고 새로」면 먼저 지운다 — 지우기는 관리자만 된다(규칙: delete if isAdmin). */
+    if (wipe) {
+      jobs = jobs.then(function () {
+        return Promise.all([
+          doTicket ? db.collection('user_tickets').where('user_id', '==', uid).get() : Promise.resolve({ docs: [] }),
+          doBuy ? db.collection('gifticon_exchanges').where('user_id', '==', uid).get() : Promise.resolve({ docs: [] })
+        ]).then(function (g) {
+          var docs = g[0].docs.concat(g[1].docs);
+          if (!docs.length) return;
+          var chain = Promise.resolve();
+          for (var i = 0; i < docs.length; i += 400) {
+            (function (chunk) {
+              chain = chain.then(function () {
+                var b = db.batch();
+                chunk.forEach(function (d) { b.delete(d.ref); });
+                return b.commit();
+              });
+            })(docs.slice(i, i + 400));
+          }
+          return chain.then(function () {
+            notes.push(L('기존 ' + docs.length + '건 비움', 'Đã xóa ' + docs.length + ' mục cũ'));
+          }).catch(function (e) {
+            notes.push('<span class="sd-bad">' + L('비우기 실패 — ', 'Xóa thất bại — ') + (e.code || e.message) + '</span>');
+          });
+        });
+      });
+    }
+
     if (doBuy && nBuy > 0) {
       if (buyBlock) {
         notes.push('<span class="sd-skip">' + L('구매 내역 건너뜀 — ', 'Bỏ qua lịch sử mua — ') + buyBlock + '</span>');
@@ -1053,6 +1094,25 @@ window.runSeed = function () {
 };
 
 /* 한 계정만 비우기 — 지우기는 관리자 권한이 필요하다(규칙: delete if isAdmin). */
+/* 관리자로 바꿔 로그인한다 — 티켓 쓰기·지우기가 관리자 전용이라 그것만 풀린다.
+   비밀번호는 어디에도 저장하지 않는다. */
+window.seedAdminLogin = function () {
+  var idEl = document.getElementById('sd-adm-id');
+  var pwEl = document.getElementById('sd-adm-pw');
+  var st = document.getElementById('sd-adm-st');
+  var id = (idEl.value || '').trim(), pw = pwEl.value || '';
+  if (!id || !pw) { st.className = 'sd-adm-st'; st.textContent = L('이메일과 비밀번호를 넣으세요.', 'Hãy nhập email và mật khẩu.'); return; }
+  st.className = 'sd-adm-st'; st.textContent = L('로그인 중…', 'Đang đăng nhập…');
+  firebase.auth().signInWithEmailAndPassword(id, pw).then(function (c) {
+    pwEl.value = '';
+    st.className = 'sd-adm-st on';
+    st.textContent = L('관리자로 로그인됨', 'Đã đăng nhập quản trị') + ' · ' + (c.user.email || '');
+  }).catch(function (e) {
+    st.className = 'sd-adm-st';
+    st.textContent = L('로그인 실패 — ', 'Đăng nhập thất bại — ') + (e.code || e.message);
+  });
+};
+
 window.wipeOne = function (uid) {
   if (!confirm(L('이 계정의 가상 티켓·구매 내역을 지웁니다. 되돌릴 수 없습니다.',
                  'Sẽ xóa vé·lịch sử mua ảo của tài khoản này. Không thể hoàn tác.'))) return;
@@ -1209,6 +1269,7 @@ document.getElementById('btn-seed').addEventListener('click', function () {
 document.getElementById('m-seed-x').addEventListener('click', function () { closeModal('m-seed'); });
 document.getElementById('m-seed-cancel').addEventListener('click', function () { closeModal('m-seed'); });
 document.getElementById('m-seed-run').addEventListener('click', runSeed);
+document.getElementById('sd-adm-btn').addEventListener('click', seedAdminLogin);
 Array.prototype.forEach.call(document.querySelectorAll('input[name="sd-target"]'), function (el) {
   el.addEventListener('change', function () {
     document.getElementById('sd-picks').style.display = (this.value === 'pick') ? 'block' : 'none';
@@ -1254,7 +1315,7 @@ load();
      표는 매번 다시 그려지므로 MutationObserver가 새로 생긴 노드까지 따라간다. -->
 <script>
 (function(){
-  var KO2VI = {"가상 데이터 넣기":"Thêm dữ liệu ảo","대상":"Đối tượng","전체 계정":"Toàn bộ tài khoản","고른 계정만":"Chỉ tài khoản đã chọn","무엇을":"Thêm gì","티켓":"Vé","얼마나":"Bao nhiêu","구매 건수":"Số lượt mua","골드":"Vàng","실버":"Bạc","브론즈":"Đồng","기존 것":"Dữ liệu cũ","비우고 새로":"Xóa rồi thêm mới","더하기":"Thêm vào","넣기":"Thêm","비우기":"Xóa sạch","계정 상세":"Chi tiết tài khoản","보유 티켓":"Vé đang giữ","구매 내역":"Lịch sử mua","불러오지 못했습니다.":"Không tải được.","구매 내역이 없습니다.":"Không có lịch sử mua.",
+  var KO2VI = {"관리자 로그인":"Đăng nhập quản trị","관리자 이메일":"Email quản trị","비밀번호":"Mật khẩu","가상 데이터 넣기":"Thêm dữ liệu ảo","대상":"Đối tượng","전체 계정":"Toàn bộ tài khoản","고른 계정만":"Chỉ tài khoản đã chọn","무엇을":"Thêm gì","티켓":"Vé","얼마나":"Bao nhiêu","구매 건수":"Số lượt mua","골드":"Vàng","실버":"Bạc","브론즈":"Đồng","기존 것":"Dữ liệu cũ","비우고 새로":"Xóa rồi thêm mới","더하기":"Thêm vào","넣기":"Thêm","비우기":"Xóa sạch","계정 상세":"Chi tiết tài khoản","보유 티켓":"Vé đang giữ","구매 내역":"Lịch sử mua","불러오지 못했습니다.":"Không tải được.","구매 내역이 없습니다.":"Không có lịch sử mua.",
   "데모에서 앱을 테스트할 때 가상 데이터를 어느 계정에 넣을지 여기서 확인합니다.": "Nơi xác nhận sẽ đưa dữ liệu giả vào tài khoản nào khi kiểm thử ứng dụng trong bản demo.",
   "+ 계정 추가": "+ Thêm tài khoản",
   "저장이 막혀 있습니다.": "Việc lưu đang bị chặn.",
