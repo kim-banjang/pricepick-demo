@@ -19463,11 +19463,12 @@ function bindKakaoComplete() {
       ppFreshKakaoLoginId(0).then(function(freshId) {
         var payload = { linked_kakao: true, kakao_login_id: freshId, kakao_nickname: randomKakaoNickname() };
         return db.collection('users').doc(uid).set(payload, { merge: true }).then(function() {
-          if (PP.user) {
-            PP.user.linked_kakao = true;
-            PP.user.kakao_login_id = payload.kakao_login_id;
-            PP.user.kakao_nickname = payload.kakao_nickname;
-          }
+          /* PP.user 가 아직 비어 있어도 연동 상태는 바로 켜져야 한다 — 그래야 새로고침
+             없이 기프티샵이 열린다. */
+          PP.user = PP.user || {};
+          PP.user.linked_kakao = true;
+          PP.user.kakao_login_id = payload.kakao_login_id;
+          PP.user.kakao_nickname = payload.kakao_nickname;
           refreshKakaoBannerVisibility();
         });
       }).catch(function(e){ console.error('kakaoLink', e); });
