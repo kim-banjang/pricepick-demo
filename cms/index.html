@@ -7650,6 +7650,14 @@ var fbApp = firebase.initializeApp({
 var auth = firebase.auth();
 var db = firebase.firestore();
 var FS = firebase.firestore;
+/* ── 시험 문서 거르기 ──
+   권한을 살펴보느라 gifticon_exchanges 에 만들어졌다가 지우지 못한 문서가 있다
+   (id 가 zz- 로 시작, 2026-09-17). 구매내역 목록은 exchanged_at 으로 정렬해 조회하므로
+   그 값이 없는 이 문서가 이미 빠지지만, 전건 조회로 세는 자리는 따로 걸러야 「총 N건」과
+   매출·정산 합계가 맞는다.
+   ⚠ 지우는 자리(확인 자국 정리 dmCleanQaTraces)에서는 거르지 않는다 — 거르면 영영 못 지운다. */
+window.ppNotProbe = function (d) { return String((d && d.id) || '').indexOf('zz-') !== 0; };
+
 window.db = db; window.FS = FS; // giSaveImageEdit(더 이른 별도 script 블록)이 참조 — 2026-08-12 발견, 여태 저장 시 "db is not defined"로 조용히 실패하던 버그
 var ADMIN_EMAIL = 'sgkim.mixit@gmail.com';
 var _authed = false;
@@ -7858,7 +7866,7 @@ function loadDashboardStats() {
   /* 기프티콘 판매 수익(마진) */
   db.collection('gifticon_exchanges').get().then(function(snap) {
     var rev = 0;
-    snap.docs.forEach(function(d){ var v=(d.data().count_used||1)*2000; rev += v - Math.round(v*0.8); });
+    snap.docs.filter(window.ppNotProbe).forEach(function(d){ var v=(d.data().count_used||1)*2000; rev += v - Math.round(v*0.8); });
     setKpi('kpi-gifticon-rev', kpiWon(rev));
     window.__ppGifticonRev = rev; recompNet();
   }).catch(function(){});
@@ -8459,7 +8467,8 @@ function loadGifticonExchanges() {
       });
     }).catch(function(e){ console.error('gifticonExchanges', e); });
   db.collection('gifticon_exchanges').get().then(function(s){
-    var el = document.getElementById('gex-count'); if (el) el.textContent = '총 ' + s.size + '건';
+    var el = document.getElementById('gex-count');
+    if (el) el.textContent = '총 ' + s.docs.filter(window.ppNotProbe).length + '건';
   }).catch(function(){});
 }
 window.loadGifticonExchanges = loadGifticonExchanges;
@@ -10283,7 +10292,7 @@ window.gsRevLoad = function () {
     (typeof gipLoadTicketValue === 'function') ? gipLoadTicketValue() : Promise.resolve(),
     (typeof dmFetchUsersByIds === 'function') ? Promise.resolve() : Promise.resolve()
   ]).then(function (res) {
-    GSREV_ROWS = res[0].docs.map(function (d) { return Object.assign({ _id: d.id }, d.data()); });
+    GSREV_ROWS = res[0].docs.filter(window.ppNotProbe).map(function (d) { return Object.assign({ _id: d.id }, d.data()); });
     /* 건별 상세가 회원 칸을 그리려면 users 와 이어야 한다 — 한 번만 읽어 둔다. */
     if (typeof dmFetchUsersByIds === 'function') {
       return dmFetchUsersByIds(GSREV_ROWS.map(function (x) { return x.user_id; })).then(function (map) {
@@ -15349,6 +15358,7 @@ function loadRevenueStats() {
     taLoadTicketValue()   // settings/ticket_value 반영(2026-08-12)
   ]).then(function(res) {
     var pbSnap = res[0], giSnap = res[1], tkSnap = res[2];
+    var giDocs = giSnap.docs.filter(window.ppNotProbe);
     var GRADE_VAL = res[3];
     var byMall = {}, totalGMV = 0, totalCommission = 0, totalSettled = 0;
     var D30 = 30 * 24 * 60 * 60 * 1000;
@@ -15372,7 +15382,7 @@ function loadRevenueStats() {
 
     /* 기프티콘 판매 마진 */
     var giValue=0, giCost=0, giMargin=0;
-    giSnap.docs.forEach(function(doc){ var v=(doc.data().count_used||1)*2000; var c=Math.round(v*0.8); giValue+=v; giCost+=c; giMargin+=(v-c); });
+    giDocs.forEach(function(doc){ var v=(doc.data().count_used||1)*2000; var c=Math.round(v*0.8); giValue+=v; giCost+=c; giMargin+=(v-c); });
 
     /* 티켓 적립 비용(등급별) */
     var tkCost={bronze:0,silver:0,gold:0}, tkCnt={bronze:0,silver:0,gold:0}, ticketCost=0;
@@ -15417,17 +15427,17 @@ function loadRevenueStats() {
     }
 
     var confirmed = pbSnap.docs.filter(function(d){ return d.data().status==='confirmed'; });
-    var revUidSource = confirmed.map(function(d){ return d.data().user_id; }).concat(giSnap.docs.map(function(d){ return d.data().user_id; }));
+    var revUidSource = confirmed.map(function(d){ return d.data().user_id; }).concat(giDocs.map(function(d){ return d.data().user_id; }));
     dmFetchUsersByIds(revUidSource).then(function(userMap) {
 
       /* sec-revenue: 기프티콘 판매 내역 */
-      var revGiItems = giSnap.docs.map(function(doc) {
+      var revGiItems = giDocs.map(function(doc) {
         var d = doc.data();
         var val = (d.count_used||1) * 2000; var cost = Math.round(val * 0.8);
         return Object.assign({ _id: doc.id, _user: userMap[d.user_id], _val: val, _cost: cost, _margin: val-cost }, d);
       });
       REVGI_CTRL.setRows(revGiItems);
-      setTxt('rev-gi-sub', '총 ' + giSnap.size + '건 · 마진 합 ' + ppN(giMargin) + '원');
+      setTxt('rev-gi-sub', '총 ' + giDocs.length + '건 · 마진 합 ' + ppN(giMargin) + '원');
     });
 
     /* sec-revenue stat cards */
@@ -15536,8 +15546,9 @@ window.csvExportClawback = function() {
 
 window.csvExportGifticons = function() {
   db.collection('gifticon_exchanges').get().then(function(snap) {
-    return dmFetchUsersByIds(snap.docs.map(function(doc){ return doc.data().user_id; })).then(function(userMap) {
-      var rows = snap.docs.map(function(doc) {
+    var docs = snap.docs.filter(window.ppNotProbe);
+    return dmFetchUsersByIds(docs.map(function(doc){ return doc.data().user_id; })).then(function(userMap) {
+      var rows = docs.map(function(doc) {
         var d = doc.data();
         return [doc.id, (userMap[d.user_id]||{}).nickname || d.user_id || '', d.gifticon_id||'', d.grade_used||'', d.count_used||1, d.status==='cancelled'?'취소':'사용완료'];
       });
@@ -16806,7 +16817,8 @@ window.dmEditPostbackSave = function() {
 window.dmCleanUnlinkedExchanges = function() {
   var btn = document.getElementById('dm-unlinked-btn');
   if (btn) { btn.disabled = true; btn.textContent = '살펴보는 중…'; }
-  db.collection('gifticon_exchanges').get().then(function(exSnap) {
+  db.collection('gifticon_exchanges').get().then(function(exSnapRaw) {
+    var exSnap = { docs: exSnapRaw.docs.filter(window.ppNotProbe) };
     var uids = Array.from(new Set(exSnap.docs.map(function(d){ return d.data().user_id; }).filter(Boolean)));
     return dmFetchUsersByIds(uids).then(function(userMap) {
       /* 회원 문서가 없거나 linked_kakao가 true가 아니면 미연동으로 본다. */
@@ -16877,7 +16889,7 @@ window.dmFillOrderNo = function() {
   var btn = document.getElementById('dm-ordno-btn');
   if (btn) { btn.disabled = true; btn.textContent = '살펴보는 중…'; }
   db.collection('gifticon_exchanges').get().then(function(snap) {
-    var todo = snap.docs.filter(function(d){ return !d.data().order_no; });
+    var todo = snap.docs.filter(window.ppNotProbe).filter(function(d){ return !d.data().order_no; });
     if (!todo.length) { toast('주문번호가 빈 구매 기록이 없습니다.'); return null; }
     if (!confirm('주문번호가 비어 있는 구매 기록 ' + todo.length + '건에' + NL
       + '발급 API와 같은 형식(PHTRX + 날짜시각 + 꼬리)으로 값을 넣습니다.' + NL + NL
@@ -17014,7 +17026,7 @@ window.dmTidyLegacyProducts = function() {
     db.collection('gifticon_exchanges').get()
   ]).then(function(res) {
     var all = res[0].docs.map(function(d){ return Object.assign({ _id: d.id, _ref: d.ref }, d.data()); });
-    var exDocs = res[1].docs;
+    var exDocs = res[1].docs.filter(window.ppNotProbe);
 
     var ph = all.filter(function(g){ return (g.image_url || '').indexOf(PH) === 0; });
     var legacy = all.filter(function(g){ return (g.image_url || '').indexOf(PH) !== 0; });
