@@ -16301,11 +16301,41 @@ function selectMall(name, domain, dest) {
 
   showScreen(dest);
 
-  // 쿠팡만 실제 경유 이동 시연 (1단계: 알리 등은 시뮬레이션 화면만 유지)
-  if (domain === 'coupang.com' && dest === 'pw-13') {
-    ppOpenCoupang();
+  if (dest === 'pw-13') {
+    // 쿠팡은 직접 제휴라 전용 테스트 API 경유다 — 손대지 않는다.
+    if (domain === 'coupang.com') ppOpenCoupang();
+    else ppOpenAffiliate(domain);
   }
 }
+
+/* 링크프라이스 제휴몰 경유 이동 — API 가 준 click_url 을 그대로 열고 u(매체 이용자 ID)만
+   얹는다. 주소를 직접 조립하지 않는다. 링크가 없는 몰은 열지 않는다(빈 주소 금지).
+   ⚠ 여는 순간 우리 매체 이름으로 클릭이 링크프라이스에 기록된다(김반장 승인 2026-09-22). */
+function ppMallOf(domain) {
+  var list = window.PP_MALLS || [];
+  for (var i = 0; i < list.length; i++) if (list[i].domain === domain) return list[i];
+  return null;
+}
+function ppAffiliateUrl(domain) {
+  var m = ppMallOf(domain);
+  var base = (m && m.clickUrl) || '';
+  if (!base) return '';
+  var uid = (window.ppUserId && window.ppUserId()) || '';
+  if (!uid) return base;
+  try {
+    var u = new URL(base);
+    u.searchParams.set('u', uid);
+    return u.toString();
+  } catch (e) {
+    return base + (base.indexOf('?') >= 0 ? '&' : '?') + 'u=' + encodeURIComponent(uid);
+  }
+}
+function ppOpenAffiliate(domain) {
+  var url = ppAffiliateUrl(domain);
+  if (!url) return;                       /* 링크가 없으면 열지 않는다 */
+  window.open(url, '_blank');
+}
+window.ppAffiliateUrl = ppAffiliateUrl;
 
 function bindNotifItems() {
   var scroll = document.querySelector('#pw-S1 .notif-scroll');
@@ -17965,6 +17995,8 @@ function ppLoadMalls() {
         commPct: rate,
         returnDay: (typeof a.return_day === 'number') ? a.return_day : null,
         payStd: a.commission_payment_standard || '',
+        /* 링크프라이스가 내려준 기본링크 그대로. 우리가 조립하지 않는다. */
+        clickUrl: a.click_url || '',
         notice: ppOfferwallClean(a.notice),
         denyProduct: ppOfferwallClean(a.deny_product)
       });
@@ -18089,6 +18121,15 @@ function ppFillMallDetail(domain) {
   if (t2) t2.textContent = '24시간 이내 구매';
   if (d2) d2.textContent = '접속 후 24시간 안에 구매분만 적립 대상이에요.';
   if (noteBox) { noteBox.style.display = 'none'; noteBox.innerHTML = ''; }
+
+  /* 제휴링크가 없으면 갈 곳이 없다 — 바로가기를 잠근다. 빈 주소로 열지 않는다. */
+  var cta = document.getElementById('mall12-cta');
+  if (cta) {
+    var goable = isCoupang || !!(m && m.clickUrl);
+    cta.disabled = !goable;
+    cta.style.opacity = goable ? '' : '.45';
+    cta.style.cursor = goable ? '' : 'not-allowed';
+  }
 
   /* 홈 화면 추가 카드 — 몰 로고와 추가 여부를 이 몰 기준으로 다시 그린다. */
   if (typeof window.cpkPaintCard === 'function') window.cpkPaintCard();
@@ -18238,6 +18279,10 @@ function performWithdraw() {
   });
 }
 window.ppPerformWithdraw = performWithdraw;
+/* 제휴링크의 u(매체 이용자 ID)에 실을 값. 데모의 이용자는 파이어베이스 익명 계정이고
+   그 uid 가 포인트·티켓을 붙이는 기준이라 그대로 쓴다. 아직 계정이 잡히기 전이면
+   지어내지 않고 데모용 고정값을 쓴다. */
+window.ppUserId = function () { return (PP && PP.uid) || 'ppdemo-guest'; };
 
 function greedyTickets(amount) {
   var units = Math.floor(amount / 5000);
