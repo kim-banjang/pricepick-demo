@@ -17669,11 +17669,6 @@ function ppMallDomain(url) {
   u = u.replace(/^https?:\/\//i, '').replace(/^www\./i, '');
   return u.split(/[\/?#]/)[0];
 }
-/* "2.1%" · "3.5% 또는 700원" · "" → 2.1 / 3.5 / 0 */
-function ppPctOf(v) {
-  var m = String(v == null ? '' : v).match(/([\d.]+)\s*%/);
-  return m ? parseFloat(m[1]) : 0;
-}
 function ppMallAbbr(name) {
   var t = String(name || '').trim();
   return t ? t.slice(0, 2) : '?';
@@ -17692,7 +17687,7 @@ function ppLoadMalls() {
     var acc = (res[0].exists && res[0].data()) || {};
     var applied = acc.applied || {};
     var logos = acc.logos || {};
-    var fees = acc.fees || {};
+    var rates = acc.rates || {};   /* 사용자에게 돌려주는 적립률 — 화면에 찍는 값은 이것이다 */
     var live = ((res[1].exists && res[1].data()) || {}).merchants || {};
     var seed = (res[3] || {}).merchants || {};
     if (!Object.keys(live).length) live = seed;
@@ -17708,13 +17703,16 @@ function ppLoadMalls() {
       var a = live[id] || {};
       var c = cat[id] || {};
       var name = a.merchant_name || c['머천트명'] || id;
+      /* ⚠ max_commission_mobile 은 링크프라이스가 우리에게 주는 수수료다. 사용자가 받는
+         값이 아니므로 화면에는 쓰지 않는다 — 적립률(rates)이 사용자 몫이다(확정 2026-09-22). */
+      var rate = (typeof rates[code] === 'number') ? rates[code] : 0;
       list.push({
         code: code,
         name: name,
         domain: ppMallDomain(a.merchant_url || c['사이트 URL']) || id,
         logo: logos[code] || '',
-        comm: a.max_commission_mobile || '',
-        commPct: ppPctOf(a.max_commission_mobile),
+        comm: rate > 0 ? (rate + '%') : '',
+        commPct: rate,
         returnDay: (typeof a.return_day === 'number') ? a.return_day : null,
         notice: ppOfferwallClean(a.notice),
         denyProduct: ppOfferwallClean(a.deny_product)
@@ -17723,12 +17721,12 @@ function ppLoadMalls() {
     /* 적립률 내림차순 — 같으면 이름순 */
     list.sort(function (x, y) { return (y.commPct - x.commPct) || x.name.localeCompare(y.name, 'ko'); });
 
-    var cf = fees[PP_COUPANG_CODE];
+    var cr = rates[PP_COUPANG_CODE];
     var head = {
       code: PP_COUPANG_CODE, name: PP_COUPANG.name, domain: PP_COUPANG.domain,
       logo: logos[PP_COUPANG_CODE] || '',
-      comm: (typeof cf === 'number' && cf > 0) ? (cf + '%') : '',
-      commPct: (typeof cf === 'number') ? cf : 0,
+      comm: (typeof cr === 'number' && cr > 0) ? (cr + '%') : '',
+      commPct: (typeof cr === 'number') ? cr : 0,
       returnDay: null, notice: '', denyProduct: '', isCoupang: true
     };
     PP_MALLS = [head].concat(list);
@@ -17762,11 +17760,13 @@ function ppRenderMallList() {
   }).join('');
 }
 
-/* 홈 「구매하고 티켓받기」 — 적용된 몰 수만큼 그린다 */
+/* 홈 「구매하고 티켓받기」 — 홈은 요약 자리다. 상위 다섯만 두고 나머지는 「전체 ›」로 넘긴다
+   (적용 몰을 전부 그리면 홈이 몰 목록으로 도배된다, 김반장 확정 2026-09-22). */
+var PP_HOME_MALL_MAX = 5;
 function ppRenderHomeMalls() {
   var box = document.getElementById('pp-home-mall-list');
   if (!box || !PP_MALLS || !PP_MALLS.length) return;
-  box.innerHTML = PP_MALLS.map(function (m, i) {
+  box.innerHTML = PP_MALLS.slice(0, PP_HOME_MALL_MAX).map(function (m, i) {
     var nm = ppEscAttr(m.name), dm = ppEscAttr(m.domain);
     var best = (i === 0);
     return '<div class="home-mall-card' + (best ? ' best' : '') + '">'
