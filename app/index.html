@@ -17766,12 +17766,16 @@ function ppRenderHomeMalls() {
   box.innerHTML = PP_MALLS.slice(0, PP_HOME_MALL_MAX).map(function (m, i) {
     var nm = ppEscAttr(m.name), dm = ppEscAttr(m.domain);
     var best = (i === 0);
-    return '<div class="home-mall-card' + (best ? ' best' : '') + '">'
+    /* 카드를 누르면 적립 안내(pw-12), 「바로가기」 단추만 이동 화면(pw-13).
+       목록 화면(pw-11)이 로고·이름을 눌러 pw-12 로 가는 것과 같은 방식이다.
+       단추는 전파를 끊어 카드 동작이 같이 돌지 않게 한다. */
+    return '<div class="home-mall-card' + (best ? ' best' : '') + '" style="cursor:pointer"'
+      + ' onclick="selectMall(\'' + nm + '\',\'' + dm + '\',\'pw-12\')">'
       + '<div class="hmc-logo" data-logo-code="' + ppEscAttr(m.code) + '">' + ppMallLogoHtml(m) + '</div>'
       + '<div class="hmc-body"><div class="hmc-row1"><span class="hmc-name">' + ppEsc(m.name) + '</span>'
       +   (best ? '<span class="hmc-badge best">BEST</span>' : '') + '</div>'
       + '<div class="hmc-desc">' + (m.comm ? ('<span>최대 적립률</span> <b>' + ppEsc(m.comm) + '</b>') : '') + '</div></div>'
-      + '<button class="hmc-go' + (best ? ' primary' : '') + '" onclick="selectMall(\'' + nm + '\',\'' + dm + '\',\'pw-13\')">바로가기 ›</button>'
+      + '<button class="hmc-go' + (best ? ' primary' : '') + '" onclick="event.stopPropagation();selectMall(\'' + nm + '\',\'' + dm + '\',\'pw-13\')">바로가기 ›</button>'
       + '</div>';
   }).join('');
 }
