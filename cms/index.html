@@ -295,6 +295,11 @@ tr:hover td{background:var(--surface-2);}
 .ta-notice-list .k{display:block;font-weight:700;color:var(--text);margin-bottom:2px;}
 /* 수수료·적립률·수익은 줄바꿈되면 값이 잘려 보인다 */
 #sec-ticket-accrual #ta-tbody-secondary td{white-space:nowrap;}
+/* 숫자 칸이 좁으면 값이 잘린다 — 칸 여백을 줄이고 입력칸에 최소 폭을 준다
+   (수수료 7번째·적립률 8번째 칸) */
+#sec-ticket-accrual #ta-tbody-secondary td:nth-child(7),
+#sec-ticket-accrual #ta-tbody-secondary td:nth-child(8){padding-left:8px;padding-right:8px;}
+#sec-ticket-accrual .ta-fee,#sec-ticket-accrual .ta-rate{min-width:64px;}
 #sec-ticket-accrual .ta-days-fixed{display:inline-block;font-size:12px;font-weight:700;line-height:1.45;
   color:var(--text-2);background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r-sm);padding:5px 9px;}
 #sec-ticket-accrual .ta-rate{height:36px;padding:6px 10px;}
@@ -315,14 +320,16 @@ tr:hover td{background:var(--surface-2);}
    표시해야 하는데 CMS에 그 데이터가 없었다. 구글 파비콘 서비스는 안 쓰고, 로고
    파일(김반장 제공)의 URL을 여기서 등록한다. 저장은 그 구획 저장 버튼을 눌러야
    반영된다 — 수수료·적립률과 같은 "저장 전 변경" 취급(즉시 Firestore 쓰기 아님). */
-#sec-ticket-accrual .ta-logo-cell{display:flex;align-items:center;justify-content:center;gap:6px;}
+#sec-ticket-accrual .ta-logo-cell{display:inline-flex;align-items:center;justify-content:center;
+  background:none;border:none;padding:3px;margin:0 auto;border-radius:50%;cursor:pointer;
+  transition:box-shadow .12s,transform .12s;}
+#sec-ticket-accrual .ta-logo-cell:hover{box-shadow:0 0 0 2px var(--main-soft);transform:scale(1.06);}
+#sec-ticket-accrual .ta-logo-cell:focus-visible{outline:2px solid var(--main);outline-offset:1px;}
 #sec-ticket-accrual .ta-logo-thumb{width:26px;height:26px;border-radius:50%;object-fit:cover;
   background:var(--surface-2);border:1px solid var(--border);display:block;flex:none;}
 #sec-ticket-accrual .ta-logo-fallback{width:26px;height:26px;border-radius:50%;background:var(--main-soft);
   color:var(--main-hover);font-size:11px;font-weight:800;display:flex;align-items:center;
   justify-content:center;flex:none;}
-#sec-ticket-accrual .ta-logo-edit-btn{font-size:11px;color:var(--main-hover);font-weight:700;
-  cursor:pointer;background:none;border:none;padding:0;white-space:nowrap;}
 #sec-ticket-accrual .ta-logo-thumb.ta-changed,#sec-ticket-accrual .ta-logo-fallback.ta-changed{
   box-shadow:0 0 0 2px var(--warning);}
 #m-ta-logo .ta-logo-preview-row{display:flex;align-items:center;gap:14px;margin-bottom:14px;}
@@ -1924,9 +1931,9 @@ window.CMS_FEATURES = {
         <table id="ta-table-primary">
           <thead>
             <tr>
-              <th style="width:9%">로고</th>
+              <th style="width:6%">로고</th>
               <th style="width:14%">제휴몰</th>
-              <th style="width:12%">수수료</th>
+              <th style="width:15%">수수료</th>
               <th style="width:13%">적립률</th>
               <th style="width:11%">수익</th>
               <th style="width:14%">전환 대기일 수</th>
@@ -2008,12 +2015,12 @@ window.CMS_FEATURES = {
             <thead>
               <tr>
                 <th class="ta-select-col" style="width:4%"><input type="checkbox" id="ta-select-all" onchange="taToggleSelectAll(this.checked)" title="보이는 몰 전체 선택"></th>
-                <th style="width:5%">로고</th>
+                <th style="width:4%">로고</th>
                 <th style="width:11%">제휴몰</th>
                 <th style="width:10%">링크프라이스 승인 상태</th>
                 <th class="ta-tight" style="width:8%">커미션(모바일)</th>
                 <th class="ta-tight" style="width:8%">앱(AOS·iOS)</th>
-                <th style="width:9%">수수료</th>
+                <th style="width:10%">수수료</th>
                 <th style="width:10%">적립률</th>
                 <th style="width:8%">수익</th>
                 <th style="width:10%">등급 전환 시점</th>
@@ -7320,6 +7327,7 @@ Object.assign(KO2VI,{
   "실적인정범위":"Phạm vi công nhận thực tích","더보기":"Xem thêm","지급 일정":"Lịch chi trả",
   "수기":"Thủ công","자동 갱신":"Tự động cập nhật","저장본":"Bản lưu","둘 다(A)":"Cả hai (A)",
   "링크프라이스 업데이트":"Cập nhật Linkprice","로고":"Logo",
+  "로고 변경":"Đổi logo","로고 등록":"Đăng ký logo",
   "링크프라이스 광고주 조회 오픈 API":"API tra cứu nhà quảng cáo Linkprice","수기 항목":"Mục thủ công",
   "링크프라이스 Affiliate Center 화면":"Màn hình Linkprice Affiliate Center","불러오는 중…":"Đang tải…","링크프라이스 조회 중…":"Đang truy vấn Linkprice…",
   "링크프라이스 광고주 조회 API 를 지금 불러 제휴몰 정보를 갱신합니다.":"Gọi ngay API tra cứu nhà quảng cáo Linkprice để cập nhật thông tin cửa hàng.",
@@ -13383,12 +13391,15 @@ function taLogoCellHtml(code, name) {
   var orig = TA_ORIGINAL[code] ? (TA_ORIGINAL[code].logo || '') : '';
   var changed = url !== orig;
   var initial = taEsc((String(name || '?').trim().charAt(0) || '?').toUpperCase());
-  return '<div class="ta-logo-cell" id="ta-logo-cell-' + code + '">'
+  /* 로고 그림을 그대로 누르면 등록·변경 모달이 열린다(2026-09-22 김반장 지시).
+     로고가 없는 몰은 빈칸으로 두지 않고 몰 이름 첫 글자 동그라미를 같은 크기로 그려
+     그것이 누르는 자리가 된다 — 예전 「등록」 글자가 하던 몫이다. */
+  return '<button type="button" class="ta-logo-cell" id="ta-logo-cell-' + code + '"'
+    +   ' onclick="taOpenLogoModal(\'' + code + '\')" title="' + (url ? '로고 변경' : '로고 등록') + '">'
     + '<img class="ta-logo-thumb' + (changed ? ' ta-changed' : '') + '" id="ta-logo-thumb-' + code + '" src="' + taEsc(url) + '" alt=""'
     +   ' style="' + (url ? '' : 'display:none') + '" onerror="this.style.display=\'none\';var f=document.getElementById(\'ta-logo-fallback-' + code + '\');if(f)f.style.display=\'flex\';">'
     + '<span class="ta-logo-fallback' + (changed ? ' ta-changed' : '') + '" id="ta-logo-fallback-' + code + '" style="' + (url ? 'display:none' : '') + '">' + initial + '</span>'
-    + '<button type="button" class="ta-logo-edit-btn" onclick="taOpenLogoModal(\'' + code + '\')">' + (url ? '변경' : '등록') + '</button>'
-    + '</div>';
+    + '</button>';
 }
 
 // 링크프라이스 상태 4종 → 기존 배지 색 토큰 재사용(새 색 안 만듦)
