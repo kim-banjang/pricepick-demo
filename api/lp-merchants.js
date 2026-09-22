@@ -21,6 +21,13 @@ const DOC_PATH = ['settings', 'linkprice_merchants'];
 const MIN_COUNT = 1;
 const MIN_RATIO = 0.5;
 
+/* 연타 방지 — 화면 비활성만으로는 부족하다. 링크프라이스는 과다 호출 시 사전 안내 없이
+   차단한다. 마지막 수집이 이 간격 안이면 부르지 않고 남은 시간을 돌려준다.
+   자동 갱신은 하루 1회라 이 간격에 걸리지 않는다. */
+const COOLDOWN_MS = 10 * 60 * 1000;
+/* 자격증명이 없어 Firestore 에 시각이 안 남을 때를 위한 같은 인스턴스 안의 최소 방어 */
+let lastFetchedAtMs = 0;
+
 function db() {
   const raw = process.env.FIREBASE_SERVICE_ACCOUNT;
   if (!raw) return null;
@@ -37,13 +44,28 @@ module.exports = async function handler(req, res) {
   const ref = store ? store.collection(DOC_PATH[0]).doc(DOC_PATH[1]) : null;
 
   let prevCount = 0;
+  let prevFetchedMs = lastFetchedAtMs;
   if (ref) {
     try {
       const snap = await ref.get();
-      if (snap.exists) prevCount = Number(snap.data().count) || 0;
+      if (snap.exists) {
+        const d = snap.data();
+        prevCount = Number(d.count) || 0;
+        const t = Date.parse(d.fetched_at || '');
+        if (!isNaN(t)) prevFetchedMs = Math.max(prevFetchedMs, t);
+      }
     } catch (e) {
       // 이전 값을 못 읽어도 수집은 계속한다 — 검사 기준만 0 이 된다.
     }
+  }
+
+  const sinceMs = prevFetchedMs ? (Date.now() - prevFetchedMs) : Infinity;
+  if (sinceMs < COOLDOWN_MS) {
+    return res.status(429).json({
+      ok: false, skipped: true, reason: 'cooldown',
+      retry_after_sec: Math.ceil((COOLDOWN_MS - sinceMs) / 1000),
+      count: prevCount, fetched_at: new Date(prevFetchedMs).toISOString(),
+    });
   }
 
   let list;
@@ -79,12 +101,14 @@ module.exports = async function handler(req, res) {
   });
 
   if (!ref) {
+    lastFetchedAtMs = Date.parse(startedAt);
     return res.status(200).json({
       ok: false, skipped: true, reason: 'no_credentials',
       count: count, checked_at: startedAt,
     });
   }
 
+  lastFetchedAtMs = Date.parse(startedAt);
   try {
     await ref.set({
       source: 'linkprice-open-api',

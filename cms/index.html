@@ -299,6 +299,9 @@ tr:hover td{background:var(--surface-2);}
 /* 저장 전 변경 표시 — 기존 warning 토큰 그대로 재사용(새 색 안 만듦) */
 #sec-ticket-accrual .ta-fee.ta-changed,#sec-ticket-accrual .ta-rate.ta-changed{
   border-color:var(--warning)!important;background:var(--warning-soft)!important;}
+#sec-ticket-accrual .ta-lp-msg{font-size:11.5px;color:var(--text-3);}
+#sec-ticket-accrual .ta-lp-msg.ok{color:var(--success);}
+#sec-ticket-accrual .ta-lp-msg.bad{color:var(--danger);}
 #sec-ticket-accrual .ta-dirty-banner{display:none;background:var(--warning-soft);
   border:1px solid var(--warning);border-radius:var(--r-md);padding:10px 16px;
   font-size:12px;color:var(--warning);margin-bottom:14px;font-weight:700;}
@@ -1983,6 +1986,10 @@ window.CMS_FEATURES = {
               <button class="btn btn-ghost btn-sm" id="ta-bulk-off-btn" onclick="taBulkSetApplied(false)">미적용으로</button>
               <button class="btn btn-ghost btn-sm" onclick="taToggleSelectMode()">취소</button>
             </span>
+            <span style="width:1px;height:22px;background:var(--border)"></span>
+            <button class="btn btn-ghost btn-sm" id="ta-lp-refresh-btn" onclick="taLpRefresh()"
+              title="링크프라이스 광고주 조회 API 를 지금 불러 제휴몰 정보를 갱신합니다.">링크프라이스 업데이트</button>
+            <span id="ta-lp-refresh-msg" class="ta-lp-msg"></span>
             <span style="width:1px;height:22px;background:var(--border)"></span>
             <button class="btn btn-ghost btn-sm" onclick="taOpenAddMall()">제휴몰 추가</button>
             <span style="width:1px;height:22px;background:var(--border)"></span>
@@ -7309,6 +7316,10 @@ Object.assign(KO2VI,{
   "광고효과인정기간":"Thời hạn công nhận hiệu quả quảng cáo",
   "실적인정범위":"Phạm vi công nhận thực tích","더보기":"Xem thêm","지급 일정":"Lịch chi trả",
   "수기":"Thủ công","자동 갱신":"Tự động cập nhật","저장본":"Bản lưu","둘 다(A)":"Cả hai (A)",
+  "링크프라이스 업데이트":"Cập nhật Linkprice","불러오는 중…":"Đang tải…","링크프라이스 조회 중…":"Đang truy vấn Linkprice…",
+  "링크프라이스 광고주 조회 API 를 지금 불러 제휴몰 정보를 갱신합니다.":"Gọi ngay API tra cứu nhà quảng cáo Linkprice để cập nhật thông tin cửa hàng.",
+  "제휴몰 갱신 실패 — 기존 자료를 그대로 씁니다.":"Cập nhật cửa hàng thất bại — vẫn dùng dữ liệu cũ.",
+  "서버에 Firestore 자격증명이 없어 저장하지 못했습니다":"Máy chủ không có thông tin xác thực Firestore nên không lưu được",
   "마지막 갱신":"Cập nhật lần cuối","수기 항목 기준일":"Ngày chuẩn mục thủ công",
   "제휴몰 정보 마지막 갱신":"Cập nhật thông tin cửa hàng lần cuối",
   "딥링크 허용 여부":"Cho phép deeplink","광고주 소개":"Giới thiệu nhà quảng cáo",
@@ -13389,6 +13400,11 @@ function taStatusBadgeClass(status) {
 var TA_STATUS_VALUES = ['승인', '승인대기', '거부', '미신청'];
 /* subscript — APR 승인 완료 · DEN 승인 거부 · REQ 광고주에게 승인 요청 상태 */
 var TA_SUBSCRIPT_KO = { APR: '승인', DEN: '거부', REQ: '승인대기' };
+/* 커미션은 "2%"·"3.5% 또는 700원"·"" 같은 문자열이다. 수수료 기본값으로 쓸 %만 뽑는다. */
+function taPctOf(v) {
+  var m = String(v == null ? '' : v).match(/([\d.]+)\s*%/);
+  return m ? parseFloat(m[1]) : 0;
+}
 function taApiRec(rawId) { return (TA_DETAIL && TA_DETAIL.merchants) ? TA_DETAIL.merchants[rawId] : null; }
 /* 링크프라이스 승인 상태는 링크프라이스가 정해 내려주는 값이다 — 우리가 고치는 값이
    아니므로 읽기 전용 배지로만 보여 준다(김반장 확정 2026-09-22). 저장 대상에서도 뺀다.
@@ -13563,11 +13579,39 @@ window.taLoad = function() {
     // 적용, 나머지(승인대기·거부·미신청)는 미적용 — 링크프라이스 승인이 나도 우리가
     // 실제로 안 붙일 수 있다.
     var catalog = catalogDoc.merchants || [];
-    TA_CATALOG = catalog;   // taOpenMerchantInfo(상세정보 모달)도 같은 배열을 쓴다
     // 'lp:' 네임스페이스 — 링크프라이스 원본에 머천트ID가 그대로 "coupang"인 항목이
     // 있다(대표와는 별개의, 링크프라이스 경유 제휴 건). 대표는 위에서 'coupang_direct'
     // 를 쓰므로 이미 안 겹치지만, 카탈로그 쪽도 항상 'lp:' 를 붙여 이중으로 분리해둔다.
-    var secondaryAll = catalog.map(function(x) {
+    /* 링크프라이스가 새로 승인한 몰은 카탈로그(2026-08-11 엑셀)에 없다. 자동 갱신본에만
+       있는 몰도 목록에 올린다 — 그래야 몰 추가가 다음날 반영된다.
+       빠진 몰은 자동으로 지우지 않는다: apr·cps 조회라 다른 사유로도 응답에서 빠질 수 있다. */
+    var catalogAll = catalog.slice();
+    var inCatalog = {};
+    catalog.forEach(function(x) { inCatalog[x['머천트ID']] = 1; });
+    var apiMs = (TA_DETAIL && TA_DETAIL.merchants) || {};
+    Object.keys(apiMs).forEach(function(id) {
+      if (inCatalog[id]) return;
+      var a = apiMs[id];
+      catalogAll.push({
+        '머천트ID': id,
+        '머천트명': a.merchant_name || id,
+        '카테고리': a.category_name || '',
+        '승인 상태': TA_SUBSCRIPT_KO[a.subscript] || '미신청',
+        '최저커미션': taPctOf(a.max_commission_mobile),
+        'PC웹 지원 여부': a.pc_yn || '',
+        '모바일 웹 지원 여부': a.mobile_yn || '',
+        'APP(AOS) 지원 여부': a.app_android_yn || '',
+        'APP(IOS) 지원 여부': a.app_ios_yn || '',
+        '기본링크': a.click_url || '',
+        '사이트 URL': a.merchant_url || '',
+        '리워드 가능 여부': a.reward_yn || '',
+        '커미션목록': [],
+      });
+    });
+    TA_CATALOG = catalogAll;   // 상세정보 모달도 이 배열을 쓴다
+    LP_BY_CODE = null;
+
+    var secondaryAll = catalogAll.map(function(x) {
       var rawId = x['머천트ID'];
       var code = 'lp:' + rawId;
       var defaultFee = taFmt(typeof x['최저커미션'] === 'number' ? x['최저커미션'] : 0);
@@ -14019,6 +14063,87 @@ function taDetailLoad() {
       });
   });
 }
+/* 「링크프라이스 업데이트」 — 자동 갱신(Vercel Cron)과 같은 자리를 부른다. 두 벌로 만들지 않는다.
+   ⚠ 링크프라이스에서 오는 값만 다시 그린다. 수수료·적립률·전환 대기일 수·적용 토글은
+   화면에서 편집 중일 수 있으므로 손대지 않는다(taLoad 를 다시 부르면 그 값이 지워진다). */
+window.taLpRefresh = function() {
+  var btn = document.getElementById('ta-lp-refresh-btn');
+  var msg = document.getElementById('ta-lp-refresh-msg');
+  var say = function(t, cls) { if (msg) { msg.className = 'ta-lp-msg' + (cls ? ' ' + cls : ''); msg.textContent = t; } };
+  if (btn) { btn.disabled = true; btn.textContent = '불러오는 중…'; }
+  say('링크프라이스 조회 중…');
+
+  var done = function() { if (btn) { btn.disabled = false; btn.textContent = '링크프라이스 업데이트'; } };
+
+  fetch('/api/lp-merchants', { cache: 'no-store' })
+    .then(function(r) {
+      /* 서버리스 함수가 없는 곳(로컬 정적 서버 등)에서는 HTML 이 돌아온다 — 파서 오류를
+         그대로 내보내지 않고 상태 코드로 적는다. */
+      return r.text().then(function(t) {
+        var j; try { j = JSON.parse(t); } catch (e) { j = { ok: false, reason: 'bad_response' }; }
+        return { status: r.status, body: j };
+      });
+    })
+    .then(function(r) {
+      var b = r.body || {};
+      if (!b.ok) {
+        var why = b.reason === 'cooldown'
+            ? ('너무 잦은 호출 — ' + (b.retry_after_sec || 0) + '초 뒤에 다시 누르세요')
+          : b.reason === 'no_credentials' ? '서버에 Firestore 자격증명이 없어 저장하지 못했습니다'
+          : b.reason === 'suspicious_count' ? ('응답 ' + b.count + '건 — 직전 ' + b.prev_count + '건보다 크게 줄어 갱신을 건너뛰었습니다')
+          : b.reason === 'fetch_failed' ? ('링크프라이스 조회 실패 — ' + (b.message || ''))
+          : b.reason === 'write_failed' ? ('저장 실패 — ' + (b.message || ''))
+          : b.reason === 'bad_response' ? ('서버 응답을 읽지 못했습니다 (HTTP ' + r.status + ')')
+          : ('갱신 실패 — ' + (b.reason || r.status));
+        say(why, 'bad');
+        toast('제휴몰 갱신 실패 — 기존 자료를 그대로 씁니다.');
+        return;
+      }
+      return taLpReread().then(function(count) {
+        var when = (TA_DETAIL && TA_DETAIL._meta) ? taWhen(TA_DETAIL._meta.fetched_at) : taWhen(b.fetched_at);
+        say((count || b.count) + '건 갱신 · ' + when, 'ok');
+        toast('제휴몰 ' + (count || b.count) + '건을 갱신했습니다.');
+      });
+    })
+    .catch(function(e) {
+      console.error('taLpRefresh', e);
+      say('갱신 실패 — ' + (e.message || e), 'bad');
+      toast('제휴몰 갱신 실패 — 기존 자료를 그대로 씁니다.');
+    })
+    .finally(done);
+};
+
+/* 갱신본을 다시 읽어 링크프라이스에서 오는 칸만 제자리에서 고친다. */
+function taLpReread() {
+  return db.collection('settings').doc('linkprice_merchants').get().then(function(doc) {
+    var d = doc.exists && doc.data();
+    var ms = d && d.merchants;
+    if (!ms || !Object.keys(ms).length) return 0;
+    TA_DETAIL = { _meta: { source: d.source, fetched_at: d.fetched_at, count: d.count, live: true }, merchants: ms };
+    LP_BY_CODE = null;
+    var rows = document.querySelectorAll('#ta-tbody-secondary tr[data-code]');
+    Array.prototype.forEach.call(rows, function(tr) {
+      var code = tr.dataset.code;
+      var api = taApiOf(code);
+      if (!api) return;
+      var st = TA_SUBSCRIPT_KO[api.subscript];
+      if (st) { TA_APPROVAL[code] = st; if (tr.cells[3]) tr.cells[3].innerHTML = taStatusBadgeHtml(code, st); }
+      if (tr.cells[4]) tr.cells[4].textContent = api.max_commission_mobile || '—';
+      if (tr.cells[5]) {
+        tr.cells[5].innerHTML = '<span class="ta-appcell ' + (api.app_android_yn === 'Y' ? 'yes' : 'no') + '">AOS ' + taEsc(api.app_android_yn || '—') + '</span>'
+          + '&nbsp;·&nbsp;<span class="ta-appcell ' + (api.app_ios_yn === 'Y' ? 'yes' : 'no') + '">iOS ' + taEsc(api.app_ios_yn || '—') + '</span>';
+      }
+    });
+    taApplyFilters();
+    var st2 = document.getElementById('ta-status');
+    if (st2) {
+      var txt = st2.innerHTML.split(' · <span>제휴몰 정보 마지막 갱신</span> ')[0];
+      st2.innerHTML = txt + ' · <span>제휴몰 정보 마지막 갱신</span> ' + taWhen(d.fetched_at);
+    }
+    return Number(d.count) || Object.keys(ms).length;
+  });
+}
+
 /* 2026-09-22 03:36:00Z → 2026-09-22 12:36 */
 function taWhen(iso) {
   if (!iso) return '—';
