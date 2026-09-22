@@ -23,24 +23,66 @@ const MIN_RATIO = 0.5;
 
 /* 연타 방지 — 화면 비활성만으로는 부족하다. 링크프라이스는 과다 호출 시 사전 안내 없이
    차단한다. 마지막 수집이 이 간격 안이면 부르지 않고 남은 시간을 돌려준다.
-   자동 갱신은 하루 1회라 이 간격에 걸리지 않는다. */
-const COOLDOWN_MS = 10 * 60 * 1000;
+   1분 — 연타는 막되 확인하려 누를 때 기다리지 않는 선이다(김반장 확정 2026-09-22,
+   10분이라 확인 중에 막히셨다). 자동 갱신은 하루 1회라 이 간격에 걸리지 않는다. */
+const COOLDOWN_MS = 60 * 1000;
 /* 자격증명이 없어 Firestore 에 시각이 안 남을 때를 위한 같은 인스턴스 안의 최소 방어 */
 let lastFetchedAtMs = 0;
 
-function db() {
-  const raw = process.env.FIREBASE_SERVICE_ACCOUNT;
-  if (!raw) return null;
+/* 서버 쪽 Firestore 접속 자격증명.
+   저장소의 scripts/*.js 는 개발자 PC 의 firebase-tools 로그인(configstore)을 읽어 쓰는데
+   그것은 이 PC 에만 있는 값이라 Vercel 에서는 못 쓴다. CMS 화면은 클라이언트 SDK 로
+   접속하므로 서버 쪽 접속은 이 함수가 처음이다 — 물려쓸 기존 환경변수가 없다.
+   이름을 하나로 못 박지 않고 흔히 쓰는 몇 가지를 다 받는다. 값은 서비스 계정 JSON
+   전문이거나 그것을 base64 로 감싼 것이면 된다. */
+const CRED_VARS = ['FIREBASE_SERVICE_ACCOUNT', 'FIREBASE_SERVICE_ACCOUNT_KEY',
+  'GOOGLE_SERVICE_ACCOUNT_JSON', 'GOOGLE_APPLICATION_CREDENTIALS_JSON'];
+
+function credRaw() {
+  for (let i = 0; i < CRED_VARS.length; i++) {
+    const v = process.env[CRED_VARS[i]];
+    if (v && String(v).trim()) return { name: CRED_VARS[i], value: String(v).trim() };
+  }
+  return null;
+}
+
+function parseCred(value) {
+  const text = value.charAt(0) === '{' ? value : Buffer.from(value, 'base64').toString('utf8');
+  return JSON.parse(text);
+}
+
+function db(found) {
+  if (!found) return null;
   const admin = require('firebase-admin');
   if (!admin.apps.length) {
-    admin.initializeApp({ credential: admin.credential.cert(JSON.parse(raw)) });
+    admin.initializeApp({ credential: admin.credential.cert(parseCred(found.value)) });
   }
   return admin.firestore();
 }
 
 module.exports = async function handler(req, res) {
   const startedAt = new Date().toISOString();
-  const store = db();
+  const found = credRaw();
+
+  /* ?check=1 — 링크프라이스를 부르지 않고 자격증명 상태만 본다.
+     상태를 보려고 외부 호출을 일으키지 않기 위한 자리다. */
+  if (req && req.query && req.query.check) {
+    let ok = false, why = null;
+    if (found) { try { parseCred(found.value); ok = true; } catch (e) { why = String((e && e.message) || e); } }
+    return res.status(200).json({
+      mode: 'check', credential: found ? found.name : null, parsed: ok, parse_error: why,
+      accepted_env: CRED_VARS, cooldown_sec: COOLDOWN_MS / 1000, checked_at: startedAt,
+    });
+  }
+
+  let store = null;
+  try { store = db(found); }
+  catch (e) {
+    return res.status(500).json({
+      ok: false, skipped: true, reason: 'bad_credentials',
+      credential: found ? found.name : null, message: String((e && e.message) || e), checked_at: startedAt,
+    });
+  }
   const ref = store ? store.collection(DOC_PATH[0]).doc(DOC_PATH[1]) : null;
 
   let prevCount = 0;
@@ -104,7 +146,7 @@ module.exports = async function handler(req, res) {
     lastFetchedAtMs = Date.parse(startedAt);
     return res.status(200).json({
       ok: false, skipped: true, reason: 'no_credentials',
-      count: count, checked_at: startedAt,
+      accepted_env: CRED_VARS, count: count, checked_at: startedAt,
     });
   }
 
