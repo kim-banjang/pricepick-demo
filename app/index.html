@@ -8731,6 +8731,7 @@ body.interactive-mode #ip-nav { display: block; }
 .C-mall-row:first-of-type { border-top: none; padding-top: 4px; }
 .C-ml-logo {
     width: 40px; height: 40px; border-radius: 8px;
+    background: var(--bg2, #F6F4FB);
     color: var(--text2);
     font-size: var(--fs-caption); font-weight: 800;
     display: flex; align-items: center; justify-content: center;
@@ -11467,27 +11468,21 @@ window.PP_FEATURES = {
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/><path d="m20 20-3-3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
             쇼핑몰 검색…
           </div>
-          <!-- 목록은 ppRenderMallList() 가 CMS 저장값으로 갈아끼운다. 아래는 못 읽었을 때
-               그대로 남는 기본값이다 — 목록이 통째로 비지 않게 한다. -->
-          <div id="pp-mall-list">
+          <!-- 카드 감싸개·그룹 머리는 원래 마크업 그대로다. 안의 행만 ppRenderMallList() 가
+               CMS 저장값으로 갈아끼운다. 못 읽으면 아래 기본 여섯 줄이 그대로 남는다. -->
           <div class="C-group">
             <div class="C-group-hd">
               <div class="C-group-t">종합 쇼핑몰</div>
-              <div class="C-group-cnt">4개</div>
+              <div class="C-group-cnt" id="pp-mall-count">4개</div>
             </div>
+            <div id="pp-mall-rows">
             <div class="C-mall-row" data-ip-bound="1" data-mall="coupang.com" data-mall-name="쿠팡"><div class="C-ml-logo" data-logo-code="coupang_direct" style="cursor:pointer;" onclick="selectMall('쿠팡','coupang.com','pw-12')"><img alt="쿠팡" style="display:none" onerror="this.remove()"><span>쿠팡</span></div><div class="C-ml-name" style="cursor:pointer;" onclick="selectMall('쿠팡','coupang.com','pw-12')">쿠팡</div><button class="C-ml-go" data-ip-bound="1" onclick="selectMall('쿠팡','coupang.com','pw-13')">바로가기 ›</button></div>
             <div class="C-mall-row" data-ip-bound="1" data-mall="11st.co.kr" data-mall-name="11번가"><div class="C-ml-logo" data-logo-code="lp:11st" style="cursor:pointer;" onclick="selectMall('11번가','11st.co.kr','pw-12')"><img alt="11번가" style="display:none" onerror="this.remove()"><span>11</span></div><div class="C-ml-name" style="cursor:pointer;" onclick="selectMall('11번가','11st.co.kr','pw-12')">11번가</div><button class="C-ml-go" data-ip-bound="1" onclick="selectMall('11번가','11st.co.kr','pw-13')">바로가기 ›</button></div>
             <div class="C-mall-row" data-ip-bound="1" data-mall="gmarket.co.kr" data-mall-name="G마켓"><div class="C-ml-logo" data-logo-code="lp:gmarket" style="cursor:pointer;" onclick="selectMall('G마켓','gmarket.co.kr','pw-12')"><img alt="G마켓" style="display:none" onerror="this.remove()"><span>G</span></div><div class="C-ml-name" style="cursor:pointer;" onclick="selectMall('G마켓','gmarket.co.kr','pw-12')">G마켓</div><button class="C-ml-go" data-ip-bound="1" onclick="selectMall('G마켓','gmarket.co.kr','pw-13')">바로가기 ›</button></div>
             <div class="C-mall-row" data-ip-bound="1" data-mall="auction.co.kr" data-mall-name="옥션"><div class="C-ml-logo" data-logo-code="lp:auction" style="cursor:pointer;" onclick="selectMall('옥션','auction.co.kr','pw-12')"><img alt="옥션" style="display:none" onerror="this.remove()"><span>옥션</span></div><div class="C-ml-name" style="cursor:pointer;" onclick="selectMall('옥션','auction.co.kr','pw-12')">옥션</div><button class="C-ml-go" data-ip-bound="1" onclick="selectMall('옥션','auction.co.kr','pw-13')">바로가기 ›</button></div>
-          </div>
-          <div class="C-group">
-            <div class="C-group-hd">
-              <div class="C-group-t">해외직구</div>
-              <div class="C-group-cnt">2개</div>
-            </div>
             <div class="C-mall-row" data-ip-bound="1" data-mall="aliexpress.com" data-mall-name="알리익스프레스"><div class="C-ml-logo" data-logo-code="lp:aliexpress" style="cursor:pointer;" onclick="selectMall('알리익스프레스','aliexpress.com','pw-12')"><img alt="알리익스프레스" style="display:none" onerror="this.remove()"><span>Ali</span></div><div class="C-ml-name" style="cursor:pointer;" onclick="selectMall('알리익스프레스','aliexpress.com','pw-12')">알리익스프레스</div><button class="C-ml-go" data-ip-bound="1" onclick="selectMall('알리익스프레스','aliexpress.com','pw-13')">바로가기 ›</button></div>
             <div class="C-mall-row" data-ip-bound="1" data-mall="iherb.com" data-mall-name="아이허브"><div class="C-ml-logo" data-logo-code="lp:iherb" style="cursor:pointer;" onclick="selectMall('아이허브','iherb.com','pw-12')"><img alt="아이허브" style="display:none" onerror="this.remove()"><span>iHerb</span></div><div class="C-ml-name" style="cursor:pointer;" onclick="selectMall('아이허브','iherb.com','pw-12')">아이허브</div><button class="C-ml-go" data-ip-bound="1" onclick="selectMall('아이허브','iherb.com','pw-13')">바로가기 ›</button></div>
-          </div>
+            </div>
           </div>
         </div>
       </div>
@@ -17746,8 +17741,10 @@ function ppMallLogoHtml(m, cls) {
 
 /* 적립 가능 쇼핑몰(pw-11) — 분류 묶음 없이 한 줄로 늘어놓는다(적용 몰이 적어 나눌 이유가 없다) */
 function ppRenderMallList() {
-  var box = document.getElementById('pp-mall-list');
+  var box = document.getElementById('pp-mall-rows');
   if (!box || !PP_MALLS || !PP_MALLS.length) return;
+  var cnt = document.getElementById('pp-mall-count');
+  if (cnt) cnt.textContent = PP_MALLS.length + '개';
   box.innerHTML = PP_MALLS.map(function (m) {
     var nm = ppEscAttr(m.name), dm = ppEscAttr(m.domain);
     var go12 = "selectMall('" + nm + "','" + dm + "','pw-12')";
