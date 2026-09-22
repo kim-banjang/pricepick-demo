@@ -17402,11 +17402,23 @@ Object.assign(KO2VI, {
      몰별 아이콘·링크는 몰마다 manifest 와 start_url 이 따로 있어야 한다(미구현). -->
 <style>
   #cpk-modal { display:none; position:fixed; inset:0; z-index:2147483600;
-    background:rgba(26,17,48,0.55); align-items:flex-end; justify-content:center; }
+    background:rgba(26,17,48,0.55); align-items:flex-end; justify-content:center;
+    opacity:0; transition:opacity .22s ease; }
+  #cpk-modal.open { opacity:1; }
   #cpk-sheet { width:100%; max-width:420px; background:#fff;
     border-radius:24px 24px 0 0; padding:10px 20px 20px;
-    font-family:-apple-system,'Apple SD Gothic Neo',sans-serif; }
-  .cpk-grab { width:40px; height:4px; border-radius:99px; background:#E0D9ED; margin:0 auto 16px; }
+    font-family:-apple-system,'Apple SD Gothic Neo',sans-serif;
+    transform:translateY(100%); transition:transform .28s cubic-bezier(.32,.72,0,1);
+    will-change:transform; }
+  #cpk-modal.open #cpk-sheet { transform:translateY(0); }
+  /* 끄는 동안에는 손가락을 그대로 따라야 하므로 전이를 끈다 */
+  #cpk-sheet.cpk-dragging { transition:none; }
+  #cpk-modal.cpk-dragging { transition:none; }
+  /* 잡는 자리 — 손잡이와 시트 맨 위. 여기서는 스크롤·선택이 일어나지 않게 막는다. */
+  .cpk-hold { touch-action:none; cursor:grab; padding:6px 0 10px; margin:-6px 0 0; }
+  .cpk-hold:active { cursor:grabbing; }
+  .cpk-grab { width:40px; height:4px; border-radius:99px; background:#E0D9ED; margin:0 auto; }
+  body.cpk-nosel, body.cpk-nosel * { user-select:none; -webkit-user-select:none; }
   .cpk-prev { background:#F1EEFF; border-radius:20px; padding:18px 16px; margin-bottom:20px; }
   .cpk-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:14px 10px; }
   .cpk-cell { display:flex; flex-direction:column; align-items:center; gap:6px; }
@@ -17431,7 +17443,7 @@ Object.assign(KO2VI, {
 </style>
 <div id="cpk-modal">
   <div id="cpk-sheet">
-    <div class="cpk-grab"></div>
+    <div class="cpk-hold" id="cpk-hold"><div class="cpk-grab"></div></div>
     <div class="cpk-prev">
       <div class="cpk-grid" id="cpk-grid"></div>
     </div>
@@ -17496,8 +17508,86 @@ function cpkOpen(){
   if(mn) mn.textContent=name;
   cpkRenderPreview(mall,name);
   m.style.display='flex';
+  m.classList.remove('cpk-dragging');
+  var sh=document.getElementById('cpk-sheet');
+  if(sh){ sh.classList.remove('cpk-dragging'); sh.style.transform=''; }
+  m.style.opacity='';
+  void m.offsetWidth;          /* 아래에서 올라오도록 시작 상태를 한 번 굳힌다 */
+  m.classList.add('open');
+  cpkBindDrag();
 }
-function cpkClose(){ var m=document.getElementById('cpk-modal'); if(m) m.style.display='none'; }
+var _cpkHideT=null;
+function cpkClose(){
+  var m=document.getElementById('cpk-modal'); if(!m) return;
+  var sh=document.getElementById('cpk-sheet');
+  if(sh){ sh.classList.remove('cpk-dragging'); sh.style.transform=''; }
+  m.classList.remove('cpk-dragging','open');
+  m.style.opacity='';
+  document.body.classList.remove('cpk-nosel');
+  if(_cpkHideT) clearTimeout(_cpkHideT);
+  _cpkHideT=setTimeout(function(){ m.style.display='none'; }, 280);
+}
+
+/* 끌어내려 닫기 — 손잡이와 시트 맨 위를 잡으면 손가락(또는 마우스)을 따라 내려온다.
+   시트 높이의 1/4 을 넘기거나 빠르게 내리면 닫고, 못 미치면 제자리로 돌아간다.
+   위로는 끌리지 않는다. 포인터 이벤트라 마우스·터치를 한 번에 받는다. */
+var _cpkDragBound=false;
+function cpkBindDrag(){
+  if(_cpkDragBound) return;
+  var m=document.getElementById('cpk-modal');
+  var sh=document.getElementById('cpk-sheet');
+  var hold=document.getElementById('cpk-hold');
+  if(!m||!sh||!hold) return;
+  _cpkDragBound=true;
+
+  var startY=0, startT=0, dy=0, h=1, active=false;
+  var HOLD_ZONE=80;     /* 시트 맨 위 이 높이까지는 어디를 잡아도 끌린다 */
+
+  function down(e){
+    if(e.button!=null && e.button!==0) return;
+    var r=sh.getBoundingClientRect();
+    var onHold = hold.contains(e.target) || (e.clientY - r.top) <= HOLD_ZONE;
+    if(!onHold) return;
+    active=true; startY=e.clientY; startT=Date.now(); dy=0; h=r.height||1;
+    sh.classList.add('cpk-dragging'); m.classList.add('cpk-dragging');
+    document.body.classList.add('cpk-nosel');
+    try{ sh.setPointerCapture(e.pointerId); }catch(err){}
+    e.preventDefault();
+  }
+  function move(e){
+    if(!active) return;
+    dy=e.clientY-startY;
+    if(dy<0) dy=0;                       /* 위로는 끌리지 않는다 */
+    sh.style.transform='translateY('+dy+'px)';
+    var k=1-(dy/h);
+    m.style.opacity=String(k<0?0:k);
+    e.preventDefault();
+  }
+  function up(e){
+    if(!active) return;
+    active=false;
+    try{ sh.releasePointerCapture(e.pointerId); }catch(err){}
+    document.body.classList.remove('cpk-nosel');
+    sh.classList.remove('cpk-dragging'); m.classList.remove('cpk-dragging');
+    var ms=Math.max(1, Date.now()-startT);
+    var fast=(dy/ms)>0.6;
+    if(dy>h/4 || fast){
+      sh.style.transform='translateY(100%)';
+      m.style.opacity='0';
+      if(_cpkHideT) clearTimeout(_cpkHideT);
+      _cpkHideT=setTimeout(function(){ m.style.display='none'; sh.style.transform=''; m.style.opacity=''; }, 280);
+    } else {
+      sh.style.transform='';
+      m.style.opacity='';
+    }
+  }
+  sh.addEventListener('pointerdown', down);
+  sh.addEventListener('pointermove', move);
+  sh.addEventListener('pointerup', up);
+  sh.addEventListener('pointercancel', up);
+  /* 딤을 누르면 닫는다 — 시트 안쪽을 누른 것은 제외한다. */
+  m.addEventListener('pointerdown', function(e){ if(e.target===m) cpkClose(); });
+}
 
 /* 추가 완료 상태 — 이 기기에서만 기억한다. 저장이 막힌 브라우저에서도 화면은 돈다. */
 function cpkDoneKey(){ var mall=cpkMall(); return 'pp_a2hs_' + ((mall&&mall.code)||(window.currentMall&&window.currentMall.domain)||''); }
