@@ -293,12 +293,16 @@ tr:hover td{background:var(--surface-2);}
 .ta-notice-list li{padding:9px 0;border-bottom:1px solid var(--border);font-size:13px;line-height:1.6;color:var(--text-2);}
 .ta-notice-list li:last-child{border-bottom:none;}
 .ta-notice-list .k{display:block;font-weight:700;color:var(--text);margin-bottom:2px;}
+/* 수수료·적립률·수익은 줄바꿈되면 값이 잘려 보인다 */
+#sec-ticket-accrual #ta-tbody-secondary td{white-space:nowrap;}
 #sec-ticket-accrual .ta-days-fixed{display:inline-block;font-size:12px;font-weight:700;line-height:1.45;
   color:var(--text-2);background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r-sm);padding:5px 9px;}
 #sec-ticket-accrual .ta-rate{height:36px;padding:6px 10px;}
 /* 저장 전 변경 표시 — 기존 warning 토큰 그대로 재사용(새 색 안 만듦) */
 #sec-ticket-accrual .ta-fee.ta-changed,#sec-ticket-accrual .ta-rate.ta-changed{
   border-color:var(--warning)!important;background:var(--warning-soft)!important;}
+#sec-ticket-accrual .ta-needsync,#ta-info-body .ta-needsync{display:inline-block;padding:1px 7px;border-radius:99px;
+  background:var(--warning-soft);color:var(--warning);font-size:11px;font-weight:700;white-space:nowrap;}
 #sec-ticket-accrual .ta-lp-msg{font-size:11.5px;color:var(--text-3);}
 #sec-ticket-accrual .ta-lp-msg.ok{color:var(--success);}
 #sec-ticket-accrual .ta-lp-msg.bad{color:var(--danger);}
@@ -2005,16 +2009,16 @@ window.CMS_FEATURES = {
               <tr>
                 <th class="ta-select-col" style="width:4%"><input type="checkbox" id="ta-select-all" onchange="taToggleSelectAll(this.checked)" title="보이는 몰 전체 선택"></th>
                 <th style="width:5%">로고</th>
-                <th style="width:10%">제휴몰</th>
-                <th style="width:9%">링크프라이스 승인 상태</th>
-                <th class="ta-tight" style="width:7%">커미션(모바일)</th>
-                <th class="ta-tight" style="width:7%">앱(AOS·iOS)</th>
-                <th style="width:6%">수수료</th>
-                <th style="width:8%">적립률</th>
-                <th style="width:6%">수익</th>
+                <th style="width:11%">제휴몰</th>
+                <th style="width:10%">링크프라이스 승인 상태</th>
+                <th class="ta-tight" style="width:8%">커미션(모바일)</th>
+                <th class="ta-tight" style="width:8%">앱(AOS·iOS)</th>
+                <th style="width:9%">수수료</th>
+                <th style="width:10%">적립률</th>
+                <th style="width:8%">수익</th>
                 <th style="width:10%">등급 전환 시점</th>
-                <th style="width:15%">시뮬레이터</th>
-                <th style="width:13%">적용</th>
+                <th style="width:9%">시뮬레이터</th>
+                <th style="width:8%">적용</th>
               </tr>
             </thead>
             <tbody id="ta-tbody-secondary"></tbody>
@@ -7107,7 +7111,7 @@ Object.assign(KO2VI,{"적립액은 구매금액과 제휴몰별 적립률로 정
 /* ── 전환 대기일 수 · 티켓 적립 설정 Notice (김반장 확정 2026-08-26) ── */
 Object.assign(KO2VI,{
   "전환 대기일 수":"Số ngày chờ chuyển đổi",
-  "등급 전환 시점":"Thời điểm chuyển hạng","익익월 6일 확정 후":"Sau khi chốt ngày 6 của tháng sau nữa",
+  "등급 전환 시점":"Thời điểm chuyển hạng","갱신 필요":"Cần cập nhật","익익월 6일 확정 후":"Sau khi chốt ngày 6 của tháng sau nữa",
   "링크프라이스 제휴몰은 실적 월의 익익월 6일 이후 확정 건을 대조해 등급 티켓으로 전환합니다. 몰마다 다르지 않습니다.":"Sàn Linkprice đối chiếu các đơn đã chốt sau ngày 6 của tháng sau nữa kể từ tháng phát sinh thực tích rồi chuyển thành vé hạng. Không khác nhau theo từng sàn.",
   "전환 대기일 수 적용":"Áp dụng số ngày chờ chuyển đổi",
   "선택한 몰에 한꺼번에 적용할 전환 대기일 수":"Số ngày chờ chuyển đổi áp dụng hàng loạt cho các sàn đã chọn",
@@ -13441,9 +13445,10 @@ function taRenderRow(m, showHideCol) {
      Affiliate Center 자료가 없다. 자리는 「링크프라이스 상태」 다음이다. */
   var api = isCatalogRow ? taApiOf(m.code) : null;
   var app = api ? { aos: api.app_android_yn, ios: api.app_ios_yn } : null;
-  var commCell = !showHideCol ? '' : ('<td class="ta-tight">' + taEsc((api && api.max_commission_mobile) || '—') + '</td>');
+  var commCell = !showHideCol ? '' : ('<td class="ta-tight">'
+    + ((api && api.max_commission_mobile) ? taEsc(api.max_commission_mobile) : '<span class="ta-needsync">갱신 필요</span>') + '</td>');
   var appCell = !showHideCol ? '' : (function() {
-    if (!app) return '<td class="ta-tight">—</td>';
+    if (!app || !app.aos) return '<td class="ta-tight"><span class="ta-needsync">갱신 필요</span></td>';
     /* 값 그대로 적는다. 엑셀의 APP 커미션 칸과 어긋나는 몰이 있어(현대홈쇼핑) 판정하지 않는다. */
     var one = function(k, v) {
       return '<span class="ta-appcell ' + (v === 'Y' ? 'yes' : 'no') + '">' + k + ' ' + (v || '—') + '</span>';
@@ -13989,7 +13994,8 @@ window.taApplyFilters = function() {
 // ── 머천트 상세정보 모달 (2026-08-11 신설) — 엑셀 24개 컬럼 전부 + 커미션 목록 전체.
 // 승인 상태는 여기서 바꾸며, 표 인풋과 마찬가지로 저장 전엔 TA_APPROVAL(메모리)에만
 // 반영되고 배지가 강조 표시된다 — 저장 버튼을 눌러야 실제로 반영된다.
-/* 링크프라이스 Affiliate Center 자료 — cms/data/lp-merchant-detail.json.
+/* 링크프라이스 자료 — /cms/data/lp-merchant-detail.json (절대 경로. CMS 가 / · /cms ·
+   /cms/ 세 주소로 열리므로 상대 경로를 쓰면 주소에 따라 404 가 난다).
    값은 코드에 박지 않고 데이터 파일에 둔다. Firestore 조회를 늘리지 않는다. */
 var TA_DETAIL = null;
 var TA_MANUAL = null;
@@ -13998,7 +14004,7 @@ var TA_MANUAL = null;
    API 에 없는 항목(차감 항목·국가/언어 등)은 어느 쪽이든 저장소 파일에서 읽는다. */
 function taDetailLoad() {
   if (TA_DETAIL) return Promise.resolve(TA_DETAIL);
-  var file = fetch('data/lp-merchant-detail.json', { cache: 'no-cache' })
+  var file = fetch('/cms/data/lp-merchant-detail.json', { cache: 'no-cache' })
     .then(function(r) { return r.json(); })
     .catch(function(e) { console.error('lp-merchant-detail', e); return { _meta: {}, merchants: {}, manual: {} }; });
 
@@ -14144,6 +14150,11 @@ function taRewardYn(v) { return v === 'A' ? '둘 다(A)' : taYn(v); }
    값이 갱신되면 표식도 따라 바뀐다(수기 플래그를 따로 들고 있지 않는다). */
 function taRewardRestricted(api) { return /리워드/.test(String((api && api.deny_ad) || '')); }
 /* src: 'api' = 링크프라이스 API 수신 항목, 'man' = API 에 없어 손으로 적은 항목 */
+/* 아직 한 번도 갱신하지 않았으면 빈칸이 아니라 상태를 적는다 — 「—」로 두면 값이 없는
+   것인지 고장인지 구분이 안 된다. */
+function taNeedSync(v) {
+  return (v === undefined || v === null || v === '') ? '<span class="ta-needsync">갱신 필요</span>' : null;
+}
 function taSrcTag(src) {
   if (src === 'api') return '<span class="ta-tag api">API</span>';
   if (src === 'man') return '<span class="ta-tag man">수기</span>';
@@ -14152,9 +14163,12 @@ function taSrcTag(src) {
 function taKv(label, valueHtml, src) {
   return '<div class="ta-kv"><div class="k">' + taEsc(label) + taSrcTag(src) + '</div><div class="v">' + valueHtml + '</div></div>';
 }
-function taKvT(label, value, src) { return taKv(label, taEsc(value || '—'), src); }
+function taKvT(label, value, src) {
+  return taKv(label, (src === 'api' ? taNeedSync(value) : null) || taEsc(value || '—'), src);
+}
 function taKvLink(label, url, src) {
-  return taKv(label, url ? ('<a href="' + taEsc(url) + '" target="_blank" rel="noopener noreferrer">' + taEsc(url) + '</a>') : '—', src);
+  return taKv(label, url ? ('<a href="' + taEsc(url) + '" target="_blank" rel="noopener noreferrer">' + taEsc(url) + '</a>')
+    : (taNeedSync(url) || '—'), src);
 }
 /* PC 는 API 에 대응 필드가 없어 카탈로그 값을 쓴다. 나머지 셋은 API 필드다. */
 function taScopeHtml(x, api) {
@@ -14162,6 +14176,7 @@ function taScopeHtml(x, api) {
     var c = v === 'Y' ? 'yes' : (v === 'N' ? 'no' : '');
     return '<span class="' + c + '">' + k + ' ' + (v || '—') + '</span>';
   };
+  if (!api || !api.mobile_yn) return '<span class="ta-needsync">갱신 필요</span>';
   return '<span class="ta-scope">'
     + one('PC', (api && api.pc_yn) || x['PC웹 지원 여부'])
     + one('MOBILE', api ? api.mobile_yn : x['모바일 웹 지원 여부'])
@@ -14203,11 +14218,11 @@ window.taOpenMerchantInfo = function(code) {
     + (taRewardRestricted(api) ? '<div class="ta-flagrow"><span class="ta-needchk">확인 필요</span></div>' : '');
 
   var right = ''
+    /* 정산 방식·차감 항목은 trans_reposition 한 필드다(^ 로 이어져 온다) — 쪼개지 않는다.
+       지급 기준·지급 일정도 commission_payment_standard 한 문장이라 한 칸으로 적는다.
+       실적 인정 국가·언어는 API 에도 상세 엑셀에도 없어 칸을 두지 않는다(2026-09-22). */
     + taKvT('정산 방식', caret(api.trans_reposition), 'api')
-    + taKvT('지급 기준', man.payment_basis, 'man')
-    + taKvT('지급 일정', man.payment_schedule, 'man')
-    + taKvT('커미션 차감 항목', man.deduction_items, 'man')
-    + taKvT('실적 인정 국가 · 언어', man.country_language, 'man')
+    + taKvT('지급 일정', api.commission_payment_standard, 'api')
     + taKvT('카테고리', api.category_name || x['카테고리'], 'api')
     + taKvLink('기본링크', api.click_url || x['기본링크'], 'api')
     + taKvLink('사이트 URL', api.merchant_url || x['사이트 URL'], 'api');
