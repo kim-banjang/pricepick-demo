@@ -16797,7 +16797,7 @@ function csSubmitInquiry(btn) {
     "적립되게 해둘까요?": "vẫn tích lũy nhé?",
     "홈 화면에 생긴 아이콘으로 들어가면": "Vào bằng icon vừa tạo trên màn hình chính thì",
     "적립이 자동으로 따라붙어요.": "sẽ tự động được tích lũy.",
-    "iPhone(사파리) — 공유 → '홈 화면에 추가'": "iPhone(Safari) — Chia sẻ → 'Thêm vào màn hình chính'",
+    "아이폰 사파리 공유 버튼 → 홈 화면에 추가": "Nút chia sẻ trên Safari iPhone → Thêm vào màn hình chính",
     "다음에 할게요": "Để sau",
     "구매 월 기준 익익월 6일 지급": "Chi trả vào ngày 6 của tháng sau nữa tính theo tháng mua",
     "배송 완료 월 기준 익익월 6일 지급": "Chi trả vào ngày 6 của tháng sau nữa tính theo tháng hoàn tất giao hàng",
@@ -17421,7 +17421,9 @@ Object.assign(KO2VI, {
   .cpk-h { font-size:24px; font-weight:800; color:#1A1130; line-height:1.34; margin-bottom:10px; }
   .cpk-b { font-size:15px; color:#5A5370; line-height:1.6; margin-bottom:14px; }
   .cpk-ios { background:#FAFAFA; border:1px solid #EEEAF3; border-radius:12px;
-    padding:11px 13px; font-size:13px; color:#5A5370; margin-bottom:16px; }
+    padding:11px 13px; font-size:13px; color:#5A5370; margin-bottom:16px;
+    display:flex; align-items:center; gap:8px; }
+  .cpk-ios svg { flex-shrink:0; }
   .cpk-cta { width:100%; height:54px; background:#845EEE; border:none; border-radius:15px;
     color:#fff; font-size:17px; font-weight:700; cursor:pointer; }
   .cpk-later { width:100%; height:48px; background:none; border:none;
@@ -17435,7 +17437,7 @@ Object.assign(KO2VI, {
     </div>
     <div class="cpk-h">앱 안 켜고도<br>적립되게 해둘까요?</div>
     <div class="cpk-b">홈 화면에 생긴 아이콘으로 들어가면 <span id="cpk-modal-mall">쿠팡</span> 적립이 자동으로 따라붙어요.</div>
-    <div class="cpk-ios" id="cpk-ios-guide">iPhone(사파리) — 공유 → '홈 화면에 추가'</div>
+    <div class="cpk-ios" id="cpk-ios-guide"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.5.5l2-2a5 5 0 0 0-7-7l-1 1M14 11a5 5 0 0 0-7.5-.5l-2 2a5 5 0 0 0 7 7l1-1" stroke="#9B93B0" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg><span>아이폰 사파리 공유 버튼 → 홈 화면에 추가</span></div>
     <button type="button" class="cpk-cta" onclick="cpkAddHome();">홈 화면에 추가</button>
     <button type="button" class="cpk-later" onclick="cpkClose();">다음에 할게요</button>
   </div>
