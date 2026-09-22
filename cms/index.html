@@ -303,6 +303,8 @@ tr:hover td{background:var(--surface-2);}
 #sec-ticket-accrual .ta-days-fixed{display:inline-block;font-size:12px;font-weight:700;line-height:1.45;
   color:var(--text-2);background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r-sm);padding:5px 9px;}
 #sec-ticket-accrual .ta-rate{height:36px;padding:6px 10px;}
+/* 여러 줄인 원문(11번가·옥션)을 줄바꿈 그대로 보여 준다 */
+#sec-ticket-accrual .ta-when{display:block;font-size:12px;line-height:1.45;color:var(--text-2);white-space:pre-line;}
 /* 저장 전 변경 표시 — 기존 warning 토큰 그대로 재사용(새 색 안 만듦) */
 #sec-ticket-accrual .ta-fee.ta-changed,#sec-ticket-accrual .ta-rate.ta-changed{
   border-color:var(--warning)!important;background:var(--warning-soft)!important;}
@@ -2011,18 +2013,19 @@ window.CMS_FEATURES = {
           <table id="ta-table-secondary">
             <thead>
               <tr>
-                <th class="ta-select-col" style="width:4%"><input type="checkbox" id="ta-select-all" onchange="taToggleSelectAll(this.checked)" title="보이는 몰 전체 선택"></th>
+                <th class="ta-select-col" style="width:3%"><input type="checkbox" id="ta-select-all" onchange="taToggleSelectAll(this.checked)" title="보이는 몰 전체 선택"></th>
                 <th style="width:4%">로고</th>
-                <th style="width:11%">제휴몰</th>
-                <th style="width:10%">링크프라이스 승인 상태</th>
-                <th class="ta-tight" style="width:8%">커미션(모바일)</th>
+                <th style="width:10%">제휴몰</th>
+                <th style="width:8%">링크프라이스 승인 상태</th>
+                <th class="ta-tight" style="width:7%">커미션(모바일)</th>
                 <th class="ta-tight" style="width:8%">앱(AOS·iOS)</th>
-                <th style="width:10%">수수료</th>
-                <th style="width:10%">적립률</th>
-                <th style="width:8%">수익</th>
-                <th style="width:10%">등급 전환 시점</th>
-                <th style="width:9%">시뮬레이터</th>
-                <th style="width:8%">적용</th>
+                <th style="width:8%">수수료</th>
+                <th style="width:8%">적립률</th>
+                <th style="width:6%">수익</th>
+                <th style="width:15%">랜덤티켓 지급 시점</th>
+                <th style="width:9%">등급 전환 시점</th>
+                <th style="width:8%">시뮬레이터</th>
+                <th style="width:6%">적용</th>
               </tr>
             </thead>
             <tbody id="ta-tbody-secondary"></tbody>
@@ -7115,6 +7118,9 @@ Object.assign(KO2VI,{"적립액은 구매금액과 제휴몰별 적립률로 정
 /* ── 전환 대기일 수 · 티켓 적립 설정 Notice (김반장 확정 2026-08-26) ── */
 Object.assign(KO2VI,{
   "전환 대기일 수":"Số ngày chờ chuyển đổi",
+  "랜덤티켓 지급 시점":"Thời điểm cấp vé ngẫu nhiên",
+  "실시간 실적 전송":"Gửi hiệu suất theo thời gian thực",
+  "구매 후 1일 이내 전송":"Gửi trong vòng 1 ngày sau khi mua",
   "등급 전환 시점":"Thời điểm chuyển hạng","갱신 필요":"Cần cập nhật","익익월 6일 확정 후":"Sau khi chốt ngày 6 của tháng sau nữa",
   "링크프라이스 제휴몰은 실적 월의 익익월 6일 이후 확정 건을 대조해 등급 티켓으로 전환합니다. 몰마다 다르지 않습니다.":"Sàn Linkprice đối chiếu các đơn đã chốt sau ngày 6 của tháng sau nữa kể từ tháng phát sinh thực tích rồi chuyển thành vé hạng. Không khác nhau theo từng sàn.",
   "전환 대기일 수 적용":"Áp dụng số ngày chờ chuyển đổi",
@@ -13463,6 +13469,14 @@ function taRenderRow(m, showHideCol) {
     };
     return '<td class="ta-tight">' + one('AOS', app.aos) + '&nbsp;·&nbsp;' + one('iOS', app.ios) + '</td>';
   })();
+  /* 랜덤티켓 지급 시점 = 구매 실적이 들어오는 시점(API when_trans). 몰마다 다르고
+     여러 줄인 몰도 있다 — 줄이거나 다듬지 않고 원문 그대로 적는다(김반장 확정 2026-09-22).
+     대표 제휴몰(쿠팡)은 직접 제휴라 이 열 자체가 없다. */
+  var whenCell = !showHideCol ? '' : (function() {
+    var v = api ? String(api.when_trans || '').trim() : '';
+    if (!v) return '<td><span class="ta-needsync">갱신 필요</span></td>';
+    return '<td><span class="ta-when">' + taEsc(v) + '</span></td>';
+  })();
   var dimStyle = (showHideCol && !m.isApplied) ? ' style="opacity:.5"' : '';
   // 선택 체크박스는 링크프라이스(showHideCol=true) 행에만 — 대표 쿠팡은 직접 제휴라
   // 일괄 적용·선택 대상에서 뺀다(김반장 확정, 2026-08-11). 쿠팡 값은 그 줄에서 직접 고친다.
@@ -13482,6 +13496,7 @@ function taRenderRow(m, showHideCol) {
     + '<td><span style="display:inline-flex;align-items:center;gap:6px">'
     +   '<input class="form-input ta-rate" type="number" min="0" max="20" step="0.1" value="' + m.rate + '" style="max-width:88px;text-align:right">%</span></td>'
     + '<td class="ta-margin">—</td>'
+    + whenCell
     + (!showHideCol
         ? '<td><span class="ta-days-fixed" title="쿠팡은 직접 제휴라 카카오톡 연동 기준을 그대로 씁니다. 고정값이라 수정할 수 없습니다.">' + TA_COUPANG_WAIT_LABEL + '</span></td>'
         : '<td><span class="ta-days-fixed" title="링크프라이스 제휴몰은 실적 월의 익익월 6일 이후 확정 건을 대조해 등급 티켓으로 전환합니다. 몰마다 다르지 않습니다.">' + TA_LP_CONVERT_LABEL + '</span></td>')
@@ -14109,6 +14124,12 @@ function taLpReread() {
       if (tr.cells[5]) {
         tr.cells[5].innerHTML = '<span class="ta-appcell ' + (api.app_android_yn === 'Y' ? 'yes' : 'no') + '">AOS ' + taEsc(api.app_android_yn || '—') + '</span>'
           + '&nbsp;·&nbsp;<span class="ta-appcell ' + (api.app_ios_yn === 'Y' ? 'yes' : 'no') + '">iOS ' + taEsc(api.app_ios_yn || '—') + '</span>';
+      }
+      /* 랜덤티켓 지급 시점(when_trans)도 갱신 대상이다 — 원문 그대로 갈아끼운다. */
+      if (tr.cells[9]) {
+        var wv = String(api.when_trans || '').trim();
+        tr.cells[9].innerHTML = wv ? '<span class="ta-when">' + taEsc(wv) + '</span>'
+                                   : '<span class="ta-needsync">갱신 필요</span>';
       }
     });
     taApplyFilters();
