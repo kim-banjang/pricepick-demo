@@ -13632,7 +13632,11 @@ window.taLoad = function() {
         fee: feeFinal,
         rate: typeof saved[code] === 'number' ? taFmt(saved[code]) : taDefaultRate(feeFinal),
         days: typeof savedDays[code] === 'number' ? savedDays[code] : TA_DEFAULT_CONVERT_DAYS,
-        isApplied: typeof savedApplied[code] === 'boolean' ? savedApplied[code] : (status === '승인'),
+        /* ⚠ 링크프라이스 승인 여부는 「적용」과 무관하다. 프라이스픽에 붙일 몰은 김반장님이
+           정하신다 — 승인됐다는 이유만으로 앱에 노출되면 안 된다(확정 2026-09-22).
+           그래서 저장값이 없는 몰(자동 갱신으로 새로 들어온 몰 포함)은 항상 꺼짐이다.
+           사람이 한 번이라도 켜고 끈 몰은 그 값을 그대로 쓴다. */
+        isApplied: typeof savedApplied[code] === 'boolean' ? savedApplied[code] : false,
         status: status,
         logo: typeof savedLogos[code] === 'string' ? savedLogos[code] : '',
       };
