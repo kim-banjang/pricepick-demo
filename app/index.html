@@ -17811,12 +17811,10 @@ function ppFillMallDetail(domain) {
     if (valid) valid.style.display = 'none';
   }
 
-  if (noteBox) {
-    var html = '';
-    if (m.notice) html += '<div class="C-notice-h">유의사항</div><div class="C-notice-b">' + ppEsc(m.notice) + '</div>';
-    if (m.denyProduct) html += '<div class="C-notice-h">적립 제외 상품</div><div class="C-notice-b">' + ppEsc(m.denyProduct) + '</div>';
-    if (html) { noteBox.innerHTML = html; noteBox.style.display = ''; }
-  }
+  /* ⚠ notice·deny_product 는 링크프라이스가 제휴 매체(우리) 운영자에게 하는 말이다 —
+     「홍보 영역」·「커미션 지급 중단」 따위는 앱 사용자가 읽을 문장이 아니다.
+     사용자용 문구는 따로 쓰기로 했으므로 그때까지 이 구획은 띄우지 않는다
+     (김반장 확정 2026-09-22). 값 자체는 지우지 않는다 — CMS 운영자 화면에서 그대로 쓴다. */
 }
 
 /* selectMall 은 더 이른 script 블록에 있어 이 블록의 이름이 안 보인다 — window 로 내보낸다. */
@@ -17826,6 +17824,7 @@ window.ppRenderHomeMalls = ppRenderHomeMalls;
 
 ppLoadMalls().then(function (list) {
   if (!list) return;          /* 못 읽었으면 기본 마크업 유지 */
+  window.PP_MALLS = PP_MALLS;   /* 이 script 블록이 IIFE 라 밖에서 확인하려면 내보내야 한다 */
   ppRenderMallList();
   ppRenderHomeMalls();
 });
