@@ -11510,7 +11510,7 @@ window.PP_FEATURES = {
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M7 17L17 7M17 7H9M17 7V15" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </button>
           <!-- 쿠팡 홈 바로가기 (파트너 코드 박힌 쿠팡 링크를 홈 화면 아이콘으로) -->
-          <button type="button" onclick="cpkOpen()" style="margin:2px 16px 8px;width:calc(100% - 32px);display:flex;align-items:center;justify-content:center;gap:8px;background:#E4002B;border:none;color:#fff;font-size:var(--fs-body);font-weight:800;border-radius:14px;padding:14px;cursor:pointer;box-shadow:0 5px 16px rgba(228,0,43,.30);">
+          <button type="button" onclick="cpkOpen()" style="margin:2px 16px 8px;width:calc(100% - 32px);display:flex;align-items:center;justify-content:center;gap:8px;background:var(--main);border:none;color:#fff;font-size:var(--fs-body);font-weight:800;border-radius:14px;padding:14px;cursor:pointer;box-shadow:0 5px 16px rgba(132,94,238,.30);">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="2" width="12" height="20" rx="2.5"/><line x1="12" y1="8.5" x2="12" y2="13.5"/><line x1="9.5" y1="11" x2="14.5" y2="11"/></svg>
             홈 화면에 '<span id="mall12-cpk-name">쿠팡</span>' 바로가기 추가
           </button>
@@ -16858,7 +16858,7 @@ Object.assign(KO2VI, {
   "원본 티켓의 적립일을 그대로 승계": "kế thừa nguyên ngày tích lũy của vé gốc",
   "(전부 동일).": "(tất cả như nhau).",
   "오래된순": "Cũ nhất",
-  "홈 화면 아이콘으로 들어가면 앱을 안 거쳐도 구매 적립이 유지돼요. 제휴 추적 코드가 담긴 쿠팡 링크예요.": "Vào bằng icon ở màn hình chính thì dù không qua app vẫn giữ tích lũy mua hàng. Là link Coupang có gắn mã theo dõi liên kết.",
+  "홈 화면 아이콘으로 들어가면 앱을 거치지 않아도 적립됩니다.": "Vào bằng icon ở màn hình chính thì không qua app vẫn được tích lũy.",
   "Android — 버튼을 누르면 홈 화면에 바로 추가돼요": "Android — bấm nút là thêm ngay vào màn hình chính",
   "iPhone(사파리) — OS 제약으로 자동 추가가 안 돼요. 공유 → '홈 화면에 추가'를 직접 눌러주세요": "iPhone(Safari) — do giới hạn OS nên không tự thêm được. Hãy tự chạm Chia sẻ → 'Thêm vào màn hình chính'"
 });
@@ -17346,33 +17346,60 @@ Object.assign(KO2VI, {
 
 <div id="cpk-modal" style="display:none;position:fixed;inset:0;z-index:2147483600;background:rgba(20,12,10,.5);align-items:center;justify-content:center;padding:20px;">
   <div style="background:#fff;border-radius:18px;max-width:330px;width:100%;overflow:hidden;box-shadow:0 16px 50px rgba(0,0,0,.32);font-family:-apple-system,'Apple SD Gothic Neo',sans-serif;">
-    <div style="background:#E4002B;padding:20px 18px 16px;text-align:center;color:#fff;position:relative;">
+    <div style="background:var(--main);padding:20px 18px 16px;text-align:center;color:#fff;position:relative;">
       <button type="button" onclick="cpkClose()" style="position:absolute;top:11px;right:12px;background:rgba(255,255,255,.22);border:none;color:#fff;width:26px;height:26px;border-radius:8px;font-size:var(--fs-section);line-height:1;cursor:pointer;">&times;</button>
-      <div style="width:62px;height:62px;margin:2px auto 11px;background:#E4002B;border-radius:16px;box-shadow:0 5px 16px rgba(0,0,0,.28),0 0 0 3px rgba(255,255,255,.30);display:flex;align-items:center;justify-content:center;">
-        <span style="display:flex;flex-direction:column;align-items:center;line-height:1.04;"><span style="font-size:var(--fs-caption);font-weight:800;color:#fff;letter-spacing:-.4px;">coupang</span><span style="font-size:var(--fs-caption);font-weight:800;color:#fff;letter-spacing:1.5px;margin-top:1px;">PICK</span></span>
-      </div>
+      <!-- 아이콘은 해당 몰의 CMS 등록 로고다(김반장 확정 2026-09-22). 가로형(120x60) 로고가
+           섞여 있어 목록·홈과 같이 contain 으로 넣는다. 로고가 없으면 첫 글자 배지가 남는다. -->
+      <div id="cpk-modal-icon" style="width:62px;height:62px;margin:2px auto 11px;background:#fff;border-radius:16px;box-shadow:0 5px 16px rgba(0,0,0,.28),0 0 0 3px rgba(255,255,255,.30);display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative;font-size:var(--fs-label);font-weight:800;color:var(--main-dark);"></div>
       <div id="cpk-modal-title" style="font-size:var(--fs-label);font-weight:800;">홈 화면에 '쿠팡' 바로가기 추가</div>
     </div>
     <div style="padding:16px 18px 18px;">
-      <div style="font-size:var(--fs-caption);color:#444;line-height:1.65;margin-bottom:13px;">홈 화면 아이콘으로 들어가면 앱을 안 거쳐도 구매 적립이 유지돼요. 제휴 추적 코드가 담긴 쿠팡 링크예요.</div>
-      <div id="cpk-ios-guide" style="background:#FFF4F1;border:1px solid #FFD9CF;border-radius:11px;padding:11px 13px;font-size:var(--fs-caption);color:#9A3A28;line-height:1.7;margin-bottom:14px;">
+      <div style="font-size:var(--fs-caption);color:#444;line-height:1.65;margin-bottom:13px;">홈 화면 아이콘으로 들어가면 앱을 거치지 않아도 적립됩니다.</div>
+      <div id="cpk-ios-guide" style="background:var(--sub-4);border:1px solid var(--sub-3);border-radius:11px;padding:11px 13px;font-size:var(--fs-caption);color:var(--main-dark);line-height:1.7;margin-bottom:14px;">
         <div>Android — 버튼을 누르면 홈 화면에 바로 추가돼요</div>
         <div>iPhone(사파리) — OS 제약으로 자동 추가가 안 돼요. 공유 → '홈 화면에 추가'를 직접 눌러주세요</div>
       </div>
-      <button type="button" onclick="cpkAddHome();" style="width:100%;height:46px;background:#E4002B;border:none;border-radius:12px;color:#fff;font-size:var(--fs-body);font-weight:800;cursor:pointer;">홈 화면에 추가</button>
+      <button type="button" onclick="cpkAddHome();" style="width:100%;height:46px;background:var(--main);border:none;border-radius:12px;color:#fff;font-size:var(--fs-body);font-weight:800;cursor:pointer;">홈 화면에 추가</button>
     </div>
   </div>
 </div>
-<!-- 쿠팡 홈 바로가기 URL: 파트너 코드 주입 자리 — https://www.coupang.com/  (TODO: 배포 시 ?lptag=AF... 제휴 추적 코드 주입, 현재 미포함) -->
+<!-- ⚠ 이 단추는 몰별 바로가기를 만들지 않는다. beforeinstallprompt 로 프라이스픽 앱(PWA)
+     자체를 홈 화면에 설치할 뿐이라, 어느 몰에서 눌러도 같은 앱 아이콘이 생긴다.
+     몰별 아이콘·몰별 링크는 몰마다 manifest 와 start_url 이 따로 있어야 한다(미구현). -->
 <script>
 window.__cpkPrompt=null;
 window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();window.__cpkPrompt=e;});
 function cpkAddHome(){
   if(window.__cpkPrompt){var p=window.__cpkPrompt;window.__cpkPrompt=null;p.prompt();cpkClose();return;}
   var g=document.getElementById('cpk-ios-guide');
-  if(g){g.style.background='#FFE4DB';g.style.borderColor='#F0917A';g.style.fontWeight='700';}
+  if(g){g.style.background='var(--sub-3)';g.style.borderColor='var(--sub-1)';g.style.fontWeight='700';}
 }
-function cpkOpen(){var m=document.getElementById('cpk-modal');if(m)m.style.display='flex';var t=document.getElementById('cpk-modal-title');if(t)t.textContent="홈 화면에 '"+((window.currentMall&&currentMall.name)||'쿠팡')+"' 바로가기 추가";}function cpkClose(){var m=document.getElementById('cpk-modal');if(m)m.style.display='none';}</script>
+/* 지금 보고 있는 몰을 PP_MALLS 에서 찾는다 — 이 블록은 목록을 만드는 IIFE 밖이라
+   window 로 내보낸 것만 쓸 수 있다. */
+function cpkMall(){
+  var d=(window.currentMall&&window.currentMall.domain)||'';
+  var list=window.PP_MALLS||[];
+  for(var i=0;i<list.length;i++) if(list[i].domain===d) return list[i];
+  return null;
+}
+function cpkOpen(){
+  var m=document.getElementById('cpk-modal'); if(!m) return;
+  var mall=cpkMall();
+  var name=(mall&&mall.name)||(window.currentMall&&window.currentMall.name)||'';
+  var t=document.getElementById('cpk-modal-title');
+  if(t) t.textContent="홈 화면에 '"+name+"' 바로가기 추가";
+  var ic=document.getElementById('cpk-modal-icon');
+  if(ic){
+    var abbr=String(name).trim().slice(0,2)||'?';
+    var badge='<span>'+abbr.replace(/&/g,'&amp;').replace(/</g,'&lt;')+'</span>';
+    var logo=(mall&&mall.logo)||'';
+    ic.innerHTML=badge+(logo
+      ? '<img src="'+String(logo).replace(/"/g,'&quot;')+'" alt="" onerror="this.remove()"'
+        + ' style="position:absolute;left:7px;top:7px;width:calc(100% - 14px);height:calc(100% - 14px);object-fit:contain;">'
+      : '');
+  }
+  m.style.display='flex';
+}function cpkClose(){var m=document.getElementById('cpk-modal');if(m)m.style.display='none';}</script>
 
 <!-- pw-31 설정: 기본 정렬 선택 모달 -->
 <div id="sort-modal" style="display:none;position:fixed;inset:0;z-index:2147483600;background:rgba(20,12,10,.5);align-items:center;justify-content:center;padding:20px;">
