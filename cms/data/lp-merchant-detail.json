@@ -47,7 +47,8 @@
       "excluded_products": "E쿠폰 · 상품권 · 순금/돌반지 · 사업자용(특판) · 여행/호텔/항공권",
       "app_browser_notes": "키워드 검색 결과·스토어 페이지 딥링크 미지원(메인 랜딩) · 스마일페이 사용 시 실적 인정",
       "country_language": "한국 / 한국어",
-      "reward_restriction_flag": false
+      "reward_restriction_flag": false,
+      "postback_timing_short": "구매 확정일 다음날"
     },
     "hmall": {
       "name": "현대홈쇼핑",
@@ -107,7 +108,8 @@
       "excluded_products": "여행/숙박/항공권 · 시계/주얼리(순금·골드바·돌반지) · e쿠폰/상품권 전체 · 가전/디지털 카테고리 전체(마이폰 탭 제외) · 홈&카 서비스(모바일)",
       "app_browser_notes": "일부 iOS에서 기본 브라우저와 구매 브라우저 상이 시 실적 전송 불가",
       "country_language": "한국 / 한국어",
-      "reward_restriction_flag": true
+      "reward_restriction_flag": true,
+      "postback_timing_short": "모바일: 구매 확정 시"
     },
     "nsseshop": {
       "name": "NS홈쇼핑",
@@ -159,15 +161,45 @@
     "excluded_products": "사이트 내 추적 허용 금지 · 쿠키 미동의 · 광고 차단 프로그램 설치 시 실적 미인정. 장바구니에 담을 때도 링크프라이스 경유 필수."
   },
   "app_support": {
-    "gmarket":   { "aos": "Y", "ios": "Y" },
-    "emart":     { "aos": "Y", "ios": "Y" },
-    "auction":   { "aos": "Y", "ios": "Y" },
-    "hmall":     { "aos": "Y", "ios": "N" },
-    "lotteon":   { "aos": "N", "ios": "N" },
-    "woori":     { "aos": "N", "ios": "N" },
-    "11st":      { "aos": "N", "ios": "N" },
-    "nsseshop":  { "aos": "N", "ios": "N" },
-    "gseshop":   { "aos": "N", "ios": "N" },
-    "gongyoung": { "aos": "N", "ios": "N" }
+    "gmarket": {
+      "aos": "Y",
+      "ios": "Y"
+    },
+    "emart": {
+      "aos": "Y",
+      "ios": "Y"
+    },
+    "auction": {
+      "aos": "Y",
+      "ios": "Y"
+    },
+    "hmall": {
+      "aos": "Y",
+      "ios": "N"
+    },
+    "lotteon": {
+      "aos": "N",
+      "ios": "N"
+    },
+    "woori": {
+      "aos": "N",
+      "ios": "N"
+    },
+    "11st": {
+      "aos": "N",
+      "ios": "N"
+    },
+    "nsseshop": {
+      "aos": "N",
+      "ios": "N"
+    },
+    "gseshop": {
+      "aos": "N",
+      "ios": "N"
+    },
+    "gongyoung": {
+      "aos": "N",
+      "ios": "N"
+    }
   }
 }
