@@ -2151,10 +2151,12 @@
         "payment_basis",
         "payment_schedule",
         "deduction_items",
-        "country_language"
+        "country_language",
+        "app_browser_notes"
       ]
     },
     "11st": {
+      "app_browser_notes": "일부 iOS에서 기본 브라우저와 구매 브라우저 상이 시 실적 전송 불가",
       "country_language": "한국 / 한국어",
       "deduction_items": "부가세 · 포인트 · 마일리지 · 적립금 · 할인쿠폰 · 배송비",
       "payment_basis": "구매 확정 월",
@@ -2162,6 +2164,7 @@
       "return_day_actual": ""
     },
     "auction": {
+      "app_browser_notes": "키워드 검색 결과·스토어 페이지 딥링크 미지원(메인 랜딩) · 스마일페이 사용 시 실적 인정",
       "country_language": "한국 / 한국어",
       "deduction_items": "부가세 · 포인트 · 마일리지 · 적립금 · 할인쿠폰 · 배송비",
       "payment_basis": "구매 확정 월",
@@ -2169,6 +2172,7 @@
       "return_day_actual": ""
     },
     "emart": {
+      "app_browser_notes": "모바일 웹 랜딩 후 「앱으로 가기」 클릭 시 미인정 · 앱 구매는 이마트몰·SSG닷컴 앱만 인정 · 웹은 이마트몰·트레이더스·SSG닷컴·신세계몰·신세계백화점 전부 인정 · 일부 안드로이드 브라우저는 앱 열기 시에도 모바일웹 랜딩 · 상품권은 제휴링크 접속 시 구매 제한 · 당일 취소 시 실적 미전송 가능",
       "country_language": "한국 / 한국어",
       "deduction_items": "포인트 · 마일리지 · 적립금 · 할인쿠폰 · 배송비",
       "payment_basis": "배송 완료 월",
@@ -2176,6 +2180,7 @@
       "return_day_actual": ""
     },
     "gmarket": {
+      "app_browser_notes": "광고효과인정기간 실제 30분 · 제휴링크 경유 후 모바일 브라우저 내 「앱으로 보기」 클릭 시 실적 전송 불가 · 일부 iOS 기기 웹 연동 불가",
       "country_language": "한국 / 한국어",
       "deduction_items": "할인쿠폰 · 배송비",
       "payment_basis": "구매 월",
@@ -2183,6 +2188,7 @@
       "return_day_actual": "30분"
     },
     "gongyoung": {
+      "app_browser_notes": "",
       "country_language": "글로벌",
       "deduction_items": "할인쿠폰",
       "payment_basis": "배송 완료 월",
@@ -2190,6 +2196,7 @@
       "return_day_actual": ""
     },
     "gseshop": {
+      "app_browser_notes": "PC에서 생성한 링크는 모바일에서 메인 랜딩 또는 오류 가능 (특가 · GS혜택 카테고리)",
       "country_language": "한국 / 한국어",
       "deduction_items": "부가세 · 포인트 · 마일리지 · 적립금 · 할인쿠폰 · 배송비",
       "payment_basis": "구매 월",
@@ -2197,6 +2204,7 @@
       "return_day_actual": ""
     },
     "hmall": {
+      "app_browser_notes": "제휴링크를 통한 앱 진입 시 앱 첫방문 전용 혜택 제공 불가 · 무통장입금은 입금 완료 여부와 무관하게 실적 전송",
       "country_language": "한국 / 한국어",
       "deduction_items": "부가세 · 포인트 · 마일리지 · 적립금 · 할인쿠폰 · 배송비",
       "payment_basis": "구매 월",
@@ -2204,6 +2212,7 @@
       "return_day_actual": ""
     },
     "lotteon": {
+      "app_browser_notes": "",
       "country_language": "글로벌",
       "deduction_items": "부가세 · 포인트 · 마일리지 · 적립금 · 할인쿠폰 · 배송비",
       "payment_basis": "구매 확정 월",
@@ -2211,6 +2220,7 @@
       "return_day_actual": ""
     },
     "nsseshop": {
+      "app_browser_notes": "iOS 사파리 구매 미인정 · 일부 PC 페이지는 모바일에서 메인 랜딩 · 쿠폰 할인이 상품별 비율로 쪼개져 실적 적재",
       "country_language": "한국 / 한국어",
       "deduction_items": "부가세 · 포인트 · 마일리지 · 적립금 · 할인쿠폰 · 배송비",
       "payment_basis": "구매 월",
@@ -2218,6 +2228,7 @@
       "return_day_actual": ""
     },
     "woori": {
+      "app_browser_notes": "가전 30만원 · 상품권 1만원은 1일 1ID 당 동일 상품 1개 제한",
       "country_language": "한국 / 한국어",
       "deduction_items": "포인트 · 마일리지 · 적립금 · 할인쿠폰 · 배송비",
       "payment_basis": "구매 월",

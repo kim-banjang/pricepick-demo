@@ -7316,7 +7316,9 @@ Object.assign(KO2VI,{
   "광고효과인정기간":"Thời hạn công nhận hiệu quả quảng cáo",
   "실적인정범위":"Phạm vi công nhận thực tích","더보기":"Xem thêm","지급 일정":"Lịch chi trả",
   "수기":"Thủ công","자동 갱신":"Tự động cập nhật","저장본":"Bản lưu","둘 다(A)":"Cả hai (A)",
-  "링크프라이스 업데이트":"Cập nhật Linkprice","불러오는 중…":"Đang tải…","링크프라이스 조회 중…":"Đang truy vấn Linkprice…",
+  "링크프라이스 업데이트":"Cập nhật Linkprice",
+  "링크프라이스 광고주 조회 오픈 API":"API tra cứu nhà quảng cáo Linkprice","수기 항목":"Mục thủ công",
+  "링크프라이스 Affiliate Center 화면":"Màn hình Linkprice Affiliate Center","불러오는 중…":"Đang tải…","링크프라이스 조회 중…":"Đang truy vấn Linkprice…",
   "링크프라이스 광고주 조회 API 를 지금 불러 제휴몰 정보를 갱신합니다.":"Gọi ngay API tra cứu nhà quảng cáo Linkprice để cập nhật thông tin cửa hàng.",
   "제휴몰 갱신 실패 — 기존 자료를 그대로 씁니다.":"Cập nhật cửa hàng thất bại — vẫn dùng dữ liệu cũ.",
   "서버에 Firestore 자격증명이 없어 저장하지 못했습니다":"Máy chủ không có thông tin xác thực Firestore nên không lưu được",
@@ -14181,6 +14183,10 @@ function taInfoLink(label, url) {
 function taYn(v) { return v === 'Y' ? '지원(Y)' : (v === 'N' ? '미지원(N)' : taEsc(v)); }
 /* reward_yn 은 Y·N 말고 A(리워드·비리워드 둘 다)가 있다. 두 갈래로 처리하면 안 된다. */
 function taRewardYn(v) { return v === 'A' ? '둘 다(A)' : taYn(v); }
+/* 활동 불가 방식(deny_ad)에 「리워드 프로그램 배포」·「리워드툴바」가 적혀 있는데 리워드 가능
+   여부는 Y 인 몰이 있다. 서로 어긋나므로 「확인 필요」로 표시만 한다 — 판정하지 않는다.
+   값이 갱신되면 표식도 따라 바뀐다(수기 플래그를 따로 들고 있지 않는다). */
+function taRewardRestricted(api) { return /리워드/.test(String((api && api.deny_ad) || '')); }
 /* src: 'api' = 링크프라이스 API 수신 항목, 'man' = API 에 없어 손으로 적은 항목 */
 function taSrcTag(src) {
   if (src === 'api') return '<span class="ta-tag api">API</span>';
@@ -14220,16 +14226,6 @@ window.taOpenMerchantInfo = function(code) {
       + ((det0 && det0.reward_restriction_flag) ? '<span class="ta-needchk">확인 필요</span>' : '');
   }
 
-  var commRows = (x['커미션목록'] || []).map(function(c) {
-    return '<tr>'
-      + '<td>' + taEsc(c['구분']) + '</td>'
-      + '<td>' + taEsc(c['PC웹'] == null ? '—' : c['PC웹']) + '</td>'
-      + '<td>' + taEsc(c['모바일웹'] == null ? '—' : c['모바일웹']) + '</td>'
-      + '<td>' + taEsc(c['APP'] == null ? '—' : c['APP']) + '</td>'
-      + '<td>' + taEsc(c['종료일'] == null ? '—' : c['종료일']) + '</td>'
-      + '</tr>';
-  }).join('');
-
   var api = taApiOf(code) || {};
   var man = taManOf(code) || {};
   var meta = (TA_DETAIL && TA_DETAIL._meta) || {};
@@ -14248,7 +14244,7 @@ window.taOpenMerchantInfo = function(code) {
     + taKvT('광고효과인정기간', cookie, man.return_day_actual ? 'man' : 'api')
     + taKvT('실적 전송 시점', timingShort, man.when_trans_short ? 'man' : 'api')
     + taKv('리워드 가능 여부', taRewardYn(api.reward_yn || x['리워드 가능 여부']), 'api')
-    + (man.reward_restriction_flag ? '<div class="ta-flagrow"><span class="ta-needchk">확인 필요</span></div>' : '');
+    + (taRewardRestricted(api) ? '<div class="ta-flagrow"><span class="ta-needchk">확인 필요</span></div>' : '');
 
   var right = ''
     + taKvT('정산 방식', caret(api.trans_reposition), 'api')
@@ -14260,24 +14256,19 @@ window.taOpenMerchantInfo = function(code) {
     + taKvLink('기본링크', api.click_url || x['기본링크'], 'api')
     + taKvLink('사이트 URL', api.merchant_url || x['사이트 URL'], 'api');
 
+  /* 더보기는 셋뿐이다 — 미인정 상품 · 앱 브라우저 주의사항 · 전송 시점 전문 */
   var more = ''
     + taKvT('커미션 미인정 상품', api.deny_product, 'api')
-    + (timingFull && timingFull !== timingShort ? taKvT('실적 전송 시점 전문', timingFull, 'api') : '')
-    + taKvT('커미션 지급 일정', api.commission_payment_standard, 'api')
-    + taKvT('활동 불가 방식', caret(api.deny_ad), 'api')
-    + taKvT('유의사항', api.notice, 'api')
-    + taKvT('딥링크 허용 여부', api.deeplink_yn, 'api')
-    + taKvT('광고주 소개', api.merchant_desc, 'api')
-    + '<div class="policy-item"><div class="policy-label" style="margin-bottom:8px"><span>커미션 목록</span> (' + (x['커미션목록'] || []).length + '<span>건</span>)</div>'
-    +   '<table><thead><tr><th>구분</th><th>PC웹</th><th>모바일웹</th><th>APP</th><th>종료일</th></tr></thead>'
-    +   '<tbody>' + (commRows || '<tr><td colspan="5">커미션 정보 없음</td></tr>') + '</tbody></table>'
-    + '</div>';
+    + taKvT('앱 · 브라우저 주의사항', man.app_browser_notes, 'man')
+    + (timingFull && timingFull !== timingShort ? taKvT('실적 전송 시점 전문', timingFull, 'api') : '');
 
   var mman = (TA_MANUAL && TA_MANUAL._meta) || {};
   var html = ''
     + '<div class="ta-src"><span>' + (meta.live ? '자동 갱신' : '저장본') + '</span>'
+    +   ' · <span>출처</span> <span>링크프라이스 광고주 조회 오픈 API</span>'
     +   ' · <span>마지막 갱신</span> ' + taEsc(taWhen(meta.fetched_at))
-    +   ' · <span>수기 항목 기준일</span> ' + taEsc(mman.checked_at || '') + '</div>'
+    +   ' · <span>수기 항목</span> <span>' + taEsc(mman.source || '') + '</span> '
+    +   taEsc(mman.checked_at || '') + '</div>'
     + '<div class="ta-grid"><div>' + left + '</div><div>' + right + '</div></div>'
     + '<details class="ta-more"><summary>더보기</summary>' + more + '</details>';
 
