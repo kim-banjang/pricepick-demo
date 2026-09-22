@@ -17575,7 +17575,10 @@ function cpkBindDrag(){
       sh.style.transform='translateY(100%)';
       m.style.opacity='0';
       if(_cpkHideT) clearTimeout(_cpkHideT);
-      _cpkHideT=setTimeout(function(){ m.style.display='none'; sh.style.transform=''; m.style.opacity=''; }, 280);
+      _cpkHideT=setTimeout(function(){
+        m.style.display='none'; m.classList.remove('open');
+        sh.style.transform=''; m.style.opacity='';
+      }, 280);
     } else {
       sh.style.transform='';
       m.style.opacity='';
