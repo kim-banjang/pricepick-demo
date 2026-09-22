@@ -8342,7 +8342,11 @@ body.interactive-mode #ip-nav { display: block; }
   .C-ac-return { width:100%; padding:0 24px; margin-top:4px; }
   .C-ac-return button { width:100%; height:52px; border:none; border-radius:14px; background:var(--main); color:#fff; font-size: var(--fs-label); font-weight:700; letter-spacing:-0.2px; cursor:pointer; }
   .C-ac-return button:active { opacity:0.9; }
-  .C-shop-return { width:100%; padding:0 24px; margin-top:4px; }
+  .C-shop-return { width:100%; padding:0 24px; margin-top:4px; transition:opacity .3s ease; }
+  /* 안내는 3.5초 뒤에 붙는다. display 로 껐다 켜면 .C-bridge 가 세로 가운데 정렬이라
+     로고·제목까지 통째로 위로 밀려 화면이 두 번 바뀌어 보인다(김반장 지적 2026-09-22).
+     자리는 처음부터 차지하고 투명도로만 나타나게 한다. */
+  .C-shop-return.pending { visibility:hidden; opacity:0; }
   .C-shop-return .C-shop-txt { font-size: var(--fs-caption); color:#9A8FB5; line-height:1.6; margin-bottom:14px; text-align:center; padding:0 8px; }
   .C-shop-return .C-shop-txt b { color:#6B5E8A; }
   .C-shop-home-btn { width:100%; height:52px; border:none; border-radius:14px; background:var(--main); color:#fff; font-size: var(--fs-label); font-weight:700; letter-spacing:-0.2px; cursor:pointer; font-family:inherit; }
@@ -14426,6 +14430,9 @@ function acGoCoupang(screenId) {
   if (h13) h13.textContent = '쿠팡을 둘러본 뒤 아래 버튼으로 복귀하세요';
   var ret = document.getElementById('ac-bridge-return');
   if (ret) ret.style.display = '';
+  /* 출석 플로우엔 경유구매 안내가 아예 뜨지 않으므로 잡아 둔 자리도 거둔다. */
+  var shopInfo = document.getElementById('shop-bridge-info');
+  if (shopInfo) { shopInfo.classList.remove('pending'); shopInfo.style.display = 'none'; }
 }
 function acReturnFromBridge() {
   var sid = window._acPendingScreen || 'pw-14';
@@ -16258,7 +16265,7 @@ function selectMall(name, domain, dest) {
   var acRet = document.getElementById('ac-bridge-return');
   if (acRet) acRet.style.display = 'none';
   var shopInfo = document.getElementById('shop-bridge-info');
-  if (shopInfo) shopInfo.style.display = 'none';
+  if (shopInfo) { shopInfo.style.display = ''; shopInfo.classList.add('pending'); }
 
   // pw-12 업데이트
   var t12 = document.getElementById('mall12-title');
@@ -19107,7 +19114,7 @@ function schedulePurchasePrompt() {
 
 function showBridgeRealInfo() {
   var info = document.getElementById('shop-bridge-info');
-  if (info) info.style.display = '';
+  if (info) { info.style.display = ''; info.classList.remove('pending'); }
 }
 
 /* ── 데모 시뮬레이션 진입 확인 팝업 (공용) ──
