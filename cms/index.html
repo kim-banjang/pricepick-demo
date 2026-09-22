@@ -340,9 +340,13 @@ tr:hover td{background:var(--surface-2);}
 /* 링크프라이스 Affiliate Center 자료(2026-09-22) */
 #ta-info-body .ta-src{padding:8px 0 10px;font-size:11.5px;color:var(--text-3);border-bottom:1px solid var(--border);}
 #ta-info-body .ta-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 28px;}
-#ta-info-body .ta-kv{display:grid;grid-template-columns:128px 1fr;gap:12px;align-items:start;
+#ta-info-body .ta-kv{display:grid;grid-template-columns:152px 1fr;gap:10px;align-items:start;
   padding:9px 0;border-bottom:1px solid var(--border);font-size:12.5px;line-height:1.55;}
 #ta-info-body .ta-kv > .k{color:var(--text-2);font-weight:600;}
+#ta-info-body .ta-tag{display:inline-block;margin-left:5px;padding:0 5px;border-radius:4px;
+  font-size:9.5px;font-weight:700;letter-spacing:.2px;vertical-align:1px;}
+#ta-info-body .ta-tag.api{background:var(--main-soft,#EDE9FE);color:var(--main);}
+#ta-info-body .ta-tag.man{background:var(--surface-2);color:var(--text-3);}
 #ta-info-body .ta-kv > .v{color:var(--text);word-break:break-word;}
 #ta-info-body .ta-kv > .v a{word-break:break-all;}
 #ta-info-body .ta-flagrow{padding:10px 0;}
@@ -7305,6 +7309,8 @@ Object.assign(KO2VI,{
   "링크프라이스 Affiliate Center":"Linkprice Affiliate Center",
   "광고효과인정기간":"Thời hạn công nhận hiệu quả quảng cáo",
   "실적인정범위":"Phạm vi công nhận thực tích","더보기":"Xem thêm","지급 일정":"Lịch chi trả",
+  "수기":"Thủ công","API 연동":"API đã kết nối","API 미연동":"API chưa kết nối",
+  "링크프라이스 Affiliate Center 화면":"Màn hình Linkprice Affiliate Center",
   "실적 전송 시점 전문":"Toàn văn thời điểm gửi thực tích",
   "실적 전송 시점":"Thời điểm gửi thực tích","정산 방식":"Phương thức quyết toán","지급 기준":"Căn cứ chi trả",
   "커미션 지급 일정":"Lịch chi trả hoa hồng","커미션 차감 항목":"Khoản trừ hoa hồng",
@@ -13415,9 +13421,9 @@ function taRenderRow(m, showHideCol) {
   );
   /* 커미션(모바일)·앱 인정 — 링크프라이스 카탈로그 행에만. 대표 제휴몰(쿠팡)은 직접 제휴라
      Affiliate Center 자료가 없다. 자리는 「링크프라이스 상태」 다음이다. */
-  var det = isCatalogRow ? taDetailOf(m.code) : null;
-  var app = isCatalogRow ? taAppOf(m.code) : null;
-  var commCell = !showHideCol ? '' : ('<td class="ta-tight">' + taEsc((det && det.commission_rate_mobile) || '—') + '</td>');
+  var api = isCatalogRow ? taApiOf(m.code) : null;
+  var app = api ? { aos: api.app_android_yn, ios: api.app_ios_yn } : null;
+  var commCell = !showHideCol ? '' : ('<td class="ta-tight">' + taEsc((api && api.max_commission_mobile) || '—') + '</td>');
   var appCell = !showHideCol ? '' : (function() {
     if (!app) return '<td class="ta-tight">—</td>';
     var one = function(k, v) {
@@ -13983,13 +13989,16 @@ function taDetailLoad() {
     .then(function(j) { TA_DETAIL = j; return j; })
     .catch(function(e) {
       console.error('lp-merchant-detail', e);
-      TA_DETAIL = { _meta: {}, merchants: {}, common: {}, app_support: {} };
+      TA_DETAIL = { _meta: {}, merchants: {}, common: {} };
       return TA_DETAIL;
     });
 }
 function taRawId(code) { return String(code || '').indexOf('lp:') === 0 ? String(code).slice(3) : String(code || ''); }
 function taDetailOf(code) { return (TA_DETAIL && TA_DETAIL.merchants) ? TA_DETAIL.merchants[taRawId(code)] : null; }
-function taAppOf(code) { return (TA_DETAIL && TA_DETAIL.app_support) ? TA_DETAIL.app_support[taRawId(code)] : null; }
+/* api = 링크프라이스 광고주 조회 오픈 API 가 내려주는 필드(필드명을 API 그대로 쓴다).
+   manual = API 에 없어 Affiliate Center 화면에서 옮겨 적은 값. */
+function taApiOf(code) { var d = taDetailOf(code); return (d && d.api) || null; }
+function taManOf(code) { var d = taDetailOf(code); return (d && d.manual) || null; }
 
 var LP_BY_CODE = null;
 function taLpByCode() {
@@ -14016,23 +14025,30 @@ function taYnApp(v) {
   if (v === 'N') return '미지원(N)<span class="ta-noapp">앱 미인정</span>';
   return taYn(v);
 }
-function taKv(label, valueHtml) {
-  return '<div class="ta-kv"><div class="k">' + taEsc(label) + '</div><div class="v">' + valueHtml + '</div></div>';
+/* src: 'api' = 링크프라이스 API 수신 항목, 'man' = API 에 없어 손으로 적은 항목 */
+function taSrcTag(src) {
+  if (src === 'api') return '<span class="ta-tag api">API</span>';
+  if (src === 'man') return '<span class="ta-tag man">수기</span>';
+  return '';
 }
-function taKvT(label, value) { return taKv(label, taEsc(value || '—')); }
-function taKvLink(label, url) {
-  return taKv(label, url ? ('<a href="' + taEsc(url) + '" target="_blank" rel="noopener noreferrer">' + taEsc(url) + '</a>') : '—');
+function taKv(label, valueHtml, src) {
+  return '<div class="ta-kv"><div class="k">' + taEsc(label) + taSrcTag(src) + '</div><div class="v">' + valueHtml + '</div></div>';
 }
-function taScopeHtml(x, app) {
+function taKvT(label, value, src) { return taKv(label, taEsc(value || '—'), src); }
+function taKvLink(label, url, src) {
+  return taKv(label, url ? ('<a href="' + taEsc(url) + '" target="_blank" rel="noopener noreferrer">' + taEsc(url) + '</a>') : '—', src);
+}
+/* PC 는 API 에 대응 필드가 없어 카탈로그 값을 쓴다. 나머지 셋은 API 필드다. */
+function taScopeHtml(x, api) {
   var one = function(k, v) {
     var c = v === 'Y' ? 'yes' : (v === 'N' ? 'no' : '');
     return '<span class="' + c + '">' + k + ' ' + (v || '—') + '</span>';
   };
   return '<span class="ta-scope">'
     + one('PC', x['PC웹 지원 여부'])
-    + one('MOBILE', x['모바일 웹 지원 여부'])
-    + one('AOS', app ? app.aos : x['APP(AOS) 지원 여부'])
-    + one('IOS', app ? app.ios : x['APP(IOS) 지원 여부'])
+    + one('MOBILE', api ? api.mobile_yn : x['모바일 웹 지원 여부'])
+    + one('AOS', api ? api.app_android_yn : x['APP(AOS) 지원 여부'])
+    + one('IOS', api ? api.app_ios_yn : x['APP(IOS) 지원 여부'])
     + '</span>';
 }
 window.taOpenMerchantInfo = function(code) {
@@ -14058,51 +14074,53 @@ window.taOpenMerchantInfo = function(code) {
       + '</tr>';
   }).join('');
 
-  var d = taDetailOf(code) || {};
-  var app = taAppOf(code);
+  var api = taApiOf(code) || {};
+  var man = taManOf(code) || {};
   var meta = (TA_DETAIL && TA_DETAIL._meta) || {};
-  var commonEx = ((TA_DETAIL && TA_DETAIL.common) || {}).excluded_products || '';
-  var cookie = d.cookie_period_label || x['광고 효과 인정 기간'] || '—';
-  if (d.cookie_period_actual) cookie += ' (실제 ' + d.cookie_period_actual + ')';
-  var timingShort = d.postback_timing_short || d.postback_timing || x['실시간 커미션 전송'] || '';
-  var timingFull = d.postback_timing || '';
+  var commonDeny = ((TA_DETAIL && TA_DETAIL.common) || {}).deny_product || '';
+  var cookie = (typeof api.return_day === 'number') ? (api.return_day + '일') : (x['광고 효과 인정 기간'] || '—');
+  if (man.return_day_actual) cookie += ' (실제 ' + man.return_day_actual + ')';
+  var timingShort = man.when_trans_short || api.when_trans || x['실시간 커미션 전송'] || '';
+  var timingFull = api.when_trans || '';
 
   var left = ''
-    + taKv('링크프라이스 승인 상태', '<span class="badge ' + taStatusBadgeClass(status) + '">' + taEsc(status || '미신청') + '</span>')
-    + taKvT('커미션(모바일)', d.commission_rate_mobile)
-    + taKv('실적인정범위', taScopeHtml(x, app))
-    + taKvT('광고효과인정기간', cookie)
-    + taKvT('실적 전송 시점', timingShort)
-    + taKv('리워드 가능 여부', taYn(x['리워드 가능 여부']))
-    + (d.reward_restriction_flag ? '<div class="ta-flagrow"><span class="ta-needchk">확인 필요</span></div>' : '');
+    + taKv('링크프라이스 승인 상태', '<span class="badge ' + taStatusBadgeClass(status) + '">' + taEsc(status || '미신청') + '</span>', 'api')
+    + taKvT('커미션(모바일)', api.max_commission_mobile, 'api')
+    + taKv('실적인정범위', taScopeHtml(x, api), 'api')
+    + taKvT('광고효과인정기간', cookie, man.return_day_actual ? 'man' : 'api')
+    + taKvT('실적 전송 시점', timingShort, man.when_trans_short ? 'man' : 'api')
+    + taKv('리워드 가능 여부', taYn(x['리워드 가능 여부']), 'api')
+    + (man.reward_restriction_flag ? '<div class="ta-flagrow"><span class="ta-needchk">확인 필요</span></div>' : '');
 
   var right = ''
-    + taKvT('정산 방식', d.settlement_method)
-    + taKvT('지급 기준', d.payment_basis)
-    + taKvT('지급 일정', d.payment_schedule)
-    + taKvT('커미션 차감 항목', d.deduction_items)
-    + taKvT('실적 인정 국가 · 언어', d.country_language)
-    + taKvT('카테고리', x['카테고리'])
-    + taKvLink('기본링크', x['기본링크'])
-    + taKvLink('사이트 URL', x['사이트 URL']);
+    + taKvT('정산 방식', api.trans_reposition, 'api')
+    + taKvT('지급 기준', man.payment_basis, 'man')
+    + taKvT('지급 일정', man.payment_schedule, 'man')
+    + taKvT('커미션 차감 항목', man.deduction_items, 'man')
+    + taKvT('실적 인정 국가 · 언어', man.country_language, 'man')
+    + taKvT('카테고리', x['카테고리'], 'api')
+    + taKvLink('기본링크', x['기본링크'], 'api')
+    + taKvLink('사이트 URL', x['사이트 URL'], 'api');
 
-  var moreEx = (d.excluded_products || '') + (commonEx ? ((d.excluded_products ? ' / ' : '') + commonEx) : '');
+  var deny = (api.deny_product || '') + (commonDeny ? ((api.deny_product ? ' / ' : '') + commonDeny) : '');
   var more = ''
-    + taKvT('커미션 미인정 상품', moreEx)
-    + taKvT('앱 · 브라우저 주의사항', d.app_browser_notes)
-    + (timingFull && timingFull !== timingShort ? taKvT('실적 전송 시점 전문', timingFull) : '')
+    + taKvT('커미션 미인정 상품', deny, 'api')
+    + taKvT('앱 · 브라우저 주의사항', man.app_browser_notes, 'man')
+    + (timingFull && timingFull !== timingShort ? taKvT('실적 전송 시점 전문', timingFull, 'api') : '')
+    + taKvT('커미션 지급 일정', api.commission_payment_standard, 'api')
     + taInfoPre('커미션 정산 방법 및 금액', x['커미션 정산 방법 및 금액'])
-    + taInfoPre('커미션 지급 일정', x['커미션 지급 일정'])
     + taInfoPre('활동 불가 방식', x['활동 불가 방식'])
-    + taInfoPre('커미션 미인정 상품', x['커미션 미인정 상품'])
     + taInfoPre('유의사항', x['유의사항'])
     + '<div class="policy-item"><div class="policy-label" style="margin-bottom:8px"><span>커미션 목록</span> (' + (x['커미션목록'] || []).length + '<span>건</span>)</div>'
     +   '<table><thead><tr><th>구분</th><th>PC웹</th><th>모바일웹</th><th>APP</th><th>종료일</th></tr></thead>'
     +   '<tbody>' + (commRows || '<tr><td colspan="5">커미션 정보 없음</td></tr>') + '</tbody></table>'
     + '</div>';
 
+  var mm = (meta.manual || {});
   var html = ''
-    + '<div class="ta-src"><span>기준일</span> ' + taEsc(meta.as_of || '') + ' · <span>출처</span> ' + taEsc(meta.source || '') + '</div>'
+    + '<div class="ta-src"><span>' + ((meta.api || {}).connected ? 'API 연동' : 'API 미연동') + '</span>'
+    +   ' · <span>출처</span> <span>' + taEsc(mm.source || '') + '</span>'
+    +   ' · <span>기준일</span> ' + taEsc(mm.checked_at || '') + '</div>'
     + '<div class="ta-grid"><div>' + left + '</div><div>' + right + '</div></div>'
     + '<details class="ta-more"><summary>더보기</summary>' + more + '</details>';
 
