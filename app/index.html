@@ -17750,7 +17750,7 @@ function ppLoadMalls() {
         name: name,
         domain: ppMallDomain(a.merchant_url || c['사이트 URL']) || id,
         logo: logos[code] || '',
-        comm: rate > 0 ? (rate + '%') : '',
+        /* commPct 는 정렬에만 쓴다 — 화면에 숫자로 찍지 않는다. */
         commPct: rate,
         returnDay: (typeof a.return_day === 'number') ? a.return_day : null,
         payStd: a.commission_payment_standard || '',
@@ -17765,7 +17765,6 @@ function ppLoadMalls() {
     var head = {
       code: PP_COUPANG_CODE, name: PP_COUPANG.name, domain: PP_COUPANG.domain,
       logo: logos[PP_COUPANG_CODE] || '',
-      comm: (typeof cr === 'number' && cr > 0) ? (cr + '%') : '',
       commPct: (typeof cr === 'number') ? cr : 0,
       returnDay: null, notice: '', denyProduct: '', isCoupang: true
     };
@@ -17805,6 +17804,15 @@ function ppRenderMallList() {
 /* 홈 「구매하고 티켓받기」 — 홈은 요약 자리다. 상위 다섯만 두고 나머지는 「전체 ›」로 넘긴다
    (적용 몰을 전부 그리면 홈이 몰 목록으로 도배된다, 김반장 확정 2026-09-22). */
 var PP_HOME_MALL_MAX = 5;
+/* 홈 카드 설명 — 적립률을 적으면 안 된다. 랜덤 티켓은 구매 순간 이미 정해진 등급을
+   화면에서 숨기려고 만든 장치인데(정책 02), 적립률을 적어 두면 금액에 곱해 등급을
+   역산할 수 있어 숨기는 뜻이 사라진다(김반장 확정 2026-09-22).
+   값은 고쳐 쓰기 전 마크업에 손으로 적혀 있던 문구 그대로다(64eefd6^).
+   문구가 없는 몰은 줄을 두지 않는다 — 지어내지 않는다. */
+var PP_HOME_DESC = {
+  'coupang_direct': '구매 시 티켓 적립 <b>실시간</b>',
+  'lp:aliexpress': '<b>해외직구</b> · 누적 후 정산'
+};
 function ppRenderHomeMalls() {
   var box = document.getElementById('pp-home-mall-list');
   if (!box || !PP_MALLS || !PP_MALLS.length) return;
@@ -17819,7 +17827,7 @@ function ppRenderHomeMalls() {
       + '<div class="hmc-logo" data-logo-code="' + ppEscAttr(m.code) + '">' + ppMallLogoHtml(m) + '</div>'
       + '<div class="hmc-body"><div class="hmc-row1"><span class="hmc-name">' + ppEsc(m.name) + '</span>'
       +   (best ? '<span class="hmc-badge best">BEST</span>' : '') + '</div>'
-      + '<div class="hmc-desc">' + (m.comm ? ('<span>최대 적립률</span> <b>' + ppEsc(m.comm) + '</b>') : '') + '</div></div>'
+      + (PP_HOME_DESC[m.code] ? ('<div class="hmc-desc">' + PP_HOME_DESC[m.code] + '</div>') : '') + '</div>'
       + '<button class="hmc-go' + (best ? ' primary' : '') + '" onclick="event.stopPropagation();selectMall(\'' + nm + '\',\'' + dm + '\',\'pw-13\')">바로가기 ›</button>'
       + '</div>';
   }).join('');
