@@ -6888,6 +6888,8 @@
   }
   .bridge-logo-cp img {
     width: 100%;
+    max-height: 100%;
+    object-fit: contain;
     height: auto;
     display: block;
   }
@@ -11374,12 +11376,12 @@ window.PP_FEATURES = {
               <span class="bridge-arrow">›</span>
               <span class="bridge-arrow">›</span>
             </div>
-            <div class="bridge-logo-cp"><img src="https://www.google.com/s2/favicons?domain=coupang.com&sz=64" alt="Coupang" onerror="this.remove()"></div>
+            <div class="bridge-logo-cp" id="bridge-logo"><img src="https://www.google.com/s2/favicons?domain=coupang.com&sz=64" alt="" onerror="this.remove()"></div>
           </div>
 
           <!-- 메시지 -->
-          <div class="bridge-title">쿠팡으로 이동 중이에요</div>
-          <div class="bridge-desc">잠시만 기다려주세요. 이동이 완료되면<br>자동으로 쿠팡 앱이 열립니다.</div>
+          <div class="bridge-title" id="bridge-title">쿠팡으로 이동 중이에요</div>
+          <div class="bridge-desc" id="bridge-desc">잠시만 기다려주세요. 이동이 완료되면<br>자동으로 쿠팡 앱이 열립니다.</div>
 
           <!-- 티켓 적립 리마인드 -->
           <div class="bridge-reminder">
@@ -11510,7 +11512,7 @@ window.PP_FEATURES = {
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M7 17L17 7M17 7H9M17 7V15" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </button>
           <!-- 홈 화면 바로가기 안내 — 실제로는 프라이스픽 앱(PWA)을 홈 화면에 설치한다. 몰별 링크가 아니다. -->
-          <button type="button" onclick="cpkOpen()" style="margin:2px 16px 8px;width:calc(100% - 32px);display:flex;align-items:center;justify-content:center;gap:8px;background:var(--main);border:none;color:#fff;font-size:var(--fs-body);font-weight:800;border-radius:14px;padding:14px;cursor:pointer;box-shadow:0 5px 16px rgba(132,94,238,.30);">
+          <button type="button" onclick="cpkOpen()" style="margin:2px 16px 8px;width:calc(100% - 32px);display:flex;align-items:center;justify-content:center;gap:8px;background:#E4002B;border:none;color:#fff;font-size:var(--fs-body);font-weight:800;border-radius:14px;padding:14px;cursor:pointer;box-shadow:0 5px 16px rgba(228,0,43,.30);">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="2" width="12" height="20" rx="2.5"/><line x1="12" y1="8.5" x2="12" y2="13.5"/><line x1="9.5" y1="11" x2="14.5" y2="11"/></svg>
             홈 화면에 '<span id="mall12-cpk-name">쿠팡</span>' 바로가기 추가
           </button>
@@ -16247,6 +16249,10 @@ function selectMall(name, domain, dest) {
   var t13 = document.getElementById('mall13-title');
   var s13 = document.getElementById('mall13-sub');
   var h13 = document.getElementById('mall13-hint');
+  var bt = document.getElementById('bridge-title');
+  var bd = document.getElementById('bridge-desc');
+  if (bt) bt.textContent = name + '으로 이동 중이에요';
+  if (bd) bd.innerHTML = '잠시만 기다려주세요. 이동이 완료되면<br>자동으로 ' + name + ' 앱이 열립니다.';
   if (l13) l13.innerHTML = '<img src="' + favicon + '" alt="' + name + '" onerror="this.remove()"><span>' + name + '</span>';
   if (t13) t13.textContent = name + '으로 이동 중';
   if (s13) s13.innerHTML = '지금부터 ' + name + '에서 구매하면<br>티켓이 자동으로 적립돼요';
@@ -16858,7 +16864,9 @@ Object.assign(KO2VI, {
   "원본 티켓의 적립일을 그대로 승계": "kế thừa nguyên ngày tích lũy của vé gốc",
   "(전부 동일).": "(tất cả như nhau).",
   "오래된순": "Cũ nhất",
-  "홈 화면 아이콘으로 들어가면 앱을 거치지 않아도 적립됩니다.": "Vào bằng icon ở màn hình chính thì không qua app vẫn được tích lũy.",
+    /* 04c 홈 바로가기 모달 본문 — 가운데 <span>이 몰 이름이라 앞뒤로 갈라 받는다 */
+    "홈 화면 아이콘으로 들어가면 앱을 안 거쳐도 구매 적립이 유지돼요. 제휴 추적 코드가 담긴": "Vào bằng icon ở màn hình chính thì dù không qua app vẫn giữ tích lũy mua hàng. Là link",
+    "링크예요.": "có gắn mã theo dõi liên kết.",
   "Android — 버튼을 누르면 홈 화면에 바로 추가돼요": "Android — bấm nút là thêm ngay vào màn hình chính",
   "iPhone(사파리) — OS 제약으로 자동 추가가 안 돼요. 공유 → '홈 화면에 추가'를 직접 눌러주세요": "iPhone(Safari) — do giới hạn OS nên không tự thêm được. Hãy tự chạm Chia sẻ → 'Thêm vào màn hình chính'"
 });
@@ -17349,7 +17357,7 @@ Object.assign(KO2VI, {
 
 <div id="cpk-modal" style="display:none;position:fixed;inset:0;z-index:2147483600;background:rgba(20,12,10,.5);align-items:center;justify-content:center;padding:20px;">
   <div style="background:#fff;border-radius:18px;max-width:330px;width:100%;overflow:hidden;box-shadow:0 16px 50px rgba(0,0,0,.32);font-family:-apple-system,'Apple SD Gothic Neo',sans-serif;">
-    <div style="background:var(--main);padding:20px 18px 16px;text-align:center;color:#fff;position:relative;">
+    <div style="background:#E4002B;padding:20px 18px 16px;text-align:center;color:#fff;position:relative;">
       <button type="button" onclick="cpkClose()" style="position:absolute;top:11px;right:12px;background:rgba(255,255,255,.22);border:none;color:#fff;width:26px;height:26px;border-radius:8px;font-size:var(--fs-section);line-height:1;cursor:pointer;">&times;</button>
       <!-- 아이콘은 해당 몰의 CMS 등록 로고다(김반장 확정 2026-09-22). 가로형(120x60) 로고가
            섞여 있어 목록·홈과 같이 contain 으로 넣는다. 로고가 없으면 첫 글자 배지가 남는다. -->
@@ -17357,12 +17365,12 @@ Object.assign(KO2VI, {
       <div id="cpk-modal-title" style="font-size:var(--fs-label);font-weight:800;">홈 화면에 '쿠팡' 바로가기 추가</div>
     </div>
     <div style="padding:16px 18px 18px;">
-      <div style="font-size:var(--fs-caption);color:#444;line-height:1.65;margin-bottom:13px;">홈 화면 아이콘으로 들어가면 앱을 거치지 않아도 적립됩니다.</div>
-      <div id="cpk-ios-guide" style="background:var(--sub-4);border:1px solid var(--sub-3);border-radius:11px;padding:11px 13px;font-size:var(--fs-caption);color:var(--main-dark);line-height:1.7;margin-bottom:14px;">
+      <div style="font-size:var(--fs-caption);color:#444;line-height:1.65;margin-bottom:13px;">홈 화면 아이콘으로 들어가면 앱을 안 거쳐도 구매 적립이 유지돼요. 제휴 추적 코드가 담긴 <span id="cpk-modal-mall">쿠팡</span> 링크예요.</div>
+      <div id="cpk-ios-guide" style="background:#FFF4F1;border:1px solid #FFD9CF;border-radius:11px;padding:11px 13px;font-size:var(--fs-caption);color:#9A3A28;line-height:1.7;margin-bottom:14px;">
         <div>Android — 버튼을 누르면 홈 화면에 바로 추가돼요</div>
         <div>iPhone(사파리) — OS 제약으로 자동 추가가 안 돼요. 공유 → '홈 화면에 추가'를 직접 눌러주세요</div>
       </div>
-      <button type="button" onclick="cpkAddHome();" style="width:100%;height:46px;background:var(--main);border:none;border-radius:12px;color:#fff;font-size:var(--fs-body);font-weight:800;cursor:pointer;">홈 화면에 추가</button>
+      <button type="button" onclick="cpkAddHome();" style="width:100%;height:46px;background:#E4002B;border:none;border-radius:12px;color:#fff;font-size:var(--fs-body);font-weight:800;cursor:pointer;">홈 화면에 추가</button>
     </div>
   </div>
 </div>
@@ -17375,7 +17383,7 @@ window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();win
 function cpkAddHome(){
   if(window.__cpkPrompt){var p=window.__cpkPrompt;window.__cpkPrompt=null;p.prompt();cpkClose();return;}
   var g=document.getElementById('cpk-ios-guide');
-  if(g){g.style.background='var(--sub-3)';g.style.borderColor='var(--sub-1)';g.style.fontWeight='700';}
+  if(g){g.style.background='#FFE4DB';g.style.borderColor='#F0917A';g.style.fontWeight='700';}
 }
 /* 지금 보고 있는 몰을 PP_MALLS 에서 찾는다 — 이 블록은 목록을 만드는 IIFE 밖이라
    window 로 내보낸 것만 쓸 수 있다. */
@@ -17391,6 +17399,8 @@ function cpkOpen(){
   var name=(mall&&mall.name)||(window.currentMall&&window.currentMall.name)||'';
   var t=document.getElementById('cpk-modal-title');
   if(t) t.textContent="홈 화면에 '"+name+"' 바로가기 추가";
+  var mn=document.getElementById('cpk-modal-mall');
+  if(mn) mn.textContent=name;
   var ic=document.getElementById('cpk-modal-icon');
   if(ic){
     var abbr=String(name).trim().slice(0,2)||'?';
@@ -17868,6 +17878,9 @@ function ppFillMallDetail(domain) {
       var box = document.getElementById(id);
       if (box) box.innerHTML = ppMallLogoHtml(m);
     });
+    /* 이동 중 화면의 로고 타일은 글자 배지 자리가 없다 — 그림만 갈아끼운다. */
+    var bl = document.getElementById('bridge-logo');
+    if (bl) bl.innerHTML = '<img src="' + ppEscAttr(m.logo) + '" alt="" onerror="this.remove()">';
   }
 
   /* 티켓 확정 문구 — 쿠팡은 직접 제휴라 기준이 따로고, 링크프라이스 몰은 몰마다 다르다. */
