@@ -17478,8 +17478,18 @@ function cpkRenderPreview(mall, name){
   }
   box.innerHTML=out.join('');
 }
+/* 시트를 지금 보고 있는 폰 프레임 안으로 옮긴다. .phone 에 항등 transform 이 걸려 있어
+   그 안의 position:fixed 는 뷰포트가 아니라 프레임을 기준으로 잡힌다 — 앱의 다른 모달
+   (kakao-modal · nt-detail-modal)이 이미 이 방식이다. 문서 끝에 그대로 두면 PC 에서
+   브라우저 창 전체를 덮어 프레임 밖으로 삐져나온다(김반장 지적 2026-09-22). */
+function cpkMount(m){
+  var pw=document.querySelector('.phone-wrap.ip-active') || document.querySelector('.phone-wrap');
+  var host=pw && (pw.querySelector('.app-screen') || pw.querySelector('.phone'));
+  if(host && m.parentElement!==host) host.appendChild(m);
+}
 function cpkOpen(){
   var m=document.getElementById('cpk-modal'); if(!m) return;
+  cpkMount(m);
   var mall=cpkMall();
   var name=(mall&&mall.name)||(window.currentMall&&window.currentMall.name)||'';
   var mn=document.getElementById('cpk-modal-mall');
