@@ -1,14 +1,50 @@
 {
   "rewrites": [
-    { "source": "/cms", "destination": "/cms/index.html" },
-    { "source": "/app", "destination": "/app/index.html" },
-    { "source": "/app/", "destination": "/app/index.html" },
-    { "source": "/scenario", "destination": "/scenario/index.html" },
-    { "source": "/demo-accounts", "destination": "/demo-accounts/index.html" },
-    { "source": "/demo-accounts/", "destination": "/demo-accounts/index.html" },
-    { "source": "/flutter", "destination": "/flutter-web/index.html" },
-    { "source": "/flutter/", "destination": "/flutter-web/index.html" },
-    { "source": "/flutter/:path*", "destination": "/flutter-web/:path*" },
-    { "source": "/",    "destination": "/cms/index.html" }
+    {
+      "source": "/cms",
+      "destination": "/cms/index.html"
+    },
+    {
+      "source": "/app",
+      "destination": "/app/index.html"
+    },
+    {
+      "source": "/app/",
+      "destination": "/app/index.html"
+    },
+    {
+      "source": "/scenario",
+      "destination": "/scenario/index.html"
+    },
+    {
+      "source": "/demo-accounts",
+      "destination": "/demo-accounts/index.html"
+    },
+    {
+      "source": "/demo-accounts/",
+      "destination": "/demo-accounts/index.html"
+    },
+    {
+      "source": "/flutter",
+      "destination": "/flutter-web/index.html"
+    },
+    {
+      "source": "/flutter/",
+      "destination": "/flutter-web/index.html"
+    },
+    {
+      "source": "/flutter/:path*",
+      "destination": "/flutter-web/:path*"
+    },
+    {
+      "source": "/",
+      "destination": "/cms/index.html"
+    }
+  ],
+  "crons": [
+    {
+      "path": "/api/lp-merchants",
+      "schedule": "0 19 * * *"
+    }
   ]
 }
