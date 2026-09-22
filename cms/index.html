@@ -1979,9 +1979,6 @@ window.CMS_FEATURES = {
               <input class="form-input" type="number" id="ta-bulk-ratio" min="0" max="100" step="1" value="60" style="width:55px;text-align:right" oninput="taBulkRatioLabelUpdate()">
               <span style="font-size:13px;color:var(--text-2)">%</span>
               <button class="btn btn-ghost btn-sm" id="ta-bulk-apply-btn" onclick="taBulkApplyRatio()">적립률 60% 적용</button>
-              <input class="form-input" type="number" id="ta-bulk-days" min="1" max="365" step="1" value="30" style="width:60px;text-align:right" title="선택한 몰에 한꺼번에 적용할 전환 대기일 수">
-              <span style="font-size:13px;color:var(--text-2)">일</span>
-              <button class="btn btn-ghost btn-sm" onclick="taBulkSetConvertDays()">전환 대기일 수 적용</button>
               <button class="btn btn-ghost btn-sm" id="ta-bulk-on-btn" onclick="taBulkSetApplied(true)">적용으로</button>
               <button class="btn btn-ghost btn-sm" id="ta-bulk-off-btn" onclick="taBulkSetApplied(false)">미적용으로</button>
               <button class="btn btn-ghost btn-sm" onclick="taToggleSelectMode()">취소</button>
@@ -2015,7 +2012,7 @@ window.CMS_FEATURES = {
                 <th style="width:6%">수수료</th>
                 <th style="width:8%">적립률</th>
                 <th style="width:6%">수익</th>
-                <th style="width:10%">전환 대기일 수</th>
+                <th style="width:10%">등급 전환 시점</th>
                 <th style="width:15%">시뮬레이터</th>
                 <th style="width:13%">적용</th>
               </tr>
@@ -7110,6 +7107,8 @@ Object.assign(KO2VI,{"적립액은 구매금액과 제휴몰별 적립률로 정
 /* ── 전환 대기일 수 · 티켓 적립 설정 Notice (김반장 확정 2026-08-26) ── */
 Object.assign(KO2VI,{
   "전환 대기일 수":"Số ngày chờ chuyển đổi",
+  "등급 전환 시점":"Thời điểm chuyển hạng","익익월 6일 확정 후":"Sau khi chốt ngày 6 của tháng sau nữa",
+  "링크프라이스 제휴몰은 실적 월의 익익월 6일 이후 확정 건을 대조해 등급 티켓으로 전환합니다. 몰마다 다르지 않습니다.":"Sàn Linkprice đối chiếu các đơn đã chốt sau ngày 6 của tháng sau nữa kể từ tháng phát sinh thực tích rồi chuyển thành vé hạng. Không khác nhau theo từng sàn.",
   "전환 대기일 수 적용":"Áp dụng số ngày chờ chuyển đổi",
   "선택한 몰에 한꺼번에 적용할 전환 대기일 수":"Số ngày chờ chuyển đổi áp dụng hàng loạt cho các sàn đã chọn",
   "카카오톡 연동 D+7 / 미연동 D+30":"Liên kết KakaoTalk D+7 / Chưa liên kết D+30",
@@ -13191,6 +13190,10 @@ function taDefaultRate(fee, ratio) {
 var TA_DEFAULT_CONVERT_DAYS = 30;
 // 쿠팡 칸에 그대로 박히는 글자. 관리자가 고칠 수 없다.
 var TA_COUPANG_WAIT_LABEL = '카카오톡 연동 D+7 / 미연동 D+30';
+/* 링크프라이스 제휴몰의 등급 전환 시점 — 몰마다 다르지 않다. 종전 「몰별 설정·기본 30일」은
+   2026-09-22 폐기(운영 정책 02 변경 이력). 우리가 정하는 값이 아니라 정산 구조가 정하는
+   값이라 읽기 전용이고 저장 대상도 아니다. */
+var TA_LP_CONVERT_LABEL = '익익월 6일 확정 후';
 var TA_CONVERT_DAYS = {};   // { code: 일수 } — 화면(저장 전 편집분 포함) 값
 
 var TA_UNITS = [                                           // ticket_grades 시드의 환산가치와 동일
@@ -13325,14 +13328,6 @@ function taCheckDirtySection(tbodySel) {
       if (appliedChanged) changed++;
     }
 
-    var daysEl = tr.querySelector('.ta-days');
-    if (daysEl && typeof orig.days === 'number') {
-      var daysVal = parseInt(daysEl.value, 10);
-      var daysChanged = isFinite(daysVal) && daysVal !== orig.days;
-      daysEl.classList.toggle('ta-changed', daysChanged);
-      if (daysChanged) changed++;
-    }
-
     var logoOrig = orig.logo || '';
     var logoCur = TA_LOGO[tr.dataset.code] || '';
     var logoChanged = logoCur !== logoOrig;
@@ -13410,7 +13405,7 @@ function taPctOf(v) {
 function taApiRec(rawId) { return (TA_DETAIL && TA_DETAIL.merchants) ? TA_DETAIL.merchants[rawId] : null; }
 /* 링크프라이스 승인 상태는 링크프라이스가 정해 내려주는 값이다 — 우리가 고치는 값이
    아니므로 읽기 전용 배지로만 보여 준다(김반장 확정 2026-09-22). 저장 대상에서도 뺀다.
-   수수료·적립률·전환 대기일 수·적용 여부는 우리가 정하는 값이라 그대로 편집 가능하다. */
+   수수료·적립률·적용 여부는 우리가 정하는 값이라 그대로 편집 가능하다. */
 function taStatusBadgeHtml(code, status) {
   var v = status || '미신청';
   return '<span class="badge ' + taStatusBadgeClass(v) + '" id="ta-status-badge-' + code + '">' + taEsc(v) + '</span>';
@@ -13476,8 +13471,7 @@ function taRenderRow(m, showHideCol) {
     + '<td class="ta-margin">—</td>'
     + (!showHideCol
         ? '<td><span class="ta-days-fixed" title="쿠팡은 직접 제휴라 카카오톡 연동 기준을 그대로 씁니다. 고정값이라 수정할 수 없습니다.">' + TA_COUPANG_WAIT_LABEL + '</span></td>'
-        : '<td><span style="display:inline-flex;align-items:center;gap:6px">'
-          + '<input class="form-input ta-days" type="number" min="1" max="365" step="1" value="' + m.days + '" style="max-width:72px;text-align:right"><span>일</span></span></td>')
+        : '<td><span class="ta-days-fixed" title="링크프라이스 제휴몰은 실적 월의 익익월 6일 이후 확정 건을 대조해 등급 티켓으로 전환합니다. 몰마다 다르지 않습니다.">' + TA_LP_CONVERT_LABEL + '</span></td>')
     + '<td><button type="button" class="btn btn-ghost btn-sm" onclick="taOpenSim(\'' + m.code + '\')">시뮬레이터</button></td>'
     + appliedCell
     + '</tr>';
@@ -13493,7 +13487,7 @@ function taCollectFromDom(scope) {
     : scope === 'secondary' ? '#ta-tbody-secondary'
     : '#ta-tbody-primary, #ta-tbody-secondary';
   var rows = document.querySelectorAll(tbodySel.split(',').map(function(s){return s.trim()+' tr[data-code]';}).join(', '));
-  var rates = {}, fees = {}, applied = {}, logos = {}, convertDays = {}, bad = false;
+  var rates = {}, fees = {}, applied = {}, logos = {}, bad = false;
   Array.prototype.forEach.call(rows, function(tr) {
     var code = tr.dataset.code;
     var v = parseFloat(tr.querySelector('.ta-rate').value);
@@ -13502,17 +13496,12 @@ function taCollectFromDom(scope) {
     var f = parseFloat(tr.querySelector('.ta-fee').value);
     if (!isFinite(f) || f < 0 || f > 100) { bad = true; return; }
     fees[code] = Math.round(f * 100) / 100;
-    var dEl = tr.querySelector('.ta-days');
-    if (dEl) {
-      var dv = parseInt(dEl.value, 10);
-      if (!isFinite(dv) || dv < 1 || dv > 365) { bad = true; return; }
-      convertDays[code] = dv;
-    }
     if (typeof TA_APPLIED[code] === 'boolean') applied[code] = TA_APPLIED[code];
     logos[code] = TA_LOGO[code] || '';
   });
-  /* approval(링크프라이스 승인 상태)은 없다 — 링크프라이스가 내려주는 값이라 저장하지 않는다. */
-  return { rates: rates, fees: fees, applied: applied, logos: logos, convertDays: convertDays, bad: bad };
+  /* approval(링크프라이스 승인 상태)·convertDays(등급 전환 시점)는 없다 —
+     둘 다 우리가 정하는 값이 아니라 저장하지 않는다. */
+  return { rates: rates, fees: fees, applied: applied, logos: logos, bad: bad };
 }
 
 window.taLoad = function() {
@@ -13688,12 +13677,6 @@ window.taLoad = function() {
     Array.prototype.forEach.call(allRows, function(tr) {
       tr.querySelector('.ta-fee').addEventListener('input', function() { taRowRefresh(tr); });
       tr.querySelector('.ta-rate').addEventListener('input', function() { taRowRefresh(tr); });
-      var dEl = tr.querySelector('.ta-days');
-      if (dEl) dEl.addEventListener('input', function() {
-        var v = parseInt(dEl.value, 10);
-        if (isFinite(v) && v >= 1) TA_CONVERT_DAYS[tr.dataset.code] = v;
-        taCheckDirty();
-      });
       taRowRefresh(tr);
     });
     taApplyFilters();
@@ -13731,19 +13714,11 @@ function taSaveScope(scope, btnId, bannerLabel, logLabel) {
       fees: Object.assign({}, data.fees || {}, c.fees),
       applied: Object.assign({}, data.applied || {}, c.applied),
       logos: Object.assign({}, data.logos || {}, c.logos),
-      convertDays: Object.assign({}, data.convertDays || {}, c.convertDays),
       updated_at: FS.FieldValue.serverTimestamp(),
     }, { merge: true });
   }).then(function() {
-    toast(bannerLabel + ' 수수료·적립률·전환 대기일 수·적용여부·로고를 저장했습니다.');
-    logAdmin(logLabel + ' 수수료·적립률·전환 대기일 수·적용여부·로고 수정');
-    // 전환 대기일 수를 줄인 몰이 있으면 이미 발급된 대기 티켓에 소급 적용한다
-    // (김반장 확정 2026-08-24 — "새로 받는 것만이 아니라 그 티켓도 앞당겨 전환된다").
-    var shortened = Object.keys(c.convertDays).filter(function(code) {
-      var before = TA_ORIGINAL[code] && TA_ORIGINAL[code].days;
-      return typeof before === 'number' && c.convertDays[code] < before;
-    });
-    if (shortened.length) taConvertRetro(c.convertDays, shortened);
+    toast(bannerLabel + ' 수수료·적립률·적용여부·로고를 저장했습니다.');
+    logAdmin(logLabel + ' 수수료·적립률·적용여부·로고 수정');
     // 방금 저장한 코드만 "원본" 기준값을 갱신 — 다른 구획(아직 저장 안 한 입력값)은
     // 안 건드린다. taLoad() 를 다시 부르면 그 구획의 입력 중이던 값이 지워진다.
     Object.keys(c.rates).forEach(function(code) {
@@ -13752,7 +13727,6 @@ function taSaveScope(scope, btnId, bannerLabel, logLabel) {
       TA_ORIGINAL[code].fee = c.fees[code];
       if (Object.prototype.hasOwnProperty.call(c.applied, code)) TA_ORIGINAL[code].applied = c.applied[code];
       if (Object.prototype.hasOwnProperty.call(c.logos, code)) TA_ORIGINAL[code].logo = c.logos[code];
-      if (Object.prototype.hasOwnProperty.call(c.convertDays, code)) TA_ORIGINAL[code].days = c.convertDays[code];
     });
     taCheckDirty();
   }).catch(function(e) {
@@ -13770,26 +13744,8 @@ window.taSaveSecondary = function() {
   taSaveScope('secondary', 'ta-save-btn-secondary', '제휴몰(링크프라이스)', '제휴몰(링크프라이스)');
 };
 
-// ── 전환 대기일 수 일괄 적용 (선택 모드) ──────────────────────────────
-// 적립률 일괄 적용(taBulkApplyRatio)과 같은 방식 — 화면 값만 바꾸고 저장 버튼을
-// 눌러야 Firestore 에 반영된다.
-window.taBulkSetConvertDays = function() {
-  var codes = Object.keys(TA_SELECTED);
-  if (!codes.length) { toast('선택된 몰이 없습니다. 「선택」을 눌러 몰을 체크하세요.'); return; }
-  var v = parseInt((document.getElementById('ta-bulk-days') || {}).value, 10);
-  if (!isFinite(v) || v < 1 || v > 365) { toast('전환 대기일 수는 1~365 사이 숫자로 입력하세요.'); return; }
-  codes.forEach(function(code) {
-    var tr = document.querySelector('#ta-tbody-secondary tr[data-code="' + code + '"]');
-    if (!tr) return;
-    var el = tr.querySelector('.ta-days');
-    if (el) el.value = v;
-    TA_CONVERT_DAYS[code] = v;
-  });
-  taCheckDirty();
-  toast(codes.length + '개 몰의 전환 대기일 수를 ' + v + '일로 맞췄습니다. 저장 버튼을 눌러야 적용됩니다.');
-};
-
-// ── 소급 전환 배치 ──────────────────────────────────────────────
+/* ⚠ 아래 taConvertRetro 를 부르는 화면 경로는 없다 — 등급 전환 시점이 고정값이 되어
+   「줄이는」 일 자체가 없어졌다(2026-09-22). 과거 데이터 손보기용으로 남겨만 둔다. */
 // 전환 대기일 수를 줄이면 "앞으로 적립되는 티켓"만이 아니라 "이미 발급되어 대기 중인
 // 랜덤 티켓"에도 새 기준을 소급 적용한다(김반장 확정 2026-08-24). 실서버에서는
 // 매일 도는 확정 배치가 같은 판정을 하지만, 일수를 줄인 그 순간 이미 기준을 넘긴
@@ -14066,7 +14022,7 @@ function taDetailLoad() {
   });
 }
 /* 「링크프라이스 업데이트」 — 자동 갱신(Vercel Cron)과 같은 자리를 부른다. 두 벌로 만들지 않는다.
-   ⚠ 링크프라이스에서 오는 값만 다시 그린다. 수수료·적립률·전환 대기일 수·적용 토글은
+   ⚠ 링크프라이스에서 오는 값만 다시 그린다. 수수료·적립률·적용 토글은
    화면에서 편집 중일 수 있으므로 손대지 않는다(taLoad 를 다시 부르면 그 값이 지워진다). */
 window.taLpRefresh = function() {
   var btn = document.getElementById('ta-lp-refresh-btn');
