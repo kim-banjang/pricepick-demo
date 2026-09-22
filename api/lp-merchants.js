@@ -17,6 +17,10 @@ const ENDPOINT = 'http://api.linkprice.com/ci/service/all_merchant/'
   + AFFILIATE_ID + '/apr/cps/detail';
 const DOC_PATH = ['settings', 'linkprice_merchants'];
 
+/* 역슬래시+n 두 글자 */
+const BSLASH_N = String.fromCharCode(92) + 'n';
+const LF = String.fromCharCode(10);
+
 /* 빈 응답·급감으로 기존 데이터를 날리지 않는다. 직전 건수의 이 비율 미만이면 건너뛴다. */
 const MIN_COUNT = 1;
 const MIN_RATIO = 0.5;
@@ -48,16 +52,37 @@ function credRaw() {
 
 function parseCred(value) {
   const text = value.charAt(0) === '{' ? value : Buffer.from(value, 'base64').toString('utf8');
-  return JSON.parse(text);
+  const json = JSON.parse(text);
+  /* private_key 안의 줄바꿈이 두 글자(역슬래시 n)로 들어오는 경우가 있다 — 환경변수에
+     JSON 을 붙여 넣는 경로에 따라 갈린다. PEM 에 역슬래시가 들어갈 일은 없으니
+     그 조합만 진짜 줄바꿈으로 되돌린다. 이미 줄바꿈이면 아무 일도 일어나지 않는다. */
+  if (json && typeof json.private_key === 'string' && json.private_key.indexOf(BSLASH_N) >= 0) {
+    json.private_key = json.private_key.split(BSLASH_N).join(LF);
+  }
+  return json;
 }
 
+/* 자격증명 모양만 보고한다 — 키 내용은 어디에도 내보내지 않는다. */
+function credShape(json) {
+  const k = (json && typeof json.private_key === 'string') ? json.private_key : '';
+  return {
+    has_project_id: !!(json && json.project_id),
+    has_client_email: !!(json && json.client_email),
+    private_key_len: k.length,
+    private_key_pem_header: k.indexOf('-----BEGIN') === 0,
+    private_key_newlines: k.indexOf(LF) >= 0 ? 'real' : (k.indexOf(BSLASH_N) >= 0 ? 'escaped' : 'none'),
+  };
+}
+
+/* firebase-admin 14 에는 예전 네임스페이스(admin.apps · admin.credential)가 없다.
+   admin.apps 가 undefined 라 .length 를 읽다 죽었다 — 그게 bad_credentials 로 보고되던
+   정체다. 자격증명 문제가 아니었다. 지금 버전의 모듈 경로로 바꾼다. */
 function db(found) {
   if (!found) return null;
-  const admin = require('firebase-admin');
-  if (!admin.apps.length) {
-    admin.initializeApp({ credential: admin.credential.cert(parseCred(found.value)) });
-  }
-  return admin.firestore();
+  const { initializeApp, getApps, cert } = require('firebase-admin/app');
+  const { getFirestore } = require('firebase-admin/firestore');
+  const app = getApps().length ? getApps()[0] : initializeApp({ credential: cert(parseCred(found.value)) });
+  return getFirestore(app);
 }
 
 module.exports = async function handler(req, res) {
@@ -67,10 +92,15 @@ module.exports = async function handler(req, res) {
   /* ?check=1 — 링크프라이스를 부르지 않고 자격증명 상태만 본다.
      상태를 보려고 외부 호출을 일으키지 않기 위한 자리다. */
   if (req && req.query && req.query.check) {
-    let ok = false, why = null;
-    if (found) { try { parseCred(found.value); ok = true; } catch (e) { why = String((e && e.message) || e); } }
+    let ok = false, why = null, shape = null, initOk = false, initErr = null;
+    if (found) {
+      try { shape = credShape(parseCred(found.value)); ok = true; }
+      catch (e) { why = String((e && e.message) || e); }
+    }
+    if (ok) { try { db(found); initOk = true; } catch (e) { initErr = String((e && e.message) || e); } }
     return res.status(200).json({
       mode: 'check', credential: found ? found.name : null, parsed: ok, parse_error: why,
+      shape: shape, admin_init: initOk, admin_error: initErr,
       accepted_env: CRED_VARS, cooldown_sec: COOLDOWN_MS / 1000, checked_at: startedAt,
     });
   }
