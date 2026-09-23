@@ -13566,10 +13566,14 @@ function taCollectFromDom(scope) {
     var v = parseFloat(tr.querySelector('.ta-rate').value);
     if (!isFinite(v) || v < 0 || v > 20) { bad = true; return; }
     rates[code] = Math.round(v * 100) / 100;
+    /* 수수료는 대표 제휴몰(쿠팡)만 갖는다 — 링크프라이스 행엔 칸이 없으니 건너뛴다.
+       없는 칸을 못 읽었다고 저장을 막으면 적립률까지 통째로 안 모인다. */
     var feeEl = tr.querySelector('.ta-fee');
-    var f = feeEl ? parseFloat(feeEl.value) : NaN;
-    if (!isFinite(f) || f < 0 || f > 100) { bad = true; return; }
-    fees[code] = Math.round(f * 100) / 100;
+    if (feeEl) {
+      var f = parseFloat(feeEl.value);
+      if (!isFinite(f) || f < 0 || f > 100) { bad = true; return; }
+      fees[code] = Math.round(f * 100) / 100;
+    }
     if (typeof TA_APPLIED[code] === 'boolean') applied[code] = TA_APPLIED[code];
     logos[code] = TA_LOGO[code] || '';
   });
