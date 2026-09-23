@@ -13298,6 +13298,37 @@ function taBasePct(tr) {
   return taCommPct(tr);
 }
 
+/* 적립률 상한 — 그 몰의 커미션(모바일)이다. 커미션보다 많이 돌려주면 역마진이다
+   (김반장 확정 2026-09-23). 커미션을 숫자로 읽을 수 없는 몰(미승인·갱신 전·문자열 값)은
+   기준이 없으므로 종전 20% 상한을 그대로 두고 막지 않는다 — 근거 없이 0으로 잠그면
+   적립률을 아예 못 넣는다. */
+var TA_RATE_MAX_FALLBACK = 20;
+function taRateCap(tr) {
+  var c = taCommPct(tr);
+  return (c == null) ? null : c;
+}
+/* 불러올 때는 최대값만 물린다 — 이미 저장돼 있던 값은 손대지 않는다(김반장 지시:
+   넘는 몰은 고치지 말고 목록으로 보고). */
+function taSetRateMax(tr) {
+  var el = tr.querySelector('.ta-rate');
+  if (!el) return;
+  var cap = taRateCap(tr);
+  el.max = (cap == null) ? TA_RATE_MAX_FALLBACK : cap;
+}
+/* 사람이 새로 넣은 값만 상한으로 잡아 준다. */
+function taClampRate(tr) {
+  var el = tr.querySelector('.ta-rate');
+  if (!el) return;
+  taSetRateMax(tr);
+  var cap = taRateCap(tr);
+  if (cap == null) return;
+  var v = parseFloat(el.value);
+  if (isFinite(v) && v > cap) {
+    el.value = taFmt(cap);
+    toast('적립률은 커미션(' + cap + '%)을 넘을 수 없어 ' + taFmt(cap) + '% 로 맞췄습니다');
+  }
+}
+
 function taRowRefresh(tr) {
   var base = taBasePct(tr);
   var rate = parseFloat((tr.querySelector('.ta-rate') || {}).value);
@@ -13565,6 +13596,9 @@ function taCollectFromDom(scope) {
     var code = tr.dataset.code;
     var v = parseFloat(tr.querySelector('.ta-rate').value);
     if (!isFinite(v) || v < 0 || v > 20) { bad = true; return; }
+    /* 커미션을 아는 몰은 그 값이 상한이다 — 화면에서 막아도 저장 때 한 번 더 본다. */
+    var cap = taRateCap(tr);
+    if (cap != null && v > cap + 0.0001) { bad = true; return; }
     rates[code] = Math.round(v * 100) / 100;
     /* 수수료는 대표 제휴몰(쿠팡)만 갖는다 — 링크프라이스 행엔 칸이 없으니 건너뛴다.
        없는 칸을 못 읽었다고 저장을 막으면 적립률까지 통째로 안 모인다. */
@@ -13757,9 +13791,10 @@ window.taLoad = function() {
 
     var allRows = document.querySelectorAll('#ta-tbody-primary tr[data-code], #ta-tbody-secondary tr[data-code]');
     Array.prototype.forEach.call(allRows, function(tr) {
+      taSetRateMax(tr);   /* 최대값만 물린다 — 저장돼 있던 값은 그대로 둔다 */
       var feeIn = tr.querySelector('.ta-fee');
       if (feeIn) feeIn.addEventListener('input', function() { taRowRefresh(tr); });
-      tr.querySelector('.ta-rate').addEventListener('input', function() { taRowRefresh(tr); });
+      tr.querySelector('.ta-rate').addEventListener('input', function() { taClampRate(tr); taRowRefresh(tr); });
       taRowRefresh(tr);
     });
     taApplyFilters();
@@ -13783,7 +13818,7 @@ window.taLoad = function() {
 function taSaveScope(scope, btnId, bannerLabel, logLabel) {
   var c = taCollectFromDom(scope);
   if (!Object.keys(c.rates).length) return;
-  if (c.bad) { toast('수수료는 0~100, 적립률은 0~20 사이 숫자로 입력하세요.'); return; }
+  if (c.bad) { toast('적립률은 0~20 사이이고 그 몰의 커미션(모바일)을 넘을 수 없습니다.'); return; }
   var btn = document.getElementById(btnId);
   if (btn) { btn.disabled = true; btn.textContent = '저장 중…'; }
   var ref = db.collection('settings').doc('ticket_accrual');
