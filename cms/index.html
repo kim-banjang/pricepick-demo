@@ -297,8 +297,7 @@ tr:hover td{background:var(--surface-2);}
 #sec-ticket-accrual #ta-tbody-secondary td{white-space:nowrap;}
 /* 숫자 칸이 좁으면 값이 잘린다 — 칸 여백을 줄이고 입력칸에 최소 폭을 준다
    (수수료 7번째·적립률 8번째 칸) */
-#sec-ticket-accrual #ta-tbody-secondary td:nth-child(7),
-#sec-ticket-accrual #ta-tbody-secondary td:nth-child(8){padding-left:8px;padding-right:8px;}
+#sec-ticket-accrual #ta-tbody-secondary td:nth-child(7){padding-left:8px;padding-right:8px;}
 #sec-ticket-accrual .ta-fee,#sec-ticket-accrual .ta-rate{min-width:64px;}
 #sec-ticket-accrual .ta-days-fixed{display:inline-block;font-size:12px;font-weight:700;line-height:1.45;
   color:var(--text-2);background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r-sm);padding:5px 9px;}
@@ -2018,19 +2017,18 @@ window.CMS_FEATURES = {
           <table id="ta-table-secondary">
             <thead>
               <tr>
-                <th class="ta-select-col" style="width:3%"><input type="checkbox" id="ta-select-all" onchange="taToggleSelectAll(this.checked)" title="보이는 몰 전체 선택"></th>
+                <th class="ta-select-col" style="width:4%"><input type="checkbox" id="ta-select-all" onchange="taToggleSelectAll(this.checked)" title="보이는 몰 전체 선택"></th>
                 <th style="width:4%">로고</th>
-                <th style="width:10%">제휴몰</th>
+                <th style="width:11%">제휴몰</th>
                 <th style="width:8%">링크프라이스 승인 상태</th>
-                <th class="ta-tight" style="width:7%">커미션(모바일)</th>
-                <th class="ta-tight" style="width:8%">앱(AOS·iOS)</th>
-                <th style="width:8%">수수료</th>
-                <th style="width:8%">적립률</th>
-                <th style="width:6%">수익</th>
+                <th class="ta-tight" style="width:8%">커미션(모바일)</th>
+                <th class="ta-tight" style="width:9%">앱(AOS·iOS)</th>
+                <th style="width:9%">적립률</th>
+                <th style="width:7%">수익</th>
                 <th style="width:15%">랜덤티켓 지급 시점</th>
                 <th style="width:9%">등급 전환 시점</th>
-                <th style="width:8%">시뮬레이터</th>
-                <th style="width:6%">적용</th>
+                <th style="width:9%">시뮬레이터</th>
+                <th style="width:7%">적용</th>
               </tr>
             </thead>
             <tbody id="ta-tbody-secondary"></tbody>
@@ -13281,15 +13279,39 @@ function taGreedy(amountKrw, ratePct) {
   return parts.length ? parts.join(' · ') : '<span>지급 없음</span>';
 }
 
+/* 커미션(모바일)은 링크프라이스가 내려주는 자유 문자열이다 — 「1.4%」가 보통이지만
+   「21% 또는 56,000원」처럼 오는 몰도 있다. 앞머리의 백분율만 읽고, 못 읽으면 null 이다
+   (지어내지 않는다). 수수료 입력칸을 없앤 뒤로 수익 계산의 기준이 이 값이다. */
+function taCommPct(tr) {
+  var cell = tr.cells[4];
+  var raw = cell ? String(cell.textContent || '').trim() : '';
+  var m = raw.match(/^\s*([\d.]+)\s*%/);
+  return m ? parseFloat(m[1]) : null;
+}
+/* 대표 제휴몰(쿠팡)은 수수료 입력칸을 그대로 쓰고, 링크프라이스 행은 커미션을 쓴다. */
+function taBasePct(tr) {
+  var feeEl = tr.querySelector('.ta-fee');
+  if (feeEl) {
+    var f = parseFloat(feeEl.value);
+    return (isFinite(f) && f >= 0) ? f : 0;
+  }
+  return taCommPct(tr);
+}
+
 function taRowRefresh(tr) {
-  var fee = parseFloat((tr.querySelector('.ta-fee') || {}).value);
-  if (!isFinite(fee) || fee < 0) fee = 0;
+  var base = taBasePct(tr);
   var rate = parseFloat((tr.querySelector('.ta-rate') || {}).value);
   if (!isFinite(rate) || rate < 0) rate = 0;
-  var margin = fee - rate;
   var mEl = tr.querySelector('.ta-margin');
-  mEl.textContent = margin.toFixed(2) + '%p';
-  mEl.style.color = margin < 0 ? 'var(--danger)' : 'var(--text)';
+  if (base == null) {
+    /* 커미션을 숫자로 읽을 수 없는 몰 — 지어내지 않고 「—」로 둔다 */
+    mEl.textContent = '—';
+    mEl.style.color = 'var(--text-3)';
+  } else {
+    var margin = base - rate;
+    mEl.textContent = margin.toFixed(2) + '%p';
+    mEl.style.color = margin < 0 ? 'var(--danger)' : 'var(--text)';
+  }
   taCheckDirty();
 }
 
@@ -13334,16 +13356,18 @@ function taCheckDirtySection(tbodySel) {
   Array.prototype.forEach.call(rows, function(tr) {
     var orig = TA_ORIGINAL[tr.dataset.code];
     if (!orig) return;
-    var feeEl = tr.querySelector('.ta-fee');
+    var feeEl = tr.querySelector('.ta-fee');   /* 링크프라이스 행엔 없다 */
     var rateEl = tr.querySelector('.ta-rate');
-    var feeVal = parseFloat(feeEl.value);
     var rateVal = parseFloat(rateEl.value);
-    var feeChanged = isFinite(feeVal) && taFmt(feeVal) !== orig.fee;
     var rateChanged = isFinite(rateVal) && taFmt(rateVal) !== orig.rate;
-    feeEl.classList.toggle('ta-changed', feeChanged);
     rateEl.classList.toggle('ta-changed', rateChanged);
-    if (feeChanged) changed++;
     if (rateChanged) changed++;
+    if (feeEl) {
+      var feeVal = parseFloat(feeEl.value);
+      var feeChanged = isFinite(feeVal) && taFmt(feeVal) !== orig.fee;
+      feeEl.classList.toggle('ta-changed', feeChanged);
+      if (feeChanged) changed++;
+    }
 
     if (typeof orig.applied === 'boolean') {
       var appliedChanged = TA_APPLIED[tr.dataset.code] !== orig.applied;
@@ -13509,8 +13533,11 @@ function taRenderRow(m, showHideCol) {
     + statusCell
     + commCell
     + appCell
-    + '<td><span style="display:inline-flex;align-items:center;gap:6px">'
-    +   '<input class="form-input ta-fee" type="number" min="0" max="100" step="0.1" value="' + m.fee + '" style="max-width:88px;text-align:right">%</span></td>'
+    /* 수수료 입력칸은 대표 제휴몰(쿠팡)만 쓴다 — 링크프라이스 몰이 우리에게 주는 값은
+       「커미션(모바일)」 하나이고 그건 읽기 전용이다(김반장 확정 2026-09-23).
+       우리가 고치는 값은 적립률 하나다. */
+    + (showHideCol ? '' : ('<td><span style="display:inline-flex;align-items:center;gap:6px">'
+    +   '<input class="form-input ta-fee" type="number" min="0" max="100" step="0.1" value="' + m.fee + '" style="max-width:88px;text-align:right">%</span></td>'))
     + '<td><span style="display:inline-flex;align-items:center;gap:6px">'
     +   '<input class="form-input ta-rate" type="number" min="0" max="20" step="0.1" value="' + m.rate + '" style="max-width:88px;text-align:right">%</span></td>'
     + '<td class="ta-margin">—</td>'
@@ -13539,7 +13566,8 @@ function taCollectFromDom(scope) {
     var v = parseFloat(tr.querySelector('.ta-rate').value);
     if (!isFinite(v) || v < 0 || v > 20) { bad = true; return; }
     rates[code] = Math.round(v * 100) / 100;
-    var f = parseFloat(tr.querySelector('.ta-fee').value);
+    var feeEl = tr.querySelector('.ta-fee');
+    var f = feeEl ? parseFloat(feeEl.value) : NaN;
     if (!isFinite(f) || f < 0 || f > 100) { bad = true; return; }
     fees[code] = Math.round(f * 100) / 100;
     if (typeof TA_APPLIED[code] === 'boolean') applied[code] = TA_APPLIED[code];
@@ -13725,7 +13753,8 @@ window.taLoad = function() {
 
     var allRows = document.querySelectorAll('#ta-tbody-primary tr[data-code], #ta-tbody-secondary tr[data-code]');
     Array.prototype.forEach.call(allRows, function(tr) {
-      tr.querySelector('.ta-fee').addEventListener('input', function() { taRowRefresh(tr); });
+      var feeIn = tr.querySelector('.ta-fee');
+      if (feeIn) feeIn.addEventListener('input', function() { taRowRefresh(tr); });
       tr.querySelector('.ta-rate').addEventListener('input', function() { taRowRefresh(tr); });
       taRowRefresh(tr);
     });
@@ -14150,10 +14179,10 @@ function taLpReread() {
           + '&nbsp;·&nbsp;<span class="ta-appcell ' + (api.app_ios_yn === 'Y' ? 'yes' : 'no') + '">iOS ' + taEsc(api.app_ios_yn || '—') + '</span>';
       }
       /* 랜덤티켓 지급 시점(when_trans)도 갱신 대상이다 — 원문 그대로 갈아끼운다. */
-      if (tr.cells[9]) {
+      if (tr.cells[8]) {
         var wv = String(api.when_trans || '').trim();
         var w1 = wv.split(/[\r\n]+/)[0].trim();
-        tr.cells[9].innerHTML = wv
+        tr.cells[8].innerHTML = wv
           ? ('<span class="ta-when" title="' + taEsc(wv) + '">' + taEsc(w1) + '</span>'
              + (w1 === wv ? '' : '<span class="ta-when-more" title="' + taEsc(wv) + '">…</span>'))
           : '<span class="ta-needsync">갱신 필요</span>';
@@ -14532,8 +14561,9 @@ window.taSimRefresh = function() {
   var tr = document.querySelector('#ta-tbody-primary tr[data-code="' + TA_SIM_CODE + '"], #ta-tbody-secondary tr[data-code="' + TA_SIM_CODE + '"]');
   if (!tr) return;
   // 표의 입력칸에서 지금 이 순간 값을 직접 읽는다 — 저장 여부와 무관하다.
-  var fee = parseFloat((tr.querySelector('.ta-fee') || {}).value);
-  if (!isFinite(fee) || fee < 0) fee = 0;
+  /* 대표 제휴몰은 수수료 입력칸, 링크프라이스 몰은 커미션(모바일)이 기준이다. */
+  var base = taBasePct(tr);
+  var fee = (base == null) ? 0 : base;
   var rate = parseFloat((tr.querySelector('.ta-rate') || {}).value);
   if (!isFinite(rate) || rate < 0) rate = 0;
   var amount = taSimParseAmount();
