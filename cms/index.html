@@ -3067,9 +3067,9 @@ window.CMS_FEATURES = {
         </div>
       </div>
       <div class="card">
-        <div class="card-header"><div><div class="card-title">알림 발송 내역</div><div class="card-sub">발송 완료 건은 불변 로그 · '예약' 상태만 발송 전 취소·수정 가능</div></div><div id="noti-hdr-actions"></div></div>
+        <div class="card-header"><div><div class="card-title">알림 발송 내역</div><div class="card-sub">발송 완료 건은 불변 로그 · '예약' 상태만 발송 전 취소·수정 가능 · 건을 누르면 수신자 목록 · 수신 기록은 90일 보관 후 삭제</div></div><div id="noti-hdr-actions"></div></div>
         <table>
-          <thead><tr><th style="text-align:center">발송일시</th><th style="text-align:center">채널</th><th>제목</th><th style="text-align:center">대상</th><th style="text-align:center">발송 수</th><th style="text-align:center">열람율</th><th style="text-align:center">상태 / 액션</th></tr></thead>
+          <thead><tr><th style="text-align:center">발송일시</th><th style="text-align:center">채널</th><th>제목</th><th style="text-align:center">대상 조건</th><th style="text-align:center">대상 수</th><th style="text-align:center">성공</th><th style="text-align:center">실패</th><th style="text-align:center">열람율</th><th style="text-align:center">상태 / 액션</th></tr></thead>
           <tbody>
           </tbody>
         </table>
@@ -4357,6 +4357,11 @@ window.CMS_FEATURES = {
         </div>
         <div style="margin-top:6px;font-size:11px;color:var(--text3)">랜덤 티켓: 구매 후 전환 대기일 수가 지나면 등급 티켓으로 전환. 취소 시 자동 환수.</div>
       </div>
+      <div class="form-group">
+        <label class="form-label">받은 알림</label>
+        <div id="m-noti-received" style="border:1px solid var(--border);border-radius:var(--r-sm);max-height:200px;overflow-y:auto"></div>
+        <div class="form-hint">수신 기록은 90일 보관 후 삭제됩니다.</div>
+      </div>
       <div class="form-group" id="m-ticket-section">
         <label class="form-label">티켓 수동 지급</label>
         <div style="display:flex;gap:8px">
@@ -4370,6 +4375,62 @@ window.CMS_FEATURES = {
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModal('m-member')">닫기</button>
       <button class="btn btn-primary" id="m-save-btn" onclick="dmMemberDetailSave()">저장</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── 모달: 알림 테스트 발송 대상 선택 (DEVQA 23번) ──
+     기존 회원 검색을 그대로 쓴다 — 테스트 계정을 따로 등록하는 메뉴는 두지 않는다. -->
+<div class="modal-overlay" id="m-noti-test">
+  <div class="modal" style="max-width:760px">
+    <div class="modal-header"><div class="modal-title">테스트 발송 대상 선택</div><button class="modal-close" onclick="closeModal('m-noti-test')"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
+    <div class="modal-body">
+      <input type="hidden" id="noti-test-src">
+      <div class="info-box" style="margin-bottom:12px">선택한 회원에게만 즉시 발송합니다. 발송 내역에는 <strong>테스트</strong> 배지로 남아 실제 발송 건수와 섞이지 않습니다.</div>
+      <div class="form-group">
+        <label class="form-label">발송 내용</label>
+        <div id="noti-test-preview" style="border:1px solid var(--border);border-radius:var(--r-sm);padding:10px 12px;font-size:12px;color:var(--text-2);line-height:1.6"></div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">회원 검색</label>
+        <input class="search-box" id="noti-test-q" style="width:100%" placeholder="닉네임 또는 식별 아이디" oninput="notiTestFilter()">
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+        <div>
+          <label class="form-label">검색 결과</label>
+          <div id="noti-test-results" style="border:1px solid var(--border);border-radius:var(--r-sm);max-height:240px;overflow-y:auto"></div>
+          <div id="noti-test-pager"></div>
+        </div>
+        <div>
+          <label class="form-label">선택한 회원 <span id="noti-test-count" style="color:var(--text-3);font-weight:600"></span></label>
+          <div id="noti-test-chosen" style="border:1px solid var(--border);border-radius:var(--r-sm);max-height:240px;overflow-y:auto"></div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('m-noti-test')">닫기</button>
+      <button class="btn btn-primary" id="noti-test-send-btn" onclick="notiTestSend()">선택 회원에게 즉시 발송</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── 모달: 알림 수신자 목록 (DEVQA 24번) ──
+     전체 발송은 대상이 많아 한 번에 뿌리지 않는다 — 검색·페이징이 기본이다. -->
+<div class="modal-overlay" id="m-noti-recipients">
+  <div class="modal" style="max-width:860px">
+    <div class="modal-header"><div><div class="modal-title">수신자 목록</div><div class="card-sub" id="noti-rcp-sub"></div></div><button class="modal-close" onclick="closeModal('m-noti-recipients')"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
+    <div class="modal-body">
+      <div id="noti-rcp-summary" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px"></div>
+      <input class="search-box" id="noti-rcp-q" style="width:100%;margin-bottom:10px" placeholder="닉네임 또는 식별 아이디" oninput="notiRcpFilter()">
+      <table>
+        <thead><tr><th>닉네임</th><th>식별 아이디</th><th style="text-align:center">결과</th><th>실패 사유</th></tr></thead>
+        <tbody id="noti-rcp-tbody"></tbody>
+      </table>
+      <div id="noti-rcp-pager"></div>
+      <div class="form-hint" style="margin-top:10px">수신 기록은 90일 보관 후 삭제됩니다.</div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('m-noti-recipients')">닫기</button>
     </div>
   </div>
 </div>
@@ -5794,7 +5855,30 @@ window.giSaveImageEdit = giSaveImageEdit;
     "구매/사용 내역":"Lịch sử mua/dùng","배너 관리":"Quản lý banner",
     "이벤트 관리":"Quản lý sự kiện","친구초대 관리":"Quản lý mời bạn",
     "약관 관리":"Quản lý điều khoản","공지사항 관리":"Quản lý thông báo",
-    "알림 관리":"Quản lý thông báo đẩy","1:1 문의":"Hỏi đáp 1:1",
+    "알림 관리":"Quản lý thông báo đẩy",
+    /* 알림 관리 — 테스트 발송 대상 선택 · 수신자 목록 (DEVQA 23·24, 2026-10-05) */
+    "테스트 발송 대상 선택":"Chọn đối tượng gửi thử",
+    "발송 내용":"Nội dung gửi",
+    "회원 검색":"Tìm hội viên",
+    "선택한 회원":"Hội viên đã chọn",
+    "선택됨":"Đã chọn",
+    "해제":"Bỏ chọn",
+    "선택 회원에게 즉시 발송":"Gửi ngay cho hội viên đã chọn",
+    "닉네임 또는 식별 아이디":"Biệt danh hoặc ID định danh",
+    "검색 결과가 없습니다.":"Không có kết quả tìm kiếm.",
+    "선택한 회원이 없습니다.":"Chưa chọn hội viên nào.",
+    "수신자 목록":"Danh sách người nhận",
+    "실패 사유":"Lý do thất bại",
+    "대상 조건":"Điều kiện đối tượng",
+    "대상 수":"Số đối tượng",
+    "받은 알림":"Thông báo đã nhận",
+    "받은 알림이 없습니다.":"Chưa nhận thông báo nào.",
+    "조건에 맞는 수신자가 없습니다.":"Không có người nhận phù hợp điều kiện.",
+    "불러오지 못했습니다.":"Không tải được.",
+    "수신 기록은 90일 보관 후 삭제됩니다.":"Bản ghi nhận được lưu 90 ngày rồi xóa.",
+    "선택한 회원에게만 즉시 발송합니다. 발송 내역에는 테스트 배지로 남아 실제 발송 건수와 섞이지 않습니다.":"Chỉ gửi ngay cho hội viên đã chọn. Lịch sử gửi sẽ gắn nhãn Gửi thử nên không lẫn với số lượng gửi thật.",
+    "발송 완료 건은 불변 로그 · '예약' 상태만 발송 전 취소·수정 가능 · 건을 누르면 수신자 목록 · 수신 기록은 90일 보관 후 삭제":"Bản ghi đã gửi là log bất biến · chỉ trạng thái 'Đặt lịch' mới hủy·sửa được trước khi gửi · bấm vào dòng để xem danh sách người nhận · bản ghi nhận được lưu 90 ngày rồi xóa",
+"1:1 문의":"Hỏi đáp 1:1",
     "계정 탈퇴 처리":"Xử lý hủy tài khoản","수익 분석":"Phân tích doanh thu",
     "매출 내역":"Lịch sử doanh thu","정산 내역":"Lịch sử quyết toán",
     "포스트백 로그":"Nhật ký Postback","앱 버전 관리":"Quản lý phiên bản",
@@ -11044,17 +11128,28 @@ function loadNotifications() {
     set('noti-kpi-month', ppN(monthCount) + '건');
     set('noti-kpi-scheduled', ppN(scheduled) + '건');
 
-    if (snap.empty) { tbody.innerHTML = ppEmpty(7,'발송 내역이 없습니다.'); return; }
+    if (snap.empty) { tbody.innerHTML = ppEmpty(9,'발송 내역이 없습니다.'); return; }
     var STATUS_BADGE = { sent:'<span class="badge badge-green">발송완료</span>', scheduled:'<span class="badge badge-amber">예약</span>', test:'<span class="badge badge-gray">테스트</span>' };
+    NOTI_DOCS = {};
     tbody.innerHTML = snap.docs.map(function(doc) {
       var d = doc.data();
-      return '<tr><td style="text-align:center;white-space:nowrap"><div style="font-weight:700;color:#333">' + ppDt(d.created_at) + '</div><div style="color:var(--text-3);font-size:11px">' + ppTm(d.created_at) + '</div></td>'
+      NOTI_DOCS[doc.id] = d;
+      var total = d.recipient_count || 0;
+      /* 예약 건은 아직 나가지 않았으므로 성공·실패가 없다 */
+      var r = (d.status === 'scheduled') ? null : notiResultCount(doc.id, d);
+      var act = (d.status === 'scheduled')
+        ? '<button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();notiOpenTest(\'' + doc.id + '\')">테스트 발송</button>'
+        : '';
+      return '<tr style="cursor:pointer" onclick="notiOpenRecipients(\'' + doc.id + '\')">'
+        + '<td style="text-align:center;white-space:nowrap"><div style="font-weight:700;color:#333">' + ppDt(d.created_at) + '</div><div style="color:var(--text-3);font-size:11px">' + ppTm(d.created_at) + '</div></td>'
         + '<td style="text-align:center">' + (NOTI_CHANNEL_KO[d.channel]||d.channel||'—') + '</td>'
         + '<td>' + (d.title||'') + '</td>'
-        + '<td style="text-align:center">' + (NOTI_TARGET_KO[d.target]||d.target||'—') + '</td>'
-        + '<td style="text-align:center">' + ppN(d.recipient_count||0) + '명</td>'
+        + '<td style="text-align:center">' + notiTargetLabel(d) + '</td>'
+        + '<td style="text-align:center">' + ppN(total) + '명</td>'
+        + '<td style="text-align:center">' + (r ? ppN(r.ok) + '명' : '—') + '</td>'
+        + '<td style="text-align:center">' + (r ? (r.fail ? '<span style="color:var(--danger);font-weight:700">' + ppN(r.fail) + '명</span>' : '0명') : '—') + '</td>'
         + '<td style="text-align:center">—</td>'
-        + '<td style="text-align:center">' + (STATUS_BADGE[d.status]||'<span class="badge badge-gray">' + (d.status||'') + '</span>') + '</td></tr>';
+        + '<td style="text-align:center">' + (STATUS_BADGE[d.status]||'<span class="badge badge-gray">' + (d.status||'') + '</span>') + ' ' + act + '</td></tr>';
     }).join('');
   }).catch(function(e){ console.error('loadNotifications', e); tbody.innerHTML = ppEmpty(7,'로드 오류'); });
 }
@@ -11119,27 +11214,262 @@ window.notiSend = function() {
   });
 };
 
-window.notiSendTest = function() {
-  var title = document.getElementById('noti-title').value.trim() || '(제목 없음)';
-  var body = document.getElementById('noti-body').value.trim() || '(내용 없음)';
-  var channel = document.getElementById('noti-channel').value;
-  var btn = document.getElementById('noti-test-btn');
-  document.getElementById('noti-preview-title').textContent = title;
-  document.getElementById('noti-preview-body').textContent = body;
-  openModal('m-noti-preview');
+/* ── DEVQA 23번 · 알림 테스트 발송 ─────────────────────────────────────────
+   작성 중인 내용을 고른 회원에게만 즉시 내보낸다. 대상은 기존 회원 검색을 그대로
+   쓴다 — 테스트 계정을 따로 등록하는 메뉴는 두지 않는다(김반장 확정 2026-10-05).
+   발송 내역에는 status:'test' 로 남아 「테스트」 배지가 붙고 실제 건수와 섞이지 않는다.
+   ⚠ 데모는 실제 푸시를 보내지 않는다 — 기록만 남긴다. */
+var NOTI_USERS = null;          /* 회원 검색용 캐시 */
+var NOTI_TEST_PICK = {};        /* { uid: 닉네임 } */
+var NOTI_DOCS = {};             /* 발송 내역 원본 — 수신자 목록이 쓴다 */
+
+function notiLoadUsers() {
+  if (NOTI_USERS) return Promise.resolve(NOTI_USERS);
+  return db.collection('users').get().then(function(snap) {
+    NOTI_USERS = snap.docs.map(function(d) {
+      var u = d.data();
+      return { id: d.id, nickname: u.nickname || '(닉네임 없음)', linked: !!u.linked_kakao };
+    });
+    return NOTI_USERS;
+  });
+}
+
+var NOTI_TEST_CTRL = window.NOTI_TEST_CTRL = ppMakeListController(8, function(pageItems, state, totalPages) {
+  var box = document.getElementById('noti-test-results');
+  if (!box) return;
+  box.innerHTML = pageItems.length ? pageItems.map(function(u) {
+    var on = !!NOTI_TEST_PICK[u.id];
+    return '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 10px;border-bottom:1px solid var(--border)">'
+      + '<div style="min-width:0"><div style="font-weight:600;font-size:12px">' + ppEsc(u.nickname) + '</div>'
+      + '<div style="font-size:11px;color:var(--text-3);font-family:monospace">' + ppEsc(u.id) + '</div></div>'
+      + '<button class="btn btn-ghost btn-sm" onclick="notiTestPick(\'' + ppEsc(u.id) + '\')"' + (on ? ' disabled' : '') + '>'
+      + (on ? '선택됨' : '선택') + '</button></div>';
+  }).join('') : '<div style="padding:14px;text-align:center;color:var(--text-3);font-size:12px">검색 결과가 없습니다.</div>';
+  var pg = document.getElementById('noti-test-pager');
+  if (pg) pg.innerHTML = ppPaginationHtml('NOTI_TEST_CTRL', state.page, totalPages);
+});
+
+function notiTestRenderChosen() {
+  var box = document.getElementById('noti-test-chosen');
+  var cnt = document.getElementById('noti-test-count');
+  var ids = Object.keys(NOTI_TEST_PICK);
+  if (cnt) cnt.textContent = ids.length ? ('· ' + ids.length + '명') : '';
+  if (!box) return;
+  box.innerHTML = ids.length ? ids.map(function(id) {
+    return '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 10px;border-bottom:1px solid var(--border)">'
+      + '<div style="min-width:0"><div style="font-weight:600;font-size:12px">' + ppEsc(NOTI_TEST_PICK[id]) + '</div>'
+      + '<div style="font-size:11px;color:var(--text-3);font-family:monospace">' + ppEsc(id) + '</div></div>'
+      + '<button class="btn btn-ghost btn-sm" onclick="notiTestDrop(\'' + ppEsc(id) + '\')">해제</button></div>';
+  }).join('') : '<div style="padding:14px;text-align:center;color:var(--text-3);font-size:12px">선택한 회원이 없습니다.</div>';
+}
+
+window.notiTestPick = function(id) {
+  var u = (NOTI_USERS || []).filter(function(x){ return x.id === id; })[0];
+  if (!u) return;
+  NOTI_TEST_PICK[id] = u.nickname;
+  NOTI_TEST_CTRL.applyFilter(notiTestPredicate());
+  notiTestRenderChosen();
+};
+window.notiTestDrop = function(id) {
+  delete NOTI_TEST_PICK[id];
+  NOTI_TEST_CTRL.applyFilter(notiTestPredicate());
+  notiTestRenderChosen();
+};
+function notiTestPredicate() {
+  var q = (document.getElementById('noti-test-q') || {}).value || '';
+  if (!q.trim()) return null;
+  return function(u) { return ppMatch(u.nickname, q) || ppMatch(u.id, q); };
+}
+window.notiTestFilter = function() { NOTI_TEST_CTRL.applyFilter(notiTestPredicate()); };
+
+/* 작성 중인 알림(인자 없음) 또는 예약 건(docId)을 테스트 대상으로 연다. */
+window.notiOpenTest = function(docId) {
+  var title, body;
+  if (docId && NOTI_DOCS[docId]) {
+    title = NOTI_DOCS[docId].title || '(제목 없음)';
+    body = NOTI_DOCS[docId].body || '(내용 없음)';
+  } else {
+    title = document.getElementById('noti-title').value.trim() || '(제목 없음)';
+    body = document.getElementById('noti-body').value.trim() || '(내용 없음)';
+  }
+  document.getElementById('noti-test-src').value = docId || '';
+  document.getElementById('noti-test-preview').innerHTML =
+    '<div style="font-weight:700;color:var(--text-1);margin-bottom:4px">' + ppEsc(title) + '</div>' + ppEsc(body);
+  NOTI_TEST_PICK = {};
+  notiTestRenderChosen();
+  var q = document.getElementById('noti-test-q'); if (q) q.value = '';
+  openModal('m-noti-test');
+  notiLoadUsers().then(function(rows) {
+    NOTI_TEST_CTRL.setRows(rows);
+  }).catch(function(e) {
+    toast('회원을 불러오지 못했습니다: ' + (e.message||e));
+  });
+};
+window.notiSendTest = function() { notiOpenTest(''); };
+
+window.notiTestSend = function() {
+  var ids = Object.keys(NOTI_TEST_PICK);
+  if (!ids.length) { toast('테스트로 보낼 회원을 선택하세요.'); return; }
+  var srcId = document.getElementById('noti-test-src').value;
+  var src = srcId ? NOTI_DOCS[srcId] : null;
+  var title = src ? (src.title || '(제목 없음)') : (document.getElementById('noti-title').value.trim() || '(제목 없음)');
+  var body = src ? (src.body || '(내용 없음)') : (document.getElementById('noti-body').value.trim() || '(내용 없음)');
+  var channel = src ? (src.channel || 'push') : document.getElementById('noti-channel').value;
+  var btn = document.getElementById('noti-test-send-btn');
   if (btn) { btn.disabled = true; btn.textContent = '발송 중…'; }
   db.collection('notifications').add({
     title: title, body: body, channel: channel, target: 'test',
-    recipient_count: 1, status: 'test',
+    test_uids: ids, test_names: ids.map(function(id){ return NOTI_TEST_PICK[id]; }),
+    recipient_count: ids.length, status: 'test',
+    source_id: srcId || null,
     created_at: FS.FieldValue.serverTimestamp(),
   }).then(function() {
-    toast('테스트 발송 완료 (본인)');
-    logAdmin('알림 테스트 발송: ' + title);
+    toast('테스트 발송 완료 · ' + ids.length + '명');
+    logAdmin('알림 테스트 발송: ' + title + ' · ' + ids.length + '명');
+    closeModal('m-noti-test');
     loadNotifications();
   }).catch(function(e) {
     toast('테스트 발송 실패: ' + (e.message||e));
   }).finally(function() {
-    if (btn) { btn.disabled = false; btn.textContent = '테스트 발송'; }
+    if (btn) { btn.disabled = false; btn.textContent = '선택 회원에게 즉시 발송'; }
+  });
+};
+
+
+/* ── DEVQA 24번 · 알림 수신자 목록 ────────────────────────────────────────
+   전체 발송은 대상이 수만 명이라 한 번에 뿌리지 않는다 — 검색·페이징이 기본이다.
+   ⚠ 데모는 실제 푸시를 보내지 않으므로 수신 결과가 없다. 발송 건과 회원을 섞은
+   값으로 성공·실패를 정해 시연용 목록을 만든다 — 같은 건은 늘 같은 결과가 나온다.
+   실제 연동이 붙으면 이 자리에 수신 기록 컬렉션을 그대로 읽어 넣으면 된다. */
+var NOTI_FAIL_REASONS = ['기기 토큰 만료', '앱 삭제', '수신 거부', '네트워크 오류'];
+
+function notiHash(str) {
+  var h = 2166136261;
+  for (var i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = (h * 16777619) >>> 0; }
+  return h >>> 0;
+}
+function notiTargetLabel(d) {
+  if (d.status === 'test' || d.target === 'test') {
+    var names = d.test_names || [];
+    return '테스트' + (names.length ? ' · ' + ppEsc(names.slice(0, 2).join(', ')) + (names.length > 2 ? ' 외 ' + (names.length - 2) + '명' : '') : '');
+  }
+  return NOTI_TARGET_KO[d.target] || d.target || '—';
+}
+/* 그 발송 건의 수신자 — 테스트는 고른 회원, 그 밖은 대상 조건에 맞는 회원이다. */
+function notiRecipientsOf(docId, d) {
+  var users = NOTI_USERS || [];
+  var rows;
+  if (d.test_uids && d.test_uids.length) {
+    rows = d.test_uids.map(function(uid, i) {
+      var u = users.filter(function(x){ return x.id === uid; })[0];
+      return { id: uid, nickname: (u && u.nickname) || (d.test_names && d.test_names[i]) || '(알 수 없음)' };
+    });
+  } else {
+    rows = users.slice();
+    if (d.target === 'kakao') rows = rows.filter(function(u){ return u.linked; });
+    else if (d.target === 'guest') rows = rows.filter(function(u){ return !u.linked; });
+    var cap = d.recipient_count || rows.length;
+    if (rows.length > cap) rows = rows.slice(0, cap);
+  }
+  return rows.map(function(u) {
+    var h = notiHash(docId + '|' + u.id);
+    var failed = (h % 100) < 5;          /* 스무 명에 한 명꼴로 실패 */
+    return { id: u.id, nickname: u.nickname, ok: !failed,
+             reason: failed ? NOTI_FAIL_REASONS[h % NOTI_FAIL_REASONS.length] : '' };
+  });
+}
+function notiResultCount(docId, d) {
+  var rows = notiRecipientsOf(docId, d);
+  var fail = rows.filter(function(r){ return !r.ok; }).length;
+  return { ok: rows.length - fail, fail: fail, total: rows.length };
+}
+
+var NOTI_RCP_ROWS = [];
+var NOTI_RCP_CTRL = window.NOTI_RCP_CTRL = ppMakeListController(10, function(pageItems, state, totalPages) {
+  var tb = document.getElementById('noti-rcp-tbody');
+  if (!tb) return;
+  tb.innerHTML = pageItems.length ? pageItems.map(function(r) {
+    return '<tr><td>' + ppEsc(r.nickname) + '</td>'
+      + '<td style="font-family:monospace;font-size:11px;color:var(--text-2)">' + ppEsc(r.id) + '</td>'
+      + '<td style="text-align:center">' + (r.ok ? '<span class="badge badge-green">성공</span>' : '<span class="badge badge-red">실패</span>') + '</td>'
+      + '<td style="color:var(--text-2);font-size:12px">' + (r.reason ? ppEsc(r.reason) : '—') + '</td></tr>';
+  }).join('') : ppEmpty(4, '조건에 맞는 수신자가 없습니다.');
+  var pg = document.getElementById('noti-rcp-pager');
+  if (pg) pg.innerHTML = ppPaginationHtml('NOTI_RCP_CTRL', state.page, totalPages);
+});
+
+window.notiRcpFilter = function() {
+  var q = (document.getElementById('noti-rcp-q') || {}).value || '';
+  NOTI_RCP_CTRL.applyFilter(q.trim() ? function(r) { return ppMatch(r.nickname, q) || ppMatch(r.id, q); } : null);
+};
+
+window.notiOpenRecipients = function(docId) {
+  var d = NOTI_DOCS[docId];
+  if (!d) return;
+  openModal('m-noti-recipients');
+  var q = document.getElementById('noti-rcp-q'); if (q) q.value = '';
+  var sub = document.getElementById('noti-rcp-sub');
+  var sum = document.getElementById('noti-rcp-summary');
+  if (sum) sum.innerHTML = '';
+  if (d.status === 'scheduled') {
+    if (sub) sub.textContent = (d.title || '') + ' · 예약 건은 아직 발송 전입니다';
+    NOTI_RCP_ROWS = [];
+    NOTI_RCP_CTRL.setRows([]);
+    return;
+  }
+  notiLoadUsers().then(function() {
+    NOTI_RCP_ROWS = notiRecipientsOf(docId, d);
+    var fail = NOTI_RCP_ROWS.filter(function(r){ return !r.ok; });
+    if (sub) {
+      var total = d.recipient_count || NOTI_RCP_ROWS.length;
+      sub.textContent = (d.title || '') + ' · ' + notiTargetLabel(d).replace(/<[^>]*>/g, '')
+        + ' · 대상 ' + ppN(total) + '명'
+        + (NOTI_RCP_ROWS.length < total ? (' 중 ' + ppN(NOTI_RCP_ROWS.length) + '명 표시') : '');
+    }
+    if (sum) {
+      /* 실패 사유별 묶음 */
+      var by = {};
+      fail.forEach(function(r){ by[r.reason] = (by[r.reason] || 0) + 1; });
+      var chips = ['<span class="badge badge-green">성공 ' + ppN(NOTI_RCP_ROWS.length - fail.length) + '명</span>',
+                   '<span class="badge badge-red">실패 ' + ppN(fail.length) + '명</span>'];
+      Object.keys(by).forEach(function(k) {
+        chips.push('<span class="badge badge-gray">' + ppEsc(k) + ' ' + ppN(by[k]) + '명</span>');
+      });
+      sum.innerHTML = chips.join('');
+    }
+    NOTI_RCP_CTRL.setRows(NOTI_RCP_ROWS);
+  }).catch(function(e) {
+    toast('수신자를 불러오지 못했습니다: ' + (e.message||e));
+  });
+};
+
+/* 회원 상세의 「받은 알림」 — 그 회원이 받은 건만 추린다. */
+window.notiLoadReceived = function(userId) {
+  var box = document.getElementById('m-noti-received');
+  if (!box) return Promise.resolve();
+  box.innerHTML = '<div style="padding:12px;text-align:center;color:var(--text-3);font-size:12px">불러오는 중…</div>';
+  return notiLoadUsers().then(function() {
+    return db.collection('notifications').orderBy('created_at', 'desc').limit(30).get();
+  }).then(function(snap) {
+    var rows = [];
+    snap.docs.forEach(function(doc) {
+      var d = doc.data();
+      if (d.status === 'scheduled') return;
+      var hit = notiRecipientsOf(doc.id, d).filter(function(r){ return r.id === userId; })[0];
+      if (!hit) return;
+      rows.push({ title: d.title || '', at: d.created_at, test: d.status === 'test', ok: hit.ok, reason: hit.reason });
+    });
+    box.innerHTML = rows.length ? rows.map(function(r) {
+      return '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 10px;border-bottom:1px solid var(--border)">'
+        + '<div style="min-width:0"><div style="font-weight:600;font-size:12px">' + ppEsc(r.title)
+        + (r.test ? ' <span class="badge badge-gray">테스트</span>' : '') + '</div>'
+        + '<div style="font-size:11px;color:var(--text-3)">' + ppDt(r.at) + ' ' + ppTm(r.at) + '</div></div>'
+        + (r.ok ? '<span class="badge badge-green">성공</span>'
+                : '<span class="badge badge-red">실패 · ' + ppEsc(r.reason) + '</span>') + '</div>';
+    }).join('') : '<div style="padding:12px;text-align:center;color:var(--text-3);font-size:12px">받은 알림이 없습니다.</div>';
+  }).catch(function(e) {
+    box.innerHTML = '<div style="padding:12px;text-align:center;color:var(--text-3);font-size:12px">불러오지 못했습니다.</div>';
+    console.error('notiLoadReceived', e);
   });
 };
 
@@ -16705,6 +17035,7 @@ window.openMemberDetail = function(id) {
         + '<span>' + (u.kakao_login_id || '(카카오 로그인ID 미등록)') + '</span></div>'
       : '<span style="font-size:12px;color:var(--text-3);">게스트(비연동)</span>';
     openModal('m-member');
+    if (window.notiLoadReceived) notiLoadReceived(id);
     return dmLoadMemberDetailTickets(id);
   }).then(function(c) {
     if (!c) return;
