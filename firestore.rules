@@ -266,6 +266,15 @@ service cloud.firestore {
       allow read, write: if true;
     }
 
+    // 검수 자료 처리 현황 (pricepick.vercel.app/devqa/qa-review-20261005.html)
+    // 개발자가 검수 74건마다 상태·메모를 남기는 작업판이다. 공개 URL의 정적 문서라
+    // 로그인이 없고, 페이지 쪽에서 쓰기 암호로 한 번 거른다. 개인정보도 비밀도 없어
+    // 이 컬렉션 하나만 공개로 둔다 (demo_accounts 와 같은 취급).
+    // 다른 컬렉션 규칙은 그대로다. 문서 ID 는 04-01 … 06-13 고정.
+    match /qa_review_20261005/{docId} {
+      allow read, write: if true;
+    }
+
     // 행운룰렛 하루 1회 제한 — {uid}_{날짜} 문서를 스핀 시점에 생성. create만 허용해
     // 같은 문서에 대한 두 번째 쓰기는 update로 분류돼 자동 거부(클라이언트 우회 방지).
     match /roulette_spins/{docId} {
