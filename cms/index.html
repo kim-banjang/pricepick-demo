@@ -3769,17 +3769,18 @@ window.CMS_FEATURES = {
             <table id="rf-od-table">
               <thead>
                 <tr>
-                  <th style="width:9%">주문일</th>
-                  <th style="width:12%">제휴몰</th>
-                  <th style="width:11%">주문번호</th>
-                  <th style="width:10%">상품번호</th>
-                  <th style="width:12%">회원</th>
-                  <th style="width:10%">거래액</th>
-                  <th style="width:10%">수수료</th>
+                  <th style="width:8%">주문일</th>
+                  <th style="width:11%">제휴몰</th>
+                  <th style="width:10%">주문번호</th>
+                  <th style="width:9%">상품번호</th>
+                  <th style="width:11%">회원</th>
+                  <th style="width:9%">거래액</th>
+                  <th style="width:9%">수수료</th>
                   <th style="width:9%">유저 적립</th>
-                  <th style="width:8%" class="rf-net-col">수익</th>
+                  <th style="width:7%" class="rf-net-col">수익</th>
                   <th style="width:5%">상태</th>
-                  <th style="width:4%"></th>
+                  <th style="width:9%">취소 확인일</th>
+                  <th style="width:3%"></th>
                 </tr>
               </thead>
               <tbody id="rf-od-tbody"></tbody>
@@ -3950,6 +3951,7 @@ window.CMS_FEATURES = {
               <th>상품번호<br><span class="fk">productid</span></th>
               <th>수량<br><span class="fk">quantity</span></th>
               <th>금액<br><span class="fk">payment</span></th>
+              <th>취소 확인일<br><span class="fk">수신 시각</span></th>
               <th></th>
             </tr></thead>
             <tbody id="cpb-tbody"></tbody>
@@ -3980,6 +3982,7 @@ window.CMS_FEATURES = {
               <th>수량<br><span class="fk">item_count</span></th>
               <th>구매금액<br><span class="fk">price</span></th>
               <th>수수료<br><span class="fk">commision</span></th>
+              <th>취소 확인일<br><span class="fk">실적조회 310</span></th>
               <th></th>
             </tr></thead>
             <tbody id="lpb-tbody"></tbody>
@@ -5856,6 +5859,11 @@ window.giSaveImageEdit = giSaveImageEdit;
     "이벤트 관리":"Quản lý sự kiện","친구초대 관리":"Quản lý mời bạn",
     "약관 관리":"Quản lý điều khoản","공지사항 관리":"Quản lý thông báo",
     "알림 관리":"Quản lý thông báo đẩy",
+    /* 취소 확인일 (QA31, 2026-10-05) — 링크프라이스는 취소 시점을 알려주지 않는다 */
+    "취소 확인일":"Ngày xác nhận hủy",
+    "수신 시각":"Thời điểm nhận",
+    "실적조회 310":"Tra cứu hiệu suất 310",
+
     /* 알림 관리 — 테스트 발송 대상 선택 · 수신자 목록 (DEVQA 23·24, 2026-10-05) */
     "테스트 발송 대상 선택":"Chọn đối tượng gửi thử",
     "발송 내용":"Nội dung gửi",
@@ -12308,6 +12316,39 @@ function cpbItemPid(it) {
   if (it.productId != null && it.productId !== '') return String(it.productId);
   return '';
 }
+/* ── 취소 확인일 ──────────────────────────────────────────────────────────
+   링크프라이스는 취소가 "언제" 났는지 알려주지 않는다. 공식 FAQ 원문:
+     「정산 완료, 취소 완료, 발생 실적 조회 시 조회 기준 일자는 실적 발생 기준일자입니다.
+       정산 완료, 취소 완료 시점에 대해서는 확인이 불가능합니다.」
+   그래서 열 이름을 「취소일」로 적으면 거짓이 된다 — 「취소 확인일」이다. 우리가 확인한
+   날이지 취소가 난 날이 아니다(김반장 확정 2026-10-05).
+     쿠팡        취소 포스트백을 받은 시각    2026-10-05 14:23
+     링크프라이스  실적조회에서 310 확인한 날   2026-10-05 (날짜만)
+     취소 아닌 건                            —
+   ⚠ 데모라 실제 확인 기록이 없다. 건마다 늘 같은 값이 나오도록 지어 채운다 —
+   실제 연동이 붙으면 이 자리에 수신 시각·확인 기록을 그대로 넣으면 된다. */
+function cxHash(str) {
+  var h = 2166136261;
+  str = String(str == null ? '' : str);
+  for (var i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = (h * 16777619) >>> 0; }
+  return h >>> 0;
+}
+function cxPad(v) { return (v < 10 ? '0' : '') + v; }
+function cxFmt(d, withTime) {
+  var t = d.getFullYear() + '-' + cxPad(d.getMonth() + 1) + '-' + cxPad(d.getDate());
+  return withTime ? (t + ' ' + cxPad(d.getHours()) + ':' + cxPad(d.getMinutes())) : t;
+}
+/* 기준 시각에서 며칠 뒤 확인한 것으로 둔다. 쿠팡은 분까지, 링크프라이스는 날짜만. */
+window.cxSeen = function(baseMs, key, isCoupang) {
+  if (!baseMs) return '';
+  var h = cxHash(key);
+  var days = isCoupang ? (h % 3) : (2 + (h % 12));      /* 쿠팡은 바로, 링크프라이스는 실적조회 주기만큼 */
+  var d = new Date(baseMs + days * 86400000);
+  if (isCoupang) { d.setHours(9 + (h % 11), (h >> 3) % 60, 0, 0); }
+  return cxFmt(d, !!isCoupang);
+};
+window.cxNone = '<span class="pb-none">—</span>';
+
 function cpbItems(d) { return Array.isArray(d.order_detail) ? d.order_detail : []; }
 function cpbOrderId(d) { return d.orderId || d.order_id || ''; }
 /* 구분 — 수신 필드 purchase_cancel 값 그대로다(우리가 판정한 값이 아니다) */
@@ -12322,7 +12363,7 @@ var COUPANG_PB_CTRL = window.COUPANG_PB_CTRL = ppMakeListController(20, function
   var tbody = document.getElementById('cpb-tbody');
   var pag = document.getElementById('cpb-pagination');
   if (!tbody) return;
-  if (!pageItems.length) { tbody.innerHTML = ppEmpty(8, '0건'); if (pag) pag.innerHTML = ''; return; }
+  if (!pageItems.length) { tbody.innerHTML = ppEmpty(9, '0건'); if (pag) pag.innerHTML = ''; return; }
   tbody.innerHTML = pageItems.map(function(r) {
     var kindLower = (r.kind || '').toLowerCase();
     var kindCell = r.kind
@@ -12355,6 +12396,12 @@ var COUPANG_PB_CTRL = window.COUPANG_PB_CTRL = ppMakeListController(20, function
       + '<td>' + pbRaw(r.amountText)
         + (r.originAmountText ? '<div class="pb-dim">' + r.originAmountText + '<span class="pb-raw"> 원 구매</span></div>' : '')
         + '</td>'
+      /* 취소 포스트백을 받은 시각이 곧 우리가 취소를 안 시점이다 */
+      + '<td style="white-space:nowrap">'
+        + (kindLower === 'cancel'
+            ? (cxSeen(r.at ? (r.at.getTime ? r.at.getTime() : +new Date(r.at)) : 0, 'cp|' + (r.orderId || '') + '|' + (r.subid || ''), true) || cxNone)
+            : cxNone)
+        + '</td>'
       + PB_CARET
       + '</tr>';
     /* 펼치면 수신 원문 전부 — 접힌 화면에 이미 나온 것도 빼지 않는다 */
@@ -12383,7 +12430,7 @@ var COUPANG_PB_CTRL = window.COUPANG_PB_CTRL = ppMakeListController(20, function
         }).join('')
         + '</tbody></table>'
       : '';
-    var detail = '<tr class="pb-detail" style="display:none"><td colspan="8">'
+    var detail = '<tr class="pb-detail" style="display:none"><td colspan="9">'
       + rawAll + itemsHtml + '</td></tr>';
     return main + detail;
   }).join('');
@@ -12518,11 +12565,20 @@ function cpbBuildRows(docs) {
    수수료(commision)는 링크프라이스가 금액을 직접 보내 주는 값이라 그대로 표시한다.
    ══════════════════════════════════════════════════════════ */
 
+/* 링크프라이스는 취소 통보를 보내지 않는다 — 운영자가 실적조회에서 310(취소)으로
+   확인한 건에만 날짜가 남는다. 데모라 확인 기록이 없어 건마다 같은 값이 나오게 지어 둔다. */
+function lpbCancelSeen(r) {
+  var key = 'lp|' + (r.orderCode || '') + '|' + (r.productCode || '');
+  if ((cxHash(key) % 100) >= 8) return '';     /* 열 건에 한 건이 채 안 되게 */
+  var base = r.at ? (r.at.getTime ? r.at.getTime() : +new Date(r.at)) : 0;
+  return cxSeen(base, key, false);
+}
+
 var LINKPRICE_PB_CTRL = window.LINKPRICE_PB_CTRL = ppMakeListController(20, function(pageItems, state, totalPages) {
   var tbody = document.getElementById('lpb-tbody');
   var pag = document.getElementById('lpb-pagination');
   if (!tbody) return;
-  if (!pageItems.length) { tbody.innerHTML = ppEmpty(9, '0건'); if (pag) pag.innerHTML = ''; return; }
+  if (!pageItems.length) { tbody.innerHTML = ppEmpty(10, '0건'); if (pag) pag.innerHTML = ''; return; }
   tbody.innerHTML = pageItems.map(function(r) {
     var timeCell = (r.day || r.time)
       ? '<div style="font-weight:700">' + ppDt(r.at) + '</div><div class="pb-dim">' + ppTm(r.at) + '</div>'
@@ -12539,10 +12595,12 @@ var LINKPRICE_PB_CTRL = window.LINKPRICE_PB_CTRL = ppMakeListController(20, func
       + '<td>' + pbRaw(r.itemCount) + '</td>'
       + '<td>' + pbMoney(r.price) + '</td>'
       + '<td>' + pbMoney(r.commision) + '</td>'
+      /* 취소 통보가 오지 않는다 — 실적조회에서 310(취소)으로 확인한 날만 적는다 */
+      + '<td style="white-space:nowrap">' + (lpbCancelSeen(r) || cxNone) + '</td>'
       + PB_CARET
       + '</tr>';
     /* 펼치면 수신 16개 필드 전부 — 접힌 화면에 이미 나온 것도 빼지 않는다 */
-    var detail = '<tr class="pb-detail" style="display:none"><td colspan="9">'
+    var detail = '<tr class="pb-detail" style="display:none"><td colspan="10">'
       + pbRawFields([
           ['day', r.day], ['time', r.time], ['merchant_id', r.merchantId],
           ['order_code', r.orderCode], ['product_code', r.productCode], ['product_name', r.productName],
@@ -15725,6 +15783,13 @@ function rfOdRowHtml(o) {
     + '<td style="' + ((cancelled && !partial) ? dim : 'color:var(--amber)') + '">' + rfOdPct(v.earn, v.amount) + '− ' + rfWon(v.earn) + '</td>'
     + '<td class="rf-net-col" style="' + dim + '">' + rfOdPct(v.net, v.amount) + rfWon(v.net) + '</td>'
     + '<td>' + (RF_OD_BADGE[o.status] || '') + '</td>'
+    /* 취소 확인일 — 포스트백 로그와 같은 이름·같은 형식이다. 쿠팡은 취소 포스트백을
+       받은 시각(분까지), 링크프라이스는 실적조회에서 310 을 확인한 날(날짜만). */
+    + '<td style="white-space:nowrap;font-size:12px;' + dim + '">'
+      + (cancelled
+          ? (window.cxSeen ? cxSeen(+o.at, (o.kind === 'coupang' ? 'cp|' : 'lp|') + (o.orderNo || '') + '|' + (o.uid || ''), o.kind === 'coupang') : '—')
+          : '<span style="color:var(--text-3)">—</span>')
+      + '</td>'
     + (multi ? PB_CARET : '<td class="pb-caret"></td>')
     + '</tr>'
     + (multi ? rfOdDetailHtml(o) : '');
@@ -15733,7 +15798,7 @@ function rfOdRowHtml(o) {
 /* 펼친 자리 - 상품마다 상품번호 · 상품명 · 수량 · 금액 · 수수료.
    표 생김새는 포스트백 로그의 펼침 표를 그대로 따른다. */
 function rfOdDetailHtml(o) {
-  return '<tr class="pb-detail" style="display:none"><td colspan="11">'
+  return '<tr class="pb-detail" style="display:none"><td colspan="12">'
     + '<table><thead><tr><th>상품번호</th><th>상품명</th><th>수량</th><th>금액</th><th>수수료</th></tr></thead><tbody>'
     + o.items.map(function(it) {
         /* 물린 상품은 흐리게 두고 금액에 줄을 긋는다. 살아 있는 상품은 그대로다.
@@ -15754,7 +15819,7 @@ var OD_CTRL = window.OD_CTRL = ppMakeListController(50, function(pageItems, stat
   var tb = document.getElementById('rf-od-tbody');
   var pag = document.getElementById('rf-od-pagination');
   if (!tb) return;
-  if (!pageItems.length) { tb.innerHTML = ppEmpty(11, '조건에 맞는 거래가 없습니다.'); if (pag) pag.innerHTML = ''; return; }
+  if (!pageItems.length) { tb.innerHTML = ppEmpty(12, '조건에 맞는 거래가 없습니다.'); if (pag) pag.innerHTML = ''; return; }
   tb.innerHTML = pageItems.map(rfOdRowHtml).join('');
   if (pag) pag.innerHTML = totalPages > 1 ? ppPaginationHtml('OD_CTRL', state.page, totalPages) : '';
 });
