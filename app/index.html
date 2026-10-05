@@ -16865,6 +16865,7 @@ function csSubmitInquiry(btn) {
   var KO2VI = {"최대 적립률": "Tỷ lệ tích lũy tối đa","유의사항": "Lưu ý","적립 제외 상품": "Sản phẩm không tích lũy",
     /* 1:1 문의 상세 · 탈퇴 소멸 항목 (2026-10-05) */
     "문의 상세": "Chi tiết hỏi đáp",
+    "적립 티켓 전부": "Toàn bộ vé tích lũy",
     "답변": "Trả lời",
     "미처리": "Chưa xử lý",
     "처리 완료": "Đã xử lý",
@@ -21895,10 +21896,12 @@ window.csOpenDetail = function (id) {
 window.ppRenderWithdrawLoss = function () { renderWithdrawLoss(); };
 function renderWithdrawLoss() {
   var t = PP.tickets || { bronze: 0, silver: 0, gold: 0, event: 0 };
-  var set = function (id, v) { var e = document.getElementById(id); if (e) e.textContent = v; };
-  set('wd-loss-tickets', '적립 티켓 전부 (브론즈 ' + (t.bronze || 0) + ' · 실버 ' + (t.silver || 0) + ' · 골드 ' + (t.gold || 0) + ')');
-  set('wd-loss-event', '이벤트 티켓 ' + (t.event || 0) + '장');
-  set('wd-loss-points', '보유 포인트 ' + (PP.points || 0).toLocaleString('ko-KR') + 'P');
+  /* 낱말과 숫자를 떼어 둔다 — 붙여 쓰면 한·베 사전이 통째 일치를 못 해 한국어로 남는다 */
+  var set = function (id, v) { var e = document.getElementById(id); if (e) e.innerHTML = v; };
+  set('wd-loss-tickets', '<span>적립 티켓 전부</span> (<span>브론즈</span> ' + (t.bronze || 0)
+    + ' · <span>실버</span> ' + (t.silver || 0) + ' · <span>골드</span> ' + (t.gold || 0) + ')');
+  set('wd-loss-event', '<span>이벤트 티켓</span> ' + (t.event || 0) + '<span>장</span>');
+  set('wd-loss-points', '<span>보유 포인트</span> ' + (PP.points || 0).toLocaleString('ko-KR') + 'P');
 }
 
 /* ── 약관 및 정책 (pw-30-terms) — CMS 약관 관리(terms 컬렉션)를 그대로 읽어서 표시.
