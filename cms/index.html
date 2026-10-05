@@ -8100,6 +8100,58 @@ function loadAllData() {
 }
 
 /* ── Dashboard stats ── */
+/* ══════════════════════════════════════════════════════════════════════
+   컬렉션 공용 캐시 — 한 번 읽어 나눠 쓴다 (2026-10-05, 읽기 할당량 초과 대응)
+
+   loadAllData() 가 로더 23개를 한꺼번에 돌리는데, 서로 모른 채 같은 컬렉션을
+   각자 통째로 읽고 있었다. 한 번 여는 데 ticket_transactions 4회·postbacks 3회·
+   users 3회·gifticon_exchanges 2회다. 문서 수만큼 과금되므로 이것이 사용량의 대부분이었다.
+
+   쓰는 법 : db.collection('users').get()  →  ppAll('users')
+   받는 값 : 스냅샷처럼 쓰는 객체 { size, empty, docs, forEach } — doc.id · doc.data() 그대로다.
+             docs 는 받는 쪽마다 새 배열이라, 한쪽이 sort 로 뒤집어도 다른 쪽이 흔들리지 않는다
+             (대시보드가 snap.docs.sort() 를 제자리에서 돌린다).
+
+   ⚠ 한 번 읽은 값을 그 화면이 살아 있는 동안 돌려쓴다. 저장 뒤 목록을 새로 그려야 하면
+     ppAllDrop(컬렉션) 으로 버리고 다시 부른다.
+   ⚠ 읽기가 실패하면 기억해 두지 않는다 — 다음에 부르는 쪽이 다시 시도한다.
+     받는 쪽의 .catch 는 그대로라 화면마다 쓰던 오류 표시가 그대로 돈다.
+   ══════════════════════════════════════════════════════════════════════ */
+var PP_COL_CACHE = {};
+function ppSnapLike(rows) {
+  var docs = rows.map(function (r) { return { id: r.id, data: function () { return r.data; } }; });
+  return {
+    size: docs.length,
+    empty: docs.length === 0,
+    docs: docs,
+    forEach: function (fn) { docs.forEach(fn); },
+  };
+}
+function ppAll(col) {
+  if (!PP_COL_CACHE[col]) {
+    PP_COL_CACHE[col] = db.collection(col).get().then(function (snap) {
+      var rows = [];
+      snap.forEach(function (d) { rows.push({ id: d.id, data: d.data() }); });
+      return rows;
+    }).catch(function (e) {
+      delete PP_COL_CACHE[col];          /* 실패는 기억하지 않는다 */
+      throw e;
+    });
+  }
+  return PP_COL_CACHE[col].then(ppSnapLike);
+}
+/* 값이 바뀐 뒤 다시 읽어야 할 때 */
+function ppAllDrop(col) { if (col) delete PP_COL_CACHE[col]; else PP_COL_CACHE = {}; }
+window.ppAllDrop = ppAllDrop;
+/* 같은 값 비교(equality where)는 전수에서 걸러도 결과가 같다 — 그 밭이 없는 문서는
+   파이어스토어도 빼고 아래 비교도 뺀다. 범위·정렬 조건은 그대로 질의한다. */
+function ppAllWhere(col, field, value) {
+  return ppAll(col).then(function (snap) {
+    return ppSnapLike(snap.docs.filter(function (d) { return d.data()[field] === value; })
+      .map(function (d) { return { id: d.id, data: d.data() }; }));
+  });
+}
+
 function setKpi(id, txt){ var el=document.getElementById(id); if(el) el.textContent=txt; }
 function kpiWon(n){ return (Math.round(n)||0).toLocaleString('ko-KR')+'원'; }
 function recompNet(){
@@ -8108,11 +8160,11 @@ function recompNet(){
 }
 function loadDashboardStats() {
   /* 전체 회원 */
-  db.collection('users').get().then(function(snap) {
+  ppAll('users').then(function(snap) {
     setKpi('kpi-users', snap.size.toLocaleString('ko-KR'));
   }).catch(function(){});
   /* 발행 티켓(누적 적립) + 티켓 적립 비용 — settings/ticket_value 반영(2026-08-12) */
-  Promise.all([taLoadTicketValue(), db.collection('ticket_transactions').where('type','==','earn').get()]).then(function(res) {
+  Promise.all([taLoadTicketValue(), ppAllWhere('ticket_transactions', 'type', 'earn')]).then(function(res) {
     var snap = res[1];
     setKpi('kpi-tickets', snap.size.toLocaleString('ko-KR'));
     var cost = 0;
@@ -8130,14 +8182,14 @@ function loadDashboardStats() {
     setKpi('kpi-draws', n.toLocaleString('ko-KR'));
   }).catch(function(){ setKpi('kpi-draws','0'); });
   /* 기프티콘 판매 수익(마진) */
-  db.collection('gifticon_exchanges').get().then(function(snap) {
+  ppAll('gifticon_exchanges').then(function(snap) {
     var rev = 0;
     snap.docs.filter(window.ppNotProbe).forEach(function(d){ var v=(d.data().count_used||1)*2000; rev += v - Math.round(v*0.8); });
     setKpi('kpi-gifticon-rev', kpiWon(rev));
     window.__ppGifticonRev = rev; recompNet();
   }).catch(function(){});
   /* 제휴 수수료 매출 + 대시보드 표 */
-  db.collection('postbacks').get().then(function(snap) {
+  ppAll('postbacks').then(function(snap) {
     var MR = { '쿠팡':0.03,'11번가':0.035,'G마켓':0.03,'알리익스프레스':0.05,'아이허브':0.05 };
     var commission = 0;
     snap.docs.forEach(function(doc){ var d=doc.data(); if(d.status!=='confirmed') return; commission += Math.round((d.purchase_amount||0)*(MR[d.mall_name]||0.03)); });
@@ -8177,7 +8229,7 @@ function loadDashboardStats() {
     }
   }).catch(function(){});
   /* dash-top-tbody: top 3 users by ticket_transactions earn count */
-  db.collection('ticket_transactions').where('type','==','earn').get().then(function(snap) {
+  ppAllWhere('ticket_transactions', 'type', 'earn').then(function(snap) {
     var topTbody = document.getElementById('dash-top-tbody');
     if (!topTbody) return;
     var byUser = {};
@@ -8732,7 +8784,7 @@ function loadGifticonExchanges() {
         GEX_CTRL.setRows(items);
       });
     }).catch(function(e){ console.error('gifticonExchanges', e); });
-  db.collection('gifticon_exchanges').get().then(function(s){
+  ppAll('gifticon_exchanges').then(function(s){
     var el = document.getElementById('gex-count');
     if (el) el.textContent = '총 ' + s.docs.filter(window.ppNotProbe).length + '건';
   }).catch(function(){});
@@ -8796,7 +8848,7 @@ function loadMembers() {
       MEM_CTRL.setRows(items);
     }).catch(function(e){ console.error('members', e); });
   /* 전체 회원 집계 (연동/게스트/마케팅 동의) */
-  db.collection('users').get().then(function(s){
+  ppAll('users').then(function(s){
     var total = s.size, kakao = 0, mkt = 0;
     s.docs.forEach(function(d){ var u=d.data(); if(u.linked_kakao) kakao++; if(u.marketing_consent===true||u.marketing_agree===true) mkt++; });
     var guest = total - kakao;
@@ -9396,7 +9448,7 @@ function loadTickets() {
       });
     }).catch(function(e){ console.error('loadTickets',e); tbody.innerHTML = ppEmpty(5,'로드 오류'); });
   /* 전체 원장 기준 통계 */
-  db.collection('ticket_transactions').get().then(function(all){
+  ppAll('ticket_transactions').then(function(all){
     var c = { earn:0, use:0, expire:0, clawback:0 };
     all.docs.forEach(function(dd){ var t=dd.data().type; if(c[t]!=null) c[t]++; });
     var byId = { 'tk-earn':c.earn, 'tk-use':c.use, 'tk-total':all.size, 'tk-expire':c.expire, 'tk-clawback':c.clawback };
@@ -10415,6 +10467,7 @@ window.giCancelExchange = function(id) {
     cancelled_at: FS.FieldValue.serverTimestamp(),
     cancel_reason: reason || '관리자 취소',
   }).then(function() {
+    if (window.ppAllDrop) ppAllDrop('gifticon_exchanges');   /* 바뀐 값을 다시 읽게 한다 */
     toast('기프티콘 구매가 취소 처리되었습니다.');
     logAdmin('기프티콘 구매 취소: ' + id + ' · 사유: ' + (reason||'관리자 취소'));
     loadGifticonExchanges();
@@ -10918,7 +10971,7 @@ window.gcancelApplyFilters = function() {
 function loadGifticonCancel() {
   var tbody = document.querySelector('#sec-gifticon-cancel table tbody');
   if (!tbody) return;
-  db.collection('gifticon_exchanges').where('status', '==', 'cancelled').get().then(function(snap) {
+  ppAllWhere('gifticon_exchanges', 'status', 'cancelled').then(function(snap) {
     var countEl = document.querySelector('#sec-gifticon-cancel .card-header span');
     if (countEl) countEl.textContent = '총 ' + snap.size + '건';
     if (snap.empty) { GCANCEL_CTRL.setRows([]); return; }
@@ -12847,7 +12900,7 @@ function loadPostback() {
     setTxt('lpb-sub', lRows.length + '건');
   }
 
-  db.collection('postbacks').get().then(function(snap) {
+  ppAll('postbacks').then(function(snap) {
     var cpNative = [], lpNative = [];
     snap.docs.forEach(function(doc) {
       var d = Object.assign({ _id: doc.id }, doc.data());
@@ -13041,9 +13094,9 @@ function loadAbuse() {
   var tbody = document.getElementById('abuse-tbody');
   if (!tbody) return;
   Promise.all([
-    db.collection('postbacks').get(),
-    db.collection('users').get(),
-    db.collection('ticket_transactions').get()
+    ppAll('postbacks'),
+    ppAll('users'),
+    ppAll('ticket_transactions')
   ]).then(function(res){
     var userMap = {};
     res[1].forEach(function(doc){ userMap[doc.id] = doc.data(); });
@@ -13124,7 +13177,7 @@ function loadClawback() {
   var tbody = tbodies[0];
   var debtTbody = tbodies[1];
   if (!tbody) return;
-  db.collection('ticket_transactions').get()
+  ppAll('ticket_transactions')
     .then(function(allSnap) {
       var docs = allSnap.docs.filter(function(d){ var t=d.data().type; return t==='clawback'||t==='expire'; })
         .sort(function(a,b){ var ta=a.data().created_at, tb=b.data().created_at; return (tb&&tb.toDate?tb.toDate():new Date(0)) - (ta&&ta.toDate?ta.toDate():new Date(0)); })
@@ -16718,6 +16771,8 @@ window.dmInit = function() {
 // 현황 카운트
 // ──────────────────────────────────────────
 window.dmLoadStats = function() {
+  /* 데모 자료를 넣거나 지운 뒤에도 불린다 — 공용 캐시를 버려 다음 화면이 새로 읽게 한다. */
+  if (window.ppAllDrop) ppAllDrop();
   var grid = document.getElementById('dm-stats-grid');
   if (!grid) return;
   var colLabels = {
@@ -16730,6 +16785,10 @@ window.dmLoadStats = function() {
   grid.innerHTML = '';
   var cols = Object.keys(colLabels);
   var pending = cols.length;
+  /* ⚠ 개수만 필요한데 문서를 다 받아 세고 있다 — 컬렉션 열두 개를 통째로 읽는다.
+     집계 질의(count)로 바꾸면 열두 건으로 끝나지만, 지금 쓰는 compat SDK 10.12.2 에는
+     집계 API 가 없다(2026-10-05 확인: collection.count · AggregateField · getCountFromServer
+     모두 없음). 모듈형 SDK 를 함께 싣는 일은 지시 범위 밖이라 손대지 않았다. */
   cols.forEach(function(c) {
     db.collection(c).get().then(function(snap) {
       var chip = document.createElement('div');
@@ -17378,6 +17437,7 @@ window.dmMemberDetailSave = function() {
   if (!nickname) { dmShowToast('닉네임을 입력하세요.', true); return; }
   var statusEn = MEMBER_STATUS_KO_TO_EN[document.getElementById('m-status').value] || 'active';
   db.collection('users').doc(userId).set({ nickname: nickname, status: statusEn, updated_at: FS.Timestamp.now() }, { merge: true }).then(function() {
+    if (window.ppAllDrop) ppAllDrop('users');   /* 바뀐 값을 다시 읽게 한다 */
     dmShowToast('회원 정보가 저장되었습니다.');
     closeModal('m-member');
     if (typeof loadMembers === 'function') loadMembers();
