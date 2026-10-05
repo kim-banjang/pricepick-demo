@@ -12478,6 +12478,38 @@ window.PP_FEATURES = {
     </div>
   </div>
 
+  <!-- 1:1 문의 상세 — 내 문의 내역에서 항목을 누르면 열린다(앱 개발 요청 2026-10-05).
+       머리·뒤로가기·카드 생김새는 문의 작성 화면 것을 그대로 쓴다. 새로 짓지 않는다.
+       상태 배지는 둘뿐이다 — 미처리 / 처리 완료. 「처리 중」은 2026-10-05 확정으로 없앴다.
+       답변이 없으면 답변 구획을 아예 그리지 않는다 — 빈 상자를 남기지 않는다. -->
+  <div class="phone-wrap" id="pw-30-cs-detail" data-screen="30-cs-detail">
+    <div class="phone">
+      <div class="my-screen" style="background:var(--bg);display:flex;flex-direction:column;">
+        <div class="statusbar"><span>9:41</span><div class="statusbar-icons"><svg width="17" height="12" viewBox="0 0 17 12" fill="currentColor"><rect x="0" y="4" width="3" height="8" rx="1"/><rect x="4.5" y="2.5" width="3" height="9.5" rx="1"/><rect x="9" y="1" width="3" height="11" rx="1"/><rect x="13.5" y="0" width="3" height="12" rx="1"/></svg></div></div>
+        <div style="display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid var(--border);background:#fff;">
+          <button class="back-btn" data-jump="pw-30-cs"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M11.25 15.5L5.96 10.45C5.17 9.65 5.17 8.35 5.96 7.55L11.25 2.66" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+          <div style="font-size:20px;font-weight:700;color:var(--text1);">문의 상세</div>
+        </div>
+        <div style="flex:1;overflow-y:auto;padding:20px 16px;display:flex;flex-direction:column;gap:12px;">
+          <div style="background:#fff;border-radius:14px;padding:16px;border:1px solid var(--border);box-shadow:0 2px 8px rgba(26,17,48,0.04);">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+              <span id="csd-cat" style="font-size:var(--fs-caption);font-weight:700;color:var(--main);background:var(--sub-4);padding:3px 8px;border-radius:20px;">문의</span>
+              <span id="csd-badge"></span>
+            </div>
+            <div id="csd-title" style="font-size:var(--fs-body);font-weight:700;color:var(--text1);margin-bottom:4px;"></div>
+            <div id="csd-at" style="font-size:var(--fs-caption);color:var(--text3);"></div>
+            <div id="csd-body" style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border);font-size:var(--fs-body);color:var(--text2);line-height:1.6;white-space:pre-wrap;"></div>
+          </div>
+          <div id="csd-answer-card" style="display:none;background:#fff;border-radius:14px;padding:16px;border:1px solid var(--border);box-shadow:0 2px 8px rgba(26,17,48,0.04);border-left:3px solid #22C55E;">
+            <div style="font-size:var(--fs-caption);font-weight:700;color:#22C55E;margin-bottom:4px;">답변</div>
+            <div id="csd-answer-at" style="font-size:var(--fs-caption);color:var(--text3);margin-bottom:10px;"></div>
+            <div id="csd-answer-body" style="font-size:var(--fs-body);color:var(--text2);line-height:1.6;white-space:pre-wrap;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="phone-wrap" id="pw-30-cs-write" data-screen="30-cs-write">
     <div class="phone">
       <div class="my-screen" style="background:var(--bg);display:flex;flex-direction:column;">
@@ -12803,7 +12835,11 @@ window.PP_FEATURES = {
           <div class="wd-sub">아래 항목들은 탈퇴 후 복원할 수 없습니다.</div>
           <div class="wd-loss-card">
             <div class="wd-loss-t">삭제되는 항목</div>
-            <div class="wd-loss-item"><div class="wd-loss-ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v2z"/><line x1="13" y1="5" x2="13" y2="19" stroke-dasharray="3 3"/></svg></div>적립 티켓 전부 (브론즈 12 · 실버 4 · 골드 2)</div>
+            <div class="wd-loss-item"><div class="wd-loss-ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v2z"/><line x1="13" y1="5" x2="13" y2="19" stroke-dasharray="3 3"/></svg></div><span id="wd-loss-tickets">적립 티켓 전부 (브론즈 12 · 실버 4 · 골드 2)</span></div>
+            <!-- 잔여 자산 소멸 — 보유 티켓·포인트는 탈퇴와 동시에 모두 소멸한다(이용약관 제13조,
+                 policy-07-account). 등급 티켓만 적어 두면 이벤트 티켓·포인트는 남는 것으로 읽힌다. -->
+            <div class="wd-loss-item"><div class="wd-loss-ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v2z"/><path d="M13 5v2"/><path d="M13 11v2"/><path d="M13 17v2"/></svg></div><span id="wd-loss-event">이벤트 티켓 0장</span></div>
+            <div class="wd-loss-item"><div class="wd-loss-ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.6 16.5V7.9h3.1c1.9 0 3.1 1.1 3.1 2.8s-1.2 2.8-3.1 2.8H9.6"/></svg></div><span id="wd-loss-points">보유 포인트 0P</span></div>
             <div class="wd-loss-item"><div class="wd-loss-ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div>활동 내역 (구매 이력, 이벤트 참여 기록)</div>
             <div class="wd-loss-item"><div class="wd-loss-ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>닉네임 · 계정 정보</div>
           </div>
@@ -16825,6 +16861,12 @@ function csSubmitInquiry(btn) {
 <script id="ip-i18n-engine">
 (function(){
   var KO2VI = {"최대 적립률": "Tỷ lệ tích lũy tối đa","유의사항": "Lưu ý","적립 제외 상품": "Sản phẩm không tích lũy",
+    /* 1:1 문의 상세 · 탈퇴 소멸 항목 (2026-10-05) */
+    "문의 상세": "Chi tiết hỏi đáp",
+    "답변": "Trả lời",
+    "미처리": "Chưa xử lý",
+    "처리 완료": "Đã xử lý",
+    "문의": "Hỏi đáp",
     /* 04c 홈 화면 바로가기 — 2차 액션 카드와 바텀시트 */
     "홈 화면에 바로가기 추가": "Thêm lối tắt vào màn hình chính",
     "한 번만 추가해두면 계속 적용돼요": "Thêm một lần là áp dụng mãi",
@@ -18952,12 +18994,14 @@ function refreshHomeData() {
       PP.randomBundleCount = Object.keys(pendingBundles).length;
       renderHomeTickets();
       renderMyTicketCard();
+      renderWithdrawLoss();
       if (typeof renderGradeSwapScreen === 'function') renderGradeSwapScreen();
       if (typeof renderPointTicketExchange === 'function') renderPointTicketExchange();
     }).catch(function(e){ console.error('tickets', e); });
   db.collection('user_points').doc(PP.uid).get().then(function(doc) {
     PP.points = doc.exists ? (doc.data().balance || 0) : 0;
     renderHomePoints();
+    renderWithdrawLoss();
     if (typeof renderPointTicketExchange === 'function') renderPointTicketExchange();
   }).catch(function(e){ console.error('points', e); });
 }
@@ -21789,19 +21833,67 @@ function renderInquiries() {
       return;
     }
     var CAT = { ticket: '티켓 적립', gifticon: '기프티콘 구매', postback: '적립 확인', account: '계정', point: '포인트' };
+    CS_INQ = {};
     box.innerHTML = iq.map(function (x) {
-      var answered = (x.status === 'answered' || !!x.answer);
-      var badge = answered
-        ? '<span style="font-size:var(--fs-caption);font-weight:700;color:#22C55E;background:#F0FDF4;padding:3px 8px;border-radius:20px;"><span style="display:inline-flex;flex-shrink:0;vertical-align:-2px"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5 10 17.5 19 7"/></svg></span> 답변 완료</span>'
-        : '<span style="font-size:var(--fs-caption);font-weight:700;color:#FF9500;background:#FFF3E0;padding:3px 8px;border-radius:20px;">처리 중</span>';
+      CS_INQ[x._id] = x;   /* ppQuery 가 문서 아이디를 _id 로 실어 준다 */
+      var answered = csAnswered(x);
+      var badge = csBadge(x);
       var ans = answered && x.answer ? '<div style="margin-top:10px;padding:10px 12px;background:var(--bg);border-radius:10px;border-left:3px solid #22C55E;"><div style="font-size:var(--fs-caption);font-weight:700;color:#22C55E;margin-bottom:3px;">관리자 답변</div><div style="font-size:var(--fs-caption);color:var(--text2);line-height:1.5;">' + ppEsc(x.answer) + '</div></div>' : '';
-      return '<div style="background:#fff;border-radius:14px;padding:16px;margin-bottom:8px;border:1px solid var(--border);box-shadow:0 2px 8px rgba(26,17,48,0.04);">'
+      return '<div data-ip-bound="1" onclick="csOpenDetail(\'' + ppEsc(String(x._id)) + '\')" style="background:#fff;border-radius:14px;padding:16px;margin-bottom:8px;border:1px solid var(--border);box-shadow:0 2px 8px rgba(26,17,48,0.04);cursor:pointer;">'
         + '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">'
         + '<span style="font-size:var(--fs-caption);font-weight:700;color:var(--main);background:var(--sub-4);padding:3px 8px;border-radius:20px;">' + ppEsc(CAT[x.category] || x.category || '문의') + '</span>' + badge + '</div>'
         + '<div style="font-size:var(--fs-body);font-weight:700;color:var(--text1);margin-bottom:4px;">' + ppEsc(x.title || '문의') + '</div>'
         + '<div style="font-size:var(--fs-caption);color:var(--text3);">' + ppFmt(ppDate(x.created_at)) + ' 접수</div>' + ans + '</div>';
     }).join('');
   });
+}
+
+/* ── 1:1 문의 상세 (pw-30-cs-detail) ───────────────────────────────────────
+   내 문의 내역에서 항목을 누르면 열린다. 목록과 상세가 같은 배지를 쓴다 —
+   상태는 둘뿐이다. 미처리 / 처리 완료. 「처리 중」은 2026-10-05 확정으로 없앴다.
+   답변이 없으면 답변 구획을 아예 그리지 않는다 — 빈 상자도, 지어낸 안내 문구도 두지 않는다. */
+var CS_INQ = {};
+function csAnswered(x) { return !!(x && (x.status === 'answered' || x.status === 'completed' || x.answer)); }
+function csBadge(x) {
+  return csAnswered(x)
+    ? '<span style="font-size:var(--fs-caption);font-weight:700;color:#22C55E;background:#F0FDF4;padding:3px 8px;border-radius:20px;"><span style="display:inline-flex;flex-shrink:0;vertical-align:-2px"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5 10 17.5 19 7"/></svg></span> 처리 완료</span>'
+    : '<span style="font-size:var(--fs-caption);font-weight:700;color:#FF9500;background:#FFF3E0;padding:3px 8px;border-radius:20px;">미처리</span>';
+}
+window.csOpenDetail = function (id) {
+  var x = CS_INQ[id];
+  if (!x) return;
+  var CAT = { ticket: '티켓 적립', gifticon: '기프티콘 구매', postback: '적립 확인', account: '계정', point: '포인트' };
+  var set = function (elId, v) { var e = document.getElementById(elId); if (e) e.textContent = v; };
+  set('csd-cat', CAT[x.category] || x.category || '문의');
+  set('csd-title', x.title || '문의');
+  set('csd-at', ppFmt(ppDate(x.created_at)) + ' 접수');
+  set('csd-body', x.body || x.content || '');
+  var badge = document.getElementById('csd-badge');
+  if (badge) badge.innerHTML = csBadge(x);
+  /* 답변이 없으면 구획째 감춘다 */
+  var card = document.getElementById('csd-answer-card');
+  if (card) {
+    if (csAnswered(x) && x.answer) {
+      card.style.display = '';
+      var at = ppDate(x.answered_at || x.updated_at);
+      set('csd-answer-at', at ? ppFmt(at) : '');
+      set('csd-answer-body', x.answer);
+    } else {
+      card.style.display = 'none';
+    }
+  }
+  showScreen('pw-30-cs-detail');
+};
+
+/* ── 탈퇴 화면 소멸 항목 — 실제 보유값을 읽어 적는다 ──────────────────────
+   보유 티켓·포인트는 탈퇴와 동시에 모두 소멸한다(이용약관 제13조, policy-07-account).
+   등급 티켓만 적어 두면 이벤트 티켓·포인트는 남는 것으로 읽힌다. */
+function renderWithdrawLoss() {
+  var t = PP.tickets || { bronze: 0, silver: 0, gold: 0, event: 0 };
+  var set = function (id, v) { var e = document.getElementById(id); if (e) e.textContent = v; };
+  set('wd-loss-tickets', '적립 티켓 전부 (브론즈 ' + (t.bronze || 0) + ' · 실버 ' + (t.silver || 0) + ' · 골드 ' + (t.gold || 0) + ')');
+  set('wd-loss-event', '이벤트 티켓 ' + (t.event || 0) + '장');
+  set('wd-loss-points', '보유 포인트 ' + (PP.points || 0).toLocaleString('ko-KR') + 'P');
 }
 
 /* ── 약관 및 정책 (pw-30-terms) — CMS 약관 관리(terms 컬렉션)를 그대로 읽어서 표시.
