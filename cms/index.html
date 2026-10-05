@@ -11253,7 +11253,8 @@ function notiTestRenderChosen() {
   var box = document.getElementById('noti-test-chosen');
   var cnt = document.getElementById('noti-test-count');
   var ids = Object.keys(NOTI_TEST_PICK);
-  if (cnt) cnt.textContent = ids.length ? ('· ' + ids.length + '명') : '';
+  /* 「명」은 사전이 아는 낱말이라 따로 떼어 둔다 — 붙여 쓰면 통째 일치가 깨져 한국어로 남는다 */
+  if (cnt) cnt.innerHTML = ids.length ? ('· ' + ids.length + ' <span>명</span>') : '';
   if (!box) return;
   box.innerHTML = ids.length ? ids.map(function(id) {
     return '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 10px;border-bottom:1px solid var(--border)">'
