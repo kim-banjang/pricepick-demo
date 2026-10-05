@@ -19017,6 +19017,7 @@ function renderHomeTickets() {
   if (tot) tot.textContent = PP.tickets.total;
 
   if (typeof renderExGifticonSummary === 'function') renderExGifticonSummary();
+  renderWithdrawLoss();
 }
 
 function renderHomePoints() {
@@ -19025,6 +19026,7 @@ function renderHomePoints() {
   var ico = el.querySelector('.htc-point-ico');
   el.textContent = PP.points.toLocaleString('ko-KR') + 'P';
   if (ico) el.insertBefore(ico, el.firstChild);
+  renderWithdrawLoss();
 }
 
 function refreshBenefitBadges() {
