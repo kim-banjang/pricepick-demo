@@ -4182,7 +4182,7 @@ window.CMS_FEATURES = {
               <div style="display:flex;align-items:center;gap:8px"><select class="form-select" id="pa-streak-bonus" style="max-width:200px"><option value="이벤트 티켓 1장" selected>이벤트 티켓 1장</option><option value="이벤트 티켓 2장">이벤트 티켓 2장</option><option value="보너스 포인트">보너스 포인트</option></select></div>
             </div>
             <div class="form-group"><label class="form-label">출석 인정 조건</label>
-              <select class="form-select" id="pa-condition"><option value="제휴몰 방문 후 앱 복귀" selected>제휴몰 방문 후 앱 복귀</option><option value="앱 진입만으로 인정">앱 진입만으로 인정</option></select>
+              <select class="form-select" id="pa-condition"><option value="제휴몰 방문 후 복귀 시 인정" selected>제휴몰 방문 후 복귀 시 인정</option></select>
             </div>
             <div class="form-group" style="margin-bottom:0"><label class="form-label">초기화 시각</label>
               <input class="form-input" type="time" id="pa-reset-time" value="00:00" style="max-width:140px">
@@ -6968,7 +6968,6 @@ window.giSaveImageEdit = giSaveImageEdit;
   "구매 확정 후 지급 (쿠팡 기준 카카오톡 연동 D+7 / 미연동 D+30 · 취소 먹튀 방지).":"Cấp sau xác nhận mua (số ngày chuyển đổi theo từng sàn, phòng hủy gian lận).",
   "이벤트 티켓 신규 상한. (구매 적립 랜덤 티켓 1일 5/월 50과 별도)":"Hạn mức mới vé sự kiện. (Riêng với vé ngẫu nhiên tích lũy mua: 5/ngày và 50/tháng)",
   "제휴 수수료 (매출)":"Hoa hồng LK (doanh thu)",
-  "앱 진입만으로 인정":"Công nhận chỉ khi vào ứng dụng",
   "등록 전 체크":"Kiểm tra trước đăng ký",
   "기프티콘 신규 입고 안내":"Thông báo nhập kho Gifticon mới",
   "기프티콘 교환 기능 출시":"Ra mắt tính năng đổi Gifticon",
@@ -6986,7 +6985,7 @@ window.giSaveImageEdit = giSaveImageEdit;
   "제휴 수수료(매출)":"Hoa hồng LK (doanh thu)",
   "티켓 환수·소멸 이력":"Lịch sử thu hồi·hủy vé",
   "(초대자 기준 성공 시)":"(Khi thành công theo người mời)",
-  "제휴몰 방문 후 앱 복귀":"Quay lại ứng dụng sau khi thăm cửa hàng LK",
+  "제휴몰 방문 후 복귀 시 인정":"Công nhận khi quay lại sau khi thăm cửa hàng LK",
   "티켓 교환 시 발생 마진":"Biên phát sinh khi đổi vé",
   "5일 연속 출석 달성 시":"Khi đạt điểm danh 5 ngày liên tiếp",
   "운영 정책 &gt; 참여·이벤트":"Chính sách vận hành &gt; Tham gia·Sự kiện",
@@ -8639,7 +8638,7 @@ var MEM_CTRL = window.MEM_CTRL = ppMakeListController(20, function(pageItems, st
       : '<span style="background:var(--warning-soft);color:var(--warning);padding:2px 8px;border-radius:99px;font-size:11px;font-weight:600;">게스트</span>';
     var statusKo = MEMBER_STATUS_KO[u.status] || '정상';
     return '<tr>'
-      + '<td>' + renderMemberIdentityListOnly(u, u._id) + '</td>'
+      + '<td>' + renderMemberIdentityListOnly(u, u._id, { maskKakao: true }) + '</td>'
       + '<td>' + kakaoType + '</td>'
       + '<td style="text-align:center;white-space:nowrap"><div style="font-weight:700;">' + ppDt(u.created_at) + '</div><div style="color:var(--text-3);font-size:11px">' + ppTm(u.created_at) + '</div></td>'
       + '<td style="text-align:center"><span id="mem-rand-' + u._id + '">…</span></td>'
@@ -9058,13 +9057,23 @@ function memberKakaoLabel(u) {
      거기서는 없는 값을 적어 넣지 않는다. */
   return (u && u.linked_kakao && u.kakao_login_id) ? u.kakao_login_id : '게스트(비연동)';
 }
+// 카카오 이메일 가림 — 목록 화면용. 앞 2자 + *** + @도메인(ab***@gmail.com).
+// 전체 값은 상세 화면·상세 모달에서만 보인다.
+function maskKakaoEmail(email) {
+  email = email == null ? '' : String(email);
+  if (!email) return '';
+  var at = email.indexOf('@');
+  if (at < 0) return email.slice(0, 2) + '***';
+  return email.slice(0, Math.min(2, at)) + '***' + email.slice(at);
+}
 function memberIdShort(docId, len) {
   docId = docId || '';
   len = len || 18;
   return docId.length > len ? (docId.slice(0, len) + '…') : docId;
 }
 // 세로 3행용 — 닉네임 / 카카오톡ID(또는 게스트) / 식별 아이디(내부 users 문서ID)
-function renderMemberIdentity(u, docId) {
+// opts.maskKakao — 목록 화면에서 카카오 이메일을 maskKakaoEmail로 가린다.
+function renderMemberIdentity(u, docId, opts) {
   /* 줄 자리는 늘 셋을 지키고, 없는 값은 빈 채로 둔다 — 줄 수가 1·2·3으로 들쭉날쭉하면
      행 높이가 제각각이 된다(김반장 2026-09-16). 없다는 말(「닉네임없음」·「게스트(비연동)」)은
      적어 넣지 않는다. 카카오 ID 줄이 차 있으면 연동, 비어 있으면 미연동이다.
@@ -9072,6 +9081,7 @@ function renderMemberIdentity(u, docId) {
   u = u || {};
   var nick = u.nickname || '';
   var kakao = (u.linked_kakao && u.kakao_login_id) ? u.kakao_login_id : '';
+  if (opts && opts.maskKakao) kakao = maskKakaoEmail(kakao);
   var uid = docId || '';
   var uidAttr = uid
     ? ' title="눌러서 식별 아이디 전체 복사" onclick="event.stopPropagation();ppCopyId(this,&quot;' + ppEsc(uid) + '&quot;)"'
@@ -9084,9 +9094,11 @@ function renderMemberIdentity(u, docId) {
 }
 // 회원 목록 리스트 전용 — 세로 2행(닉네임 / 카카오ID). 식별 아이디(내부 문서ID)는 상세에서만 노출.
 // 카카오 연동 회원은 카카오 로그인 ID, 미연동(게스트) 회원은 "미연동"으로 표기.
-function renderMemberIdentityListOnly(u, docId) {
+function renderMemberIdentityListOnly(u, docId, opts) {
   u = u || {};
-  var idLine = (u.linked_kakao && u.kakao_login_id) ? u.kakao_login_id : '미연동';
+  var idLine = (u.linked_kakao && u.kakao_login_id)
+    ? ((opts && opts.maskKakao) ? maskKakaoEmail(u.kakao_login_id) : u.kakao_login_id)
+    : '미연동';
   return '<div style="font-weight:500;">' + (u.nickname || '닉네임없음') + '</div>'
     + '<div style="font-size:11px;color:var(--text-2);font-family:monospace;">' + idLine + '</div>';
 }
@@ -9237,7 +9249,7 @@ var TICKETS_CTRL = window.TICKETS_CTRL = ppMakeListController(20, function(pageI
   if (!tbody) return;
   if (!pageItems.length) { tbody.innerHTML = ppEmpty(5,'조건에 맞는 티켓 이력이 없습니다.'); if (pag) pag.innerHTML = ''; return; }
   tbody.innerHTML = pageItems.map(function(d) {
-    return '<tr><td>' + renderMemberIdentity(d._user, d.user_id) + '</td>'
+    return '<tr><td>' + renderMemberIdentity(d._user, d.user_id, { maskKakao: true }) + '</td>'
       + '<td>' + d._reasonHtml + '</td>'
       + '<td style="text-align:center">' + d._ticketHtml + '</td>'
       + '<td style="text-align:center">' + d._statusHtml + '</td>'
@@ -13045,7 +13057,9 @@ function loadPointAttendance() {
     setVal('pa-daily-points', d.daily_points);
     setVal('pa-mall', d.mall);
     setVal('pa-streak-bonus', d.streak_bonus);
-    setVal('pa-condition', d.condition);
+    /* 선택지에 없는 옛 저장값(「앱 진입만으로 인정」 등)은 받지 않는다 — 넣으면 칸이 빈다. */
+    var paCond = document.getElementById('pa-condition');
+    if (paCond && d.condition && Array.prototype.some.call(paCond.options, function(o){ return o.value === d.condition; })) paCond.value = d.condition;
     setVal('pa-reset-time', d.reset_time);
     if (d.daily_points != null) setTxt2('pa-disp-points', d.daily_points + 'P (' + Math.round(d.daily_points/10) + '원 상당)');
     if (d.mall) setTxt2('pa-disp-mall', d.mall);
@@ -13124,7 +13138,7 @@ var POINTS_CTRL = window.POINTS_CTRL = ppMakeListController(20, function(pageIte
     var amt = d.amount||0;
     var sign = amt >= 0 ? '+' : '';
     var color = amt >= 0 ? 'color:var(--success);font-weight:700' : 'color:var(--danger);font-weight:700';
-    return '<tr><td>' + renderMemberIdentity(d._user, d.user_id) + '</td>'
+    return '<tr><td>' + renderMemberIdentity(d._user, d.user_id, { maskKakao: true }) + '</td>'
       + '<td>' + ptReasonHtml(d) + '</td>'
       + '<td style="text-align:center;' + color + '">' + sign + ppN(amt) + 'P</td>'
       + '<td style="text-align:center;font-weight:600">—</td>'
