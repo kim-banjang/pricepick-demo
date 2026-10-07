@@ -275,6 +275,13 @@ service cloud.firestore {
       allow read, write: if true;
     }
 
+    // 추가 점검 처리 현황 (pricepick.vercel.app/devqa/qa-extra-20261002.html)
+    // 위 qa_review_20261005 와 같은 작업판이다. 상태가 74건과 섞이지 않게 컬렉션을 나눴다.
+    // 문서 ID 는 LP · 01 … 24 · 27 고정 (22·25·26 없음).
+    match /qa_extra_20261002/{docId} {
+      allow read, write: if true;
+    }
+
     // 행운룰렛 하루 1회 제한 — {uid}_{날짜} 문서를 스핀 시점에 생성. create만 허용해
     // 같은 문서에 대한 두 번째 쓰기는 update로 분류돼 자동 거부(클라이언트 우회 방지).
     match /roulette_spins/{docId} {
