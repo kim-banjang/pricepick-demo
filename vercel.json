@@ -25,6 +25,14 @@
       "destination": "/demo-accounts/index.html"
     },
     {
+      "source": "/asp-cms",
+      "destination": "/asp-cms/index.html"
+    },
+    {
+      "source": "/asp-cms/",
+      "destination": "/asp-cms/index.html"
+    },
+    {
       "source": "/flutter",
       "destination": "/flutter-web/index.html"
     },
