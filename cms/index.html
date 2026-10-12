@@ -242,6 +242,11 @@ html,body{font-family:var(--font);background:var(--bg);color:var(--text);-webkit
 /* ── 섹션 ── */
 .section{display:none;padding:26px;}
 .section.active{display:block;animation:fadeIn .2s ease-out;}
+/* ASP 매체 — /asp-cms/ 를 끼워 보여주는 자리 */
+.section.asp-sec{padding:0;}
+#asp-host{display:none;}
+#asp-host.on{display:block;}
+.asp-frame{display:block;width:100%;height:calc(100vh - 58px);border:0;background:#F4F1FB;}
 @keyframes fadeIn{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:translateY(0);}}
 
 /* ── 카드 ── */
@@ -1474,6 +1479,49 @@ window.CMS_FEATURES = {
           <button class="sb-item" id="nav-gifticon-errlog" data-label="다우테크 오류 로그" onclick="go('gifticon-errlog',this)">
             <span class="sb-item-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span>
             <span class="sb-item-lbl" id="nav-label-gifticon-errlog">다우테크 오류 로그</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- ASP 매체 — 탑툰·투믹스 등 외부 매체의 쇼핑 적립(2026-10-12). 화면 본체는 /asp-cms/ 이고,
+           여기서는 그 화면을 ?embed=1 로 끼워 보여준다(aspShow). 매체 회원은 프라이스픽 회원과 따로 관리한다. -->
+      <div class="sb-grp" id="grp-asp">
+        <div class="sb-grp-hd" onclick="toggleGroup('grp-asp')">
+          <span id="nav-group-label-asp" class="sb-grp-lbl">ASP 매체</span>
+          <span class="sb-chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></span>
+        </div>
+        <div class="sb-grp-items">
+          <button class="sb-item" id="nav-asp-dash" data-label="매체 현황" onclick="go('asp-dash',this)">
+            <span class="sb-item-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.5"/></svg></span>
+            <span class="sb-item-lbl" id="nav-label-asp-dash">매체 현황</span>
+          </button>
+          <button class="sb-item" id="nav-asp-media" data-label="매체 목록" onclick="go('asp-media',this)">
+            <span class="sb-item-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5l8.5 4.5L12 12.5 3.5 8z"/><path d="M3.5 12l8.5 4.5 8.5-4.5"/><path d="M3.5 16l8.5 4.5 8.5-4.5"/></svg></span>
+            <span class="sb-item-lbl" id="nav-label-asp-media">매체 목록</span>
+          </button>
+          <button class="sb-item" id="nav-asp-members" data-label="매체 회원" onclick="go('asp-members',this)">
+            <span class="sb-item-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8.5" r="3.3"/><path d="M3 19.5a6 6 0 0 1 12 0"/><path d="M16 5.5a3.2 3.2 0 0 1 0 6.2M18.5 19.5a6 6 0 0 0-2.5-4.9"/></svg></span>
+            <span class="sb-item-lbl" id="nav-label-asp-members">매체 회원</span>
+          </button>
+          <button class="sb-item" id="nav-asp-buys" data-label="구매 적립 내역" onclick="go('asp-buys',this)">
+            <span class="sb-item-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3.5h12V21l-3-2-3 2-3-2-3 2z"/><path d="M9 8.5h6M9 12.5h6"/></svg></span>
+            <span class="sb-item-lbl" id="nav-label-asp-buys">구매 적립 내역</span>
+          </button>
+          <button class="sb-item" id="nav-asp-convs" data-label="코인 전환 내역" onclick="go('asp-convs',this)">
+            <span class="sb-item-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9h13l-3.5-3.5"/><path d="M20 15H7l3.5 3.5"/></svg></span>
+            <span class="sb-item-lbl" id="nav-label-asp-convs">코인 전환 내역</span>
+          </button>
+          <button class="sb-item" id="nav-asp-expo" data-label="쇼핑몰 노출 관리" onclick="go('asp-expo',this)">
+            <span class="sb-item-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8h14l-1 12.5H6z"/><path d="M9 8V6.5a3 3 0 0 1 6 0V8"/></svg></span>
+            <span class="sb-item-lbl" id="nav-label-asp-expo">쇼핑몰 노출 관리</span>
+          </button>
+          <button class="sb-item" id="nav-asp-faq" data-label="자주 묻는 질문" onclick="go('asp-faq',this)">
+            <span class="sb-item-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M9.6 9.4a2.5 2.5 0 0 1 4.8 1c0 1.7-2.4 2.2-2.4 3.6"/><path d="M12 17h.01"/></svg></span>
+            <span class="sb-item-lbl" id="nav-label-asp-faq">자주 묻는 질문</span>
+          </button>
+          <button class="sb-item" id="nav-asp-link" data-label="연동 현황" onclick="go('asp-link',this)">
+            <span class="sb-item-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M10 14a4 4 0 0 0 5.66 0l3-3a4 4 0 0 0-5.66-5.66l-1 1"/><path d="M14 10a4 4 0 0 0-5.66 0l-3 3a4 4 0 0 0 5.66 5.66l1-1"/></svg></span>
+            <span class="sb-item-lbl" id="nav-label-asp-link">연동 현황</span>
           </button>
         </div>
       </div>
@@ -4055,6 +4103,17 @@ window.CMS_FEATURES = {
       </div>
     </div>
 
+    <!-- ── ASP 매체 — 메뉴별 빈 섹션 + iframe 하나(asp-host)를 같이 쓴다 ── -->
+    <div class="section asp-sec" id="sec-asp-dash"></div>
+    <div class="section asp-sec" id="sec-asp-media"></div>
+    <div class="section asp-sec" id="sec-asp-members"></div>
+    <div class="section asp-sec" id="sec-asp-buys"></div>
+    <div class="section asp-sec" id="sec-asp-convs"></div>
+    <div class="section asp-sec" id="sec-asp-expo"></div>
+    <div class="section asp-sec" id="sec-asp-faq"></div>
+    <div class="section asp-sec" id="sec-asp-link"></div>
+    <div id="asp-host"></div>
+
     <!-- ── 스케줄러 ── -->
     <div class="section" id="sec-scheduler">
       <div class="info-box"><strong>스케줄러</strong>는 백그라운드 자동 작업입니다. 비정상 상태 감지 시 즉시 재시작하세요.</div>
@@ -5261,6 +5320,14 @@ const I18N = {
     'page.appver.title': '앱 버전 관리', 'page.appver.bc': '시스템',
     'page.apikeys.title': '제휴몰 API 관리', 'page.apikeys.bc': '시스템',
     'page.scheduler.title': '스케줄러', 'page.scheduler.bc': '시스템',
+    'page.asp-dash.title': '매체 현황', 'page.asp-dash.bc': 'ASP 매체',
+    'page.asp-media.title': '매체 목록', 'page.asp-media.bc': 'ASP 매체',
+    'page.asp-members.title': '매체 회원', 'page.asp-members.bc': 'ASP 매체',
+    'page.asp-buys.title': '구매 적립 내역', 'page.asp-buys.bc': 'ASP 매체',
+    'page.asp-convs.title': '코인 전환 내역', 'page.asp-convs.bc': 'ASP 매체',
+    'page.asp-expo.title': '쇼핑몰 노출 관리', 'page.asp-expo.bc': 'ASP 매체',
+    'page.asp-faq.title': '자주 묻는 질문', 'page.asp-faq.bc': 'ASP 매체',
+    'page.asp-link.title': '연동 현황', 'page.asp-link.bc': 'ASP 매체',
     'page.accounts.title': '관리자 계정', 'page.accounts.bc': '계정 관리',
     'page.demo-mgmt.title': '데이터 관리(개발용)', 'page.demo-mgmt.bc': '개발용',
     'nav.op-policy': '운영 정책', 'page.op-policy.title': '운영 정책', 'page.op-policy.bc': '운영',
@@ -5551,11 +5618,36 @@ function go(id, navEl) {
   if (id === 'jackpot-roulette' && window.rltLoad) window.rltLoad('jackpot');
   if (id === 'giftbox-daily' && window.rltLoad) window.rltLoad('giftDaily');
   if (id === 'giftbox-random' && window.rltLoad) window.rltLoad('giftRandom');
+  if (window.aspShow) window.aspShow(id.indexOf('asp-') === 0 ? id.slice(4) : null);
   // 모바일: 메뉴 항목 선택 시 드로어 닫기
   if (window.innerWidth <= 768) closeMobileSidebar();
   // 새로고침/뒤로가기 복원을 위해 현재 섹션을 URL 해시에 반영
   if (location.hash.replace('#', '') !== id) location.hash = id;
 }
+
+/* ── ASP 매체 (2026-10-12) ──
+   /asp-cms/?embed=1 을 iframe 하나로 띄워 두고 메뉴만 바꿔 끼운다(iframe 을 옮기면 다시 읽히므로 옮기지 않는다).
+   iframe 안에서 화면이 바뀌면(전체 보기·회원 클릭 등) aspSync 로 이쪽 메뉴·제목을 맞춘다. */
+window.aspShow = function(sec) {
+  var host = document.getElementById('asp-host');
+  if (!host) return;
+  if (!sec) { host.classList.remove('on'); return; }
+  host.classList.add('on');
+  var f = document.getElementById('asp-frame');
+  if (!f) {
+    f = document.createElement('iframe');
+    f.id = 'asp-frame'; f.className = 'asp-frame'; f.title = 'ASP 매체 관리';
+    f.src = '/asp-cms/?embed=1#' + sec;
+    host.appendChild(f);
+    return;
+  }
+  try { var w = f.contentWindow; if (w && w.aspCurrent && w.aspCurrent() !== sec) w.location.hash = sec; } catch (e) {}
+};
+window.aspSync = function(sec) {
+  var s = document.getElementById('sec-asp-' + sec);
+  if (!s || s.classList.contains('active')) return;
+  go('asp-' + sec);
+};
 
 // 브라우저 뒤로/앞으로 가기 시 섹션 전환 (로그인 화면에서는 무시 — 로그인 가드 유지)
 window.addEventListener('hashchange', function() {

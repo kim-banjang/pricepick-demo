@@ -173,6 +173,11 @@ textarea.inp{height:auto;min-height:110px;padding:10px 12px;line-height:1.7;resi
 .pvbox b{display:block;margin-bottom:4px}
 .toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%);z-index:500;padding:12px 18px;border-radius:12px;background:#1A1130;color:#FFFFFF;font-size:13px;font-weight:600;box-shadow:0 8px 24px rgba(0,0,0,.2);max-width:calc(100vw - 32px)}
 .scrim{display:none}
+/* CMS DEMO 안에 끼워 쓸 때(?embed=1) — 사이드바·제목은 CMS DEMO 것을 쓰고, 여기서는 매체 전환만 남긴다 */
+html.embed .sidebar,html.embed .scrim,html.embed .tb-menu,html.embed .tb-left{display:none}
+html.embed .main{margin-left:0}
+html.embed .topbar{justify-content:flex-end;min-height:52px;padding:8px 26px}
+@media (max-width:900px){html.embed .topbar{padding:8px 16px}}
 /* CMS DEMO 연동 */
 .sb-ext{display:flex;align-items:center;gap:8px;margin:0 12px 10px;padding:9px 12px;border:1px solid var(--sb-bdr);border-radius:var(--r-md);color:var(--sb-text);font-size:12px;font-weight:600;text-decoration:none}
 .sb-ext:hover{border-color:var(--sb-active);color:var(--sb-active)}
@@ -234,7 +239,7 @@ html.unlocked .gate{display:none}
 .gate .g-err.show .msg{display:inline}
 </style>
 <script>
-try{ if(sessionStorage.getItem("dsn-20261012-asp-cms")==="ok") document.documentElement.classList.add("unlocked"); }catch(e){}
+try{ if(/[?&]embed=1/.test(location.search)||sessionStorage.getItem("dsn-20261012-asp-cms")==="ok") document.documentElement.classList.add("unlocked"); }catch(e){}
 </script>
 </head>
 <body>
@@ -272,6 +277,7 @@ try{ if(sessionStorage.getItem("dsn-20261012-asp-cms")==="ok") document.document
   });
 })();
 </script>
+<script>if(/[?&]embed=1/.test(location.search))document.documentElement.classList.add("embed");</script>
 <div class="app" id="app">
   <aside class="sidebar" id="sidebar" aria-label="메뉴">
     <div class="sb-logo">
@@ -308,6 +314,10 @@ let TICKET_WON=10;
 /* CMS DEMO 연동 — 같은 Firebase(pricepick-demo)의 공개 읽기 문서 settings/ticket_value 를 읽는다.
    쇼핑 적립 티켓 1장 = 브론즈 티켓 단가. CMS DEMO 「티켓 가치 설정」에서 바꾸면 여기 환산이 같이 바뀐다. 읽기 전용. */
 const DEMO='https://pricepick-demo.vercel.app/cms/';
+const EMBED=document.documentElement.classList.contains('embed');
+let lastSec=null;
+/* CMS DEMO(부모 창)의 메뉴와 서로 맞춘다. 같은 도메인이라 부모 함수(go, aspSync)를 바로 부른다. */
+function syncParent(){ if(!EMBED||S.sec===lastSec) return; lastSec=S.sec; try{ if(parent!==window&&parent.aspSync) parent.aspSync(S.sec); }catch(e){} }
 const LIVE={st:'loading',won:10,at:''};
 function loadTicketValue(){
   const u='https://firestore.googleapis.com/v1/projects/pricepick-demo/databases/(default)/documents/settings/ticket_value?key=AIzaSyCElUPJAitnMZxttVYjboV0j4s_qpErAgA';
@@ -401,7 +411,7 @@ const mc=id=>{const m=mediaOf(id);return `<span class="mc">${m.logo?`<img src="$
 const tk=(n,miss)=>`<span class="tk${miss?' miss':''}">${tkIc}${won(n)}장</span>`;
 const coin=(n,id)=>`<span class="coin">${coinIc}${won(n)}개</span>`;
 const inMedia=r=>S.media==='all'||r.media===S.media;
-const lk=(hash,label)=>`<a class="lk" href="${DEMO}#${hash}" target="_blank" rel="noopener">${ic('<path d="M10 14a4 4 0 0 0 5.66 0l3-3a4 4 0 0 0-5.66-5.66l-1 1"/><path d="M14 10a4 4 0 0 0-5.66 0l-3 3a4 4 0 0 0 5.66 5.66l1-1"/>',12)}CMS DEMO · ${esc(label)}</a>`;
+const lk=(hash,label)=>`<a class="lk" href="${DEMO}#${hash}" target="_blank" rel="noopener" data-demo="${hash}">${ic('<path d="M10 14a4 4 0 0 0 5.66 0l3-3a4 4 0 0 0-5.66-5.66l-1 1"/><path d="M14 10a4 4 0 0 0-5.66 0l-3 3a4 4 0 0 0 5.66 5.66l1-1"/>',12)}${EMBED?'':'CMS DEMO · '}${esc(label)}</a>`;
 const liveTxt=()=>LIVE.st==='ok'?`<span class="live ok"><i></i>CMS DEMO 값 사용 중 · 브론즈 ${won(LIVE.won)}원 · ${LIVE.at} 읽음</span>`:LIVE.st==='loading'?`<span class="live"><i></i>CMS DEMO 값을 읽는 중</span>`:`<span class="live fail"><i></i>CMS DEMO 값을 읽지 못해 기본값 ${won(TICKET_WON)}원으로 보여요</span>`;
 const fmt=(t,m)=>t.replace(/\{코인명\}/g,m.coin||'코인').replace(/\{전환단위\}/g,m.ratio||'—');
 const tokHtml=t=>esc(t).replace(/\{(코인명|전환단위)\}/g,'<span class="tok">{$1}</span>');
@@ -531,7 +541,7 @@ function link(){
     </div></section>
   <section class="card"><div class="card-h"><div><h2 class="card-t">연동 항목</h2><div class="card-s">${LINKS.length}개 · 실시간 연동 ${cnt('live')} · CMS DEMO 수정 필요 ${cnt('fix')} · 결정 필요 ${cnt('decide')}</div></div></div>
     <div class="tbl-wrap"><table><thead><tr><th>항목</th><th>방향</th><th>CMS DEMO 화면</th><th>ASP CMS 화면</th><th>상태</th><th>내용</th></tr></thead><tbody>
-    ${LINKS.map(x=>`<tr><td class="l-cell"><b>${esc(x[0])}</b></td><td><span class="badge ${DIR[x[1]][1]}">${DIR[x[1]][0]}</span></td><td class="l-cell"><a class="lk" href="${DEMO}#${x[2]}" target="_blank" rel="noopener">${esc(x[3])}</a></td><td class="r">${esc(x[4])}</td><td><span class="badge ${LST[x[5]][1]}">${LST[x[5]][0]}</span></td><td class="d-cell">${esc(x[6])}</td></tr>`).join('')}
+    ${LINKS.map(x=>`<tr><td class="l-cell"><b>${esc(x[0])}</b></td><td><span class="badge ${DIR[x[1]][1]}">${DIR[x[1]][0]}</span></td><td class="l-cell"><a class="lk" href="${DEMO}#${x[2]}" target="_blank" rel="noopener" data-demo="${x[2]}">${esc(x[3])}</a></td><td class="r">${esc(x[4])}</td><td><span class="badge ${LST[x[5]][1]}">${LST[x[5]][0]}</span></td><td class="d-cell">${esc(x[6])}</td></tr>`).join('')}
     </tbody></table></div></section>`;
 }
 
@@ -596,6 +606,7 @@ function render(anim){
   const cs=document.getElementById('cst'); if(cs) cs.value=S.cst;
   renderNav();
   slot.innerHTML=modal();
+  syncParent();
 }
 let tt=null;
 function toast(m){clearTimeout(tt);document.getElementById('toastSlot').innerHTML=`<div class="toast" role="status">${esc(m)}</div>`;tt=setTimeout(()=>{document.getElementById('toastSlot').innerHTML='';},2400);}
@@ -647,6 +658,8 @@ function readMedia(){
   const r=parseInt(v('f-ratio'),10); d.ratio=r>0?r:null;
 }
 document.addEventListener('click',e=>{
+  const dl=e.target.closest('a[data-demo]');
+  if(dl&&EMBED){ try{ if(parent!==window&&typeof parent.go==='function'){ e.preventDefault(); parent.go(dl.dataset.demo); return; } }catch(x){} }
   const t=e.target.closest('[data-act]'); if(!t||t.disabled) return;
   if(t.classList.contains('overlay')&&e.target!==t) return;
   act(t.dataset.act,t.dataset.arg,t);
@@ -667,6 +680,11 @@ document.addEventListener('change',e=>{
 document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&S.modal){S.modal=null;render();} });
 document.getElementById('menuBtn').addEventListener('click',()=>app.classList.toggle('nav'));
 document.getElementById('scrim').addEventListener('click',()=>app.classList.remove('nav'));
+const SEC_IDS=['dash','link','media','members','buys','convs','expo','faq'];
+const fromHash=()=>{const s=location.hash.replace('#','');return SEC_IDS.indexOf(s)>=0?s:null;};
+if(fromHash()) S.sec=fromHash();
+window.addEventListener('hashchange',()=>{const s=fromHash(); if(s&&s!==S.sec){ S.modal=null; go(s); }});
+window.aspCurrent=()=>S.sec;
 render();
 loadTicketValue();
 })();
