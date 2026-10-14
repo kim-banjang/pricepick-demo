@@ -19461,90 +19461,43 @@ window.ppGiImgFallback = ppGiImgFallback;
    홈 탭은 「인기상품 + 정렬」이 한 줄, 브랜드 탭은 브랜드 칩 · 「정렬 + 구매 가능만」 ·
    구역 제목 차례. 칸은 2단이고 상품 사진 위에 「구매가능」 딱지가 붙는다.
    갈래(카테고리) 칩은 시안에 없어서 뺐다. */
-/* ── 티켓 환산 — 큰 등급부터 채운다 ──
-   정책: 적립이 「큰 등급부터 채워 지급」이므로 사용(교환)도 같은 규칙을 쓴다.
-   골드 → 실버 → 브론즈 차례로 채우고 자투리는 아래 등급으로 내린다.
-   예) 6,300원 → 골드 31 + 실버 1 · 4,500원 → 골드 22 + 실버 1 · 3,000원 → 골드 15
-   ⚠ 보유 티켓과 무관하게 상품 가격만으로 정한다. */
+/* ── 티켓 환산 — 가격 ÷ 티켓 1장 값(10원) = 필요 장수 (2026-10-14 티켓 1종 통합) ──
+   큰 등급부터 채우던 조합 계산은 걷었다. 보유 티켓과 무관하게 상품 가격만으로 정한다.
+   예) 6,300원 → 티켓 630장 · 4,500원 → 티켓 450장 */
 var PP_TV = { bronze: 10, silver: 100, gold: 200 };
 window.PP_TV = PP_TV;
-var PP_GRADE_KO = { bronze: '브론즈', silver: '실버', gold: '골드' };
-var PP_GRADE_ORDER = ['gold', 'silver', 'bronze'];
+var PP_GRADE_KO = { bronze: '티켓', silver: '실버', gold: '골드' };
 
 function ppTicketCombo(won) {
-  var rest = Math.max(0, Math.round(Number(won) || 0));
-  var out = [];
-  PP_GRADE_ORDER.forEach(function (g) {
-    var v = PP_TV[g];
-    if (!v || rest < v) return;
-    var k = Math.floor(rest / v);
-    out.push({ grade: g, count: k });
-    rest -= k * v;
-  });
-  /* 가장 작은 등급으로도 안 떨어지는 자투리는 브론즈 한 장을 더 받는다(손해 보지 않게). */
-  if (rest > 0) {
-    var b = out.filter(function (x) { return x.grade === 'bronze'; })[0];
-    if (b) b.count += 1; else out.push({ grade: 'bronze', count: 1 });
-  }
-  return out;
+  var w = Math.max(0, Math.round(Number(won) || 0));
+  var unit = PP_TV.bronze;
+  if (!w || !(unit > 0)) return [];
+  /* 자투리 규칙 미확정 — 2026-10-14. 10원으로 나눠떨어지지 않으면 일단 올림(1장 더). */
+  return [{ grade: PP_TICKET_GRADE, count: Math.ceil(w / unit) }];
 }
 
-/* 상품 하나의 환산 — 가격(원)이 정본이다. 가격이 없으면 예전 방식(단일 등급) 값을 쓴다. */
+/* 상품 하나의 환산 — 가격(원)이 정본이다. 가격이 없는 옛 상품은 저장된 등급·장수를
+   티켓 장수로 바꿔 쓴다(옛 실버·골드 1장 = 티켓 10·20장). */
 function ppComboOf(g) {
   var won = (g && typeof g.price === 'number') ? g.price : 0;
   if (won > 0) return ppTicketCombo(won);
-  return [{ grade: (g && g.required_grade) || 'bronze', count: (g && g.required_count) || 1 }];
+  var gr = (g && g.required_grade) || 'bronze';
+  return [{ grade: PP_TICKET_GRADE, count: ((g && g.required_count) || 1) * (PP_TICKET_PER_DOC[gr] || 1) }];
 }
-function ppComboText(c, sep) {
-  return c.map(function (x) { return PP_GRADE_KO[x.grade] + ' ' + x.count + '장'; }).join(sep || ' + ');
-}
-/* 칸에는 짧게 — 대표 등급 하나, 자투리가 있으면 뒤에 「+」 */
-function ppComboShort(c) {
-  if (!c.length) return '';
-  return PP_GRADE_KO[c[0].grade] + ' ' + c[0].count + '장' + (c.length > 1 ? ' +' : '');
-}
-/* 모자란 등급을 다른 등급으로 바꿔 채울 수 있는지 따진다.
-   보유 총 가치가 상품 값에 못 미치면 바꿔도 못 사므로 null 을 돌려준다(교환소로 안 보낸다).
-   채울 수 있으면 「무엇이 몇 장 모자란지」와 「무엇을 몇 장 바꾸면 되는지」를 짧게 적는다. */
-function ppTicketWorth() {
-  return PP_GRADE_ORDER.reduce(function (a, gr) {
-    return a + (PP.tickets[gr] || 0) * (PP_TV[gr] || 0);
-  }, 0);
-}
-function ppSwapPlan(combo) {
-  var lack = ppComboHave(combo);
-  if (!lack.length) return null;
-  var price = combo.reduce(function (a, x) { return a + x.count * (PP_TV[x.grade] || 0); }, 0);
-  if (ppTicketWorth() < price) return null;          /* ③ 다 바꿔도 못 산다 */
-
-  /* 모자란 값을 남는 등급에서 끌어온다 — 작은 등급부터 걷어 큰 등급을 만든다. */
-  var need = lack.reduce(function (a, x) { return a + x.short * (PP_TV[x.grade] || 0); }, 0);
-  var spare = {};
-  PP_GRADE_ORDER.forEach(function (gr) {
-    var used = 0;
-    combo.forEach(function (x) { if (x.grade === gr) used = x.count; });
-    spare[gr] = Math.max(0, (PP.tickets[gr] || 0) - used);
-  });
-  /* 바꿀 장수는 적을수록 좋다 — 값이 큰 등급부터 걷는다.
-     모자란 그 등급 자체는 걷지 않는다(있었으면 안 모자랐다). */
-  var shortOf = {};
-  lack.forEach(function (x) { shortOf[x.grade] = 1; });
-  var give = [];
-  PP_GRADE_ORDER.forEach(function (gr) {
-    if (need <= 0 || shortOf[gr]) return;
-    var unit = PP_TV[gr] || 0;
-    if (!unit || !spare[gr]) return;
-    var k = Math.min(spare[gr], Math.ceil(need / unit));
-    if (k > 0) { give.push(PP_GRADE_KO[gr] + ' ' + k + '장'); need -= k * unit; }
-  });
-
-  var short = lack.map(function (x) { return PP_GRADE_KO[x.grade] + '가 ' + x.short + '장 모자랍니다'; }).join(' · ');
-  return { text: short + (give.length ? ' · ' + give.join(' · ') + '을 바꾸면 됩니다' : '') };
-}
+function ppComboCount(c) { return (c || []).reduce(function (a, x) { return a + x.count; }, 0); }
+function ppComboText(c) { return '티켓 ' + ppComboCount(c) + '장'; }
+function ppComboShort(c) { return ppComboText(c); }
 
 function ppComboHave(c) {
-  return c.filter(function (x) { return (PP.tickets[x.grade] || 0) < x.count; })
-          .map(function (x) { return { grade: x.grade, short: x.count - (PP.tickets[x.grade] || 0) }; });
+  var short = ppComboCount(c) - (PP.tickets.ticket || 0);
+  return short > 0 ? [{ grade: PP_TICKET_GRADE, short: short }] : [];
+}
+/* 교환 기록에 남은 사용 장수 — 옛 기록(실버·골드 조합)도 티켓 장수로 센다 */
+function ppTicketsUsedCount(x, g) {
+  x = x || {}; g = g || {};
+  var tu = (x.tickets_used && x.tickets_used.length) ? x.tickets_used
+         : [{ grade: x.grade_used || g.required_grade || 'bronze', count: x.count_used || g.required_count || 1 }];
+  return tu.reduce(function (a, t) { return a + (t.count || 0) * (PP_TICKET_PER_DOC[t.grade] || 1); }, 0);
 }
 
 var PP_GI_BRAND = '';
@@ -19578,15 +19531,13 @@ function ppGiRenderBrands() {
     + '<div style="flex:none;width:12px;"></div>';
 }
 
-/* 내 티켓 바 — 브론즈 · 실버 · 골드 */
+/* 내 티켓 바 — 티켓 */
 function ppGiRenderTickets() {
   var box = document.getElementById('gs-tk-list');
   if (!box) return;
-  box.innerHTML = [['bronze', '브론즈'], ['silver', '실버'], ['gold', '골드']].map(function (g) {
-    return '<div class="gs-tk-one">' + ticketIcon(g[0])
-      + '<span class="gs-tk-g">' + g[1] + '</span>'
-      + '<span class="gs-tk-n">' + (PP.tickets[g[0]] || 0) + '</span></div>';
-  }).join('');
+  box.innerHTML = '<div class="gs-tk-one">' + ticketIcon('bronze')
+    + '<span class="gs-tk-g">티켓</span>'
+    + '<span class="gs-tk-n">' + (PP.tickets.ticket || 0) + '</span></div>';
 }
 
 window.ppGiRenderTickets = ppGiRenderTickets;
@@ -19728,7 +19679,7 @@ function renderGifticons() {
       + '<div class="gs-card-b">'
       + '<div class="gs-brand">' + ppEsc(g.brand || '') + '</div>'
       + '<div class="gs-name">' + ppEsc(ppStripBrand(g.brand, g.name || g.product_name)) + '</div>'
-      + '<div class="gs-card-tk"><span class="gs-tkchip">' + ticketIcon(combo[0].grade)
+      + '<div class="gs-card-tk"><span class="gs-tkchip">' + ticketIcon('bronze')
       + '<span>' + ppComboShort(combo) + '</span></span></div>'
       + '</div></div>';
   }).join('');
@@ -19813,12 +19764,8 @@ function ppFillExDone(g, x) {
   if (en) en.textContent = ppStripBrand(g.brand, g.name || g.product_name);
 
   /* 사용한 티켓 — 교환 기록에 남은 값이 정본(그 뒤 상품 값이 바뀌어도 기록은 그대로다). */
-  /* 조합이 남아 있으면 조합 그대로, 없으면(예전 기록) 단일 등급으로 */
-  var tu = (x.tickets_used && x.tickets_used.length) ? x.tickets_used
-         : [{ grade: x.grade_used || g.required_grade || 'bronze', count: x.count_used || g.required_count || 1 }];
   var used = document.getElementById('ex-done-used');
-  if (used) used.innerHTML = ticketIcon(tu[0].grade) + '<span>'
-    + tu.map(function (t) { return PP_GRADE_KO[t.grade] + ' ' + t.count + '장'; }).join(' · ') + ' 사용</span>';
+  if (used) used.innerHTML = ticketIcon('bronze') + '<span>티켓 ' + ppTicketsUsedCount(x, g) + '장 사용</span>';
 
   var ec = document.getElementById('ex-done-code');
   if (ec) ec.textContent = x.code || '';
@@ -19876,48 +19823,27 @@ function populateGifticonDetail(g) {
   var name = s.querySelector('.ex-product-name');
   if (name) name.textContent = ppStripBrand(g.brand, g.name || g.product_name);
 
-  /* 값은 조합 전체를 쓴다 — 큰 등급부터 채운 결과 그대로 */
+  /* 값은 티켓 장수 하나 — 가격 ÷ 티켓 1장 값 */
   var combo = ppComboOf(g);
+  var need = ppComboCount(combo);
   var row = s.querySelector('.ex-price-row');
-  if (row) {
-    row.innerHTML = combo.map(function (x) {
-      return '<span class="ex-price-tk">' + ticketIcon(x.grade)
-        + '<span>' + PP_GRADE_KO[x.grade] + ' 티켓 ' + x.count + '장</span></span>';
-    }).join('<span class="ex-plus">+</span>');
-  }
-  /* 보유 티켓은 등급 셋을 다 적는다 — 모자랄 때 회원이 볼 것이 이것뿐이다. */
+  if (row) row.innerHTML = '<span class="ex-price-tk">' + ticketIcon('bronze') + '<span>티켓 ' + need + '장</span></span>';
   var haveEl = s.querySelector('.ex-cost-have');
-  if (haveEl) haveEl.textContent = '현재 보유: ' + PP_GRADE_ORDER.slice().reverse().map(function (gr) {
-    return PP_GRADE_KO[gr] + ' ' + (PP.tickets[gr] || 0) + '장';
-  }).join(' · ');
+  if (haveEl) haveEl.textContent = '현재 보유: 티켓 ' + (PP.tickets.ticket || 0) + '장';
 
-  /* 아래는 셋으로 갈린다.
-       ① 보유로 바로 산다        — 차감 줄 + 구매하기(활성)
-       ② 지금 등급은 모자라지만 총 가치로는 된다 — 모자란 장수·바꿀 장수 + 교환소 링크 + 구매하기(꺼짐)
-       ③ 다 바꿔도 못 산다       — 보유 티켓 수만 + 구매하기(꺼짐)
-     ③에서는 교환소로 보내지 않는다 — 가 봐야 채울 수 없다(김반장 2026-09-16). */
+  /* 보유로 바로 사면 차감 줄 + 구매하기(활성), 모자라면 보유 장수만 + 구매하기(꺼짐).
+     등급을 바꿔 채우는 길(교환소 링크)은 등급 교환 폐기로 없어졌다. */
   var lack = ppComboHave(combo);
   var deduct = s.querySelector('.ex-deduct');
   var warn = document.getElementById('exd-lack');
   var cta = s.querySelector('.ex-cta');
   var enough = !lack.length;
-
-  /* 박스는 하나. 글만 세 갈래로 바뀐다. 모자랄 때는 차감 계산을 하지 않는다. */
-  var swap = enough ? null : ppSwapPlan(combo);
   if (deduct) {
-    if (enough) {
-      deduct.textContent = ppComboText(combo, ' · ') + ' 차감 → 잔여 '
-        + combo.map(function (x) {
-            return PP_GRADE_KO[x.grade] + ' ' + ((PP.tickets[x.grade] || 0) - x.count) + '장';
-          }).join(' · ');
-    } else if (swap) {
-      deduct.textContent = swap.text;
-    } else {
-      deduct.textContent = haveEl ? haveEl.textContent : '';
-    }
+    deduct.textContent = enough
+      ? '티켓 ' + need + '장 차감 → 잔여 티켓 ' + ((PP.tickets.ticket || 0) - need) + '장'
+      : (haveEl ? haveEl.textContent : '');
   }
-  /* 교환소 링크는 바꿔서 채울 수 있을 때만, 박스 밖 한 줄로 */
-  if (warn) warn.style.display = swap ? '' : 'none';
+  if (warn) warn.style.display = 'none';
 
   if (cta) {
     cta.textContent = '구매하기';
@@ -19946,36 +19872,18 @@ function bindExchangeBtn() {
     e.stopPropagation();
     var g = PP.currentGifticon;
     if (!g || !PP.uid) return;
-    /* 차감도 표시와 같은 규칙(큰 등급부터 채운 조합)이어야 한다 — 다르면 사고다. */
+    /* 차감도 표시와 같은 장수(가격 ÷ 티켓 1장 값)여야 한다 — 다르면 사고다. 먼저 받은 것부터 쓴다. */
     var combo = ppComboOf(g);
     var lack = ppComboHave(combo);
     if (lack.length) { showToast('구매할 수 있는 티켓이 부족합니다.'); return; }
-    var grade = combo[0].grade;
-    var cnt = combo.reduce(function (a, x) { return a + x.count; }, 0);
+    var grade = PP_TICKET_GRADE;
+    var cnt = ppComboCount(combo);
+    var plan = null;
     btn.disabled = true;
-    db.collection('user_tickets')
-      .where('user_id', '==', PP.uid)
-      .where('status', '==', 'active')
-      .get()
-      .then(function(snap) {
-        /* 등급별로 만료 임박(적립일이 오래된) 것부터 빼낸다. */
-        var byGrade = {};
-        snap.docs.forEach(function (d) {
-          var gd = d.data().grade;
-          (byGrade[gd] = byGrade[gd] || []).push(d);
-        });
-        Object.keys(byGrade).forEach(function (k) {
-          byGrade[k].sort(function (a, b) {
-            var ea = a.data().earned_at, eb = b.data().earned_at;
-            return ((ea && ea.toMillis) ? ea.toMillis() : 0) - ((eb && eb.toMillis) ? eb.toMillis() : 0);
-          });
-        });
-        var docs = [];
-        for (var i = 0; i < combo.length; i++) {
-          var list = byGrade[combo[i].grade] || [];
-          if (list.length < combo[i].count) { showToast('티켓이 부족합니다'); btn.disabled = false; return null; }
-          docs = docs.concat(list.slice(0, combo[i].count));
-        }
+    ppPlanTicketUse(cnt)
+      .then(function(pl) {
+        if (!pl) { showToast('티켓이 부족합니다'); btn.disabled = false; return null; }
+        plan = pl;
         var now = FS.FieldValue.serverTimestamp();
         var code = 'PP-' + Math.random().toString(36).slice(2,6).toUpperCase() + '-'
           + Math.random().toString(36).slice(2,6).toUpperCase() + '-'
@@ -19988,22 +19896,16 @@ function bindExchangeBtn() {
            ⚠ API 연동이 붙으면 이 블록을 지우고 응답의 주문번호를 그대로 넣는다.
            형식: PHTRX + YYYYMMDDHHmmss + 무작위 꼬리(hex 8자) */
         var orderNo = ppMakeOrderNo();
-        var batch = db.batch();
-        docs.forEach(function(doc) {
-          batch.update(doc.ref, { status: 'used', used_at: now });
-          batch.set(db.collection('ticket_transactions').doc(), {
-            user_id: PP.uid, ticket_grade: doc.data().grade, type: 'use', postback_id: null, created_at: now,
-          });
-        });
         var exRef = db.collection('gifticon_exchanges').doc();
-        batch.set(exRef, {
-          user_id: PP.uid, gifticon_id: g._id, grade_used: grade, count_used: cnt,
-          /* 조합 전체도 남긴다 — 나중에 교환 내역·완료 화면이 그대로 읽는다. */
-          tickets_used: combo.map(function (x) { return { grade: x.grade, count: x.count }; }),
-          status: 'completed', code: code, order_no: orderNo,
-          expires_at: expiresAt, exchanged_at: now,
-        });
-        return batch.commit().then(function() {
+        var ops = ppTicketUseOps(plan, null, now).concat([function (b) {
+          b.set(exRef, {
+            user_id: PP.uid, gifticon_id: g._id, grade_used: grade, count_used: cnt,
+            tickets_used: [{ grade: grade, count: cnt }],
+            status: 'completed', code: code, order_no: orderNo,
+            expires_at: expiresAt, exchanged_at: now,
+          });
+        }]);
+        return ppCommitOps(ops).then(function() {
           return { code: code, order_no: orderNo, expires_at: expiresAt,
                    grade_used: grade, count_used: cnt, tickets_used: combo,
                    exchanged_at: new Date() };
@@ -20011,8 +19913,7 @@ function bindExchangeBtn() {
       })
       .then(function(res) {
         if (!res) return;
-        combo.forEach(function (x) { PP.tickets[x.grade] = (PP.tickets[x.grade] || 0) - x.count; });
-        PP.tickets.total -= cnt;
+        ppAfterTicketUse(plan);
         renderHomeTickets();
         renderMyTicketCard();
         ppFillExDone(g, res);
@@ -21824,9 +21725,7 @@ function renderGifticonHistory() {
       var g = (PP.gifticonList || []).filter(function (it) { return it._id === x.gifticon_id; })[0] || {};
       var nm = ppBrandName(g.brand, g.name || g.product_name) || '기프티콘';
       var done = (x.status === 'completed' || x.status === 'issued');
-      var tu = (x.tickets_used && x.tickets_used.length) ? x.tickets_used
-             : (x.grade_used ? [{ grade: x.grade_used, count: x.count_used || 1 }] : []);
-      var used = tu.map(function (t) { return PP_GRADE_KO[t.grade] + ' ' + t.count + '장'; }).join(' · ');
+      var used = (x.tickets_used && x.tickets_used.length) || x.grade_used ? '티켓 ' + ppTicketsUsedCount(x, g) + '장' : '';
       var d = ppDate(x.exchanged_at);
       return '<div class="gxh-card" data-gx="' + i + '">'
         + '<div class="gxh-hd"><div class="gxh-nm">' + ppEsc(nm) + '</div>'
@@ -22089,7 +21988,9 @@ function ppTicketUseOps(plan, via, now, extra) {
     var g = doc.data().grade;
     ops.push(function (b) {
       b.update(doc.ref, { status: 'used', used_at: now });
-      b.set(db.collection('ticket_transactions').doc(), Object.assign({ user_id: PP.uid, ticket_grade: g, type: 'use', postback_id: null, via: via, created_at: now }, extra || {}));
+      var tx = Object.assign({ user_id: PP.uid, ticket_grade: g, type: 'use', postback_id: null, created_at: now }, extra || {});
+      if (via) tx.via = via;
+      b.set(db.collection('ticket_transactions').doc(), tx);
     });
   });
   var src = plan.change ? plan.last.data() : null;
