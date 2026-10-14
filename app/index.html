@@ -1243,16 +1243,17 @@
   .tab-ico {
     width: 24px; height: 24px;
     display: flex; align-items: center; justify-content: center;
-    color: var(--text4);
+    color: var(--text3);
   }
   .tab-ico svg { width: 22px; height: 22px; }
   .tab-lbl {
     font-size: var(--fs-caption);
-    color: var(--text4);
-    font-weight: 500;
+    color: var(--text3);
+    font-weight: 600;
   }
-  .tab-item.active .tab-ico { color: var(--text1); }
-  .tab-item.active .tab-lbl { color: var(--text1); font-weight: 700; }
+  /* 실제 앱(2026-10-14 기준)과 맞춤 — 활성 탭은 보라 */
+  .tab-item.active .tab-ico { color: var(--main); }
+  .tab-item.active .tab-lbl { color: var(--main); font-weight: 700; }
   /* 라인/솔리드 듀얼 SVG 토글 */
   .tab-ico .ico-line { display: block; }
   .tab-ico .ico-solid { display: none; }
@@ -8616,12 +8617,30 @@ body.interactive-mode #ip-nav { display: block; }
 .home-mission-card.hmc-roulette .hmc-title { color: #6E2247; }
 .home-mission-card.hmc-invite .hmc-title { color: #1D3F66; }
 .home-mission-card.hmc-streak .hmc-title { color: #3B2570; }
-.hmc-reward { font-size: var(--fs-caption); font-weight: 400; background: rgba(255,255,255,.85); border-radius: 999px; padding: 3px 7px; white-space: nowrap; letter-spacing: -0.2px; }
-.hmc-reward b { font-weight: 400; }
+.hmc-reward { font-size: var(--fs-caption); font-weight: 600; background: rgba(255,255,255,.85); border-radius: 999px; padding: 3px 7px; white-space: nowrap; letter-spacing: -0.2px; }
+.hmc-reward b { font-weight: 800; }
+.home-mission-card.hmc-gb1 .hmc-reward { color: #7E5FE6; }
+/* 랜덤 선물 상자 배너 — 실제 앱(2026-10-14 기준)과 맞춤: 짙은 남색 바탕, 왼쪽 원형 3D 상자,
+   오른쪽 모서리에 걸친 큰 3D 상자 + 이벤트 티켓. 문구만 골드 표기 폐기분을 쓴다 */
+.gb-home-banner { margin: 14px 16px 0; min-height: 96px; padding: 0 16px; border-radius: 16px; position: relative; overflow: hidden;
+  display: flex; align-items: center; gap: 14px; cursor: pointer;
+  background: radial-gradient(75% 150% at 10% 0%, rgba(78,48,160,.55) 0%, rgba(78,48,160,0) 62%), #0E0824;
+  box-shadow: 0 8px 22px rgba(20,10,50,.22); }
+.gb-hb-ico { position: relative; z-index: 1; flex-shrink: 0; width: 52px; height: 52px; border-radius: 50%; border: 3px solid #5F5157;
+  background: radial-gradient(circle at 38% 32%, #A68CF7 0%, #7B5CE6 55%, #5F43CC 100%); display: flex; align-items: center; justify-content: center; }
+.gb-hb-ico img { width: 30px; height: auto; display: block; }
+.gb-hb-txt { position: relative; z-index: 1; flex: 1; min-width: 0; padding-right: 44px; }
+.gb-hb-t1 { font-size: 12px; font-weight: 800; letter-spacing: 1.8px; color: #F9DA5C; }
+.gb-hb-t2 { margin-top: 3px; font-size: var(--fs-body); font-weight: 800; color: #FFFFFF; letter-spacing: -0.02em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.gb-hb-t3 { margin-top: 3px; font-size: var(--fs-caption); font-weight: 700; color: #C2B0F9; white-space: nowrap; }
+.gb-hb-t3:empty { display: none; }
+.gb-hb-box { position: absolute; right: -6px; top: 34px; width: 60px; height: auto; transform: rotate(-8deg); pointer-events: none; }
+.gb-hb-tk { position: absolute; right: 50px; top: 66px; width: 22px; height: 22px; transform: rotate(-30deg); opacity: .9; pointer-events: none; }
+.gb-hb-arrow { position: absolute; right: 24px; top: 30px; z-index: 2; font-size: 22px; font-weight: 800; line-height: 1; color: #F9DA5C; pointer-events: none; }
 .home-mission-card.hmc-attend .hmc-reward { color: #C77F00; }
 .home-mission-card.hmc-roulette .hmc-reward { color: #E0509B; }
-.home-mission-card.hmc-invite .hmc-reward { color: #2E86E8; }
-.home-mission-card.hmc-streak .hmc-reward { color: #7B2FF2; }
+.home-mission-card.hmc-invite .hmc-reward { color: #4884E1; }
+.home-mission-card.hmc-streak .hmc-reward { color: #7233E9; }
 .home-mall-section { margin-top: 26px; }
 .home-mall-head {
     padding: 0 16px; display: flex; justify-content: space-between;
@@ -9753,14 +9772,16 @@ window.PP_FEATURES = {
                시안 배치 순서 그대로 미션 4종 아래 · 쇼핑 섹션 위에 넣는다. -->
           <!-- 랜덤 선물 상자 진입 배너 — 2026-08-27 확정으로 잭팟 배너 자리를 대신한다.
                잭팟 배너는 바로 아래에 PP_FEATURES.roulette 로 숨겨 둔다(삭제 아님). -->
-          <div class="gb-home-banner" data-jump="gb2" style="margin:14px 20px 0; padding:14px 16px; border-radius:16px; background:linear-gradient(110deg,#2A1656 0%,#4A2A94 55%,#845EEE 100%); position:relative; overflow:hidden; display:flex; align-items:center; gap:12px; cursor:pointer; box-shadow:0 8px 22px rgba(44,22,104,0.26);">
-            <div style="flex-shrink:0; width:48px; height:48px; border-radius:14px; background:rgba(255,255,255,.14); display:flex; align-items:center; justify-content:center; font-size:26px;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="13" rx="2"/><path d="M3 12h18"/><path d="M12 8v13"/><path d="M12 8S10.5 4 8 4a2.5 2.5 0 0 0 0 5h4z"/><path d="M12 8s1.5-4 4-4a2.5 2.5 0 0 1 0 5h-4z"/></svg></div>
-            <div style="flex:1; min-width:0;">
-              <div style="font-size:var(--fs-caption); font-weight:700; color:#FFD75E; letter-spacing:1.4px;">RANDOM GIFT BOX</div>
-              <div style="font-size:var(--fs-caption); font-weight:800; color:#FFFFFF; margin-top:3px; white-space:nowrap;" id="gb-banner-headline"><span class="i18n"><span class="ko">이벤트 티켓을 모아 티켓 선물에 도전하세요</span><span class="vi">Gom vé sự kiện để thử nhận quà vé</span></span></div>
-              <div style="font-size:var(--fs-caption); font-weight:400; color:#FFFFFF; margin-top:3px; white-space:nowrap;" id="gb-banner-owned"></div>
+          <div class="gb-home-banner" data-jump="gb2">
+            <div class="gb-hb-ico"><img src="/app/assets/giftbox/box-gold.png" alt=""></div>
+            <div class="gb-hb-txt">
+              <div class="gb-hb-t1">RANDOM GIFT BOX</div>
+              <div class="gb-hb-t2" id="gb-banner-headline"><span class="i18n"><span class="ko">이벤트 티켓으로 티켓 선물 도전</span><span class="vi">Dùng vé sự kiện để thử nhận quà vé</span></span></div>
+              <div class="gb-hb-t3" id="gb-banner-owned"></div>
             </div>
-            <div style="flex-shrink:0; font-size:var(--fs-section); font-weight:700; color:#FFD75E; line-height:1; opacity:.75;" aria-hidden="true">&rsaquo;</div>
+            <img class="gb-hb-tk" src="/app/assets/giftbox/ico-ticket-event.svg" alt="" aria-hidden="true">
+            <img class="gb-hb-box" src="/app/assets/giftbox/box-gold.png" alt="" aria-hidden="true">
+            <div class="gb-hb-arrow" aria-hidden="true">&rsaquo;</div>
           </div>
 
           <div class="jp-home-banner" data-pp-feature="roulette" style="margin:14px 20px 0; padding:14px 16px; border-radius:16px; background:#14092F; position:relative; overflow:hidden; display:flex; align-items:center; gap:12px; cursor:pointer; box-shadow:0 8px 22px rgba(44,22,104,0.26);">
@@ -9769,7 +9790,7 @@ window.PP_FEATURES = {
             <svg width="48" height="48" viewBox="0 0 100 100" style="flex-shrink:0; position:relative;"><defs><linearGradient id="mwRim" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#FFE9A8"></stop><stop offset="45%" stop-color="#E0A800"></stop><stop offset="100%" stop-color="#8A6200"></stop></linearGradient></defs><circle cx="50" cy="52" r="42" fill="url(#mwRim)"></circle><circle cx="50" cy="52" r="36" fill="#14092F"></circle><g transform="translate(50,52)"><path d="M0,0 L0,-33 A33,33 0 0 1 28.58,-16.5 Z" fill="#E6A800"></path><path d="M0,0 L28.58,-16.5 A33,33 0 0 1 28.58,16.5 Z" fill="#2A1A5E"></path><path d="M0,0 L28.58,16.5 A33,33 0 0 1 0,33 Z" fill="#8B5A2B"></path><path d="M0,0 L0,33 A33,33 0 0 1 -28.58,16.5 Z" fill="#221546"></path><path d="M0,0 L-28.58,16.5 A33,33 0 0 1 -28.58,-16.5 Z" fill="#845EEE"></path><path d="M0,0 L-28.58,-16.5 A33,33 0 0 1 0,-33 Z" fill="#C9C9C9"></path></g><circle cx="50" cy="52" r="11" fill="url(#mwRim)"></circle><circle cx="50" cy="52" r="8" fill="#14092F"></circle><path d="M50 2 C45 12 42 16 42 20 A8 8 0 0 0 58 20 C58 16 55 12 50 2 Z" fill="#FFD75E" stroke="#14092F" stroke-width="2.4"></path></svg>
             <div style="flex:1; min-width:0; position:relative;">
               <div style="font-size:var(--fs-caption); font-weight:700; color:#FFD75E; letter-spacing:1.4px;">JACKPOT ROULETTE</div>
-              <div style="font-size:var(--fs-caption); font-weight:800; color:#FFFFFF; margin-top:3px; white-space:nowrap;" id="jp-banner-headline">이벤트 티켓을 모아 티켓 선물에 도전하세요</div>
+              <div style="font-size:var(--fs-caption); font-weight:800; color:#FFFFFF; margin-top:3px; white-space:nowrap;" id="jp-banner-headline">이벤트 티켓으로 티켓 선물 도전</div>
               <div style="font-size:var(--fs-caption); font-weight:400; color:#FFFFFF; margin-top:3px; white-space:nowrap;" id="jp-banner-owned"></div>
             </div>
             <div style="position:relative; flex-shrink:0; font-size:var(--fs-section); font-weight:700; color:#FFD75E; line-height:1; opacity:.75;" aria-hidden="true">&rsaquo;</div>
@@ -9802,7 +9823,6 @@ window.PP_FEATURES = {
                     <span class="hmc-name">쿠팡</span>
                     <span class="hmc-badge best">BEST</span>
                   </div>
-                  <div class="hmc-desc">구매 시 티켓 적립 <b>실시간</b></div>
                 </div>
                 <button class="hmc-go primary" onclick="selectMall('쿠팡','coupang.com','pw-13')">바로가기 ›</button>
               </div>
@@ -15305,15 +15325,15 @@ function jpRenderHomeBanner() {
   var has = n > 0;
   var h = document.getElementById('jp-banner-headline');
   var o = document.getElementById('jp-banner-owned');
-  if (h) h.textContent = has ? '이벤트 티켓 1장으로 티켓 선물 도전' : '이벤트 티켓을 모아 티켓 선물에 도전하세요';
+  if (h) h.textContent = has ? '이벤트 티켓 1장으로 티켓 선물 도전' : '이벤트 티켓으로 티켓 선물 도전';
   if (o) o.textContent = has ? ('내 보유 이벤트 티켓 ' + n + '장') : '';
   /* 랜덤 선물 상자 배너(2026-08-27 신설) — 잭팟 배너와 같은 값을 쓴다. 한/베 둘 다 갱신한다. */
   var gh = document.getElementById('gb-banner-headline');
   var go = document.getElementById('gb-banner-owned');
   if (gh) {
     var ghKo = gh.querySelector('.ko'), ghVi = gh.querySelector('.vi');
-    if (ghKo) ghKo.textContent = has ? '이벤트 티켓 1장으로 티켓 선물 도전' : '이벤트 티켓을 모아 티켓 선물에 도전하세요';
-    if (ghVi) ghVi.textContent = has ? 'Mở bằng 1 vé sự kiện để thử nhận quà vé' : 'Gom vé sự kiện để thử nhận quà vé';
+    if (ghKo) ghKo.textContent = has ? '이벤트 티켓 1장으로 티켓 선물 도전' : '이벤트 티켓으로 티켓 선물 도전';
+    if (ghVi) ghVi.textContent = has ? 'Mở bằng 1 vé sự kiện để thử nhận quà vé' : 'Dùng vé sự kiện để thử nhận quà vé';
   }
   if (go) go.textContent = has ? ('내 보유 이벤트 티켓 ' + n + '장') : '';
 }
@@ -18019,7 +18039,6 @@ var PP_HOME_MALL_MAX = 5;
    값은 고쳐 쓰기 전 마크업에 손으로 적혀 있던 문구 그대로다(64eefd6^).
    문구가 없는 몰은 줄을 두지 않는다 — 지어내지 않는다. */
 var PP_HOME_DESC = {
-  'coupang_direct': '구매 시 티켓 적립 <b>실시간</b>',
   'lp:aliexpress': '<b>해외직구</b> · 누적 후 정산'
 };
 function ppRenderHomeMalls() {
