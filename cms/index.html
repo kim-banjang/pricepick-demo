@@ -1793,16 +1793,17 @@ window.CMS_FEATURES = {
     <div class="section" id="sec-ticket-value">
 
       <div class="info-box">
-        티켓 1장의 <strong>원화 환산가치</strong>를 정합니다. 이 값이 룰렛 잭팟 판정·포인트 교환 비율·등급 교환 비율의 기준이 됩니다.
+        티켓 1장의 <strong>원화 환산가치</strong>를 정합니다. 이 값이 룰렛 잭팟 판정·포인트 교환 비율의 기준이 됩니다.
         저장하면 앱이 실제로 이 값을 읽어 씁니다.
       </div>
 
-      <!-- ① 등급별 환산가치 설정 -->
+      <!-- ① 티켓 가치 설정 — 2026-10-14 티켓 1종 통합. 값은 settings/ticket_value.bronze 에 그대로 쓴다
+           (Firestore 필드 교체는 개발팀 몫). -->
       <div class="card">
         <div class="card-header">
           <div>
-            <div class="card-title">등급별 환산가치</div>
-            <div class="card-sub">티켓 1장 = 원화 얼마로 볼 것인지 (0 이상 정수) · 하나를 바꾸면 나머지 둘이 비율(1:10:20)대로 자동 조정됩니다</div>
+            <div class="card-title">티켓 가치</div>
+            <div class="card-sub">티켓 1장 = 원화 얼마로 볼 것인지 (0 이상 정수)</div>
           </div>
           <button class="btn btn-primary btn-sm" id="tv-save-btn" onclick="tvSaveTier()">저장</button>
         </div>
@@ -1810,7 +1811,7 @@ window.CMS_FEATURES = {
         <table>
           <thead>
             <tr>
-              <th style="width:26%">등급</th>
+              <th style="width:26%">종류</th>
               <th style="width:22%">현재 적용값</th>
               <th style="width:30%">변경할 값</th>
               <th style="width:22%">변동</th>
@@ -1818,41 +1819,20 @@ window.CMS_FEATURES = {
           </thead>
           <tbody>
             <tr>
-              <td><span class="tk-bronze">브론즈</span></td>
+              <td><span class="tk-bronze">티켓</span></td>
               <td id="tv-cur-bronze">10원</td>
               <td>
-                <input class="form-input tv-input" type="number" id="tv-bronze" min="0" step="1" value="10" data-orig="10" data-name="브론즈" oninput="tvOnInput('bronze')">
+                <input class="form-input tv-input" type="number" id="tv-bronze" min="0" step="1" value="10" data-orig="10" data-name="티켓" oninput="tvOnInput()">
                 <span class="tv-unit">원</span>
                 <div class="tv-rounded-note" id="tv-rounded-bronze"></div>
               </td>
               <td id="tv-diff-bronze"><span class="badge badge-gray">변경 없음</span></td>
             </tr>
-            <tr>
-              <td><span class="tk-silver">실버</span></td>
-              <td id="tv-cur-silver">100원</td>
-              <td>
-                <input class="form-input tv-input" type="number" id="tv-silver" min="0" step="1" value="100" data-orig="100" data-name="실버" oninput="tvOnInput('silver')">
-                <span class="tv-unit">원</span>
-                <div class="tv-rounded-note" id="tv-rounded-silver"></div>
-              </td>
-              <td id="tv-diff-silver"><span class="badge badge-gray">변경 없음</span></td>
-            </tr>
-            <tr>
-              <td><span class="tk-gold">골드</span></td>
-              <td id="tv-cur-gold">200원</td>
-              <td>
-                <input class="form-input tv-input" type="number" id="tv-gold" min="0" step="1" value="200" data-orig="200" data-name="골드" oninput="tvOnInput('gold')">
-                <span class="tv-unit">원</span>
-                <div class="tv-rounded-note" id="tv-rounded-gold"></div>
-              </td>
-              <td id="tv-diff-gold"><span class="badge badge-gray">변경 없음</span></td>
-            </tr>
           </tbody>
         </table>
       </div>
 
-      <!-- 이벤트 티켓 가치 — 등급 체계와 별개(2026-08-11 분리, 김반장 지시).
-           경품 응모 전용이라 브론즈·실버·골드 비율 연동에서 완전히 뺐다.
+      <!-- 이벤트 티켓 가치 — 티켓과 별개(2026-08-11 분리, 김반장 지시).
            저장 버튼도 별도(2026-08-14, Vin 지적 — 버튼이 등급 카드 안에만 있어서
            "등급값만 저장되는 줄 알았다". 실제로는 저장 시 이벤트 값도 같이 Firestore에
            쓰이고 있었는데 버튼 위치 때문에 그렇게 안 보였다. 김반장·Vin 합의로 분리). -->
@@ -1860,7 +1840,7 @@ window.CMS_FEATURES = {
         <div class="card-header">
           <div>
             <div class="card-title">이벤트 티켓 가치</div>
-            <div class="card-sub">이벤트 티켓은 등급 티켓과 쓰임이 달라 가치를 별개로 정합니다 · 등급 값을 바꿔도 따라 움직이지 않습니다</div>
+            <div class="card-sub">이벤트 티켓은 티켓과 쓰임이 달라 가치를 별개로 정합니다 · 티켓 값을 바꿔도 따라 움직이지 않습니다</div>
           </div>
           <button class="btn btn-primary btn-sm" id="tv-save-btn-event" onclick="tvSaveEvent()">저장</button>
         </div>
@@ -1886,35 +1866,6 @@ window.CMS_FEATURES = {
             </tr>
           </tbody>
         </table>
-      </div>
-
-      <!-- ② 등급 간 교환 비율 (자동 계산) -->
-      <div class="card">
-        <div class="card-header">
-          <div>
-            <div class="card-title">등급 간 교환 비율</div>
-            <div class="card-sub">위 입력값으로 자동 계산됩니다 (입력 즉시 갱신)</div>
-          </div>
-          <span class="badge badge-purple">자동 계산</span>
-        </div>
-        <div class="tv-ratio-row">
-          <span class="tk-bronze">브론즈</span>
-          <span class="tv-ratio-formula" id="tv-ratio-bs">브론즈 <span class="tv-n">10</span>장 = 실버 1장</span>
-          <span id="tv-ratio-bs-badge"><span class="badge badge-green">정수 배수</span></span>
-          <span class="tv-ratio-desc" id="tv-ratio-bs-desc">현재 기준 10장</span>
-        </div>
-        <div class="tv-ratio-row">
-          <span class="tk-silver">실버</span>
-          <span class="tv-ratio-formula" id="tv-ratio-sg">실버 <span class="tv-n">2</span>장 = 골드 1장</span>
-          <span id="tv-ratio-sg-badge"><span class="badge badge-green">정수 배수</span></span>
-          <span class="tv-ratio-desc" id="tv-ratio-sg-desc">현재 기준 2장</span>
-        </div>
-      </div>
-
-      <div class="warn-box" id="tv-ratio-warn" style="display:none">
-        <strong>교환 비율이 나누어떨어지지 않습니다.</strong>
-        <div id="tv-ratio-warn-body" style="margin-top:4px"></div>
-        <div style="margin-top:4px">소수점 교환은 앱에서 처리가 애매해집니다. 등급 값을 배수 관계로 맞추는 것을 권장합니다.</div>
       </div>
 
       <div class="warn-box" id="tv-invalid-warn" style="display:none">
@@ -1951,12 +1902,12 @@ window.CMS_FEATURES = {
         </div>
         <div class="policy-item">
           <div class="policy-label">포인트 → 티켓 교환 비율</div>
-          <div class="policy-value">브론즈 100P / 실버 1,000P / 골드 2,000P<span class="badge badge-gray tv-impact-badge">포인트 관리 &gt; 포인트 정책</span></div>
-          <div class="policy-desc">현재 비율은 브론즈 10원 기준(10P = 1원)으로 잡혀 있습니다. 티켓 가치가 바뀌면 포인트 환산도 어긋납니다.</div>
+          <div class="policy-value">티켓 100P<span class="badge badge-gray tv-impact-badge">포인트 관리 &gt; 포인트 정책</span></div>
+          <div class="policy-desc">현재 비율은 티켓 10원 기준(10P = 1원)으로 잡혀 있습니다. 티켓 가치가 바뀌면 포인트 환산도 어긋납니다.</div>
           <div class="tv-sim-line" id="tv-sim-points"></div>
         </div>
         <div class="policy-item">
-          <div class="policy-label">등급별 적립 기준</div>
+          <div class="policy-label">적립 기준</div>
           <div class="policy-value">구매금액 × 제휴몰별 적립률<span class="badge badge-gray tv-impact-badge">티켓 · 보상 &gt; 티켓 적립 설정</span></div>
           <div class="policy-desc">적립액은 구매금액과 제휴몰별 적립률로 정해집니다. 티켓 가치를 바꾸면 같은 적립액이 몇 장으로 지급되는지가 달라집니다. 최소 구매 금액 문턱은 없습니다.</div>
         </div>
@@ -2072,7 +2023,7 @@ window.CMS_FEATURES = {
                 <th style="width:9%">적립률</th>
                 <th style="width:7%">수익</th>
                 <th style="width:15%">랜덤티켓 지급 시점</th>
-                <th style="width:9%">등급 전환 시점</th>
+                <th style="width:9%">티켓 전환 시점</th>
                 <th style="width:9%">시뮬레이터</th>
                 <th style="width:7%">적용</th>
               </tr>
@@ -4691,7 +4642,7 @@ window.CMS_FEATURES = {
         <li><span class="k">쿠팡 전환 대기일 수</span><span>카카오톡 연동 D+7 / 미연동 D+30</span>. <strong>고정값이라 수정할 수 없습니다.</strong></li>
         <li><span class="k">링크프라이스 제휴몰 전환 대기일 수</span>몰마다 설정합니다. 기본 30일.</li>
         <li><span class="k">대기일 수를 줄이면</span>이미 발급된 랜덤 티켓도 앞당겨 전환됩니다. 늘려도 이미 확정된 티켓은 되돌리지 않습니다.</li>
-        <li><span class="k">등급 환산</span>큰 단위부터 채웁니다.</li>
+        <li><span class="k">티켓 환산</span>적립액 ÷ 티켓 1장 값, 남는 잔돈은 버립니다.</li>
       </ul>
     </div>
     <div class="modal-footer">
@@ -6219,7 +6170,7 @@ window.giSaveImageEdit = giSaveImageEdit;
     "조회 전용":"Chỉ xem",
     "적립·보상 정책":"Chính sách tích lũy·phần thưởng","참여·이벤트 정책":"Chính sách tham gia·sự kiện",
     "적립 제외 정책":"Chính sách loại trừ tích lũy",
-    "등급별 적립 기준":"Tiêu chuẩn tích lũy theo hạng","적립 단위":"Đơn vị tích lũy",
+    "적립 기준":"Tiêu chuẩn tích lũy","적립 단위":"Đơn vị tích lũy",
     "지급":"Cấp","환산가치":"Giá trị quy đổi","보상률":"Tỷ lệ phần thưởng",
     "적립 산정 — 큰 등급 우선 배분":"Tính tích lũy — Ưu tiên hạng lớn",
     "알고리즘 공식":"Công thức thuật toán",
@@ -7301,7 +7252,8 @@ Object.assign(KO2VI,{"나누어떨어지지 않음":"Không chia hết","교환�
 Object.assign(KO2VI,{"기존의":"so với trước","40원":"40 won"});
 Object.assign(KO2VI,{"저장하지 않은 변경":"Thay đổi chưa lưu","저장 버튼을 눌러야 적용됩니다":"chỉ được áp dụng khi bấm nút Lưu"});
 Object.assign(KO2VI,{"적용으로":"Chuyển sang áp dụng","미적용으로":"Chuyển sang chưa áp dụng","건강":"Sức khỏe","교육":"Giáo dục","금융":"Tài chính","도서/문화":"Sách/Văn hóa","뷰티":"Làm đẹp","생활/인테리어":"Sinh hoạt/Nội thất","식품":"Thực phẩm","여행/티켓":"Du lịch/Vé","유아/아동":"Trẻ sơ sinh/Trẻ em","종합쇼핑몰":"Trung tâm mua sắm tổng hợp"});
-Object.assign(KO2VI,{"티켓 1장의":"Của 1 vé","원화 환산가치":"giá trị quy đổi ra won","를 정합니다. 이 값이 룰렛 잭팟 판정·포인트 교환 비율·등급 교환 비율의 기준이 됩니다.\n        저장하면 앱이 실제로 이 값을 읽어 씁니다.":"sẽ được thiết lập. Giá trị này là chuẩn cho phán định jackpot vòng quay · tỷ lệ đổi Điểm · tỷ lệ đổi hạng.\n        Khi lưu, app sẽ đọc và dùng ngay giá trị này.","등급별 환산가치":"Giá trị quy đổi theo hạng","티켓 1장 = 원화 얼마로 볼 것인지 (0 이상 정수) · 하나를 바꾸면 나머지 둘이 비율(1:10:20)대로 자동 조정됩니다":"Xem 1 vé tương ứng bao nhiêu won (số nguyên từ 0 trở lên) · Đổi 1 giá trị thì 2 giá trị còn lại tự động điều chỉnh theo tỷ lệ (1:10:20)","현재 적용값":"Giá trị đang áp dụng","변경할 값":"Giá trị sẽ đổi","변동":"Thay đổi","변경 없음":"Không thay đổi","이벤트 티켓 가치":"Giá trị vé Sự kiện","이벤트 티켓은 등급 티켓과 쓰임이 달라 가치를 별개로 정합니다 · 등급 값을 바꿔도 따라 움직이지 않습니다":"Vé sự kiện có công dụng khác với vé hạng nên giá trị được đặt riêng · Dù đổi giá trị hạng cũng không thay đổi theo","종류":"Loại","등급 간 교환 비율":"Tỷ lệ đổi giữa các hạng","위 입력값으로 자동 계산됩니다 (입력 즉시 갱신)":"Tự động tính theo giá trị nhập ở trên (cập nhật ngay khi nhập)","정수 배수":"Bội số nguyên","교환 비율이 나누어떨어지지 않습니다.":"Tỷ lệ đổi không chia hết.","소수점 교환은 앱에서 처리가 애매해집니다. 등급 값을 배수 관계로 맞추는 것을 권장합니다.":"Đổi có số thập phân sẽ khó xử lý trên app. Khuyến nghị đặt giá trị hạng theo quan hệ bội số.","입력값을 확인하세요.":"Vui lòng kiểm tra giá trị đã nhập.","영향 범위 안내":"Thông báo phạm vi ảnh hưởng","티켓 가치를 바꾸면 아래 항목들도 같이 조정해야 합니다":"Nếu đổi giá trị vé thì các mục dưới đây cũng cần được điều chỉnh theo","안내만 · 자동 반영 없음":"Chỉ thông báo · không tự động áp dụng","이 화면은":"Màn hình này","티켓 환산가치만":"chỉ giá trị quy đổi vé","다룹니다. 아래 항목은":"được xử lý ở đây. Các mục dưới đây","각자 담당 화면에서 별도로":"cần được sửa riêng ở từng màn hình phụ trách","수정해야 하며,\n          여기서 값을 바꿔도 자동으로 바뀌지 않습니다.":",\n          đổi giá trị ở đây sẽ không tự động thay đổi các mục đó.","매일 행운 룰렛 보상 구성":"Cấu hình phần thưởng Vòng quay may mắn hằng ngày","보상 슬롯별 티켓 종류·수량":"Loại · số lượng vé theo từng ô thưởng","티켓 · 보상 > 매일 행운 룰렛":"Vé · Thưởng > Vòng quay may mắn hằng ngày","티켓 1장의 가치가 바뀌면 슬롯별 기대값(원화)이 그대로 따라 움직입니다.":"Nếu giá trị 1 vé thay đổi, giá trị kỳ vọng (won) của từng ô sẽ thay đổi theo.","잭팟 룰렛 보상 구성":"Cấu hình phần thưởng Vòng quay Jackpot","잭팟 당첨 보상·확률 테이블":"Bảng phần thưởng · xác suất trúng Jackpot","티켓 · 보상 > 잭팟 룰렛":"Vé · Thưởng > Vòng quay Jackpot","잭팟 1회 기대비용이 티켓 가치에 비례해 변합니다.":"Chi phí kỳ vọng mỗi lượt Jackpot thay đổi tỷ lệ thuận với giá trị vé.","포인트 → 티켓 교환 비율":"Tỷ lệ đổi Điểm → Vé","브론즈 100P / 실버 1,000P / 골드 2,000P":"Đồng 100P / Bạc 1.000P / Vàng 2.000P","포인트 관리 > 포인트 정책":"Quản lý điểm > Chính sách điểm","현재 비율은 브론즈 10원 기준(10P = 1원)으로 잡혀 있습니다. 티켓 가치가 바뀌면 포인트 환산도 어긋납니다.":"Tỷ lệ hiện tại đang đặt theo chuẩn Đồng 10 won (10P = 1 won). Nếu giá trị vé thay đổi, quy đổi điểm cũng sẽ lệch.","티켓 · 보상 > 티켓 적립 설정":"Vé · Thưởng > Cài đặt tích lũy vé","입력한 값은":"Giá trị đã nhập","저장 버튼을 눌러야 적용됩니다.":"chỉ được áp dụng khi bấm nút Lưu.","티켓 가치 설정":"Cài đặt giá trị vé","제휴몰별 수수료와 사용자에게 돌려줄 적립률을 정합니다(계약이 바뀌면 수수료도 여기서 바로 반영). 등급 환산은 큰 단위부터 채우는 기존 방식 그대로입니다. 쿠팡은 대표 제휴몰로 항상 별도 표시됩니다. 적립률 기본값은 수수료의 60%이며, 나머지 40%가 우리 수익입니다.":"Đặt hoa hồng theo từng sàn liên kết và tỷ lệ tích lũy trả lại cho người dùng (nếu hợp đồng thay đổi thì cập nhật hoa hồng ngay tại đây). Quy đổi hạng vẫn theo cách cũ — điền từ đơn vị lớn trước. Coupang luôn hiển thị riêng vì là sàn liên kết đại diện. Tỷ lệ tích lũy mặc định là 60% hoa hồng, 40% còn lại là lợi nhuận của chúng ta.","카테고리 전체":"Toàn bộ danh mục","가전/디지털/IT":"Điện tử/Kỹ thuật số/IT","링크프라이스 승인 상태 전체":"Toàn bộ trạng thái duyệt Linkprice","적용 상태 전체":"Toàn bộ trạng thái áp dụng","미적용":"Chưa áp dụng","링크프라이스 승인 상태":"Trạng thái duyệt Linkprice","링크프라이스 승인 상태로 거르기":"Lọc theo trạng thái duyệt Linkprice","눌러서 몰을 체크한 뒤 일괄 조작하세요.":"Bấm để chọn các cửa hàng rồi thao tác hàng loạt.","보이는 몰 전체 선택":"Chọn toàn bộ cửa hàng đang hiển thị","미적용 — 클릭하면 적용으로":"Chưa áp dụng — bấm để chuyển sang áp dụng","적용됨 — 클릭하면 미적용으로":"Đã áp dụng — bấm để chuyển sang chưa áp dụng","승인":"Đã duyệt","승인대기":"Chờ duyệt","거부":"Từ chối","미신청":"Chưa đăng ký","제휴몰 정보 —":"Thông tin cửa hàng liên kết —","머천트ID":"ID merchant","머천트명":"Tên merchant","리워드 가능 여부":"Có hỗ trợ Reward","지원(Y)":"Hỗ trợ (Y)","PC웹 지원 여부":"Có hỗ trợ PC web","미지원(N)":"Không hỗ trợ (N)","모바일 웹 지원 여부":"Có hỗ trợ Mobile web","APP(AOS) 지원 여부":"Có hỗ trợ APP(AOS)","APP(IOS) 지원 여부":"Có hỗ trợ APP(IOS)","기본링크":"Link cơ bản","사이트 URL":"URL trang web","광고 효과 인정 기간":"Thời gian công nhận hiệu quả quảng cáo","실시간 커미션 전송":"Gửi hoa hồng thời gian thực","실시간 실적 전송":"Gửi thực tích thời gian thực","커미션 정산 방법 및 금액":"Cách quyết toán và số tiền hoa hồng","커미션 지급 일정":"Lịch chi trả hoa hồng","활동 불가 방식":"Hình thức không được phép hoạt động","커미션 미인정 상품":"Sản phẩm không công nhận hoa hồng","유의사항":"Lưu ý","커미션 목록":"Danh sách hoa hồng","구분":"Phân loại","PC웹":"PC web","모바일웹":"Mobile web","실시간 실적 - 정가상품":"Thực tích thời gian thực - Sản phẩm giá gốc","실시간 실적 - 세일상품":"Thực tích thời gian thực - Sản phẩm giảm giá","확정 실적 - 정가상품":"Thực tích đã xác nhận - Sản phẩm giá gốc","확정 실적 - 세일상품":"Thực tích đã xác nhận - Sản phẩm giảm giá","개 선택":"mục đã chọn","1원 고정":"cố định 1 won","당":"mỗi","당 1장":"mỗi 1 vé","예: 브론즈 1장 → 바뀌면":"VD: Đồng 1 vé → nếu đổi thành","— 같은 기대값을 유지하려면":"— để giữ nguyên giá trị kỳ vọng thì","— 같은 기대비용을 유지하려면":"— để giữ nguyên chi phí kỳ vọng thì","입력값 오류":"Lỗi giá trị nhập","브론즈 값이 0이라 비율을 계산할 수 없습니다":"Giá trị Đồng bằng 0 nên không thể tính tỷ lệ","실버 값이 0이라 비율을 계산할 수 없습니다":"Giá trị Bạc bằng 0 nên không thể tính tỷ lệ","카탈로그 로드 실패 — 새로고침 필요":"Tải catalog thất bại — cần tải lại trang","카탈로그 데이터를 불러오지 못했습니다 — 새로고침 해주세요.":"Không tải được dữ liệu catalog — vui lòng tải lại trang.","대표 제휴몰이 없습니다.":"Không có cửa hàng liên kết đại diện.","표시":"hiển thị"});
+Object.assign(KO2VI,{"티켓 1장의":"Của 1 vé","원화 환산가치":"giá trị quy đổi ra won","를 정합니다. 이 값이 룰렛 잭팟 판정·포인트 교환 비율의 기준이 됩니다.\n        저장하면 앱이 실제로 이 값을 읽어 씁니다.":"sẽ được thiết lập. Giá trị này là chuẩn cho phán định jackpot vòng quay · tỷ lệ đổi Điểm.\n        Khi lưu, app sẽ đọc và dùng ngay giá trị này.","등급별 환산가치":"Giá trị quy đổi theo hạng","티켓 1장 = 원화 얼마로 볼 것인지 (0 이상 정수) · 하나를 바꾸면 나머지 둘이 비율(1:10:20)대로 자동 조정됩니다":"Xem 1 vé tương ứng bao nhiêu won (số nguyên từ 0 trở lên) · Đổi 1 giá trị thì 2 giá trị còn lại tự động điều chỉnh theo tỷ lệ (1:10:20)","현재 적용값":"Giá trị đang áp dụng","변경할 값":"Giá trị sẽ đổi","변동":"Thay đổi","변경 없음":"Không thay đổi","이벤트 티켓 가치":"Giá trị vé Sự kiện","이벤트 티켓은 티켓과 쓰임이 달라 가치를 별개로 정합니다 · 티켓 값을 바꿔도 따라 움직이지 않습니다":"Vé sự kiện có công dụng khác với vé nên giá trị được đặt riêng · Dù đổi giá trị vé cũng không thay đổi theo","종류":"Loại","등급 간 교환 비율":"Tỷ lệ đổi giữa các hạng","위 입력값으로 자동 계산됩니다 (입력 즉시 갱신)":"Tự động tính theo giá trị nhập ở trên (cập nhật ngay khi nhập)","정수 배수":"Bội số nguyên","교환 비율이 나누어떨어지지 않습니다.":"Tỷ lệ đổi không chia hết.","소수점 교환은 앱에서 처리가 애매해집니다. 등급 값을 배수 관계로 맞추는 것을 권장합니다.":"Đổi có số thập phân sẽ khó xử lý trên app. Khuyến nghị đặt giá trị hạng theo quan hệ bội số.","입력값을 확인하세요.":"Vui lòng kiểm tra giá trị đã nhập.","영향 범위 안내":"Thông báo phạm vi ảnh hưởng","티켓 가치를 바꾸면 아래 항목들도 같이 조정해야 합니다":"Nếu đổi giá trị vé thì các mục dưới đây cũng cần được điều chỉnh theo","안내만 · 자동 반영 없음":"Chỉ thông báo · không tự động áp dụng","이 화면은":"Màn hình này","티켓 환산가치만":"chỉ giá trị quy đổi vé","다룹니다. 아래 항목은":"được xử lý ở đây. Các mục dưới đây","각자 담당 화면에서 별도로":"cần được sửa riêng ở từng màn hình phụ trách","수정해야 하며,\n          여기서 값을 바꿔도 자동으로 바뀌지 않습니다.":",\n          đổi giá trị ở đây sẽ không tự động thay đổi các mục đó.","매일 행운 룰렛 보상 구성":"Cấu hình phần thưởng Vòng quay may mắn hằng ngày","보상 슬롯별 티켓 종류·수량":"Loại · số lượng vé theo từng ô thưởng","티켓 · 보상 > 매일 행운 룰렛":"Vé · Thưởng > Vòng quay may mắn hằng ngày","티켓 1장의 가치가 바뀌면 슬롯별 기대값(원화)이 그대로 따라 움직입니다.":"Nếu giá trị 1 vé thay đổi, giá trị kỳ vọng (won) của từng ô sẽ thay đổi theo.","잭팟 룰렛 보상 구성":"Cấu hình phần thưởng Vòng quay Jackpot","잭팟 당첨 보상·확률 테이블":"Bảng phần thưởng · xác suất trúng Jackpot","티켓 · 보상 > 잭팟 룰렛":"Vé · Thưởng > Vòng quay Jackpot","잭팟 1회 기대비용이 티켓 가치에 비례해 변합니다.":"Chi phí kỳ vọng mỗi lượt Jackpot thay đổi tỷ lệ thuận với giá trị vé.","포인트 → 티켓 교환 비율":"Tỷ lệ đổi Điểm → Vé","브론즈 100P / 실버 1,000P / 골드 2,000P":"Đồng 100P / Bạc 1.000P / Vàng 2.000P","포인트 관리 > 포인트 정책":"Quản lý điểm > Chính sách điểm","현재 비율은 티켓 10원 기준(10P = 1원)으로 잡혀 있습니다. 티켓 가치가 바뀌면 포인트 환산도 어긋납니다.":"Tỷ lệ hiện tại đang đặt theo chuẩn vé 10 won (10P = 1 won). Nếu giá trị vé thay đổi, quy đổi điểm cũng sẽ lệch.","티켓 · 보상 > 티켓 적립 설정":"Vé · Thưởng > Cài đặt tích lũy vé","입력한 값은":"Giá trị đã nhập","저장 버튼을 눌러야 적용됩니다.":"chỉ được áp dụng khi bấm nút Lưu.","티켓 가치 설정":"Cài đặt giá trị vé","제휴몰별 수수료와 사용자에게 돌려줄 적립률을 정합니다(계약이 바뀌면 수수료도 여기서 바로 반영). 등급 환산은 큰 단위부터 채우는 기존 방식 그대로입니다. 쿠팡은 대표 제휴몰로 항상 별도 표시됩니다. 적립률 기본값은 수수료의 60%이며, 나머지 40%가 우리 수익입니다.":"Đặt hoa hồng theo từng sàn liên kết và tỷ lệ tích lũy trả lại cho người dùng (nếu hợp đồng thay đổi thì cập nhật hoa hồng ngay tại đây). Quy đổi hạng vẫn theo cách cũ — điền từ đơn vị lớn trước. Coupang luôn hiển thị riêng vì là sàn liên kết đại diện. Tỷ lệ tích lũy mặc định là 60% hoa hồng, 40% còn lại là lợi nhuận của chúng ta.","카테고리 전체":"Toàn bộ danh mục","가전/디지털/IT":"Điện tử/Kỹ thuật số/IT","링크프라이스 승인 상태 전체":"Toàn bộ trạng thái duyệt Linkprice","적용 상태 전체":"Toàn bộ trạng thái áp dụng","미적용":"Chưa áp dụng","링크프라이스 승인 상태":"Trạng thái duyệt Linkprice","링크프라이스 승인 상태로 거르기":"Lọc theo trạng thái duyệt Linkprice","눌러서 몰을 체크한 뒤 일괄 조작하세요.":"Bấm để chọn các cửa hàng rồi thao tác hàng loạt.","보이는 몰 전체 선택":"Chọn toàn bộ cửa hàng đang hiển thị","미적용 — 클릭하면 적용으로":"Chưa áp dụng — bấm để chuyển sang áp dụng","적용됨 — 클릭하면 미적용으로":"Đã áp dụng — bấm để chuyển sang chưa áp dụng","승인":"Đã duyệt","승인대기":"Chờ duyệt","거부":"Từ chối","미신청":"Chưa đăng ký","제휴몰 정보 —":"Thông tin cửa hàng liên kết —","머천트ID":"ID merchant","머천트명":"Tên merchant","리워드 가능 여부":"Có hỗ trợ Reward","지원(Y)":"Hỗ trợ (Y)","PC웹 지원 여부":"Có hỗ trợ PC web","미지원(N)":"Không hỗ trợ (N)","모바일 웹 지원 여부":"Có hỗ trợ Mobile web","APP(AOS) 지원 여부":"Có hỗ trợ APP(AOS)","APP(IOS) 지원 여부":"Có hỗ trợ APP(IOS)","기본링크":"Link cơ bản","사이트 URL":"URL trang web","광고 효과 인정 기간":"Thời gian công nhận hiệu quả quảng cáo","실시간 커미션 전송":"Gửi hoa hồng thời gian thực","실시간 실적 전송":"Gửi thực tích thời gian thực","커미션 정산 방법 및 금액":"Cách quyết toán và số tiền hoa hồng","커미션 지급 일정":"Lịch chi trả hoa hồng","활동 불가 방식":"Hình thức không được phép hoạt động","커미션 미인정 상품":"Sản phẩm không công nhận hoa hồng","유의사항":"Lưu ý","커미션 목록":"Danh sách hoa hồng","구분":"Phân loại","PC웹":"PC web","모바일웹":"Mobile web","실시간 실적 - 정가상품":"Thực tích thời gian thực - Sản phẩm giá gốc","실시간 실적 - 세일상품":"Thực tích thời gian thực - Sản phẩm giảm giá","확정 실적 - 정가상품":"Thực tích đã xác nhận - Sản phẩm giá gốc","확정 실적 - 세일상품":"Thực tích đã xác nhận - Sản phẩm giảm giá","개 선택":"mục đã chọn","1원 고정":"cố định 1 won","당":"mỗi","당 1장":"mỗi 1 vé","예: 브론즈 1장 → 바뀌면":"VD: Đồng 1 vé → nếu đổi thành","— 같은 기대값을 유지하려면":"— để giữ nguyên giá trị kỳ vọng thì","— 같은 기대비용을 유지하려면":"— để giữ nguyên chi phí kỳ vọng thì","입력값 오류":"Lỗi giá trị nhập","브론즈 값이 0이라 비율을 계산할 수 없습니다":"Giá trị Đồng bằng 0 nên không thể tính tỷ lệ","실버 값이 0이라 비율을 계산할 수 없습니다":"Giá trị Bạc bằng 0 nên không thể tính tỷ lệ","카탈로그 로드 실패 — 새로고침 필요":"Tải catalog thất bại — cần tải lại trang","카탈로그 데이터를 불러오지 못했습니다 — 새로고침 해주세요.":"Không tải được dữ liệu catalog — vui lòng tải lại trang.","대표 제휴몰이 없습니다.":"Không có cửa hàng liên kết đại diện.","표시":"hiển thị"});
+Object.assign(KO2VI,{"티켓 가치":"Giá trị vé","티켓 1장 = 원화 얼마로 볼 것인지 (0 이상 정수)":"1 vé = bao nhiêu won (số nguyên ≥ 0)","티켓 100P":"Vé 100P"});
 Object.assign(KO2VI,{"룰렛 보상 슬롯은 운영자가 CMS에서 직접 정하는 값입니다(자동 계산 대상 아님). 티켓 가치를 바꾸면 슬롯 구성도 다시 정해야 합니다.":"Ô thưởng vòng quay là giá trị do quản trị viên tự đặt trực tiếp trong CMS (không phải đối tượng tự động tính toán). Nếu đổi giá trị vé thì cấu hình ô thưởng cũng cần được đặt lại."});
 Object.assign(KO2VI,{"잭팟 보상 슬롯도 운영자가 CMS에서 직접 정하는 값입니다(자동 계산 대상 아님). 티켓 가치를 바꾸면 슬롯 구성도 다시 정해야 합니다.":"Ô thưởng Jackpot cũng là giá trị do quản trị viên tự đặt trực tiếp trong CMS (không phải đối tượng tự động tính toán). Nếu đổi giá trị vé thì cấu hình ô thưởng cũng cần được đặt lại."});
 Object.assign(KO2VI,{"적립액은 구매금액과 제휴몰별 적립률로 정해집니다. 티켓 가치를 바꾸면 같은 적립액이 몇 장으로 지급되는지가 달라집니다. 최소 구매 금액 문턱은 없습니다.":"Số tiền tích lũy được quyết định bởi số tiền mua và tỷ lệ tích lũy theo từng sàn liên kết. Nếu đổi giá trị vé thì số lượng vé được phát cho cùng một số tiền tích lũy sẽ thay đổi. Không có mức tối thiểu cho số tiền mua."});
@@ -7316,7 +7268,7 @@ Object.assign(KO2VI,{
   "구매일 다음날 구매액만 전송 (커미션 0원)":"Hôm sau ngày mua chỉ gửi doanh số (hoa hồng 0 won)",
   "PC : 구매수, 구매액만 실적 전송, 구매 확정 시 커미션까지 재전송\n모바일 : 구매 확정 시 전송\n구매 확정을 하지 않을 경우 배송완료 기준 약 15일 이후 구매 확정":"PC : chỉ gửi số đơn và doanh số, khi xác nhận mua thì gửi lại kèm hoa hồng\nMobile : gửi khi xác nhận mua\nNếu không xác nhận mua thì khoảng 15 ngày sau khi giao hàng xong sẽ tự xác nhận",
   "구매일 다음날 구매액만 전송 (커미션 0원)\n 구매 확정일 다음날 구매액, 커미션 반영하여 재전송":"Hôm sau ngày mua chỉ gửi doanh số (hoa hồng 0 won)\n Hôm sau ngày xác nhận mua gửi lại kèm doanh số và hoa hồng",
-  "등급 전환 시점":"Thời điểm chuyển hạng","갱신 필요":"Cần cập nhật","익익월 6일 확정 후":"Sau khi chốt ngày 6 của tháng sau nữa",
+  "티켓 전환 시점":"Thời điểm chuyển vé","갱신 필요":"Cần cập nhật","익익월 6일 확정 후":"Sau khi chốt ngày 6 của tháng sau nữa",
   "링크프라이스 제휴몰은 실적 월의 익익월 6일 이후 확정 건을 대조해 등급 티켓으로 전환합니다. 몰마다 다르지 않습니다.":"Sàn Linkprice đối chiếu các đơn đã chốt sau ngày 6 của tháng sau nữa kể từ tháng phát sinh thực tích rồi chuyển thành vé hạng. Không khác nhau theo từng sàn.",
   "전환 대기일 수 적용":"Áp dụng số ngày chờ chuyển đổi",
   "선택한 몰에 한꺼번에 적용할 전환 대기일 수":"Số ngày chờ chuyển đổi áp dụng hàng loạt cho các sàn đã chọn",
@@ -7333,8 +7285,8 @@ Object.assign(KO2VI,{
   "몰마다 설정합니다. 기본 30일.":"Đặt riêng cho từng sàn. Mặc định 30 ngày.",
   "대기일 수를 줄이면":"Nếu giảm số ngày chờ",
   "이미 발급된 랜덤 티켓도 앞당겨 전환됩니다. 늘려도 이미 확정된 티켓은 되돌리지 않습니다.":"vé ngẫu nhiên đã phát hành cũng được chuyển đổi sớm hơn. Dù tăng lên thì vé đã xác nhận cũng không bị hoàn lại.",
-  "등급 환산":"Quy đổi hạng",
-  "큰 단위부터 채웁니다.":"Điền từ đơn vị lớn trước.",
+  "티켓 환산":"Quy đổi vé",
+  "적립액 ÷ 티켓 1장 값, 남는 잔돈은 버립니다.":"Số tiền tích lũy ÷ giá trị 1 vé, phần lẻ còn lại bị bỏ.",
   "닫기":"Đóng",
   "전환 대기일 수는 1~365 사이 숫자로 입력하세요.":"Vui lòng nhập số ngày chờ chuyển đổi trong khoảng 1~365.",
   "전환 대기일 수를 줄였지만, 해당 제휴몰에는 새 기준으로 이미 기간이 지난 대기 티켓이 없었습니다.":"Đã giảm số ngày chờ chuyển đổi, nhưng sàn đó không có vé đang chờ nào đã quá hạn theo tiêu chuẩn mới.",
@@ -13457,42 +13409,13 @@ window.pointPolicySubmitEdit = function() {
    cms/ticket-value.html 이식(2026-08-12) — 별도 페이지로 두면 사이드바를 두 군데서
    따로 그려서 배지·메뉴가 어긋난다는 지적으로 index.html 안 화면 전환으로 합쳤다.
    로직·문구·동작은 원본 그대로, db/FS/toast 등은 index.html 것을 그대로 쓴다. */
-const TV_KEYS = ['bronze','silver','gold'];
-const TV_ALL_KEYS = ['bronze','silver','gold','event'];
+/* 2026-10-14 티켓 1종 통합 — 티켓(Firestore 키 bronze)과 이벤트 티켓 둘만 다룬다. */
+const TV_KEYS = ['bronze'];
+const TV_ALL_KEYS = ['bronze','event'];
 const tvWon = n => n.toLocaleString('ko-KR') + '<span>원</span>';
 const tvWonText = n => n.toLocaleString('ko-KR') + '원';
 
-/* 등급 간 비율은 고정이다(김반장 확정) — 이 상수를 바꾸는 UI는 만들지 않는다.
-   100:1000:2000 을 브론즈=1 기준으로 정리한 값. */
-const TV_RATIOS = { bronze:1, silver:10, gold:20 };
-
 function tvEl(k){ return document.getElementById('tv-' + k); }
-
-/* 하나를 고치면 나머지 셋을 같은 비율로 맞춘다 — 개별로 두면 등급 체계가 깨진다는
-   지적. 방금 타이핑한 칸(anchorKey)은 그대로 두고, 나머지 셋만 anchorKey 기준
-   배수로 다시 계산해 채운다. 소수점이 나오면 반올림하고 그 칸에 표시(tv-rounded-*)
-   한다 — 반올림을 감춘 채 조용히 값만 바꾸지 않는다. */
-function tvSyncRatios(anchorKey){
-  const anchorEl = tvEl(anchorKey);
-  const raw = Number(anchorEl.value);
-  if(anchorEl.value.trim() === '' || !Number.isFinite(raw) || raw < 0) return; // 무효값은 무효 처리에 맡기고 연동 안 함
-  const unit = raw / TV_RATIOS[anchorKey];
-  TV_KEYS.forEach(k => {
-    const note = document.getElementById('tv-rounded-' + k);
-    if(k === anchorKey){ note.classList.remove('show'); note.textContent = ''; return; }
-    const exact = unit * TV_RATIOS[k];
-    const rounded = Math.round(exact);
-    const wasRounded = Math.abs(exact - rounded) > 1e-9;
-    tvEl(k).value = rounded;
-    if(wasRounded){
-      note.innerHTML = '<span>정확히는</span> ' + tvFmtRatio(exact) + '<span>원 — 반올림됨</span>';
-      note.classList.add('show');
-    }else{
-      note.textContent = '';
-      note.classList.remove('show');
-    }
-  });
-}
 
 /* 입력값 읽기: 숫자·0 이상만 유효 (검증은 최소한만) */
 function tvRead(k){
@@ -13550,60 +13473,8 @@ function tvRecalc(){
     invBox.style.display = 'none';
   }
 
-  /* 교환 비율 자동 계산 */
-  const warnLines = [];
-  const pairs = [
-    { id:'bs', from:'브론즈', to:'실버', a:v.bronze, b:v.silver },
-    { id:'sg', from:'실버',   to:'골드', a:v.silver, b:v.gold  }
-  ];
-
-  pairs.forEach(p => {
-    const fEl = document.getElementById('tv-ratio-' + p.id);
-    const bEl = document.getElementById('tv-ratio-' + p.id + '-badge');
-    const dEl = document.getElementById('tv-ratio-' + p.id + '-desc');
-
-    let n = null, ok = false, reason = '';
-    if(!p.a.valid || !p.b.valid){
-      reason = '입력값 오류';
-    }else if(p.a.value === 0){
-      reason = p.from + ' 값이 0이라 비율을 계산할 수 없습니다';
-    }else{
-      n = p.b.value / p.a.value;
-      ok = tvIsWhole(n) && n > 0;
-      if(!ok && Number.isFinite(n)) reason = p.from + ' ' + tvFmtRatio(n) + '장 = ' + p.to + ' 1장';
-    }
-
-    const nTxt = n === null ? '—' : tvFmtRatio(n);
-    fEl.innerHTML = n === null
-      ? p.from + ' <span class="tv-n tv-n-warn">—</span> = <span>' + p.to + '</span> 1<span>장</span>'
-      : p.from + ' <span class="tv-n' + (ok ? '' : ' tv-n-warn') + '">' + nTxt + '</span><span>장</span> = <span>' + p.to + '</span> 1<span>장</span>';
-
-    if(n === null){
-      bEl.innerHTML = '<span class="badge badge-amber">계산 불가</span>';
-      dEl.textContent = reason;
-      warnLines.push('<span>' + p.from + '</span> → <span>' + p.to + '</span>: <span>' + reason + '</span>');
-    }else if(ok){
-      bEl.innerHTML = '<span class="badge badge-green">정수 배수</span>';
-      dEl.innerHTML = '<span>' + p.to + '</span> ' + tvWon(p.b.value) + ' ÷ <span>' + p.from + '</span> ' + tvWon(p.a.value);
-    }else{
-      bEl.innerHTML = '<span class="badge badge-amber">나누어떨어지지 않음</span>';
-      dEl.innerHTML = '<span>' + p.to + '</span> ' + tvWon(p.b.value) + ' ÷ <span>' + p.from + '</span> ' + tvWon(p.a.value) + ' = ' + nTxt + '<span>장</span>';
-      warnLines.push('<span>' + p.from + '</span> ' + nTxt + '<span>장</span> = <span>' + p.to + '</span> 1<span>장</span> — <span>교환이 애매해집니다.</span>');
-    }
-  });
-
-  const rw = document.getElementById('tv-ratio-warn');
-  if(warnLines.length){
-    document.getElementById('tv-ratio-warn-body').innerHTML = warnLines.join('<br>');
-    rw.style.display = '';
-  }else{
-    rw.style.display = 'none';
-  }
-
   /* 변경 표시 배너 + 저장 버튼 강조 — 카드별로 분리(2026-08-14, Vin 지적 + 김반장 확정).
-     예전엔 배너 하나로 4개 값을 합쳐서 세서 "등급별 환산가치" 버튼 하나가 이벤트 티켓
-     값까지 같이 저장한다는 걸 admin이 알기 어려웠다. 등급(브론즈·실버·골드)과 이벤트는
-     서로 독립된 값이니 배너도 카드별로 나눠서 "어느 카드 것인지" 바로 보이게 한다. */
+     티켓과 이벤트 티켓은 서로 독립된 값이니 배너도 카드별로 나눠서 "어느 카드 것인지" 바로 보이게 한다. */
   const tierChanged = changed.filter(c => TV_KEYS.indexOf(c.key) !== -1);
   const eventChanged = changed.filter(c => c.key === 'event');
   tvRenderDirtyBanner('tv-dirty-banner-tier', 'tv-save-btn', tierChanged);
@@ -13652,8 +13523,8 @@ function tvHideSim(id){
 
 function tvUpdateImpactSim(anyChanged){
   const ids = ['points'];
-  const b = tvRead('bronze'), s = tvRead('silver'), g = tvRead('gold');
-  if(!anyChanged || !b.valid || !s.valid || !g.valid || b.value <= 0){
+  const b = tvRead('bronze');
+  if(!anyChanged || !b.valid || b.value <= 0){
     ids.forEach(tvHideSim);
     return;
   }
@@ -13664,22 +13535,19 @@ function tvUpdateImpactSim(anyChanged){
 
   /* 포인트 → 티켓 — 10P = 1원 고정, 원화값만 바뀐 만큼 그대로 곱한다 */
   tvSetSim('points',
-    '<span>브론즈</span> ' + (b.orig*TV_POINTS_PER_WON).toLocaleString('ko-KR') + 'P → <strong>' + (b.value*TV_POINTS_PER_WON).toLocaleString('ko-KR') + 'P</strong>' +
-    ' · <span>실버</span> ' + (s.orig*TV_POINTS_PER_WON).toLocaleString('ko-KR') + 'P → <strong>' + (s.value*TV_POINTS_PER_WON).toLocaleString('ko-KR') + 'P</strong>' +
-    ' · <span>골드</span> ' + (g.orig*TV_POINTS_PER_WON).toLocaleString('ko-KR') + 'P → <strong>' + (g.value*TV_POINTS_PER_WON).toLocaleString('ko-KR') + 'P</strong>' +
+    '<span>티켓</span> ' + (b.orig*TV_POINTS_PER_WON).toLocaleString('ko-KR') + 'P → <strong>' + (b.value*TV_POINTS_PER_WON).toLocaleString('ko-KR') + 'P</strong>' +
     ' (' + TV_POINTS_PER_WON + 'P = <span>1원 고정</span>)');
 
-  /* 등급별 적립 기준(accrual) — 제휴몰마다 적립률이 달라 "몇 원당 몇 장" 고정 배수가
+  /* 적립 기준(accrual) — 제휴몰마다 적립률이 달라 "몇 원당 몇 장" 고정 배수가
      성립하지 않는다(2026-08-14 김반장 확정). 숫자 시뮬레이션 없이 policy-desc로만 안내. */
 }
 
-window.tvOnInput = function(anchorKey){
-  if(anchorKey) tvSyncRatios(anchorKey);
+window.tvOnInput = function(){
   tvRecalc();
 };
 
 /* settings/ticket_value 조회 — taLoad() 패턴 그대로.
-   문서가 없으면 화면에 이미 박혀 있는 현행값(100/1000/2000/40)을 그대로 쓴다. */
+   문서가 없으면 화면에 이미 박혀 있는 현행값(티켓 10 · 이벤트 티켓 40)을 그대로 쓴다. */
 window.tvLoad = function(){
   db.collection('settings').doc('ticket_value').get().then(function(doc){
     const d = (doc.exists && doc.data()) || {};
@@ -13698,7 +13566,7 @@ window.tvLoad = function(){
   });
 };
 
-/* 저장 — 등급(브론즈·실버·골드)과 이벤트 티켓은 서로 독립된 값이라 카드별로 따로
+/* 저장 — 티켓과 이벤트 티켓은 서로 독립된 값이라 카드별로 따로
    저장한다(2026-08-14, Vin 지적 + 김반장 확정 — 버튼이 등급 카드 안에만 있어서
    "등급값만 저장된다"고 오해하기 쉬웠다. 실제로는 저장 시 4개 값이 한 번에 Firestore에
    쓰이고 있었는데 버튼 위치 때문에 그렇게 안 보였다). taSaveScope()와 같은 방식:
@@ -13750,12 +13618,12 @@ function tvSaveScope(keys, btnIds, label){
   });
 }
 
-window.tvSaveTier = function(){ tvSaveScope(TV_KEYS, ['tv-save-btn'], '등급별 환산가치'); };
+window.tvSaveTier = function(){ tvSaveScope(TV_KEYS, ['tv-save-btn'], '티켓 가치'); };
 window.tvSaveEvent = function(){ tvSaveScope(['event'], ['tv-save-btn-event'], '이벤트 티켓 가치'); };
 
 /* ── sec-ticket-accrual ── 제휴몰별 티켓 적립률 (settings/ticket_accrual)
    지금까지 코드에 박혀 있던 "모든 제휴몰 일률 2%"를 운영자가 몰별로 고칠 수 있게 한다.
-   등급 환산은 기존 방식 그대로 — 적립액을 큰 단위(골드)부터 채우는 Greedy. */
+   티켓 환산 — 적립액 ÷ 티켓 1장 값(10원), 남는 잔돈은 버린다(2026-10-14 티켓 1종 통합). */
 // 적립률 초기값 = 수수료 × 60%(김반장 확정, 2026-08-11) — 실제 링크프라이스 커미션이
 // 0.6~0.7% 수준이라 고정 2% 초기값을 쓰면 전 몰이 역마진이었다. 나머지 40%가 우리 수익.
 // 「일괄 적용」 버튼의 비율 입력칸 기본값도 이 상수를 그대로 쓴다.
@@ -13784,17 +13652,12 @@ var TA_COUPANG_WAIT_LABEL = '카카오톡 연동 D+7 / 미연동 D+30';
 var TA_LP_CONVERT_LABEL = '익익월 6일 확정 후';
 var TA_CONVERT_DAYS = {};   // { code: 일수 } — 화면(저장 전 편집분 포함) 값
 
-var TA_UNITS = [                                           // ticket_grades 시드의 환산가치와 동일
-  { name: '골드',   value: 200 },
-  { name: '실버',   value: 100 },
-  { name: '브론즈', value: 10  },
-];
 var TA_PREVIEW_KRW = 100000;
 
 /* settings/ticket_value 조회 — 「티켓 가치 설정」에서 저장한 값이 실제로 쓰이는 자리들
    (2026-08-12 신설, 「1/10로 저장했는데 적립 설정에 반영이 안 된다」 긴급 보고로 추가).
    문서가 없거나 조회 실패 시 지금까지 코드에 박혀 있던 값을 그대로 기본값으로 쓴다.
-   로드되면 TA_UNITS·RLT_REWARD_TYPES를 같은 객체 참조를 유지한 채 그 자리에서 갱신한다 —
+   로드되면 RLT_REWARD_TYPES를 같은 객체 참조를 유지한 채 그 자리에서 갱신한다 —
    이미 다른 곳에서 이 배열/객체를 들고 있어도(참조) 새로 만들 필요 없이 값만 바뀐다. */
 var TA_TICKET_VALUE = { bronze: 10, silver: 100, gold: 200, event: 40 };
 window.TA_TICKET_VALUE = TA_TICKET_VALUE; // 다른 <script> 블록(tkSimulate 등)에서도 참조 — 이 객체는 그 자리에서 값만 갱신되므로 재노출 불필요
@@ -13807,9 +13670,6 @@ function taLoadTicketValue() {
     if (typeof d.silver === 'number') TA_TICKET_VALUE.silver = d.silver;
     if (typeof d.gold === 'number') TA_TICKET_VALUE.gold = d.gold;
     if (typeof d.event === 'number') TA_TICKET_VALUE.event = d.event;
-    TA_UNITS[0].value = TA_TICKET_VALUE.gold;
-    TA_UNITS[1].value = TA_TICKET_VALUE.silver;
-    TA_UNITS[2].value = TA_TICKET_VALUE.bronze;
     if (typeof RLT_REWARD_TYPES !== 'undefined') {
       RLT_REWARD_TYPES.bronze_ticket.unitValue = TA_TICKET_VALUE.bronze;
       RLT_REWARD_TYPES.silver_ticket.unitValue = TA_TICKET_VALUE.silver;
@@ -13832,36 +13692,22 @@ taLoadTicketValue();
 function taFmt(n) { return Math.round(n * 100) / 100; }
 
 function taGreedy(amountKrw, ratePct) {
-  var budget = Math.floor(amountKrw * ratePct / 100);
-  var parts = [];
-  for (var i = 0; i < TA_UNITS.length; i++) {
-    var n = Math.floor(budget / TA_UNITS[i].value);
-    if (n > 0) {
-      // 번역 엔진이 텍스트 노드 단위로 치환하므로 '골드'·'장'을 각각 분리해 담는다
-      parts.push('<span>' + TA_UNITS[i].name + '</span> ' + n + '<span>장</span>');
-      budget -= n * TA_UNITS[i].value;
-    }
-  }
-  return parts.length ? parts.join(' · ') : '<span>지급 없음</span>';
+  var sp = taAccrualSplit(amountKrw, ratePct);
+  // 번역 엔진이 텍스트 노드 단위로 치환하므로 '티켓'·'장'을 각각 분리해 담는다
+  return (sp && sp.total) ? '<span>티켓</span> ' + sp.total + '<span>장</span>' : '<span>지급 없음</span>';
 }
 
-/* 구매 → 티켓 (마스터 정책서 공식) — taGreedy 와 같은 셈을 수량으로 돌려준다. 앱 greedyTickets 와도 같다.
-   적립액 = ⌊구매확정금액 × 그 제휴몰의 적립률 / 100⌋. 큰 단위(골드)부터 채우고 실버 → 브론즈,
-   브론즈 단가 미만으로 남는 잔돈은 버린다. 단가는 TA_TICKET_VALUE(settings/ticket_value).
+/* 구매 → 티켓 (마스터 정책서 공식) — 앱 greedyTickets 와 같은 셈.
+   적립액 = ⌊구매확정금액 × 그 제휴몰의 적립률 / 100⌋, 티켓 N장 = ⌊적립액 ÷ 티켓 1장 값⌋,
+   남는 잔돈은 버린다(2026-10-14 티켓 1종 통합). 티켓 1장 값은 TA_TICKET_VALUE.bronze(settings/ticket_value).
+   새 티켓 문서는 grade:'bronze' 로 쓴다(Firestore 필드 교체는 개발팀 몫).
    적립률을 모르면 null — 비율을 지어내지 않는다. */
 function taAccrualSplit(amountKrw, ratePct) {
   if (typeof ratePct !== 'number' || !(ratePct >= 0)) return null;
-  var rest = Math.floor((Number(amountKrw) || 0) * ratePct / 100);
-  var out = { gold: 0, silver: 0, bronze: 0, total: 0, earn: rest, remainder: 0 };
-  ['gold', 'silver', 'bronze'].forEach(function(g) {
-    var unit = TA_TICKET_VALUE[g];
-    if (!(unit > 0) || rest < unit) return;
-    out[g] = Math.floor(rest / unit);
-    rest -= out[g] * unit;
-  });
-  out.remainder = rest;
-  out.total = out.gold + out.silver + out.bronze;
-  return out;
+  var earn = Math.floor((Number(amountKrw) || 0) * ratePct / 100);
+  var unit = TA_TICKET_VALUE.bronze;
+  var n = unit > 0 ? Math.floor(earn / unit) : 0;
+  return { ticket: n, bronze: n, silver: 0, gold: 0, total: n, earn: earn, remainder: earn - n * (unit > 0 ? unit : 0) };
 }
 window.taAccrualSplit = taAccrualSplit;
 /* 몰별 적립률 — settings/ticket_accrual.rates(코드별 %). 포스트백에는 몰 이름만 있어서
@@ -17049,7 +16895,7 @@ window.dmAdd = function(col) {
     var msg = col + ' 문서 추가 완료 (' + ref.id.slice(0,10) + '…)';
     if (tk && tk.total > 0) {
       var label = data.status === 'confirmed' ? '등급 티켓' : '가지급(랜덤 티켓 1개)';
-      msg += ' · ' + label + ' ' + tk.total + '장(골' + tk.gold + '·실' + tk.silver + '·동' + tk.bronze + ')';
+      msg += ' · ' + label + ' 티켓 ' + tk.total + '장';
     }
     dmShowToast(msg);
     dmLoadList(col);
@@ -17077,15 +16923,24 @@ function dmAccrueWithRate(postbackId, userId, amount, status, ratePct) {
   for (var gi = 0; gi < tk.gold; gi++) grades.push('gold');
   for (var si = 0; si < tk.silver; si++) grades.push('silver');
   for (var bi = 0; bi < tk.bronze; bi++) grades.push('bronze');
-  var b = db.batch();
-  grades.forEach(function(g) {
-    b.set(db.collection('user_tickets').doc(), {
-      user_id: userId, grade: g, status: ticketStatus, postback_id: postbackId,
-      earned_at: now, confirmed_at: ticketStatus === 'active' ? now : null, expires_at: null,
-    });
-    b.set(db.collection('ticket_transactions').doc(), { user_id: userId, ticket_grade: g, type: 'earn', postback_id: postbackId, created_at: now });
-  });
-  return b.commit().then(function() { return tk; });
+  /* 티켓 1장 = 1문서라 장수가 많으면 한 배치(500건)를 넘는다 — 200장씩 나눠 쓴다. */
+  var chain = Promise.resolve();
+  for (var ci = 0; ci < grades.length; ci += 200) {
+    (function(chunk) {
+      chain = chain.then(function() {
+        var b = db.batch();
+        chunk.forEach(function(g) {
+          b.set(db.collection('user_tickets').doc(), {
+            user_id: userId, grade: g, status: ticketStatus, postback_id: postbackId,
+            earned_at: now, confirmed_at: ticketStatus === 'active' ? now : null, expires_at: null,
+          });
+          b.set(db.collection('ticket_transactions').doc(), { user_id: userId, ticket_grade: g, type: 'earn', postback_id: postbackId, created_at: now });
+        });
+        return b.commit();
+      });
+    })(grades.slice(ci, ci + 200));
+  }
+  return chain.then(function() { return tk; });
 }
 
 // 구매확정 — 같은 구매건(postback_id)의 가지급(pending) 티켓들을 등급 티켓(active)으로
