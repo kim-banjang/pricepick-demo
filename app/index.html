@@ -19473,7 +19473,7 @@ function ppTicketCombo(won) {
   var w = Math.max(0, Math.round(Number(won) || 0));
   var unit = PP_TV.bronze;
   if (!w || !(unit > 0)) return [];
-  /* 자투리 규칙 미확정 — 2026-10-14. 10원으로 나눠떨어지지 않으면 일단 올림(1장 더). */
+  /* 자투리는 올림(1장 더 받는 쪽) — 2026-10-14 김반장 확정. 10원으로 나눠떨어지지 않으면 1장 더. */
   return [{ grade: PP_TICKET_GRADE, count: Math.ceil(w / unit) }];
 }
 
