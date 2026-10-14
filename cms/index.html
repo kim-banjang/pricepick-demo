@@ -8067,6 +8067,7 @@ auth.onAuthStateChanged(function(user) {
 function loadAllData() {
   if (window.mtInjectStatusTags) window.mtInjectStatusTags();
   if (window.mtLoadStatuses) window.mtLoadStatuses();
+  ppAllBegin();
   loadDashboardStats();
   setTimeout(function() {
     loadGifticonProducts();
@@ -8096,6 +8097,7 @@ function loadAllData() {
     loadPointAttendance();
     loadPointPolicy();
     loadRevenueStats();
+    ppAllEnd();
   }, 300);
 }
 
@@ -8112,12 +8114,17 @@ function loadAllData() {
              docs 는 받는 쪽마다 새 배열이라, 한쪽이 sort 로 뒤집어도 다른 쪽이 흔들리지 않는다
              (대시보드가 snap.docs.sort() 를 제자리에서 돌린다).
 
-   ⚠ 한 번 읽은 값을 그 화면이 살아 있는 동안 돌려쓴다. 저장 뒤 목록을 새로 그려야 하면
-     ppAllDrop(컬렉션) 으로 버리고 다시 부른다.
+   ⚠ 나눠 쓰는 것은 loadAllData() 가 로더를 한꺼번에 돌리는 그 한 번뿐이다(ppAllBegin ~ ppAllEnd).
+     그 밖에서 부르면 예전처럼 그때그때 새로 읽는다 — 저장·지급·삭제 뒤에 로더를 다시 부르는
+     자리가 많아서, 캐시를 오래 들고 있으면 그 자리마다 옛 값이 그려진다.
    ⚠ 읽기가 실패하면 기억해 두지 않는다 — 다음에 부르는 쪽이 다시 시도한다.
      받는 쪽의 .catch 는 그대로라 화면마다 쓰던 오류 표시가 그대로 돈다.
    ══════════════════════════════════════════════════════════════════════ */
 var PP_COL_CACHE = {};
+var PP_COL_CACHE_ON = false;
+function ppAllBegin() { PP_COL_CACHE = {}; PP_COL_CACHE_ON = true; }
+/* 로더들이 읽기를 모두 시작한 뒤 끈다. 이미 나눠 준 약속(promise)은 그대로 끝까지 돈다. */
+function ppAllEnd() { PP_COL_CACHE_ON = false; PP_COL_CACHE = {}; }
 function ppSnapLike(rows) {
   var docs = rows.map(function (r) { return { id: r.id, data: function () { return r.data; } }; });
   return {
@@ -8128,6 +8135,7 @@ function ppSnapLike(rows) {
   };
 }
 function ppAll(col) {
+  if (!PP_COL_CACHE_ON) return db.collection(col).get();
   if (!PP_COL_CACHE[col]) {
     PP_COL_CACHE[col] = db.collection(col).get().then(function (snap) {
       var rows = [];
@@ -8146,6 +8154,7 @@ window.ppAllDrop = ppAllDrop;
 /* 같은 값 비교(equality where)는 전수에서 걸러도 결과가 같다 — 그 밭이 없는 문서는
    파이어스토어도 빼고 아래 비교도 뺀다. 범위·정렬 조건은 그대로 질의한다. */
 function ppAllWhere(col, field, value) {
+  if (!PP_COL_CACHE_ON) return db.collection(col).where(field, '==', value).get();
   return ppAll(col).then(function (snap) {
     return ppSnapLike(snap.docs.filter(function (d) { return d.data()[field] === value; })
       .map(function (d) { return { id: d.id, data: d.data() }; }));
