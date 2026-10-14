@@ -1819,9 +1819,9 @@ window.CMS_FEATURES = {
           <tbody>
             <tr>
               <td><span class="tk-bronze">브론즈</span></td>
-              <td id="tv-cur-bronze">100원</td>
+              <td id="tv-cur-bronze">10원</td>
               <td>
-                <input class="form-input tv-input" type="number" id="tv-bronze" min="0" step="1" value="100" data-orig="100" data-name="브론즈" oninput="tvOnInput('bronze')">
+                <input class="form-input tv-input" type="number" id="tv-bronze" min="0" step="1" value="10" data-orig="10" data-name="브론즈" oninput="tvOnInput('bronze')">
                 <span class="tv-unit">원</span>
                 <div class="tv-rounded-note" id="tv-rounded-bronze"></div>
               </td>
@@ -1829,9 +1829,9 @@ window.CMS_FEATURES = {
             </tr>
             <tr>
               <td><span class="tk-silver">실버</span></td>
-              <td id="tv-cur-silver">1,000원</td>
+              <td id="tv-cur-silver">100원</td>
               <td>
-                <input class="form-input tv-input" type="number" id="tv-silver" min="0" step="1" value="1000" data-orig="1000" data-name="실버" oninput="tvOnInput('silver')">
+                <input class="form-input tv-input" type="number" id="tv-silver" min="0" step="1" value="100" data-orig="100" data-name="실버" oninput="tvOnInput('silver')">
                 <span class="tv-unit">원</span>
                 <div class="tv-rounded-note" id="tv-rounded-silver"></div>
               </td>
@@ -1839,9 +1839,9 @@ window.CMS_FEATURES = {
             </tr>
             <tr>
               <td><span class="tk-gold">골드</span></td>
-              <td id="tv-cur-gold">2,000원</td>
+              <td id="tv-cur-gold">200원</td>
               <td>
-                <input class="form-input tv-input" type="number" id="tv-gold" min="0" step="1" value="2000" data-orig="2000" data-name="골드" oninput="tvOnInput('gold')">
+                <input class="form-input tv-input" type="number" id="tv-gold" min="0" step="1" value="200" data-orig="200" data-name="골드" oninput="tvOnInput('gold')">
                 <span class="tv-unit">원</span>
                 <div class="tv-rounded-note" id="tv-rounded-gold"></div>
               </td>
@@ -3355,6 +3355,10 @@ window.CMS_FEATURES = {
               <span class="ds-tag calc" style="margin-left:auto">실시간 계산</span>
             </div>
             <div style="display:flex;gap:12px;align-items:flex-end">
+              <div style="flex:1">
+                <label style="font-size:11px;color:var(--text-2);font-weight:600;display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:.4px">제휴몰</label>
+                <select id="tk-sim-mall" class="form-select" onchange="tkSimulate()" style="width:100%"></select>
+              </div>
               <div style="flex:1">
                 <label style="font-size:11px;color:var(--text-2);font-weight:600;display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:.4px">구매 확정가 (원)</label>
                 <input id="tk-sim-input" type="number" class="search-box" value="154000" placeholder="예: 50000" oninput="tkSimulate()" style="min-width:0;width:100%">
@@ -5197,24 +5201,41 @@ document.addEventListener('DOMContentLoaded', applyTicketIcons);
 
 let currentRole = 'superadmin';
 
-// ── 티켓 시뮬레이터 (Greedy 알고리즘) ──
-// ⚠️ 정책 문서 문구·표(등급별 적립 기준)는 그대로 두고, 이 실계산 위젯만
-// settings/ticket_value를 따라가게 한다(2026-08-12, 정책 확정 전 구현용 —
-// 확정은 김반장·이부장 상의 후). 기준 배수(×50)는 기존 정책값(브론즈 100원↔5,000원)에서 그대로 가져왔다.
-const TK_ACCRUAL_MULT = 50;
+// ── 티켓 시뮬레이터 — 마스터 정책서 공식(taAccrualSplit, 티켓 적립 설정의 taGreedy 와 같은 셈) ──
+// 적립액 = 구매확정금액 × 고른 제휴몰의 적립률(settings/ticket_accrual), 큰 단위(골드)부터 채우고
+// 브론즈 단가 미만 잔돈은 버린다. 적립률은 몰마다 CMS 설정에서 읽는다.
+let tkSimAcc = null, tkSimLoading = false;
+function tkSimFillMalls() {
+  if (tkSimAcc || tkSimLoading || !window.taLoadAccrualRates) return;
+  tkSimLoading = true;
+  window.taLoadAccrualRates().then(function(acc) {
+    tkSimAcc = acc;
+    const sel = document.getElementById('tk-sim-mall');
+    if (sel) {
+      const codes = Object.keys(acc.rates).filter(function(c) {
+        return typeof acc.rates[c] === 'number' && (c === 'coupang_direct' || acc.applied[c] === true);
+      }).sort(function(a, b) { return (a === 'coupang_direct' ? -1 : b === 'coupang_direct' ? 1 : 0); });
+      sel.innerHTML = codes.map(function(c) {
+        const nm = String(acc.nameOf[c] || c).replace(/&/g, '&amp;').replace(/</g, '&lt;');
+        return '<option value="' + c + '">' + nm + '</option>';
+      }).join('');
+    }
+    tkSimulate();
+  }).catch(function(e) { console.error('tkSimFillMalls', e); }).finally(function() { tkSimLoading = false; });
+}
 function tkSimulate() {
   const input = document.getElementById('tk-sim-input');
   const result = document.getElementById('tk-sim-result');
   if (!input || !result) return;
-  let amount = parseInt(input.value) || 0;
-  if (amount < 1) { result.style.display = 'none'; return; }
-  const orig = amount;
-  const v = window.TA_TICKET_VALUE || { bronze:100, silver:1000, gold:2000 };
-  const goldUnit = v.gold * TK_ACCRUAL_MULT, silverUnit = v.silver * TK_ACCRUAL_MULT, bronzeUnit = v.bronze * TK_ACCRUAL_MULT;
-  const gold   = Math.floor(amount / goldUnit);   amount -= gold * goldUnit;
-  const silver = Math.floor(amount / silverUnit); amount -= silver * silverUnit;
-  const bronze = Math.floor(amount / bronzeUnit); amount -= bronze * bronzeUnit;
-  const remainder = amount;
+  if (!tkSimAcc) { tkSimFillMalls(); result.style.display = 'none'; return; }
+  const orig = parseInt(input.value) || 0;
+  const sel = document.getElementById('tk-sim-mall');
+  const mallRate = sel && sel.value ? tkSimAcc.rates[sel.value] : null;
+  const sp = (orig > 0 && window.taAccrualSplit) ? window.taAccrualSplit(orig, mallRate) : null;
+  if (!sp) { result.style.display = 'none'; return; }
+  const v = window.TA_TICKET_VALUE;
+  const gold = sp.gold, silver = sp.silver, bronze = sp.bronze;
+  const remainder = sp.remainder;
   const reward = gold * v.gold + silver * v.silver + bronze * v.bronze;
   const rate = orig > 0 ? (reward / orig * 100).toFixed(2) : '0.00';
 
@@ -5222,7 +5243,7 @@ function tkSimulate() {
   if (gold > 0)   html += `<span class="tk-gold" style="margin-right:6px">골드 ${gold}장</span>`;
   if (silver > 0) html += `<span class="tk-silver" style="margin-right:6px">실버 ${silver}장</span>`;
   if (bronze > 0) html += `<span class="tk-bronze" style="margin-right:6px">브론즈 ${bronze}장</span>`;
-  if (!html)      html = '<span style="color:var(--text-2)">지급 티켓 없음 (' + bronzeUnit.toLocaleString() + '원 미만)</span>';
+  if (!html)      html = '<span style="color:var(--text-2)">지급 티켓 없음 (' + v.bronze.toLocaleString() + '원 미만)</span>';
 
   result.innerHTML = `
     <div style="font-size:11px;color:var(--text-2);margin-bottom:8px">${orig.toLocaleString()}원 구매 시 지급</div>
@@ -13702,9 +13723,9 @@ var TA_LP_CONVERT_LABEL = '익익월 6일 확정 후';
 var TA_CONVERT_DAYS = {};   // { code: 일수 } — 화면(저장 전 편집분 포함) 값
 
 var TA_UNITS = [                                           // ticket_grades 시드의 환산가치와 동일
-  { name: '골드',   value: 2000 },
-  { name: '실버',   value: 1000 },
-  { name: '브론즈', value: 100  },
+  { name: '골드',   value: 200 },
+  { name: '실버',   value: 100 },
+  { name: '브론즈', value: 10  },
 ];
 var TA_PREVIEW_KRW = 100000;
 
@@ -13713,7 +13734,7 @@ var TA_PREVIEW_KRW = 100000;
    문서가 없거나 조회 실패 시 지금까지 코드에 박혀 있던 값을 그대로 기본값으로 쓴다.
    로드되면 TA_UNITS·RLT_REWARD_TYPES를 같은 객체 참조를 유지한 채 그 자리에서 갱신한다 —
    이미 다른 곳에서 이 배열/객체를 들고 있어도(참조) 새로 만들 필요 없이 값만 바뀐다. */
-var TA_TICKET_VALUE = { bronze: 100, silver: 1000, gold: 2000, event: 40 };
+var TA_TICKET_VALUE = { bronze: 10, silver: 100, gold: 200, event: 40 };
 window.TA_TICKET_VALUE = TA_TICKET_VALUE; // 다른 <script> 블록(tkSimulate 등)에서도 참조 — 이 객체는 그 자리에서 값만 갱신되므로 재노출 불필요
 var TA_TICKET_VALUE_CACHE = null;
 function taLoadTicketValue() {
@@ -13760,6 +13781,53 @@ function taGreedy(amountKrw, ratePct) {
     }
   }
   return parts.length ? parts.join(' · ') : '<span>지급 없음</span>';
+}
+
+/* 구매 → 티켓 (마스터 정책서 공식) — taGreedy 와 같은 셈을 수량으로 돌려준다. 앱 greedyTickets 와도 같다.
+   적립액 = ⌊구매확정금액 × 그 제휴몰의 적립률 / 100⌋. 큰 단위(골드)부터 채우고 실버 → 브론즈,
+   브론즈 단가 미만으로 남는 잔돈은 버린다. 단가는 TA_TICKET_VALUE(settings/ticket_value).
+   적립률을 모르면 null — 비율을 지어내지 않는다. */
+function taAccrualSplit(amountKrw, ratePct) {
+  if (typeof ratePct !== 'number' || !(ratePct >= 0)) return null;
+  var rest = Math.floor((Number(amountKrw) || 0) * ratePct / 100);
+  var out = { gold: 0, silver: 0, bronze: 0, total: 0, earn: rest, remainder: 0 };
+  ['gold', 'silver', 'bronze'].forEach(function(g) {
+    var unit = TA_TICKET_VALUE[g];
+    if (!(unit > 0) || rest < unit) return;
+    out[g] = Math.floor(rest / unit);
+    rest -= out[g] * unit;
+  });
+  out.remainder = rest;
+  out.total = out.gold + out.silver + out.bronze;
+  return out;
+}
+window.taAccrualSplit = taAccrualSplit;
+/* 몰별 적립률 — settings/ticket_accrual.rates(코드별 %). 포스트백에는 몰 이름만 있어서
+   링크프라이스 카탈로그(머천트명 → 머천트ID)로 코드를 되찾는다. 쿠팡은 coupang_direct. */
+function taLoadAccrualRates() {
+  return Promise.all([
+    db.collection('settings').doc('ticket_accrual').get(),
+    db.collection('settings').doc('linkprice_catalog').get(),
+  ]).then(function(res) {
+    var acc = (res[0].exists && res[0].data()) || {};
+    var cat = (res[1].exists && res[1].data()) || {};
+    var byName = { '쿠팡': 'coupang_direct' }, nameOf = { 'coupang_direct': '쿠팡' };
+    (cat.merchants || []).forEach(function(x) {
+      var n = String(x['머천트명'] || '').trim();
+      if (!n || !x['머천트ID']) return;
+      byName[n] = 'lp:' + x['머천트ID'];
+      nameOf['lp:' + x['머천트ID']] = n;
+    });
+    return { rates: acc.rates || {}, applied: acc.applied || {}, byName: byName, nameOf: nameOf };
+  });
+}
+window.taLoadAccrualRates = taLoadAccrualRates;
+function taRateForMall(acc, mallName) {
+  if (!acc) return null;
+  var n = String(mallName || '').trim();
+  var code = acc.byName[n] || (n.toLowerCase() === 'coupang' ? 'coupang_direct' : null);
+  var r = code ? acc.rates[code] : null;
+  return (typeof r === 'number' && r >= 0) ? r : null;
 }
 
 /* 커미션(모바일)은 링크프라이스가 내려주는 자유 문자열이다 — 「1.4%」가 보통이지만
@@ -16906,7 +16974,7 @@ window.dmAdd = function(col) {
     // 포스트백 1건 = 랜덤 티켓 1묶음 — 대기(pending)든 확정(confirmed)이든 이 시점에 Greedy
     // 등급환산으로 등급 티켓을 만든다. 대기면 status:pending(가지급), 확정이면 바로 active.
     if (col === 'postbacks' && (data.status === 'pending' || data.status === 'confirmed')) {
-      return dmAccruePostbackTickets(ref.id, data.user_id, data.purchase_amount || 0, data.status === 'confirmed' ? 'active' : 'pending');
+      return dmAccruePostbackTickets(ref.id, data.user_id, data.purchase_amount || 0, data.status === 'confirmed' ? 'active' : 'pending', data.mall_name);
     }
     return null;
   }).then(function(tk) {
@@ -16923,12 +16991,17 @@ window.dmAdd = function(col) {
   });
 };
 
-// 포스트백 1건 = "랜덤 티켓" 1묶음. 구매금액을 Greedy 등급환산(scenGreedy)해 등급 티켓 N장을
+// 포스트백 1건 = "랜덤 티켓" 1묶음. 구매금액에 그 몰의 적립률을 곱해 정책서 공식(scenGreedy)으로 등급 티켓 N장을
 // 만들되, 아직 확정 전(대기/pending)이면 status:'pending'(가지급)으로, 바로 확정(confirmed)이면
 // status:'active'로 생성한다. ticket_transactions(type:'earn')는 티켓이 실제로 새로 만들어지는
 // 이 시점에만 1회 기록 — 이후 확정 전환(dmConfirmPostbackTickets)은 상태만 바꿀 뿐 새로 만들지 않는다.
-function dmAccruePostbackTickets(postbackId, userId, amount, status) {
-  var tk = scenGreedy(amount);
+function dmAccruePostbackTickets(postbackId, userId, amount, status, mallName) {
+  return taLoadAccrualRates().then(function(acc) {
+    return dmAccrueWithRate(postbackId, userId, amount, status, taRateForMall(acc, mallName));
+  });
+}
+function dmAccrueWithRate(postbackId, userId, amount, status, ratePct) {
+  var tk = scenGreedy(amount, ratePct);
   if (!tk.total) return Promise.resolve(tk);
   var ticketStatus = status || 'active';
   var now = FS.Timestamp.now();
@@ -18035,8 +18108,7 @@ window.dmSeedInject = function() {
     'pb-sara-001':  { user_id:'user-sara-001',  mall_name:'11번가', mall_domain:'11st.co.kr', purchase_amount:25000,  status:'confirmed', created_at:ago(30), confirmed_at:ago(23) },
   };
   // Tickets (active, pending, expired, used)
-  // 등급 구성은 scenGreedy와 같은 규칙 — 단위 수 = floor(금액/5,000), 큰 단위부터.
-  // 67,000원은 13단위(65,000원)라 실버1+브론즈3이고 2,000원은 버린다(2026-09-03 정정).
+  // 아래 등급 구성은 2026-08-12에 폐기된 고정 구간 방식으로 만든 옛 시드 값이다. 지금 공식은 scenGreedy.
   var TK = [
     ['tk-frank-01','user-frank-001','gold',  'active','pb-frank-001', ago(60),ago(53),future(305)],
     ['tk-frank-02','user-frank-001','silver','active','pb-frank-001', ago(60),ago(53),future(305)],
@@ -18233,14 +18305,13 @@ function dmShowToast(msg, isErr) {
 // ════════════════════════════════════════════════
 var SCEN_MALL = { name:'쿠팡', domain:'coupang.com', rate:0.03 };
 
-// Greedy 등급환산 정책 확정값: 골드=100,000원당 1장 · 실버=50,000원당 1장 · 브론즈=5,000원당 1장.
-// 큰 단위부터 차감, 남는 금액은 버림(반올림 아님). 예: 67,000원 → 실버1(50,000)+브론즈3(15,000), 2,000원 버림.
-// (과거엔 Math.ceil로 단가 이하 금액을 올림 처리해 브론즈가 1장 더 나오는 버그가 있었음 — floor로 수정)
-// scenGreedy는 [데이터 관리 → 시나리오 채우기](dmFillFromScenarios)가 그대로 쓰는 공용 함수라 유지.
-function scenGreedy(amount) {
-  var u = Math.floor((amount||0)/5000);
-  var g = Math.floor(u/20), r = u%20, s = Math.floor(r/10), b = r%10;
-  return { gold:g, silver:s, bronze:b, total:g+s+b };
+// 구매 → 티켓은 마스터 정책서 공식 하나만 쓴다(taAccrualSplit, taGreedy 와 같은 셈):
+// 적립액 = 구매확정금액 × 그 제휴몰의 적립률(settings/ticket_accrual), 큰 단위(골드)부터 채우고
+// 실버 → 브론즈 순, 브론즈 단가 미만 잔돈은 버린다.
+// scenGreedy는 [데이터 관리 → 포스트백 추가 · 시나리오 채우기]가 쓰는 공용 함수라 이름은 유지한다.
+// 적립률을 모르면 0장이다.
+function scenGreedy(amount, ratePct) {
+  return taAccrualSplit(amount, ratePct) || { gold:0, silver:0, bronze:0, total:0, earn:0, remainder:0 };
 }
 
 // (시나리오 관리 CMS UI는 제거됨 — demo_scenarios 문서는 scripts/seed-demo.js로만 등록.
@@ -18254,7 +18325,8 @@ window.dmFillFromScenarios = function() {
       dmShowToast('등록된 시나리오가 없습니다. scripts/seed-demo.js로 demo_scenarios를 먼저 채워주세요.', true);
       return;
     }
-    return db.collection('users').get().then(function(uSnap){
+    return Promise.all([db.collection('users').get(), taLoadAccrualRates()]).then(function(res){
+      var uSnap = res[0], scenRate = taRateForMall(res[1], SCEN_MALL.name);
       var hasScn = uSnap.docs.some(function(d){ return d.id.indexOf('user-scn-')===0; });
       if (hasScn && !confirm('이미 채워진 시나리오 데이터가 있습니다. 중복을 막으려면 [전체 비우기] 후 채우는 것을 권장합니다. 그래도 계속할까요?')) return;
       if (btn) { btn.textContent='채우는 중…'; btn.disabled=true; }
@@ -18275,7 +18347,7 @@ window.dmFillFromScenarios = function() {
         PB[pbId] = { user_id:uid, mall_name:SCEN_MALL.name, mall_domain:SCEN_MALL.domain, purchase_amount:amount, order_id:orderId, status:(linked?'confirmed':'pending'), created_at:created, confirmed_at:confirmedAt };
         CL[clId] = { user_id:uid, mall_name:SCEN_MALL.name, mall_domain:SCEN_MALL.domain, clicked_at:created };
         CPM['cpm-scn-'+sid] = { user_id:uid, click_id:clId, postback_id:pbId, created_at:created };
-        var tk = scenGreedy(amount), tkStatus = linked ? 'active' : 'pending', grades = [];
+        var tk = scenGreedy(amount, scenRate), tkStatus = linked ? 'active' : 'pending', grades = [];
         for (var gi=0; gi<tk.gold; gi++) grades.push('gold');
         for (var si2=0; si2<tk.silver; si2++) grades.push('silver');
         for (var bi=0; bi<tk.bronze; bi++) grades.push('bronze');
@@ -18339,9 +18411,9 @@ var RLT_REWARD_TYPES = {
   miss:          { label: '꽝',         unit: '',   unitValue: 0    },
   point:         { label: '포인트',      unit: 'P',  unitValue: 0.1  },  /* 10P = 1원 */
   event_ticket:  { label: '이벤트 티켓',  unit: '장', unitValue: 40   },  /* 잭팟 룰렛 1회 기대값 기준 */
-  bronze_ticket: { label: '브론즈 티켓',  unit: '장', unitValue: 100  },
-  silver_ticket: { label: '실버 티켓',    unit: '장', unitValue: 1000 },
-  gold_ticket:   { label: '골드 티켓',    unit: '장', unitValue: 2000 }
+  bronze_ticket: { label: '브론즈 티켓',  unit: '장', unitValue: 10   },
+  silver_ticket: { label: '실버 티켓',    unit: '장', unitValue: 100  },
+  gold_ticket:   { label: '골드 티켓',    unit: '장', unitValue: 200  }
 };
 var RLT_KINDS = {
   daily: {

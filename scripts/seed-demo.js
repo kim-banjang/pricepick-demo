@@ -65,9 +65,9 @@ const AFFILIATE_MALLS = {
   'iherb':     { mall_code:'iherb',     name:'아이허브',     commission_rate:0.050, domain:'iherb.com',    active:true, created_at:ts('2026-01-01') },
 };
 const TICKET_GRADES = {
-  bronze: { grade_code:'bronze', accrual_unit_krw:5000,   reward_value_krw:100,  sort_order:1 },
-  silver: { grade_code:'silver', accrual_unit_krw:50000,  reward_value_krw:1000, sort_order:2 },
-  gold:   { grade_code:'gold',   accrual_unit_krw:100000, reward_value_krw:2000, sort_order:3 },
+  bronze: { grade_code:'bronze', accrual_unit_krw:5000,   reward_value_krw:10,   sort_order:1 },
+  silver: { grade_code:'silver', accrual_unit_krw:50000,  reward_value_krw:100,  sort_order:2 },
+  gold:   { grade_code:'gold',   accrual_unit_krw:100000, reward_value_krw:200,  sort_order:3 },
 };
 const GRADE_EXCHANGE_RULES = {
   'rule-bronze-to-silver': { from_grade:'bronze', to_grade:'silver', from_qty:10, to_qty:1, created_at:ts('2026-01-01') },
