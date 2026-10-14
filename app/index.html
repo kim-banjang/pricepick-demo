@@ -8190,38 +8190,13 @@ body.interactive-mode #ip-nav { display: block; }
 
 /* ===== v5_15 누락 화면 CSS 이식 (출처: Screenflow, _s10 2026-05-25) ===== */
 .home-ticket-card {
+    /* 2026-10-14 재디자인 — 교환소 상단 카드와 같은 티켓형(.tx-tk)을 쓴다. 이 래퍼는 여백·그림자만 맡는다 */
     margin: 16px;
-    border-radius: 18px;
-    background: #3D2A78;
-    color: #fff;
-    padding: 18px 18px 14px;
-    box-shadow: 0 8px 24px rgba(61,42,120,0.22);
+    filter: drop-shadow(0 12px 18px rgba(61,42,120,.26));
   }
-.htc-head {
-    display: flex; justify-content: space-between; align-items: center;
-    font-size: var(--fs-caption); color: rgba(255,255,255,0.85); margin-bottom: 6px;
-  }
-.htc-head .htc-more {
-    font-size: var(--fs-caption); color: rgba(255,255,255,0.45); font-weight: 400;
-  }
-.htc-total {
-    font-size: var(--fs-number); font-weight: 700; letter-spacing: -0.5px;
-    margin-bottom: 14px;
-    display: flex; align-items: center; justify-content: space-between;
-  }
-.htc-total b { color: #fff; font-weight: 700; }
-.htc-total span { font-size: var(--fs-body); font-weight: 700; color: rgba(255,255,255,0.7); margin-left: 4px; }
-.htc-total .htc-tickets-grp { display: flex; align-items: baseline; }
-.htc-total .htc-point {
-    display: inline-flex; align-items: center; gap: 6px;
-    background: rgba(255,255,255,0.12); border-radius: 999px;
-    padding: 5px 12px 5px 5px; margin: 0;
-    font-size: var(--fs-label); font-weight: 700; color: #fff; letter-spacing: -0.3px;
-  }
-.htc-total .htc-point-ico {
-    width: 22px; height: 22px; margin: 0;
-    display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;
-  }
+.home-ticket-card .htc-cta { margin-top: 10px; }
+.tx-tk-head { position: relative; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.tx-tk-head .htc-more { font-size: var(--fs-caption); font-weight: 500; color: rgba(255,255,255,.5); cursor: pointer; white-space: nowrap; }
 .htc-grades {
     display: grid; grid-template-columns: repeat(3, 1fr);
     gap: 8px; margin-bottom: 14px;
@@ -8432,8 +8407,8 @@ body.interactive-mode #ip-nav { display: block; }
      왼쪽 본권 = 보유 티켓(주인공), 오른쪽 절취선 너머 스텁 = 이벤트 티켓·포인트.
      절취선 위아래 홈은 mask로 실제로 뚫는다(배경색을 덮어 흉내 내지 않음) → 그림자는 바깥 래퍼의 drop-shadow가 맡는다.
      색은 홈 「내 보유 티켓」 카드(#3D2A78) 계열로 맞췄다. */
-  .tx-hold-card { --stub:132px; --notch:11px; filter:drop-shadow(0 12px 18px rgba(61,42,120,.28)); }
-  .tx-tk { position:relative; display:flex; min-height:124px; border-radius:20px; color:#fff; overflow:hidden;
+  .tx-hold-card { filter:drop-shadow(0 12px 18px rgba(61,42,120,.28)); }
+  .tx-tk { --stub:132px; --notch:11px; position:relative; display:flex; min-height:124px; border-radius:20px; color:#fff; overflow:hidden;
     background:
       radial-gradient(130% 150% at 0% 0%, rgba(155,120,255,.42) 0%, rgba(155,120,255,0) 58%),
       linear-gradient(135deg, #4B35A6 0%, #3D2A78 58%, #2C1E5C 100%);
@@ -8641,7 +8616,7 @@ body.interactive-mode #ip-nav { display: block; }
 .home-mission-card.hmc-roulette .hmc-title { color: #6E2247; }
 .home-mission-card.hmc-invite .hmc-title { color: #1D3F66; }
 .home-mission-card.hmc-streak .hmc-title { color: #3B2570; }
-.hmc-reward { font-size: var(--fs-caption); font-weight: 400; background: rgba(255,255,255,.85); border-radius: 999px; padding: 3px 9px; }
+.hmc-reward { font-size: var(--fs-caption); font-weight: 400; background: rgba(255,255,255,.85); border-radius: 999px; padding: 3px 7px; white-space: nowrap; letter-spacing: -0.2px; }
 .hmc-reward b { font-weight: 400; }
 .home-mission-card.hmc-attend .hmc-reward { color: #C77F00; }
 .home-mission-card.hmc-roulette .hmc-reward { color: #E0509B; }
@@ -9713,13 +9688,17 @@ window.PP_FEATURES = {
           </div>
           <!-- 보유 티켓 카드 -->
           <div class="home-ticket-card">
-            <div class="htc-head">
-              <span>내 보유 티켓</span>
-              <span class="htc-more">자세히 ›</span>
-            </div>
-            <div class="htc-total">
-              <div class="htc-tickets-grp"><b>0</b><span>장</span></div>
-              <span class="htc-point"><span class="htc-point-ico"><svg width="22" height="22" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="pcoin_htc" x1="0" y1="0" x2="0.35" y2="1"><stop offset="49.9%" stop-color="#FFE066"/><stop offset="50%" stop-color="#F0AE00"/></linearGradient><linearGradient id="pcoinf_htc" x1="0" y1="0" x2="0.35" y2="1"><stop offset="49.9%" stop-color="#FFDA3D"/><stop offset="50%" stop-color="#FFC400"/></linearGradient></defs><ellipse cx="32" cy="57" rx="17" ry="3" fill="#E6A800" opacity="0.16"/><circle cx="32" cy="30" r="27" fill="url(#pcoin_htc)"/><circle cx="32" cy="30" r="21.5" fill="url(#pcoinf_htc)"/><path d="M23.35 42.37H29.16V34.61H33.29C38.97 34.61 42.45 31.26 42.45 26.14C42.45 21.11 39.04 17.63 33.46 17.63H23.35ZM29.16 30.00V22.34H32.23C34.97 22.34 36.44 23.81 36.44 26.14C36.44 28.46 34.97 30.00 32.23 30.00Z" fill="#FFE477" stroke="#E0A600" stroke-width="0.6" paint-order="stroke" stroke-linejoin="round"/></svg></span>0P</span>
+            <!-- 2026-10-14 재디자인: 교환소 상단 카드와 같은 티켓형. 본권 = 보유 티켓, 스텁 = 이벤트 티켓·포인트 -->
+            <div class="tx-tk">
+              <div class="tx-tk-main">
+                <svg class="tx-tk-mark" viewBox="0 0 512 512" aria-hidden="true"><path d="M306.6,106.8l-49.5,49.5,2.4,2.4c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-2.4-2.4-138.6,138.6c-3.7,3.7-3.7,9.6,0,13.3l75.5,75.5c3.7,3.7,9.6,3.7,13.3,0l138.6-138.6-2.3-2.3c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l2.3,2.3,49.5-49.5c3.7-3.7,3.7-9.6,0-13.3l-75.5-75.5c-3.7-3.7-9.6-3.7-13.3,0ZM335.6,234.8c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM322.9,222.1c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM310.2,209.4c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM297.6,196.7c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM284.9,184.1c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM272.2,171.4c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7Z" fill="currentColor"/></svg>
+                <div class="tx-tk-head"><div class="tx-tk-label"><span class="i18n"><span class="ko">내 보유 티켓</span><span class="vi">Vé của tôi</span></span></div><span class="htc-more"><span class="i18n"><span class="ko">자세히 ›</span><span class="vi">Chi tiết ›</span></span></span></div>
+                <div class="tx-tk-num"><b id="htc-ticket">0</b><span class="tx-tk-unit"><span class="i18n"><span class="ko">장</span><span class="vi">vé</span></span></span></div>
+              </div>
+              <div class="tx-tk-stub">
+                <div class="tx-tk-row"><svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="tki_htc" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#C9AAFF"/><stop offset="100%" stop-color="#845EEE"/></linearGradient></defs><path d="M306.6,106.8l-49.5,49.5,2.4,2.4c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-2.4-2.4-138.6,138.6c-3.7,3.7-3.7,9.6,0,13.3l75.5,75.5c3.7,3.7,9.6,3.7,13.3,0l138.6-138.6-2.3-2.3c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l2.3,2.3,49.5-49.5c3.7-3.7,3.7-9.6,0-13.3l-75.5-75.5c-3.7-3.7-9.6-3.7-13.3,0ZM335.6,234.8c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM322.9,222.1c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM310.2,209.4c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM297.6,196.7c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM284.9,184.1c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7ZM272.2,171.4c1.4,1.4,1.4,3.5,0,4.9h0c-1.4,1.4-3.5,1.4-4.9,0l-4.7-4.7c-1.4-1.4-1.4-3.5,0-4.9h0c1.4-1.4,3.5-1.4,4.9,0l4.7,4.7Z" fill="url(#tki_htc)"/><path d="M316.2,155.8l12.1,6.2c.8.4,1.8.3,2.4-.4l9.6-9.6c1.4-1.4,3.8-.2,3.5,1.8l-2.1,13.5c-.1.9.3,1.8,1.1,2.2l12.1,6.2c1.8.9,1.4,3.6-.6,3.9l-13.5,2.1c-.9.1-1.6.8-1.7,1.7l-2.1,13.5c-.3,2-3,2.4-3.9.6l-6.2-12.1c-.4-.8-1.3-1.3-2.2-1.1l-13.5,2.1c-2,.3-3.2-2.1-1.8-3.5l9.6-9.6c.6-.6.8-1.6.4-2.4l-6.2-12.1c-.9-1.8,1-3.7,2.8-2.8Z" fill="rgba(255,255,255,0.95)"/><path d="M180.7,298.9l-5.2,5.2,27.4,27.4-4.7,4.7-27.4-27.4-5.2,5.2-4.2-4.2,15.1-15.1,4.2,4.2ZM215.3,319.1l-4.7,4.7-31.6-31.6,4.7-4.7,31.6,31.6ZM231.9,296.8c1.9,1.9,1.9,3.9,0,5.8l-9.9,9.9c-1.9,1.9-3.8,1.8-5.7,0l-25.8-25.8c-1.9-1.9-2-3.8-.1-5.7l9.9-9.9c1.9-1.9,3.9-1.9,5.8,0l7.4,7.4-4.7,4.7-6.2-6.2-6.1,6.1,23.5,23.5,6.1-6.1-6.6-6.6,4.7-4.7,7.8,7.8ZM254.4,280l-5.2,5.2-20.1-8.1,14.1,14.1-4.7,4.7-31.6-31.6,4.7-4.7,13.4,13.4-8.1-18.6,5.2-5.2.2.2,8.6,21.4,23.6,9.2ZM269.5,265l-13.1,13.1-31.6-31.6,13-13,4.2,4.2-8.3,8.3,9.2,9.2,7.1-7.1,4.1,4.1-7.1,7.1,9.9,9.9,8.4-8.4,4.2,4.2ZM259,220.6l-5.2,5.2,27.4,27.4-4.7,4.7-27.4-27.4-5.2,5.2-4.2-4.2,15.1-15.1,4.2,4.2Z" fill="rgba(255,255,255,0.95)"/></svg><div class="tx-tk-txt"><span class="tx-tk-k"><span class="i18n"><span class="ko">이벤트 티켓</span><span class="vi">Vé sự kiện</span></span></span><span class="tx-tk-v"><b id="htc-event">0</b><i><span class="i18n"><span class="ko">장</span><span class="vi">vé</span></span></i></span></div></div>
+                <div class="tx-tk-row"><svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="pcoin_htc" x1="0" y1="0" x2="0.35" y2="1"><stop offset="49.9%" stop-color="#FFE066"/><stop offset="50%" stop-color="#F0AE00"/></linearGradient><linearGradient id="pcoinf_htc" x1="0" y1="0" x2="0.35" y2="1"><stop offset="49.9%" stop-color="#FFDA3D"/><stop offset="50%" stop-color="#FFC400"/></linearGradient></defs><ellipse cx="32" cy="57" rx="17" ry="3" fill="#E6A800" opacity="0.16"/><circle cx="32" cy="30" r="27" fill="url(#pcoin_htc)"/><circle cx="32" cy="30" r="21.5" fill="url(#pcoinf_htc)"/><path d="M23.35 42.37H29.16V34.61H33.29C38.97 34.61 42.45 31.26 42.45 26.14C42.45 21.11 39.04 17.63 33.46 17.63H23.35ZM29.16 30.00V22.34H32.23C34.97 22.34 36.44 23.81 36.44 26.14C36.44 28.46 34.97 30.00 32.23 30.00Z" fill="#FFE477" stroke="#E0A600" stroke-width="0.6" paint-order="stroke" stroke-linejoin="round"/></svg><div class="tx-tk-txt"><span class="tx-tk-k"><span class="i18n"><span class="ko">포인트</span><span class="vi">Điểm</span></span></span><span class="tx-tk-v"><b id="htc-point">0</b><i>P</i></span></div></div>
+              </div>
             </div>
 
             <div class="htc-cta" data-pp-feature="exchange-entry">
@@ -9778,7 +9757,7 @@ window.PP_FEATURES = {
             <div style="flex-shrink:0; width:48px; height:48px; border-radius:14px; background:rgba(255,255,255,.14); display:flex; align-items:center; justify-content:center; font-size:26px;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="13" rx="2"/><path d="M3 12h18"/><path d="M12 8v13"/><path d="M12 8S10.5 4 8 4a2.5 2.5 0 0 0 0 5h4z"/><path d="M12 8s1.5-4 4-4a2.5 2.5 0 0 1 0 5h-4z"/></svg></div>
             <div style="flex:1; min-width:0;">
               <div style="font-size:var(--fs-caption); font-weight:700; color:#FFD75E; letter-spacing:1.4px;">RANDOM GIFT BOX</div>
-              <div style="font-size:var(--fs-caption); font-weight:800; color:#FFFFFF; margin-top:3px; white-space:nowrap;" id="gb-banner-headline"><span class="i18n"><span class="ko">이벤트 티켓을 모아 골드 티켓에 도전하세요</span><span class="vi">Gom vé sự kiện để thử vận với vé Gold</span></span></div>
+              <div style="font-size:var(--fs-caption); font-weight:800; color:#FFFFFF; margin-top:3px; white-space:nowrap;" id="gb-banner-headline"><span class="i18n"><span class="ko">이벤트 티켓을 모아 티켓 선물에 도전하세요</span><span class="vi">Gom vé sự kiện để thử nhận quà vé</span></span></div>
               <div style="font-size:var(--fs-caption); font-weight:400; color:#FFFFFF; margin-top:3px; white-space:nowrap;" id="gb-banner-owned"></div>
             </div>
             <div style="flex-shrink:0; font-size:var(--fs-section); font-weight:700; color:#FFD75E; line-height:1; opacity:.75;" aria-hidden="true">&rsaquo;</div>
@@ -9790,7 +9769,7 @@ window.PP_FEATURES = {
             <svg width="48" height="48" viewBox="0 0 100 100" style="flex-shrink:0; position:relative;"><defs><linearGradient id="mwRim" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#FFE9A8"></stop><stop offset="45%" stop-color="#E0A800"></stop><stop offset="100%" stop-color="#8A6200"></stop></linearGradient></defs><circle cx="50" cy="52" r="42" fill="url(#mwRim)"></circle><circle cx="50" cy="52" r="36" fill="#14092F"></circle><g transform="translate(50,52)"><path d="M0,0 L0,-33 A33,33 0 0 1 28.58,-16.5 Z" fill="#E6A800"></path><path d="M0,0 L28.58,-16.5 A33,33 0 0 1 28.58,16.5 Z" fill="#2A1A5E"></path><path d="M0,0 L28.58,16.5 A33,33 0 0 1 0,33 Z" fill="#8B5A2B"></path><path d="M0,0 L0,33 A33,33 0 0 1 -28.58,16.5 Z" fill="#221546"></path><path d="M0,0 L-28.58,16.5 A33,33 0 0 1 -28.58,-16.5 Z" fill="#845EEE"></path><path d="M0,0 L-28.58,-16.5 A33,33 0 0 1 0,-33 Z" fill="#C9C9C9"></path></g><circle cx="50" cy="52" r="11" fill="url(#mwRim)"></circle><circle cx="50" cy="52" r="8" fill="#14092F"></circle><path d="M50 2 C45 12 42 16 42 20 A8 8 0 0 0 58 20 C58 16 55 12 50 2 Z" fill="#FFD75E" stroke="#14092F" stroke-width="2.4"></path></svg>
             <div style="flex:1; min-width:0; position:relative;">
               <div style="font-size:var(--fs-caption); font-weight:700; color:#FFD75E; letter-spacing:1.4px;">JACKPOT ROULETTE</div>
-              <div style="font-size:var(--fs-caption); font-weight:800; color:#FFFFFF; margin-top:3px; white-space:nowrap;" id="jp-banner-headline">이벤트 티켓을 모아 골드 티켓에 도전하세요</div>
+              <div style="font-size:var(--fs-caption); font-weight:800; color:#FFFFFF; margin-top:3px; white-space:nowrap;" id="jp-banner-headline">이벤트 티켓을 모아 티켓 선물에 도전하세요</div>
               <div style="font-size:var(--fs-caption); font-weight:400; color:#FFFFFF; margin-top:3px; white-space:nowrap;" id="jp-banner-owned"></div>
             </div>
             <div style="position:relative; flex-shrink:0; font-size:var(--fs-section); font-weight:700; color:#FFD75E; line-height:1; opacity:.75;" aria-hidden="true">&rsaquo;</div>
@@ -15326,15 +15305,15 @@ function jpRenderHomeBanner() {
   var has = n > 0;
   var h = document.getElementById('jp-banner-headline');
   var o = document.getElementById('jp-banner-owned');
-  if (h) h.textContent = has ? '이벤트 티켓 1장으로 골드 티켓 도전' : '이벤트 티켓을 모아 골드 티켓에 도전하세요';
+  if (h) h.textContent = has ? '이벤트 티켓 1장으로 티켓 선물 도전' : '이벤트 티켓을 모아 티켓 선물에 도전하세요';
   if (o) o.textContent = has ? ('내 보유 이벤트 티켓 ' + n + '장') : '';
   /* 랜덤 선물 상자 배너(2026-08-27 신설) — 잭팟 배너와 같은 값을 쓴다. 한/베 둘 다 갱신한다. */
   var gh = document.getElementById('gb-banner-headline');
   var go = document.getElementById('gb-banner-owned');
   if (gh) {
     var ghKo = gh.querySelector('.ko'), ghVi = gh.querySelector('.vi');
-    if (ghKo) ghKo.textContent = has ? '이벤트 티켓 1장으로 골드 티켓 도전' : '이벤트 티켓을 모아 골드 티켓에 도전하세요';
-    if (ghVi) ghVi.textContent = has ? 'Mở bằng 1 vé sự kiện để thử vận với vé Gold' : 'Gom vé sự kiện để thử vận với vé Gold';
+    if (ghKo) ghKo.textContent = has ? '이벤트 티켓 1장으로 티켓 선물 도전' : '이벤트 티켓을 모아 티켓 선물에 도전하세요';
+    if (ghVi) ghVi.textContent = has ? 'Mở bằng 1 vé sự kiện để thử nhận quà vé' : 'Gom vé sự kiện để thử nhận quà vé';
   }
   if (go) go.textContent = has ? ('내 보유 이벤트 티켓 ' + n + '장') : '';
 }
@@ -19103,20 +19082,25 @@ function refreshHomeData() {
 }
 
 function renderHomeTickets() {
-  var tot = document.querySelector('#pw-10 .htc-tickets-grp b');
-  if (tot) tot.textContent = PP.tickets.ticket || 0;
+  var tot = document.getElementById('htc-ticket');
+  if (tot) tot.textContent = (PP.tickets.ticket || 0).toLocaleString('ko-KR');
+  renderHomeEvent();
 
   if (typeof renderExGifticonSummary === 'function') renderExGifticonSummary();
   renderWithdrawLoss();
 }
 
 function renderHomePoints() {
-  var el = document.querySelector('#pw-10 .htc-point');
+  var el = document.getElementById('htc-point');
   if (!el) return;
-  var ico = el.querySelector('.htc-point-ico');
-  el.textContent = PP.points.toLocaleString('ko-KR') + 'P';
-  if (ico) el.insertBefore(ico, el.firstChild);
+  el.textContent = (PP.points || 0).toLocaleString('ko-KR');
   renderWithdrawLoss();
+}
+/* 홈 보유 카드 스텁의 이벤트 티켓 — 선물 상자 열기·지급처럼 이벤트 티켓만 바뀌는 경우도
+   renderMyTicketCard 에서 같이 부른다 */
+function renderHomeEvent() {
+  var ev = document.getElementById('htc-event');
+  if (ev) ev.textContent = (PP.tickets.event || 0).toLocaleString('ko-KR');
 }
 
 function refreshBenefitBadges() {
@@ -19130,6 +19114,7 @@ function refreshBenefitBadges() {
 function renderMyTicketCard() {
   // 홈 잭팟 배너 문구는 보유 이벤트 티켓 수에 따라 갈리므로 잔량이 바뀔 때마다 같이 갱신
   if (window.ppRenderJackpotBanner) window.ppRenderJackpotBanner();
+  if (typeof renderHomeEvent === 'function') renderHomeEvent();
   // 티켓 교환 상단 보유 카드도 같이 갱신 — 화면 진입 후 자산이 늦게 로드돼도 반영된다
   if (typeof renderTicketExchangeHome === 'function') renderTicketExchangeHome();
   var card = document.querySelector('#pw-20 .my-ticket-card');
