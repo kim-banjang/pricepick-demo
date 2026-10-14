@@ -4782,7 +4782,7 @@ window.CMS_FEATURES = {
       <div class="form-group"><label class="form-label">상품명</label><input class="form-input" placeholder="예: 스타벅스 아메리카노 Tall"></div>
       <div class="form-row">
         <div class="form-group"><label class="form-label">원가 (벤더 매입가)</label><input class="form-input" type="number" placeholder="4500"></div>
-        <div class="form-group"><label class="form-label">교환 등급</label><select class="form-select"><option>브론즈</option><option>실버</option><option>골드</option></select></div>
+        <div class="form-group"><label class="form-label">교환 티켓</label><select class="form-select"><option>티켓</option></select></div>
       </div>
       <div class="form-row">
         <div class="form-group"><label class="form-label">필요 티켓 수</label><input class="form-input" type="number" placeholder="8"></div>
@@ -5089,9 +5089,7 @@ function tkSimulate() {
   const rate = orig > 0 ? (reward / orig * 100).toFixed(2) : '0.00';
 
   let html = '';
-  if (gold > 0)   html += `<span class="tk-gold" style="margin-right:6px">골드 ${gold}장</span>`;
-  if (silver > 0) html += `<span class="tk-silver" style="margin-right:6px">실버 ${silver}장</span>`;
-  if (bronze > 0) html += `<span class="tk-bronze" style="margin-right:6px">브론즈 ${bronze}장</span>`;
+  if (bronze > 0) html += `<span class="tk-bronze" style="margin-right:6px">티켓 ${bronze}장</span>`;
   if (!html)      html = '<span style="color:var(--text-2)">지급 티켓 없음 (' + v.bronze.toLocaleString() + '원 미만)</span>';
 
   result.innerHTML = `
@@ -6259,7 +6257,7 @@ window.giSaveImageEdit = giSaveImageEdit;
     "기프티콘 상품 등록":"Đăng ký sản phẩm Gifticon",
     "등록 전 체크: 벤더사(Giftishow 등)와 사전 계약 + API 연동 필수. 마진 -10% 미만은 적자.":"Kiểm tra trước đăng ký: Hợp đồng trước với nhà cung cấp (Giftishow v.v.) + Bắt buộc liên kết API. Dưới -10% margin là lỗ.",
     "원가 (벤더 매입가)":"Giá vốn (giá nhập nhà cung cấp)",
-    "교환 등급":"Hạng đổi","필요 티켓 수":"Số vé cần","초기 재고":"Tồn kho ban đầu",
+    "교환 티켓":"Vé đổi","필요 티켓 수":"Số vé cần","초기 재고":"Tồn kho ban đầu",
     "유효 기간 (발급 후 N일)":"Hạn dùng (N ngày sau phát hành)","벤더사":"Nhà cung cấp",
     "등록되었습니다.":"Đã đăng ký.",
     "문의 상세 / 답변":"Chi tiết hỏi đáp / Trả lời","카카오 연동 &nbsp;·&nbsp; 2026-05-11 14:21":"Liên kết Kakao &nbsp;·&nbsp; 2026-05-11 14:21",
@@ -7659,11 +7657,9 @@ Object.assign(KO2VI,{
         </select>
       </div>
       <div>
-        <label style="font-size:12px;font-weight:600;color:var(--text-2);display:block;margin-bottom:5px;">필요 등급 *</label>
+        <label style="font-size:12px;font-weight:600;color:var(--text-2);display:block;margin-bottom:5px;">필요 티켓 *</label>
         <select id="pp-gi-grade" class="form-input" style="appearance:auto;">
-          <option value="bronze">브론즈</option>
-          <option value="silver">실버</option>
-          <option value="gold">골드</option>
+          <option value="bronze">티켓</option>
         </select>
       </div>
       <div>
@@ -8027,8 +8023,9 @@ function loadDashboardStats() {
   Promise.all([taLoadTicketValue(), ppAllWhere('ticket_transactions', 'type', 'earn')]).then(function(res) {
     var snap = res[1];
     setKpi('kpi-tickets', snap.size.toLocaleString('ko-KR'));
+    /* 옛 브론즈·실버·골드 기록은 티켓 1·10·20장 × 티켓 1장 값, 이벤트 티켓은 그 값 그대로 */
     var cost = 0;
-    snap.docs.forEach(function(d){ cost += (TA_TICKET_VALUE[d.data().ticket_grade]||0); });
+    snap.docs.forEach(function(d){ var g = d.data().ticket_grade, w = TK_KIND_WEIGHT[g]; cost += w ? w * TA_TICKET_VALUE.bronze : (TA_TICKET_VALUE[g]||0); });
     setKpi('kpi-ticket-cost', kpiWon(cost));
     window.__ppTicketCost = cost; recompNet();
   }).catch(function(){});
@@ -8041,10 +8038,11 @@ function loadDashboardStats() {
     var n = snap.docs.filter(function(d){ var s=d.data().status; return s && s!=='completed' && s!=='done'; }).length;
     setKpi('kpi-draws', n.toLocaleString('ko-KR'));
   }).catch(function(){ setKpi('kpi-draws','0'); });
-  /* 기프티콘 판매 수익(마진) */
-  ppAll('gifticon_exchanges').then(function(snap) {
+  /* 기프티콘 판매 수익(마진) — 판매가는 상품 실제 가격(없으면 티켓 장수 × 티켓 1장 값) */
+  Promise.all([ppAll('gifticon_exchanges'), ppAll('gifticons'), taLoadTicketValue()]).then(function(res) {
+    var snap = res[0], priceOf = cmsGiPriceMap(res[1]);
     var rev = 0;
-    snap.docs.filter(window.ppNotProbe).forEach(function(d){ var v=(d.data().count_used||1)*2000; rev += v - Math.round(v*0.8); });
+    snap.docs.filter(window.ppNotProbe).forEach(function(d){ var v=cmsGiSaleWon(d.data(), priceOf); rev += v - Math.round(v*0.8); });
     setKpi('kpi-gifticon-rev', kpiWon(rev));
     window.__ppGifticonRev = rev; recompNet();
   }).catch(function(){});
@@ -8119,7 +8117,7 @@ function gipLoadTicketValue() {
     .then(function(d){ GIP_TV = (d.exists && d.data()) || null; return GIP_TV; })
     .catch(function(e){ console.error('ticket_value', e); GIP_TV = null; return null; });
 }
-var GIP_GRADE_KO = { bronze:'브론즈', silver:'실버', gold:'골드' };
+var GIP_GRADE_KO = { bronze:'티켓', silver:'실버', gold:'골드' };
 
 /* ── 판매가격 ──
    포인츠허브와 똑같이 판매가격은 원화로 받고 원화로 저장한다. 티켓은 화면에서 계산해
@@ -8129,23 +8127,13 @@ var GIP_GRADE_KO = { bronze:'브론즈', silver:'실버', gold:'골드' };
    (「교환 비율은 환산가치 1:1 등가」 — 티켓 가치 설정 화면), 나누어떨어지는 가장 높은
    등급을 써서 장수를 가장 적게 보인다. 어느 등급으로도 딱 떨어지지 않으면 가장 작은
    단위(브론즈)로 올린다. */
-/* 원화 → 티켓 환산은 큰 등급부터 채운다(골드 → 실버 → 브론즈). 앱과 같은 규칙이다.
-   예) 6,300원 → 골드 31장 + 실버 1장 · 4,500원 → 골드 22장 + 실버 1장 */
+/* 원화 → 티켓 = 가격 ÷ 티켓 1장 값(2026-10-14 티켓 1종 통합, 앱과 같은 규칙).
+   자투리는 올림(1장 더 받는 쪽) — 2026-10-14 김반장 확정. 예) 6,300원 → 티켓 630장 */
 function gipComboFromWon(won) {
   if (!GIP_TV || typeof won !== 'number' || won <= 0) return [];
-  var rest = Math.round(won), out = [];
-  ['gold', 'silver', 'bronze'].forEach(function(g) {
-    var unit = GIP_TV[g];
-    if (typeof unit !== 'number' || unit <= 0 || rest < unit) return;
-    var k = Math.floor(rest / unit);
-    out.push({ grade: g, count: k });
-    rest -= k * unit;
-  });
-  if (rest > 0) {
-    var b = out.filter(function(x){ return x.grade === 'bronze'; })[0];
-    if (b) b.count += 1; else out.push({ grade: 'bronze', count: 1 });
-  }
-  return out;
+  var unit = GIP_TV.bronze;
+  if (typeof unit !== 'number' || unit <= 0) return [];
+  return [{ grade: 'bronze', count: Math.ceil(Math.round(won) / unit) }];
 }
 function gipComboText(c) {
   return c.map(function(x){ return (GIP_GRADE_KO[x.grade] || x.grade) + ' ' + x.count; }).join(' + ');
@@ -8161,8 +8149,9 @@ function gipPriceParts(g) {
   if (won !== null) {
     tk = gipTicketsFromWon(won);
   } else if (g.required_grade || g.required_count) {
-    tk = { grade: g.required_grade || 'bronze', count: g.required_count || 1 };
-    var u = GIP_TV && GIP_TV[tk.grade];
+    /* 옛 등급·장수는 티켓 장수로(실버 1장 = 10장, 골드 1장 = 20장) */
+    tk = { grade: 'bronze', count: (g.required_count || 1) * (TK_KIND_WEIGHT[g.required_grade || 'bronze'] || 1) };
+    var u = GIP_TV && GIP_TV.bronze;
     if (typeof u === 'number') won = u * tk.count;
   }
   return { won: won, tk: tk };
@@ -8302,7 +8291,7 @@ var GI_BULK_ROWS = [];
 var GI_BULK_FILE = '';
 var GI_BULK_PAGE = 1;
 var GI_BULK_SIZE = 20;
-var GI_GRADE_MAP = { '브론즈':'bronze', '실버':'silver', '골드':'gold', bronze:'bronze', silver:'silver', gold:'gold' };
+var GI_GRADE_MAP = { '티켓':'bronze', '브론즈':'bronze', '실버':'silver', '골드':'gold', bronze:'bronze', silver:'silver', gold:'gold' };   // 옛 CSV(등급명)도 읽는다
 
 window.btTab = function(which) {
   var isNew = which === 'new';
@@ -8503,7 +8492,7 @@ window.giBulkDownloadTemplate = function() {
 };
 
 /* ── Gifticon Exchanges ── */
-var GEX_GRADE_KO = { bronze: '브론즈', silver: '실버', gold: '골드' };
+var GEX_GRADE_KO = { bronze: '티켓', silver: '실버', gold: '골드' };
 /* ── 2. 구매내역 (포인츠허브 구조) ──
    칸: 구매일(날짜 아래 시각) · 주문번호 · 이름(아래 닉네임) · 상품명 · 상품코드 · 유효기간 · 상태 */
 /* 상품명에 브랜드가 이미 들어 있으면 또 붙이지 않는다 — 「GS25 GS25 3,000원 금액권」처럼 겹친다. */
@@ -9171,6 +9160,21 @@ var TK_EVENT_CATEGORY_LABELS = {
 var TK_KIND_WEIGHT = { bronze: 1, silver: 10, gold: 20 };
 function tkKindOf(grade) { return TK_KIND_WEIGHT[grade] ? 'ticket' : grade; }
 function tkWeightOf(grade) { return TK_KIND_WEIGHT[grade] || 1; }
+/* 기프티콘 한 건의 판매가 — 상품 실제 가격(gifticons.price)을 쓰고, 가격이 없으면 쓴 티켓 장수 × 티켓 1장 값.
+   예전 count_used × 2000(골드 단가 고정)은 티켓 1종 통합으로 장수가 커진 새 기록에서 수익을 터무니없이 부풀려 걷었다(2026-10-14). */
+function cmsGiPriceMap(snap) {
+  var m = {};
+  (snap && snap.docs ? snap.docs : []).forEach(function(d) { var pr = d.data().price; if (typeof pr === 'number' && pr > 0) m[d.id] = pr; });
+  return m;
+}
+function cmsGiTicketsUsed(x) {
+  var tu = (x && x.tickets_used && x.tickets_used.length) ? x.tickets_used : [{ grade: (x && x.grade_used) || 'bronze', count: (x && x.count_used) || 1 }];
+  return tu.reduce(function(a, t) { return a + (t.count || 0) * (TK_KIND_WEIGHT[t.grade] || 1); }, 0);
+}
+function cmsGiSaleWon(x, priceOf) {
+  var pr = priceOf && x && priceOf[x.gifticon_id];
+  return pr ? pr : cmsGiTicketsUsed(x) * (TA_TICKET_VALUE.bronze || 0);
+}
 var TK_GRADE_CHIPS = { ticket:'<span class="tk-chip bronze bare">티켓</span>', event:'<span class="tk-chip event bare">이벤트 티켓</span>' };
 var TK_STATUS_MAP = {
   earn: '<span style="display:inline-block;font-size:11px;font-weight:700;color:#1f9d57;background:#e6f7ec;border:1px solid #b6e6c8;border-radius:20px;padding:3px 10px">보유 중</span>',
@@ -10344,9 +10348,9 @@ window.giCancelExchange = function(id) {
 };
 
 /* ── sec-gifticon-cancel ── gifticon_exchanges where status=='cancelled' */
-var GCANCEL_GRADE_KO = { bronze:'브론즈', silver:'실버', gold:'골드' };
-/* ── PH 자리 = 등급 티켓 (김반장 확정 2026-09-16) ──
-   포인츠허브의 PH 자리에 프라이스픽은 등급 티켓을 놓는다. 기프티콘 교환은 전부 등급
+var GCANCEL_GRADE_KO = { bronze:'티켓', silver:'실버', gold:'골드' };
+/* ── PH 자리 = 티켓 (김반장 확정 2026-09-16, 2026-10-14 티켓 1종 통합) ──
+   포인츠허브의 PH 자리에 프라이스픽은 티켓을 놓는다. 기프티콘 교환은 전부
    티켓으로 이뤄지고(gifticon_exchanges.grade_used·count_used) 포인트로 결제되는 경로는
    없다. 원화는 판매가격과 같은 방식으로 아래에 병기한다 — 환산 값은 settings/ticket_value
    한 곳만 읽는다(gipPriceHtml과 같은 출처). */
@@ -10360,12 +10364,10 @@ function ticketLines(parts, negative) {
   parts = (parts || []).filter(function(x){ return x && x.count; });
   if (!parts.length) return '<span class="ph-hold">—</span>';
   var sign = negative ? '−' : '';
-  var won = 0, unknown = false;
-  var rows = parts.map(function(x) {
-    var u = tvUnit(x.grade);
-    if (u === null) unknown = true; else won += u * x.count;
-    return '<div>' + sign + (GIP_GRADE_KO[x.grade] || x.grade) + ' ' + x.count + '</div>';
-  }).join('');
+  /* 티켓 1종 통합(2026-10-14) — 옛 브론즈·실버·골드 기록은 티켓 1·10·20장으로 합쳐 한 줄 */
+  var n = parts.reduce(function(a, x) { return a + x.count * (TK_KIND_WEIGHT[x.grade] || 1); }, 0);
+  var u = tvUnit('bronze'), unknown = (u === null), won = unknown ? 0 : u * n;
+  var rows = '<div>' + sign + '티켓 ' + n.toLocaleString('ko-KR') + '</div>';
   var sub = unknown
     ? '<div class="gip-price-none">(환산값 미설정)</div>'
     : '<div class="gip-price-won">(' + sign + won.toLocaleString('ko-KR') + '원)</div>';
@@ -10388,7 +10390,7 @@ function holdCell(uid) {
   var h = GC_HOLD[uid];
   if (!h) return '<span class="ph-hold">—</span>';
   var parts = [], any = false;
-  ['gold', 'silver', 'bronze'].forEach(function(g) {
+  ['bronze', 'silver', 'gold'].forEach(function(g) {
     var c = h[g] || 0;
     if (!c) return;
     any = true;
@@ -10522,10 +10524,8 @@ function gsParts(x) {
     : (x.grade_used ? [{ grade: x.grade_used, count: x.count_used || 1 }] : []);
 }
 function gsWon(x) {
-  return gsParts(x).reduce(function (a, t) {
-    var u = tvUnit(t.grade);
-    return a + ((u === null) ? 0 : u * (t.count || 0));
-  }, 0);
+  var u = tvUnit('bronze');
+  return (u === null) ? 0 : u * cmsGiTicketsUsed(x);
 }
 
 function gsRender() {
@@ -10545,22 +10545,18 @@ function gsRender() {
   };
 
   var view = (lv === 'month') ? 'month' : 'day';
-  var buckets = {}, sum = { cnt: 0, won: 0, gold: 0, silver: 0, bronze: 0 }, cancelled = 0, rows = [];
+  var buckets = {}, sum = { cnt: 0, won: 0, ticket: 0 }, cancelled = 0, rows = [];
   GSREV_ROWS.forEach(function (x) {
     var d = (x.exchanged_at && x.exchanged_at.toDate) ? x.exchanged_at.toDate() : null;
     if (!d || !inScope(d)) return;
     if (x.status === 'cancelled') { cancelled++; return; }   /* 취소 건은 매출에서 뺀다 */
     rows.push(x);
     var k = gsKey(d, view);
-    var b = buckets[k] || (buckets[k] = { key: k, cnt: 0, gold: 0, silver: 0, bronze: 0, won: 0 });
+    var b = buckets[k] || (buckets[k] = { key: k, cnt: 0, ticket: 0, won: 0 });
     b.cnt++; sum.cnt++;
-    gsParts(x).forEach(function (t) {
-      var c = t.count || 0;
-      if (b[t.grade] === undefined) return;
-      b[t.grade] += c; sum[t.grade] += c;
-      var u = tvUnit(t.grade);
-      if (u !== null) { b.won += u * c; sum.won += u * c; }
-    });
+    var n = cmsGiTicketsUsed(x), u = tvUnit('bronze');
+    b.ticket += n; sum.ticket += n;
+    if (u !== null) { b.won += u * n; sum.won += u * n; }
   });
 
   var set = function (id, v) { var e = document.getElementById(id); if (e) e.textContent = v; };
@@ -10568,7 +10564,7 @@ function gsRender() {
   set('gs-kpi-count', sum.cnt.toLocaleString('ko-KR') + '건');
   set('gs-kpi-count-sub', scopeLabel);
   set('gs-kpi-won', sum.won.toLocaleString('ko-KR') + '원');
-  set('gs-kpi-won-sub', '골드 ' + sum.gold + ' · 실버 ' + sum.silver + ' · 브론즈 ' + sum.bronze);
+  set('gs-kpi-won-sub', '티켓 ' + sum.ticket.toLocaleString('ko-KR') + '장');
   set('gs-kpi-cancel', cancelled.toLocaleString('ko-KR') + '건');
   set('gs-kpi-cancel-sub', '매출에서 뺀 건');
 
@@ -10630,7 +10626,7 @@ function gsRender() {
   }
   tbody.innerHTML = keys.map(function (k) {
     var b = buckets[k];
-    var parts = [{ grade: 'gold', count: b.gold }, { grade: 'silver', count: b.silver }, { grade: 'bronze', count: b.bronze }];
+    var parts = [{ grade: 'bronze', count: b.ticket }];
     var next = (lv === 'month') ? 'day' : 'detail';
     return '<tr>'
       + '<td class="gs-drillable" onclick="gsDrillTo(&quot;' + next + '&quot;,&quot;' + ppEsc(b.key) + '&quot;)">' + ppEsc(b.key) + '</td>'
@@ -16036,9 +16032,10 @@ function loadRevenueStats() {
     db.collection('postbacks').get(),
     db.collection('gifticon_exchanges').get(),
     db.collection('ticket_transactions').where('type','==','earn').get(),
-    taLoadTicketValue()   // settings/ticket_value 반영(2026-08-12)
+    taLoadTicketValue(),   // settings/ticket_value 반영(2026-08-12)
+    db.collection('gifticons').get()
   ]).then(function(res) {
-    var pbSnap = res[0], giSnap = res[1], tkSnap = res[2];
+    var pbSnap = res[0], giSnap = res[1], tkSnap = res[2], giPriceOf = cmsGiPriceMap(res[4]);
     var giDocs = giSnap.docs.filter(window.ppNotProbe);
     var GRADE_VAL = res[3];
     var byMall = {}, totalGMV = 0, totalCommission = 0, totalSettled = 0;
@@ -16063,11 +16060,11 @@ function loadRevenueStats() {
 
     /* 기프티콘 판매 마진 */
     var giValue=0, giCost=0, giMargin=0;
-    giDocs.forEach(function(doc){ var v=(doc.data().count_used||1)*2000; var c=Math.round(v*0.8); giValue+=v; giCost+=c; giMargin+=(v-c); });
+    giDocs.forEach(function(doc){ var v=cmsGiSaleWon(doc.data(), giPriceOf); var c=Math.round(v*0.8); giValue+=v; giCost+=c; giMargin+=(v-c); });
 
-    /* 티켓 적립 비용(등급별) */
-    var tkCost={bronze:0,silver:0,gold:0}, tkCnt={bronze:0,silver:0,gold:0}, ticketCost=0;
-    tkSnap.docs.forEach(function(doc){ var g=doc.data().ticket_grade; if(GRADE_VAL[g]!=null){ tkCost[g]+=GRADE_VAL[g]; tkCnt[g]++; ticketCost+=GRADE_VAL[g]; } });
+    /* 티켓 적립 비용 — 옛 브론즈·실버·골드 기록은 티켓 1·10·20장으로 센다(이벤트 티켓은 제외, 종전과 같음) */
+    var tkCnt = 0, ticketCost = 0;
+    tkSnap.docs.forEach(function(doc){ var w = TK_KIND_WEIGHT[doc.data().ticket_grade]; if (w) { tkCnt += w; ticketCost += w * GRADE_VAL.bronze; } });
 
     var totalRevenue = totalCommission + giMargin;
     var net = totalRevenue - ticketCost;
@@ -16091,12 +16088,10 @@ function loadRevenueStats() {
         + '<tr><td>기프티콘 매입원가 <span style="font-size:11px;color:var(--text-3)">(도매)</span></td><td style="text-align:right;color:var(--amber)">− ' + ppN(giCost) + '원</td></tr>'
         + '<tr style="border-top:2px solid var(--border)"><td style="font-weight:700">기프티콘 판매 수익 (마진)</td><td style="font-weight:700;color:var(--success)">+ ' + ppN(giMargin) + '원</td></tr>';
     }
-    /* [2] 티켓 적립 비용 — 등급별 */
+    /* [2] 티켓 적립 비용 */
     if (statsTbodies[2]) {
-      statsTbodies[2].innerHTML = ['bronze','silver','gold'].map(function(g){
-        var nm={bronze:'브론즈',silver:'실버',gold:'골드'}[g];
-        return '<tr><td><span class="tk-chip ' + g + ' bare">' + nm + '</span></td><td style="text-align:center">' + ppN(tkCnt[g]) + '장</td><td>' + ppN(GRADE_VAL[g]) + '원</td><td style="color:var(--amber)">' + ppN(tkCost[g]) + '원</td></tr>';
-      }).join('') + '<tr style="border-top:2px solid var(--border)"><td style="font-weight:700">합계</td><td style="text-align:center">—</td><td>—</td><td style="font-weight:700;color:var(--amber)">' + ppN(ticketCost) + '원</td></tr>';
+      statsTbodies[2].innerHTML = '<tr><td><span class="tk-chip bronze bare">티켓</span></td><td style="text-align:center">' + ppN(tkCnt) + '장</td><td>' + ppN(GRADE_VAL.bronze) + '원</td><td style="color:var(--amber)">' + ppN(ticketCost) + '원</td></tr>'
+        + '<tr style="border-top:2px solid var(--border)"><td style="font-weight:700">합계</td><td style="text-align:center">—</td><td>—</td><td style="font-weight:700;color:var(--amber)">' + ppN(ticketCost) + '원</td></tr>';
     }
     /* [3] 순수익 종합 */
     if (statsTbodies[3]) {
@@ -16114,7 +16109,7 @@ function loadRevenueStats() {
       /* sec-revenue: 기프티콘 판매 내역 */
       var revGiItems = giDocs.map(function(doc) {
         var d = doc.data();
-        var val = (d.count_used||1) * 2000; var cost = Math.round(val * 0.8);
+        var val = cmsGiSaleWon(d, giPriceOf); var cost = Math.round(val * 0.8);
         return Object.assign({ _id: doc.id, _user: userMap[d.user_id], _val: val, _cost: cost, _margin: val-cost }, d);
       });
       REVGI_CTRL.setRows(revGiItems);
@@ -16515,7 +16510,7 @@ var DM_FIELDS = {
     { id:'name',          label:'상품명',     type:'text',   def:'아메리카노' },
     
     { id:'category',      label:'카테고리',   type:'text',   def:'카페' },
-    { id:'required_grade',label:'등급',       type:'select', opts:['bronze','silver','gold'], def:'bronze' },
+    { id:'required_grade',label:'티켓',       type:'select', opts:['bronze'], def:'bronze' },
     { id:'required_count',label:'필요장수',   type:'number', def:'2' },
     { id:'validity_days', label:'유효일수',   type:'number', def:'30' },
   ],
