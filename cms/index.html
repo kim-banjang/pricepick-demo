@@ -4981,8 +4981,10 @@ const _TK_COLORS = {
   event:  ['#C9AAFF','#845EEE','rgba(255,255,255,0.95)'],
   random: ['#FF6B55','#C8200A','rgba(255,255,255,0.95)'],
 };
+/* 티켓 1종 통합(2026-10-14) — 티켓 아이콘은 골드 티켓 그림(김반장 2026-10-15). 옛 등급 값도 같은 그림으로 */
+const _TK_ALIAS = { bronze: 'gold', silver: 'gold', ticket: 'gold' };
 function tkSVG(grade, size, uid) {
-  const [c1,c2,ic] = _TK_COLORS[grade] || _TK_COLORS.bronze;
+  const [c1,c2,ic] = _TK_COLORS[_TK_ALIAS[grade] || grade] || _TK_COLORS.gold;
   const w = size === 'large' ? 60 : 28;
   const qmark = grade === 'random' ? '<text x="220" y="370" font-family="Arial Black, Arial" font-size="270" font-weight="900" fill="rgba(255,255,255,0.5)" text-anchor="middle">?</text>' : '';
   return `<svg width="${w}" height="${w}" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="g${uid}" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="${c1}"/><stop offset="100%" stop-color="${c2}"/></linearGradient></defs><path d="${_TK_P1}" fill="url(#g${uid})"/><path d="${_TK_P2}" fill="${ic}"/><path d="${_TK_P3}" fill="${ic}"/>${qmark}</svg>`;
