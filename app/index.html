@@ -21162,7 +21162,16 @@ function mt21SetTickets(byGrade) {
   mt21RenderHold();
 }
 function mt21SetPoints(balance, groupList) {
-  MT21_HOLD.point = { count: balance || 0, groups: (groupList || []).map(function (g) { return { d: g.expiresAt, n: g.amt }; }), pending: 0 };
+  var groups = (groupList || []).map(function (g) { return { d: g.expiresAt, n: g.amt }; });
+  /* 잔액이 기준 — 적립 내역에서 역산한 남은 적립분이 잔액보다 많으면(교환 등 사용 기록이 내역에 안 남은
+     데모 자료) 그 차이만큼 오래된 묶음부터 쓴 것으로 친다. 안 그러면 「총 2,020P」 아래 22,000P 줄이 뜬다. */
+  var excess = groups.reduce(function (s, g) { return s + g.n; }, 0) - (balance || 0);
+  groups = groups.filter(function (g) {
+    if (excess <= 0) return true;
+    var used = Math.min(g.n, excess); g.n -= used; excess -= used;
+    return g.n > 0;
+  });
+  MT21_HOLD.point = { count: balance || 0, groups: groups, pending: 0 };
   mt21RenderHold();
 }
 function mt21ToggleDetail() { MT21_DETAIL_OPEN = !MT21_DETAIL_OPEN; mt21RenderHold(); }
