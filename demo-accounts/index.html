@@ -217,6 +217,10 @@ textarea.form-input{resize:vertical;min-height:64px;}
     </div>
   </div>
 
+  <div class="warn-box" id="quota-warn">
+    <strong>Firestore 하루 사용 한도를 다 썼습니다.</strong> <span>읽기·쓰기가 모두 막혀 있어 명부도 가상 데이터도 지금은 다룰 수 없습니다. 무료 한도는 미국 태평양 시간 자정(한국 시각 오후 4시, 11월 초 서머타임이 끝나면 오후 5시)에 다시 채워집니다.</span>
+  </div>
+
   <div class="warn-box" id="rule-warn">
     <strong>저장이 막혀 있습니다.</strong> Firestore 규칙에 <code>demo_accounts</code> 공개 규칙이 아직 게시되지 않았습니다.
     저장소의 <code>firestore.rules</code>에 규칙은 들어가 있으니, Firebase 콘솔 → Firestore Database → 규칙에서 한 번 게시하면 바로 열립니다.
@@ -377,8 +381,9 @@ textarea.form-input{resize:vertical;min-height:64px;}
 <script>
 'use strict';
 
-/* 프픽 데모와 같은 Firestore를 쓴다. 컬렉션은 demo_accounts 하나뿐이고,
-   그 컬렉션만 로그인 없이 읽고 쓰도록 규칙을 열었다(firestore.rules 참고).
+/* 프픽 데모와 같은 Firestore를 쓴다. 명부는 demo_accounts 이고, 가상 데이터는
+   user_tickets(티켓)·gifticon_exchanges(구매 내역)에 쓴다. 세 컬렉션 모두 로그인 없이
+   쓰도록 규칙을 열었다(firestore.rules 참고 — 읽기는 익명 로그인 뒤).
    보안이 필요 없는 명부라 공개로 둔다 — 김반장 확정. */
 firebase.initializeApp({
   apiKey: "AIzaSyCElUPJAitnMZxttVYjboV0j4s_qpErAgA",
@@ -608,6 +613,17 @@ function render() {
 function showRuleWarn(on) {
   document.getElementById('rule-warn').style.display = on ? 'block' : 'none';
 }
+function showQuotaWarn(on) {
+  document.getElementById('quota-warn').style.display = on ? 'block' : 'none';
+}
+/* Firestore 실패를 원인별로 가른다 — 한도 초과(resource-exhausted)를 규칙 탓으로 적으면
+   콘솔에서 규칙만 들여다보다 시간을 버린다(2026-10-15 실제로 그랬다). */
+function fsErrText(e) {
+  var c = e && e.code;
+  if (c === 'resource-exhausted') return L('Firestore 하루 한도 초과', 'Vượt hạn mức Firestore trong ngày') + ' (resource-exhausted)';
+  if (c === 'permission-denied') return L('규칙이 막음', 'Bị quy tắc chặn') + ' (permission-denied)';
+  return (c || (e && e.message) || String(e));
+}
 
 function load() {
   return db.collection(COL).orderBy('created_at', 'asc').get()
@@ -616,6 +632,7 @@ function load() {
         var x = d.data(); x._id = d.id; return x;
       });
       showRuleWarn(false);
+      showQuotaWarn(false);
       /* 닉네임·카카오는 저장해 둔 값을 쓰지 않는다 — 그릴 때마다 회원 정보를 새로 읽는다. */
       return fetchUsersByIds(ROWS.map(function (r) { return normRow(r).account_id; }))
         .then(function (map) { USERS = map; })
@@ -628,7 +645,12 @@ function load() {
     })
     .catch(function (e) {
       console.error('load', e);
-      if (e && e.code === 'permission-denied') {
+      if (e && e.code === 'resource-exhausted') {
+        showQuotaWarn(true);
+        document.getElementById('tbody').innerHTML = '<tr><td colspan="7" class="empty">한도가 다시 채워지면 여기에 명부가 뜹니다.</td></tr>';
+        document.getElementById('rowcards').innerHTML = '<div class="empty">한도가 다시 채워지면 여기에 명부가 뜹니다.</div>';
+        document.getElementById('cnt').textContent = '—';
+      } else if (e && e.code === 'permission-denied') {
         showRuleWarn(true);
         document.getElementById('tbody').innerHTML = '<tr><td colspan="7" class="empty">규칙이 게시되면 여기에 명부가 뜹니다.</td></tr>';
         document.getElementById('rowcards').innerHTML = '<div class="empty">규칙이 게시되면 여기에 명부가 뜹니다.</div>';
@@ -685,7 +707,7 @@ function saveAcc() {
     console.error('save', e);
     err.textContent = (e && e.code === 'permission-denied')
       ? '저장이 막혀 있습니다 — demo_accounts 규칙이 아직 게시되지 않았습니다.'
-      : L('저장 실패: ', 'Lưu thất bại: ') + (e.message || e);
+      : L('저장 실패: ', 'Lưu thất bại: ') + fsErrText(e);
     err.style.display = 'block';
   }).finally(function () {
     btn.disabled = false; btn.textContent = '저장';
@@ -818,7 +840,7 @@ function openInfo(uid) {
      · 상품은 브랜드와 가격대를 고르게 — 한 브랜드에 몰리지 않게,
        가격대 다섯 구간(1천 이하·5천 이하·2만 이하·5만 이하·그 위)을 돌아가며
      · 날짜는 최근 석 달에 흩는다
-     · 티켓 환산은 큰 등급부터(골드→실버→브론즈), 단가는 settings/ticket_value
+     · 티켓 환산은 가격 ÷ 티켓 1장 값(settings/ticket_value.bronze, 10원), 자투리는 올림
      · 주문번호는 PHTRX + YYYYMMDDHHmmss + 무작위 꼬리
 
    ⚠ 카카오 미연동·탈퇴 계정에는 구매 내역을 넣지 않는다 — 미연동은 기프티샵을
@@ -833,21 +855,15 @@ function seedOrderNo(d) {
   while (tail.length < 8) tail += Math.floor(Math.random() * 16).toString(16);
   return 'PHTRX' + stamp + tail;
 }
-/* 큰 등급부터 채운다 — 앱·CMS와 같은 규칙 */
+/* 앱(app/index.html)이 지금 쓰는 값 그대로 — 2026-10-14 티켓 1종 통합.
+   앱은 새 티켓을 grade:'bronze'(PP_TICKET_GRADE) 1문서 = 1장으로 쓰고, 옛 등급 문서는
+   한 문서를 10·20장으로 읽는다. 가상 데이터가 옛 등급으로 넣으면 앱에서 장수가 10·20배로 부푼다. */
+var SEED_TICKET_GRADE = 'bronze';
+/* 상품 가격 ÷ 티켓 1장 값, 자투리는 올림 — 앱 ppTicketCombo 와 같은 규칙 */
 function seedCombo(won, tv) {
-  var rest = Math.max(0, Math.round(won || 0)), out = [];
-  ['gold', 'silver', 'bronze'].forEach(function (g) {
-    var u = tv[g];
-    if (!u || rest < u) return;
-    var k = Math.floor(rest / u);
-    out.push({ grade: g, count: k });
-    rest -= k * u;
-  });
-  if (rest > 0) {
-    var b = out.filter(function (x) { return x.grade === 'bronze'; })[0];
-    if (b) b.count += 1; else out.push({ grade: 'bronze', count: 1 });
-  }
-  return out;
+  var w = Math.max(0, Math.round(won || 0)), unit = tv.bronze;
+  if (!w || !(unit > 0)) return [];
+  return [{ grade: SEED_TICKET_GRADE, count: Math.ceil(w / unit) }];
 }
 /* 브랜드와 가격대를 고르게 — 가격 구간을 돌아가며, 그 구간에서 아직 안 쓴 브랜드를 고른다 */
 function seedPickProducts(prodMap, howMany) {
@@ -961,7 +977,7 @@ window.runSeed = function () {
     return load();
   }).catch(function (e) {
     console.error('runSeed', e);
-    seedLog('<div class="sd-bad">' + esc(String(e.message || e)) + '</div>');
+    seedLog('<div class="sd-bad">' + esc(fsErrText(e)) + '</div>');
   }).finally(function () {
     btn.disabled = false; btn.textContent = L('넣기', 'Thêm');
   });
@@ -978,7 +994,7 @@ window.runSeed = function () {
     var jobs = Promise.resolve();
     var myBuy = 0, myTk = 0, notes = [];
 
-    /* 「비우고 새로」면 먼저 지운다 — 지우기는 관리자만 된다(규칙: delete if isAdmin). */
+    /* 「비우고 새로」면 먼저 지운다 — firestore.rules 가 user_tickets·gifticon_exchanges 지우기를 로그인 없이 열어 두었다. */
     if (wipe) {
       jobs = jobs.then(function () {
         return Promise.all([
@@ -1000,7 +1016,7 @@ window.runSeed = function () {
           return chain.then(function () {
             notes.push(L('기존 ' + docs.length + '건 비움', 'Đã xóa ' + docs.length + ' mục cũ'));
           }).catch(function (e) {
-            notes.push('<span class="sd-bad">' + L('비우기 실패 — ', 'Xóa thất bại — ') + (e.code || e.message) + '</span>');
+            notes.push('<span class="sd-bad">' + L('비우기 실패 — ', 'Xóa thất bại — ') + fsErrText(e) + '</span>');
           });
         });
       });
@@ -1020,7 +1036,7 @@ window.runSeed = function () {
             var d = dates[i] || new Date();
             batch.set(db.collection('gifticon_exchanges').doc(), {
               user_id: uid, gifticon_id: g._id,
-              grade_used: combo[0] ? combo[0].grade : 'bronze',
+              grade_used: SEED_TICKET_GRADE,
               count_used: combo.reduce(function (a, x) { return a + x.count; }, 0),
               tickets_used: combo,
               status: sts[i], code: seedCode(),
@@ -1034,7 +1050,7 @@ window.runSeed = function () {
           myBuy = picks.length;
           return batch.commit().catch(function (e) {
             myBuy = 0;
-            denied.push(L('구매 내역 쓰기 실패', 'Ghi lịch sử mua thất bại') + ' (' + label + ') — ' + (e.code || e.message));
+            denied.push(L('구매 내역 쓰기 실패', 'Ghi lịch sử mua thất bại') + ' (' + label + ') — ' + fsErrText(e));
           });
         });
       }
@@ -1042,18 +1058,29 @@ window.runSeed = function () {
 
     if (doTicket) {
       jobs = jobs.then(function () {
-        var batch = db.batch(), total = 0;
-        for (var i = 0; i < nTicket; i++) {
-          total++;
-          batch.set(db.collection('user_tickets').doc(), {
-            user_id: uid, grade: 'bronze', status: 'active',
-            earned_at: firebase.firestore.FieldValue.serverTimestamp(),
-            expires_at: null, manual: true, postback_id: null, reason: 'demo-seed', seeded: true
-          });
+        if (!(nTicket > 0)) return;
+        /* 1장 = 1문서다. Firestore 배치는 한 번에 500건까지라 400건씩 나눠 쓴다(앱 ppCommitOps 와 같다).
+           나눠 쓰는 중 실패하면 앞 묶음은 이미 들어가 있으니 들어간 장수만 센다. */
+        var now = firebase.firestore.FieldValue.serverTimestamp(), chain = Promise.resolve(), done = 0;
+        for (var i = 0; i < nTicket; i += 400) {
+          (function (k) {
+            chain = chain.then(function () {
+              var b = db.batch();
+              for (var j = 0; j < k; j++) {
+                b.set(db.collection('user_tickets').doc(), {
+                  user_id: uid, grade: SEED_TICKET_GRADE, status: 'active',
+                  earned_at: now, confirmed_at: now,
+                  expires_at: null, manual: true, postback_id: null, reason: 'demo-seed', seeded: true
+                });
+              }
+              return b.commit().then(function () { done += k; });
+            });
+          })(Math.min(400, nTicket - i));
         }
-        if (!total) return;
-        return batch.commit().then(function () { myTk = total; }).catch(function (e) {
-          denied.push(L('티켓 쓰기 실패', 'Ghi vé thất bại') + ' (' + label + ') — ' + (e.code || e.message));
+        return chain.then(function () { myTk = done; }).catch(function (e) {
+          myTk = done;
+          denied.push(L('티켓 쓰기 실패', 'Ghi vé thất bại') + ' (' + label + ') — ' + fsErrText(e)
+            + (done ? L(' · ' + done + '장까지는 들어감', ' · đã thêm ' + done + ' vé') : ''));
         });
       });
     }
@@ -1072,7 +1099,7 @@ window.runSeed = function () {
   }
 };
 
-/* 한 계정만 비우기 — 지우기는 관리자 권한이 필요하다(규칙: delete if isAdmin). */
+/* 한 계정만 비우기 — firestore.rules 가 user_tickets·gifticon_exchanges 지우기를 로그인 없이 열어 두었다. */
 window.wipeOne = function (uid) {
   if (!confirm(L('이 계정의 가상 티켓·구매 내역을 지웁니다. 되돌릴 수 없습니다.',
                  'Sẽ xóa vé·lịch sử mua ảo của tài khoản này. Không thể hoàn tác.'))) return;
@@ -1097,7 +1124,7 @@ window.wipeOne = function (uid) {
     return chain.then(function () { toast(L(docs.length + '건을 지웠습니다.', 'Đã xóa ' + docs.length + ' mục.')); return load(); });
   }).catch(function (e) {
     console.error('wipeOne', e);
-    toast(L('지우지 못했습니다 — ', 'Không xóa được — ') + (e.code || e.message));
+    toast(L('지우지 못했습니다 — ', 'Không xóa được — ') + fsErrText(e));
   });
 };
 
@@ -1278,6 +1305,9 @@ load();
   "데모에서 앱을 테스트할 때 가상 데이터를 어느 계정에 넣을지 여기서 확인합니다.": "Nơi xác nhận sẽ đưa dữ liệu giả vào tài khoản nào khi kiểm thử ứng dụng trong bản demo.",
   "+ 계정 추가": "+ Thêm tài khoản",
   "저장이 막혀 있습니다.": "Việc lưu đang bị chặn.",
+  "Firestore 하루 사용 한도를 다 썼습니다.": "Đã dùng hết hạn mức Firestore trong ngày.",
+  "읽기·쓰기가 모두 막혀 있어 명부도 가상 데이터도 지금은 다룰 수 없습니다. 무료 한도는 미국 태평양 시간 자정(한국 시각 오후 4시, 11월 초 서머타임이 끝나면 오후 5시)에 다시 채워집니다.": "Mọi thao tác đọc/ghi đang bị chặn nên hiện không thể xử lý danh bạ hay dữ liệu ảo. Hạn mức miễn phí được làm mới lúc nửa đêm giờ Thái Bình Dương (16:00 giờ Hàn Quốc; 17:00 sau khi hết giờ mùa hè đầu tháng 11).",
+  "한도가 다시 채워지면 여기에 명부가 뜹니다.": "Danh bạ sẽ hiện ở đây khi hạn mức được làm mới.",
   "Firestore 규칙에": "Quy tắc công khai",
   "공개 규칙이 아직 게시되지 않았습니다.\n    저장소의": "trong quy tắc Firestore chưa được phát hành. Quy tắc đã có trong",
   "에 규칙은 들어가 있으니, Firebase 콘솔 → Firestore Database → 규칙에서 한 번 게시하면 바로 열립니다.": "của kho mã, chỉ cần phát hành một lần tại Firebase Console → Firestore Database → Rules là mở ngay.",
