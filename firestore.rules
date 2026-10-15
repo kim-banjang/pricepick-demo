@@ -117,20 +117,22 @@ service cloud.firestore {
       allow read: if isSignedIn();
       allow create, update, delete: if true;
     }
+    // 데모 — /demo-accounts 의 「가상 데이터 넣기」가 남의 uid 앞으로 포인트 잔액을 넣고 덮는다.
+    // 시연용 저장소라 로그인 없이 쓰기를 연다(user_tickets 와 같은 취급, 김반장 2026-10-15).
     match /user_points/{userId} {
       allow read: if isSignedIn();
-      allow write: if isOwner(userId) || isAdmin();
+      allow write: if true;
     }
 
-    // Immutable ledger – append-only. 수정 불가(불변). 단, 데모 리셋을 위해 admin 삭제만 허용.
+    // Immutable ledger – append-only. 수정 불가(불변).
     // read를 isSignedIn()까지 완화: /app(html 프로토타입)의 "카카오 연동 회원 시뮬 로그인"이
     // 포인트 내역(마이 > 포인트)을 조회해야 함 — 다른 컬렉션과 동일한 이유(uid 불일치, postbacks 주석 참고).
-    // 앱은 이 컬렉션에 쓰지 않으므로(포인트 적립/차감 계산은 CMS·백엔드 몫) create는 owner-uid 검증 유지.
+    // 데모 — /demo-accounts 의 「가상 데이터 넣기」가 남의 uid 앞으로 적립 기록을 넣고 「비우고 새로」로 지운다.
+    // 그래서 create·delete 를 로그인 없이 연다(김반장 2026-10-15). update 는 그대로 막는다(원장 불변).
     match /point_transactions/{docId} {
       allow read: if isSignedIn();
-      allow create: if isAdmin() || (isSignedIn() && request.resource.data.user_id == request.auth.uid);
+      allow create, delete: if true;
       allow update: if false;
-      allow delete: if isAdmin();
     }
 
     // ──────────────────────────────────────────
