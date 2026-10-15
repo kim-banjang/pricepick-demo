@@ -312,6 +312,7 @@ textarea.form-input{resize:vertical;min-height:64px;}
           <label class="sd-opt"><input type="checkbox" id="sd-do-buy" checked> 구매 내역</label>
           <label class="sd-opt"><input type="checkbox" id="sd-do-point" checked> 포인트</label>
           <label class="sd-opt"><input type="checkbox" id="sd-do-event" checked> 이벤트 티켓</label>
+          <label class="sd-opt"><input type="checkbox" id="sd-do-random" checked> 랜덤 티켓</label>
         </div>
       </div>
 
@@ -322,6 +323,7 @@ textarea.form-input{resize:vertical;min-height:64px;}
           <div><span class="sd-lbl">티켓 장수</span><input class="form-input" id="sd-n-ticket" type="number" min="0" max="2000" value="100"></div>
           <div><span class="sd-lbl">포인트</span><input class="form-input" id="sd-n-point" type="number" min="0" max="1000000" value="1000"></div>
           <div><span class="sd-lbl">이벤트 티켓 장수</span><input class="form-input" id="sd-n-event" type="number" min="0" max="2000" value="5"></div>
+          <div><span class="sd-lbl">랜덤 티켓 장수</span><input class="form-input" id="sd-n-random" type="number" min="0" max="20" value="3"></div>
         </div>
       </div>
 
@@ -735,6 +737,17 @@ function infoTicketValue() {
 /* 포인트 가치 — 1P = 1원(김반장 2026-10-15 확정, 종전 10P = 1원 폐기).
    settings/point_policy.rate 를 읽어 쓰면 DB에 옛 「10P = 1원」이 남아 있을 때 1/10로 보이므로 확정값으로 둔다. */
 var POINTS_PER_WON = 1;
+/* 랜덤 티켓 장수 계산용 적립률 — 앱 greedyTickets 와 같은 식(구매액 × 적립률% ÷ 티켓 1장 값, 내림).
+   가상 구매는 쿠팡(coupang_direct)으로 넣는다 — 앱이 코드 없이 이름·도메인만으로 알아보는 유일한 몰. */
+var SEED_RANDOM_MALL = { code: 'coupang_direct', name: '쿠팡', domain: 'coupang.com' };
+var ACC_CACHE = null;
+function infoAccrualRates() {
+  if (ACC_CACHE) return Promise.resolve(ACC_CACHE);
+  return db.collection('settings').doc('ticket_accrual').get().then(function (d) {
+    ACC_CACHE = ((d.exists && d.data()) || {}).rates || {};
+    return ACC_CACHE;
+  }).catch(function () { return {}; });
+}
 function infoProducts() {
   if (GI_CACHE) return Promise.resolve(GI_CACHE);
   return ensureSignedIn()
@@ -775,8 +788,15 @@ function openInfo(uid) {
     infoTicketValue(), infoProducts(),
     /* 보유 포인트 — 앱과 같이 user_points/{uid}.balance 를 읽는다 */
     ensureSignedIn().then(function () { return db.collection('user_points').doc(uid).get(); }),
-    Promise.resolve(POINTS_PER_WON)
+    Promise.resolve(POINTS_PER_WON),
+    /* 랜덤 티켓 — 앱 refreshHomeData 와 같이 대기(pending) 티켓의 postback_id 가짓수로 센다 */
+    ensureSignedIn().then(function () {
+      return db.collection('user_tickets').where('user_id', '==', uid).where('status', '==', 'pending').get();
+    })
   ]).then(function (res) {
+    var rnd = {};
+    res[6].forEach(function (d) { var t = d.data(); if (t.grade !== 'event' && t.postback_id) rnd[t.postback_id] = 1; });
+    var nRnd = Object.keys(rnd).length;
     var tv = res[2], prod = res[3];
     var pt = (res[4].exists && res[4].data().balance) || 0, ppw = res[5];
     var ptHtml = '<div class="ai-sec"><div class="ai-h">' + L('보유 포인트', 'Điểm đang giữ') + '</div>'
@@ -795,7 +815,7 @@ function openInfo(uid) {
     };
 
     var tkHtml = '<div class="ai-sec"><div class="ai-h">' + L('보유 티켓', 'Vé đang giữ') + '</div>'
-      + '<div class="ai-tk">' + box(L('티켓', 'Vé'), nTk) + box(L('이벤트 티켓', 'Vé sự kiện'), nEv) + '</div>'
+      + '<div class="ai-tk">' + box(L('티켓', 'Vé'), nTk) + box(L('이벤트 티켓', 'Vé sự kiện'), nEv) + box(L('랜덤 티켓', 'Vé ngẫu nhiên'), nRnd) + '</div>'
       + '<div class="ai-won">' + won.toLocaleString('ko-KR') + L('원', ' won') + '</div></div>';
 
     var ex = res[1].docs.map(function (d) { return d.data(); })
@@ -859,6 +879,8 @@ function openInfo(uid) {
      · 기본 티켓 100장 (2026-10-14 등급 3종 → 「티켓」 1종 통합)
      · 기본 포인트 1,000P (김반장 2026-10-15) — 1P = 1원
      · 기본 이벤트 티켓 5장 (김반장 2026-10-15) — 1장 = 40원 = 티켓 2장
+     · 기본 랜덤 티켓 3장 (김반장 2026-10-15) — 구매 직후 전환 대기. 1장 = 구매 1건(postbacks)
+       + 그 구매의 티켓 N장(user_tickets status:'pending'). 확정(CMS 포스트백 관리)되면 N장이 active 로 바뀐다.
      · 상품은 브랜드와 가격대를 고르게 — 한 브랜드에 몰리지 않게,
        가격대 다섯 구간(1천 이하·5천 이하·2만 이하·5만 이하·그 위)을 돌아가며
      · 날짜는 최근 석 달에 흩는다
@@ -980,18 +1002,22 @@ window.runSeed = function () {
   var doBuy = document.getElementById('sd-do-buy').checked;
   var doPoint = document.getElementById('sd-do-point').checked;
   var doEvent = document.getElementById('sd-do-event').checked;
-  if (!doTicket && !doBuy && !doPoint && !doEvent) { err.textContent = L('넣을 것을 고르세요.', 'Hãy chọn dữ liệu cần thêm.'); err.style.display = 'block'; return; }
+  var doRandom = document.getElementById('sd-do-random').checked;
+  if (!doTicket && !doBuy && !doPoint && !doEvent && !doRandom) { err.textContent = L('넣을 것을 고르세요.', 'Hãy chọn dữ liệu cần thêm.'); err.style.display = 'block'; return; }
   var nBuy = parseInt(document.getElementById('sd-n-buy').value, 10) || 0;
   var nTicket = parseInt(document.getElementById('sd-n-ticket').value, 10) || 0;
   var nPoint = parseInt(document.getElementById('sd-n-point').value, 10) || 0;
   var nEvent = parseInt(document.getElementById('sd-n-event').value, 10) || 0;
+  var nRandom = Math.min(20, parseInt(document.getElementById('sd-n-random').value, 10) || 0);
   var wipe = ((document.querySelector('input[name="sd-mode"]:checked') || {}).value || 'wipe') === 'wipe';
 
   btn.disabled = true; btn.textContent = L('넣는 중…', 'Đang thêm…');
-  var okAcc = 0, okBuy = 0, okTk = 0, okPt = 0, okEv = 0, denied = [];
+  var okAcc = 0, okBuy = 0, okTk = 0, okPt = 0, okEv = 0, okRd = 0, denied = [];
 
-  Promise.all([infoTicketValue(), infoProducts(), ensureSignedIn()]).then(function (res) {
+  var accRates = {};
+  Promise.all([infoTicketValue(), infoProducts(), ensureSignedIn(), doRandom ? infoAccrualRates() : {}]).then(function (res) {
     var tv = res[0], prod = res[1];
+    accRates = res[3] || {};
     var chain = Promise.resolve();
     targets.forEach(function (r) {
       chain = chain.then(function () { return seedOne(r, prod, tv); });
@@ -1002,7 +1028,8 @@ window.runSeed = function () {
       + L('계정 ', 'Tài khoản ') + okAcc + L('개 · 구매 ', ' · Mua ') + okBuy
       + L('건 · 티켓 ', ' · Vé ') + okTk + L('장', '')
       + (doPoint ? ' · ' + L('포인트 ', 'Điểm ') + okPt.toLocaleString('ko-KR') + 'P' : '')
-      + (doEvent ? ' · ' + L('이벤트 티켓 ', 'Vé sự kiện ') + okEv + L('장', '') : '') + '</div>');
+      + (doEvent ? ' · ' + L('이벤트 티켓 ', 'Vé sự kiện ') + okEv + L('장', '') : '')
+      + (doRandom ? ' · ' + L('랜덤 티켓 ', 'Vé ngẫu nhiên ') + okRd + L('장', '') : '') + '</div>');
     if (denied.length) {
       seedLog('<div class="sd-bad" style="margin-top:6px">' + denied.join('<br>') + '</div>');
     }
@@ -1024,22 +1051,29 @@ window.runSeed = function () {
     else if (!(st.u && st.u.linked_kakao === true)) buyBlock = L('카카오 미연동', 'Chưa liên kết Kakao');
 
     var jobs = Promise.resolve();
-    var myBuy = 0, myTk = 0, myPt = 0, myEv = 0, notes = [];
+    var myBuy = 0, myTk = 0, myPt = 0, myEv = 0, myRd = 0, notes = [];
 
     /* 「비우고 새로」면 먼저 지운다 — firestore.rules 가 user_tickets·gifticon_exchanges·point_transactions
        지우기를 로그인 없이 열어 두었다. 포인트 잔액(user_points)은 아래 포인트 단계에서 새 값으로 덮는다. */
     if (wipe) {
       jobs = jobs.then(function () {
         return Promise.all([
-          (doTicket || doEvent) ? db.collection('user_tickets').where('user_id', '==', uid).get() : Promise.resolve({ docs: [] }),
+          (doTicket || doEvent || doRandom) ? db.collection('user_tickets').where('user_id', '==', uid).get() : Promise.resolve({ docs: [] }),
           doBuy ? db.collection('gifticon_exchanges').where('user_id', '==', uid).get() : Promise.resolve({ docs: [] }),
-          doPoint ? db.collection('point_transactions').where('user_id', '==', uid).get() : Promise.resolve({ docs: [] })
+          doPoint ? db.collection('point_transactions').where('user_id', '==', uid).get() : Promise.resolve({ docs: [] }),
+          doRandom ? db.collection('postbacks').where('user_id', '==', uid).get() : Promise.resolve({ docs: [] })
         ]).then(function (g) {
-          /* 이벤트 티켓은 user_tickets 안에서 grade:'event' 로만 갈린다 — 고른 쪽만 지운다. */
+          /* user_tickets 하나에 셋이 섞여 있다 — grade:'event' 는 이벤트 티켓, status:'pending' 은 랜덤 티켓
+             (전환 대기), 나머지는 티켓. 고른 쪽만 지운다. */
           var tks = g[0].docs.filter(function (d) {
-            return (d.data().grade === 'event') ? doEvent : doTicket;
+            var t = d.data();
+            if (t.grade === 'event') return doEvent;
+            if (t.status === 'pending') return doRandom;
+            return doTicket;
           });
-          var docs = tks.concat(g[1].docs, g[2].docs);
+          /* 구매 건(postbacks)은 가상 데이터가 만든 것(seeded)만 지운다 — 규칙도 그것만 지우게 열었다. */
+          var pbs = g[3].docs.filter(function (d) { return d.data().seeded === true; });
+          var docs = tks.concat(g[1].docs, g[2].docs, pbs);
           if (!docs.length) return;
           var chain = Promise.resolve();
           for (var i = 0; i < docs.length; i += 400) {
@@ -1111,6 +1145,60 @@ window.runSeed = function () {
       });
     }
 
+    /* 랜덤 티켓 — 앱 ppProcessPurchase 와 같은 구조. 1장 = 구매 1건:
+         postbacks       { user_id, mall_name, mall_domain, purchase_amount, status:'pending', created_at, is_demo_sim }
+         user_tickets ×N { grade:'bronze', status:'pending', postback_id, earned_at, confirmed_at:null, expires_at }
+       N = ⌊⌊구매액 × 적립률 ÷ 100⌋ ÷ 티켓 1장 값⌋ (앱 greedyTickets). N 은 화면에 내지 않는다 — 감추는 것이 장수다.
+       ticket_transactions 적립 기록은 규칙상 본인만 쓸 수 있어 넣지 않는다(티켓·이벤트 티켓과 같다). */
+    if (doRandom && nRandom > 0) {
+      jobs = jobs.then(function () {
+        var rate = accRates[SEED_RANDOM_MALL.code];
+        if (!(typeof rate === 'number' && rate > 0) || !(tv.bronze > 0)) {
+          notes.push('<span class="sd-skip">' + L('랜덤 티켓 건너뜀 — 쿠팡 적립률(settings/ticket_accrual)이 없습니다',
+            'Bỏ qua vé ngẫu nhiên — chưa có tỷ lệ tích lũy') + '</span>');
+          return;
+        }
+        var chain = Promise.resolve();
+        for (var r = 0; r < nRandom; r++) {
+          chain = chain.then(function () {
+            /* 구매액 1만~5만원(100원 단위) — 한 건에 티켓 문서가 수백 장 생기지 않게 좁혀 둔다 */
+            var amount = (100 + Math.floor(Math.random() * 401)) * 100;
+            var n = Math.floor(Math.floor(amount * rate / 100) / tv.bronze);
+            if (n < 1) return;
+            var now = firebase.firestore.FieldValue.serverTimestamp();
+            var exp = firebase.firestore.Timestamp.fromMillis(Date.now() + TICKET_VALID_DAYS * 86400000);
+            var pbRef = db.collection('postbacks').doc();
+            var ops = [function (b) {
+              b.set(pbRef, {
+                user_id: uid, mall_name: SEED_RANDOM_MALL.name, mall_domain: SEED_RANDOM_MALL.domain,
+                purchase_amount: amount, status: 'pending', created_at: now, is_demo_sim: true, seeded: true
+              });
+            }];
+            for (var j = 0; j < n; j++) {
+              ops.push(function (b) {
+                b.set(db.collection('user_tickets').doc(), {
+                  user_id: uid, grade: SEED_TICKET_GRADE, status: 'pending', postback_id: pbRef.id,
+                  earned_at: now, confirmed_at: null, expires_at: exp, is_demo_sim: true, seeded: true
+                });
+              });
+            }
+            /* 배치 500건 한도 — 적립률이 높아 장수가 많으면 400건씩 나눠 쓴다(앱 ppCommitOps 와 같다). */
+            var c = Promise.resolve();
+            for (var k = 0; k < ops.length; k += 400) {
+              (function (chunk) {
+                c = c.then(function () { var b = db.batch(); chunk.forEach(function (op) { op(b); }); return b.commit(); });
+              })(ops.slice(k, k + 400));
+            }
+            return c.then(function () { myRd++; });
+          });
+        }
+        return chain.catch(function (e) {
+          denied.push(L('랜덤 티켓 쓰기 실패', 'Ghi vé ngẫu nhiên thất bại') + ' (' + label + ') — ' + fsErrText(e)
+            + (myRd ? L(' · ' + myRd + '장까지는 들어감', ' · đã thêm ' + myRd + ' vé') : ''));
+        });
+      });
+    }
+
     /* 포인트 — 앱·CMS 수동 지급과 같은 구조: point_transactions 에 적립 1건 + user_points/{uid}.balance.
        「비우고 새로」면 잔액을 넣는 값으로 덮고(원장도 위에서 비웠다), 「더하기」면 잔액에 더한다. */
     if (doPoint && (nPoint > 0 || wipe)) {
@@ -1132,11 +1220,12 @@ window.runSeed = function () {
     }
 
     return jobs.then(function () {
-      okAcc++; okBuy += myBuy; okTk += myTk; okPt += myPt; okEv += myEv;
+      okAcc++; okBuy += myBuy; okTk += myTk; okPt += myPt; okEv += myEv; okRd += myRd;
       seedLog('<div><b>' + label + '</b> — '
         + L('구매 ', 'Mua ') + myBuy + L('건 · 티켓 ', ' · Vé ') + myTk + L('장', '')
         + (doPoint ? ' · ' + L('포인트 ', 'Điểm ') + myPt.toLocaleString('ko-KR') + 'P' : '')
         + (doEvent ? ' · ' + L('이벤트 티켓 ', 'Vé sự kiện ') + myEv + L('장', '') : '')
+        + (doRandom ? ' · ' + L('랜덤 티켓 ', 'Vé ngẫu nhiên ') + myRd + L('장', '') : '')
         + (notes.length ? ' · ' + notes.join(' · ') : '') + '</div>');
     });
   }
@@ -1376,7 +1465,7 @@ load();
      표는 매번 다시 그려지므로 MutationObserver가 새로 생긴 노드까지 따라간다. -->
 <script>
 (function(){
-  var KO2VI = {"가상 데이터 넣기":"Thêm dữ liệu ảo","대상":"Đối tượng","전체 계정":"Toàn bộ tài khoản","고른 계정만":"Chỉ tài khoản đã chọn","무엇을":"Thêm gì","티켓":"Vé","얼마나":"Bao nhiêu","구매 건수":"Số lượt mua","티켓 장수":"Số vé","포인트":"Điểm","이벤트 티켓 장수":"Số vé sự kiện","보유 포인트":"Điểm đang giữ","이벤트 티켓":"Vé sự kiện","기존 것":"Dữ liệu cũ","비우고 새로":"Xóa rồi thêm mới","더하기":"Thêm vào","넣기":"Thêm","비우기":"Xóa sạch","계정 상세":"Chi tiết tài khoản","보유 티켓":"Vé đang giữ","구매 내역":"Lịch sử mua","불러오지 못했습니다.":"Không tải được.","구매 내역이 없습니다.":"Không có lịch sử mua.",
+  var KO2VI = {"가상 데이터 넣기":"Thêm dữ liệu ảo","대상":"Đối tượng","전체 계정":"Toàn bộ tài khoản","고른 계정만":"Chỉ tài khoản đã chọn","무엇을":"Thêm gì","티켓":"Vé","얼마나":"Bao nhiêu","구매 건수":"Số lượt mua","티켓 장수":"Số vé","포인트":"Điểm","이벤트 티켓 장수":"Số vé sự kiện","랜덤 티켓":"Vé ngẫu nhiên","랜덤 티켓 장수":"Số vé ngẫu nhiên","보유 포인트":"Điểm đang giữ","이벤트 티켓":"Vé sự kiện","기존 것":"Dữ liệu cũ","비우고 새로":"Xóa rồi thêm mới","더하기":"Thêm vào","넣기":"Thêm","비우기":"Xóa sạch","계정 상세":"Chi tiết tài khoản","보유 티켓":"Vé đang giữ","구매 내역":"Lịch sử mua","불러오지 못했습니다.":"Không tải được.","구매 내역이 없습니다.":"Không có lịch sử mua.",
   "데모에서 앱을 테스트할 때 가상 데이터를 어느 계정에 넣을지 여기서 확인합니다.": "Nơi xác nhận sẽ đưa dữ liệu giả vào tài khoản nào khi kiểm thử ứng dụng trong bản demo.",
   "+ 계정 추가": "+ Thêm tài khoản",
   "저장이 막혀 있습니다.": "Việc lưu đang bị chặn.",

@@ -87,10 +87,12 @@ service cloud.firestore {
       // Firebase Auth uid가 CMS 세팅 회원의 실제 문서 ID와 다르므로 uid 일치 검사를 통과할 수 없다.
       // 앱은 postback을 "구매 발생" 이벤트로 생성만 하고(recordPurchase) 이후 상태 변경은 하지 않으므로
       // update는 owner-uid 검증을 유지한다.
+      // delete: 데모 — /demo-accounts 「가상 데이터 넣기」의 「비우고 새로」가 자기가 만든 랜덤 티켓 구매 건
+      // (seeded == true)만 지운다. 실제·앱 시뮬 구매 건은 그대로 admin 전용(김반장 2026-10-15).
       allow read: if isSignedIn();
       allow create: if isSignedIn();
       allow update: if isAdmin() || (isSignedIn() && resource.data.user_id == request.auth.uid);
-      allow delete: if isAdmin();
+      allow delete: if isAdmin() || resource.data.seeded == true;
     }
     match /click_postback_matches/{docId} {
       allow read: if isAdmin() || isSignedIn();
