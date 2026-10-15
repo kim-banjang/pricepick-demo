@@ -16843,7 +16843,7 @@ function dmAccrueWithRate(postbackId, userId, amount, status, ratePct) {
         chunk.forEach(function(g) {
           b.set(db.collection('user_tickets').doc(), {
             user_id: userId, grade: g, status: ticketStatus, postback_id: postbackId,
-            earned_at: now, confirmed_at: ticketStatus === 'active' ? now : null, expires_at: null,
+            earned_at: now, confirmed_at: ticketStatus === 'active' ? now : null, expires_at: dmFutureTimestamp(TICKET_VALID_DAYS_CMS),  /* 적립일 + 1년(정책 03) */
           });
           b.set(db.collection('ticket_transactions').doc(), { user_id: userId, ticket_grade: g, type: 'earn', postback_id: postbackId, created_at: now });
         });
@@ -16983,6 +16983,7 @@ document.addEventListener('click', function(e) {
 var TM_GRADE_KO = { bronze: '티켓', silver: '실버', gold: '골드', event: '이벤트 티켓' };
 // 이벤트 티켓 만료 정책값: 발급일로부터 100일 (티켓 1년과 별개)
 var EVENT_TICKET_VALID_DAYS = 100;
+var TICKET_VALID_DAYS_CMS = 365;  /* 티켓 = 받은 날(적립일) + 1년 — 정책 03 유효기간 */
 function dmFutureTimestamp(days) {
   var d = new Date();
   d.setDate(d.getDate() + days);
@@ -17058,7 +17059,7 @@ window.tmSubmit = function() {
 // 지급 — dmAccruePostbackTickets와 동일한 문서 구조(user_tickets: status active,
 // ticket_transactions: type earn)를 postback_id 없이 그대로 재사용. 티켓은 grade:'bronze',
 // 이벤트 티켓(grade:'event')은 별개 종류로 저장되며 만료만 발급일+100일로 계산해서 넣어준다
-// (티켓은 기존과 동일하게 expires_at:null 유지).
+// 티켓은 받은 날 + 1년(정책 03 유효기간 · 2026-10-15 — 종전 expires_at:null 은 앱에서 「만료일 없음」으로 보였다).
 /* 티켓 1장 = 1문서라 장수가 많으면 한 배치(500건)를 넘는다 — 작업을 모아 나눠 쓴다. */
 function tmCommitOps(ops) {
   var chain = Promise.resolve();
@@ -17071,7 +17072,7 @@ function tmCommitOps(ops) {
 }
 function tmGrantTickets(userId, grade, qty, reason) {
   var now = FS.Timestamp.now();
-  var expiresAt = grade === 'event' ? dmFutureTimestamp(EVENT_TICKET_VALID_DAYS) : null;
+  var expiresAt = dmFutureTimestamp(grade === 'event' ? EVENT_TICKET_VALID_DAYS : TICKET_VALID_DAYS_CMS);
   var ops = [];
   for (var i = 0; i < qty; i++) {
     ops.push(function(b) {
@@ -17121,7 +17122,7 @@ function tmRevokeTickets(userId, grade, qty, reason) {
       /* 옛 실버·골드 문서가 필요한 장수를 넘기면 남는 장수를 티켓으로 돌려준다(받은 날·만료일은 그대로) */
       for (var k = 0; k < change; k++) {
         ops.push(function(b) {
-          b.set(db.collection('user_tickets').doc(), { user_id: userId, grade: 'bronze', status: 'active', postback_id: null, earned_at: src.earned_at || now, confirmed_at: src.confirmed_at || now, expires_at: src.expires_at == null ? null : src.expires_at });
+          b.set(db.collection('user_tickets').doc(), { user_id: userId, grade: 'bronze', status: 'active', postback_id: null, earned_at: src.earned_at || now, confirmed_at: src.confirmed_at || now, expires_at: src.expires_at || (src.earned_at && src.earned_at.toMillis ? FS.Timestamp.fromMillis(src.earned_at.toMillis() + TICKET_VALID_DAYS_CMS * 86400000) : dmFutureTimestamp(TICKET_VALID_DAYS_CMS)) });
           b.set(db.collection('ticket_transactions').doc(), { user_id: userId, ticket_grade: 'bronze', type: 'earn', postback_id: null, via: 'grade_exchange', created_at: now });
         });
       }

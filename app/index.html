@@ -18330,6 +18330,21 @@ function ppEventTicketExpiry() {
   var ms = Date.now() + EVENT_TICKET_VALID_DAYS * 86400000;
   return FS.Timestamp.fromMillis(ms);
 }
+/* 티켓 만료 — 정책 「받은 날(적립일) + 1년(365일)」(정책 03 유효기간, 확정일 아님).
+   2026-10-15 전까지 데모는 구매 적립·교환·온보딩·CMS 수동 지급 티켓을 expires_at: null 로 저장해
+   「만료일 없음」으로 보였다. 새로 만드는 티켓은 적립 시점에 만료일을 넣고(ppTicketExpiry),
+   이미 쌓인 null 문서는 읽을 때 적립일 + 365일로 셈한다(ppTicketExpDate). */
+var TICKET_VALID_DAYS = 365;
+function ppTicketExpiry(fromMs) {
+  return FS.Timestamp.fromMillis((fromMs || Date.now()) + TICKET_VALID_DAYS * 86400000);
+}
+function ppTicketExpDate(t) {
+  var d = ppDate(t && t.expires_at);
+  if (d) return d;
+  if (!t || (t.grade || '').toLowerCase() === 'event') return null;
+  var e = ppDate(t.earned_at);
+  return e ? new Date(e.getTime() + TICKET_VALID_DAYS * 86400000) : null;
+}
 function ppGrantPoints(amount, reason, category) {
   if (!PP.uid || !amount) return Promise.resolve();
   var now = FS.FieldValue.serverTimestamp();
@@ -19203,7 +19218,7 @@ function renderMyTicketExpiryBadges(card) {
       if (t.status !== 'active') return;
       var w = PP_TICKET_PER_DOC[(t.grade || '').toLowerCase()];
       if (!w) return;
-      var exp = ppDate(t.expires_at);
+      var exp = ppTicketExpDate(t);
       if (!exp) return;
       var days = Math.ceil((exp - now) / 86400000);
       if (days <= 7) {
@@ -19431,7 +19446,7 @@ function ppProcessPurchase(amount, overlay) {
   var ops = [function (b) { b.set(postRef, postData); }];
   for (var j = 0; j < tk.total; j++) {
     ops.push(function (b) {
-      b.set(db.collection('user_tickets').doc(), { user_id: PP.uid, grade: PP_TICKET_GRADE, status: 'pending', postback_id: postRef.id, earned_at: now, confirmed_at: null, expires_at: null, is_demo_sim: true });
+      b.set(db.collection('user_tickets').doc(), { user_id: PP.uid, grade: PP_TICKET_GRADE, status: 'pending', postback_id: postRef.id, earned_at: now, confirmed_at: null, expires_at: ppTicketExpiry(), is_demo_sim: true });
       b.set(db.collection('ticket_transactions').doc(), { user_id: PP.uid, ticket_grade: PP_TICKET_GRADE, type: 'earn', postback_id: postRef.id, created_at: now, is_demo_sim: true });
     });
   }
@@ -21587,7 +21602,7 @@ function renderTicketDetail() {
         var waiting = (g === 'event') && (t.status === 'pending' || (t.status === 'active' && !t.confirmed_at));
         if (t.status === 'active' && !waiting) {
           mt21ByGrade[mk].count += mw;
-          for (var mi = 0; mi < mw; mi++) mt21Expiries[mk].push(ppDate(t.expires_at));
+          for (var mi = 0; mi < mw; mi++) mt21Expiries[mk].push(ppTicketExpDate(t));
         }
       }
       if (!act.hasOwnProperty(g)) return;
@@ -21612,7 +21627,7 @@ function renderTicketDetail() {
     var rows = '';
     ['bronze', 'silver', 'gold'].forEach(function (g) {
       if (!act[g]) return;
-      var expiries = activeByGrade[g].map(function (t) { return ppDate(t.expires_at); }).filter(Boolean).sort(function (a, b) { return a - b; });
+      var expiries = activeByGrade[g].map(function (t) { return ppTicketExpDate(t); }).filter(Boolean).sort(function (a, b) { return a - b; });
       var near = expiries.filter(function (d) { return Math.ceil((d - now) / 86400000) <= 7; });
       var right = '';
       if (near.length) {
@@ -22149,7 +22164,7 @@ function ppTicketUseOps(plan, via, now, extra) {
     ops.push(function (b) {
       b.set(db.collection('user_tickets').doc(), {
         user_id: PP.uid, grade: PP_TICKET_GRADE, status: 'active', postback_id: null,
-        earned_at: src.earned_at || now, confirmed_at: src.confirmed_at || now, expires_at: (src.expires_at === undefined) ? null : src.expires_at,
+        earned_at: src.earned_at || now, confirmed_at: src.confirmed_at || now, expires_at: src.expires_at || (ppTicketExpDate(src) ? FS.Timestamp.fromDate(ppTicketExpDate(src)) : ppTicketExpiry()),
       });
       b.set(db.collection('ticket_transactions').doc(), { user_id: PP.uid, ticket_grade: PP_TICKET_GRADE, type: 'earn', postback_id: null, via: 'grade_exchange', created_at: now });
     });
@@ -22166,7 +22181,7 @@ function ppTicketGrantOps(n, via, now, extraDoc, extraTx) {
   var ops = [];
   for (var i = 0; i < n; i++) {
     ops.push(function (b) {
-      b.set(db.collection('user_tickets').doc(), Object.assign({ user_id: PP.uid, grade: PP_TICKET_GRADE, status: 'active', postback_id: null, earned_at: now, confirmed_at: now, expires_at: null }, extraDoc || {}));
+      b.set(db.collection('user_tickets').doc(), Object.assign({ user_id: PP.uid, grade: PP_TICKET_GRADE, status: 'active', postback_id: null, earned_at: now, confirmed_at: now, expires_at: ppTicketExpiry() }, extraDoc || {}));
       b.set(db.collection('ticket_transactions').doc(), Object.assign({ user_id: PP.uid, ticket_grade: PP_TICKET_GRADE, type: 'earn', postback_id: null, via: via, created_at: now }, extraTx || {}));
     });
   }
