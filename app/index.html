@@ -18462,6 +18462,17 @@ window.ppLoadTicketValue = function() {
     return v;
   });
 };
+/* 포인트 원장 금액 읽기 — 2026-10-15 포인트 가치 10P = 1원 → 1P = 1원(김반장 확정).
+   point_transactions는 추가 전용 원장이라(규칙상 수정 불가) 바뀌기 전에 쌓인 기록은 옛 단위로 남아 있다.
+   그 기록은 화면에 쓸 때만 1/10로 읽는다(값이 전부 10의 배수라 정수로 떨어진다). 기준 시각은
+   새 단위 코드가 배포된 때(2026-10-15 12:02 KST) — 그 뒤 기록은 이미 새 단위로 쌓인다.
+   잔액(user_points)·선물 상자 설정·룰렛 기록은 데이터 자체를 1/10로 바꿨다. */
+var PP_POINT_RESCALE_AT = Date.UTC(2026, 9, 15, 3, 2, 14);
+function ppPtAmt(p) {
+  var a = p.amount != null ? p.amount : (p.qty || 0);
+  var d = ppDate(p.created_at);
+  return (d && d.getTime() < PP_POINT_RESCALE_AT) ? Math.round(a / 10) : a;
+}
 /* settings/point_policy.rate("1P = 1원", 2026-10-15 변경 · 종전 "10P = 1원") 에서 "1원당 몇 포인트인지"를 읽는다 —
    CMS 저장 포맷은 pointPolicySubmitEdit()과 같은 정규식으로 파싱. 실패 시 1(정책값 1P = 1원). */
 var PP_POINTS_PER_WON_CACHE = null;
@@ -20394,7 +20405,7 @@ function renderActivity(filter) {
       ev.push({ d: ppDate(x.exchanged_at), ft: 'use', ico: 'use', title: '기프티콘 구매', detail: '티켓 ' + ppTicketsUsedCount(x) + '장 사용', amt: '-' + ppTicketsUsedCount(x) + '장', cls: 'use', grade: x.grade_used, qty: -(x.count_used || 1) });
     });
     ptx.forEach(function (p) {
-      var amt = p.amount != null ? p.amount : (p.qty || 0);
+      var amt = ppPtAmt(p);
       var badge = p.manual ? (amt < 0 ? '관리자 환수' : '관리자 지급') : null;
       if (p.via === 'point_exchange') {
         ev.push({ d: ppDate(p.created_at), ft: 'swap', ico: amt >= 0 ? 'earn' : 'return', title: p.reason || '포인트 교환', detail: '포인트 교환', amt: (amt >= 0 ? '+' : '') + amt + 'P', cls: amt >= 0 ? 'earn' : 'return', badge: badge });
@@ -20528,7 +20539,7 @@ function renderNotifications() {
       items.push({ key: 'iv:' + x._id, type: 'event', d: ppDate(x.created_at), tag: '이벤트', head: '친구 초대 완료', desc: '초대 보상 지급' });
     });
     ptx.forEach(function (p) {
-      var amt = p.amount != null ? p.amount : (p.qty || 0);
+      var amt = ppPtAmt(p);
       if (amt > 0) items.push({ key: 'pt:' + p._id, type: 'event', d: ppDate(p.created_at), tag: '이벤트', head: (p.reason || '포인트 적립'), desc: '+' + amt + 'P 적립' });
     });
     /* 주간 경품 추첨 숨김 중에는 당첨 알림도 노출하지 않는다 (PP_FEATURES.weeklyRaffle) */
@@ -21718,11 +21729,11 @@ function ppGetPointPolicyExpiry() {
 }
 /* 적립분에서 이후 사용액을 FIFO로 상계해 "아직 남아있는 적립분"을 만료일별로 묶는다 — pw-20 박스·pw-21 통합카드가 공유 */
 function ppComputePointGroups(ptx, days) {
-  var earns = ptx.filter(function (p) { return (p.amount != null ? p.amount : (p.qty || 0)) > 0; })
-    .map(function (p) { return { amt: p.amount != null ? p.amount : (p.qty || 0), d: ppDate(p.created_at) }; })
+  var earns = ptx.filter(function (p) { return (ppPtAmt(p)) > 0; })
+    .map(function (p) { return { amt: ppPtAmt(p), d: ppDate(p.created_at) }; })
     .sort(function (a, b) { return a.d - b.d; });
-  var spendTotal = ptx.filter(function (p) { return (p.amount != null ? p.amount : (p.qty || 0)) < 0; })
-    .reduce(function (s, p) { return s + Math.abs(p.amount != null ? p.amount : (p.qty || 0)); }, 0);
+  var spendTotal = ptx.filter(function (p) { return (ppPtAmt(p)) < 0; })
+    .reduce(function (s, p) { return s + Math.abs(ppPtAmt(p)); }, 0);
   var remain = spendTotal;
   earns.forEach(function (e) {
     var used = Math.min(e.amt, remain);
@@ -21784,7 +21795,7 @@ function renderPointPanel() {
       return;
     }
     rec.innerHTML = ptx.map(function (p) {
-      var amt = p.amount != null ? p.amount : (p.qty || 0);
+      var amt = ppPtAmt(p);
       var pos = amt >= 0;
       return '<div style="display:flex;align-items:center;justify-content:space-between;padding:13px 2px;border-bottom:1px solid #EFEAF7;">'
         + '<div><div style="font-size:var(--fs-body);font-weight:400;color:var(--text1);">' + ppEsc(p.reason || p.type || '포인트') + '</div>'

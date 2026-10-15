@@ -13140,6 +13140,15 @@ window.pointAttendanceSubmitEdit = function() {
   });
 };
 
+/* 포인트 원장 금액 읽기 — 2026-10-15 포인트 가치 1P = 1원(종전 10P = 1원). 원장은 추가 전용이라
+   바뀌기 전 기록은 옛 단위로 남아 있다 → 기준 시각(새 단위 배포 2026-10-15 12:02 KST) 전 기록만
+   1/10로 읽는다. 앱 ppPtAmt()와 같은 규칙이라 두 화면 숫자가 어긋나지 않는다. */
+var PP_POINT_RESCALE_AT = Date.UTC(2026, 9, 15, 3, 2, 14);
+function ppPtAmtCms(d) {
+  var a = Number(d && d.amount) || 0;
+  var c = d && d.created_at, t = c ? (c.toDate ? c.toDate().getTime() : (c.seconds != null ? c.seconds * 1000 : new Date(c).getTime())) : null;
+  return (t != null && !isNaN(t) && t < PP_POINT_RESCALE_AT) ? Math.round(a / 10) : a;
+}
 /* ── sec-points ── point_transactions
    Harry 확정 답변(2026-07-14): 근거 없던 "기프티콘 교환 보너스"·"일일 방문 보상" 삭제,
    "매일 행운 룰렛 당첨"·"포인트→티켓 전환" 추가. 실제 원장은 category 필드로 분류하고(레거시 시드
@@ -13168,7 +13177,7 @@ var POINTS_CTRL = window.POINTS_CTRL = ppMakeListController(20, function(pageIte
   if (!tbody) return;
   if (!pageItems.length) { tbody.innerHTML = ppEmpty(5,'조건에 맞는 포인트 이력이 없습니다.'); if (pag) pag.innerHTML = ''; return; }
   tbody.innerHTML = pageItems.map(function(d) {
-    var amt = d.amount||0;
+    var amt = ppPtAmtCms(d);
     var sign = amt >= 0 ? '+' : '';
     var color = amt >= 0 ? 'color:var(--success);font-weight:700' : 'color:var(--danger);font-weight:700';
     return '<tr><td>' + renderMemberIdentity(d._user, d.user_id, { maskKakao: true }) + '</td>'
@@ -13215,7 +13224,7 @@ function loadPoints() {
   db.collection('point_transactions').get().then(function(all){
     var earned=0, used=0, expired=0;
     all.docs.forEach(function(dd){
-      var d=dd.data(); var a=d.amount||0;
+      var d=dd.data(); var a=ppPtAmtCms(d);
       if (d.type==='expire') expired += Math.abs(a);
       else if (a>0) earned += a;
       else used += Math.abs(a);
@@ -16198,7 +16207,7 @@ window.csvExportPoints = function() {
     return dmFetchUsersByIds(snap.docs.map(function(doc){ return doc.data().user_id; })).then(function(userMap) {
       var rows = snap.docs.map(function(doc) {
         var d = doc.data();
-        return [(userMap[d.user_id]||{}).nickname || d.user_id || '', d.type||'', d.amount||0, ppDateInputValue(d.created_at&&d.created_at.toDate?d.created_at.toDate():new Date())];
+        return [(userMap[d.user_id]||{}).nickname || d.user_id || '', d.type||'', ppPtAmtCms(d), ppDateInputValue(d.created_at&&d.created_at.toDate?d.created_at.toDate():new Date())];
       });
       ppDownloadCsv('포인트내역_' + ppTodayStr() + '.csv', ['회원','유형','포인트','일시'], rows);
       toast('CSV 내보내기 완료');
@@ -18819,7 +18828,7 @@ function rltLoadLog(k) {
       function key(uid, dt) { return uid + '|' + (dt ? ppFmtYMD(dt) : ''); }
       if (res[1]) res[1].forEach(function(doc) {
         var d = doc.data(), dt = rltTsDate(d.created_at);
-        if (dt) ptMap[key(d.user_id, dt)] = (ptMap[key(d.user_id, dt)] || 0) + (Number(d.amount) || 0);
+        if (dt) ptMap[key(d.user_id, dt)] = (ptMap[key(d.user_id, dt)] || 0) + ppPtAmtCms(d);
       });
       if (res[2]) res[2].forEach(function(doc) {
         var d = doc.data(), dt = rltTsDate(d.created_at);
