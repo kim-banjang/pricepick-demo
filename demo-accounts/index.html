@@ -724,9 +724,9 @@ function infoTicketValue() {
     .then(function () { return db.collection('settings').doc('ticket_value').get(); })
     .then(function (d) {
       var v = (d.exists && d.data()) || {};
-      TV_CACHE = { bronze: v.bronze || 10, silver: v.silver || 100, gold: v.gold || 200 };
+      TV_CACHE = { bronze: v.bronze || 10, event: v.event || 40 };
       return TV_CACHE;
-    }).catch(function () { TV_CACHE = { bronze: 10, silver: 100, gold: 200 }; return TV_CACHE; });
+    }).catch(function () { TV_CACHE = { bronze: 10, event: 40 }; return TV_CACHE; });
 }
 function infoProducts() {
   if (GI_CACHE) return Promise.resolve(GI_CACHE);
@@ -735,9 +735,10 @@ function infoProducts() {
     .then(function (snap) { GI_CACHE = {}; snap.forEach(function (d) { GI_CACHE[d.id] = d.data(); }); return GI_CACHE; })
     .catch(function () { GI_CACHE = {}; return GI_CACHE; });
 }
-var GRADE_KO = { gold: '골드', silver: '실버', bronze: '브론즈' };
-var GRADE_VI = { gold: 'Vàng', silver: 'Bạc', bronze: 'Đồng' };
-function gKo(g) { return L(GRADE_KO[g] || g, GRADE_VI[g] || g); }
+/* 티켓은 1종이다(2026-10-14). 앱(app/index.html PP_TICKET_PER_DOC)과 같이 옛 등급 문서는
+   한 문서를 티켓 10·20장으로 센다 — 옛 1장 값(100·200원) ÷ 티켓 1장 값(10원). */
+var TICKET_PER_DOC = { bronze: 1, silver: 10, gold: 20 };
+function ticketsOf(grade, count) { return (count || 0) * (TICKET_PER_DOC[grade] || 1); }
 function dash() { return '<span class="uid-none">—</span>'; }
 
 function openInfo(uid) {
@@ -767,14 +768,19 @@ function openInfo(uid) {
     infoTicketValue(), infoProducts()
   ]).then(function (res) {
     var tv = res[2], prod = res[3];
-    var tk = { gold: 0, silver: 0, bronze: 0 };
-    res[0].forEach(function (d) { var g = d.data().grade; if (tk[g] !== undefined) tk[g]++; });
-    var won = tk.gold * tv.gold + tk.silver * tv.silver + tk.bronze * tv.bronze;
+    var nTk = 0, nEv = 0;
+    res[0].forEach(function (d) {
+      var g = d.data().grade;
+      if (g === 'event') nEv++;
+      else if (TICKET_PER_DOC.hasOwnProperty(g)) nTk += TICKET_PER_DOC[g];
+    });
+    var won = nTk * tv.bronze + nEv * tv.event;
+    var box = function (k, n) {
+      return '<div class="ai-tk-one"><div class="ai-tk-g">' + k + '</div><div class="ai-tk-n">' + n.toLocaleString('ko-KR') + '</div></div>';
+    };
 
     var tkHtml = '<div class="ai-sec"><div class="ai-h">' + L('보유 티켓', 'Vé đang giữ') + '</div>'
-      + '<div class="ai-tk">' + ['gold', 'silver', 'bronze'].map(function (g) {
-          return '<div class="ai-tk-one"><div class="ai-tk-g">' + gKo(g) + '</div><div class="ai-tk-n">' + tk[g] + '</div></div>';
-        }).join('') + '</div>'
+      + '<div class="ai-tk">' + box(L('티켓', 'Vé'), nTk) + box(L('이벤트 티켓', 'Vé sự kiện'), nEv) + '</div>'
       + '<div class="ai-won">' + won.toLocaleString('ko-KR') + L('원', ' won') + '</div></div>';
 
     var ex = res[1].docs.map(function (d) { return d.data(); })
@@ -814,9 +820,8 @@ function openInfo(uid) {
             var parts = (x.tickets_used && x.tickets_used.length)
               ? x.tickets_used
               : (x.grade_used ? [{ grade: x.grade_used, count: x.count_used || 1 }] : []);
-            var tkTxt = parts.length
-              ? parts.map(function (t) { return gKo(t.grade) + ' ' + t.count; }).join('<br>')
-              : '—';
+            var used = parts.reduce(function (a, t) { return a + ticketsOf(t.grade, t.count); }, 0);
+            var tkTxt = parts.length ? L('티켓 ', 'Vé ') + used.toLocaleString('ko-KR') + L('장', '') : '—';
             var stTxt = (x.status === 'cancelled') ? L('취소', 'Đã hủy')
               : (x.status === 'used') ? L('사용완료', 'Đã dùng') : L('발급완료', 'Đã cấp');
             return '<tr><td>' + day + '</td><td>' + (nm ? esc(nm) : dash()) + '</td>'
@@ -1301,7 +1306,7 @@ load();
      표는 매번 다시 그려지므로 MutationObserver가 새로 생긴 노드까지 따라간다. -->
 <script>
 (function(){
-  var KO2VI = {"가상 데이터 넣기":"Thêm dữ liệu ảo","대상":"Đối tượng","전체 계정":"Toàn bộ tài khoản","고른 계정만":"Chỉ tài khoản đã chọn","무엇을":"Thêm gì","티켓":"Vé","얼마나":"Bao nhiêu","구매 건수":"Số lượt mua","티켓 장수":"Số vé","골드":"Vàng","실버":"Bạc","브론즈":"Đồng","기존 것":"Dữ liệu cũ","비우고 새로":"Xóa rồi thêm mới","더하기":"Thêm vào","넣기":"Thêm","비우기":"Xóa sạch","계정 상세":"Chi tiết tài khoản","보유 티켓":"Vé đang giữ","구매 내역":"Lịch sử mua","불러오지 못했습니다.":"Không tải được.","구매 내역이 없습니다.":"Không có lịch sử mua.",
+  var KO2VI = {"가상 데이터 넣기":"Thêm dữ liệu ảo","대상":"Đối tượng","전체 계정":"Toàn bộ tài khoản","고른 계정만":"Chỉ tài khoản đã chọn","무엇을":"Thêm gì","티켓":"Vé","얼마나":"Bao nhiêu","구매 건수":"Số lượt mua","티켓 장수":"Số vé","이벤트 티켓":"Vé sự kiện","기존 것":"Dữ liệu cũ","비우고 새로":"Xóa rồi thêm mới","더하기":"Thêm vào","넣기":"Thêm","비우기":"Xóa sạch","계정 상세":"Chi tiết tài khoản","보유 티켓":"Vé đang giữ","구매 내역":"Lịch sử mua","불러오지 못했습니다.":"Không tải được.","구매 내역이 없습니다.":"Không có lịch sử mua.",
   "데모에서 앱을 테스트할 때 가상 데이터를 어느 계정에 넣을지 여기서 확인합니다.": "Nơi xác nhận sẽ đưa dữ liệu giả vào tài khoản nào khi kiểm thử ứng dụng trong bản demo.",
   "+ 계정 추가": "+ Thêm tài khoản",
   "저장이 막혀 있습니다.": "Việc lưu đang bị chặn.",
@@ -1371,7 +1376,7 @@ load();
   var _orig=new Map(), _tracked=new Set(), _applying=false;
   function hasKo(s){ return /[가-힯ᄀ-ᇿ㄰-㆏]/.test(s); }
   /* ── 규칙층 ─────────────────────────────────────────────────────────
-     「골드 15장」·「(3,000원)」·「총 54건」처럼 숫자가 매번 달라지는 말은
+     「티켓 15장」·「(3,000원)」·「총 54건」처럼 숫자가 매번 달라지는 말은
      사전에 다 적어 둘 수가 없다. 그래서 사전에서 못 찾았을 때만 여기서 한 번 더 본다.
 
      ⚠ 상품명·브랜드명·닉네임·주문번호는 데이터다 — 번역 대상이 아니다.
@@ -1379,8 +1384,8 @@ load();
      집어 바꾸는 일은 하지 않는다. 「떠먹는 스초생 + 아메리카노 R 2잔」 같은 상품명이
      조각조각 깨지는 것을 막기 위해서다(조각 하나라도 모르면 통째로 포기한다).
 
-     등급 이름과 화폐 표기는 이 파일 사전에서 그대로 끌어 쓴다 — 화면마다
-     Gold/Vàng, ₩/won 이 다른데 규칙이 제 값을 따로 들고 있으면 어긋난다. */
+     티켓 이름과 화폐 표기는 이 파일 사전에서 그대로 끌어 쓴다 — 화면마다
+     Vé/Ticket, ₩/won 이 다른데 규칙이 제 값을 따로 들고 있으면 어긋난다. */
   var VI_UNIT = { '장':'vé', '일':'ngày', '개월':'tháng', '건':'trường hợp', '회':'lần' };
   function viWord(ko){ var v = KO2VI[ko]; return (v == null) ? ko : v; }
   function viNum(s){ return String(s).replace(/,/g, '.'); }   /* 1,000 → 1.000 (베트남 자릿점) */
@@ -1390,19 +1395,15 @@ load();
     if (!hasKo(t)) return t;                 /* 숫자·영문 조각은 그대로 통과 */
     var d = KO2VI[t]; if (d != null) return d;
     var m;
-    /* 등급 — 「골드 15」·「골드 15장」·「−골드 141」·「잔여 골드 33장」·「골드 15장 사용」 */
-    /* 끝의 「 +」는 「조합이 더 있다」는 표시다(앱 카드) — 그대로 달아 둔다. */
-    m = t.match(/^(잔여\s+)?([-\u2212])?(골드|실버|브론즈)\s+([\d,]+)(장)?(?:\s+(사용|차감))?(\s\+)?$/);
+    /* 티켓 — 「티켓 15장」·「이벤트 티켓 15장」·「잔여 티켓 33장」·「티켓 15장 사용」 */
+    m = t.match(/^(잔여\s+)?([-\u2212])?(티켓|이벤트 티켓)\s+([\d,]+)장?(?:\s+(사용|차감))?$/);
     if (m) {
-      var s = (m[2] || '') + viWord(m[3]) + ' ' + viNum(m[4]) + (m[5] ? ' vé' : '');
+      var s = (m[2] || '') + viWord(m[3]) + ' ' + viNum(m[4]);
       if (m[1]) s = 'Còn lại ' + s;
-      if (m[6] === '사용') s += ' đã dùng';
-      if (m[6] === '차감') s += ' bị trừ';
-      return s + (m[7] || '');
+      if (m[5] === '사용') s += ' đã dùng';
+      if (m[5] === '차감') s += ' bị trừ';
+      return s;
     }
-    /* 「골드 티켓 15장」 */
-    m = t.match(/^(골드|실버|브론즈) 티켓 ([\d,]+)장$/);
-    if (m) return viWord(m[1]) + ' ' + viNum(m[2]) + ' vé';
     /* 금액 — 「3,000원」·「(3,000원)」·「(−28,200원)」 */
     m = t.match(/^(\()?([-\u2212])?([\d,]+)원(\))?$/);
     if (m && !m[1] === !m[4]) {
@@ -1420,13 +1421,13 @@ load();
     /* 「대량 가져오기 (총 0 / 성공 0 , 실패 0)」 */
     m = t.match(/^대량 가져오기 \(총 ([\d,]+) \/ 성공 ([\d,]+) , 실패 ([\d,]+)\)$/);
     if (m) return 'Nhập hàng loạt (Tổng ' + viNum(m[1]) + ' / Thành công ' + viNum(m[2]) + ' , Thất bại ' + viNum(m[3]) + ')';
-    /* 「현재 보유: 브론즈 132장 · 실버 79장」 */
+    /* 「현재 보유: 티켓 132장 · 이벤트 티켓 79장」 */
     m = t.match(/^현재 보유: (.+)$/);
     if (m) { var r = viSplit(m[1]); if (r == null) r = viAtom(m[1]); return (r == null) ? null : 'Hiện có: ' + r; }
     /* 「2026.09.17까지」·「2026.09.17까지 (90일)」 */
     m = t.match(/^([\d.\-\/]+)까지(?: \(([\d,]+)일\))?$/);
     if (m) return 'Đến ' + m[1] + (m[2] ? ' (' + viNum(m[2]) + ' ngày)' : '');
-    /* 「골드 15 (3,000원)」 — 조합과 금액을 한 칸에 같이 적는 자리 */
+    /* 「티켓 15장 (150원)」 — 장수와 금액을 한 칸에 같이 적는 자리 */
     m = t.match(/^(.+) (\([\d,\u2212-]+원\))$/);
     if (m) {
       var a = viAtom(m[1]); if (a == null) a = viSplit(m[1]);
