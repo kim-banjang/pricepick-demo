@@ -8265,9 +8265,12 @@ body.interactive-mode #ip-nav { display: block; }
 .hmc-ico {
     width: 50px; height: 50px; border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
-    font-size: 26px;
+    font-size: 27px; line-height: 1;
   }
-.hmc-ico.attend { background: linear-gradient(140deg,#FFE89A,#FFC54D); box-shadow: 0 5px 12px rgba(240,170,30,.4), inset 0 2px 3px rgba(255,255,255,.7); }
+.hmc-ico img { width: 32px; height: auto; display: block; }
+/* 아이콘 원 — 이모지가 얹히도록 실제 앱처럼 연한 방사형(2026-10-15) */
+.hmc-ico.attend { background: radial-gradient(circle at 34% 30%,#FFF1C2,#F7C85A); box-shadow: 0 5px 12px rgba(240,170,30,.35), inset 0 2px 3px rgba(255,255,255,.7); }
+.hmc-ico.gift { background: radial-gradient(circle at 34% 30%,#F4EFFF,#CDBBFF); box-shadow: 0 5px 12px rgba(130,90,240,.3), inset 0 2px 3px rgba(255,255,255,.7); }
   /* ============== 14. 쿠팡 구경하기 ============== */
   .ac-screen { height:100%; display:flex; flex-direction:column; background:var(--bg); position:relative; }
   /* 출석체크 결과 모달 — 시안 "출석체크 페이지"의 실제 앱 구조: 화면 딤 + 흰 카드만.
@@ -8569,8 +8572,8 @@ body.interactive-mode #ip-nav { display: block; }
   .iv-share-btn:active { transform:scale(.98); background:#6247E8; }
 
 .hmc-ico.roulette { background: linear-gradient(140deg,#FFD4EA,#FF8EC6); box-shadow: 0 5px 12px rgba(240,100,170,.4), inset 0 2px 3px rgba(255,255,255,.7); }
-.hmc-ico.invite { background: linear-gradient(140deg,#DCEEFF,#76B7FF); box-shadow: 0 5px 12px rgba(80,150,230,.4), inset 0 2px 3px rgba(255,255,255,.7); }
-.hmc-ico.streak { background: linear-gradient(140deg,#E7DEFF,#9C7EFF); box-shadow: 0 5px 12px rgba(130,90,240,.4), inset 0 2px 3px rgba(255,255,255,.7); }
+.hmc-ico.invite { background: radial-gradient(circle at 34% 30%,#EAF4FF,#8EC1FF); box-shadow: 0 5px 12px rgba(80,150,230,.35), inset 0 2px 3px rgba(255,255,255,.7); }
+.hmc-ico.streak { background: radial-gradient(circle at 34% 30%,#EEE7FF,#A98BFF); box-shadow: 0 5px 12px rgba(130,90,240,.35), inset 0 2px 3px rgba(255,255,255,.7); }
   /* ===== 17. 연속구매 미션 (2026-08 New Design 이식) ===== */
   .sm2-hero { border-radius:22px; padding:20px 18px;
     background-image: linear-gradient(rgba(255,255,255,.3), rgba(255,255,255,.36)), url("/app/assets/hero-bg-invite-streak.png");
@@ -9744,10 +9747,10 @@ window.PP_FEATURES = {
             </div>
           </div>
 
-          <!-- 미션 3개 -->
+          <!-- 미션 — 아이콘은 실제 앱과 같은 이모지 + 3D 선물상자(2026-10-15, 20261015_NewDesign_home.html) -->
           <div class="home-mission-row">
             <div class="home-mission-card hmc-attend">
-              <div class="hmc-ico attend"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8h14l1 12H4L5 8z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg></div>
+              <div class="hmc-ico attend">🛍️</div>
               <div class="hmc-title">쿠팡 구경</div>
               <div class="hmc-reward">매일 <b>100P</b></div>
             </div>
@@ -9759,17 +9762,17 @@ window.PP_FEATURES = {
               <div class="hmc-reward">하루 <b>1회</b></div>
             </div>
             <div class="home-mission-card hmc-gb1" data-jump="gb1">
-              <div class="hmc-ico" style="background:linear-gradient(140deg,#C6AFFF,#845EEE)"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="13" rx="2"/><path d="M3 12h18"/><path d="M12 8v13"/><path d="M12 8S10.5 4 8 4a2.5 2.5 0 0 0 0 5h4z"/><path d="M12 8s1.5-4 4-4a2.5 2.5 0 0 1 0 5h-4z"/></svg></div>
+              <div class="hmc-ico gift"><img src="/app/assets/giftbox/box-purple.png" alt=""></div>
               <div class="hmc-title"><span class="i18n"><span class="ko">매일 선물</span><span class="vi">Quà mỗi ngày</span></span></div>
               <div class="hmc-reward"><span class="i18n"><span class="ko">하루 <b>1회</b></span><span class="vi"><b>1 lần</b>/ngày</span></span></div>
             </div>
             <div class="home-mission-card hmc-invite">
-              <div class="hmc-ico invite"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M3 20a6 6 0 0 1 12 0"/><path d="M16 5.6a3.2 3.2 0 0 1 0 5.4"/><path d="M17.4 14.6A6 6 0 0 1 21 20"/></svg></div>
+              <div class="hmc-ico invite">👥</div>
               <div class="hmc-title">친구 초대</div>
               <div class="hmc-reward">각 <b>500P</b></div>
             </div>
             <div class="home-mission-card hmc-streak">
-              <div class="hmc-ico streak"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1.2"/></svg></div>
+              <div class="hmc-ico streak">🎯</div>
               <div class="hmc-title">연속구매</div>
               <div class="hmc-reward">최대 <b>5장</b></div>
             </div>
