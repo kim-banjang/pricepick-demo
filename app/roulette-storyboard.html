@@ -152,12 +152,12 @@
         <p class="desc">진입할 때마다 CMS가 저장한 <code>settings/roulette</code> 문서를 다시 읽어 6칸(유형·값)을 그대로 그린다. 하드코딩이 아니라 운영자가 바꾸면 앱이 바뀐다. 문서가 없으면 기본값 예시로 대체. 상단 배지에 오늘 남은 기회(1회)가 표시된다.</p>
         <table class="wheel-tbl">
           <tr><th>칸</th><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td></tr>
-          <tr><th>구성 (기본값 예시)</th><td class="win">이벤트 티켓 1장</td><td class="miss">꽝</td><td class="win">포인트 100P</td><td class="win">이벤트 티켓 2장</td><td class="miss">꽝</td><td class="win">포인트 200P</td></tr>
+          <tr><th>구성 (기본값 예시)</th><td class="win">이벤트 티켓 1장</td><td class="miss">꽝</td><td class="win">포인트 10P</td><td class="win">이벤트 티켓 2장</td><td class="miss">꽝</td><td class="win">포인트 20P</td></tr>
         </table>
         <div class="shots">
           <div class="shot wide">
             <img src="roulette-storyboard-assets/02-roulette-initial.png" alt="행운룰렛 초기 화면 — 6칸 휠, 오늘 남은 기회 1회, 돌리기 버튼">
-            <div class="cap">룰렛 초기 상태 · 6칸(포인트 100/200P · 이벤트 티켓 1/2장 · 꽝 2칸) + "돌리기"</div>
+            <div class="cap">룰렛 초기 상태 · 6칸(포인트 10/20P · 이벤트 티켓 1/2장 · 꽝 2칸) + "돌리기"</div>
           </div>
         </div>
         <div class="badge-note">
@@ -180,11 +180,11 @@
         <div class="branch-wrap">
           <div class="branch win">
             <span class="tag">당첨 · 포인트</span>
-            <h3>포인트 칸 (100P / 200P)</h3>
+            <h3>포인트 칸 (10P / 20P)</h3>
             <p>당첨 즉시 포인트 지급. 결과 카드에 "축하해요! 보상이 지급됐어요"와 지급액 표시.</p>
             <div class="shot">
-              <img src="roulette-storyboard-assets/03-result-point.png" alt="포인트 100P 당첨 결과 화면">
-              <div class="cap">"100P 당첨" · 실제 지급 완료</div>
+              <img src="roulette-storyboard-assets/03-result-point.png" alt="포인트 10P 당첨 결과 화면">
+              <div class="cap">"10P 당첨" · 실제 지급 완료</div>
             </div>
           </div>
           <div class="branch win2">
@@ -234,8 +234,8 @@
         <p class="desc">지급은 별도 대기 없이 즉시다. 포인트는 홈 상단 포인트 잔액에, 이벤트 티켓은 혜택 탭 "이벤트 티켓" 카드 수량에 바로 반영된다. 이벤트 티켓은 경품 응모 전용이라 적립(등급) 티켓과 완전히 분리돼 표시된다.</p>
         <div class="shots">
           <div class="shot wide">
-            <img src="roulette-storyboard-assets/06-home-after-point.png" alt="100P 당첨 직후 홈 화면 — 포인트 100P 반영">
-            <div class="cap">100P 당첨 직후 홈 · 0P → 100P 즉시 반영</div>
+            <img src="roulette-storyboard-assets/06-home-after-point.png" alt="10P 당첨 직후 홈 화면 — 포인트 10P 반영">
+            <div class="cap">10P 당첨 직후 홈 · 0P → 10P 즉시 반영</div>
           </div>
           <div class="shot wide">
             <img src="roulette-storyboard-assets/07-benefit-event-ticket.png" alt="이벤트 티켓 2장 당첨 직후 혜택 탭 — 이벤트 티켓 2장 반영">
@@ -254,11 +254,11 @@
       <div class="step-card">
         <span class="role role-user">유저</span>
         <h2>활동 내역 — 당첨 보상 영구 기록</h2>
-        <p class="desc">마이 &gt; 활동 내역에 지급 건이 기록된다. 포인트는 "행운 룰렛 당첨 +100P"로, 이벤트 티켓은 "이벤트 티켓 적립 +1장"으로 남는다. 2장 당첨은 티켓 문서가 장 단위로 발급되므로 <b>+1장 기록 2건</b>으로 표시된다.</p>
+        <p class="desc">마이 &gt; 활동 내역에 지급 건이 기록된다. 포인트는 "행운 룰렛 당첨 +10P"로, 이벤트 티켓은 "이벤트 티켓 적립 +1장"으로 남는다. 2장 당첨은 티켓 문서가 장 단위로 발급되므로 <b>+1장 기록 2건</b>으로 표시된다.</p>
         <div class="shots">
           <div class="shot wide">
-            <img src="roulette-storyboard-assets/08-ledger-point.png" alt="활동 내역 — 행운 룰렛 당첨 +100P">
-            <div class="cap">활동 내역 · "행운 룰렛 당첨 — 포인트 +100P"</div>
+            <img src="roulette-storyboard-assets/08-ledger-point.png" alt="활동 내역 — 행운 룰렛 당첨 +10P">
+            <div class="cap">활동 내역 · "행운 룰렛 당첨 — 포인트 +10P"</div>
           </div>
           <div class="shot wide">
             <img src="roulette-storyboard-assets/09-ledger-event-ticket.png" alt="활동 내역 — 이벤트 티켓 적립 +1장 두 건">
@@ -300,7 +300,7 @@
       <div class="step-card">
         <span class="role role-cms">운영자 · CMS</span>
         <h2>CMS "행운룰렛 설정" — 6칸 유형·값 편집 (실연동)</h2>
-        <p class="desc">CMS &gt; 티켓 · 보상 &gt; 행운룰렛 설정에서 6칸 각각의 유형(꽝 / 이벤트티켓 / 포인트)과 값(장수 / P 액수)을 편집해 저장하면 <code>settings/roulette</code>에 기록되고, 앱은 다음 진입 시 그대로 반영한다. 꽝 선택 시 값 입력은 자동 비활성화된다. 캡처 시점 저장값은 기본값 예시와 동일한 6칸(이벤트티켓 1장 / 꽝 / 포인트 100 / 이벤트티켓 2장 / 꽝 / 포인트 200)이며, 운영자가 CMS에서 언제든 편집·저장해 값을 바꿀 수 있다.</p>
+        <p class="desc">CMS &gt; 티켓 · 보상 &gt; 행운룰렛 설정에서 6칸 각각의 유형(꽝 / 이벤트티켓 / 포인트)과 값(장수 / P 액수)을 편집해 저장하면 <code>settings/roulette</code>에 기록되고, 앱은 다음 진입 시 그대로 반영한다. 꽝 선택 시 값 입력은 자동 비활성화된다. 캡처 시점 저장값은 기본값 예시와 동일한 6칸(이벤트티켓 1장 / 꽝 / 포인트 10 / 이벤트티켓 2장 / 꽝 / 포인트 20)이며, 운영자가 CMS에서 언제든 편집·저장해 값을 바꿀 수 있다.</p>
         <div class="shots">
           <div class="shot" style="flex-basis:100%;">
             <img src="roulette-storyboard-assets/11-cms-roulette-settings.png" alt="CMS 행운룰렛 설정 화면 — 6칸 유형·값 편집" style="width:640px;max-width:100%;">
@@ -323,7 +323,7 @@
           <li><span class="k">성격</span> — 출석(쿠팡 구경)과 무관한 독립 상시 이벤트. 구매 없이 참여 가능.</li>
           <li><span class="k">참여</span> — 하루 1회, 매일 자정 초기화.</li>
           <li><span class="k">보상</span> — 포인트 또는 이벤트 티켓을 확률 지급. 확률·배분은 고정 정책값이 아니라 운영자가 CMS에서 직접 설정하는 가변값이다(6칸 균등 1/6 추첨).</li>
-          <li><span class="k">6칸 배분값</span> <span class="pill-info">운영자 설정(가변)</span> — 기본값 예시: 포인트 100P·200P / 이벤트 티켓 1장·2장 / 꽝 2칸. CMS <code>settings/roulette</code>에 저장되며 운영자가 언제든 값을 바꿀 수 있다.</li>
+          <li><span class="k">6칸 배분값</span> <span class="pill-info">운영자 설정(가변)</span> — 기본값 예시: 포인트 10P·20P / 이벤트 티켓 1장·2장 / 꽝 2칸. CMS <code>settings/roulette</code>에 저장되며 운영자가 언제든 값을 바꿀 수 있다.</li>
           <li><span class="k">이벤트 티켓 성격</span> — 경품 응모(추첨) 전용, 등급(적립) 티켓과 완전 분리. 발급일 +100일 만료.</li>
           <li><span class="k">지급 한도</span> — 이벤트 티켓 어뷰징 한도 일 5장 / 월 30장이 룰렛 지급에도 적용(전 경로 합산). 한도 초과 당첨 건은 미지급 처리(결과 카드에 안내).</li>
           <li><span class="k">포인트 지급</span> — 즉시 지급·즉시 반영, 활동 내역 "행운 룰렛 당첨"으로 기록. 구매와 무관한 무상 보상이라 환불·환수와 무관.</li>
