@@ -12,3 +12,6 @@ flutter/
 # 로컬 개발용 의존성 — 정적 배포에 빌드 단계가 없어 쓰이지 않는다
 # (scripts/seed-*.js 는 로컬에서만 실행)
 node_modules/
+
+# 쇼핑 적립 ASP 시험 코드 — 로컬에서만 돈다 (node tests/asp/run.js · node tests/asp/dev-server.js)
+tests/

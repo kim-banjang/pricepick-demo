@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#131419">
+<meta name="robots" content="noindex">
+<meta name="referrer" content="no-referrer">
+<title>쇼핑 적립</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800&family=Outfit:wght@300;600;800&display=swap">
+<style>
+/* 쇼핑 적립 — 탑툰 앱 안 화면. 폰 폭 전체를 채우고, 넓은 화면에서는 가운데 480px. 앱 화면은 프로토타입과 같은 다크 단일 톤 */
+:root{
+  --bg:#131419; --surface:#1F2129; --surface-2:#262933; --surface-3:#2A2D37; --line:#23262F; --line-2:#3A3D47;
+  --text:#F4F5F8; --text-2:#E3E5EC; --sub:#A3A7B4; --muted:#8A8E9C;
+  --violet:#9B7BFF; --violet-soft:#C4B3FF; --link:#B8A4FF; --btn:#6E4BF0; --amber:#FFC93C; --amber-soft:#FFD466; --green:#6EE7A0; --red:#FF9B9B; --band:#2A1E66;
+  --font:'Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif; --num:'Outfit','Noto Sans KR',sans-serif;
+  color-scheme:dark;
+}
+html,body{height:100%;margin:0;background:#0B0C10}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
+.device{position:fixed;top:0;bottom:0;left:0;right:0;margin:0 auto;width:100%;max-width:480px;overflow:hidden;background:var(--bg);color:var(--text);font-family:var(--font)}
+.device *{box-sizing:border-box}
+.device button:focus-visible,.device input:focus-visible{outline:2px solid var(--violet-soft);outline-offset:2px;border-radius:10px}
+
+.screen{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;background:var(--bg);scrollbar-width:none}
+.screen::-webkit-scrollbar{display:none}
+.screen.fwd{animation:fwd .28s cubic-bezier(.2,.7,.2,1)}
+.screen.bwd{animation:bwd .28s cubic-bezier(.2,.7,.2,1)}
+@keyframes fwd{from{opacity:0;transform:translateX(22px)}to{opacity:1;transform:none}}
+@keyframes bwd{from{opacity:0;transform:translateX(-22px)}to{opacity:1;transform:none}}
+@keyframes up{from{opacity:0;transform:translateY(36px)}to{opacity:1;transform:none}}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+@keyframes pop{0%{transform:scale(.4);opacity:0}70%{transform:scale(1.08);opacity:1}100%{transform:scale(1)}}
+
+.bar{position:sticky;top:0;z-index:5;height:56px;padding:0 12px 0 6px;display:flex;align-items:center;justify-content:space-between;background:var(--bg)}
+.bar-l{display:flex;align-items:center;gap:2px}
+.icon-btn{width:44px;height:44px;display:flex;align-items:center;justify-content:center;color:var(--text)}
+.bar-title{margin:0;font-size:17px;font-weight:700}
+.ghost-btn{height:44px;display:flex;align-items:center}
+.ghost-btn span{height:36px;padding:0 14px;border:1px solid #4A4E5C;border-radius:10px;display:flex;align-items:center;font-size:14px;font-weight:500;color:var(--text-2)}
+
+.hero{padding:20px 24px 0}
+.hero-h{margin:0;font-size:28px;line-height:1.38;font-weight:800;letter-spacing:-.02em}
+.hero-label{margin-top:28px;font-size:14px;color:var(--sub)}
+.hero-row{margin-top:6px;display:flex;align-items:center;gap:10px}
+.hero-num{font-family:var(--num);font-size:46px;font-weight:800;line-height:1;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.hero-unit{margin-left:-6px;align-self:flex-end;padding-bottom:6px;font-size:20px;font-weight:700}
+.pill{margin-left:6px;height:40px;padding:0 16px;border-radius:20px;background:var(--surface-2);color:var(--text-2);font-size:14px;font-weight:500}
+.hero-conv{margin-top:10px;font-size:14px;font-weight:700;color:var(--text-2)}
+.hero-rate{margin-top:2px;font-size:13px;color:var(--sub)}
+.cta{margin-top:20px;width:100%;height:56px;border-radius:16px;background:var(--btn);color:#FFFFFF;font-size:17px;font-weight:700}
+.cta:active{filter:brightness(.92)}
+.cta[disabled]{background:var(--surface-2);color:var(--muted);cursor:default}
+.hint{margin:12px 0 0;font-size:13px;line-height:1.6;color:var(--sub)}
+.hint b{color:var(--text);font-weight:700}
+.hint.ok{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.hint.ok>span{display:flex;align-items:center;gap:6px;color:var(--green)}
+.hint.err{display:flex;align-items:flex-start;gap:6px;color:var(--red)}
+.hint.err svg{flex:none;margin-top:3px}
+.link{flex:none;height:32px;display:inline-flex;align-items:center;gap:1px;color:var(--link);font-weight:500}
+
+.malls{padding:40px 24px 0}
+.sec-head{display:flex;align-items:baseline;justify-content:space-between}
+.sec-head h2{margin:0;font-size:18px;font-weight:700}
+.sec-head span{font-size:13px;color:var(--muted)}
+.grid{margin-top:44px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));row-gap:26px;column-gap:8px}
+.mall{position:relative;display:flex;flex-direction:column;align-items:center;gap:10px;color:var(--text-2);font-size:14px;font-weight:500;white-space:nowrap}
+.mall img{width:68px;height:68px;border-radius:50%;object-fit:cover;background:#FFFFFF;display:block;transition:transform .15s}
+.mall:active img{transform:scale(.93)}
+.mall.down{color:var(--muted)}
+.mall.down img{filter:grayscale(1);opacity:.4}
+.bubble{position:absolute;top:-38px;left:50%;transform:translateX(-50%);white-space:nowrap;padding:5px 11px;border:1.5px solid var(--violet);border-radius:16px;background:var(--bg);color:var(--text);font-size:12px;font-weight:700}
+.bubble::after{content:"";position:absolute;bottom:-6px;left:50%;width:9px;height:9px;background:var(--bg);border-right:1.5px solid var(--violet);border-bottom:1.5px solid var(--violet);transform:translateX(-50%) rotate(45deg)}
+
+.band{margin-top:44px;width:100%;height:132px;padding:0 20px 0 24px;background:var(--band);color:var(--text);text-align:left;display:flex;align-items:center;justify-content:space-between;position:relative}
+.band-k{display:block;font-size:15px;font-weight:700;color:#B9A8FF}
+.band-t{display:block;margin-top:6px;font-size:19px;font-weight:800;line-height:1.38;letter-spacing:-.02em}
+.band svg{flex:none}
+.band-pg{position:absolute;right:14px;bottom:12px;padding:2px 10px;border-radius:12px;background:rgba(0,0,0,.35);font-family:var(--num);font-size:13px;font-weight:600;color:var(--text-2)}
+
+.me{padding:40px 24px 0}
+.me-k{font-size:15px;font-weight:500;color:var(--violet)}
+.me-t{margin:8px 0 0;font-size:26px;font-weight:800;line-height:1.35;letter-spacing:-.02em}
+.me-t em{font-style:normal;color:var(--violet-soft)}
+.me .link{margin-top:12px;height:44px;font-size:15px}
+
+.notes{margin-top:40px;padding:28px 24px 36px;border-top:8px solid #0D0E12}
+.notes h2{margin:0;font-size:15px;font-weight:700;color:var(--text-2)}
+.notes ul{margin:12px 0 0;padding:0 0 0 18px;display:flex;flex-direction:column;gap:8px;font-size:13px;line-height:1.6;color:var(--sub)}
+.notes b{color:var(--text);font-weight:700}
+.notes p{margin:24px 0 0;font-size:12px;color:var(--muted)}
+
+.sum{margin:8px 20px 0;padding:20px;border-radius:20px;background:var(--surface)}
+.sum-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:16px}
+.sum-col{display:flex;flex-direction:column;gap:6px;min-width:0}
+.sum-col+.sum-col{padding-left:16px;border-left:1px solid #2E313B}
+.sum-l{font-size:13px;color:var(--sub)}
+.sum-v{display:flex;align-items:center;gap:8px}
+.sum-v b{font-family:var(--num);font-size:30px;font-weight:800;line-height:1;font-variant-numeric:tabular-nums}
+.sum-v i{margin-left:-4px;font-style:normal;font-size:15px;font-weight:700}
+.sum-col.hl .sum-v{color:var(--violet-soft)}
+.sum-s{font-size:12px;color:var(--muted)}
+.sum-note{margin:16px 0 0;padding-top:14px;border-top:1px solid #2E313B;font-size:13px;line-height:1.6;color:var(--sub)}
+.chips{margin-top:24px;padding:0 20px;display:flex;gap:6px}
+.chip{flex:1 1 auto;height:40px;padding:0 8px;border-radius:20px;background:var(--surface);color:#C9CCD6;font-size:14px;font-weight:500;white-space:nowrap;display:flex;align-items:center;justify-content:center;gap:4px}
+.chip b{font-family:var(--num);font-weight:600}
+.chip[aria-pressed="true"]{background:var(--text);color:var(--bg)}
+.rows{margin-top:8px;padding:0 20px 28px}
+.row{display:flex;gap:14px;padding:18px 0;border-bottom:1px solid var(--line)}
+.row-ic{flex:none;width:44px;height:44px}
+.row-ic img{width:44px;height:44px;border-radius:50%;object-fit:cover;background:#FFFFFF;display:block}
+.row-coin{width:44px;height:44px;border-radius:50%;background:var(--surface-3);display:flex;align-items:center;justify-content:center}
+.row-main{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px}
+.row-top{display:flex;justify-content:space-between;align-items:baseline;gap:12px}
+.row-name{font-size:16px;font-weight:700}
+.row-amt{flex:none;font-family:var(--num);font-size:18px;font-weight:800;font-variant-numeric:tabular-nums}
+.row-amt small{margin-left:2px;font-family:var(--font);font-size:13px;font-weight:500}
+.row-amt.done{color:var(--violet-soft)}
+.row-amt.conv{color:var(--amber)}
+.row-amt.miss{color:#6E7281;text-decoration:line-through}
+.row-meta{font-size:13px;color:var(--muted)}
+.row-st{margin-top:4px;display:flex;align-items:center;gap:8px}
+.badge{flex:none;height:24px;padding:0 8px;border-radius:6px;font-size:12px;font-weight:700;display:flex;align-items:center}
+.badge.pending{background:rgba(155,123,255,.18);color:var(--violet-soft)}
+.badge.done{background:rgba(74,222,128,.15);color:var(--green)}
+.badge.conv{background:rgba(255,201,60,.16);color:var(--amber-soft)}
+.badge.miss{background:var(--surface-3);color:var(--sub)}
+.row-detail{font-size:13px;color:#C9CCD6}
+.row-st .link{margin-left:auto;font-size:13px}
+.empty{margin:56px 24px 0;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;font-size:14px;line-height:1.6;color:var(--sub)}
+.empty b{margin-top:6px;font-size:16px;color:var(--text)}
+.empty .pill{margin:10px 0 0}
+
+.g-wrap{min-height:100%;display:flex;flex-direction:column}
+.g-card{margin:12px 20px 0;padding:28px 24px 24px;border-radius:24px;background:var(--surface);display:flex;flex-direction:column;align-items:center;text-align:center}
+.g-card img{width:80px;height:80px;border-radius:50%;object-fit:cover;background:#FFFFFF;display:block}
+.g-name{margin-top:14px;font-size:22px;font-weight:800;letter-spacing:-.02em}
+.g-tag{margin-top:10px;height:30px;padding:0 12px;border-radius:15px;background:rgba(155,123,255,.18);color:var(--violet-soft);font-size:13px;font-weight:700;display:flex;align-items:center;gap:6px}
+.g-rate{margin-top:8px;font-size:13px;color:var(--sub)}
+.steps{padding:32px 24px 0}
+.steps h2{margin:0;font-size:17px;font-weight:700}
+.steps ol{margin:16px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:16px}
+.steps li{display:flex;gap:12px;align-items:flex-start;font-size:15px;line-height:1.6;color:var(--text-2)}
+.steps li b{color:var(--text)}
+.step-n{flex:none;width:28px;height:28px;border-radius:50%;background:var(--surface-3);color:var(--violet-soft);font-family:var(--num);font-size:14px;font-weight:800;display:flex;align-items:center;justify-content:center}
+.steps li span:last-child{padding-top:2px}
+.caution{margin:28px 20px 0;padding:16px 18px;border-radius:16px;background:rgba(255,201,60,.08)}
+.caution-h{display:flex;align-items:center;gap:6px;font-size:14px;font-weight:700;color:var(--amber-soft)}
+.caution ul{margin:8px 0 0;padding:0 0 0 18px;display:flex;flex-direction:column;gap:4px;font-size:13px;line-height:1.6;color:#D9D3C2}
+.g-gap{flex:1 0 24px}
+.g-foot{position:sticky;bottom:0;padding:16px 20px 28px;border-top:1px solid var(--line);background:var(--bg);display:flex;flex-direction:column;gap:10px}
+.sc{width:100%;height:72px;padding:0 16px 0 14px;border:1px solid var(--line-2);border-radius:16px;display:flex;align-items:center;gap:14px;text-align:left}
+.sc.done{border-color:transparent;background:#16241E;cursor:default}
+.sc-ic{position:relative;flex:none;width:44px;height:44px}
+.sc-ic .m{width:44px;height:44px;border-radius:12px;object-fit:cover;background:#FFFFFF;display:block}
+.sc-ic .b{position:absolute;right:-6px;bottom:-6px;width:22px;height:22px;border:2px solid var(--bg);border-radius:7px;object-fit:cover;background:#FFFFFF;display:block}
+.sc.done .sc-ic .b{border-color:#16241E}
+.sc-t{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
+.sc-t b{font-size:15px;font-weight:700}
+.sc-t span{font-size:12px;color:var(--sub)}
+.sc.done .sc-t b{color:var(--green)}
+.sc>svg{flex:none}
+.go{width:100%;height:56px;border-radius:16px;background:var(--btn);color:#FFFFFF;font-size:17px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:6px}
+.disc{margin:2px 0 0;font-size:12px;line-height:1.55;color:var(--muted);text-align:center}
+
+.scrim{position:absolute;inset:0;z-index:20;background:rgba(5,6,9,.68);animation:fade .2s}
+.sheet{position:absolute;left:0;right:0;bottom:0;z-index:21;padding:12px 24px 28px;border-radius:24px 24px 0 0;background:var(--surface);color:var(--text);animation:up .26s cubic-bezier(.2,.7,.2,1)}
+.sheet.center{display:flex;flex-direction:column;align-items:center;text-align:center}
+.handle{margin:0 auto;width:40px;height:4px;border-radius:2px;background:var(--line-2)}
+.pin{margin-top:28px;display:flex;flex-direction:column;align-items:center;gap:8px;font-size:12px;color:#C9CCD6}
+.pin-ic{position:relative;width:72px;height:72px}
+.pin-ic .m{width:72px;height:72px;border-radius:18px;object-fit:cover;background:#FFFFFF;display:block}
+.pin-ic .b{position:absolute;right:-8px;bottom:-8px;width:26px;height:26px;border:2px solid var(--surface);border-radius:8px;object-fit:cover;background:#FFFFFF;display:block}
+.sh-title{margin:20px 0 0;font-size:20px;font-weight:800;line-height:1.4;letter-spacing:-.02em}
+.sh-ctx{margin-top:6px;font-size:13px;color:var(--muted)}
+.sh-p{margin:10px 0 0;font-size:14px;line-height:1.6;color:var(--sub)}
+.sheet .sh-p.lead{margin-top:18px;font-size:15px;line-height:1.65;color:var(--text-2)}
+.btn-main{margin-top:24px;width:100%;height:56px;border-radius:16px;background:var(--btn);color:#FFFFFF;font-size:17px;font-weight:700}
+.btn-light{margin-top:22px;width:100%;height:56px;border-radius:16px;background:var(--text);color:var(--bg);font-size:17px;font-weight:700}
+.btn-text{margin-top:6px;width:100%;height:48px;color:var(--sub);font-size:15px;font-weight:500}
+.reasons{margin:18px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px}
+.reasons li{display:flex;align-items:center;gap:12px;font-size:15px;font-weight:500}
+.reasons span{flex:none;width:36px;height:36px;border-radius:10px;background:var(--surface-3);color:var(--violet-soft);display:flex;align-items:center;justify-content:center}
+.osd{position:absolute;left:39px;right:39px;top:50%;z-index:21;transform:translateY(-50%);padding:24px 24px 10px;border-radius:28px;background:#2B2D33;color:#E6E1E6;animation:fade .2s}
+.osd h2{margin:0;font-size:22px;font-weight:400;line-height:1.3}
+.osd .pin{margin-top:24px;font-size:14px;color:#E6E1E6}
+.osd .pin-ic{width:64px;height:64px}
+.osd .pin-ic .m{width:64px;height:64px;border-radius:16px}
+.osd .pin-ic .b{width:24px;height:24px;border-color:#2B2D33;right:-7px;bottom:-7px}
+.osd p{margin:20px 0 0;font-size:14px;line-height:1.6;color:#C4C7CF}
+.osd-act{margin-top:16px;display:flex;justify-content:flex-end;gap:4px}
+.osd-act button{height:44px;padding:0 12px;font-size:14px;font-weight:500;color:#A8C7FA}
+
+.launch{position:absolute;inset:0;background:#1B2238;color:#FFFFFF;overflow:hidden}
+.wp{position:absolute;border-radius:50%}
+.clock{position:relative;padding:72px 28px 0}
+.clock b{display:block;font-family:var(--num);font-size:64px;font-weight:300;line-height:1;letter-spacing:-.02em}
+.clock span{display:block;margin-top:10px;font-size:15px;font-weight:500;color:#D5DAE8}
+.lgrid{position:relative;margin-top:56px;padding:0 20px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));row-gap:22px;column-gap:8px}
+.app{min-width:0;display:flex;flex-direction:column;align-items:center;gap:7px;font-size:12px;color:#FFFFFF;text-shadow:0 1px 2px rgba(0,0,0,.45)}
+.app>span:last-child{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.app-ic{position:relative;width:60px;height:60px;border-radius:16px;display:flex;align-items:center;justify-content:center}
+.app-ic .m{width:60px;height:60px;border-radius:16px;object-fit:cover;background:#FFFFFF;display:block}
+.app-ic .b{position:absolute;right:-7px;bottom:-7px;width:22px;height:22px;border:2px solid #1B2238;border-radius:7px;object-fit:cover;background:#FFFFFF;display:block}
+.app.new .app-ic{outline:2px solid #B9A8FF;outline-offset:4px;animation:pop .5s cubic-bezier(.2,.7,.2,1)}
+.app.new>span:last-child{font-weight:700}
+.dock{position:absolute;left:16px;right:16px;bottom:28px;height:88px;border-radius:28px;background:rgba(255,255,255,.12);display:grid;grid-template-columns:repeat(4,minmax(0,1fr));align-items:center;justify-items:center}
+
+.toast{position:absolute;left:20px;right:20px;bottom:28px;z-index:40;padding:13px 16px;border-radius:14px;background:rgba(244,245,248,.97);color:#131419;font-size:14px;font-weight:500;line-height:1.5;text-align:center;box-shadow:0 8px 24px rgba(0,0,0,.35);animation:up .22s}
+
+.pend{margin-top:12px;width:100%;padding:14px 16px;border-radius:16px;background:var(--surface);color:var(--text);text-align:left;display:flex;align-items:center;gap:12px}
+.pend svg:first-child{flex:none}
+.pend-t{flex:1;min-width:0;display:flex;align-items:baseline;gap:8px}
+.pend-t span{font-size:14px;color:var(--sub)}
+.pend-t b{font-family:var(--num);font-size:20px;font-weight:800;font-variant-numeric:tabular-nums}
+.pend-t b i{margin-left:2px;font-style:normal;font-family:var(--font);font-size:14px;font-weight:700}
+.pend-r{flex:none;display:flex;align-items:center;gap:2px;font-size:13px;font-weight:500;color:var(--link)}
+.tabbar{position:absolute;left:0;right:0;bottom:0;z-index:10;height:72px;padding:6px 8px 12px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));background:#17181E;border-top:1px solid var(--line)}
+.tab{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:var(--muted);font-size:11px;font-weight:600;letter-spacing:.02em}
+.tab[aria-current="page"]{color:var(--text)}
+.tab[aria-current="page"] svg{color:var(--violet-soft)}
+#view.tabs .screen{bottom:72px}
+.device.tabs .toast{bottom:88px}
+.bar-title.solo{padding-left:18px}
+.prof{padding:12px 24px 0;display:flex;align-items:center;gap:14px}
+.avatar{flex:none;width:56px;height:56px;border-radius:50%;background:var(--surface-2);color:var(--violet-soft);display:flex;align-items:center;justify-content:center}
+.prof-t{display:flex;flex-direction:column;gap:4px;min-width:0}
+.prof-t b{font-size:20px;font-weight:800;letter-spacing:-.02em}
+.prof-t span{font-size:13px;color:var(--sub)}
+.tcard{margin:24px 20px 0;width:calc(100% - 40px);padding:20px 16px 20px 20px;border-radius:20px;background:var(--surface);color:var(--text);text-align:left;display:flex;align-items:center;gap:14px}
+.tcard>svg{flex:none;color:var(--muted)}
+.tcard-main{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px}
+.tcard-k{font-size:13px;color:var(--sub)}
+.tcard-v{display:flex;align-items:center;gap:8px;color:var(--violet-soft)}
+.tcard-v b{font-family:var(--num);font-size:32px;font-weight:800;line-height:1;font-variant-numeric:tabular-nums}
+.tcard-v i{margin-left:-4px;font-style:normal;font-size:16px;font-weight:700}
+.tcard-s{font-size:12px;color:var(--muted)}
+.tcard-side{flex:none;padding-left:14px;border-left:1px solid #2E313B;display:flex;flex-direction:column;gap:6px}
+.tcard-side b{font-family:var(--num);font-size:20px;font-weight:800;font-variant-numeric:tabular-nums}
+.tcard-side b i{margin-left:2px;font-style:normal;font-family:var(--font);font-size:13px;font-weight:700}
+.mysec{margin:32px 24px 0}
+.mysec-h{display:flex;align-items:baseline;justify-content:space-between}
+.mysec-h h2{margin:0;font-size:17px;font-weight:700}
+.mysec-h span{font-size:13px;color:var(--muted)}
+.pins{margin-top:16px;display:flex;flex-wrap:wrap;gap:16px 20px}
+.pinb{display:flex;flex-direction:column;align-items:center;gap:8px;font-size:12px;color:var(--text-2)}
+.my-ic{position:relative;width:52px;height:52px}
+.my-ic .m{width:52px;height:52px;border-radius:14px;object-fit:cover;background:#FFFFFF;display:block}
+.my-ic .b{position:absolute;right:-6px;bottom:-6px;width:20px;height:20px;border:2px solid var(--bg);border-radius:6px;object-fit:cover;background:#FFFFFF;display:block}
+.pin-empty{margin-top:14px;padding:14px 14px 14px 16px;border:1px dashed var(--line-2);border-radius:16px;display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:14px;color:var(--sub)}
+.pin-empty .pill{margin:0;flex:none}
+.menu{margin-top:32px;border-top:8px solid #0D0E12;display:flex;flex-direction:column}
+.menu button{height:60px;padding:0 18px 0 24px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;font-size:16px;font-weight:500;color:var(--text)}
+.menu button svg{color:var(--muted)}
+.my-foot{margin:24px 24px 32px;font-size:12px;color:var(--muted)}
+.faq{padding:4px 0 32px}
+.q{border-bottom:1px solid var(--line)}
+.q button{width:100%;padding:20px 18px 20px 24px;display:flex;align-items:flex-start;gap:10px;text-align:left;font-size:16px;font-weight:700;line-height:1.5;color:var(--text)}
+.q .qm{flex:none;font-family:var(--num);font-weight:800;color:var(--violet)}
+.q button svg{flex:none;margin-left:auto;margin-top:3px;color:var(--muted);transition:transform .2s}
+.q.open button svg{transform:rotate(90deg)}
+.q .a{margin:0;padding:0 24px 20px 46px;font-size:14px;line-height:1.7;color:var(--sub)}
+
+@media (prefers-reduced-motion:reduce){.screen.fwd,.screen.bwd,.sheet,.scrim,.osd,.toast,.app.new .app-ic{animation:none}.mall img{transition:none}}
+/* ── 데이터 연결로 생긴 화면 (프로토타입에 없던 것) ── */
+.lt{width:68px;height:68px;border-radius:50%;background:#FFFFFF;color:#1B1D24;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800}
+.row-ic .lt{width:44px;height:44px;font-size:14px}
+.g-card .lt{width:80px;height:80px;font-size:22px}
+.sc-ic .lt,.pin-ic .lt,.my-ic .lt,.app-ic .lt{width:100%;height:100%;border-radius:inherit;font-size:16px}
+.hint.wait{display:flex;align-items:flex-start;gap:6px;color:var(--amber-soft)}
+.hint.wait svg{flex:none;margin-top:3px}
+.row-amt.pending{color:var(--violet-soft);font-size:15px}
+.row-amt.wait{color:var(--amber-soft)}
+.badge.wait{background:rgba(255,201,60,.16);color:var(--amber-soft)}
+.badge.fail{background:rgba(255,155,155,.14);color:var(--red)}
+.sum-s.rand{color:var(--violet-soft)}
+.state{position:absolute;inset:0;padding:0 32px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:10px}
+.state h1{margin:12px 0 0;font-size:21px;font-weight:800;line-height:1.4;letter-spacing:-.02em}
+.state p{margin:0;font-size:14px;line-height:1.65;color:var(--sub)}
+.state .code{margin-top:4px;font-family:ui-monospace,Menlo,monospace;font-size:12px;color:var(--muted)}
+.state .btn-light{max-width:320px}
+.spin{width:36px;height:36px;border-radius:50%;border:3px solid var(--surface-3);border-top-color:var(--violet);animation:rot 0.9s linear infinite}
+@keyframes rot{to{transform:rotate(360deg)}}
+.cta .spin{display:inline-block;width:18px;height:18px;border-width:2px;margin-right:8px;vertical-align:-3px;border-top-color:#FFFFFF}
+.shop{padding-bottom:24px}
+.shop .g-mall{margin-top:22px;display:flex;align-items:center;gap:12px}
+.shop .g-mall img,.shop .g-mall .lt{width:48px;height:48px;border-radius:50%;object-fit:cover;background:#FFFFFF;font-size:14px}
+.shop .g-mall b{font-size:18px;font-weight:800}
+.demo-tag{display:inline-flex;align-items:center;height:22px;padding:0 8px;border-radius:6px;background:rgba(255,201,60,.16);color:var(--amber-soft);font-size:11px;font-weight:800;letter-spacing:.06em}
+.subid{margin-top:12px;padding:10px 12px;border-radius:12px;background:var(--surface-3);font-family:ui-monospace,Menlo,monospace;font-size:12px;line-height:1.5;color:#C9CCD6;word-break:break-all}
+.amt{margin-top:18px;display:flex;flex-direction:column;gap:8px}
+.amt label{font-size:13px;color:var(--sub)}
+.amt-row{display:flex;align-items:center;gap:8px;height:56px;padding:0 16px;border-radius:14px;background:var(--surface-3)}
+.amt-row input{flex:1;min-width:0;height:100%;border:0;background:none;color:var(--text);font-family:var(--num);font-size:22px;font-weight:700;outline:none}
+.amt-row span{font-size:16px;font-weight:700;color:var(--sub)}
+.amt-q{display:flex;gap:6px}
+.amt-q button{flex:1;height:36px;border-radius:18px;background:var(--surface-2);font-size:13px;color:var(--text-2)}
+.toast{position:absolute}
+.tabbar{padding-bottom:calc(12px + env(safe-area-inset-bottom,0px));height:calc(72px + env(safe-area-inset-bottom,0px))}
+#view.tabs .screen{bottom:calc(72px + env(safe-area-inset-bottom,0px))}
+.mall>span:last-child{max-width:100%;overflow:hidden;text-overflow:ellipsis}
+
+</style>
+</head>
+<body>
+<div class="device" id="device" role="application" aria-label="쇼핑 적립">
+  <div id="view"></div>
+  <div id="toastSlot"></div>
+</div>
+<script>
+(function(){
+'use strict';
+/* 쇼핑 적립 회원 화면 — 서버(api/asp/*)가 정본이다. 이 화면은 받은 값을 그리고, 누른 것을 서버에 보낸다.
+   화면 구성·문구는 2026-10-12 프로토타입 그대로, 숫자·목록·결과만 실제 데이터로 바꿨다.
+   데모 장치(데모 쇼핑몰 시트)는 서버가 demo:true 를 줄 때만 나온다 — 운영 화면에는 없다. */
+const API='/api/asp/';
+const MOCK='/api/asp-mock/';
+const TT_LOGO='/asp/logos/toptoon.png';
+/* CMS DEMO 에 로고가 없을 때 쓰는 기본 로고 (링크프라이스 광고주 ID 기준) */
+const LOCAL_LOGO={coupang_direct:'coupang.jpg','lp:11st':'11st.png','lp:gmarket':'gmarket.png','lp:auction':'auction.png','lp:lotteon':'lotteon.png','lp:woori':'lottehs.png','lp:hmall':'hmall.png','lp:nsseshop':'nsmall.png','lp:emart':'emart.png','lp:cjbrand':'cjthemarket.jpg'};
+const SLIDES=[['쇼핑 적립은','어떻게 탑툰 코인을<br>받는 건가요?'],['STEP 1 · 구매','여기서 쇼핑몰로 이동해<br>평소처럼 구매하세요'],['STEP 2 · 전환','구매가 확정되면<br>탑툰 코인으로 전환해요']];
+const CHIPS=[['all','전체'],['pending','예정'],['done','확정'],['miss','미적립'],['conv','전환']];
+const TABS=['home','history','my'];
+const FAIL_TEXT={'1001':'탑툰 계정을 찾지 못해 전환하지 못했어요. 티켓은 그대로 돌아왔어요. 탑툰 고객센터에 문의해 주세요.','1002':'지금은 이 탑툰 계정으로 코인을 받을 수 없어요. 티켓은 그대로 돌아왔어요.','2001':'연결 설정 문제로 전환하지 못했어요. 티켓은 그대로 남아 있으니 잠시 후 다시 전환해 주세요.','2003':'연결 설정 문제로 전환하지 못했어요. 티켓은 그대로 남아 있으니 잠시 후 다시 전환해 주세요.'};
+const ERR_SCREEN={
+  bad_sig:['올바른 경로로 들어오지 않았어요','탑툰 무료충전소에서 「쇼핑 적립」을 다시 눌러 주세요.'],
+  bad_param:['올바른 경로로 들어오지 않았어요','탑툰 무료충전소에서 「쇼핑 적립」을 다시 눌러 주세요.'],
+  unknown_media:['올바른 경로로 들어오지 않았어요','탑툰 무료충전소에서 「쇼핑 적립」을 다시 눌러 주세요.'],
+  expired:['들어온 지 시간이 오래 지났어요','탑툰 무료충전소에서 「쇼핑 적립」을 다시 눌러 주세요.'],
+  no_session:['탑툰 무료충전소에서 다시 들어와 주세요','쇼핑 적립은 탑툰 무료충전소의 「쇼핑 적립」에서 열 수 있어요.'],
+  no_member:['탑툰 무료충전소에서 다시 들어와 주세요','쇼핑 적립은 탑툰 무료충전소의 「쇼핑 적립」에서 열 수 있어요.'],
+  media_stopped:['지금은 쇼핑 적립을 이용할 수 없어요','잠시 후 다시 이용해 주세요.'],
+  network:['연결이 원활하지 않아요','잠시 후 다시 시도해 주세요.']
+};
+const APPS=[
+  {name:'캘린더',bg:'#E8EBF2',fg:'#3B4A6B',d:'<path d="M4 6h16v14H4zM4 10h16M8 3.5v4M16 3.5v4"/>'},
+  {name:'시계',bg:'#2E3440',fg:'#FFFFFF',d:'<path d="M12 3.5a8.5 8.5 0 1 0 0 17a8.5 8.5 0 1 0 0-17zM12 7.5V12l3 2"/>'},
+  {name:'날씨',bg:'#4A7BD0',fg:'#FFFFFF',d:'<path d="M7 15.5a4 4 0 0 1 .5-8 5 5 0 0 1 9.5 1.5 3.3 3.3 0 0 1 0 6.5z"/>'},
+  {name:'지도',bg:'#3E8E6B',fg:'#FFFFFF',d:'<path d="M12 21s-6.5-6-6.5-11a6.5 6.5 0 0 1 13 0c0 5-6.5 11-6.5 11zM12 7.5a2.5 2.5 0 1 0 0 5a2.5 2.5 0 1 0 0-5z"/>'},
+  {name:'갤러리',bg:'#C8664A',fg:'#FFFFFF',d:'<path d="M4 5h16v14H4zM4 16l5-5 4 4 2-2 5 5M15.5 8.5h.01"/>'},
+  {name:'메모',bg:'#E3B547',fg:'#3A2C0A',d:'<path d="M5 3.5h10l4 4v13H5zM8.5 11h7M8.5 14.5h7M8.5 18h4"/>'},
+  {name:'음악',bg:'#8A5CC7',fg:'#FFFFFF',d:'<path d="M9 17.5V5.5l10-2v12M9 17.5a2.5 2.5 0 1 1-5 0a2.5 2.5 0 1 1 5 0zM19 15.5a2.5 2.5 0 1 1-5 0a2.5 2.5 0 1 1 5 0z"/>'}
+];
+const DOCK=[
+  {name:'전화',bg:'#3E9A5C',fg:'#FFFFFF',d:'<path d="M6.6 3.5h2.8l1.4 3.6-1.9 1.2a11 11 0 0 0 6.8 6.8l1.2-1.9 3.6 1.4v2.8a2 2 0 0 1-2.2 2A16 16 0 0 1 4.6 5.7a2 2 0 0 1 2-2.2z"/>'},
+  {name:'메시지',bg:'#4A7BD0',fg:'#FFFFFF',d:'<path d="M4 5.5h16v10H9l-5 4z"/>'},
+  {name:'브라우저',bg:'#E8EBF2',fg:'#3B4A6B',d:'<path d="M12 3.5a8.5 8.5 0 1 0 0 17a8.5 8.5 0 1 0 0-17zM3.5 12h17M12 3.5c2.5 2.5 3.5 5.5 3.5 8.5s-1 6-3.5 8.5c-2.5-2.5-3.5-5.5-3.5-8.5s1-6 3.5-8.5z"/>'},
+  {name:'카메라',bg:'#2E3440',fg:'#FFFFFF',d:'<path d="M3.5 8h4l1.5-2.5h6L16.5 8h4v11h-17zM12 10.5a3.5 3.5 0 1 0 0 7a3.5 3.5 0 1 0 0-7z"/>'}
+];
+
+const ic=(d,s,w)=>`<svg width="${s||24}" height="${s||24}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${w||2}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
+const I={home:'<path d="M5 8h14l-1 12.5H6z"/><path d="M9 8V6.5a3 3 0 0 1 6 0V8"/>',receipt:'<path d="M6 3.5h12V21l-3-2-3 2-3-2-3 2z"/><path d="M9 8.5h6M9 12.5h6"/>',user:'<circle cx="12" cy="8.5" r="3.8"/><path d="M4.5 20.5a7.5 7.5 0 0 1 15 0"/>',back:'<path d="M15 5l-7 7 7 7"/>',next:'<path d="M9 5l7 7-7 7"/>',plus:'<path d="M12 5v14"/><path d="M5 12h14"/>',check:'<path d="M5 12.5l4.5 4.5L19 7.5"/>',alert:'<circle cx="12" cy="12" r="9"/><path d="M12 7.5v5"/><path d="M12 16.3h.01"/>',clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7.5V12l3 2"/>',ext:'<path d="M7 17L17 7"/><path d="M8 7h9v9"/>',undo:'<path d="M9 14L4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/>',tag:'<path d="M20.6 13.4l-7.2 7.2a2 2 0 0 1-2.8 0L3 13V3h10l7.6 7.6a2 2 0 0 1 0 2.8z"/><path d="M7.5 7.5h.01"/><path d="M4 20L20 4"/>',chain:'<path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/>',phone:'<rect x="6" y="2.5" width="12" height="19" rx="2.5"/><path d="M11 18h2"/>'};
+const ticket=(s,fill,dash)=>`<svg width="${s}" height="${s}" viewBox="0 0 36 36" aria-hidden="true"><path d="M7 9h22a4 4 0 0 1 4 4v1.5a3.5 3.5 0 0 0 0 7V23a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4v-1.5a3.5 3.5 0 0 0 0-7V13a4 4 0 0 1 4-4z" fill="${fill||'#9B7BFF'}"/><path d="M13 12.5v11" stroke="${dash||'#E4DCFF'}" stroke-width="2.2" stroke-linecap="round" stroke-dasharray="0.5 3.8"/></svg>`;
+const coin=s=>`<svg width="${s}" height="${s}" viewBox="0 0 36 36" aria-hidden="true"><circle cx="18" cy="18" r="17" fill="#FFC93C"/><circle cx="18" cy="18" r="12" fill="none" stroke="#E2A400" stroke-width="2.2"/><path d="M11.5 14.5a7.5 7.5 0 0 1 5.5-4.6" fill="none" stroke="#FFF1C2" stroke-width="2.4" stroke-linecap="round"/></svg>`;
+const bagArt=`<svg width="120" height="112" viewBox="0 0 120 112" aria-hidden="true"><circle cx="88" cy="36" r="19" fill="#FFC93C"/><circle cx="88" cy="36" r="13" fill="none" stroke="#E2A400" stroke-width="2.6"/><path d="M80 30.5a8.5 8.5 0 0 1 6-5" fill="none" stroke="#FFF1C2" stroke-width="2.6" stroke-linecap="round"/><path d="M50 52v-8a14 14 0 0 1 28 0v8" fill="none" stroke="#D3C7FF" stroke-width="5" stroke-linecap="round"/><path d="M32 52h64l-6 54H38z" fill="#8B6CFF"/><path d="M32 52h64l-1.1 10H33.1z" fill="#7656F0"/><circle cx="46" cy="90" r="11" fill="#4ADE80"/><path d="M41 90.5l3.5 3.5 6.5-7" fill="none" stroke="#0F2A1A" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const won=n=>Number(n||0).toLocaleString('ko-KR');
+const MD=new Intl.DateTimeFormat('ko-KR',{timeZone:'Asia/Seoul',month:'long',day:'numeric'});
+const md=ms=>ms?MD.format(new Date(ms)):'';
+const reduced=()=>matchMedia('(prefers-reduced-motion: reduce)').matches;
+const inFrame=window.parent!==window;
+
+/* ── 상태 ── */
+let S={phase:'loading',err:null,v:null,stack:[{s:'home'}],filter:'all',faq:-1,slide:0,overlay:null,busy:false,flash:null,pins:[],lastPin:null};
+let lastKey=null, pollTimer=null, watchTx=null;
+const top=()=>S.stack[S.stack.length-1];
+const keyOf=v=>v.s+(v.id?':'+v.id:'');
+const V=()=>S.v;
+const coinName=()=>(V()&&V().media.coin_name)||'코인';
+const rate=()=>(V()&&V().media.coin_rate)||22;
+const mallOf=code=>(V()&&V().malls.find(m=>m.code===code))||null;
+const pinKey=()=>'asp_pins_'+(V()?V().member.mk_masked:'');
+function loadPins(){ try{ S.pins=JSON.parse(localStorage.getItem(pinKey())||'[]').filter(c=>mallOf(c)); }catch(e){ S.pins=[]; } }
+function savePins(){ try{ localStorage.setItem(pinKey(),JSON.stringify(S.pins)); }catch(e){} }
+
+function logo(code,cls){
+  const m=mallOf(code); const src=(m&&m.logo)||(LOCAL_LOGO[code]?'/asp/logos/'+LOCAL_LOGO[code]:'');
+  if(src) return `<img${cls?` class="${cls}"`:''} src="${esc(src)}" alt="">`;
+  return `<span class="lt${cls?' '+cls:''}">${esc(((m&&m.name)||'?').slice(0,1))}</span>`;
+}
+const shortcutIcon=(code,cls)=>`<span class="${cls}">${logo(code,'m')}<img class="b" src="${TT_LOGO}" alt=""></span>`;
+
+/* ── 서버 ── */
+async function call(path,opts){
+  let r;
+  try{ r=await fetch(path,Object.assign({credentials:'same-origin',headers:{'Content-Type':'application/json'}},opts||{})); }
+  catch(e){ const x=new Error('network'); x.code='network'; throw x; }
+  let j=null; try{ j=await r.json(); }catch(e){}
+  if(!r.ok||!j||j.ok===false){ const x=new Error((j&&j.message)||'요청 실패'); x.code=(j&&j.error)||'network'; x.status=r.status; throw x; }
+  return j;
+}
+function tell(type){ if(inFrame){ try{ parent.postMessage({type:type},location.origin); }catch(e){} } }
+
+async function load(silent){
+  try{
+    const v=await call(API+'me');
+    const prevActive=S.v&&S.v.active;
+    S.v=v; S.phase='ready';
+    if(watchTx&&!(v.active&&v.active.transaction_id===watchTx&&(v.active.status==='requested'||v.active.status==='retrying'))){
+      const last=v.last&&v.last.transaction_id===watchTx?v.last:null;
+      if(last){ S.flash=last; if(last.status==='paid') toast(`${esc(coinName())} ${last.coins}개가 탑툰 계정에 들어갔어요.`); }
+      watchTx=null;
+    }
+    if(!prevActive&&v.active&&(v.active.status==='requested'||v.active.status==='retrying')) watchTx=v.active.transaction_id;
+    loadPins();
+    schedulePoll();
+    render(); tell('asp-updated');
+  }catch(e){
+    if(!e.code) console.error('[asp] load',e);
+    if(silent&&e.code==='network') return;
+    S.phase='error'; S.err=e.code||'network'; render();
+  }
+}
+function schedulePoll(){
+  clearTimeout(pollTimer);
+  const a=S.v&&S.v.active;
+  if(a&&(a.status==='requested'||a.status==='retrying')){ watchTx=a.transaction_id; pollTimer=setTimeout(()=>{ if(!document.hidden) load(true); else schedulePoll(); },8000); }
+}
+
+async function boot(){
+  const q=location.search;
+  if(/[?&]sig=/.test(q)){
+    try{
+      await call(API+'enter',{method:'POST',body:JSON.stringify({q:q.slice(1)})});
+      window.history.replaceState(null,'',location.pathname);   // 서명값을 주소창·방문 기록에 남기지 않는다
+    }catch(e){ if(!e.code) console.error('[asp] enter',e); S.phase='error'; S.err=e.code||'network'; render(); tell('asp-updated'); return; }
+  }
+  load();
+}
+
+/* ── 화면 ── */
+function bar(title,act,right){
+  return `<header class="bar"><div class="bar-l"><button class="icon-btn" data-act="${act}" aria-label="뒤로">${ic(I.back)}</button><h1 class="bar-title">${title}</h1></div>${right||''}</header>`;
+}
+function topbar(t){ return `<header class="bar"><h1 class="bar-title solo">${t}</h1></header>`; }
+function tabbar(cur){
+  const T=[['home','적립몰',I.home],['history','적립내역',I.receipt],['my','MY',I.user]];
+  return `<nav class="tabbar" aria-label="쇼핑 적립 메뉴">${T.map(([k,l,d])=>`<button class="tab" data-act="tab" data-arg="${k}"${cur===k?' aria-current="page"':''}>${ic(d,24,1.9)}<span>${l}</span></button>`).join('')}</nav>`;
+}
+
+function convState(){
+  const v=V(), b=v.balance, a=v.active, r=rate(), cn=esc(coinName());
+  const sending=a&&(a.status==='requested'||a.status==='retrying');
+  let conv, label, can=false;
+  if(S.busy){ label=`<span class="spin"></span>전환하는 중`; conv=`${cn} ${b.convertible_coins}개로 전환하고 있어요`; }
+  else if(sending){ label='전환 처리 중'; conv=`${cn} ${a.coins}개를 보내고 있어요`; }
+  else if(b.convertible_coins>0){ can=true; label=`${cn} ${b.convertible_coins}개로 전환`; conv=`${cn} ${b.convertible_coins}개로 전환할 수 있어요`; }
+  else if(b.available>0){ label=`티켓 ${r}장부터 전환할 수 있어요`; conv=`${r-b.available}장 더 모이면 ${cn} 1개로 전환할 수 있어요`; }
+  else { label='구매가 확정되면 전환할 수 있어요'; conv='구매가 확정되면 티켓이 쌓여요'; }
+  return {conv,label,can,sending};
+}
+function hintHtml(){
+  const v=V(), a=v.active, f=S.flash, cn=esc(coinName());
+  if(a&&a.status==='retrying') return `<p class="hint wait" role="status">${ic(I.clock,16,2.2)}<span>탑툰 응답이 늦어 자동으로 다시 보내고 있어요. 티켓 ${a.tickets}장은 전환이 끝날 때까지 따로 보관돼요.</span></p>`;
+  if(a&&a.status==='stuck') return `<p class="hint wait" role="status">${ic(I.clock,16,2.2)}<span>${cn} ${a.coins}개 전환을 확인하고 있어요. 티켓 ${a.tickets}장은 확인이 끝날 때까지 따로 보관돼요.</span></p>`;
+  if(!f) return '';
+  if(f.status==='paid') return `<div class="hint ok"><span>${ic(I.check,16,2.4)}티켓 ${f.tickets}장을 ${cn} ${f.coins}개로 전환했어요.</span><button class="link" data-act="histf" data-arg="conv">전환 기록${ic(I.next,14,2.2)}</button></div>`;
+  if(f.status==='failed') return `<p class="hint err" role="alert">${ic(I.alert,16,2.2)}<span>${FAIL_TEXT[f.code]||'전환하지 못했어요. 티켓은 그대로 남아 있으니 잠시 후 다시 전환해 주세요.'}</span></p>`;
+  return '';
+}
+
+function home(){
+  const v=V(), b=v.balance, p=v.pending, r=rate(), cn=esc(coinName());
+  const cs=convState(), sl=SLIDES[S.slide];
+  const nick=esc(v.member.nick||'회원');
+  const nextDay=p.next_at?md(p.next_at):'';
+  return `<div class="screen" data-key="home">
+  ${bar('쇼핑 적립','exit','<button class="ghost-btn" data-act="notes"><span>이용안내</span></button>')}
+  <section class="hero">
+    <h2 class="hero-h">쇼핑하고<br>${cn} 받아볼까요?</h2>
+    <div class="hero-label">확정된 쇼핑 적립 티켓</div>
+    <div class="hero-row">${ticket(40)}<span class="hero-num">${won(b.available)}</span><span class="hero-unit">장</span><button class="pill" data-act="histf" data-arg="all">내역보기</button></div>
+    <div class="hero-conv">${cs.conv}</div>
+    <div class="hero-rate">티켓 ${r}장 = ${cn} 1개</div>
+    <button class="cta" data-act="convert" ${cs.can&&!S.busy?'':'disabled'}>${cs.label}</button>
+    ${p.count?`<button class="pend" data-act="histf" data-arg="pending">${ticket(26,'#5B5F6E','#9A9EAD')}<span class="pend-t"><span>적립 예정 · 랜덤 티켓</span><b>${p.count}<i>장</i></b></span><span class="pend-r">${p.count}건 보기${ic(I.next,14,2.2)}</span></button>`
+      :`<div class="pend">${ticket(26,'#5B5F6E','#9A9EAD')}<span class="pend-t"><span>적립 예정 · 랜덤 티켓</span><b>0<i>장</i></b></span></div>`}
+    ${hintHtml()}
+    ${!p.count&&!b.available&&!b.held?'<p class="hint">아래 쇼핑몰로 이동해 구매하면 적립이 시작돼요.</p>':''}
+  </section>
+  <section class="malls">
+    <div class="sec-head"><h2>어디서 쇼핑할까요?</h2><span>구매하면 랜덤 티켓 1장</span></div>
+    <div class="grid">${v.malls.map(x=>{const down=x.st==='maint';return `<button class="mall${down?' down':''}" data-act="mall" data-arg="${esc(x.code)}"${down?` aria-label="${esc(x.name)} 점검중"`:''}>${x.bubble?`<span class="bubble">${esc(x.bubble)}</span>`:''}${logo(x.code)}<span>${down?'점검중':esc(x.name)}</span></button>`;}).join('')}</div>
+  </section>
+  <button class="band" data-act="slide" aria-label="다음 안내 보기"><span><span class="band-k">${sl[0]}</span><span class="band-t">${sl[1].replace('탑툰 코인',cn)}</span></span>${bagArt}<span class="band-pg">${S.slide+1} / 3</span></button>
+  <section class="me">
+    ${p.count?`<div class="me-k">${nick} 님, 다음 확정을 기다리고 있어요</div><p class="me-t">${nextDay}에<br>랜덤 티켓 <em>${p.next_count}장</em>이 확정돼요</p><button class="link" data-act="histf" data-arg="pending">적립 예정 ${p.count}건 보기${ic(I.next,18)}</button>`
+      :`<div class="me-k">${nick} 님, ${b.available?'다음 쇼핑도 적립해 보세요':'첫 쇼핑을 시작해 보세요'}</div><p class="me-t">구매가 확정되면<br><em>티켓</em>이 쌓여요</p>`}
+  </section>
+  <section class="notes" id="notes">
+    <h2>꼭 확인하세요</h2>
+    <ul>
+      <li><b>이 화면에서 쇼핑몰로 이동해 구매한 건만 적립돼요.</b></li>
+      <li>구매 1건마다 랜덤 티켓 1장이 먼저 쌓이고, 구매가 확정되는 날 구매 금액에 맞는 장수로 바뀌어요.</li>
+      <li>쇼핑 적립 티켓 ${r}장이 ${cn} 1개로 전환돼요. ${r}장이 안 되는 나머지 티켓은 그대로 남아 다음 전환 때 함께 전환할 수 있어요.</li>
+      <li>확정일은 쇼핑몰과 구매일에 따라 달라요. 건별 확정 예정일은 내역에서 확인할 수 있어요.</li>
+      <li>확정된 쇼핑 적립 티켓은 「${cn}으로 전환」을 눌러야 ${cn}이 돼요.</li>
+      <li>주문을 취소하거나 반품하면 적립되지 않아요.</li>
+      <li>일부 쇼핑몰은 앱에서 구매하면 적립되지 않을 수 있어요.</li>
+    </ul>
+    <p>쇼핑 적립 서비스는 프라이스픽이 제공합니다.</p>
+  </section>
+</div>`;
+}
+
+function rowOf(h){
+  const cn=esc(coinName());
+  if(h.kind==='conv'){
+    const st=h.st==='conv'?['전환','conv',`${cn} ${h.coins}개 반영`]:h.st==='conv_wait'?['전환 중','wait',`${cn} ${h.coins}개 보내는 중`]:['전환 실패','fail','티켓 되돌림'];
+    return `<div class="row"><span class="row-ic"><span class="row-coin">${coin(28)}</span></span><div class="row-main">
+      <div class="row-top"><span class="row-name">${cn}으로 전환</span><span class="row-amt ${h.st==='conv'?'conv':h.st==='conv_wait'?'wait':'miss'}">${won(h.tickets)}<small>장</small></span></div>
+      <div class="row-meta">${md(h.at)} · 티켓 ${won(h.tickets)}장</div>
+      <div class="row-st"><span class="badge ${st[1]}">${st[0]}</span><span class="row-detail">${st[2]}</span></div></div></div>`;
+  }
+  const amt=h.st==='pending'?`<span class="row-amt pending">랜덤 <small>1장</small></span>`:h.st==='done'?`<span class="row-amt done">+${won(h.tickets)}<small>장</small></span>`:`<span class="row-amt miss">1<small>장</small></span>`;
+  const badge=h.st==='pending'?['적립 예정','pending',`${md(h.expect_at)} 확정 예정`]:h.st==='done'?['적립 확정','done',`${md(h.confirmed_at)} 확정`]:['미적립','miss',esc(h.reason||'구매 미확정')];
+  return `<div class="row"><span class="row-ic">${logo(h.mall)}</span><div class="row-main">
+    <div class="row-top"><span class="row-name">${esc(h.name)}</span>${amt}</div>
+    <div class="row-meta">${md(h.at)} 구매 · ${won(h.amount)}원</div>
+    <div class="row-st"><span class="badge ${badge[1]}">${badge[0]}</span><span class="row-detail">${badge[2]}</span>${h.st==='miss'?`<button class="link" data-act="unearned" data-arg="${esc(h.id)}">이유 보기${ic(I.next,14,2.2)}</button>`:''}</div></div></div>`;
+}
+const inChip=(h,k)=>k==='all'||(k==='conv'?h.kind==='conv':h.kind==='order'&&h.st===k);
+
+function historyView(){
+  const v=V(), b=v.balance, r=rate(), cn=esc(coinName());
+  const items=v.history;
+  const count=k=>items.filter(h=>inChip(h,k)).length;
+  const rows=items.filter(h=>inChip(h,S.filter));
+  const doneS=b.convertible_coins>0?`${cn} ${b.convertible_coins}개 전환 가능`:b.available>0?`${r}장부터 전환할 수 있어요`:'아직 없어요';
+  const list=!items.length?`<div class="empty">${ticket(44,'#3A3D47','#6E7281')}<b>아직 적립 내역이 없어요</b><span>쇼핑몰로 이동해 구매하면 여기에 쌓여요.</span><button class="pill" data-act="tab" data-arg="home">쇼핑몰 보러 가기</button></div>`
+    :rows.length?rows.map(rowOf).join(''):'<div class="empty"><span>이 상태의 내역이 없어요.</span></div>';
+  return `<div class="screen" data-key="history">
+  ${topbar('적립내역')}
+  <section class="sum">
+    <div class="sum-grid">
+      <div class="sum-col"><span class="sum-l">적립 예정 · 랜덤 티켓</span><span class="sum-v">${ticket(26,'#5B5F6E','#9A9EAD')}<b>${v.pending.count}</b><i>장</i></span><span class="sum-s${v.pending.count?' rand':''}">${v.pending.count?'확정되면 장수가 정해져요':'아직 없어요'}</span></div>
+      <div class="sum-col hl"><span class="sum-l">적립 확정</span><span class="sum-v">${ticket(26)}<b>${won(b.available)}</b><i>장</i></span><span class="sum-s">${doneS}</span></div>
+    </div>
+    <p class="sum-note">구매 1건마다 랜덤 티켓 1장이 쌓이고, 구매가 확정되는 날 구매 금액에 맞는 장수로 바뀌어 적립 확정으로 옮겨져요. ${r}장마다 ${cn} 1개로 전환할 수 있어요.${b.held?` 지금 전환 처리 중인 티켓 ${won(b.held)}장은 따로 보관 중이에요.`:''}</p>
+  </section>
+  ${items.length?`<div class="chips" role="group" aria-label="내역 거르기">${CHIPS.map(([k,l])=>`<button class="chip" data-act="filter" data-arg="${k}" aria-pressed="${S.filter===k}">${l}<b>${count(k)}</b></button>`).join('')}</div>`:''}
+  <div class="rows">${list}</div>
+</div>`;
+}
+
+function guide(code){
+  const x=mallOf(code); if(!x) return home();
+  const added=S.pins.includes(code), cn=esc(coinName()), nm=esc(x.name);
+  const step3=x.coupang?`구매가 확정되면 랜덤 티켓이 구매 금액에 맞는 장수로 바뀌고, ${cn}으로 전환할 수 있어요. 확정 예정일은 적립 내역에서 확인할 수 있어요.`
+    :`구매가 확정된 건은 <b>구매한 달의 다다음 달 6일</b>에 장수가 정해지고, ${cn}으로 전환할 수 있어요.`;
+  const warn=x.coupang?'쿠팡 앱이 이미 열려 있다면 종료한 뒤 바로가기를 눌러 주세요.':`${nm} 앱에서 구매하면 적립되지 않을 수 있어요. 바로가기로 열린 화면에서 결제해 주세요.`;
+  const sc=added
+    ?`<div class="sc done">${shortcutIcon(code,'sc-ic')}<span class="sc-t"><b>홈 화면에 추가했어요</b><span>「${nm} 적립」 아이콘으로 바로 들어갈 수 있어요</span></span>${ic(I.check,20,2.4).replace('currentColor','#6EE7A0')}</div>`
+    :`<button class="sc" data-act="shortcut" data-arg="${esc(code)}">${shortcutIcon(code,'sc-ic')}<span class="sc-t"><b>홈 화면에 ${nm} 바로가기 추가</b><span>이 아이콘이 「${nm} 적립」 이름으로 생겨요</span></span>${ic(I.plus,20).replace('currentColor','#B8A4FF')}</button>`;
+  return `<div class="screen" data-key="guide:${esc(code)}"><div class="g-wrap">
+  ${bar(`${nm} 적립 안내`,'back')}
+  <section class="g-card">
+    ${logo(code)}
+    <div class="g-name">${nm}</div>
+    <div class="g-tag">${ticket(18)}구매 1건마다 랜덤 티켓 1장</div>
+    <div class="g-rate">티켓 ${rate()}장 = ${cn} 1개</div>
+  </section>
+  <section class="steps">
+    <h2>이렇게 적립돼요</h2>
+    <ol>
+      <li><span class="step-n">1</span><span>아래 <b>${nm} 바로가기</b> 버튼으로 이동해야 적립이 시작돼요.</span></li>
+      <li><span class="step-n">2</span><span>이동한 뒤 <b>24시간 안에</b> 구매한 건만 적립돼요.</span></li>
+      <li><span class="step-n">3</span><span>${step3}</span></li>
+    </ol>
+  </section>
+  <section class="caution">
+    <div class="caution-h">${ic(I.alert,16,2.2)}꼭 확인하세요</div>
+    <ul><li>${warn}</li><li>주문을 취소하거나 반품하면 적립되지 않아요.</li></ul>
+  </section>
+  <div class="g-gap"></div>
+  <div class="g-foot">
+    ${sc}
+    <button class="go" data-act="openMall" data-arg="${esc(code)}">${nm} 바로가기${ic(I.ext,18,2.2)}</button>
+    ${x.coupang?'<p class="disc">이 서비스는 쿠팡 파트너스 활동의 일환으로,<br>이에 따른 일정액의 수수료를 제공받습니다.</p>':''}
+  </div>
+</div></div>`;
+}
+
+function launcher(){
+  const d=new Date(), days=['일','월','화','수','목','금','토'];
+  const hm=String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
+  const appIc=a=>`<span class="app-ic" style="background:${a.bg};color:${a.fg}">${ic(a.d,28,1.8)}</span>`;
+  const apps=APPS.map(a=>`<button class="app" data-act="app">${appIc(a)}<span>${a.name}</span></button>`);
+  apps.splice(0,0,`<button class="app" data-act="openToptoon"><span class="app-ic"><img class="m" src="${TT_LOGO}" alt=""></span><span>탑툰</span></button>`);
+  const pins=S.pins.map(c=>`<button class="app${c===S.lastPin?' new':''}" data-act="tapPin" data-arg="${esc(c)}">${shortcutIcon(c,'app-ic')}<span>${esc(mallOf(c).name)} 적립</span></button>`);
+  return `<div class="launch" data-key="launcher">
+  <span class="wp" aria-hidden="true" style="left:-120px;top:380px;width:420px;height:420px;background:#222B45"></span>
+  <span class="wp" aria-hidden="true" style="right:-160px;top:-60px;width:380px;height:380px;background:#26304D"></span>
+  <span class="wp" aria-hidden="true" style="right:-40px;bottom:-120px;width:300px;height:300px;background:#2B3556"></span>
+  <div class="clock"><b>${hm}</b><span>${d.getMonth()+1}월 ${d.getDate()}일 ${days[d.getDay()]}요일</span></div>
+  <div class="lgrid">${apps.concat(pins).join('')}</div>
+  <div class="dock">${DOCK.map(a=>`<button class="app" data-act="app" aria-label="${a.name}">${appIc(a)}</button>`).join('')}</div>
+</div>`;
+}
+
+function my(){
+  const v=V(), b=v.balance, r=rate(), cn=esc(coinName());
+  const sub=b.convertible_coins>0?`${cn} ${b.convertible_coins}개로 전환할 수 있어요`:b.available>0?`${r}장부터 전환할 수 있어요`:'구매가 확정되면 티켓이 쌓여요';
+  const pins=S.pins.length
+    ?`<div class="pins">${S.pins.map(c=>`<button class="pinb" data-act="mall" data-arg="${esc(c)}">${shortcutIcon(c,'my-ic')}<span>${esc(mallOf(c).name)} 적립</span></button>`).join('')}</div>`
+    :`<div class="pin-empty"><span>아직 추가한 바로가기가 없어요.</span><button class="pill" data-act="tab" data-arg="home">쇼핑몰 고르기</button></div>`;
+  return `<div class="screen" data-key="my">
+  ${topbar('MY')}
+  <section class="prof"><span class="avatar">${ic(I.user,28,1.8)}</span><span class="prof-t"><b>${esc(v.member.nick||'회원')} 님</b><span>탑툰 계정으로 쇼핑 적립을 이용하고 있어요</span></span></section>
+  <button class="tcard" data-act="histf" data-arg="all">
+    <span class="tcard-main"><span class="tcard-k">확정된 쇼핑 적립 티켓</span><span class="tcard-v">${ticket(28)}<b>${won(b.available)}</b><i>장</i></span><span class="tcard-s">${sub}</span></span>
+    <span class="tcard-side"><span class="tcard-k">랜덤 티켓</span><b>${v.pending.count}<i>장</i></b></span>
+    ${ic(I.next,18)}
+  </button>
+  <section class="mysec"><div class="mysec-h"><h2>홈 화면 바로가기</h2><span>${S.pins.length}개</span></div>${pins}</section>
+  <nav class="menu" aria-label="안내">
+    <button data-act="go" data-arg="howto"><span>이용 안내</span>${ic(I.next,18)}</button>
+    <button data-act="go" data-arg="faq"><span>자주 묻는 질문</span>${ic(I.next,18)}</button>
+  </nav>
+  <p class="my-foot">쇼핑 적립 서비스는 프라이스픽이 제공합니다.</p>
+</div>`;
+}
+
+function howto(){
+  const r=rate(), cn=esc(coinName());
+  return `<div class="screen" data-key="howto">
+  ${bar('이용 안내','back')}
+  <section class="steps" style="padding-top:12px">
+    <h2>이렇게 ${cn}을 받아요</h2>
+    <ol>
+      <li><span class="step-n">1</span><span><b>적립몰에서 쇼핑몰을 골라</b> 바로가기로 이동해요.</span></li>
+      <li><span class="step-n">2</span><span>이동한 뒤 <b>24시간 안에</b> 구매하면 랜덤 티켓 1장이 적립 예정으로 쌓여요.</span></li>
+      <li><span class="step-n">3</span><span>구매가 확정되면 구매 금액에 맞는 장수로 바뀌고, <b>티켓 ${r}장마다 ${cn} 1개</b>로 전환할 수 있어요.</span></li>
+    </ol>
+  </section>
+  <section class="caution">
+    <div class="caution-h">${ic(I.alert,16,2.2)}꼭 확인하세요</div>
+    <ul>
+      <li>${r}장이 안 되는 나머지 티켓은 그대로 남아 다음 전환 때 함께 전환할 수 있어요.</li>
+      <li>확정일은 쇼핑몰과 구매일에 따라 달라요. 건별 확정 예정일은 적립내역에서 확인할 수 있어요.</li>
+      <li>주문을 취소하거나 반품하면 적립되지 않아요.</li>
+      <li>일부 쇼핑몰은 앱에서 구매하면 적립되지 않을 수 있어요.</li>
+    </ul>
+  </section>
+  <div style="height:32px"></div>
+</div>`;
+}
+
+function faq(){
+  return `<div class="screen" data-key="faq">
+  ${bar('자주 묻는 질문','back')}
+  <div class="faq">${V().faq.map((f,i)=>`<div class="q${S.faq===i?' open':''}"><button data-act="faq" data-arg="${i}" aria-expanded="${S.faq===i}"><span class="qm">Q</span><span>${esc(f.q)}</span>${ic(I.next,18)}</button>${S.faq===i?`<p class="a">${esc(f.a)}</p>`:''}</div>`).join('')}</div>
+</div>`;
+}
+
+function stateScreen(){
+  if(S.phase==='loading') return `<div class="state" data-key="loading"><div class="spin" role="status" aria-label="불러오는 중"></div></div>`;
+  const e=ERR_SCREEN[S.err]||ERR_SCREEN.network;
+  const retry=S.err==='network'||!ERR_SCREEN[S.err];
+  return `<div class="state" data-key="error" role="alert">${ic(I.alert,40,1.8)}<h1>${e[0]}</h1><p>${e[1]}</p><span class="code">${esc(S.err)}</span>
+    ${retry?'<button class="btn-light" data-act="reload">다시 시도</button>':''}<button class="btn-text" data-act="exit">무료충전소로 돌아가기</button></div>`;
+}
+
+function overlay(){
+  const o=S.overlay; if(!o) return '';
+  if(o.o==='unearned'){
+    const h=V().history.find(x=>x.id===o.id)||{};
+    return `<div class="scrim" data-act="close"></div>
+  <section class="sheet" role="dialog" aria-modal="true" aria-labelledby="ueTitle">
+    <div class="handle"></div>
+    <h2 class="sh-title" id="ueTitle">적립되지 않은 이유</h2>
+    <div class="sh-ctx">${esc(h.name||'')} · ${md(h.at)} 구매 · ${won(h.amount)}원</div>
+    <p class="sh-p lead">쇼핑몰에서 구매가 확정되지 않아 티켓이 적립되지 않았어요. 아래와 같은 경우 확정되지 않을 수 있어요.</p>
+    <ul class="reasons">
+      <li><span>${ic(I.undo,18)}</span>주문 취소 또는 반품</li>
+      <li><span>${ic(I.tag,18)}</span>적립 제외 상품 구매</li>
+      <li><span>${ic(I.chain,18)}</span>이 화면을 거치지 않은 구매</li>
+      <li><span>${ic(I.phone,18)}</span>일부 쇼핑몰 앱에서 구매</li>
+    </ul>
+    <p class="sh-p">주문 상태는 구매한 쇼핑몰에서 확인할 수 있어요.</p>
+    <button class="btn-light" data-act="close">확인</button>
+  </section>`;
+  }
+  if(o.o==='shop'){
+    const c=o.click, nm=esc(c.mall_name);
+    return `<div class="scrim" data-act="close"></div>
+  <section class="sheet shop" role="dialog" aria-modal="true" aria-labelledby="shopTitle">
+    <div class="handle"></div>
+    <div class="g-mall">${logo(c.mall)}<b>${nm}</b><span class="demo-tag">DEMO</span></div>
+    <h2 class="sh-title" id="shopTitle">${nm}에서 구매한 것으로 해 볼까요?</h2>
+    <p class="sh-p">실제 서비스에서는 여기서 ${nm} 페이지로 이동해요. 이동 주소에 아래 적립 표시가 실리고, 구매하면 ${esc(c.route)}가 프라이스픽에 구매를 알려 줘요.</p>
+    <div class="subid">sub_id ${esc(c.sub_id)}</div>
+    <div class="amt"><label for="amt">구매 금액</label><div class="amt-row"><input id="amt" inputmode="numeric" value="${won(o.amount)}" aria-label="구매 금액"><span>원</span></div>
+      <div class="amt-q">${[18900,54000,156000].map(n=>`<button data-act="amt" data-arg="${n}">${won(n)}원</button>`).join('')}</div></div>
+    <button class="btn-main" data-act="buy" ${o.busy?'disabled':''}>${o.busy?'접수하는 중':'구매 완료 (데모)'}</button>
+    <button class="btn-text" data-act="close">구매하지 않고 돌아가기</button>
+  </section>`;
+  }
+  const x=mallOf(o.id); if(!x) return '';
+  const nm=esc(x.name);
+  if(o.o==='sheet') return `<div class="scrim" data-act="close"></div>
+  <section class="sheet center" role="dialog" aria-modal="true" aria-labelledby="scTitle">
+    <div class="handle"></div>
+    <div class="pin">${shortcutIcon(o.id,'pin-ic')}<span>${nm} 적립</span></div>
+    <h2 class="sh-title" id="scTitle">홈 화면에 ${nm} 바로가기를<br>추가할까요?</h2>
+    <p class="sh-p">바로가기로 ${nm}에 들어가도<br>쇼핑 적립 티켓이 똑같이 쌓여요.</p>
+    <button class="btn-main" data-act="os" data-arg="${esc(o.id)}">추가하기</button>
+    <button class="btn-text" data-act="close">다음에 할게요</button>
+  </section>`;
+  if(o.o==='os') return `<div class="scrim"></div>
+  <section class="osd" role="dialog" aria-modal="true" aria-labelledby="osTitle">
+    <h2 id="osTitle">홈 화면에 추가</h2>
+    <div class="pin">${shortcutIcon(o.id,'pin-ic')}<span>${nm} 적립</span></div>
+    <p>길게 눌러 원하는 위치에 직접 놓을 수도 있어요.</p>
+    <div class="osd-act"><button data-act="close">취소</button><button data-act="pin" data-arg="${esc(o.id)}">자동으로 추가</button></div>
+  </section>`;
+  return '';
+}
+
+const device=document.getElementById('device'),view=document.getElementById('view'),slot=document.getElementById('toastSlot');
+function render(dir){
+  if(S.phase!=='ready'){ view.className=''; device.classList.remove('tabs'); view.innerHTML=stateScreen(); lastKey=null; return; }
+  const v=top(), key=keyOf(v);
+  const old=view.querySelector('.screen'); const keep=old&&lastKey===key?old.scrollTop:0;
+  const root=S.stack.length===1&&TABS.includes(v.s);
+  const html=v.s==='home'?home():v.s==='history'?historyView():v.s==='my'?my():v.s==='guide'?guide(v.id):v.s==='howto'?howto():v.s==='faq'?faq():launcher();
+  view.className=root?'tabs':'';
+  device.classList.toggle('tabs',root);
+  view.innerHTML=html+(root?tabbar(v.s):'')+overlay();
+  const sc=view.querySelector('.screen');
+  if(sc){ if(lastKey===key) sc.scrollTop=keep; else if(dir) sc.classList.add(dir==='back'?'bwd':'fwd'); }
+  lastKey=key;
+  const f=view.querySelector('.sheet button,.osd button'); if(f&&S.overlay&&S.overlay.o!=='shop') f.focus({preventScroll:true});
+}
+let tt=null;
+function toast(msg){
+  clearTimeout(tt);
+  slot.innerHTML=`<div class="toast" role="status">${msg}</div>`;
+  tt=setTimeout(()=>{slot.innerHTML='';},2600);
+}
+const push=v=>{S.overlay=null;S.stack.push(v);render('fwd');};
+const pop=()=>{if(S.stack.length>1){S.stack.pop();S.overlay=null;render('back');}};
+function exit(){ if(inFrame) tell('asp-exit'); else toast('탑툰 무료충전소 화면으로 돌아가요.'); }
+
+async function doConvert(){
+  if(S.busy) return;
+  S.busy=true; S.flash=null; render();
+  try{
+    const r=await call(API+'convert',{method:'POST',body:'{}'});
+    S.v=r; S.flash=r.conv; S.busy=false;
+    if(r.conv.status==='paid') toast(`${esc(coinName())} ${r.conv.coins}개가 탑툰 계정에 들어갔어요.`);
+    if(r.conv.status==='retrying') watchTx=r.conv.transaction_id;
+    schedulePoll(); render(); tell('asp-updated');
+  }catch(e){
+    S.busy=false;
+    if(e.code==='no_session'){ S.phase='error'; S.err=e.code; render(); return; }
+    toast(esc(e.message||'잠시 후 다시 시도해 주세요.'));
+    load(true);
+  }
+}
+async function openMall(code){
+  const x=mallOf(code); if(!x) return;
+  try{
+    const c=await call(API+'click',{method:'POST',body:JSON.stringify({mall:code})});
+    if(c.demo){ S.overlay={o:'shop',click:c,amount:[30400,54000,72000][Math.floor(Math.random()*3)],busy:false}; render(); return; }
+    if(c.out_url) location.href=c.out_url;                     // 운영: 제휴 주소로 이동 (쿠팡은 딥링크 API 결과)
+    else toast(`${esc(x.name)} 페이지로 이동해요. 24시간 안에 구매하면 적립돼요.`);
+  }catch(e){ toast(esc(e.message||'잠시 후 다시 시도해 주세요.')); if(e.code==='mall_unavailable') load(true); }
+}
+async function demoBuy(){
+  const o=S.overlay; if(!o||o.o!=='shop'||o.busy) return;
+  const el=document.getElementById('amt'); const n=parseInt(String(el?el.value:o.amount).replace(/[^0-9]/g,''),10);
+  if(!(n>0)){ toast('구매 금액을 입력해 주세요.'); return; }
+  o.busy=true; o.amount=n; render();
+  try{
+    await call(MOCK+'postback',{method:'POST',body:JSON.stringify({click_id:o.click.click_id,amount:n})});
+    S.overlay=null; S.stack=[{s:'home'}]; S.flash=null;
+    toast('구매가 접수됐어요. 랜덤 티켓 1장이 적립 예정에 들어갔어요.');
+    await load(true);
+  }catch(e){ o.busy=false; render(); toast(esc(e.message||'잠시 후 다시 시도해 주세요.')); }
+}
+
+function act(a,arg){
+  switch(a){
+    case 'go': if(arg==='faq') S.faq=-1; push({s:arg}); break;
+    case 'tab': {
+      S.overlay=null;
+      if(S.stack.length===1&&top().s===arg){ const sc=view.querySelector('.screen'); if(sc) sc.scrollTo({top:0,behavior:reduced()?'auto':'smooth'}); return; }
+      if(arg==='history') S.filter='all';
+      S.stack=[{s:arg}]; render(); if(arg==='history') load(true); break;
+    }
+    case 'histf': S.overlay=null; S.filter=arg; S.stack=[{s:'history'}]; render(); break;
+    case 'faq': { const i=+arg; S.faq=S.faq===i?-1:i; render(); break; }
+    case 'back': pop(); break;
+    case 'exit': exit(); break;
+    case 'reload': S.phase='loading'; render(); load(); break;
+    case 'notes': { const n=view.querySelector('#notes'); if(n) n.scrollIntoView({behavior:reduced()?'auto':'smooth'}); break; }
+    case 'convert': doConvert(); break;
+    case 'mall': { const x=mallOf(arg); if(!x) return; if(x.st==='maint'){toast(`지금 ${esc(x.name)} 점검 중이에요. 잠시 후 다시 이용해 주세요.`);return;} push({s:'guide',id:arg}); break; }
+    case 'slide': S.slide=(S.slide+1)%SLIDES.length; render(); break;
+    case 'filter': S.filter=arg; render(); break;
+    case 'unearned': S.overlay={o:'unearned',id:arg}; render(); break;
+    case 'shortcut': S.overlay={o:'sheet',id:arg}; render(); break;
+    case 'os': S.overlay={o:'os',id:arg}; render(); break;
+    case 'close': S.overlay=null; render(); break;
+    case 'pin': if(!S.pins.includes(arg)) S.pins.push(arg); savePins(); S.lastPin=arg; push({s:'launcher'}); break;
+    case 'openMall': openMall(arg); break;
+    case 'amt': { const el=document.getElementById('amt'); if(el) el.value=won(+arg); break; }
+    case 'buy': demoBuy(); break;
+    case 'openToptoon': S.overlay=null; S.lastPin=null; S.stack=[{s:'home'}]; render('back'); break;
+    case 'tapPin': toast(`${esc(mallOf(arg).name)} 페이지로 바로 이동해요. 탑툰 적립 경로가 그대로 적용돼요.`); break;
+    case 'app': toast('예시 앱이에요. 탑툰 아이콘을 누르면 쇼핑 적립 화면으로 돌아가요.'); break;
+  }
+}
+device.addEventListener('click',e=>{const t=e.target.closest('[data-act]'); if(!t||t.disabled) return; act(t.dataset.act,t.dataset.arg);});
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'&&S.overlay&&S.overlay.o!=='os'){S.overlay=null;render();}
+  if(e.key==='Enter'&&e.target&&e.target.id==='amt') demoBuy();
+});
+document.addEventListener('visibilitychange',()=>{ if(!document.hidden&&S.phase==='ready') load(true); });
+/* 시연 화면(/asp-sim/)이 구매 확정 등을 처리한 뒤 다시 읽으라고 알려 준다 — 같은 출처만 */
+window.addEventListener('message',e=>{ if(e.origin!==location.origin||!e.data) return; if(e.data.type==='asp-reload'&&S.phase==='ready') load(true); });
+render();
+boot();
+})();
+
+</script>
+</body>
+</html>

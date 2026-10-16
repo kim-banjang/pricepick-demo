@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light">
+<title>쇼핑 적립 ASP — 개발 안내 (2026-10-16)</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#FFFFFF; --wash:#F6F5FB; --ink:#16171D; --sub:#555A66; --mute:#8A8F9B; --rule:#E4E3EE;
+  --violet:#845EEE; --violet-deep:#5A3BC4; --violet-soft:#EFEAFD;
+  --amber:#9A5800; --amber-soft:#FFF3DC; --red:#B4232F; --red-soft:#FBE9EA;
+  --green:#1F7A4D; --green-soft:#E6F4EC; --gray:#5B6070; --gray-soft:#EEEFF2;
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-behavior:smooth; scroll-padding-top:16px}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+body{margin:0; background:var(--paper); color:var(--ink); font-family:"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",system-ui,sans-serif; font-size:16px; line-height:1.7; -webkit-font-smoothing:antialiased}
+main{max-width:960px; margin:0 auto; padding:56px 24px 96px}
+a{color:var(--violet-deep); text-underline-offset:3px}
+a:focus-visible{outline:3px solid var(--violet); outline-offset:2px; border-radius:4px}
+.kicker{font-size:.84rem; font-weight:600; color:var(--violet); letter-spacing:.02em; margin:0 0 8px}
+h1{font-size:clamp(1.7rem,4vw,2.4rem); line-height:1.25; letter-spacing:-0.02em; margin:0 0 22px; font-weight:700}
+.head{display:grid; grid-template-columns:auto 1fr; gap:6px 18px; margin:0 0 26px; padding:16px 0; border-top:1px solid var(--rule); border-bottom:1px solid var(--rule); font-size:.94rem}
+.head dt{color:var(--mute); white-space:nowrap}
+.head dd{margin:0}
+.toc{display:flex; flex-wrap:wrap; gap:8px; margin:0; padding:0; list-style:none}
+.toc a{display:inline-block; font-size:.85rem; padding:6px 12px; border:1px solid var(--rule); border-radius:999px; color:var(--sub); text-decoration:none}
+.toc a:hover{border-color:var(--violet); color:var(--violet-deep)}
+h2{display:flex; align-items:baseline; gap:12px; font-size:1.38rem; line-height:1.35; letter-spacing:-0.01em; margin:64px 0 16px; padding-top:18px; border-top:2px solid var(--ink); font-weight:700}
+h2 .no{color:var(--violet); font-variant-numeric:tabular-nums; font-size:1rem; font-weight:700}
+p{margin:0 0 14px; max-width:76ch}
+.conclusion{list-style:none; counter-reset:c; margin:0; padding:0; border-top:1px solid var(--rule)}
+.conclusion li{counter-increment:c; display:grid; grid-template-columns:44px 1fr; gap:4px; padding:14px 4px; border-bottom:1px solid var(--rule); margin:0; font-size:1.02rem}
+.conclusion li::before{content:counter(c,decimal-leading-zero); font-weight:700; color:var(--violet); font-variant-numeric:tabular-nums}
+.scroll{overflow-x:auto; margin:12px 0 12px; border:1px solid var(--rule); border-radius:10px}
+table{border-collapse:collapse; width:100%; font-size:.93rem; line-height:1.6}
+th{background:var(--wash); text-align:left; font-weight:600; padding:11px 14px; border-bottom:1px solid var(--rule); white-space:nowrap}
+td{padding:12px 14px; border-bottom:1px solid var(--rule); vertical-align:top}
+tr:last-child td{border-bottom:0}
+td.n{color:var(--violet); font-weight:700; width:52px; font-variant-numeric:tabular-nums; text-align:center}
+td.k{font-weight:600; white-space:nowrap}
+td.nw{white-space:nowrap}
+table.wide{min-width:720px}
+.chip{display:inline-block; font-size:.78rem; font-weight:600; padding:2px 10px; border-radius:999px; white-space:nowrap; line-height:1.6}
+.chip.first{background:var(--violet-soft); color:var(--violet-deep)}
+.chip.later{background:var(--gray-soft); color:var(--gray)}
+.chip.now{background:var(--amber-soft); color:var(--amber)}
+.chip.talk{background:var(--green-soft); color:var(--green)}
+.legend{display:flex; flex-wrap:wrap; gap:8px 14px; align-items:center; font-size:.84rem; color:var(--mute); margin:8px 0 0}
+.figure{margin:12px 0 10px; border:1px solid var(--rule); border-radius:10px; overflow-x:auto; background:var(--paper)}
+.figure svg{display:block; width:100%; min-width:640px; height:auto}
+.steps{list-style:none; counter-reset:c; margin:0; padding:0; border-top:1px solid var(--rule)}
+.steps li{counter-increment:c; display:grid; grid-template-columns:44px 1fr; gap:4px; padding:12px 4px; border-bottom:1px solid var(--rule); margin:0}
+.steps li::before{content:counter(c); font-weight:700; color:var(--violet); font-variant-numeric:tabular-nums}
+.steps li span.sm{display:block; color:var(--sub); font-size:.9rem}
+.fn{margin-top:72px; padding-top:14px; border-top:1px solid var(--rule); font-size:.86rem; color:var(--sub)}
+@media (max-width:600px){
+  main{padding:36px 16px 72px}
+  .head{grid-template-columns:1fr; gap:0}
+  .head dt{margin-top:8px}
+  .conclusion li,.steps li{grid-template-columns:34px 1fr}
+}
+@media print{
+  .toc{display:none}
+  h2{break-after:avoid}
+  .scroll,.figure{overflow:visible}
+  table.wide{min-width:0}
+  .figure svg{min-width:0}
+}
+/* 열람 비밀번호 */
+html:not(.unlocked) main{display:none}
+html.unlocked .gate{display:none}
+.gate{position:fixed; inset:0; z-index:50; display:flex; align-items:center; justify-content:center; padding:16px; background:var(--wash)}
+.gate form{width:100%; max-width:380px; background:var(--paper); border:1px solid var(--rule); border-top:3px solid var(--violet); border-radius:12px; padding:30px 28px 26px; box-shadow:0 10px 30px rgba(22,23,29,.06)}
+.gate .g-title{font-size:1.15rem; font-weight:700; line-height:1.4; letter-spacing:-0.01em; margin:0 0 6px}
+.gate .g-sub{font-size:.88rem; color:var(--sub); margin:0 0 20px}
+.gate .g-row{display:flex; gap:8px}
+.gate input{flex:1; min-width:0; font:inherit; font-size:1rem; padding:10px 12px; border:1px solid var(--rule); border-radius:8px; color:var(--ink); background:var(--paper)}
+.gate input:focus{outline:none; border-color:var(--violet); box-shadow:0 0 0 3px var(--violet-soft)}
+.gate input[aria-invalid="true"]{border-color:var(--red)}
+.gate button{font:inherit; font-size:.95rem; font-weight:600; padding:10px 18px; border:0; border-radius:8px; background:var(--violet-deep); color:#fff; cursor:pointer}
+.gate button:hover{background:var(--violet)}
+.gate button:focus-visible{outline:3px solid var(--violet); outline-offset:2px}
+.gate .g-err{min-height:1.4em; margin:10px 0 0; font-size:.86rem; color:var(--red)}
+.gate .g-err .msg{display:none}
+.gate .g-err.show .msg{display:inline}
+@media print{html:not(.unlocked) body{display:none}}
+
+h3{font-size:1.05rem; margin:30px 0 10px; font-weight:600}
+ul{margin:0 0 14px; padding-left:1.2em} li{margin-bottom:5px}
+code{font-family:ui-monospace,"SFMono-Regular",Consolas,monospace; font-size:.88em; background:var(--gray-soft); padding:1px 6px; border-radius:4px}
+pre{margin:10px 0 16px; padding:14px 16px; background:#F7F7FA; border:1px solid var(--rule); border-radius:10px; overflow-x:auto; font-family:ui-monospace,"SFMono-Regular",Consolas,monospace; font-size:.84rem; line-height:1.6; color:var(--ink)}
+pre code{background:none; padding:0; font-size:inherit}
+td code{white-space:nowrap}
+.note{background:var(--wash); border-radius:10px; padding:14px 18px; margin:16px 0; font-size:.95rem; color:var(--sub)}
+.note strong{color:var(--ink)}
+.req{color:var(--red); font-weight:700}
+.opt{color:var(--mute)}
+.badge{display:inline-block; font-size:.74rem; font-weight:700; padding:1px 8px; border-radius:6px; margin-right:6px; vertical-align:1px}
+.badge.get{background:var(--green-soft); color:var(--green)}
+.badge.post{background:var(--violet-soft); color:var(--violet-deep)}
+.dir{font-size:.84rem; color:var(--sub); margin:-6px 0 12px}
+</style>
+<script>
+try{ if(sessionStorage.getItem("dev-20261016-asp")==="ok") document.documentElement.classList.add("unlocked"); }catch(e){}
+</script>
+</head>
+<body>
+<div class="gate" role="dialog" aria-modal="true" aria-labelledby="g-title">
+  <form id="gate-form" autocomplete="off" novalidate>
+    <p class="g-title" id="g-title">쇼핑 적립 ASP — 개발 안내</p>
+    <p class="g-sub">사내 문서 · 열람 비밀번호를 입력하십시오</p>
+    <div class="g-row">
+      <input type="password" id="gate-pw" aria-label="열람 비밀번호" aria-describedby="gate-err" inputmode="numeric" autofocus>
+      <button type="submit">확인</button>
+    </div>
+    <p class="g-err" id="gate-err" role="alert" aria-live="assertive"><span class="msg">비밀번호가 올바르지 않습니다.</span></p>
+  </form>
+</div>
+<script>
+(function(){
+  var root=document.documentElement, form=document.getElementById("gate-form"),
+      pw=document.getElementById("gate-pw"), err=document.getElementById("gate-err");
+  if(root.classList.contains("unlocked")) return;
+  pw.focus();
+  form.addEventListener("submit",function(e){
+    e.preventDefault();
+    if(pw.value==="1111"){
+      try{ sessionStorage.setItem("dev-20261016-asp","ok"); }catch(x){}
+      root.classList.add("unlocked");
+      err.classList.remove("show");
+      window.scrollTo(0,0);
+    }else{
+      err.classList.remove("show"); void err.offsetWidth; err.classList.add("show");
+      pw.setAttribute("aria-invalid","true");
+      pw.value="";
+      pw.focus();
+    }
+  });
+  pw.addEventListener("input",function(){ pw.removeAttribute("aria-invalid"); });
+})();
+</script>
+<main>
+<p class="kicker">개발 안내 · 데모 기준 v1 · 프라이스픽 개발팀</p>
+<h1>쇼핑 적립 ASP — 데모를 운영으로 옮기는 안내</h1>
+<dl class="head">
+  <dt>작성일</dt><dd>2026-10-16</dd>
+  <dt>대상</dt><dd>프라이스픽 개발팀 · 첫 매체 탑툰(무료충전소)</dd>
+  <dt>원칙</dt><dd>데모가 곧 명세입니다. 데모 서버의 규칙과 화면을 그대로 운영으로 옮깁니다.</dd>
+  <dt>근거</dt><dd><a href="https://sgkim-project.vercel.app/partners/20261016-toptoon-asp-spec.html">탑툰 연동 문서 v0.1</a> — 아래 「연동 문서 03」 같은 표기는 그 문서의 절 번호입니다</dd>
+</dl>
+<ul class="toc">
+  <li><a href="#s1">01 요약</a></li><li><a href="#s2">02 데모 주소</a></li><li><a href="#s3">03 파일 구성</a></li><li><a href="#s4">04 흐름</a></li>
+  <li><a href="#s5">05 데이터</a></li><li><a href="#s6">06 서버 API</a></li><li><a href="#s7">07 규칙</a></li><li><a href="#s8">08 운영 전환 때 바꿀 것</a></li>
+  <li><a href="#s9">09 시험</a></li><li><a href="#s10">10 환경변수</a></li>
+</ul>
+
+<h2 id="s1"><span class="no">01</span>요약</h2>
+<ol class="conclusion">
+  <li>데모는 실제 서버로 돕니다. 회원 진입 검증, 구매 적립, 확정, 코인 전환, 재시도, 월간 지급 내역까지 데모 저장소(pricepick-demo)의 서버 코드가 처리합니다.</li>
+  <li>규칙은 한 파일에 모았습니다. <code>api/_lib/asp.js</code> 를 운영 서버로 옮기면 됩니다. 탑툰 쪽 동작만 흉내 서버(<code>api/asp-mock</code>)가 대신하고, 이것은 옮기지 않습니다.</li>
+  <li>시험 24건(<code>node tests/asp/run.js</code>)이 연동 문서 08의 8가지를 포함합니다. 운영 코드도 같은 시험을 통과해야 합니다.</li>
+  <li>운영으로 갈 때 바꿀 곳은 08절 12개입니다. 포스트백 연결, 확정 배치, 1분 재시도 스케줄러, 토큰·세션 비밀값, 데모 장치 끄기가 핵심입니다.</li>
+</ol>
+
+<h2 id="s2"><span class="no">02</span>데모 주소</h2>
+<div class="scroll"><table class="wide">
+<thead><tr><th>화면</th><th>주소</th><th>용도</th></tr></thead>
+<tbody>
+<tr><td class="k">시연 화면</td><td class="nw"><a href="/asp-sim/">/asp-sim/</a></td><td>탑툰 회원을 골라 무료충전소에서 들어가는 것부터 재현합니다. 왼쪽은 탑툰 흉내 서버와 쇼핑몰·제휴망 흉내 조작판, 오른쪽 폰 안은 운영과 같은 적립 화면입니다.</td></tr>
+<tr><td class="k">적립 화면</td><td class="nw">/asp/?media=…&amp;sig=…</td><td>탑툰 앱 안 화면(웹뷰)에 열리는 회원 화면. 서명된 진입 주소로만 열립니다. 주소만 열면 「다시 들어와 주세요」 안내가 나옵니다.</td></tr>
+<tr><td class="k">ASP CMS</td><td class="nw"><a href="/asp-cms/">/asp-cms/</a> · <a href="/cms/">CMS DEMO</a> 「ASP 매체」</td><td>CMS DEMO 에 관리자로 로그인돼 있으면 실데이터, 아니면 예시 데이터를 보여 줍니다. 전환 재요청, 매체 설정, 쇼핑몰 노출, FAQ, 월간 CSV 가 실제로 저장됩니다.</td></tr>
+</tbody></table></div>
+<p class="note"><strong>열람 비밀번호</strong>는 다른 데모 문서와 같습니다. 시연 화면에서 만든 기록은 데모 Firestore 에 남고, 「이 회원 기록 지우기」로 회원별로 지울 수 있습니다.</p>
+
+<h2 id="s3"><span class="no">03</span>파일 구성</h2>
+<div class="scroll"><table class="wide">
+<thead><tr><th>파일</th><th>역할</th><th>운영</th></tr></thead>
+<tbody>
+<tr><td class="nw"><code>api/_lib/asp.js</code></td><td>규칙 본체 — 진입 서명 검증, 세션, 쇼핑몰 목록, 클릭, 구매 적립·확정·미적립, 전환·재시도·운영자 재요청, CMS 집계, 월간 CSV</td><td><span class="chip first">옮김</span></td></tr>
+<tr><td class="nw"><code>api/asp/[op].js</code></td><td>회원 화면용 서버 — enter · me · click · convert</td><td><span class="chip first">옮김</span></td></tr>
+<tr><td class="nw"><code>api/asp-admin/[op].js</code></td><td>CMS 용 서버 — overview · retry · media · layout · faq · csv. 관리자 로그인 토큰 확인</td><td><span class="chip first">옮김</span></td></tr>
+<tr><td class="nw"><code>api/_lib/http.js</code></td><td>Firestore 접속, 본문 읽기, 쿠키, 관리자 확인</td><td><span class="chip first">옮김</span></td></tr>
+<tr><td class="nw"><code>asp/index.html</code></td><td>회원 화면. 프로토타입(10-12) 화면·문구 그대로, 숫자·목록·결과만 서버 값</td><td><span class="chip first">옮김</span> 데모 시트 제외</td></tr>
+<tr><td class="nw"><code>asp-cms/index.html</code></td><td>ASP CMS. CMS DEMO 「ASP 매체」 메뉴가 이 화면을 끼워 씁니다</td><td><span class="chip first">옮김</span></td></tr>
+<tr><td class="nw"><code>api/asp-mock/[op].js</code><br><code>api/_lib/asp-mock.js</code></td><td>탑툰 흉내 — 진입 주소 서명, 코인 지급 API. 쇼핑몰·제휴망 흉내 — 포스트백, 확정, 예시 기록</td><td><span class="chip later">옮기지 않음</span></td></tr>
+<tr><td class="nw"><code>asp-sim/index.html</code></td><td>시연 화면</td><td><span class="chip later">옮기지 않음</span></td></tr>
+<tr><td class="nw"><code>tests/asp/</code></td><td><code>run.js</code> 시험 24건, <code>fake-store.js</code> 가짜 Firestore, <code>dev-server.js</code> 로컬 전체 실행</td><td><span class="chip first">옮김</span></td></tr>
+</tbody></table></div>
+<p>탑툰 흉내의 코인 지급 API(<code>coinApi</code>)는 탑툰이 지켜야 할 동작의 기준 구현이기도 합니다. 서명·시각 검증, 결과 코드, 같은 거래번호 재요청 때 처음 결과를 그대로 돌려주는 방식이 연동 문서 04~06 과 같습니다. 탑툰 시험 때 비교 기준으로 씁니다.</p>
+
+<h2 id="s4"><span class="no">04</span>흐름</h2>
+<ol class="steps">
+  <li>진입 — 탑툰 서버가 서명한 주소로 <code>/asp/</code> 가 열립니다. 화면이 주소의 ?뒤 문자열을 <code>POST /api/asp/enter</code> 로 보내고, 서버가 서명과 시각(10분)을 검증한 뒤 회원을 만들거나 갱신하고 세션 쿠키를 줍니다. 화면은 주소창에서 서명값을 지웁니다.<span class="sm">연동 문서 03 · 05</span></li>
+  <li>쇼핑몰 이동 — 바로가기를 누르면 <code>POST /api/asp/click</code> 이 이동 기록을 남기고 <code>sub_id = asp-{매체코드}-{클릭ID}</code> 를 만듭니다. 링크프라이스는 기본링크에 <code>u_id</code> 로, 쿠팡은 파트너스 딥링크의 subId 로 싣습니다.</li>
+  <li>구매 적립 — 포스트백의 sub_id 로 클릭을 찾아 매체 회원 구매로 넣습니다(<code>receiveOrder</code>). 회원에게는 랜덤 티켓 1장으로 보이고, 장수는 확정 전까지 내보내지 않습니다. 같은 주문번호는 한 번만 적립합니다.</li>
+  <li>확정 — 확정 기준일에 <code>confirmOrder</code> 가 구매할 때 남긴 적립률과 티켓 1장 값으로 장수를 정해 확정 티켓에 더합니다. 취소·반품은 <code>missOrder</code>.</li>
+  <li>전환 — 회원이 「코인으로 전환」을 누르면 <code>POST /api/asp/convert</code>. 전환 단위만큼 티켓을 보류하고 거래번호를 만든 뒤 탑툰 코인 지급 API 를 부르고, 결과대로 차감 확정 · 되돌림 · 재시도로 나눕니다.<span class="sm">연동 문서 04 · 06</span></li>
+  <li>재시도 — 응답이 없거나 9999 면 같은 거래번호로 1분 · 5분 · 30분 뒤 다시 보냅니다. 세 번 모두 실패하면 운영자 확인으로 넘기고, 운영자가 CMS 「다시 보내기」로 같은 거래번호를 보냅니다.</li>
+  <li>월간 대조 — CMS 에서 월을 골라 지급 내역 CSV 를 내려받아 탑툰에 전달합니다.<span class="sm">연동 문서 07</span></li>
+</ol>
+
+<h2 id="s5"><span class="no">05</span>데이터</h2>
+<p>모두 서버 전용 컬렉션입니다. 클라이언트 SDK 보안 규칙은 열지 않았고, 서버가 서비스 계정으로만 읽고 씁니다. 복합 색인이 필요한 쿼리는 쓰지 않아 색인 배포 없이 돕니다. 시각 필드(*_at)는 Unix 밀리초 숫자입니다.</p>
+<div class="scroll"><table class="wide">
+<thead><tr><th>컬렉션</th><th>문서 ID</th><th>주요 필드</th></tr></thead>
+<tbody>
+<tr><td class="nw"><code>asp_media</code></td><td class="nw">매체 코드 (TOPTOON)</td><td>name · status(live·ready·stop) · coin_name · coin_rate(전환 단위, 22) · entry · fallback_rate(기본 적립률 0.5) · coin_api_url · layout(쇼핑몰 노출 순서·상태·말풍선)</td></tr>
+<tr><td class="nw"><code>asp_members</code></td><td class="nw">매체코드_mk</td><td>mk · nick · env · first_at · last_at · visits · available(확정 티켓) · held(전환 보류) · orders_pending · coins_total · tickets_converted · active_tx(처리 중 전환)</td></tr>
+<tr><td class="nw"><code>asp_clicks</code></td><td class="nw">click_id</td><td>sub_id · member_id · mall_code · route · rate(그때 적립률) · fee_rate · ticket_won(그때 티켓 1장 값) · out_url · at</td></tr>
+<tr><td class="nw"><code>asp_orders</code></td><td class="nw">cp_주문번호 · lp_주문번호</td><td>member_id · click_id · mall_code · order_no · amount · rate · ticket_won · tickets_expected(CMS 전용) · tickets(확정 후) · fee · status(pending·confirmed·missed) · ordered_at · expect_at · confirmed_at</td></tr>
+<tr><td class="nw"><code>asp_conversions</code></td><td class="nw">거래번호</td><td>member_id · mk · coins · tickets · status(requested·retrying·paid·failed·stuck) · attempts[] · retries · next_retry_at · lease_until · code · toptoon_tx_id · paid_at · requested_at</td></tr>
+<tr><td class="nw"><code>asp_ticket_tx</code></td><td class="nw">자동</td><td>잔액이 바뀌는 모든 일 — kind(confirm·hold·settle·release) · d_available · d_held · 바뀐 뒤 잔액 · ref(주문·거래번호) · at</td></tr>
+<tr><td class="nw"><code>asp_counters</code></td><td class="nw">conv_YYYYMMDD</td><td>n — 거래번호 일련번호 (KST 날짜별)</td></tr>
+<tr><td class="nw"><code>asp_settings</code></td><td class="nw">faq</td><td>items[{q, a, on}] — 매체 공용. {코인명} {전환단위}는 매체 값으로 바뀝니다</td></tr>
+</tbody></table></div>
+<p class="note"><strong>회원은 프라이스픽 앱 회원과 섞지 않습니다.</strong> 같은 사람이어도 매체 회원은 따로이고, 티켓 원장도 <code>asp_ticket_tx</code> 로 따로 남깁니다. 쇼핑몰 목록·로고·적립률·티켓 1장 값은 CMS DEMO 설정(settings/ticket_accrual · ticket_value · linkprice_merchants)을 그대로 읽습니다.</p>
+
+<h2 id="s6"><span class="no">06</span>서버 API</h2>
+<h3>회원 화면 — 세션 쿠키 asp_s (HttpOnly · Secure · SameSite=Lax · Path=/api/asp · 6시간)</h3>
+<div class="scroll"><table class="wide">
+<thead><tr><th>요청</th><th>본문</th><th>하는 일</th></tr></thead>
+<tbody>
+<tr><td class="nw"><span class="badge post">POST</span><code>/api/asp/enter</code></td><td class="nw"><code>{ q }</code></td><td>진입 주소 검증 → 회원 생성·갱신 → 세션 쿠키. 실패 코드: bad_sig · expired · bad_param · unknown_media · media_stopped</td></tr>
+<tr><td class="nw"><span class="badge get">GET</span><code>/api/asp/me</code></td><td>—</td><td>잔액 · 랜덤 티켓 건수 · 다음 확정일 · 처리 중 전환 · 내역 · 쇼핑몰 · FAQ. 이 회원의 재시도 시각이 된 전환도 같이 보냅니다</td></tr>
+<tr><td class="nw"><span class="badge post">POST</span><code>/api/asp/click</code></td><td class="nw"><code>{ mall }</code></td><td>이동 기록 → click_id · sub_id · out_url</td></tr>
+<tr><td class="nw"><span class="badge post">POST</span><code>/api/asp/convert</code></td><td>—</td><td>보류 → 코인 지급 API → 반영. 결과와 갱신된 화면 데이터를 함께 돌려줍니다. 실패 코드: not_enough · in_progress · media_stopped</td></tr>
+</tbody></table></div>
+<h3>CMS — Authorization: Bearer {CMS DEMO 로그인 토큰}, 이메일이 @pricepick-cms.internal 인 관리자만</h3>
+<div class="scroll"><table class="wide">
+<thead><tr><th>요청</th><th>본문</th><th>하는 일</th></tr></thead>
+<tbody>
+<tr><td class="nw"><span class="badge get">GET</span><code>/api/asp-admin/overview</code></td><td>—</td><td>매체(집계 포함) · 회원 · 구매 · 전환 · 쇼핑몰 · FAQ 를 한 번에. 연동 토큰은 끝 4자리만</td></tr>
+<tr><td class="nw"><span class="badge post">POST</span><code>/api/asp-admin/retry</code></td><td class="nw"><code>{ transaction_id }</code></td><td>운영자 재요청 — 같은 거래번호로 지금 한 번</td></tr>
+<tr><td class="nw"><span class="badge post">POST</span><code>/api/asp-admin/media</code></td><td class="nw"><code>{ code, patch }</code></td><td>매체 이름 · 상태 · 코인 이름 · 전환 단위 · 진입 위치</td></tr>
+<tr><td class="nw"><span class="badge post">POST</span><code>/api/asp-admin/layout</code></td><td class="nw"><code>{ code, layout }</code></td><td>쇼핑몰 노출 순서 · 노출/점검중/숨김 · 말풍선 (12자)</td></tr>
+<tr><td class="nw"><span class="badge post">POST</span><code>/api/asp-admin/faq</code></td><td class="nw"><code>{ items }</code></td><td>자주 묻는 질문</td></tr>
+<tr><td class="nw"><span class="badge get">GET</span><code>/api/asp-admin/csv</code></td><td class="nw"><code>?media&amp;month</code></td><td>월간 지급 내역 CSV — 연동 문서 07 의 열 순서, 최종 결과(OK · FAIL)가 난 건만</td></tr>
+</tbody></table></div>
+
+<h2 id="s7"><span class="no">07</span>규칙</h2>
+<div class="scroll"><table class="wide">
+<thead><tr><th>항목</th><th>값</th></tr></thead>
+<tbody>
+<tr><td class="k">진입 유효 시간</td><td>ts 와 서버 시각 차이 10분 이내. 서명은 sig 를 뺀 모든 파라미터를 키 오름차순으로 이은 문자열의 HMAC-SHA256</td></tr>
+<tr><td class="k">세션</td><td>6시간. 서명 쿠키(HMAC). 진입 주소의 서명값은 다시 쓰지 않음</td></tr>
+<tr><td class="k">적립 인정</td><td>이동 후 24시간 안 구매. 같은 주문번호는 한 번</td></tr>
+<tr><td class="k">확정 예정일</td><td>쿠팡 구매일 + 7일, 그 외 구매한 달의 다다음 달 6일 (KST)</td></tr>
+<tr><td class="k">티켓 장수</td><td>내림(구매 금액 × 적립률% ÷ 티켓 1장 값). 적립률과 1장 값은 클릭할 때 값으로 고정. 적립률이 없는 몰은 매체 기본 적립률</td></tr>
+<tr><td class="k">회원 표시</td><td>확정 전은 「랜덤 티켓 1장」, 장수 비공개. 확정 뒤 장수 공개</td></tr>
+<tr><td class="k">전환</td><td>내림(확정 티켓 ÷ 전환 단위)개, 전환 단위 × 개수만큼 보류. 처리 중 전환이 있으면 새 전환을 막음</td></tr>
+<tr><td class="k">거래번호</td><td>PPT + KST 날짜 8자리 + 날짜별 일련번호 6자리 (예: PPT20261016000123)</td></tr>
+<tr><td class="k">결과 처리</td><td>0000 차감 확정 · 1001 1002 2001 2003 실패 확정·티켓 되돌림 · 2002 새 시각으로 그 자리에서 한 번 더 · 9999 와 10초 무응답 재시도</td></tr>
+<tr><td class="k">재시도</td><td>1분 · 5분 · 30분 뒤 같은 거래번호로. 세 번 모두 실패하면 운영자 확인(티켓은 보류 그대로, 새 전환은 허용)</td></tr>
+<tr><td class="k">동시 처리 막기</td><td>전환을 보내기 전에 25초 동안 잡아 둠(lease_until). 다른 곳에서 같은 전환을 동시에 보내지 않음</td></tr>
+</tbody></table></div>
+
+<h2 id="s8"><span class="no">08</span>운영 전환 때 바꿀 것</h2>
+<div class="scroll"><table class="wide">
+<thead><tr><th></th><th>항목</th><th>데모</th><th>운영</th></tr></thead>
+<tbody>
+<tr><td class="n">1</td><td class="k">포스트백</td><td>시연 화면의 「구매 완료 (데모)」가 흉내</td><td>기존 포스트백 수신기에서 sub_id 가 <code>asp-</code> 로 시작하면 <code>receiveOrder</code> 로 넘김. 포스트백 로그에 매체 열 추가</td></tr>
+<tr><td class="n">2</td><td class="k">확정 · 미적립</td><td>「적립 예정 전부 확정」 버튼</td><td>확정 기준일 배치가 <code>confirmOrder</code> · <code>missOrder</code> 호출 (쿠팡 구매 확정, 링크프라이스 확정 데이터)</td></tr>
+<tr><td class="n">3</td><td class="k">재시도 스케줄러</td><td>화면 조회 때 같이 + 「재시도 대기 건 지금 보내기」 (Vercel Hobby 는 분 단위 스케줄러 없음)</td><td>1분마다 <code>retryDue</code> 를 부르는 스케줄러</td></tr>
+<tr><td class="n">4</td><td class="k">연동 토큰</td><td>연동 문서 05 의 예시 토큰</td><td><code>ASP_TOKEN_TOPTOON</code> 운영·시험 따로, <code>ASP_ALLOW_TEST_TOKEN=off</code></td></tr>
+<tr><td class="n">5</td><td class="k">세션 비밀값</td><td>서비스 계정 값에서 끌어냄</td><td><code>ASP_SESSION_SECRET</code> 따로</td></tr>
+<tr><td class="n">6</td><td class="k">데모 장치</td><td>켜짐</td><td><code>ASP_DEMO=off</code> — 흉내 서버가 닫히고, 회원 화면의 데모 시트 대신 제휴 주소로 이동</td></tr>
+<tr><td class="n">7</td><td class="k">코인 지급 API 주소</td><td>/api/asp-mock/coin</td><td>탑툰이 회신한 운영·시험 주소를 <code>asp_media.coin_api_url</code> 에</td></tr>
+<tr><td class="n">8</td><td class="k">쿠팡 이동 주소</td><td>만들지 않음</td><td>쿠팡 파트너스 딥링크 API 를 subId = sub_id 로 불러 받은 주소</td></tr>
+<tr><td class="n">9</td><td class="k">홈 화면 바로가기</td><td>화면만 (휴대폰 홈 화면 흉내)</td><td>탑툰 앱의 바로가기 기능 연동이 필요 — 탑툰과 협의</td></tr>
+<tr><td class="n">10</td><td class="k">적립 한도</td><td>적용 안 함</td><td>프라이스픽 앱의 일 5장 · 월 50장(랜덤 티켓 기준)을 ASP 에도 둘지 결정 필요</td></tr>
+<tr><td class="n">11</td><td class="k">적립률</td><td>앱 적립률, 없으면 매체 기본 0.5%</td><td>매체별로 따로 둘지 결정 필요</td></tr>
+<tr><td class="n">12</td><td class="k">CMS DEMO 쪽 수정</td><td>—</td><td>ASP CMS 「CMS DEMO 연동」 화면의 「CMS DEMO 수정 필요」 항목(매출 유입 경로, 어뷰징 감시, 관리자 권한 등)</td></tr>
+</tbody></table></div>
+
+<h2 id="s9"><span class="no">09</span>시험</h2>
+<pre><code>node tests/asp/run.js          # 규칙 시험 24건 — 네트워크 · Firebase 없이
+node tests/asp/dev-server.js   # http://localhost:4600/asp-sim/ — 메모리 저장소로 데모 전체</code></pre>
+<p>연동 문서 08 의 8가지는 시연 화면에서 이렇게 재현합니다.</p>
+<div class="scroll"><table class="wide">
+<thead><tr><th></th><th>시험 항목</th><th>시연 화면에서</th></tr></thead>
+<tbody>
+<tr><td class="n">1</td><td>정상 진입</td><td>회원 고르기 → 「정상 진입」</td></tr>
+<tr><td class="n">2</td><td>서명이 틀린 진입</td><td>「서명 틀린 진입」 → 안내 화면 (bad_sig)</td></tr>
+<tr><td class="n">3</td><td>만료된 진입</td><td>「만료된 진입」 → 안내 화면 (expired)</td></tr>
+<tr><td class="n">4</td><td>앱 안에서 쇼핑몰 이동</td><td>탑툰 앱 실기기에서만 확인 (웹뷰 조건)</td></tr>
+<tr><td class="n">5</td><td>코인 지급 정상</td><td>예시 기록 넣기 → 전환 → 기록판 양쪽 코인 일치</td></tr>
+<tr><td class="n">6</td><td>같은 거래번호 재요청</td><td>CMS 「다시 보내기」 또는 응답 지연 뒤 재시도 → 기록판 「재요청 n회」, 코인 그대로</td></tr>
+<tr><td class="n">7</td><td>없는 회원 지급</td><td>「없는회원」으로 전환 → 1001, 티켓 되돌림</td></tr>
+<tr><td class="n">8</td><td>응답 지연</td><td>응답 「응답 지연 11초」 → 전환 → 자동 재시도 중 → 정상으로 바꾸고 「재시도 대기 건 지금 보내기」 → 한 번만 지급</td></tr>
+</tbody></table></div>
+
+<h2 id="s10"><span class="no">10</span>환경변수</h2>
+<div class="scroll"><table class="wide">
+<thead><tr><th>이름</th><th>데모</th><th>운영</th></tr></thead>
+<tbody>
+<tr><td class="nw"><code>FIREBASE_SERVICE_ACCOUNT</code></td><td>설정됨 (기존)</td><td>운영 프로젝트 서비스 계정</td></tr>
+<tr><td class="nw"><code>ASP_TOKEN_TOPTOON</code></td><td>없음 → 예시 토큰</td><td>필수</td></tr>
+<tr><td class="nw"><code>ASP_ALLOW_TEST_TOKEN</code></td><td>없음</td><td><code>off</code></td></tr>
+<tr><td class="nw"><code>ASP_SESSION_SECRET</code></td><td>없음</td><td>필수</td></tr>
+<tr><td class="nw"><code>ASP_DEMO</code></td><td>없음 (켜짐)</td><td><code>off</code></td></tr>
+</tbody></table></div>
+
+<p class="fn">데모 저장소 pricepick-demo · 2026-10-16. 화면 문구와 흐름은 2026-10-12 프로토타입을 그대로 따릅니다. 바뀐 점은 적립 예정을 「랜덤 티켓」으로 보이고 장수를 확정 때 공개하는 것(2026-10-14 티켓 정책)입니다.</p>
+</main>
+</body>
+</html>

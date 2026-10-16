@@ -33,6 +33,30 @@
       "destination": "/asp-cms/index.html"
     },
     {
+      "source": "/asp",
+      "destination": "/asp/index.html"
+    },
+    {
+      "source": "/asp/",
+      "destination": "/asp/index.html"
+    },
+    {
+      "source": "/asp-sim",
+      "destination": "/asp-sim/index.html"
+    },
+    {
+      "source": "/asp-sim/",
+      "destination": "/asp-sim/index.html"
+    },
+    {
+      "source": "/asp-dev",
+      "destination": "/asp-dev/index.html"
+    },
+    {
+      "source": "/asp-dev/",
+      "destination": "/asp-dev/index.html"
+    },
+    {
       "source": "/flutter",
       "destination": "/flutter-web/index.html"
     },
@@ -54,5 +78,16 @@
       "path": "/api/lp-merchants",
       "schedule": "0 19 * * *"
     }
-  ]
+  ],
+  "functions": {
+    "api/asp/*.js": {
+      "maxDuration": 30
+    },
+    "api/asp-mock/*.js": {
+      "maxDuration": 30
+    },
+    "api/asp-admin/*.js": {
+      "maxDuration": 30
+    }
+  }
 }
