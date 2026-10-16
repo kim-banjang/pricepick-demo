@@ -73,22 +73,57 @@ h1{margin:-10px 0 0;font-size:28px;font-weight:800;letter-spacing:-.02em}
 .phone{position:absolute;inset:0;width:390px;height:844px;border-radius:52px;overflow:hidden;background:#131419;box-shadow:0 0 0 10px #0E0F13,0 30px 70px rgba(24,22,48,.30);transform-origin:top left}
 .phone iframe{position:absolute;inset:0;width:100%;height:100%;border:0;display:block;background:#131419}
 .phone [hidden]{display:none!important}
-.tt{position:absolute;inset:0;overflow:auto;background:#121317;color:#F2F3F6;font-family:var(--font)}
-.tt-bar{height:56px;display:flex;align-items:center;gap:6px;padding:0 16px;font-size:17px;font-weight:700;border-bottom:1px solid #22242B}
-.tt-bar small{margin-left:auto;font-size:11px;font-weight:700;color:#FFC93C;letter-spacing:.06em}
-.tt-coin{margin:16px;padding:18px;border-radius:16px;background:#1E2027;display:flex;align-items:center;justify-content:space-between}
-.tt-coin span{font-size:14px;color:#A3A7B4}
-.tt-coin b{font-family:var(--num);font-size:26px;font-weight:800}
-.tt-coin b i{font-style:normal;font-family:var(--font);font-size:14px;margin-left:3px}
-.tt-h{margin:20px 16px 8px;font-size:14px;font-weight:700;color:#A3A7B4}
-.offer{width:calc(100% - 32px);margin:0 16px 8px;padding:14px;border-radius:14px;background:#1E2027;display:flex;align-items:center;gap:12px;text-align:left;color:#F2F3F6}
-.offer.hl{background:#2A1E66;outline:1.5px solid #9B7BFF}
-.offer .oi{flex:none;width:44px;height:44px;border-radius:12px;background:#2A2D37;display:flex;align-items:center;justify-content:center;font-size:20px}
-.offer.hl .oi{background:#6E4BF0}
-.offer b{display:block;font-size:15px}
-.offer small{display:block;margin-top:2px;font-size:12px;color:#A3A7B4}
-.offer em{margin-left:auto;font-style:normal;font-size:13px;font-weight:700;color:#FFC93C}
-.tt-foot{margin:18px 16px 28px;font-size:11px;line-height:1.6;color:#6E7281}
+/* 탑툰 화면 흉내 — 실제 탑툰 웹(어두운 기본 테마)의 흐름만 따른다. 작품 그림·다른 제휴사 배너는 넣지 않고 빈 칸·색 블록으로 둔다 */
+.tt{position:absolute;inset:0;overflow:auto;background:#1C1C1E;color:#EDEDF0;font-family:var(--font);scrollbar-width:none}
+.tt::-webkit-scrollbar{display:none}
+.tt button{color:inherit}
+.tt.lock{overflow:hidden}
+.tt-demo{position:absolute;left:50%;bottom:14px;transform:translateX(-50%);z-index:40;padding:4px 12px;border-radius:12px;background:rgba(255,201,60,.95);color:#2A1E00;font-size:11px;font-weight:800;white-space:nowrap;pointer-events:none}
+.tth{height:60px;display:flex;align-items:center;gap:4px;padding:0 8px 0 14px}
+.tth img{height:19px;display:block}
+.tth .sp{flex:1}
+.tth .att{height:28px;padding:0 10px;margin-right:4px;border:1.5px solid #EDEDF0;border-radius:14px;font-size:12px;font-weight:700}
+.tth .ib{position:relative;width:36px;height:36px;display:flex;align-items:center;justify-content:center}
+.ib.pulse::after{content:"";position:absolute;inset:2px;border-radius:50%;border:2px solid #FFC93C;animation:pulse 1.4s ease-out infinite}
+@keyframes pulse{from{transform:scale(.7);opacity:1}to{transform:scale(1.35);opacity:0}}
+.cats{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;padding:4px 12px 12px}
+.cats button{height:38px;border-radius:6px;background:#2C2C30;color:#C9C9CF;font-size:14px}
+.hero{margin:6px 12px 0;height:210px;border-radius:14px;background:linear-gradient(135deg,#3A3A42,#26262B);display:flex;align-items:flex-end;padding:16px;color:#9C9CA6;font-size:13px}
+.sec-t{margin:22px 12px 10px;font-size:17px;font-weight:800}
+.thumbs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:0 12px 80px}
+.thumbs span{aspect-ratio:3/4;border-radius:10px;background:linear-gradient(160deg,#34343B,#232327)}
+.coach{position:absolute;right:10px;top:64px;z-index:5;max-width:210px;padding:10px 12px;border-radius:12px;background:#FFC93C;color:#2A1E00;font-size:12.5px;font-weight:700;line-height:1.45;box-shadow:0 8px 20px rgba(0,0,0,.35)}
+.coach::before{content:"";position:absolute;top:-6px;right:16px;width:12px;height:12px;background:#FFC93C;transform:rotate(45deg)}
+.ttm-scrim{position:absolute;inset:0;z-index:20;background:rgba(0,0,0,.55)}
+.ttm-x{position:absolute;z-index:22;top:16px;left:calc(22% - 50px);width:40px;height:40px;border-radius:50%;background:#18181A;display:flex;align-items:center;justify-content:center}
+.ttm{position:absolute;top:0;right:0;bottom:0;z-index:21;width:78%;background:#232326;overflow:auto;padding:20px 16px 60px;animation:slide .22s ease-out;scrollbar-width:none}
+@keyframes slide{from{transform:translateX(40px);opacity:0}to{transform:none;opacity:1}}
+.ttm .who{display:flex;align-items:center;justify-content:space-between;font-size:12px;color:#9C9CA6}
+.ttm .acct{margin-top:8px;font-size:19px;font-weight:700}
+.ttm .coins{margin-top:16px;border:1px solid #3A3A3F;border-radius:8px;padding:12px 4px;display:grid;grid-template-columns:repeat(4,1fr);text-align:center;font-size:11.5px;color:#BDBDC6}
+.coins .ci{width:42px;height:42px;margin:6px auto 4px;border-radius:50%;background:#18181A;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:19px}
+.coins b{font-family:var(--num);font-size:15px}
+.coins .got{animation:got 1.2s ease-out 2}
+@keyframes got{50%{background:#FFC93C;color:#2A1E00}}
+.ttm .btns{display:grid;grid-template-columns:1.4fr 1fr;gap:8px;margin-top:14px}
+.ttm .btns span{height:44px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700}
+.ml{margin-top:14px;display:flex;flex-direction:column}
+.ml button{height:52px;padding:0 8px;display:flex;align-items:center;gap:12px;font-size:16px;color:#E6E6EA;border-radius:8px;text-align:left}
+.ml button svg{flex:none;color:#9C9CA6}
+.ml button.hl{background:rgba(255,201,60,.12);color:#FFFFFF;outline:1.5px solid rgba(255,201,60,.6)}
+.ml button.hl svg{color:#FFC93C}
+.ml button .go{margin-left:auto}
+.ttf-h{position:sticky;top:0;z-index:3;height:56px;display:flex;align-items:center;gap:4px;padding:0 8px;background:#1C1C1E;font-size:18px;font-weight:800}
+.ttf-h button{width:40px;height:40px;display:flex;align-items:center;justify-content:center}
+.ttf-coin{margin:2px 12px 12px;padding:12px 14px;border-radius:10px;background:#26262A;display:flex;justify-content:space-between;align-items:center;font-size:14px;color:#BDBDC6}
+.ttf-coin b{font-family:var(--num);font-size:18px;color:#FFFFFF}
+.bn{position:relative;display:block;width:calc(100% - 24px);margin:0 12px 10px;aspect-ratio:15/8;overflow:hidden;padding:0;border-radius:2px}
+.bn img{width:100%;height:100%;display:block;object-fit:cover}
+.bn.ours{outline:2.5px solid #FFC93C;outline-offset:3px;margin-top:6px;margin-bottom:16px}
+.bn .pin{position:absolute;left:10px;top:10px;padding:3px 9px;border-radius:10px;background:#FFC93C;color:#2A1E00;font-size:11px;font-weight:800}
+.bn.ph{display:flex;flex-direction:column;justify-content:center;padding:0 24px;text-align:left;color:#FFFFFF;font-size:26px;font-weight:900;letter-spacing:-.02em;cursor:default}
+.bn.ph small{margin-top:8px;font-size:12px;font-weight:600;opacity:.8;letter-spacing:0}
+.bn-foot{margin:6px 16px 70px;font-size:11px;line-height:1.6;color:#7E7E88}
 
 @media (max-width:900px){.stage{flex-direction:column;align-items:center}.panel{width:min(100%,460px)}.phone-wrap{position:relative;top:0}}
 @media (max-width:440px){.phone-wrap{width:100%;height:calc(100vh - 40px)}.phone{width:100%;height:100%;border-radius:24px;transform:none!important}}
@@ -134,14 +169,23 @@ try{ if(sessionStorage.getItem("asp-sim-20261016")==="ok") document.documentElem
     </section>
 
     <section class="box">
-      <div class="box-h"><h2>2 · 무료충전소에서 들어가기</h2><span>연동 문서 03</span></div>
+      <div class="box-h"><h2>2 · 탑툰에서 들어가기</h2><span>연동 문서 03</span></div>
       <div class="row">
-        <button class="btn primary" data-enter="ok">정상 진입</button>
+        <button class="btn primary" data-act="home">탑툰 첫 화면부터</button>
+        <button class="btn" data-act="free">무료 충전소 바로</button>
+        <button class="btn" data-enter="ok">적립 화면 바로</button>
         <button class="btn" data-enter="badsig">서명 틀린 진입</button>
         <button class="btn" data-enter="expired">만료된 진입</button>
-        <button class="btn" data-act="tt">무료충전소 화면</button>
       </div>
+      <p class="note">폰 화면에서 오른쪽 위 메뉴 → 「무료 충전소」 → 쇼핑 적립 배너를 누르면 탑툰 서버 역할을 하는 흉내 서버가 서명된 진입 주소를 만들어 적립 화면을 엽니다. 적립 화면에서 나가면 무료 충전소로 돌아옵니다.</p>
       <div id="sigBox"></div>
+    </section>
+
+    <section class="box">
+      <div class="box-h"><h2>무료 충전소 배너 시안</h2><a href="https://sgkim-project.vercel.app/design/20261016_ASP_Banner.html" target="_blank" rel="noopener" style="font-size:12px;color:var(--accent);text-decoration:none;font-weight:600">시안 크게 보기</a></div>
+      <div class="seg" id="bannerSeg" role="group" aria-label="배너 시안">
+        <button data-banner="1">1 코랄 (추천)</button><button data-banner="2">2 네이비</button><button data-banner="3">3 옐로</button>
+      </div>
     </section>
 
     <section class="box">
@@ -174,7 +218,8 @@ try{ if(sessionStorage.getItem("asp-sim-20261016")==="ok") document.documentElem
       <a href="/asp-cms/" target="_blank" rel="noopener">ASP CMS</a>
       <a href="/cms/#asp-convs" target="_blank" rel="noopener">CMS DEMO · ASP 매체</a>
       <a href="/asp-dev/" target="_blank" rel="noopener">개발 안내</a>
-      <a href="https://sgkim-project.vercel.app/partners/20261016-toptoon-asp-spec.html" target="_blank" rel="noopener">연동 문서 v0.1</a>
+      <a href="https://sgkim-project.vercel.app/partners/20261016-toptoon-asp-spec.html" target="_blank" rel="noopener">연동 문서</a>
+      <a href="https://sgkim-project.vercel.app/design/20261016_ASP_Banner.html" target="_blank" rel="noopener">배너 시안</a>
     </div>
   </aside>
 
@@ -182,6 +227,7 @@ try{ if(sessionStorage.getItem("asp-sim-20261016")==="ok") document.documentElem
     <div class="phone" id="phone">
       <div class="tt" id="tt"></div>
       <iframe id="frame" title="쇼핑 적립 화면" hidden></iframe>
+      <span class="tt-demo" id="ttDemo">시연용 탑툰 화면</span>
     </div>
   </div>
 </div>
@@ -192,7 +238,8 @@ try{ if(sessionStorage.getItem("asp-sim-20261016")==="ok") document.documentElem
 'use strict';
 /* 왼쪽 조작판은 api/asp-mock/* (탑툰 흉내 · 시연 장치)만 부른다. 폰 안 적립 화면은 운영과 같은 /asp/ 페이지다. */
 const MOCK='/api/asp-mock/';
-const S={mk:'tt_demo_0001',screen:'tt',state:null,entry:null,arm:null};
+const S={mk:'tt_demo_0001',screen:'tt',tt:'home',menu:false,banner:1,state:null,entry:null,arm:null,lastCoins:null,flash:false};
+try{ const b=+localStorage.getItem('asp-sim-banner'); if(b>=1&&b<=3) S.banner=b; }catch(e){}
 const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const won=n=>Number(n||0).toLocaleString('ko-KR');
 const $=id=>document.getElementById(id);
@@ -232,18 +279,72 @@ function renderSig(){
   const e=S.entry;
   $('sigBox').innerHTML=e?`<div class="sig"><b>서명 대상 문자열</b><br>${esc(e.base)}<br><b>sig</b> ${esc(e.sig)}${e.variant==='badsig'?' (끝자리를 바꾼 틀린 서명)':e.variant==='expired'?' (11분 전 시각)':''}</div>`:'';
 }
-function renderTt(){
-  const t=S.state&&S.state.toptoon, p=((S.state&&S.state.presets)||[]).find(x=>x.mk===S.mk)||{};
-  tt.innerHTML=`<div class="tt-bar">무료충전소<small>탑툰 흉내 화면</small></div>
-    <div class="tt-coin"><span>${esc(p.nick||'')} 님 보유 코인</span><b>${t?won(t.coins):'—'}<i>개</i></b></div>
-    <div class="tt-h">코인 무료로 받기</div>
-    <button class="offer hl" data-enter="ok"><span class="oi"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 8h14l-1 12.5H6z"/><path d="M9 8V6.5a3 3 0 0 1 6 0V8"/></svg></span><span><b>쇼핑 적립</b><small>쇼핑몰에서 사고 코인 받기 · 프라이스픽</small></span><em>열기</em></button>
-    <div class="offer"><span class="oi"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span><span><b>출석 체크</b><small>매일 한 번</small></span><em>+1</em></div>
-    <div class="offer"><span class="oi"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10-6.5z"/></svg></span><span><b>광고 보고 받기</b><small>30초 영상</small></span><em>+1</em></div>
-    <p class="tt-foot">시연용 화면입니다. 「쇼핑 적립」을 누르면 탑툰 서버 역할을 하는 흉내 서버가 서명된 진입 주소를 만들고, 폰 안에서 실제 적립 페이지가 열립니다.</p>`;
+const svgI=(d,sz)=>`<svg width="${sz||22}" height="${sz||22}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
+const IC={search:'<circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.2-4.2"/>',menu:'<path d="M4 7h16M4 12h16M4 17h16"/>',coin:'<circle cx="12" cy="12" r="8.5"/><path d="M14.6 9.6a3.3 3.3 0 1 0 0 4.8"/>',x:'<path d="M6 6l12 12M18 6L6 18"/>',back:'<path d="M15 5l-7 7 7 7"/>',next:'<path d="M9 5l7 7-7 7"/>',
+  user:'<circle cx="12" cy="8.5" r="3.8"/><path d="M4.5 20.5a7.5 7.5 0 0 1 15 0"/>',book:'<path d="M6 3.5h11v17H6zM9.5 3.5v17"/>',cal:'<rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M8 3v4M16 3v4"/>',free:'<circle cx="12" cy="12" r="8.5"/><path d="M14.6 9.6a3.3 3.3 0 1 0 0 4.8"/>',ev:'<path d="M5 20l3-12 9 9z"/><path d="M14 4l1 2M18 7l2-1M17 3l-1 2"/>',bell:'<path d="M4 10v4h3l5 4V6L7 10z"/><path d="M16 9.5a4 4 0 0 1 0 5"/>'};
+/* 다른 제휴 자리 — 실제 배너를 옮기지 않고 색과 성격만 남긴다 */
+const OTHERS=[['#6F62FF','포인트 전환 제휴','다른 제휴 자리 · 시연용'],['#2DBE4E','포인트 충전 제휴','다른 제휴 자리 · 시연용'],['#2F7DE1','카드 포인트 제휴','다른 제휴 자리 · 시연용']];
+function preset(){ return ((S.state&&S.state.presets)||[]).find(x=>x.mk===S.mk)||{}; }
+function ttHome(){
+  return `<header class="tth"><img src="/asp-sim/toptoon-wordmark.png" alt="탑툰"><span class="sp"></span>
+    <button class="att" data-tt="noop">출석</button>
+    <button class="ib" data-tt="noop" aria-label="검색">${svgI(IC.search)}</button>
+    <button class="ib" data-tt="noop" aria-label="코인">${svgI(IC.coin)}</button>
+    <button class="ib${S.menu?'':' pulse'}" data-tt="menu" aria-label="메뉴 열기">${svgI(IC.menu)}</button></header>
+  ${S.menu?'':'<div class="coach">메뉴를 열고 「무료 충전소」를 눌러 보세요</div>'}
+  <nav class="cats">${['연재','채팅','랭킹','신작/완결','영상','세일','내서재','선물함'].map(t=>`<button data-tt="noop">${t}</button>`).join('')}</nav>
+  <div class="hero">오늘의 추천 작품 자리 (시연용)</div>
+  <div class="sec-t">실시간 랭킹</div>
+  <div class="thumbs"><span></span><span></span><span></span><span></span><span></span><span></span></div>`;
 }
-function show(screen){ S.screen=screen; tt.hidden=screen!=='tt'; frame.hidden=screen!=='asp'; if(screen==='tt'){ frame.removeAttribute('src'); renderTt(); } }
-function renderAll(){ renderMembers(); renderMode(); renderLedger(); renderSig(); if(S.screen==='tt') renderTt(); }
+function ttMenu(){
+  const t=S.state&&S.state.toptoon, p=preset();
+  const coins=t?won(t.coins):'0';
+  return `<div class="ttm-scrim" data-tt="close"></div>
+  <button class="ttm-x" data-tt="close" aria-label="메뉴 닫기">${svgI(IC.x,20)}</button>
+  <aside class="ttm" aria-label="탑툰 메뉴">
+    <div class="who"><span>탑툰 회원</span><span>로그아웃</span></div>
+    <div class="acct">${esc(p.nick||'회원')}</div>
+    <div class="coins">
+      <div><span>코인</span><div class="ci${S.flash?' got':''}" style="color:#FF9F1C">C</div><b style="color:#FF9F1C">${coins}</b></div>
+      <div><span>보너스코인</span><div class="ci" style="color:#3FA9F5">B</div><b style="color:#3FA9F5">0</b></div>
+      <div><span>무료이용권</span><div class="ci" style="color:#EDEDF0">${svgI('<rect x="4" y="9" width="16" height="11" rx="1.5"/><path d="M3 9h18M12 9v11M12 9c-2-4-6-4-6-1.5S10 9 12 9c2 0 6 .5 6-1.5S14 5 12 9"/>',18)}</div><b style="color:#FF5A5F">0장</b></div>
+      <div><span>이벤트코인</span><div class="ci" style="color:#9B7BFF">E</div><b style="color:#9B7BFF">0</b></div>
+    </div>
+    <div class="btns"><span style="background:#EF2B37">코인충전</span><span style="background:#4A4A50">쿠폰등록</span></div>
+    <nav class="ml">
+      <button data-tt="noop">${svgI(IC.user)}마이페이지</button>
+      <button data-tt="noop">${svgI(IC.book)}내서재</button>
+      <button data-tt="noop">${svgI(IC.cal)}출석체크</button>
+      <button class="hl" data-tt="free">${svgI(IC.free)}무료 충전소<span class="go">${svgI(IC.next,18)}</span></button>
+      <button data-tt="noop">${svgI(IC.ev)}이벤트</button>
+      <button data-tt="noop">${svgI(IC.bell)}공지사항</button>
+    </nav>
+  </aside>`;
+}
+function ttFree(){
+  const t=S.state&&S.state.toptoon;
+  return `<header class="ttf-h"><button data-tt="home" aria-label="뒤로">${svgI(IC.back)}</button>무료 충전소</header>
+  <div class="ttf-coin"><span>${esc(preset().nick||'회원')} 님 보유 코인</span><b>${t?won(t.coins):'—'}</b></div>
+  <button class="bn ours" data-tt="banner" aria-label="쇼핑 적립 열기"><img src="/asp-sim/banners/banner-${S.banner}.png" alt="쇼핑 적립 — 쇼핑하고 탑툰 코인으로 전환"><span class="pin">눌러 보세요 · 시안 ${S.banner}</span></button>
+  ${OTHERS.map(o=>`<div class="bn ph" style="background:${o[0]}">${o[1]}<small>${o[2]}</small></div>`).join('')}
+  <p class="bn-foot">시연용 화면입니다. 쇼핑 적립 배너의 실제 자리와 순서는 탑툰과 협의합니다. 지급 코인 종류(코인 · 보너스코인 · 이벤트코인)는 탑툰 회신 후 정하며, 시연에서는 「코인」 칸에 보여 줍니다.</p>`;
+}
+function renderTt(){
+  if(S.menu) tt.scrollTop=0;
+  tt.classList.toggle('lock',S.tt==='home'&&S.menu);
+  tt.innerHTML=S.tt==='free'?ttFree():ttHome()+(S.menu?ttMenu():'');
+  if(S.flash) setTimeout(()=>{ S.flash=false; },2600);
+}
+function show(screen){ S.screen=screen; tt.hidden=screen!=='tt'; frame.hidden=screen!=='asp'; $('ttDemo').hidden=screen!=='tt'; if(screen==='tt'){ frame.removeAttribute('src'); renderTt(); } }
+function goTt(where){ S.tt=where==='free'?'free':'home'; S.menu=where==='menu'; show('tt'); tt.scrollTop=0; }
+function renderBanner(){ document.querySelectorAll('#bannerSeg button').forEach(b=>b.setAttribute('aria-pressed',String(+b.dataset.banner===S.banner))); }
+function renderAll(){
+  const t=S.state&&S.state.toptoon;
+  if(t&&S.lastCoins!=null&&t.coins>S.lastCoins) S.flash=true;     // 코인이 들어오면 메뉴의 코인 칸을 잠깐 반짝인다
+  S.lastCoins=t?t.coins:null;
+  renderMembers(); renderMode(); renderBanner(); renderLedger(); renderSig(); if(S.screen==='tt') renderTt();
+}
 
 async function loadState(){ try{ S.state=await api('state?mk='+encodeURIComponent(S.mk)); renderAll(); }catch(e){ toast(e.message); } }
 async function enter(variant){
@@ -262,7 +363,7 @@ async function sim(action,btn){
   try{
     const r=await api('sim',{action,mk:S.mk});
     toast(SIM_TEXT[action](r));
-    if(action==='reset'){ show('tt'); }
+    if(action==='reset'){ goTt('home'); }
     await loadState();
     if(S.screen==='asp'&&frame.contentWindow) frame.contentWindow.postMessage({type:'asp-reload'},location.origin);
   }catch(e){ toast(e.message); }
@@ -271,15 +372,27 @@ async function sim(action,btn){
 async function setMode(m){ try{ await api('mode',{mode:m}); await loadState(); toast(m==='ok'?'코인 지급 API 가 정상으로 답해요':m==='error'?'코인 지급 API 가 9999 일시 오류로 답해요':'코인 지급 API 가 지급 후 11초 늦게 답해요 (우리 쪽은 10초에 끊음)'); }catch(e){ toast(e.message); } }
 
 document.addEventListener('click',e=>{
-  const m=e.target.closest('[data-mk]'); if(m){ S.mk=m.dataset.mk; S.entry=null; show('tt'); loadState(); return; }
+  const m=e.target.closest('[data-mk]'); if(m){ S.mk=m.dataset.mk; S.entry=null; S.lastCoins=null; goTt('home'); loadState(); return; }
+  const tv=e.target.closest('[data-tt]');
+  if(tv){
+    const a=tv.dataset.tt;
+    if(a==='menu'){ S.menu=true; renderTt(); }
+    else if(a==='close'){ S.menu=false; renderTt(); }
+    else if(a==='free'){ goTt('free'); }
+    else if(a==='home'){ goTt('home'); }
+    else if(a==='banner'){ enter('ok'); }
+    else toast('시연에서는 메뉴의 「무료 충전소」만 열려요');
+    return;
+  }
+  const bs=e.target.closest('[data-banner]'); if(bs){ S.banner=+bs.dataset.banner; try{ localStorage.setItem('asp-sim-banner',String(S.banner)); }catch(x){} renderBanner(); if(S.screen==='tt') renderTt(); else goTt('free'); return; }
   const en=e.target.closest('[data-enter]'); if(en){ enter(en.dataset.enter); return; }
   const md=e.target.closest('[data-mode]'); if(md){ setMode(md.dataset.mode); return; }
   const sm=e.target.closest('[data-sim]'); if(sm){ sim(sm.dataset.sim,sm); return; }
-  const a=e.target.closest('[data-act="tt"]'); if(a){ show('tt'); loadState(); }
+  const a=e.target.closest('[data-act]'); if(a&&(a.dataset.act==='home'||a.dataset.act==='free')){ S.entry=null; renderSig(); goTt(a.dataset.act); loadState(); }
 });
 window.addEventListener('message',e=>{
   if(e.origin!==location.origin||!e.data) return;
-  if(e.data.type==='asp-exit'){ show('tt'); loadState(); }
+  if(e.data.type==='asp-exit'){ goTt('free'); loadState(); }
   if(e.data.type==='asp-updated') loadState();
 });
 /* 데모 Firebase 는 무료 요금제(하루 읽기 5만 건)라 자동 갱신은 30초 간격, 화면이 보일 때만 */
@@ -295,7 +408,7 @@ addEventListener('resize',fit); fit();
 
 /* 열람 비밀번호 */
 const root=document.documentElement, form=$('gate-form'), pw=$('gate-pw'), err=$('gate-err');
-function start(){ show('tt'); loadState(); fit(); }
+function start(){ goTt('home'); renderBanner(); loadState(); fit(); }
 if(root.classList.contains('unlocked')) start();
 else form.addEventListener('submit',ev=>{
   ev.preventDefault();
