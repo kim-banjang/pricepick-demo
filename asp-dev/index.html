@@ -105,6 +105,8 @@ td code{white-space:nowrap}
 .badge.get{background:var(--green-soft); color:var(--green)}
 .badge.post{background:var(--violet-soft); color:var(--violet-deep)}
 .dir{font-size:.84rem; color:var(--sub); margin:-6px 0 12px}
+.steps li div,.conclusion li div{min-width:0}
+.steps li code,.conclusion li code{white-space:normal;word-break:break-all}
 </style>
 <script>
 try{ if(sessionStorage.getItem("dev-20261016-asp")==="ok") document.documentElement.classList.add("unlocked"); }catch(e){}
@@ -162,10 +164,10 @@ try{ if(sessionStorage.getItem("dev-20261016-asp")==="ok") document.documentElem
 
 <h2 id="s1"><span class="no">01</span>요약</h2>
 <ol class="conclusion">
-  <li>데모는 실제 서버로 돕니다. 회원 진입 검증, 구매 적립, 확정, 코인 전환, 재시도, 월간 지급 내역까지 데모 저장소(pricepick-demo)의 서버 코드가 처리합니다.</li>
-  <li>규칙은 한 파일에 모았습니다. <code>api/_lib/asp.js</code> 를 운영 서버로 옮기면 됩니다. 탑툰 쪽 동작만 흉내 서버(<code>api/asp-mock</code>)가 대신하고, 이것은 옮기지 않습니다.</li>
-  <li>시험 24건(<code>node tests/asp/run.js</code>)이 연동 문서 08의 8가지를 포함합니다. 운영 코드도 같은 시험을 통과해야 합니다.</li>
-  <li>운영으로 갈 때 바꿀 곳은 08절 12개입니다. 포스트백 연결, 확정 배치, 1분 재시도 스케줄러, 토큰·세션 비밀값, 데모 장치 끄기가 핵심입니다.</li>
+  <li><div>데모는 실제 서버로 돕니다. 회원 진입 검증, 구매 적립, 확정, 코인 전환, 재시도, 월간 지급 내역까지 데모 저장소(pricepick-demo)의 서버 코드가 처리합니다.</div></li>
+  <li><div>규칙은 한 파일에 모았습니다. <code>api/_lib/asp.js</code> 를 운영 서버로 옮기면 됩니다. 탑툰 쪽 동작만 흉내 서버(<code>api/asp-mock</code>)가 대신하고, 이것은 옮기지 않습니다.</div></li>
+  <li><div>시험 24건(<code>node tests/asp/run.js</code>)이 연동 문서 08의 8가지를 포함합니다. 운영 코드도 같은 시험을 통과해야 합니다.</div></li>
+  <li><div>운영으로 갈 때 바꿀 곳은 08절 12개입니다. 포스트백 연결, 확정 배치, 1분 재시도 스케줄러, 토큰·세션 비밀값, 데모 장치 끄기가 핵심입니다.</div></li>
 </ol>
 
 <h2 id="s2"><span class="no">02</span>데모 주소</h2>
@@ -196,13 +198,13 @@ try{ if(sessionStorage.getItem("dev-20261016-asp")==="ok") document.documentElem
 
 <h2 id="s4"><span class="no">04</span>흐름</h2>
 <ol class="steps">
-  <li>진입 — 탑툰 서버가 서명한 주소로 <code>/asp/</code> 가 열립니다. 화면이 주소의 ?뒤 문자열을 <code>POST /api/asp/enter</code> 로 보내고, 서버가 서명과 시각(10분)을 검증한 뒤 회원을 만들거나 갱신하고 세션 쿠키를 줍니다. 화면은 주소창에서 서명값을 지웁니다.<span class="sm">연동 문서 03 · 05</span></li>
-  <li>쇼핑몰 이동 — 바로가기를 누르면 <code>POST /api/asp/click</code> 이 이동 기록을 남기고 <code>sub_id = asp-{매체코드}-{클릭ID}</code> 를 만듭니다. 링크프라이스는 기본링크에 <code>u_id</code> 로, 쿠팡은 파트너스 딥링크의 subId 로 싣습니다.</li>
-  <li>구매 적립 — 포스트백의 sub_id 로 클릭을 찾아 매체 회원 구매로 넣습니다(<code>receiveOrder</code>). 회원에게는 랜덤 티켓 1장으로 보이고, 장수는 확정 전까지 내보내지 않습니다. 같은 주문번호는 한 번만 적립합니다.</li>
-  <li>확정 — 확정 기준일에 <code>confirmOrder</code> 가 구매할 때 남긴 적립률과 티켓 1장 값으로 장수를 정해 확정 티켓에 더합니다. 취소·반품은 <code>missOrder</code>.</li>
-  <li>전환 — 회원이 「코인으로 전환」을 누르면 <code>POST /api/asp/convert</code>. 전환 단위만큼 티켓을 보류하고 거래번호를 만든 뒤 탑툰 코인 지급 API 를 부르고, 결과대로 차감 확정 · 되돌림 · 재시도로 나눕니다.<span class="sm">연동 문서 04 · 06</span></li>
-  <li>재시도 — 응답이 없거나 9999 면 같은 거래번호로 1분 · 5분 · 30분 뒤 다시 보냅니다. 세 번 모두 실패하면 운영자 확인으로 넘기고, 운영자가 CMS 「다시 보내기」로 같은 거래번호를 보냅니다.</li>
-  <li>월간 대조 — CMS 에서 월을 골라 지급 내역 CSV 를 내려받아 탑툰에 전달합니다.<span class="sm">연동 문서 07</span></li>
+  <li><div>진입 — 탑툰 서버가 서명한 주소로 <code>/asp/</code> 가 열립니다. 화면이 주소의 ?뒤 문자열을 <code>POST /api/asp/enter</code> 로 보내고, 서버가 서명과 시각(10분)을 검증한 뒤 회원을 만들거나 갱신하고 세션 쿠키를 줍니다. 화면은 주소창에서 서명값을 지웁니다.<span class="sm">연동 문서 03 · 05</span></div></li>
+  <li><div>쇼핑몰 이동 — 바로가기를 누르면 <code>POST /api/asp/click</code> 이 이동 기록을 남기고 <code>sub_id = asp-{매체코드}-{클릭ID}</code> 를 만듭니다. 링크프라이스는 기본링크에 <code>u_id</code> 로, 쿠팡은 파트너스 딥링크의 subId 로 싣습니다.</div></li>
+  <li><div>구매 적립 — 포스트백의 sub_id 로 클릭을 찾아 매체 회원 구매로 넣습니다(<code>receiveOrder</code>). 회원에게는 랜덤 티켓 1장으로 보이고, 장수는 확정 전까지 내보내지 않습니다. 같은 주문번호는 한 번만 적립합니다.</div></li>
+  <li><div>확정 — 확정 기준일에 <code>confirmOrder</code> 가 구매할 때 남긴 적립률과 티켓 1장 값으로 장수를 정해 확정 티켓에 더합니다. 취소·반품은 <code>missOrder</code>.</div></li>
+  <li><div>전환 — 회원이 「코인으로 전환」을 누르면 <code>POST /api/asp/convert</code>. 전환 단위만큼 티켓을 보류하고 거래번호를 만든 뒤 탑툰 코인 지급 API 를 부르고, 결과대로 차감 확정 · 되돌림 · 재시도로 나눕니다.<span class="sm">연동 문서 04 · 06</span></div></li>
+  <li><div>재시도 — 응답이 없거나 9999 면 같은 거래번호로 1분 · 5분 · 30분 뒤 다시 보냅니다. 세 번 모두 실패하면 운영자 확인으로 넘기고, 운영자가 CMS 「다시 보내기」로 같은 거래번호를 보냅니다.</div></li>
+  <li><div>월간 대조 — CMS 에서 월을 골라 지급 내역 CSV 를 내려받아 탑툰에 전달합니다.<span class="sm">연동 문서 07</span></div></li>
 </ol>
 
 <h2 id="s5"><span class="no">05</span>데이터</h2>
