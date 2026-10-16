@@ -73,57 +73,77 @@ h1{margin:-10px 0 0;font-size:28px;font-weight:800;letter-spacing:-.02em}
 .phone{position:absolute;inset:0;width:390px;height:844px;border-radius:52px;overflow:hidden;background:#131419;box-shadow:0 0 0 10px #0E0F13,0 30px 70px rgba(24,22,48,.30);transform-origin:top left}
 .phone iframe{position:absolute;inset:0;width:100%;height:100%;border:0;display:block;background:#131419}
 .phone [hidden]{display:none!important}
-/* 탑툰 화면 흉내 — 실제 탑툰 웹(어두운 기본 테마)의 흐름만 따른다. 작품 그림·다른 제휴사 배너는 넣지 않고 빈 칸·색 블록으로 둔다 */
+/* 탑툰 화면 흉내 — 탑툰 웹(어두운 기본 테마) 실제 화면 구성을 따른다(2026-10-16 김반장 제공 화면).
+   작품 그림과 다른 제휴사 배너(로고·그림)는 옮기지 않고 같은 형식의 빈 칸 · 일반 블록으로 둔다 */
 .tt{position:absolute;inset:0;overflow:auto;background:#1C1C1E;color:#EDEDF0;font-family:var(--font);scrollbar-width:none}
 .tt::-webkit-scrollbar{display:none}
 .tt button{color:inherit}
 .tt.lock{overflow:hidden}
 .tt-demo{position:absolute;left:50%;bottom:14px;transform:translateX(-50%);z-index:40;padding:4px 12px;border-radius:12px;background:rgba(255,201,60,.95);color:#2A1E00;font-size:11px;font-weight:800;white-space:nowrap;pointer-events:none}
-.tth{height:60px;display:flex;align-items:center;gap:4px;padding:0 8px 0 14px}
-.tth img{height:19px;display:block}
+.tth{position:sticky;top:0;z-index:4;height:54px;display:flex;align-items:center;gap:2px;padding:0 6px 0 11px;background:#1C1C1E}
+.tth .logo{display:flex;align-items:center;padding:0}
+.tth .logo img{height:13px;display:block}
+.adult{margin-left:8px;display:flex;align-items:center;width:30px;height:15px;border-radius:8px;background:#4A4A50;position:relative}
+.adult b{position:absolute;left:-2px;top:-3px;width:21px;height:21px;border-radius:50%;background:#FFFFFF;border:2px solid #EF2B37;color:#111;font-family:var(--num);font-size:9px;font-weight:800;display:flex;align-items:center;justify-content:center}
 .tth .sp{flex:1}
-.tth .att{height:28px;padding:0 10px;margin-right:4px;border:1.5px solid #EDEDF0;border-radius:14px;font-size:12px;font-weight:700}
-.tth .ib{position:relative;width:36px;height:36px;display:flex;align-items:center;justify-content:center}
-.ib.pulse::after{content:"";position:absolute;inset:2px;border-radius:50%;border:2px solid #FFC93C;animation:pulse 1.4s ease-out infinite}
+.tth .att{height:24px;padding:0 9px;margin-right:4px;border:1.5px solid #EDEDF0;border-radius:12px;font-size:11.5px;font-weight:700}
+.tth .ib{position:relative;width:34px;height:34px;display:flex;align-items:center;justify-content:center}
+.ib.pulse::after{content:"";position:absolute;inset:1px;border-radius:50%;border:2px solid #FFC93C;animation:pulse 1.4s ease-out infinite}
 @keyframes pulse{from{transform:scale(.7);opacity:1}to{transform:scale(1.35);opacity:0}}
-.cats{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;padding:4px 12px 12px}
-.cats button{height:38px;border-radius:6px;background:#2C2C30;color:#C9C9CF;font-size:14px}
-.hero{margin:6px 12px 0;height:210px;border-radius:14px;background:linear-gradient(135deg,#3A3A42,#26262B);display:flex;align-items:flex-end;padding:16px;color:#9C9CA6;font-size:13px}
-.sec-t{margin:22px 12px 10px;font-size:17px;font-weight:800}
-.thumbs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:0 12px 80px}
-.thumbs span{aspect-ratio:3/4;border-radius:10px;background:linear-gradient(160deg,#34343B,#232327)}
-.coach{position:absolute;right:10px;top:64px;z-index:5;max-width:210px;padding:10px 12px;border-radius:12px;background:#FFC93C;color:#2A1E00;font-size:12.5px;font-weight:700;line-height:1.45;box-shadow:0 8px 20px rgba(0,0,0,.35)}
-.coach::before{content:"";position:absolute;top:-6px;right:16px;width:12px;height:12px;background:#FFC93C;transform:rotate(45deg)}
-.ttm-scrim{position:absolute;inset:0;z-index:20;background:rgba(0,0,0,.55)}
-.ttm-x{position:absolute;z-index:22;top:16px;left:calc(22% - 50px);width:40px;height:40px;border-radius:50%;background:#18181A;display:flex;align-items:center;justify-content:center}
-.ttm{position:absolute;top:0;right:0;bottom:0;z-index:21;width:78%;background:#232326;overflow:auto;padding:20px 16px 60px;animation:slide .22s ease-out;scrollbar-width:none}
+.cats{display:grid;grid-template-columns:repeat(4,1fr);gap:4px 4px;padding:2px 11px 10px}
+.cats button{position:relative;height:29px;border-radius:3px;background:#2B2B2E;color:#C9C9CF;font-size:13px}
+.cats i{position:absolute;top:-6px;right:12px;min-width:15px;height:15px;padding:0 3px;border-radius:8px;background:#EF2B37;color:#FFFFFF;font-style:normal;font-family:var(--num);font-size:9.5px;font-weight:800;display:flex;align-items:center;justify-content:center}
+.hero{margin:4px 11px 0;height:300px;border-radius:14px;background:linear-gradient(160deg,#4A4440,#2A2726);display:flex;align-items:flex-end;padding:16px;color:#A8A2A0;font-size:12px}
+.sec-t{margin:22px 11px 10px;font-size:17px;font-weight:800;display:flex;align-items:center;gap:4px}
+.thumbs{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;padding:0 11px 80px}
+.thumbs span{aspect-ratio:3/4;border-radius:8px;background:linear-gradient(160deg,#3A3A42,#232327)}
+.coach{position:absolute;right:8px;top:58px;z-index:6;max-width:210px;padding:10px 12px;border-radius:12px;background:#FFC93C;color:#2A1E00;font-size:12.5px;font-weight:700;line-height:1.45;box-shadow:0 8px 20px rgba(0,0,0,.35)}
+.coach::before{content:"";position:absolute;top:-6px;right:14px;width:12px;height:12px;background:#FFC93C;transform:rotate(45deg)}
+.ttm-scrim{position:absolute;inset:0;z-index:20;background:rgba(0,0,0,.6)}
+.ttm-x{position:absolute;z-index:22;top:12px;left:calc(30% - 46px);width:38px;height:38px;border-radius:50%;background:#121214;display:flex;align-items:center;justify-content:center}
+.ttm{position:absolute;top:0;right:0;bottom:0;z-index:21;width:70%;background:#262628;overflow:auto;padding:22px 14px 60px;animation:slide .22s ease-out;scrollbar-width:none}
+.ttm::-webkit-scrollbar{display:none}
 @keyframes slide{from{transform:translateX(40px);opacity:0}to{transform:none;opacity:1}}
-.ttm .who{display:flex;align-items:center;justify-content:space-between;font-size:12px;color:#9C9CA6}
-.ttm .acct{margin-top:8px;font-size:19px;font-weight:700}
-.ttm .coins{margin-top:16px;border:1px solid #3A3A3F;border-radius:8px;padding:12px 4px;display:grid;grid-template-columns:repeat(4,1fr);text-align:center;font-size:11.5px;color:#BDBDC6}
-.coins .ci{width:42px;height:42px;margin:6px auto 4px;border-radius:50%;background:#18181A;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:19px}
-.coins b{font-family:var(--num);font-size:15px}
+.ttm .r1{display:flex;align-items:center;justify-content:space-between}
+.grade{height:17px;padding:0 6px;border-radius:3px;background:#C8743A;color:#FFFFFF;font-size:10.5px;font-weight:700;display:inline-flex;align-items:center}
+.ttm .out{font-size:11.5px;color:#BDBDC6}
+.acct{margin-top:9px;display:flex;align-items:center;gap:6px;font-size:16px;font-weight:600}
+.acct .kt{width:17px;height:17px;border-radius:50%;background:#FEE500;color:#3A1D1D;font-size:5.5px;font-weight:900;display:flex;align-items:center;justify-content:center;letter-spacing:-.02em}
+.theme{margin-top:12px;display:flex;align-items:center;gap:6px;font-size:15px}
+.theme .tg{margin-left:auto;width:42px;height:22px;border-radius:11px;background:#141416;position:relative}
+.theme .tg::before{content:"";position:absolute;left:6px;top:8px;width:6px;height:6px;border-radius:50%;background:#8A8A92}
+.theme .tg::after{content:"";position:absolute;right:2px;top:2px;width:18px;height:18px;border-radius:50%;background:#3E8BFF}
+.wallet{margin-top:12px;border:1px solid #3A3A3F;border-radius:5px;padding:12px 6px 0}
+.coins{display:grid;grid-template-columns:repeat(4,1fr);text-align:center;font-size:10.5px;color:#BDBDC6}
+.coins .ci{width:36px;height:36px;margin:6px auto 5px;border-radius:50%;background:#18181A;border:1px solid #333338;display:flex;align-items:center;justify-content:center;font-family:var(--num);font-weight:800;font-size:17px}
+.coins b{font-family:var(--num);font-size:13px}
 .coins .got{animation:got 1.2s ease-out 2}
 @keyframes got{50%{background:#FFC93C;color:#2A1E00}}
-.ttm .btns{display:grid;grid-template-columns:1.4fr 1fr;gap:8px;margin-top:14px}
-.ttm .btns span{height:44px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700}
-.ml{margin-top:14px;display:flex;flex-direction:column}
-.ml button{height:52px;padding:0 8px;display:flex;align-items:center;gap:12px;font-size:16px;color:#E6E6EA;border-radius:8px;text-align:left}
+.benefit{margin:12px 4px 0;padding:12px 2px 12px;border-top:1px solid #3A3A3F;display:flex;align-items:center;gap:8px}
+.benefit b{display:block;font-size:13px}
+.benefit span{display:block;margin-top:2px;font-size:11.5px;color:#9C9CA6}
+.benefit span.on{color:#FFC93C;font-weight:700}
+.benefit svg{margin-left:auto;flex:none;color:#EF2B37}
+.ttm .btns{display:grid;grid-template-columns:1.25fr 1fr;gap:6px;margin-top:10px}
+.ttm .btns span{height:36px;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:13.5px;font-weight:700}
+.ml{margin-top:10px;display:flex;flex-direction:column}
+.ml button{height:44px;padding:0 6px;display:flex;align-items:center;gap:11px;font-size:14.5px;color:#E6E6EA;border-radius:6px;text-align:left}
 .ml button svg{flex:none;color:#9C9CA6}
+.ml button .go{margin-left:auto;display:flex}
+.ml button .go svg{color:#8A8A92}
+.ml .n{width:15px;height:15px;border-radius:50%;background:#EF2B37;color:#fff;font-family:var(--num);font-size:9px;font-weight:800;display:flex;align-items:center;justify-content:center}
+.ml .pass{margin-left:auto;font-size:9.5px;font-weight:800;color:#8A8A92;border:1px solid #55555B;border-radius:8px;padding:1px 6px}
 .ml button.hl{background:rgba(255,201,60,.12);color:#FFFFFF;outline:1.5px solid rgba(255,201,60,.6)}
 .ml button.hl svg{color:#FFC93C}
-.ml button .go{margin-left:auto}
-.ttf-h{position:sticky;top:0;z-index:3;height:56px;display:flex;align-items:center;gap:4px;padding:0 8px;background:#1C1C1E;font-size:18px;font-weight:800}
-.ttf-h button{width:40px;height:40px;display:flex;align-items:center;justify-content:center}
-.ttf-coin{margin:2px 12px 12px;padding:12px 14px;border-radius:10px;background:#26262A;display:flex;justify-content:space-between;align-items:center;font-size:14px;color:#BDBDC6}
-.ttf-coin b{font-family:var(--num);font-size:18px;color:#FFFFFF}
-.bn{position:relative;display:block;width:calc(100% - 24px);margin:0 12px 10px;aspect-ratio:15/8;overflow:hidden;padding:0;border-radius:2px}
+.bn{position:relative;display:block;width:calc(100% - 18px);margin:0 9px 8px;aspect-ratio:15/8;overflow:hidden;padding:0}
 .bn img{width:100%;height:100%;display:block;object-fit:cover}
-.bn.ours{outline:2.5px solid #FFC93C;outline-offset:3px;margin-top:6px;margin-bottom:16px}
-.bn .pin{position:absolute;left:10px;top:10px;padding:3px 9px;border-radius:10px;background:#FFC93C;color:#2A1E00;font-size:11px;font-weight:800}
-.bn.ph{display:flex;flex-direction:column;justify-content:center;padding:0 24px;text-align:left;color:#FFFFFF;font-size:26px;font-weight:900;letter-spacing:-.02em;cursor:default}
-.bn.ph small{margin-top:8px;font-size:12px;font-weight:600;opacity:.8;letter-spacing:0}
-.bn-foot{margin:6px 16px 70px;font-size:11px;line-height:1.6;color:#7E7E88}
+.bn.ours{outline:2.5px solid #FFC93C;outline-offset:2px;margin-top:4px;margin-bottom:10px}
+.bn .pin{position:absolute;left:8px;top:8px;padding:3px 9px;border-radius:10px;background:#FFC93C;color:#2A1E00;font-size:10.5px;font-weight:800}
+.bn.ph{display:flex;flex-direction:column;justify-content:center;padding:0 20px;text-align:left;color:#FFFFFF;cursor:default}
+.bn.ph b{font-size:33px;font-weight:900;letter-spacing:-.04em;line-height:1.1}
+.bn.ph span{margin-top:10px;font-size:13px;line-height:1.45;opacity:.9}
+.bn.ph em{position:absolute;right:18px;top:50%;transform:translateY(-50%);width:84px;height:84px;border-radius:22px;background:rgba(255,255,255,.18)}
+.bn-foot{margin:8px 14px 70px;font-size:11px;line-height:1.6;color:#7E7E88}
 
 @media (max-width:900px){.stage{flex-direction:column;align-items:center}.panel{width:min(100%,460px)}.phone-wrap{position:relative;top:0}}
 @media (max-width:440px){.phone-wrap{width:100%;height:calc(100vh - 40px)}.phone{width:100%;height:100%;border-radius:24px;transform:none!important}}
@@ -280,55 +300,64 @@ function renderSig(){
   $('sigBox').innerHTML=e?`<div class="sig"><b>서명 대상 문자열</b><br>${esc(e.base)}<br><b>sig</b> ${esc(e.sig)}${e.variant==='badsig'?' (끝자리를 바꾼 틀린 서명)':e.variant==='expired'?' (11분 전 시각)':''}</div>`:'';
 }
 const svgI=(d,sz)=>`<svg width="${sz||22}" height="${sz||22}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
-const IC={search:'<circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.2-4.2"/>',menu:'<path d="M4 7h16M4 12h16M4 17h16"/>',coin:'<circle cx="12" cy="12" r="8.5"/><path d="M14.6 9.6a3.3 3.3 0 1 0 0 4.8"/>',x:'<path d="M6 6l12 12M18 6L6 18"/>',back:'<path d="M15 5l-7 7 7 7"/>',next:'<path d="M9 5l7 7-7 7"/>',
-  user:'<circle cx="12" cy="8.5" r="3.8"/><path d="M4.5 20.5a7.5 7.5 0 0 1 15 0"/>',book:'<path d="M6 3.5h11v17H6zM9.5 3.5v17"/>',cal:'<rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M8 3v4M16 3v4"/>',free:'<circle cx="12" cy="12" r="8.5"/><path d="M14.6 9.6a3.3 3.3 0 1 0 0 4.8"/>',ev:'<path d="M5 20l3-12 9 9z"/><path d="M14 4l1 2M18 7l2-1M17 3l-1 2"/>',bell:'<path d="M4 10v4h3l5 4V6L7 10z"/><path d="M16 9.5a4 4 0 0 1 0 5"/>'};
-/* 다른 제휴 자리 — 실제 배너를 옮기지 않고 색과 성격만 남긴다 */
-const OTHERS=[['#6F62FF','포인트 전환 제휴','다른 제휴 자리 · 시연용'],['#2DBE4E','포인트 충전 제휴','다른 제휴 자리 · 시연용'],['#2F7DE1','카드 포인트 제휴','다른 제휴 자리 · 시연용']];
+const IC={search:'<circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.2-4.2"/>',menu:'<path d="M4 6.5h16M4 12h16M4 17.5h16"/>',copy:'<circle cx="12" cy="12" r="9"/><path d="M14.8 9.4a3.6 3.6 0 1 0 0 5.2"/>',x:'<path d="M6 6l12 12M18 6L6 18"/>',next:'<path d="M9 5l7 7-7 7"/>',
+  gear:'<circle cx="12" cy="12" r="3"/><path d="M12 2.8v2.4M12 18.8v2.4M2.8 12h2.4M18.8 12h2.4M5.5 5.5l1.7 1.7M16.8 16.8l1.7 1.7M5.5 18.5l1.7-1.7M16.8 7.2l1.7-1.7"/>',
+  pass:'<path d="M5 9a7 7 0 0 1 12-3l2 2M19 15a7 7 0 0 1-12 3l-2-2"/><path d="M19 4v4h-4M5 20v-4h4"/>',user:'<circle cx="12" cy="8.5" r="3.8"/><path d="M4.5 20.5a7.5 7.5 0 0 1 15 0"/>',book:'<rect x="5" y="3.5" width="14" height="17" rx="1.5"/><path d="M9.5 3.5v17"/>',cal:'<rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M8 3v4M16 3v4M8 14h2M12 14h2M16 14h0M8 17h2M12 17h2"/>',
+  shorts:'<path d="M15.5 4.5l-7 3.5a4 4 0 0 0 0 7.2l7 3.5a4 4 0 0 0 0-7.2"/><path d="M10.5 9.5l4 2.5-4 2.5z"/>',free:'<circle cx="12" cy="12" r="8.5"/><path d="M14.6 9.6a3.3 3.3 0 1 0 0 4.8"/>',ev:'<path d="M5 20l3-12 9 9z"/><path d="M14 4l1 2M18 7l2-1M17 3l-1 2"/>',bell:'<path d="M4 10v4h3l5 4V6L7 10z"/><path d="M16 9.5a4 4 0 0 1 0 5"/>',chat:'<path d="M4 5.5h16v10H9l-5 4z"/>',
+  gift:'<rect x="4" y="9" width="16" height="11" rx="1.5"/><path d="M3 9h18M12 9v11M12 9c-2-4-6-4-6-1.5S10 9 12 9c2 0 6 .5 6-1.5S14 5 12 9"/>'};
+/* 다른 제휴 자리 — 실제 배너(로고·그림)는 옮기지 않고 같은 형식만 둔다 */
+const OTHERS=[['#6E5BFF','포인트 전환','다른 제휴 자리 · 시연용<br>실제 배너는 옮기지 않음'],['#28C04C','포인트 충전','다른 제휴 자리 · 시연용<br>실제 배너는 옮기지 않음'],['#2E7BE0','카드 포인트','다른 제휴 자리 · 시연용<br>실제 배너는 옮기지 않음']];
 function preset(){ return ((S.state&&S.state.presets)||[]).find(x=>x.mk===S.mk)||{}; }
-function ttHome(){
-  return `<header class="tth"><img src="/asp-sim/toptoon-wordmark.png" alt="탑툰"><span class="sp"></span>
+function ttTop(){
+  return `<header class="tth"><button class="logo" data-tt="home" aria-label="탑툰 첫 화면"><img src="/asp-sim/toptoon-wordmark.png" alt="TOPTOON"></button><span class="adult" aria-hidden="true"><b>19</b></span><span class="sp"></span>
     <button class="att" data-tt="noop">출석</button>
-    <button class="ib" data-tt="noop" aria-label="검색">${svgI(IC.search)}</button>
-    <button class="ib" data-tt="noop" aria-label="코인">${svgI(IC.coin)}</button>
-    <button class="ib${S.menu?'':' pulse'}" data-tt="menu" aria-label="메뉴 열기">${svgI(IC.menu)}</button></header>
-  ${S.menu?'':'<div class="coach">메뉴를 열고 「무료 충전소」를 눌러 보세요</div>'}
-  <nav class="cats">${['연재','채팅','랭킹','신작/완결','영상','세일','내서재','선물함'].map(t=>`<button data-tt="noop">${t}</button>`).join('')}</nav>
-  <div class="hero">오늘의 추천 작품 자리 (시연용)</div>
-  <div class="sec-t">실시간 랭킹</div>
+    <button class="ib" data-tt="noop" aria-label="검색">${svgI(IC.search,23)}</button>
+    <button class="ib" data-tt="noop" aria-label="코인">${svgI(IC.copy,23)}</button>
+    <button class="ib${S.menu||S.tt==='free'?'':' pulse'}" data-tt="menu" aria-label="메뉴 열기">${svgI(IC.menu,24)}</button></header>
+  <nav class="cats">${[['연재'],['채팅','N'],['랭킹'],['신작/완결'],['영상'],['세일'],['내서재'],['선물함','9']].map(([t,b])=>`<button data-tt="noop">${t}${b?`<i>${b}</i>`:''}</button>`).join('')}</nav>`;
+}
+function ttHome(){
+  return ttTop()+`${S.menu?'':'<div class="coach">메뉴를 열고 「무료 충전소」를 눌러 보세요</div>'}
+  <div class="hero">오늘의 추천 작품 자리 (시연용 · 작품 그림 없음)</div>
+  <div class="sec-t">실시간 랭킹 ${svgI(IC.next,18)}</div>
   <div class="thumbs"><span></span><span></span><span></span><span></span><span></span><span></span></div>`;
 }
 function ttMenu(){
   const t=S.state&&S.state.toptoon, p=preset();
-  const coins=t?won(t.coins):'0';
+  const c=t?t.coins:0;
   return `<div class="ttm-scrim" data-tt="close"></div>
-  <button class="ttm-x" data-tt="close" aria-label="메뉴 닫기">${svgI(IC.x,20)}</button>
+  <button class="ttm-x" data-tt="close" aria-label="메뉴 닫기">${svgI(IC.x,22)}</button>
   <aside class="ttm" aria-label="탑툰 메뉴">
-    <div class="who"><span>탑툰 회원</span><span>로그아웃</span></div>
-    <div class="acct">${esc(p.nick||'회원')}</div>
-    <div class="coins">
-      <div><span>코인</span><div class="ci${S.flash?' got':''}" style="color:#FF9F1C">C</div><b style="color:#FF9F1C">${coins}</b></div>
-      <div><span>보너스코인</span><div class="ci" style="color:#3FA9F5">B</div><b style="color:#3FA9F5">0</b></div>
-      <div><span>무료이용권</span><div class="ci" style="color:#EDEDF0">${svgI('<rect x="4" y="9" width="16" height="11" rx="1.5"/><path d="M3 9h18M12 9v11M12 9c-2-4-6-4-6-1.5S10 9 12 9c2 0 6 .5 6-1.5S14 5 12 9"/>',18)}</div><b style="color:#FF5A5F">0장</b></div>
-      <div><span>이벤트코인</span><div class="ci" style="color:#9B7BFF">E</div><b style="color:#9B7BFF">0</b></div>
+    <div class="r1"><span class="grade">브론즈</span><span class="out">로그아웃</span></div>
+    <div class="acct"><span class="kt">TALK</span>${esc(p.nick||'회원')}</div>
+    <div class="theme">${svgI(IC.gear,17)}테마 설정<span class="tg" aria-hidden="true"></span></div>
+    <div class="wallet">
+      <div class="coins">
+        <div>코인<div class="ci${S.flash?' got':''}" style="color:#F5A623">C</div><b style="color:#F5A623">${won(c)}</b></div>
+        <div>보너스코인<div class="ci" style="color:#3FA9F5">B</div><b style="color:#3FA9F5">0</b></div>
+        <div>무료이용권<div class="ci" style="color:#EDEDF0">${svgI(IC.gift,17)}</div><b style="color:#FF5A5F">0장</b></div>
+        <div>이벤트코인<div class="ci" style="color:#8B7CF6">E</div><b style="color:#8B7CF6">0</b></div>
+      </div>
+      <div class="benefit"><div><b>최근 3개월 내가 받은 혜택</b>${c?`<span class="on">쇼핑 적립 · 탑툰 코인 ${won(c)}개</span>`:'<span>아직 받은 혜택이 없어요</span>'}</div>${svgI(IC.gift,26)}</div>
     </div>
-    <div class="btns"><span style="background:#EF2B37">코인충전</span><span style="background:#4A4A50">쿠폰등록</span></div>
+    <div class="btns"><span style="background:#EF2B37">코인충전</span><span style="background:#4B4B50">쿠폰등록</span></div>
     <nav class="ml">
-      <button data-tt="noop">${svgI(IC.user)}마이페이지</button>
-      <button data-tt="noop">${svgI(IC.book)}내서재</button>
-      <button data-tt="noop">${svgI(IC.cal)}출석체크</button>
-      <button class="hl" data-tt="free">${svgI(IC.free)}무료 충전소<span class="go">${svgI(IC.next,18)}</span></button>
-      <button data-tt="noop">${svgI(IC.ev)}이벤트</button>
-      <button data-tt="noop">${svgI(IC.bell)}공지사항</button>
+      <button data-tt="noop">${svgI(IC.pass)}코인패스 자동충전<span class="pass">OFF</span></button>
+      <button data-tt="noop">${svgI(IC.user)}마이페이지<span class="go">${svgI(IC.next,16)}</span></button>
+      <button data-tt="noop">${svgI(IC.book)}내서재<span class="go">${svgI(IC.next,16)}</span></button>
+      <button data-tt="noop">${svgI(IC.cal)}출석체크<span class="go">${svgI(IC.next,16)}</span></button>
+      <button data-tt="noop">${svgI(IC.shorts)}탑툰쇼츠<span class="go">${svgI(IC.next,16)}</span></button>
+      <button class="hl" data-tt="free">${svgI(IC.free)}무료 충전소<span class="go">${svgI(IC.next,16)}</span></button>
+      <button data-tt="noop">${svgI(IC.ev)}이벤트<span class="go">${svgI(IC.next,16)}</span></button>
+      <button data-tt="noop">${svgI(IC.bell)}공지사항<span class="n">N</span><span class="go">${svgI(IC.next,16)}</span></button>
+      <button data-tt="noop">${svgI(IC.chat)}상담 채널<span class="go">${svgI(IC.next,16)}</span></button>
     </nav>
   </aside>`;
 }
 function ttFree(){
-  const t=S.state&&S.state.toptoon;
-  return `<header class="ttf-h"><button data-tt="home" aria-label="뒤로">${svgI(IC.back)}</button>무료 충전소</header>
-  <div class="ttf-coin"><span>${esc(preset().nick||'회원')} 님 보유 코인</span><b>${t?won(t.coins):'—'}</b></div>
-  <button class="bn ours" data-tt="banner" aria-label="쇼핑 적립 열기"><img src="/asp-sim/banners/banner-${S.banner}.png" alt="쇼핑 적립 — 쇼핑하고 탑툰 코인으로 전환"><span class="pin">눌러 보세요 · 시안 ${S.banner}</span></button>
-  ${OTHERS.map(o=>`<div class="bn ph" style="background:${o[0]}">${o[1]}<small>${o[2]}</small></div>`).join('')}
-  <p class="bn-foot">시연용 화면입니다. 쇼핑 적립 배너의 실제 자리와 순서는 탑툰과 협의합니다. 지급 코인 종류(코인 · 보너스코인 · 이벤트코인)는 탑툰 회신 후 정하며, 시연에서는 「코인」 칸에 보여 줍니다.</p>`;
+  return ttTop()+`<button class="bn ours" data-tt="banner" aria-label="쇼핑 적립 열기"><img src="/asp-sim/banners/banner-${S.banner}.png" alt="쇼핑 적립 — 쇼핑하고 탑툰 코인으로 전환"><span class="pin">무료 충전소 · 눌러 보세요</span></button>
+  ${OTHERS.map(o=>`<div class="bn ph" style="background:${o[0]}"><b>${o[1]}</b><span>${o[2]}</span><em></em></div>`).join('')}
+  <p class="bn-foot">시연용 화면입니다. 탑툰 무료 충전소의 실제 구성(머리 · 카테고리 · 배너 목록)을 따랐고, 쇼핑 적립 배너의 자리와 순서는 탑툰과 협의합니다. 지급 코인 종류는 탑툰 회신 후 정하며, 시연에서는 「코인」 칸에 보여 줍니다.</p>`;
 }
 function renderTt(){
   if(S.menu) tt.scrollTop=0;

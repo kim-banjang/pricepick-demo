@@ -56,7 +56,17 @@ function send(res, status, obj, headers) {
   if (headers) for (const k of Object.keys(headers)) res.setHeader(k, headers[k]);
   res.end(JSON.stringify(obj));
 }
+/* Firestore 하루 한도 초과(gRPC 8 RESOURCE_EXHAUSTED) — 데모 Firebase 는 무료 요금제라 하루 읽기 5만 건에서 막힌다.
+   한도는 태평양 시각 자정(한국 16:00 · 서머타임 끝나면 17:00)에 풀린다. */
+function quotaError(e) {
+  const m = String((e && (e.message || e.details)) || '');
+  return (e && (e.code === 8 || e.code === 'resource-exhausted')) || /RESOURCE_EXHAUSTED|Quota exceeded/i.test(m);
+}
 function sendError(res, e) {
+  if (quotaError(e)) {
+    console.error('[asp] quota', e && e.message);
+    return send(res, 503, { ok: false, error: 'quota', message: '데모 데이터베이스의 하루 사용 한도를 넘었습니다. 한국 시각 오후 4시(서머타임 끝나면 5시)에 다시 열립니다' });
+  }
   const status = (e && e.status) || 500;
   if (status >= 500) console.error('[asp]', e);
   send(res, status, { ok: false, error: (e && e.code) || 'server_error', message: (e && e.code && e.message) || '잠시 후 다시 시도해 주세요' });
