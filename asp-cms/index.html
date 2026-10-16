@@ -820,7 +820,8 @@ if(fbAuth){
     else { RD.st='nologin'; if(!S.modal) render(); }
   });
 } else { RD.st='nologin'; render(); }
-setInterval(()=>{ if(isLive()&&!document.hidden&&!S.modal&&!S.dirty) loadLive(); },20000);
+/* 데모 Firebase 는 무료 요금제(하루 읽기 5만 건)라 자동 갱신은 1분 간격, 화면이 보일 때만 */
+setInterval(()=>{ if(isLive()&&!document.hidden&&!S.modal&&!S.dirty) loadLive(); },60000);
 })();
 </script>
 

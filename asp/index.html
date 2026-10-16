@@ -418,7 +418,13 @@ async function load(silent){
 function schedulePoll(){
   clearTimeout(pollTimer);
   const a=S.v&&S.v.active;
-  if(a&&(a.status==='requested'||a.status==='retrying')){ watchTx=a.transaction_id; pollTimer=setTimeout(()=>{ if(!document.hidden) load(true); else schedulePoll(); },8000); }
+  if(a&&(a.status==='requested'||a.status==='retrying')){
+    watchTx=a.transaction_id;
+    /* 재시도 대기 중이면 다음 재시도 시각에 맞춰 한 번만 다시 읽는다 (10초 ~ 5분) */
+    let wait=10000;
+    if(a.status==='retrying'&&a.next_retry_at) wait=Math.min(300000,Math.max(10000,a.next_retry_at-(S.v.now||Date.now())+3000));
+    pollTimer=setTimeout(()=>{ if(!document.hidden) load(true); else schedulePoll(); },wait);
+  }
 }
 
 async function boot(){

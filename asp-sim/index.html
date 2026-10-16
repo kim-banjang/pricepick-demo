@@ -282,7 +282,8 @@ window.addEventListener('message',e=>{
   if(e.data.type==='asp-exit'){ show('tt'); loadState(); }
   if(e.data.type==='asp-updated') loadState();
 });
-setInterval(()=>{ if(!document.hidden&&document.documentElement.classList.contains('unlocked')) loadState(); },15000);
+/* 데모 Firebase 는 무료 요금제(하루 읽기 5만 건)라 자동 갱신은 30초 간격, 화면이 보일 때만 */
+setInterval(()=>{ if(!document.hidden&&document.documentElement.classList.contains('unlocked')) loadState(); },30000);
 
 function fit(){
   const wrap=$('wrap'), ph=$('phone');

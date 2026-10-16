@@ -253,11 +253,19 @@ function seedMerchants() {
 }
 function pct(v) { const n = parseFloat(String(v == null ? '' : v).replace('%', '')); return isFinite(n) ? n : null; }
 
+/* CMS DEMO 설정 4건은 자주 바뀌지 않아 함수 인스턴스 안에서 60초 동안 다시 쓴다.
+   데모 Firebase 는 무료 요금제(하루 읽기 5만 건)라 화면 조회마다 4건씩 읽지 않으려는 것. */
+const APP_TTL_MS = 60000;
+const APP_CACHE = new WeakMap();
 async function loadAppSettings(store) {
+  const hit = APP_CACHE.get(store);
+  if (hit && Date.now() - hit.at < APP_TTL_MS) return hit.val;
   const get = id => store.collection('settings').doc(id).get().then(s => (s.exists ? s.data() : {})).catch(() => ({}));
   const [acc, live, cat, tv] = await Promise.all([get('ticket_accrual'), get('linkprice_merchants'), get('linkprice_catalog'), get('ticket_value')]);
   const ticketWon = Number(tv.bronze) > 0 ? Number(tv.bronze) : DEFAULT_TICKET_WON;
-  return { acc, live: live.merchants || {}, cat: cat.merchants || [], ticketWon };
+  const val = { acc, live: live.merchants || {}, cat: cat.merchants || [], ticketWon };
+  APP_CACHE.set(store, { at: Date.now(), val });
+  return val;
 }
 
 /* 반환: [{ code, name, logo, rate, fee_rate, click_url, route, coupang, st, bubble }] — 매체 노출 설정(layout) 적용 순서 */
@@ -623,9 +631,9 @@ async function memberView(store, sess, now) {
 async function adminOverview(store, now) {
   const [medias, msnap, osnap, csnap, app, faq] = await Promise.all([
     listMedia(store),
-    store.collection(C.MEMBERS).orderBy('last_at', 'desc').limit(500).get(),
-    store.collection(C.ORDERS).orderBy('ordered_at', 'desc').limit(500).get(),
-    store.collection(C.CONVS).orderBy('requested_at', 'desc').limit(500).get(),
+    store.collection(C.MEMBERS).orderBy('last_at', 'desc').limit(200).get(),
+    store.collection(C.ORDERS).orderBy('ordered_at', 'desc').limit(200).get(),
+    store.collection(C.CONVS).orderBy('requested_at', 'desc').limit(200).get(),
     loadAppSettings(store),
     getFaq(store),
   ]);
