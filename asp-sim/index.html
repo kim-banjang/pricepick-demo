@@ -74,7 +74,7 @@ h1{margin:-10px 0 0;font-size:28px;font-weight:800;letter-spacing:-.02em}
 .phone iframe{position:absolute;inset:0;width:100%;height:100%;border:0;display:block;background:#131419}
 .phone [hidden]{display:none!important}
 /* 탑툰 화면 흉내 — 탑툰 웹(어두운 기본 테마) 실제 화면 구성을 따른다(2026-10-16 김반장 제공 화면).
-   작품 그림과 다른 제휴사 배너(로고·그림)는 옮기지 않고 같은 형식의 빈 칸 · 일반 블록으로 둔다 */
+   작품 그림은 옮기지 않고 빈 칸으로 둔다. 무료 충전소의 다른 제휴 배너 4장은 김반장이 준 실제 배너(750×400)를 쓴다(2026-10-19) */
 .tt{position:absolute;inset:0;overflow:auto;background:#1C1C1E;color:#EDEDF0;font-family:var(--font);scrollbar-width:none}
 .tt::-webkit-scrollbar{display:none}
 .tt button{color:inherit}
@@ -139,10 +139,7 @@ h1{margin:-10px 0 0;font-size:28px;font-weight:800;letter-spacing:-.02em}
 .bn img{width:100%;height:100%;display:block;object-fit:cover}
 .bn.ours{outline:2.5px solid #FFC93C;outline-offset:2px;margin-top:4px;margin-bottom:10px}
 .bn .pin{position:absolute;left:8px;top:8px;padding:3px 9px;border-radius:10px;background:#FFC93C;color:#2A1E00;font-size:10.5px;font-weight:800}
-.bn.ph{display:flex;flex-direction:column;justify-content:center;padding:0 20px;text-align:left;color:#FFFFFF;cursor:default}
-.bn.ph b{font-size:33px;font-weight:900;letter-spacing:-.04em;line-height:1.1}
-.bn.ph span{margin-top:10px;font-size:13px;line-height:1.45;opacity:.9}
-.bn.ph em{position:absolute;right:18px;top:50%;transform:translateY(-50%);width:84px;height:84px;border-radius:22px;background:rgba(255,255,255,.18)}
+.bn.other{cursor:default}
 .bn-foot{margin:8px 14px 70px;font-size:11px;line-height:1.6;color:#7E7E88}
 
 @media (max-width:900px){.stage{flex-direction:column;align-items:center}.panel{width:min(100%,460px)}.phone-wrap{position:relative;top:0}}
@@ -305,8 +302,8 @@ const IC={search:'<circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.2-4.2"/>',
   pass:'<path d="M5 9a7 7 0 0 1 12-3l2 2M19 15a7 7 0 0 1-12 3l-2-2"/><path d="M19 4v4h-4M5 20v-4h4"/>',user:'<circle cx="12" cy="8.5" r="3.8"/><path d="M4.5 20.5a7.5 7.5 0 0 1 15 0"/>',book:'<rect x="5" y="3.5" width="14" height="17" rx="1.5"/><path d="M9.5 3.5v17"/>',cal:'<rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M8 3v4M16 3v4M8 14h2M12 14h2M16 14h0M8 17h2M12 17h2"/>',
   shorts:'<path d="M15.5 4.5l-7 3.5a4 4 0 0 0 0 7.2l7 3.5a4 4 0 0 0 0-7.2"/><path d="M10.5 9.5l4 2.5-4 2.5z"/>',free:'<circle cx="12" cy="12" r="8.5"/><path d="M14.6 9.6a3.3 3.3 0 1 0 0 4.8"/>',ev:'<path d="M5 20l3-12 9 9z"/><path d="M14 4l1 2M18 7l2-1M17 3l-1 2"/>',bell:'<path d="M4 10v4h3l5 4V6L7 10z"/><path d="M16 9.5a4 4 0 0 1 0 5"/>',chat:'<path d="M4 5.5h16v10H9l-5 4z"/>',
   gift:'<rect x="4" y="9" width="16" height="11" rx="1.5"/><path d="M3 9h18M12 9v11M12 9c-2-4-6-4-6-1.5S10 9 12 9c2 0 6 .5 6-1.5S14 5 12 9"/>'};
-/* 다른 제휴 자리 — 실제 배너(로고·그림)는 옮기지 않고 같은 형식만 둔다 */
-const OTHERS=[['#6E5BFF','포인트 전환','다른 제휴 자리 · 시연용<br>실제 배너는 옮기지 않음'],['#28C04C','포인트 충전','다른 제휴 자리 · 시연용<br>실제 배너는 옮기지 않음'],['#2E7BE0','카드 포인트','다른 제휴 자리 · 시연용<br>실제 배너는 옮기지 않음']];
+/* 무료 충전소의 다른 제휴 배너 — 탑툰 실제 배너(김반장 제공, 2026-10-19). 시연에서는 눌러도 아무 일 없음 */
+const OTHERS=[['tt-paypang','페이팡 — 최대 8% 페이백 포인트 모아 탑툰 코인으로 전환하세요'],['tt-naver','네이버포인트 — 숨어있는 네이버포인트로 무료 코인 충전하세요, 최대 45코인'],['tt-shinhan','신한카드 — 신한카드 포인트 조회하고 무료코인 받으세요, 최대 180코인'],['tt-lotte','롯데카드 — 롯데카드 L포인트 조회하고 무료코인 받으세요, 최대 250코인']];
 function preset(){ return ((S.state&&S.state.presets)||[]).find(x=>x.mk===S.mk)||{}; }
 function ttTop(){
   return `<header class="tth"><button class="logo" data-tt="home" aria-label="탑툰 첫 화면"><img src="/asp-sim/toptoon-wordmark.png" alt="TOPTOON"></button><span class="adult" aria-hidden="true"><b>19</b></span><span class="sp"></span>
@@ -356,7 +353,7 @@ function ttMenu(){
 }
 function ttFree(){
   return ttTop()+`<button class="bn ours" data-tt="banner" aria-label="쇼핑 적립 열기"><img src="/asp-sim/banners/banner-${S.banner}.png" alt="쇼핑 적립 — 쇼핑하고 탑툰 코인으로 전환"><span class="pin">무료 충전소 · 눌러 보세요</span></button>
-  ${OTHERS.map(o=>`<div class="bn ph" style="background:${o[0]}"><b>${o[1]}</b><span>${o[2]}</span><em></em></div>`).join('')}
+  ${OTHERS.map(o=>`<div class="bn other"><img src="/asp-sim/banners/${o[0]}.webp" alt="${o[1]}" loading="lazy"></div>`).join('')}
   <p class="bn-foot">시연용 화면입니다. 탑툰 무료 충전소의 실제 구성(머리 · 카테고리 · 배너 목록)을 따랐고, 쇼핑 적립 배너의 자리와 순서는 탑툰과 협의합니다. 지급 코인 종류는 탑툰 회신 후 정하며, 시연에서는 「코인」 칸에 보여 줍니다.</p>`;
 }
 function renderTt(){
