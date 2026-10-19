@@ -69,7 +69,7 @@ function sendError(res, e) {
   }
   const status = (e && e.status) || 500;
   if (status >= 500) console.error('[asp]', e);
-  send(res, status, { ok: false, error: (e && e.code) || 'server_error', message: (e && e.code && e.message) || '잠시 후 다시 시도해 주세요' });
+  send(res, status, { ok: false, error: (e && e.code) || 'server_error', message: (e && e.code && e.message) || '잠시 후 다시 시도해 주세요', detail: (e && e.detail) || undefined });
 }
 
 function cookies(req) {
@@ -102,7 +102,13 @@ async function requireAdmin(req) {
   if (!m) throw err('no_token', 'CMS DEMO 에 로그인해 주세요', 401);
   let d;
   try { d = await require('firebase-admin/auth').getAuth(app()).verifyIdToken(m[1]); }
-  catch (_) { throw err('bad_token', '로그인이 만료됐습니다. CMS DEMO 에서 다시 로그인해 주세요', 401); }
+  catch (e) {
+    /* 원인을 남긴다(2026-10-19) — 유효한 관리자 토큰도 여기서 막혀 원인을 봐야 했다. Firebase 오류 코드·문구만 싣는다. */
+    console.error('[asp-admin] verifyIdToken', e && e.code, e && e.message);
+    const x = err('bad_token', '로그인이 만료됐습니다. CMS DEMO 에서 다시 로그인해 주세요', 401);
+    x.detail = String((e && (e.code || '')) + ' ' + ((e && e.message) || '')).slice(0, 200);
+    throw x;
+  }
   if (!d.email || !/@pricepick-cms\.internal$/.test(d.email)) throw err('not_admin', '관리자 계정이 아닙니다', 403);
   return { uid: d.uid, user: d.email.replace('@pricepick-cms.internal', '') };
 }
