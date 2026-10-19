@@ -200,9 +200,7 @@ try{ if(sessionStorage.getItem("asp-sim-20261016")==="ok") document.documentElem
 
     <section class="box">
       <div class="box-h"><h2>무료 충전소 배너 시안</h2><a href="https://sgkim-project.vercel.app/design/20261016_ASP_Banner.html" target="_blank" rel="noopener" style="font-size:12px;color:var(--accent);text-decoration:none;font-weight:600">시안 크게 보기</a></div>
-      <div class="seg" id="bannerSeg" role="group" aria-label="배너 시안">
-        <button data-banner="1">1 코랄 (추천)</button><button data-banner="2">2 네이비</button><button data-banner="3">3 옐로</button>
-      </div>
+      <p class="note">2차 시안(10-19)이 들어가 있습니다. 탑툰 실제 배너와 같은 규격 — 750×400, 제목·설명 글꼴 에스코어 드림, 빨간 원형 배지 — 으로 맞췄습니다. 1차 시안 3종은 시안 문서에 남겨 두었습니다.</p>
     </section>
 
     <section class="box">
@@ -255,8 +253,7 @@ try{ if(sessionStorage.getItem("asp-sim-20261016")==="ok") document.documentElem
 'use strict';
 /* 왼쪽 조작판은 api/asp-mock/* (탑툰 흉내 · 시연 장치)만 부른다. 폰 안 적립 화면은 운영과 같은 /asp/ 페이지다. */
 const MOCK='/api/asp-mock/';
-const S={mk:'tt_demo_0001',screen:'tt',tt:'home',menu:false,banner:1,state:null,entry:null,arm:null,lastCoins:null,flash:false};
-try{ const b=+localStorage.getItem('asp-sim-banner'); if(b>=1&&b<=3) S.banner=b; }catch(e){}
+const S={mk:'tt_demo_0001',screen:'tt',tt:'home',menu:false,state:null,entry:null,arm:null,lastCoins:null,flash:false};
 const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const won=n=>Number(n||0).toLocaleString('ko-KR');
 const $=id=>document.getElementById(id);
@@ -352,7 +349,7 @@ function ttMenu(){
   </aside>`;
 }
 function ttFree(){
-  return ttTop()+`<button class="bn ours" data-tt="banner" aria-label="쇼핑 적립 열기"><img src="/asp-sim/banners/banner-${S.banner}.png" alt="쇼핑 적립 — 쇼핑하고 탑툰 코인으로 전환"><span class="pin">무료 충전소 · 눌러 보세요</span></button>
+  return ttTop()+`<button class="bn ours" data-tt="banner" aria-label="쇼핑 적립 열기"><img src="/asp-sim/banners/banner-v2.webp" alt="쇼핑 적립 — 쿠팡·G마켓에서 쇼핑하고 탑툰 코인으로 전환하세요, 쿠팡도 적립"><span class="pin">무료 충전소 · 눌러 보세요</span></button>
   ${OTHERS.map(o=>`<div class="bn other"><img src="/asp-sim/banners/${o[0]}.webp" alt="${o[1]}" loading="lazy"></div>`).join('')}
   <p class="bn-foot">시연용 화면입니다. 탑툰 무료 충전소의 실제 구성(머리 · 카테고리 · 배너 목록)을 따랐고, 쇼핑 적립 배너의 자리와 순서는 탑툰과 협의합니다. 지급 코인 종류는 탑툰 회신 후 정하며, 시연에서는 「코인」 칸에 보여 줍니다.</p>`;
 }
@@ -364,12 +361,11 @@ function renderTt(){
 }
 function show(screen){ S.screen=screen; tt.hidden=screen!=='tt'; frame.hidden=screen!=='asp'; $('ttDemo').hidden=screen!=='tt'; if(screen==='tt'){ frame.removeAttribute('src'); renderTt(); } }
 function goTt(where){ S.tt=where==='free'?'free':'home'; S.menu=where==='menu'; show('tt'); tt.scrollTop=0; }
-function renderBanner(){ document.querySelectorAll('#bannerSeg button').forEach(b=>b.setAttribute('aria-pressed',String(+b.dataset.banner===S.banner))); }
 function renderAll(){
   const t=S.state&&S.state.toptoon;
   if(t&&S.lastCoins!=null&&t.coins>S.lastCoins) S.flash=true;     // 코인이 들어오면 메뉴의 코인 칸을 잠깐 반짝인다
   S.lastCoins=t?t.coins:null;
-  renderMembers(); renderMode(); renderBanner(); renderLedger(); renderSig(); if(S.screen==='tt') renderTt();
+  renderMembers(); renderMode(); renderLedger(); renderSig(); if(S.screen==='tt') renderTt();
 }
 
 async function loadState(){ try{ S.state=await api('state?mk='+encodeURIComponent(S.mk)); renderAll(); }catch(e){ toast(e.message); } }
@@ -410,7 +406,6 @@ document.addEventListener('click',e=>{
     else toast('시연에서는 메뉴의 「무료 충전소」만 열려요');
     return;
   }
-  const bs=e.target.closest('[data-banner]'); if(bs){ S.banner=+bs.dataset.banner; try{ localStorage.setItem('asp-sim-banner',String(S.banner)); }catch(x){} renderBanner(); if(S.screen==='tt') renderTt(); else goTt('free'); return; }
   const en=e.target.closest('[data-enter]'); if(en){ enter(en.dataset.enter); return; }
   const md=e.target.closest('[data-mode]'); if(md){ setMode(md.dataset.mode); return; }
   const sm=e.target.closest('[data-sim]'); if(sm){ sim(sm.dataset.sim,sm); return; }
@@ -434,7 +429,7 @@ addEventListener('resize',fit); fit();
 
 /* 열람 비밀번호 */
 const root=document.documentElement, form=$('gate-form'), pw=$('gate-pw'), err=$('gate-err');
-function start(){ goTt('home'); renderBanner(); loadState(); fit(); }
+function start(){ goTt('home'); loadState(); fit(); }
 if(root.classList.contains('unlocked')) start();
 else form.addEventListener('submit',ev=>{
   ev.preventDefault();
