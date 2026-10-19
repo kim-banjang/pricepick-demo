@@ -10,6 +10,9 @@
   "author": "",
   "license": "ISC",
   "type": "commonjs",
+  "engines": {
+    "node": "22.x"
+  },
   "dependencies": {
     "firebase-admin": "^14.0.0",
     "google-auth-library": "^10.7.0",
