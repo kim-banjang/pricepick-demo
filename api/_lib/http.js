@@ -93,6 +93,40 @@ function opOf(req) {
   return m ? m[1] : '';
 }
 
+/* Firebase 로그인 토큰(ID 토큰) 확인 — firebase-admin 의 verifyIdToken 대신 직접 한다(2026-10-19).
+   firebase-admin 14 의 auth 가 jwks-rsa 4 → jose 6(ES 모듈)을 require 하는데, Vercel 함수 실행 환경에서
+   ERR_REQUIRE_ESM 으로 죽어 유효한 관리자 토큰도 전부 막혔다(engines 22.x 로도 안 풀림).
+   Firebase 문서의 「제3자 JWT 라이브러리로 ID 토큰 확인」 절차 그대로: RS256 서명을 구글 공개 인증서로 확인하고,
+   aud = 프로젝트 ID · iss = https://securetoken.google.com/<프로젝트 ID> · exp 미래 · iat 과거 · sub 있음. */
+let GCERTS = null, GCERTS_UNTIL = 0;
+async function googleCerts() {
+  if (global.__ASP_TEST_CERTS__) return global.__ASP_TEST_CERTS__;      // 시험 전용
+  if (GCERTS && Date.now() < GCERTS_UNTIL) return GCERTS;
+  const r = await fetch('https://www.googleapis.com/robot/v1/metadata/x509/securetoken@system.gserviceaccount.com');
+  if (!r.ok) throw new Error('인증서 ' + r.status);
+  const m = /max-age=(\d+)/.exec(r.headers.get('cache-control') || '');
+  GCERTS = await r.json();
+  GCERTS_UNTIL = Date.now() + (m ? Number(m[1]) * 1000 : 3600 * 1000);
+  return GCERTS;
+}
+const b64u = s => Buffer.from(String(s).replace(/-/g, '+').replace(/_/g, '/'), 'base64');
+async function verifyIdToken(token, nowSec) {
+  const parts = String(token || '').split('.');
+  if (parts.length !== 3) throw new Error('토큰 형식');
+  const header = JSON.parse(b64u(parts[0]).toString('utf8'));
+  const p = JSON.parse(b64u(parts[1]).toString('utf8'));
+  if (header.alg !== 'RS256' || !header.kid) throw new Error('alg/kid');
+  const pem = (await googleCerts())[header.kid];
+  if (!pem) throw new Error('모르는 kid');
+  const ok = require('crypto').createVerify('RSA-SHA256').update(parts[0] + '.' + parts[1]).verify(pem, b64u(parts[2]));
+  if (!ok) throw new Error('서명 불일치');
+  const proj = projectId(), now = nowSec || Math.floor(Date.now() / 1000);
+  if (p.aud !== proj || p.iss !== 'https://securetoken.google.com/' + proj) throw new Error('aud/iss');
+  if (!(p.exp > now)) throw new Error('만료');
+  if (!(p.iat <= now + 300) || !p.sub) throw new Error('iat/sub');
+  return Object.assign({ uid: p.sub }, p);
+}
+
 /* CMS DEMO 관리자 — Firebase 로그인 토큰을 확인하고 이메일 도메인을 본다 (firestore.rules isAdmin 과 같은 기준) */
 async function requireAdmin(req) {
   if (global.__ASP_TEST_ADMIN__) return global.__ASP_TEST_ADMIN__;     // 로컬 시험 서버 전용
@@ -101,12 +135,11 @@ async function requireAdmin(req) {
   const err = (code, msg, status) => { const e = new Error(msg); e.code = code; e.status = status; return e; };
   if (!m) throw err('no_token', 'CMS DEMO 에 로그인해 주세요', 401);
   let d;
-  try { d = await require('firebase-admin/auth').getAuth(app()).verifyIdToken(m[1]); }
+  try { d = await verifyIdToken(m[1]); }
   catch (e) {
-    /* 원인을 남긴다(2026-10-19) — 유효한 관리자 토큰도 여기서 막혀 원인을 봐야 했다. Firebase 오류 코드·문구만 싣는다. */
-    console.error('[asp-admin] verifyIdToken', e && e.code, e && e.message);
+    console.error('[asp-admin] verifyIdToken', e && e.message);
     const x = err('bad_token', '로그인이 만료됐습니다. CMS DEMO 에서 다시 로그인해 주세요', 401);
-    x.detail = String((e && (e.code || '')) + ' ' + ((e && e.message) || '')).slice(0, 200);
+    x.detail = String((e && e.message) || '').slice(0, 120);
     throw x;
   }
   if (!d.email || !/@pricepick-cms\.internal$/.test(d.email)) throw err('not_admin', '관리자 계정이 아닙니다', 403);
@@ -120,4 +153,4 @@ async function adminAccessToken() {
 }
 function projectId() { const j = credJson(); return (j && j.project_id) || 'pricepick-demo'; }
 
-module.exports = { store, rawBody, jsonBody, send, sendError, cookies, origin, opOf, requireAdmin, adminAccessToken, projectId };
+module.exports = { store, rawBody, jsonBody, send, sendError, cookies, origin, opOf, requireAdmin, verifyIdToken, adminAccessToken, projectId };
