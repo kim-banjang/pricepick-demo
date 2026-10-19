@@ -20466,29 +20466,35 @@ function ppRenderActListHtml(ev, filter) {
   });
   return parts.join('');
 }
-function renderActivity(filter) {
-  if (!PP.uid) return;
-  var lists = document.querySelectorAll('.activity-list');
-  if (!lists.length) return;
-  if (PP._actEvents) {
-    var html = ppRenderActListHtml(ppApplySortOrder(PP._actEvents), filter || null);
-    lists.forEach(function (el) { el.innerHTML = html; });
-    return;
-  }
-  var actPbP = ppQuery('postbacks', 'user_id', PP.uid);
-  Promise.all([
-    ppQuery('ticket_transactions', 'user_id', PP.uid),
-    ppQuery('gifticon_exchanges', 'user_id', PP.uid),
-    ppQuery('point_transactions', 'user_id', PP.uid),
-    ppGetPointPolicyExpiry(),
-    /* 연출 환수 기록을 만들려면 구매건과 그 티켓 상태가 있어야 한다 — 취소는 원장에 없는
-       연출이라 ticket_transactions만 읽으면 「환수」 탭이 계속 빈 채로 남는다.
-       티켓은 연출에 걸린 구매 건의 장수만 센다(ppDemoCancelTicketCounts, 2026-10-16). */
-    actPbP,
-    ppDemoCancelTicketCounts(actPbP),
-  ]).then(function (res) {
-    var ttx = res[0], gex = res[1], ptx = res[2], pointExpiryDays = ppPointExpiryDays(res[3]), ev = [];
-    ev = ev.concat(ppDemoClawbackEvents(res[4] || [], res[5] || {}));
+/* ── 활동 내역 나눠 읽기 (2026-10-16, 김반장 확정) ──
+   티켓 원장은 티켓 1장 = 1건이라 회원 한 명에 수만 건이 될 수 있다. 예전엔 활동 내역을 열 때마다 전부 읽었다
+   (티켓 1.7만 장 회원이면 한 번에 3만 건 넘게 — 하루 무료 한도의 절반 이상). 이제 티켓 기록은 최근 100건씩 읽고
+   목록 끝의 「이전 내역 더 보기」로 이어 읽는다.
+   기프티콘·포인트 기록은 건수가 적어 전부 읽되, 아직 안 읽은 티켓 기록보다 오래된 것은 그 기록이 내려올 때까지
+   감춘다 — 그래야 날짜 순서와 「티켓 잔여 N장」이 전부 읽었을 때와 같다(잔여는 지금 보유량에서 최신 기록부터
+   거꾸로 되감아 구하므로, 위에서부터 읽은 만큼은 전부 읽었을 때와 숫자가 같다).
+   정렬이 「오래된순」이면 읽은 범위 안에서 오래된 것부터 보이고, 더 보기는 그보다 이전 기록을 가져온다. */
+var ACT_PAGE = 100;
+var ppActSrc = null;      // { uid, ttx, last, done, gex, ptx, pointExpiryDays, claw }
+var ppActFilter = null;
+function ppActTxPage(uid, after) {
+  var q = db.collection('ticket_transactions').where('user_id', '==', uid).orderBy('created_at', 'desc');
+  if (after) q = q.startAfter(after);
+  return q.limit(ACT_PAGE).get().then(function (snap) {
+    var rows = []; snap.forEach(function (d) { var x = d.data(); x._id = d.id; rows.push(x); });
+    return { rows: rows, last: snap.docs.length ? snap.docs[snap.docs.length - 1] : after, done: snap.docs.length < ACT_PAGE };
+  }).catch(function (e) {
+    /* 정렬 색인이 없거나 질의가 실패하면 예전처럼 전부 읽는다(화면은 같다) */
+    console.warn('[활동 내역] 나눠 읽기 실패 → 전부 읽습니다', e && e.message);
+    if (after) return { rows: [], last: after, done: true };
+    return ppQuery('ticket_transactions', 'user_id', uid).then(function (rows) { return { rows: rows, last: null, done: true }; });
+  });
+}
+function ppActBuild(src) {
+  /* 같은 시각 기록끼리의 순서를 전부 읽던 때(문서 id 순)와 맞춘다 */
+  var ttx = src.ttx.slice().sort(function (a, b) { return a._id < b._id ? -1 : a._id > b._id ? 1 : 0; });
+  var gex = src.gex, ptx = src.ptx, pointExpiryDays = src.pointExpiryDays, ev = [];
+  ev = ev.concat(src.claw);
     ttx.forEach(function (t) {
       /* 티켓 1종 통합(2026-10-14): 브론즈·실버·골드 기록은 모두 「티켓」, 장수는 1·10·20장 */
       var w = PP_TICKET_PER_DOC[t.ticket_grade];
@@ -20548,9 +20554,61 @@ function renderActivity(filter) {
       e.balanceAfter = runningBal[e.grade];
       runningBal[e.grade] -= e.qty;
     });
-    PP._actEvents = validEv.sort(function (a, b) { return b.d - a.d; });
-    var html = ppRenderActListHtml(ppApplySortOrder(PP._actEvents), filter || null);
-    lists.forEach(function (el) { el.innerHTML = html; });
+    /* 아직 안 읽은 티켓 기록이 있으면, 읽은 것 중 가장 오래된 티켓 기록보다 이전 것은 감춘다(위 설명) */
+    if (!src.done && src.ttx.length) {
+      var cut = ppDate(src.ttx[src.ttx.length - 1].created_at);
+      if (cut) validEv = validEv.filter(function (e) { return e.d >= cut; });
+    }
+    return validEv.sort(function (a, b) { return b.d - a.d; });
+}
+function ppActPaint() {
+  var lists = document.querySelectorAll('.activity-list');
+  if (!lists.length || !PP._actEvents) return;
+  var html = ppRenderActListHtml(ppApplySortOrder(PP._actEvents), ppActFilter);
+  if (ppActSrc && !ppActSrc.done) {
+    html += '<div class="act-more" onclick="ppActMore(this)" style="margin:0;padding:14px;text-align:center;background:white;border-bottom:1px solid var(--border);font-size:var(--fs-caption);color:var(--text2);font-weight:600;cursor:pointer;">'
+      + '<span class="i18n"><span class="ko">이전 내역 더 보기</span><span class="vi">Xem thêm lịch sử trước</span></span></div>';
+  }
+  lists.forEach(function (el) { el.innerHTML = html; });
+}
+function ppActMore(btn) {
+  var src = ppActSrc;
+  if (!src || src.done || src.busy) return;
+  src.busy = true;
+  if (btn) btn.style.opacity = '0.5';
+  ppActTxPage(src.uid, src.last).then(function (pg) {
+    src.busy = false;
+    if (ppActSrc !== src) return;
+    src.ttx = src.ttx.concat(pg.rows); src.last = pg.last; src.done = pg.done;
+    PP._actEvents = ppActBuild(src);
+    ppActPaint();
+  }).catch(function (e) { src.busy = false; console.error('ppActMore', e); if (btn) btn.style.opacity = ''; });
+}
+window.ppActMore = ppActMore;
+function renderActivity(filter) {
+  if (!PP.uid) return;
+  var lists = document.querySelectorAll('.activity-list');
+  if (!lists.length) return;
+  ppActFilter = filter || null;
+  if (PP._actEvents && ppActSrc && ppActSrc.uid === PP.uid) { ppActPaint(); return; }
+  var uid = PP.uid;
+  var actPbP = ppQuery('postbacks', 'user_id', uid);
+  Promise.all([
+    ppActTxPage(uid, null),
+    ppQuery('gifticon_exchanges', 'user_id', uid),
+    ppQuery('point_transactions', 'user_id', uid),
+    ppGetPointPolicyExpiry(),
+    /* 연출 환수 기록을 만들려면 구매건과 그 티켓 상태가 있어야 한다 — 취소는 원장에 없는
+       연출이라 ticket_transactions만 읽으면 「환수」 탭이 계속 빈 채로 남는다.
+       티켓은 연출에 걸린 구매 건의 장수만 센다(ppDemoCancelTicketCounts, 2026-10-16). */
+    actPbP,
+    ppDemoCancelTicketCounts(actPbP),
+  ]).then(function (res) {
+    if (uid !== PP.uid) return;
+    ppActSrc = { uid: uid, ttx: res[0].rows, last: res[0].last, done: res[0].done, gex: res[1], ptx: res[2],
+      pointExpiryDays: ppPointExpiryDays(res[3]), claw: ppDemoClawbackEvents(res[4] || [], res[5] || {}) };
+    PP._actEvents = ppActBuild(ppActSrc);
+    ppActPaint();
   });
 }
 window.ppRenderActivity = renderActivity;
@@ -22259,7 +22317,11 @@ function ppByEarned(a, b) {
 /* ── 티켓 쓰기(차감) — 먼저 받은 것부터(선입선출) ──
    옛 실버·골드 문서는 한 문서가 티켓 10·20장이라, 필요한 장수를 넘겨 걸리면 남는 장수만큼
    티켓을 새로 만들어 돌려준다. 받은 날·만료일은 원래 문서 것을 그대로 잇는다(선입선출 유지). */
-function ppPlanTicketUse(n) {
+/* 2026-10-16 — 쓸 장수만큼만 읽는다. 예전엔 보유 티켓을 전부 읽어 정렬했다(티켓 1장 = 1건이라 1만 장 넘는
+   회원이면 기프티콘 한 번 사는 데 1만 건 넘게 읽었다). 받은 날(earned_at) 오름차순으로 필요한 만큼씩 끊어 읽는다
+   — 같은 날이면 문서 id 순이라 예전 정렬(문서 id 순으로 받아 안정 정렬)과 같은 티켓을 고른다.
+   이 질의에는 색인(user_id·status·earned_at)이 필요하다. 색인이 없거나 실패하면 예전처럼 전부 읽는다. */
+function ppPlanTicketUseAll(n) {
   return db.collection('user_tickets').where('user_id', '==', PP.uid).where('status', '==', 'active').get()
     .then(function (snap) {
       var docs = snap.docs.filter(function (d) { return PP_TICKET_PER_DOC.hasOwnProperty(d.data().grade); }).sort(ppByEarned);
@@ -22268,6 +22330,28 @@ function ppPlanTicketUse(n) {
       if (got < n) return null;
       return { docs: take, change: got - n, last: take[take.length - 1] };
     });
+}
+function ppPlanTicketUse(n) {
+  var uid = PP.uid, take = [], got = 0;
+  var base = db.collection('user_tickets').where('user_id', '==', uid).where('status', '==', 'active').orderBy('earned_at', 'asc');
+  function page(after) {
+    var size = Math.min(500, Math.max(50, n - got + 10));
+    var q = after ? base.startAfter(after) : base;
+    return q.limit(size).get().then(function (snap) {
+      for (var i = 0; i < snap.docs.length && got < n; i++) {
+        var d = snap.docs[i], w = PP_TICKET_PER_DOC[d.data().grade];
+        if (!w) continue;                      // 이벤트 티켓은 여기서 쓰지 않는다
+        take.push(d); got += w;
+      }
+      if (got >= n) return { docs: take, change: got - n, last: take[take.length - 1] };
+      if (snap.docs.length < size) return null;  // 다 읽었는데 모자란다
+      return page(snap.docs[snap.docs.length - 1]);
+    });
+  }
+  return page(null).catch(function (e) {
+    console.warn('[티켓 차감] 나눠 읽기 실패 → 전부 읽습니다', e && e.message);
+    return ppPlanTicketUseAll(n);
+  });
 }
 function ppTicketUseOps(plan, via, now, extra) {
   var ops = [];

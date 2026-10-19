@@ -107,4 +107,11 @@ async function requireAdmin(req) {
   return { uid: d.uid, user: d.email.replace('@pricepick-cms.internal', '') };
 }
 
-module.exports = { store, rawBody, jsonBody, send, sendError, cookies, origin, opOf, requireAdmin };
+/* 서비스 계정 접근 토큰(cloud-platform 범위) — Firestore Admin API(색인 관리)를 부를 때만 쓴다 */
+async function adminAccessToken() {
+  const t = await app().options.credential.getAccessToken();
+  return t.access_token;
+}
+function projectId() { const j = credJson(); return (j && j.project_id) || 'pricepick-demo'; }
+
+module.exports = { store, rawBody, jsonBody, send, sendError, cookies, origin, opOf, requireAdmin, adminAccessToken, projectId };

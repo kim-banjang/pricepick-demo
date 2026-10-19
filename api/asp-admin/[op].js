@@ -7,6 +7,7 @@
  *   POST /api/asp-admin/layout  { code, layout }    → 쇼핑몰 노출 순서 · 점검중 · 숨김 · 말풍선
  *   POST /api/asp-admin/faq     { items }           → 자주 묻는 질문
  *   GET  /api/asp-admin/csv?media=TOPTOON&month=YYYY-MM → 월간 지급 내역 CSV (07)
+ *   GET/POST /api/asp-admin/indexes                 → 데모 앱 읽기 줄이기용 Firestore 색인 확인 · 없으면 만들기
  */
 const A = require('../_lib/asp');
 const H = require('../_lib/http');
@@ -35,6 +36,10 @@ module.exports = async function handler(req, res) {
     }
     if (op === 'faq' && req.method === 'POST') {
       return H.send(res, 200, { ok: true, items: await A.saveFaq(store, body.items, Date.now()) });
+    }
+    /* Firestore 복합 색인 확인(GET) · 없는 것 만들기(POST) — 데모 앱 읽기 줄이기용(api/_lib/fs-index.js) */
+    if (op === 'indexes') {
+      return H.send(res, 200, { ok: true, indexes: await require('../_lib/fs-index').ensure(req.method === 'POST') });
     }
     if (op === 'csv') {
       const q = req.query || {};

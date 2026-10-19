@@ -7817,11 +7817,22 @@ function ppAggregate(col, where, aggs) {
 function ppCount(col, where) {
   return ppAggregate(col, where, [{ alias: 'n', count: {} }]).then(function (r) { return r ? r.n : null; });
 }
-/* 여러 개를 한꺼번에 — 하나라도 실패하면 null(부르는 쪽이 예전 방식으로 간다) */
+/* 여러 개를 한꺼번에 — 하나라도 실패하면 null(부르는 쪽이 예전 방식으로 간다).
+   회원이 수백 명이라 회원별로 물으면 요청이 수백 개다 — 한 번에 12개씩만 보낸다. 하나라도 실패하면 남은 것은 묻지 않는다. */
 function ppCountAll(list) {
-  return Promise.all(list.map(function (x) { return ppCount(x[0], x[1]); })).then(function (ns) {
-    return ns.some(function (n) { return n === null; }) ? null : ns;
-  });
+  var out = new Array(list.length), next = 0, failed = false;
+  function worker() {
+    if (failed || next >= list.length) return Promise.resolve();
+    var i = next++;
+    return ppCount(list[i][0], list[i][1]).then(function (n) {
+      if (n === null) { failed = true; return; }
+      out[i] = n;
+      return worker();
+    });
+  }
+  var lanes = [];
+  for (var k = 0; k < Math.min(12, list.length); k++) lanes.push(worker());
+  return Promise.all(lanes).then(function () { return failed ? null : out; });
 }
 window.ppCount = ppCount; window.ppCountAll = ppCountAll;
 /* ── 시험 문서 거르기 ──
