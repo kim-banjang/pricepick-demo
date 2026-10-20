@@ -6,6 +6,9 @@
 <meta name="color-scheme" content="light">
 <meta name="robots" content="noindex">
 <title>쇼핑 적립 시연</title>
+<script>
+(function(){ var l="ko"; try{ var q=/[?&]lang=(ko|vi)\b/.exec(location.search); l=q?q[1]:(localStorage.getItem("asp-sim-lang")||"ko"); }catch(e){} if(l==="vi"){ document.documentElement.lang="vi"; document.title="Demo Tích điểm mua sắm"; } })();
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800&family=Outfit:wght@300;600;800&display=swap">
 <style>
@@ -159,82 +162,93 @@ html.unlocked .gate{display:none}
 .gate button{padding:10px 18px;border-radius:8px;background:#5A3BC4;color:#FFFFFF;font-weight:600}
 .gate .g-err{min-height:1.4em;margin-top:10px;font-size:.86rem;color:var(--bad);visibility:hidden}
 .gate .g-err.show{visibility:visible}
+/* 한/베 토글 */
+html[lang="vi"] .ko{display:none!important}
+html:not([lang="vi"]) .vi{display:none!important}
+.langtog{position:fixed;top:16px;right:18px;z-index:120;display:inline-flex;gap:2px;padding:3px;border-radius:20px;background:#5A3BC4;box-shadow:0 4px 14px rgba(40,24,120,.18)}
+.langtog .lt{font-size:12px;font-weight:700;color:#FFFFFF;padding:4px 13px;border-radius:16px;opacity:.7}
+html:not([lang="vi"]) .langtog .sk, html[lang="vi"] .langtog .sv{background:#FFFFFF;color:#5A3BC4;opacity:1}
+.langtog:focus-visible{outline:3px solid #845EEE;outline-offset:2px}
+.vi-note{margin:0;padding:10px 12px;border-radius:10px;background:var(--soft);color:var(--ink);font-size:12.5px;line-height:1.55}
+@media (max-width:440px){.langtog{top:10px;right:10px}}
 </style>
 <script>
 try{ if(sessionStorage.getItem("asp-sim-20261016")==="ok") document.documentElement.classList.add("unlocked"); }catch(e){}
 </script>
 </head>
 <body>
+<button type="button" class="langtog" id="langBtn" role="switch" aria-checked="false" aria-label="한국어 / Tiếng Việt"><span class="lt sk">KO</span><span class="lt sv">VI</span></button>
 <div class="gate" role="dialog" aria-modal="true" aria-labelledby="g-title">
   <form id="gate-form" autocomplete="off" novalidate>
-    <p class="g-title" id="g-title">쇼핑 적립 시연 — 탑툰</p>
-    <p class="g-sub">사내 문서 · 열람 비밀번호를 입력하십시오</p>
-    <div class="g-row"><input type="password" id="gate-pw" aria-label="열람 비밀번호" inputmode="numeric" autofocus><button type="submit">확인</button></div>
-    <p class="g-err" id="gate-err" role="alert">비밀번호가 올바르지 않습니다.</p>
+    <p class="g-title" id="g-title"><span class="ko">쇼핑 적립 시연 — 탑툰</span><span class="vi">Demo Tích điểm mua sắm — Toptoon</span></p>
+    <p class="g-sub"><span class="ko">사내 문서 · 열람 비밀번호를 입력하십시오</span><span class="vi">Tài liệu nội bộ · Vui lòng nhập mật khẩu để xem</span></p>
+    <div class="g-row"><input type="password" id="gate-pw" aria-label="열람 비밀번호" inputmode="numeric" autofocus><button type="submit"><span class="ko">확인</span><span class="vi">Xác nhận</span></button></div>
+    <p class="g-err" id="gate-err" role="alert"><span class="ko">비밀번호가 올바르지 않습니다.</span><span class="vi">Mật khẩu không chính xác.</span></p>
   </form>
 </div>
 
 <div class="stage">
   <aside class="panel" aria-label="시연 조작판">
     <p class="eyebrow">PricePick × TOPTOON · DEMO</p>
-    <h1>쇼핑 적립 시연</h1>
-    <p class="lead">탑툰 무료충전소에서 들어가는 순간부터 코인 지급까지 실제 서버로 돕니다. 오른쪽 폰 안의 적립 화면은 운영과 같은 페이지이고, 탑툰 쪽(진입 서명 · 코인 지급 API)만 흉내 서버입니다.</p>
+    <h1><span class="ko">쇼핑 적립 시연</span><span class="vi">Demo Tích điểm mua sắm</span></h1>
+    <p class="lead"><span class="ko">탑툰 무료충전소에서 들어가는 순간부터 코인 지급까지 실제 서버로 돕니다. 오른쪽 폰 안의 적립 화면은 운영과 같은 페이지이고, 탑툰 쪽(진입 서명 · 코인 지급 API)만 흉내 서버입니다.</span><span class="vi">Chạy trên máy chủ thật, từ lúc vào từ Trạm nạp miễn phí (무료충전소) của Toptoon cho đến khi cấp xu. Màn hình tích điểm trong điện thoại bên phải chính là trang dùng cho vận hành; chỉ phía Toptoon (chữ ký truy cập · API cấp xu) là máy chủ mô phỏng.</span></p>
+    <p class="vi-note vi">Màn hình trong điện thoại giữ nguyên tiếng Hàn vì dịch vụ dành cho thành viên Toptoon tại Hàn Quốc. Phần điều khiển, ghi chú và thông báo ở trang này được dịch sang tiếng Việt.</p>
 
     <section class="box">
-      <div class="box-h"><h2>1 · 탑툰 회원</h2><span>회원 식별값 mk</span></div>
+      <div class="box-h"><h2><span class="ko">1 · 탑툰 회원</span><span class="vi">1 · Thành viên Toptoon</span></h2><span><span class="ko">회원 식별값 mk</span><span class="vi">mã định danh thành viên mk</span></span></div>
       <div class="members" id="members"></div>
     </section>
 
     <section class="box">
-      <div class="box-h"><h2>2 · 탑툰에서 들어가기</h2><span>연동 문서 03</span></div>
+      <div class="box-h"><h2><span class="ko">2 · 탑툰에서 들어가기</span><span class="vi">2 · Vào từ Toptoon</span></h2><span><span class="ko">연동 문서 03</span><span class="vi">tài liệu tích hợp 03</span></span></div>
       <div class="row">
-        <button class="btn primary" data-act="home">탑툰 첫 화면부터</button>
-        <button class="btn" data-act="free">무료 충전소 바로</button>
-        <button class="btn" data-enter="ok">적립 화면 바로</button>
-        <button class="btn" data-enter="badsig">서명 틀린 진입</button>
-        <button class="btn" data-enter="expired">만료된 진입</button>
+        <button class="btn primary" data-act="home"><span class="ko">탑툰 첫 화면부터</span><span class="vi">Bắt đầu từ trang chủ Toptoon</span></button>
+        <button class="btn" data-act="free"><span class="ko">무료 충전소 바로</span><span class="vi">Vào thẳng Trạm nạp miễn phí</span></button>
+        <button class="btn" data-enter="ok"><span class="ko">적립 화면 바로</span><span class="vi">Vào thẳng màn hình tích điểm</span></button>
+        <button class="btn" data-enter="badsig"><span class="ko">서명 틀린 진입</span><span class="vi">Truy cập sai chữ ký</span></button>
+        <button class="btn" data-enter="expired"><span class="ko">만료된 진입</span><span class="vi">Truy cập đã hết hạn</span></button>
       </div>
-      <p class="note">폰 화면에서 오른쪽 위 메뉴 → 「무료 충전소」 → 쇼핑 적립 배너를 누르면 탑툰 서버 역할을 하는 흉내 서버가 서명된 진입 주소를 만들어 적립 화면을 엽니다. 적립 화면에서 나가면 무료 충전소로 돌아옵니다.</p>
+      <p class="note"><span class="ko">폰 화면에서 오른쪽 위 메뉴 → 「무료 충전소」 → 쇼핑 적립 배너를 누르면 탑툰 서버 역할을 하는 흉내 서버가 서명된 진입 주소를 만들어 적립 화면을 엽니다. 적립 화면에서 나가면 무료 충전소로 돌아옵니다.</span><span class="vi">Trên điện thoại, bấm menu ở góc trên bên phải → 「무료 충전소」 (Trạm nạp miễn phí) → banner Tích điểm mua sắm: máy chủ mô phỏng đóng vai máy chủ Toptoon sẽ tạo URL truy cập có chữ ký và mở màn hình tích điểm. Thoát khỏi màn hình tích điểm sẽ quay về Trạm nạp miễn phí.</span></p>
       <div id="sigBox"></div>
     </section>
 
     <section class="box">
-      <div class="box-h"><h2>무료 충전소 배너 시안</h2><a href="https://sgkim-project.vercel.app/design/20261016_ASP_Banner.html" target="_blank" rel="noopener" style="font-size:12px;color:var(--accent);text-decoration:none;font-weight:600">시안 크게 보기</a></div>
-      <p class="note">2차 시안(10-19)이 들어가 있습니다. 탑툰 실제 배너와 같은 규격 — 750×400, 제목·설명 글꼴 에스코어 드림, 빨간 원형 배지 — 으로 맞췄습니다. 1차 시안 3종은 시안 문서에 남겨 두었습니다.</p>
+      <div class="box-h"><h2><span class="ko">무료 충전소 배너 시안</span><span class="vi">Thiết kế banner Trạm nạp miễn phí</span></h2><a href="https://sgkim-project.vercel.app/design/20261016_ASP_Banner.html" target="_blank" rel="noopener" style="font-size:12px;color:var(--accent);text-decoration:none;font-weight:600"><span class="ko">시안 크게 보기</span><span class="vi">Xem bản thiết kế</span></a></div>
+      <p class="note"><span class="ko">2차 시안(10-19)이 들어가 있습니다. 탑툰 실제 배너와 같은 규격 — 750×400, 제목·설명 글꼴 에스코어 드림, 빨간 원형 배지 — 으로 맞췄습니다. 1차 시안 3종은 시안 문서에 남겨 두었습니다.</span><span class="vi">Đang dùng bản thiết kế lần 2 (19/10), theo đúng quy cách banner thật của Toptoon — 750×400, font tiêu đề·mô tả S-Core Dream (에스코어 드림), huy hiệu tròn màu đỏ. 3 mẫu lần 1 vẫn được giữ trong tài liệu thiết kế.</span></p>
     </section>
 
     <section class="box">
-      <div class="box-h"><h2>3 · 탑툰 코인 지급 API 응답</h2><span>연동 문서 04 · 06</span></div>
+      <div class="box-h"><h2><span class="ko">3 · 탑툰 코인 지급 API 응답</span><span class="vi">3 · Phản hồi của API cấp xu Toptoon</span></h2><span><span class="ko">연동 문서 04 · 06</span><span class="vi">tài liệu tích hợp 04 · 06</span></span></div>
       <div class="seg" id="modeSeg" role="group" aria-label="코인 지급 API 응답 방식">
-        <button data-mode="ok">정상 0000</button><button data-mode="error">일시 오류 9999</button><button data-mode="timeout">응답 지연 11초</button>
+        <button data-mode="ok"><span class="ko">정상 0000</span><span class="vi">Bình thường 0000</span></button><button data-mode="error"><span class="ko">일시 오류 9999</span><span class="vi">Lỗi tạm thời 9999</span></button><button data-mode="timeout"><span class="ko">응답 지연 11초</span><span class="vi">Chậm 11 giây</span></button>
       </div>
-      <p class="note">일시 오류와 응답 지연이면 같은 거래번호로 1분 · 5분 · 30분 뒤 다시 보냅니다. 응답 지연은 탑툰이 지급은 끝낸 경우라 재시도 때 처음 결과가 그대로 돌아오고, 코인은 한 번만 들어갑니다.</p>
+      <p class="note"><span class="ko">일시 오류와 응답 지연이면 같은 거래번호로 1분 · 5분 · 30분 뒤 다시 보냅니다. 응답 지연은 탑툰이 지급은 끝낸 경우라 재시도 때 처음 결과가 그대로 돌아오고, 코인은 한 번만 들어갑니다.</span><span class="vi">Khi lỗi tạm thời hoặc phản hồi chậm, hệ thống gửi lại với cùng mã giao dịch sau 1 phút · 5 phút · 30 phút. Phản hồi chậm là trường hợp Toptoon đã cấp xu xong, nên khi thử lại sẽ nhận lại đúng kết quả lần đầu và xu chỉ được cộng một lần.</span></p>
     </section>
 
     <section class="box">
-      <div class="box-h"><h2>4 · 구매 처리</h2><span>쇼핑몰 · 제휴망 흉내</span></div>
+      <div class="box-h"><h2><span class="ko">4 · 구매 처리</span><span class="vi">4 · Xử lý đơn mua</span></h2><span><span class="ko">쇼핑몰 · 제휴망 흉내</span><span class="vi">mô phỏng sàn mua sắm · mạng liên kết</span></span></div>
       <div class="row">
-        <button class="btn" data-sim="confirm-all">적립 예정 전부 확정</button>
-        <button class="btn" data-sim="miss-latest">최근 예정 1건 미적립</button>
-        <button class="btn" data-sim="retry-now">재시도 대기 건 지금 보내기</button>
-        <button class="btn" data-sim="seed">예시 기록 넣기</button>
-        <button class="btn danger" data-sim="reset">이 회원 기록 지우기</button>
+        <button class="btn" data-sim="confirm-all"><span class="ko">적립 예정 전부 확정</span><span class="vi">Xác nhận tất cả đơn đang chờ</span></button>
+        <button class="btn" data-sim="miss-latest"><span class="ko">최근 예정 1건 미적립</span><span class="vi">Đổi 1 đơn chờ gần nhất thành không được tích</span></button>
+        <button class="btn" data-sim="retry-now"><span class="ko">재시도 대기 건 지금 보내기</span><span class="vi">Gửi ngay các giao dịch chờ thử lại</span></button>
+        <button class="btn" data-sim="seed"><span class="ko">예시 기록 넣기</span><span class="vi">Thêm dữ liệu mẫu</span></button>
+        <button class="btn danger" data-sim="reset"><span class="ko">이 회원 기록 지우기</span><span class="vi">Xóa dữ liệu của thành viên này</span></button>
       </div>
-      <p class="note">구매는 폰 화면에서 쇼핑몰 → 바로가기 → 「구매 완료 (데모)」로 넣습니다. 확정은 운영에서 확정 기준일 배치가 하는 일을 여기서 바로 실행합니다.</p>
+      <p class="note"><span class="ko">구매는 폰 화면에서 쇼핑몰 → 바로가기 → 「구매 완료 (데모)」로 넣습니다. 확정은 운영에서 확정 기준일 배치가 하는 일을 여기서 바로 실행합니다.</span><span class="vi">Đơn mua được tạo trên điện thoại: chọn sàn → đi tới sàn → 「구매 완료 (데모)」 (hoàn tất mua – demo). Nút xác nhận ở đây chạy ngay việc mà batch theo ngày xác nhận sẽ làm khi vận hành thật.</span></p>
     </section>
 
     <section class="box">
-      <div class="box-h"><h2>기록판</h2><span id="stamp"></span></div>
+      <div class="box-h"><h2><span class="ko">기록판</span><span class="vi">Bảng ghi nhận</span></h2><span id="stamp"></span></div>
       <div class="ledger" id="ledger"></div>
       <div class="txs" id="txs"></div>
     </section>
 
     <div class="links">
       <a href="/asp-cms/" target="_blank" rel="noopener">ASP CMS</a>
-      <a href="/cms/#asp-convs" target="_blank" rel="noopener">CMS DEMO · ASP 매체</a>
-      <a href="/asp-dev/" target="_blank" rel="noopener">개발 안내</a>
-      <a href="https://sgkim-project.vercel.app/partners/20261016-toptoon-asp-spec.html" target="_blank" rel="noopener">연동 문서</a>
-      <a href="https://sgkim-project.vercel.app/design/20261016_ASP_Banner.html" target="_blank" rel="noopener">배너 시안</a>
+      <a href="/cms/#asp-convs" target="_blank" rel="noopener"><span class="ko">CMS DEMO · ASP 매체</span><span class="vi">CMS DEMO · Nền tảng ASP</span></a>
+      <a href="/asp-dev/" target="_blank" rel="noopener"><span class="ko">개발 안내</span><span class="vi">Hướng dẫn phát triển</span></a>
+      <a href="https://sgkim-project.vercel.app/partners/20261016-toptoon-asp-spec.html" target="_blank" rel="noopener"><span class="ko">연동 문서</span><span class="vi">Tài liệu tích hợp</span></a>
+      <a href="https://sgkim-project.vercel.app/design/20261016_ASP_Banner.html" target="_blank" rel="noopener"><span class="ko">배너 시안</span><span class="vi">Thiết kế banner</span></a>
     </div>
   </aside>
 
@@ -242,7 +256,7 @@ try{ if(sessionStorage.getItem("asp-sim-20261016")==="ok") document.documentElem
     <div class="phone" id="phone">
       <div class="tt" id="tt"></div>
       <iframe id="frame" title="쇼핑 적립 화면" hidden></iframe>
-      <span class="tt-demo" id="ttDemo">시연용 탑툰 화면</span>
+      <span class="tt-demo" id="ttDemo"><span class="ko">시연용 탑툰 화면</span><span class="vi">Màn hình Toptoon mô phỏng</span></span>
     </div>
   </div>
 </div>
@@ -258,40 +272,49 @@ const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;',
 const won=n=>Number(n||0).toLocaleString('ko-KR');
 const $=id=>document.getElementById(id);
 const frame=$('frame'), tt=$('tt');
-const CODE={'0000':['지급','ok'],'1001':['없는 회원','bad'],'1002':['지급 불가','bad'],'2001':['서명 오류','bad'],'2002':['시각 만료','warn'],'2003':['형식 오류','bad'],'9999':['일시 오류','warn']};
+/* 한/베 — 조작판에서 그리는 문구. 폰 안 탑툰 UI 와 적립 화면은 한국어 그대로 */
+const root=document.documentElement;
+const isVi=()=>root.lang==='vi';
+const L=(ko,vi)=>isVi()?vi:ko;
+const CODE={'0000':[['지급','Đã cấp'],'ok'],'1001':[['없는 회원','Không có thành viên'],'bad'],'1002':[['지급 불가','Không thể cấp'],'bad'],'2001':[['서명 오류','Lỗi chữ ký'],'bad'],'2002':[['시각 만료','Hết hạn thời điểm'],'warn'],'2003':[['형식 오류','Lỗi định dạng'],'bad'],'9999':[['일시 오류','Lỗi tạm thời'],'warn']};
+/* 흉내 서버가 돌려주는 안내 — 베트남어 화면일 때만 바꿔 보여 준다 */
+const SERVER_VI={'먼저 무료충전소에서 들어가 주세요':'Hãy vào từ Trạm nạp miễn phí trước','회원을 고르세요':'Hãy chọn thành viên','mk 형식이 올바르지 않습니다':'Định dạng mk không hợp lệ',
+  '모르는 동작입니다':'Thao tác không xác định','응답 방식이 올바르지 않습니다':'Kiểu phản hồi không hợp lệ','이동 기록이 없습니다':'Không có bản ghi chuyển sang sàn','잠시 후 다시 시도해 주세요':'Vui lòng thử lại sau giây lát'};
+const NOTE_VI={'tt_demo_0001':'Thành viên đang tích điểm','tt_demo_0002':'Thành viên vào lần đầu','tt_demo_0003':'Không thể cấp xu — 1002','tt_demo_0404':'Không có trên Toptoon — 1001'};
 
 let tt0=null;
 function toast(m){ clearTimeout(tt0); $('toastSlot').innerHTML=`<div class="toast" role="status">${esc(m)}</div>`; tt0=setTimeout(()=>{$('toastSlot').innerHTML='';},2800); }
 async function api(path,body){
   const r=await fetch(MOCK+path,body?{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}:{});
   const j=await r.json().catch(()=>null);
-  if(!r.ok||!j||j.ok===false) throw new Error((j&&j.message)||'요청 실패');
+  if(!r.ok||!j||j.ok===false) { const m=(j&&j.message)||''; throw new Error(m?(isVi()&&SERVER_VI[m]?SERVER_VI[m]:m):L('요청 실패','Yêu cầu thất bại')); }
   return j;
 }
 
 function renderMembers(){
   const ps=(S.state&&S.state.presets)||[];
-  $('members').innerHTML=ps.map(p=>`<button class="mem" data-mk="${esc(p.mk)}" aria-pressed="${S.mk===p.mk}"><i></i><span><b>${esc(p.nick)}</b><small>${esc(p.note)}</small></span><code>${esc(p.mk)}</code></button>`).join('');
+  $('members').innerHTML=ps.map(p=>`<button class="mem" data-mk="${esc(p.mk)}" aria-pressed="${S.mk===p.mk}"><i></i><span><b>${esc(p.nick)}</b><small>${esc(isVi()&&NOTE_VI[p.mk]?NOTE_VI[p.mk]:p.note)}</small></span><code>${esc(p.mk)}</code></button>`).join('');
 }
 function renderMode(){ document.querySelectorAll('#modeSeg button').forEach(b=>b.setAttribute('aria-pressed',S.state&&S.state.mode===b.dataset.mode?'true':'false')); }
 function renderLedger(){
   const st=S.state||{}, pp=st.pricepick, t=st.toptoon;
-  $('ledger').innerHTML=`<div class="lg"><h3>프라이스픽 (우리 서버)</h3>${pp?`
-    <div class="kv"><span>확정 티켓</span><b>${won(pp.available)}장</b></div>
-    <div class="kv"><span>전환 중 보관</span><b>${won(pp.held)}장</b></div>
-    <div class="kv"><span>랜덤 티켓 (예정)</span><b>${won(pp.orders_pending)}장</b></div>
-    <div class="kv"><span>전환한 코인</span><b>${won(pp.coins_total)}개</b></div>`:'<div class="kv"><span>아직 들어온 적 없음</span></div>'}</div>
-  <div class="lg"><h3>탑툰 (흉내 서버)</h3>${t?`
-    <div class="kv"><span>회원 상태</span><b>${t.status==='active'?'정상':'탈퇴'}</b></div>
-    <div class="kv"><span>코인 잔액</span><b>${won(t.coins)}개</b></div>
-    <div class="kv"><span>받은 지급 요청</span><b>${(st.toptoon_tx||[]).length}건</b></div>`:'<div class="kv"><span>탑툰에 없는 회원</span></div>'}</div>`;
+  const jang=n=>L(won(n)+'장',won(n)+' vé'), gae=n=>L(won(n)+'개',won(n)+' xu');
+  $('ledger').innerHTML=`<div class="lg"><h3>${L('프라이스픽 (우리 서버)','PricePick (phía ta)')}</h3>${pp?`
+    <div class="kv"><span>${L('확정 티켓','Vé đã xác nhận')}</span><b>${jang(pp.available)}</b></div>
+    <div class="kv"><span>${L('전환 중 보관','Đang giữ để đổi')}</span><b>${jang(pp.held)}</b></div>
+    <div class="kv"><span>${L('랜덤 티켓 (예정)','Vé ngẫu nhiên (chờ)')}</span><b>${jang(pp.orders_pending)}</b></div>
+    <div class="kv"><span>${L('전환한 코인','Xu đã đổi')}</span><b>${gae(pp.coins_total)}</b></div>`:`<div class="kv"><span>${L('아직 들어온 적 없음','Chưa từng vào')}</span></div>`}</div>
+  <div class="lg"><h3>${L('탑툰 (흉내 서버)','Toptoon (mô phỏng)')}</h3>${t?`
+    <div class="kv"><span>${L('회원 상태','Trạng thái')}</span><b>${t.status==='active'?L('정상','Bình thường'):L('탈퇴','Đã rời bỏ')}</b></div>
+    <div class="kv"><span>${L('코인 잔액','Số dư xu')}</span><b>${gae(t.coins)}</b></div>
+    <div class="kv"><span>${L('받은 지급 요청','Yêu cầu đã nhận')}</span><b>${L((st.toptoon_tx||[]).length+'건',(st.toptoon_tx||[]).length+'')}</b></div>`:`<div class="kv"><span>${L('탑툰에 없는 회원','Thành viên không có trên Toptoon')}</span></div>`}</div>`;
   const tx=st.toptoon_tx||[];
-  $('txs').innerHTML=tx.length?tx.map(x=>{const c=CODE[x.code]||[x.code,'warn'];return `<div class="tx"><code>${esc(x.transaction_id)}</code><span>코인 ${x.coin}개${x.replays?` · 재요청 ${x.replays}회`:''}</span><span class="tag ${c[1]}">${x.code} ${c[0]}</span></div>`;}).join(''):'';
-  const d=new Date(); $('stamp').textContent=`${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}:${String(d.getSeconds()).padStart(2,'0')} 기준`;
+  $('txs').innerHTML=tx.length?tx.map(x=>{const c=CODE[x.code]||[[x.code,x.code],'warn'];return `<div class="tx"><code>${esc(x.transaction_id)}</code><span>${L('코인 '+x.coin+'개',x.coin+' xu')}${x.replays?L(` · 재요청 ${x.replays}회`,` · gửi lại ${x.replays} lần`):''}</span><span class="tag ${c[1]}">${x.code} ${L(c[0][0],c[0][1])}</span></div>`;}).join(''):'';
+  const d=new Date(); const hms=`${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}:${String(d.getSeconds()).padStart(2,'0')}`; $('stamp').textContent=L(hms+' 기준','cập nhật lúc '+hms);
 }
 function renderSig(){
   const e=S.entry;
-  $('sigBox').innerHTML=e?`<div class="sig"><b>서명 대상 문자열</b><br>${esc(e.base)}<br><b>sig</b> ${esc(e.sig)}${e.variant==='badsig'?' (끝자리를 바꾼 틀린 서명)':e.variant==='expired'?' (11분 전 시각)':''}</div>`:'';
+  $('sigBox').innerHTML=e?`<div class="sig"><b>${L('서명 대상 문자열','Chuỗi được ký')}</b><br>${esc(e.base)}<br><b>sig</b> ${esc(e.sig)}${e.variant==='badsig'?L(' (끝자리를 바꾼 틀린 서명)',' (chữ ký sai — đã đổi ký tự cuối)'):e.variant==='expired'?L(' (11분 전 시각)',' (thời điểm cách đây 11 phút)'):''}</div>`:'';
 }
 const svgI=(d,sz)=>`<svg width="${sz||22}" height="${sz||22}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
 const IC={search:'<circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.2-4.2"/>',menu:'<path d="M4 6.5h16M4 12h16M4 17.5h16"/>',copy:'<circle cx="12" cy="12" r="9"/><path d="M14.8 9.4a3.6 3.6 0 1 0 0 5.2"/>',x:'<path d="M6 6l12 12M18 6L6 18"/>',next:'<path d="M9 5l7 7-7 7"/>',
@@ -311,8 +334,8 @@ function ttTop(){
   <nav class="cats">${[['연재'],['채팅','N'],['랭킹'],['신작/완결'],['영상'],['세일'],['내서재'],['선물함','9']].map(([t,b])=>`<button data-tt="noop">${t}${b?`<i>${b}</i>`:''}</button>`).join('')}</nav>`;
 }
 function ttHome(){
-  return ttTop()+`${S.menu?'':'<div class="coach">메뉴를 열고 「무료 충전소」를 눌러 보세요</div>'}
-  <div class="hero">오늘의 추천 작품 자리 (시연용 · 작품 그림 없음)</div>
+  return ttTop()+`${S.menu?'':`<div class="coach">${L('메뉴를 열고 「무료 충전소」를 눌러 보세요','Mở menu rồi bấm 「무료 충전소」 (Trạm nạp miễn phí)')}</div>`}
+  <div class="hero">${L('오늘의 추천 작품 자리 (시연용 · 작품 그림 없음)','Vị trí tác phẩm đề xuất hôm nay (demo · không có hình tác phẩm)')}</div>
   <div class="sec-t">실시간 랭킹 ${svgI(IC.next,18)}</div>
   <div class="thumbs"><span></span><span></span><span></span><span></span><span></span><span></span></div>`;
 }
@@ -349,9 +372,9 @@ function ttMenu(){
   </aside>`;
 }
 function ttFree(){
-  return ttTop()+`<button class="bn ours" data-tt="banner" aria-label="쇼핑 적립 열기"><img src="/asp-sim/banners/banner-v2.webp" alt="쇼핑 적립 — 쿠팡·G마켓에서 쇼핑하고 탑툰 코인으로 전환하세요, 쿠팡도 적립"><span class="pin">무료 충전소 · 눌러 보세요</span></button>
+  return ttTop()+`<button class="bn ours" data-tt="banner" aria-label="쇼핑 적립 열기"><img src="/asp-sim/banners/banner-v2.webp" alt="쇼핑 적립 — 쿠팡·G마켓에서 쇼핑하고 탑툰 코인으로 전환하세요, 쿠팡도 적립"><span class="pin">${L('무료 충전소 · 눌러 보세요','Trạm nạp miễn phí · bấm thử')}</span></button>
   ${OTHERS.map(o=>`<div class="bn other"><img src="/asp-sim/banners/${o[0]}.webp" alt="${o[1]}" loading="lazy"></div>`).join('')}
-  <p class="bn-foot">시연용 화면입니다. 탑툰 무료 충전소의 실제 구성(머리 · 카테고리 · 배너 목록)을 따랐고, 쇼핑 적립 배너의 자리와 순서는 탑툰과 협의합니다. 지급 코인 종류는 탑툰 회신 후 정하며, 시연에서는 「코인」 칸에 보여 줍니다.</p>`;
+  <p class="bn-foot">${L('시연용 화면입니다. 탑툰 무료 충전소의 실제 구성(머리 · 카테고리 · 배너 목록)을 따랐고, 쇼핑 적립 배너의 자리와 순서는 탑툰과 협의합니다. 지급 코인 종류는 탑툰 회신 후 정하며, 시연에서는 「코인」 칸에 보여 줍니다.','Đây là màn hình dùng cho demo. Bố cục theo đúng Trạm nạp miễn phí thật của Toptoon (đầu trang · danh mục · danh sách banner); vị trí và thứ tự banner Tích điểm mua sắm sẽ thỏa thuận với Toptoon. Loại xu được cấp sẽ chốt sau khi Toptoon phản hồi; trong demo, xu hiển thị ở ô 「코인」 (xu).')}</p>`;
 }
 function renderTt(){
   if(S.menu) tt.scrollTop=0;
@@ -375,12 +398,15 @@ async function enter(variant){
     S.entry=e; renderSig(); show('asp'); frame.src=e.url;
   }catch(e){ toast(e.message); }
 }
-const SIM_TEXT={'confirm-all':r=>r.confirmed?`적립 예정 ${r.confirmed}건을 확정했어요`:'확정할 적립 예정이 없어요','miss-latest':r=>r.missed?'최근 적립 예정 1건을 미적립으로 바꿨어요':'바꿀 적립 예정이 없어요',
-  'retry-now':r=>r.sent&&r.sent.length?`재시도 ${r.sent.length}건을 보냈어요 — ${r.sent.map(x=>x.status==='paid'?'지급 완료':x.status==='stuck'?'운영자 확인으로 넘어감':'다시 대기').join(', ')}`:'보낼 재시도 대기 건이 없어요',
-  seed:r=>`예시 구매 ${r.seeded}건을 넣었어요`, reset:r=>`이 회원 기록 ${r.deleted}건을 지웠어요`};
+const SIM_TEXT={'confirm-all':r=>r.confirmed?L(`적립 예정 ${r.confirmed}건을 확정했어요`,`Đã xác nhận ${r.confirmed} đơn đang chờ`):L('확정할 적립 예정이 없어요','Không có đơn đang chờ để xác nhận'),
+  'miss-latest':r=>r.missed?L('최근 적립 예정 1건을 미적립으로 바꿨어요','Đã đổi 1 đơn chờ gần nhất thành không được tích'):L('바꿀 적립 예정이 없어요','Không có đơn đang chờ để đổi'),
+  'retry-now':r=>r.sent&&r.sent.length?L(`재시도 ${r.sent.length}건을 보냈어요 — `,`Đã gửi ${r.sent.length} lần thử lại — `)+r.sent.map(x=>x.status==='paid'?L('지급 완료','đã cấp'):x.status==='stuck'?L('운영자 확인으로 넘어감','chuyển sang chờ người vận hành kiểm tra'):L('다시 대기','tiếp tục chờ')).join(', '):L('보낼 재시도 대기 건이 없어요','Không có giao dịch nào chờ thử lại'),
+  seed:r=>L(`예시 구매 ${r.seeded}건을 넣었어요`,`Đã thêm ${r.seeded} đơn mua mẫu`), reset:r=>L(`이 회원 기록 ${r.deleted}건을 지웠어요`,`Đã xóa ${r.deleted} bản ghi của thành viên này`)};
+const RESET_LABEL=()=>L('이 회원 기록 지우기','Xóa dữ liệu của thành viên này');
+const resetBtn=document.querySelector('[data-sim="reset"]'), resetHtml=resetBtn?resetBtn.innerHTML:'';
 async function sim(action,btn){
-  if(action==='reset'&&S.arm!==btn){ S.arm=btn; btn.classList.add('arm'); btn.textContent='한 번 더 누르면 지워요'; setTimeout(()=>{ if(S.arm===btn){S.arm=null; btn.classList.remove('arm'); btn.textContent='이 회원 기록 지우기';} },3000); return; }
-  if(action==='reset'){ S.arm=null; btn.classList.remove('arm'); btn.textContent='이 회원 기록 지우기'; }
+  if(action==='reset'&&S.arm!==btn){ S.arm=btn; btn.classList.add('arm'); btn.textContent=L('한 번 더 누르면 지워요','Bấm thêm lần nữa để xóa'); setTimeout(()=>{ if(S.arm===btn){S.arm=null; btn.classList.remove('arm'); btn.innerHTML=resetHtml;} },3000); return; }
+  if(action==='reset'){ S.arm=null; btn.classList.remove('arm'); btn.innerHTML=resetHtml; }
   btn.disabled=true;
   try{
     const r=await api('sim',{action,mk:S.mk});
@@ -391,7 +417,7 @@ async function sim(action,btn){
   }catch(e){ toast(e.message); }
   finally{ btn.disabled=false; }
 }
-async function setMode(m){ try{ await api('mode',{mode:m}); await loadState(); toast(m==='ok'?'코인 지급 API 가 정상으로 답해요':m==='error'?'코인 지급 API 가 9999 일시 오류로 답해요':'코인 지급 API 가 지급 후 11초 늦게 답해요 (우리 쪽은 10초에 끊음)'); }catch(e){ toast(e.message); } }
+async function setMode(m){ try{ await api('mode',{mode:m}); await loadState(); toast(m==='ok'?L('코인 지급 API 가 정상으로 답해요','API cấp xu phản hồi bình thường'):m==='error'?L('코인 지급 API 가 9999 일시 오류로 답해요','API cấp xu trả về 9999 (lỗi tạm thời)'):L('코인 지급 API 가 지급 후 11초 늦게 답해요 (우리 쪽은 10초에 끊음)','API cấp xu phản hồi chậm 11 giây sau khi cấp (phía ta ngắt ở 10 giây)')); }catch(e){ toast(e.message); } }
 
 document.addEventListener('click',e=>{
   const m=e.target.closest('[data-mk]'); if(m){ S.mk=m.dataset.mk; S.entry=null; S.lastCoins=null; goTt('home'); loadState(); return; }
@@ -403,7 +429,7 @@ document.addEventListener('click',e=>{
     else if(a==='free'){ goTt('free'); }
     else if(a==='home'){ goTt('home'); }
     else if(a==='banner'){ enter('ok'); }
-    else toast('시연에서는 메뉴의 「무료 충전소」만 열려요');
+    else toast(L('시연에서는 메뉴의 「무료 충전소」만 열려요','Trong demo, chỉ mở được 「무료 충전소」 (Trạm nạp miễn phí) trong menu'));
     return;
   }
   const en=e.target.closest('[data-enter]'); if(en){ enter(en.dataset.enter); return; }
@@ -427,8 +453,22 @@ function fit(){
 }
 addEventListener('resize',fit); fit();
 
+/* 한/베 토글 — 지난번 선택을 기억하고, 주소에 ?lang=vi 를 붙이면 베트남어로 연다 */
+const langBtn=$('langBtn');
+function applyLang(l){
+  root.lang=l; try{ localStorage.setItem('asp-sim-lang',l); }catch(x){}
+  document.title=L('쇼핑 적립 시연','Demo Tích điểm mua sắm');
+  langBtn.setAttribute('aria-checked',String(l==='vi'));
+  $('gate-pw').setAttribute('aria-label',L('열람 비밀번호','Mật khẩu xem tài liệu'));
+  frame.title=L('쇼핑 적립 화면','Màn hình tích điểm');
+  if(S.arm&&resetBtn){ S.arm=null; resetBtn.classList.remove('arm'); resetBtn.innerHTML=resetHtml; }
+  renderAll();
+}
+langBtn.addEventListener('click',()=>applyLang(isVi()?'ko':'vi'));
+applyLang(isVi()?'vi':'ko');
+
 /* 열람 비밀번호 */
-const root=document.documentElement, form=$('gate-form'), pw=$('gate-pw'), err=$('gate-err');
+const form=$('gate-form'), pw=$('gate-pw'), err=$('gate-err');
 function start(){ goTt('home'); loadState(); fit(); }
 if(root.classList.contains('unlocked')) start();
 else form.addEventListener('submit',ev=>{
