@@ -1,0 +1,797 @@
+diff --git a/app/index.html b/app/index.html
+index 9dd48b0..fc5f0d5 100644
+--- a/app/index.html
++++ b/app/index.html
+@@ -17896,58 +17896,6 @@ var auth = firebase.auth();
+ var db = firebase.firestore();
+ var FS = firebase.firestore;
+ 
+-/* ── 개수 조회 (2026-10-16, 무료 한도 소진 대응) ──
+-   장수만 필요한 자리에서 티켓 문서를 전부 받아 세지 않고 개수만 묻는다. 문서를 받아 세면 문서 수만큼
+-   읽기로 치지만, 개수 조회는 1,000건까지 1건으로 친다. 티켓 1장이 문서 1건이라 회원 한 명의 티켓이
+-   수백~수천 건이고, 예전엔 홈에 들어올 때마다 그걸 전부 읽어 하루 무료 한도(읽기 5만 건)가 금방 찼다.
+-   compat SDK 10.12.2 에는 집계 API 가 없어 Firestore REST(documents:runAggregationQuery)를 로그인
+-   토큰으로 부른다(익명 로그인도 토큰이 있다). 보안 규칙은 SDK 로 읽을 때와 똑같이 적용된다.
+-   조건은 [필드, '==', 값] 만 받는다 — 같음 조건끼리는 색인을 따로 만들지 않아도 된다.
+-   실패하면 null — 부르는 쪽이 예전 방식(전부 읽어 세기)으로 간다. 숫자는 같고 읽기만 많다.
+-   CMS(cms/index.html)의 ppAggregate 와 같은 코드다. */
+-var PP_AGG_OFF = false;
+-function ppAggValue(v) {
+-  if (typeof v === 'string') return { stringValue: v };
+-  if (typeof v === 'boolean') return { booleanValue: v };
+-  if (v === null) return { nullValue: null };
+-  if (typeof v === 'number') return Number.isInteger(v) ? { integerValue: String(v) } : { doubleValue: v };
+-  throw new Error('ppAggValue: ' + typeof v);
+-}
+-function ppAggregate(col, where, aggs) {
+-  var user = auth.currentUser;
+-  if (PP_AGG_OFF || !user || typeof fetch !== 'function') return Promise.resolve(null);
+-  var filters = (where || []).map(function (w) {
+-    if (w[1] !== '==') throw new Error('ppAggregate: == 만 받는다');
+-    return { fieldFilter: { field: { fieldPath: w[0] }, op: 'EQUAL', value: ppAggValue(w[2]) } };
+-  });
+-  var sq = { from: [{ collectionId: col }] };
+-  if (filters.length === 1) sq.where = filters[0];
+-  else if (filters.length > 1) sq.where = { compositeFilter: { op: 'AND', filters: filters } };
+-  var url = 'https://firestore.googleapis.com/v1/projects/' + app.options.projectId + '/databases/(default)/documents:runAggregationQuery';
+-  var sent = false;
+-  return user.getIdToken().then(function (token) {
+-    sent = true;
+-    return fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+-      body: JSON.stringify({ structuredAggregationQuery: { structuredQuery: sq, aggregations: aggs } }) });
+-  }).then(function (res) {
+-    if (!res.ok) return res.text().then(function (t) { throw new Error('HTTP ' + res.status + ' ' + t.slice(0, 300)); });
+-    return res.json();
+-  }).then(function (rows) {
+-    var row = (rows || []).filter(function (r) { return r && r.result; })[0];
+-    var f = row && row.result.aggregateFields;
+-    if (!f) throw new Error('결과 없음');
+-    var out = {};
+-    aggs.forEach(function (a) { var v = f[a.alias]; out[a.alias] = v ? Number(v.integerValue != null ? v.integerValue : v.doubleValue) : 0; });
+-    return out;
+-  }).catch(function (e) {
+-    if (sent && e instanceof TypeError) PP_AGG_OFF = true;     // 요청이 아예 나가지 못함(네트워크·CORS)
+-    console.warn('[개수 조회 실패 → 전부 읽어 셉니다]', col, JSON.stringify(where || []), e && e.message);
+-    return null;
+-  });
+-}
+-function ppCount(col, where) {
+-  return ppAggregate(col, where, [{ alias: 'n', count: {} }]).then(function (r) { return r ? r.n : null; });
+-}
+ 
+ /* 제휴몰 로고 — CMS 「티켓 적립 설정」에서 등록한 값을 읽는다(2026-08-14, Vin 질문
+    답변 — 구글 파비콘 서비스 대신 CMS에 등록한 로고를 쓴다). 대상은 "적립 가능
+@@ -18418,39 +18366,35 @@ function ppGrantEventTicket(qty, reason, category) {
+   var now = FS.FieldValue.serverTimestamp();
+   var expiresAt = ppEventTicketExpiry();
+   var batch = db.batch();
+-  for (var i = 0; i < qty; i++) {
+-    batch.set(db.collection('user_tickets').doc(), {
+-      user_id: PP.uid, grade: 'event', status: 'active', postback_id: null,
+-      earned_at: now, confirmed_at: now, expires_at: expiresAt,
+-    });
+-    batch.set(db.collection('ticket_transactions').doc(), {
+-      user_id: PP.uid, ticket_grade: 'event', type: 'earn', postback_id: null, category: category || 'etc', created_at: now,
+-    });
+-  }
++  /* 묶음 1건 + 원장 1건(2026-10-19 묶음 저장) */
++  batch.set(db.collection('user_tickets').doc(), {
++    user_id: PP.uid, grade: 'event', status: 'active', count: qty, postback_id: null,
++    earned_at: now, confirmed_at: now, expires_at: expiresAt,
++  });
++  batch.set(db.collection('ticket_transactions').doc(), {
++    user_id: PP.uid, ticket_grade: 'event', type: 'earn', qty: qty, postback_id: null, category: category || 'etc', created_at: now,
++  });
+   return batch.commit().then(function() {
+     PP.tickets.event = (PP.tickets.event || 0) + qty;
+     renderMyTicketCard();
+   }).catch(function(e) { console.error('ppGrantEventTicket', e); });
+ }
+ /* 티켓 무상 지급 — 선물 상자·룰렛 티켓 칸 당첨용(티켓 1종 통합 후 grade 는 'bronze').
+-   구매 티켓과 달리 postback이 없으므로 정해진 장수를 그대로 발급한다. 장수가 많아(최대 200장)
+-   한 배치를 넘을 수 있어 나눠 쓴다. 유효기간은 지금까지와 같이 EVENT_TICKET_VALID_DAYS 를 쓴다. */
++   구매 티켓과 달리 postback이 없으므로 정해진 장수를 그대로 발급한다 — 묶음 1건 + 원장 1건(2026-10-19).
++   유효기간은 지금까지와 같이 EVENT_TICKET_VALID_DAYS 를 쓴다. */
+ function ppGrantGradeTicket(grade, qty, reason, category) {
+   if (!PP.uid || !qty || ['bronze', 'silver', 'gold'].indexOf(grade) === -1) return Promise.resolve();
+   var now = FS.FieldValue.serverTimestamp();
+   var expiresAt = ppEventTicketExpiry();
+-  var ops = [];
+-  for (var i = 0; i < qty; i++) {
+-    ops.push(function (b) {
+-      b.set(db.collection('user_tickets').doc(), {
+-        user_id: PP.uid, grade: grade, status: 'active', postback_id: null,
+-        earned_at: now, confirmed_at: now, expires_at: expiresAt,
+-      });
+-      b.set(db.collection('ticket_transactions').doc(), {
+-        user_id: PP.uid, ticket_grade: grade, type: 'earn', postback_id: null, category: category || 'etc', created_at: now,
+-      });
++  var ops = [function (b) {
++    b.set(db.collection('user_tickets').doc(), {
++      user_id: PP.uid, grade: grade, status: 'active', count: qty, postback_id: null,
++      earned_at: now, confirmed_at: now, expires_at: expiresAt,
+     });
+-  }
++    b.set(db.collection('ticket_transactions').doc(), {
++      user_id: PP.uid, ticket_grade: grade, type: 'earn', qty: qty, postback_id: null, category: category || 'etc', created_at: now,
++    });
++  }];
+   return ppCommitOps(ops).then(function() {
+     PP.tickets[grade] = (PP.tickets[grade] || 0) + qty;
+     ppTicketsSync();
+@@ -18462,32 +18406,13 @@ function ppGrantGradeTicket(grade, qty, reason, category) {
+    confirmed_at 이 찍힌 티켓만 쓴다(돌린 뒤 주문을 취소·환불하는 악용 차단). */
+ function ppSpendEventTicket(reason, requireConfirmed) {
+   if (!PP.uid) return Promise.resolve(false);
+-  return db.collection('user_tickets')
+-    .where('user_id', '==', PP.uid)
+-    .where('grade', '==', 'event')
+-    .where('status', '==', 'active')
+-    .get()
+-    .then(function(snap) {
+-      var docs = snap.docs.filter(function(d) {
+-        return requireConfirmed ? !!d.data().confirmed_at : true;
+-      }).sort(function(a, b) {
+-        var ea = a.data().earned_at, eb = b.data().earned_at;
+-        return ((ea && ea.toMillis) ? ea.toMillis() : 0) - ((eb && eb.toMillis) ? eb.toMillis() : 0);
+-      });
+-      if (!docs.length) return false;
+-      var now = FS.FieldValue.serverTimestamp();
+-      var batch = db.batch();
+-      batch.update(docs[0].ref, { status: 'used', used_at: now });
+-      batch.set(db.collection('ticket_transactions').doc(), {
+-        user_id: PP.uid, ticket_grade: 'event', type: 'use', postback_id: null,
+-        category: 'jackpot_spin', reason: reason || '잭팟 룰렛 참여', created_at: now,
+-      });
+-      return batch.commit().then(function() {
+-        PP.tickets.event = Math.max(0, (PP.tickets.event || 0) - 1);
+-        renderMyTicketCard();
+-        if (window.ppRenderJackpotBanner) window.ppRenderJackpotBanner();
+-        return true;
+-      });
++  return ppSpendEvent(1, requireConfirmed, { category: 'jackpot_spin', reason: reason || '잭팟 룰렛 참여' })
++    .then(function(ok) {
++      if (!ok) return false;
++      PP.tickets.event = Math.max(0, (PP.tickets.event || 0) - 1);
++      renderMyTicketCard();
++      if (window.ppRenderJackpotBanner) window.ppRenderJackpotBanner();
++      return true;
+     }).catch(function(e) { console.error('ppSpendEventTicket', e); return false; });
+ }
+ window.ppGrantPoints = ppGrantPoints;
+@@ -18633,7 +18558,11 @@ window.ppJackpotSpinsToday = function() {
+ };
+ window.ppEventTicketAllowance = function(dailyCap, monthlyCap) {
+   if (!PP.uid) return Promise.resolve({ daily: 0, monthly: 0 });
+-  return ppQuery('ticket_transactions', 'user_id', PP.uid).then(function(list) {
++  /* 이벤트 티켓 적립 기록만 읽는다 — 원장 전체를 읽을 필요가 없다. 기록 1건 = qty 장(2026-10-19 묶음 저장) */
++  return db.collection('ticket_transactions').where('user_id', '==', PP.uid).where('ticket_grade', '==', 'event').where('type', '==', 'earn').get()
++    .then(function(snap) { var out = []; snap.forEach(function(d) { out.push(d.data()); }); return out; })
++    .catch(function(e) { console.error('ppEventTicketAllowance', e); return []; })
++    .then(function(list) {
+     var now = new Date();
+     var dayCount = 0, monthCount = 0;
+     list.forEach(function(t) {
+@@ -18641,8 +18570,8 @@ window.ppEventTicketAllowance = function(dailyCap, monthlyCap) {
+       var d = ppDate(t.created_at);
+       if (!d) return;
+       if (d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth()) {
+-        monthCount++;
+-        if (d.getDate() === now.getDate()) dayCount++;
++        monthCount += txQty(t);
++        if (d.getDate() === now.getDate()) dayCount += txQty(t);
+       }
+     });
+     return {
+@@ -19159,45 +19088,29 @@ function refreshKakaoBannerVisibility() {
+    등급 티켓(브/실/골)은 status='active'만 집계, 이벤트 티켓은 별도 버킷(안 섞임),
+    랜덤 티켓은 CMS와 동일하게 "묶음 수"(대기 중 postback_id distinct count)로 집계 —
+    Greedy 등 티켓 계산 로직은 재계산하지 않고 CMS가 만든 결과 데이터를 읽기만 한다. */
+-/* 홈 보유 티켓 (2026-10-16) — 장수만 필요하므로 티켓 문서를 전부 받지 않는다.
+-   예전엔 회원 티켓을 상태와 상관없이 전부 읽어 셌다(다 쓴 티켓까지). 티켓 1장이 문서 1건이라 회원 한 명에
+-   수백~수천 건이었고, 홈에 들어올 때마다 그만큼 읽었다. 이제:
+-   · 티켓(브론즈)·옛 실버·골드 — 보유(active) 개수만 묻는다(개수 조회)
+-   · 이벤트 티켓 — 승인(confirmed_at) 여부를 봐야 해서 보유분만 읽는다(장수가 적다)
+-   · 대기(pending) — 랜덤 티켓 묶음 수(구매 건 수)를 세야 해서 대기분만 읽는다
+-   개수 조회가 안 되면 예전처럼 전부 읽어 센다. 세는 기준은 둘이 같다(ppHomeTicketsFromDocs). */
++/* 홈 보유 티켓 — 보유(active)·대기(pending) 묶음만 읽어 장수(count)를 더한다(2026-10-19 묶음 저장).
++   예전엔 회원 티켓을 상태와 상관없이 1장 = 1건으로 전부 읽어 셌다(다 쓴 티켓까지 — 1만 장 회원이면 홈 한 번에 1만 건).
++   10-16에는 개수 조회로 버텼지만, 묶음으로 저장하면 회원 한 명의 보유·대기 묶음은 수십 건 안쪽이라 그냥 읽는다. */
+ function ppHomeTicketsFromDocs(docs) {
+   var c = { bronze: 0, silver: 0, gold: 0, event: 0 };
+   var pendingBundles = {};
+   var eventWaiting = 0;   /* 구매 확정 전이라 아직 못 쓰는 이벤트 티켓 — 보유 수에는 넣지 않는다 */
+   docs.forEach(function(d) {
+-    var t = d.data();
++    var t = d.data(), n = tkCnt(t);
+     var g = (t.grade || 'bronze').toLowerCase();
+     /* 이벤트 티켓은 승인(confirmed_at)된 것만 보유 수량으로 센다 — 잭팟 룰렛 차감 쿼리와 같은 기준.
+        구매로 발급돼 아직 승인 대기 중인 티켓을 세면 "N장 있는데 못 돌린다"가 된다. */
+     var waiting = (g === 'event') && (t.status === 'pending' || (t.status === 'active' && !t.confirmed_at));
+-    if (t.status === 'active' && c.hasOwnProperty(g) && !waiting) c[g]++;
+-    if (waiting) eventWaiting++;
++    if (t.status === 'active' && c.hasOwnProperty(g) && !waiting) c[g] += n;
++    if (waiting) eventWaiting += n;
+     if (t.status === 'pending' && t.postback_id) pendingBundles[t.postback_id] = true;
+   });
+   return { c: c, eventWaiting: eventWaiting, bundles: Object.keys(pendingBundles).length };
+ }
+ function ppHomeTickets(uid) {
+-  var held = function(g) { return ppCount('user_tickets', [['user_id', '==', uid], ['status', '==', 'active'], ['grade', '==', g]]); };
+-  return Promise.all([held('bronze'), held('silver'), held('gold')]).then(function(n) {
+-    if (n.some(function(x) { return x === null; })) {
+-      return db.collection('user_tickets').where('user_id', '==', uid).get().then(function(snap) { return ppHomeTicketsFromDocs(snap.docs); });
+-    }
+-    return Promise.all([
+-      db.collection('user_tickets').where('user_id', '==', uid).where('grade', '==', 'event').where('status', '==', 'active').get(),
+-      db.collection('user_tickets').where('user_id', '==', uid).where('status', '==', 'pending').get(),
+-    ]).then(function(res) {
+-      /* 이벤트 보유분과 대기분은 겹치지 않는다(상태가 다르다) — 둘을 합쳐 예전과 같은 기준으로 센다 */
+-      var r = ppHomeTicketsFromDocs(res[0].docs.concat(res[1].docs));
+-      r.c.bronze = n[0]; r.c.silver = n[1]; r.c.gold = n[2];
+-      return r;
+-    });
+-  });
++  var base = db.collection('user_tickets').where('user_id', '==', uid);
++  return Promise.all([base.where('status', '==', 'active').get(), base.where('status', '==', 'pending').get()])
++    .then(function(res) { return ppHomeTicketsFromDocs(res[0].docs.concat(res[1].docs)); });
+ }
+ /* 같은 화면 전환에서 여러 번 불린다(showScreen 훅이 겹쳐 있다) — 한 번만 읽는다 */
+ var ppHomeTimer = null;
+@@ -19318,7 +19231,7 @@ function renderMyTicketExpiryBadges(card) {
+       if (!exp) return;
+       var days = Math.ceil((exp - now) / 86400000);
+       if (days <= 7) {
+-        nearCount += w;
++        nearCount += w * tkCnt(t);
+         if (minDays == null || days < minDays) minDays = days;
+       }
+     });
+@@ -19540,10 +19453,11 @@ function ppProcessPurchase(amount, overlay) {
+     purchase_amount: amount, status: 'pending', created_at: now, is_demo_sim: true,
+   };
+   var ops = [function (b) { b.set(postRef, postData); }];
+-  for (var j = 0; j < tk.total; j++) {
++  /* 구매 1건 = 대기 묶음 1건(장수 tk.total) + 원장 1건 — 2026-10-19 묶음 저장 */
++  if (tk.total > 0) {
+     ops.push(function (b) {
+-      b.set(db.collection('user_tickets').doc(), { user_id: PP.uid, grade: PP_TICKET_GRADE, status: 'pending', postback_id: postRef.id, earned_at: now, confirmed_at: null, expires_at: ppTicketExpiry(), is_demo_sim: true });
+-      b.set(db.collection('ticket_transactions').doc(), { user_id: PP.uid, ticket_grade: PP_TICKET_GRADE, type: 'earn', postback_id: postRef.id, created_at: now, is_demo_sim: true });
++      b.set(db.collection('user_tickets').doc(), { user_id: PP.uid, grade: PP_TICKET_GRADE, status: 'pending', count: tk.total, postback_id: postRef.id, earned_at: now, confirmed_at: null, expires_at: ppTicketExpiry(), is_demo_sim: true });
++      b.set(db.collection('ticket_transactions').doc(), { user_id: PP.uid, ticket_grade: PP_TICKET_GRADE, type: 'earn', qty: tk.total, postback_id: postRef.id, created_at: now, is_demo_sim: true });
+     });
+   }
+   ppCommitOps(ops).then(function() {
+@@ -20090,35 +20004,16 @@ function bindExchangeBtn() {
+ function ppEnterRaffle() {
+   if (!PP.uid) return Promise.resolve(false);
+   if ((PP.tickets.event || 0) < 1) { showToast('이벤트 티켓이 부족해요'); return Promise.resolve(false); }
+-  return db.collection('user_tickets')
+-    .where('user_id', '==', PP.uid)
+-    .where('grade', '==', 'event')
+-    .where('status', '==', 'active')
+-    .get()
+-    .then(function(snap) {
+-      var docs = snap.docs.slice().sort(function(a, b) {
+-        var ea = a.data().earned_at, eb = b.data().earned_at;
+-        var ta = (ea && ea.toMillis) ? ea.toMillis() : 0;
+-        var tb = (eb && eb.toMillis) ? eb.toMillis() : 0;
+-        return ta - tb;
+-      });
+-      if (!docs.length) { showToast('이벤트 티켓이 부족해요'); return false; }
+-      var now = FS.FieldValue.serverTimestamp();
+-      var batch = db.batch();
+-      batch.update(docs[0].ref, { status: 'used', used_at: now });
+-      batch.set(db.collection('ticket_transactions').doc(), {
+-        user_id: PP.uid, ticket_grade: 'event', type: 'use', postback_id: null, created_at: now,
+-      });
+-      batch.set(db.collection('raffle_entries').doc(), {
+-        user_id: PP.uid, tickets_used: 1, created_at: now,
+-      });
+-      return batch.commit().then(function() {
+-        PP.tickets.event -= 1;
+-        renderMyTicketCard();
+-        renderRaffleScreen();
+-        showToast('응모가 완료됐어요');
+-        return true;
+-      });
++  return ppSpendEvent(1, false, null, function (now) {
++      return [function (b) { b.set(db.collection('raffle_entries').doc(), { user_id: PP.uid, tickets_used: 1, created_at: now }); }];
++    })
++    .then(function(ok) {
++      if (!ok) { showToast('이벤트 티켓이 부족해요'); return false; }
++      PP.tickets.event -= 1;
++      renderMyTicketCard();
++      renderRaffleScreen();
++      showToast('응모가 완료됐어요');
++      return true;
+     }).catch(function(e) { console.error('ppEnterRaffle', e); showToast('응모 중 오류가 발생했어요'); return false; });
+ }
+ window.ppEnterRaffle = ppEnterRaffle;
+@@ -20499,7 +20394,7 @@ function ppActBuild(src) {
+       /* 티켓 1종 통합(2026-10-14): 브론즈·실버·골드 기록은 모두 「티켓」, 장수는 1·10·20장 */
+       var w = PP_TICKET_PER_DOC[t.ticket_grade];
+       var grade = w ? 'ticket' : t.ticket_grade, g = GRADE_KO[grade] || '티켓', type = t.type || 'earn', d = ppDate(t.created_at);
+-      w = w || 1;
++      w = (w || 1) * txQty(t);   /* 원장 1건 = qty 개(2026-10-19 묶음 저장, 옛 기록은 1) */
+       var badge = t.manual ? (type === 'clawback' ? '관리자 환수' : '관리자 지급') : null;
+       /* 이벤트 티켓 → 티켓 교환, 옛 실버·골드를 쓰고 남은 장수 돌려받기 */
+       if (t.via === 'grade_exchange') {
+@@ -21511,16 +21406,15 @@ var MT21_MALL_VI = { '쿠팡': 'Coupang', '11번가': '11st', 'G마켓': 'Gmarke
+    확정 뒤 구매는 정책대로 뽑은 등급 구성 그대로 — 큰 등급부터 적는다.
+    grade·qty는 일부러 안 넣는다: 이 기록은 연출이라 오른쪽 「잔여 N장」 역산에 끼면
+    실제 보유량과 어긋난 숫자가 찍힌다(renderActivity가 grade 없는 건은 건너뛴다). */
+-/* 데모 취소 연출(mt21DemoCancel)에 걸린 구매 건의 티켓 장수 — { postback_id: { pending, settled } } (2026-10-16)
+-   예전엔 이 몇 건을 위해 회원 티켓을 전부 읽었다(티켓 1장 = 1건이라 회원 한 명에 수백~수천 건).
+-   이제 걸린 구매 건마다 개수만 묻는다(전체 · 대기 — 확정분 = 전체 − 대기). 걸린 건이 없으면 아무것도 읽지 않는다.
+-   개수 조회가 안 되면 예전처럼 전부 읽어 센다(ppDemoTicketsByPb). */
++/* 데모 취소 연출(mt21DemoCancel)에 걸린 구매 건의 티켓 장수 — { postback_id: { pending, settled } }
++   예전엔 이 몇 건을 위해 회원 티켓을 전부 읽었다(티켓 1장 = 1건). 이제 걸린 구매 건의 묶음만 읽어 장수(count)를 더한다
++   (2026-10-19 묶음 저장). 걸린 건이 없으면 아무것도 읽지 않는다. */
+ function ppDemoTicketsByPb(tks) {
+   var byPb = {};
+   tks.forEach(function (t) {
+     if (!t.postback_id) return;
+     var b = byPb[t.postback_id] || (byPb[t.postback_id] = { pending: 0, settled: 0 });
+-    if (t.status === 'pending') b.pending++; else b.settled++;
++    if (t.status === 'pending') b.pending += tkCnt(t); else b.settled += tkCnt(t);
+   });
+   return byPb;
+ }
+@@ -21529,17 +21423,10 @@ function ppDemoCancelTicketCounts(pbsP) {
+   return pbsP.then(function (pbs) {
+     var hit = (pbs || []).filter(function (pb) { return mt21DemoCancel(pb); });
+     if (!hit.length || !uid) return {};
+-    var q = [];
+-    hit.forEach(function (pb) {
+-      q.push(ppCount('user_tickets', [['user_id', '==', uid], ['postback_id', '==', pb._id]]));
+-      q.push(ppCount('user_tickets', [['user_id', '==', uid], ['postback_id', '==', pb._id], ['status', '==', 'pending']]));
+-    });
+-    return Promise.all(q).then(function (n) {
+-      if (n.some(function (x) { return x === null; })) return ppQuery('user_tickets', 'user_id', uid).then(ppDemoTicketsByPb);
+-      var byPb = {};
+-      hit.forEach(function (pb, i) { var all = n[2 * i], pend = n[2 * i + 1]; if (all) byPb[pb._id] = { pending: pend, settled: all - pend }; });
+-      return byPb;
+-    });
++    return Promise.all(hit.map(function (pb) {
++      return db.collection('user_tickets').where('user_id', '==', uid).where('postback_id', '==', pb._id).get()
++        .then(function (snap) { var o = []; snap.forEach(function (d) { o.push(d.data()); }); return o; });
++    })).then(function (lists) { return ppDemoTicketsByPb([].concat.apply([], lists)); });
+   }).catch(function (e) { console.error('ppDemoCancelTicketCounts', e); return {}; });
+ }
+ function ppDemoClawbackEvents(pbs, byPb) {
+@@ -21776,17 +21663,20 @@ function renderTicketDetail() {
+     tk.forEach(function (t) {
+       var g = (t.grade || '').toLowerCase();
+       if (t.status === 'pending') { pend.push(t); return; }
++      /* 묶음 1건 = count 개(2026-10-19 묶음 저장, 옛 낱장 문서는 1) */
++      var n = tkCnt(t);
+       var mk = PP_TICKET_PER_DOC[g] ? 'ticket' : g, mw = PP_TICKET_PER_DOC[g] || 1;
+       if (mt21ByGrade.hasOwnProperty(mk)) {
+         var waiting = (g === 'event') && (t.status === 'pending' || (t.status === 'active' && !t.confirmed_at));
+         if (t.status === 'active' && !waiting) {
+-          mt21ByGrade[mk].count += mw;
+-          for (var mi = 0; mi < mw; mi++) mt21Expiries[mk].push(ppTicketExpDate(t));
++          mt21ByGrade[mk].count += mw * n;
++          var exd = ppTicketExpDate(t);
++          for (var mi = 0; mi < mw * n; mi++) mt21Expiries[mk].push(exd);
+         }
+       }
+       if (!act.hasOwnProperty(g)) return;
+-      act[g]++;
+-      activeByGrade[g].push(t);
++      act[g] += n;
++      for (var ai = 0; ai < n; ai++) activeByGrade[g].push(t);
+       /* "랜덤 티켓 전환 현황"은 구매로 받은 랜덤 티켓이 등급으로 전환된 이력만 보여준다.
+          이벤트/포인트 교환·관리자 지급·출석 등 구매 아닌 경로는 postback_id가 항상 null
+          (ppGrantGradeTicket/ppExecuteTicketSwap/포인트↔티켓 교환 전부 postback_id:null로 저장)
+@@ -21794,7 +21684,7 @@ function renderTicketDetail() {
+       if (!t.postback_id) return;
+       var key = t.postback_id;
+       if (!done[key]) done[key] = { grades: {}, earnedAt: null };
+-      done[key].grades[g] = (done[key].grades[g] || 0) + 1;
++      done[key].grades[g] = (done[key].grades[g] || 0) + n;
+       var ea = ppDate(t.earned_at);
+       if (ea && (!done[key].earnedAt || ea < done[key].earnedAt)) done[key].earnedAt = ea;
+     });
+@@ -22294,7 +22184,18 @@ function ppTicketsSync() {
+   return t.ticket;
+ }
+ window.ppTicketsSync = ppTicketsSync;
+-/* 1장 = 1문서라 장수가 많으면 한 배치(최대 500건)를 넘는다 — 나눠서 쓴다. */
++/* ── 티켓 묶음 저장 (2026-10-19, 김반장 확정) ──
++   user_tickets 문서 1건 = 같은 조건(회원 · 종류 · 상태 · 구매 건 · 받은 날 · 만료일)으로 함께 받은 티켓 묶음.
++   count = 그 묶음의 장수(옛 실버·골드 문서는 그 등급 장수). 값이 없으면 1 — 예전 낱장 문서(1장 = 1건)도 그대로 읽힌다.
++   ticket_transactions 문서 1건 = 원장 기록 1번. qty = 장수(없으면 1).
++   · 받을 때: 묶음 1건 + 원장 1건.
++   · 쓸 때(차감 · 환수): 받은 날이 오래된 묶음부터. 묶음을 통째로 쓰면 그 문서의 상태만 바꾸고, 일부만 쓰면 남은 장수로
++     줄인 뒤 쓴 장수만큼의 문서를 새로 만들어 상태를 남긴다(받은 날 · 만료일 · 구매 건은 그대로 잇는다).
++   예전엔 티켓 1장 = 문서 1건이라 1만 장 가진 회원이면 홈에 들어올 때마다 1만 건을 읽고, 기프티콘 한 건에 수백 건을 썼다. */
++function tkCnt(d) { var c = d && d.count; return (typeof c === 'number' && c > 0) ? c : 1; }
++function txQty(t) { var q = t && t.qty; return (typeof q === 'number' && q > 0) ? q : 1; }
++window.tkCnt = tkCnt; window.txQty = txQty;
++/* 작업이 많으면 한 배치(최대 500건)를 넘는다 — 나눠서 쓴다. 묶음 저장 뒤로는 거의 한 배치로 끝난다. */
+ function ppCommitOps(ops) {
+   var chain = Promise.resolve();
+   for (var i = 0; i < ops.length; i += 400) {
+@@ -22314,85 +22215,95 @@ function ppByEarned(a, b) {
+   var tb = (eb && eb.toMillis) ? eb.toMillis() : 0;
+   return ta - tb;
+ }
++/* 받은 날 순으로 늘어놓은 묶음에서 n장을 고른다(선입선출). weightOf(grade) = 그 종류 1개가 티켓 몇 장인지.
++   돌려주는 값: { take: [{ doc, data, units, whole }], change, last } — units 는 그 묶음에서 쓸 개수,
++   change 는 옛 실버·골드처럼 1개가 여러 장이라 필요한 장수를 넘겨 쓴 만큼(티켓으로 돌려준다). 모자라면 null. */
++function ppPlanFrom(docs, n, weightOf) {
++  var take = [], got = 0;
++  for (var i = 0; i < docs.length && got < n; i++) {
++    var d = docs[i], x = d.data(), w = weightOf(x.grade) || 1, c = tkCnt(x);
++    var units = Math.min(c, Math.ceil((n - got) / w));
++    take.push({ doc: d, data: x, units: units, whole: units === c });
++    got += units * w;
++  }
++  if (got < n) return null;
++  return { take: take, change: got - n, last: take.length ? take[take.length - 1].data : null };
++}
+ /* ── 티켓 쓰기(차감) — 먼저 받은 것부터(선입선출) ──
+-   옛 실버·골드 문서는 한 문서가 티켓 10·20장이라, 필요한 장수를 넘겨 걸리면 남는 장수만큼
+-   티켓을 새로 만들어 돌려준다. 받은 날·만료일은 원래 문서 것을 그대로 잇는다(선입선출 유지). */
+-/* 2026-10-16 — 쓸 장수만큼만 읽는다. 예전엔 보유 티켓을 전부 읽어 정렬했다(티켓 1장 = 1건이라 1만 장 넘는
+-   회원이면 기프티콘 한 번 사는 데 1만 건 넘게 읽었다). 받은 날(earned_at) 오름차순으로 필요한 만큼씩 끊어 읽는다
+-   — 같은 날이면 문서 id 순이라 예전 정렬(문서 id 순으로 받아 안정 정렬)과 같은 티켓을 고른다.
+-   이 질의에는 색인(user_id·status·earned_at)이 필요하다. 색인이 없거나 실패하면 예전처럼 전부 읽는다. */
+-function ppPlanTicketUseAll(n) {
++   옛 실버·골드 문서는 1개가 티켓 10·20장이라, 필요한 장수를 넘겨 걸리면 남는 장수만큼 티켓으로 돌려준다.
++   받은 날·만료일은 원래 묶음 것을 그대로 잇는다(선입선출 유지). */
++function ppPlanTicketUse(n) {
+   return db.collection('user_tickets').where('user_id', '==', PP.uid).where('status', '==', 'active').get()
+     .then(function (snap) {
+       var docs = snap.docs.filter(function (d) { return PP_TICKET_PER_DOC.hasOwnProperty(d.data().grade); }).sort(ppByEarned);
+-      var take = [], got = 0;
+-      for (var i = 0; i < docs.length && got < n; i++) { take.push(docs[i]); got += PP_TICKET_PER_DOC[docs[i].data().grade]; }
+-      if (got < n) return null;
+-      return { docs: take, change: got - n, last: take[take.length - 1] };
++      return ppPlanFrom(docs, n, function (g) { return PP_TICKET_PER_DOC[g]; });
+     });
+ }
+-function ppPlanTicketUse(n) {
+-  var uid = PP.uid, take = [], got = 0;
+-  var base = db.collection('user_tickets').where('user_id', '==', uid).where('status', '==', 'active').orderBy('earned_at', 'asc');
+-  function page(after) {
+-    var size = Math.min(500, Math.max(50, n - got + 10));
+-    var q = after ? base.startAfter(after) : base;
+-    return q.limit(size).get().then(function (snap) {
+-      for (var i = 0; i < snap.docs.length && got < n; i++) {
+-        var d = snap.docs[i], w = PP_TICKET_PER_DOC[d.data().grade];
+-        if (!w) continue;                      // 이벤트 티켓은 여기서 쓰지 않는다
+-        take.push(d); got += w;
++/* 계획대로 쓰는 작업 묶음. opt: { status:'used'(기본)|'revoked', stamp:'used_at'(기본), txType:'use'(기본) } */
++function ppTicketUseOps(plan, via, now, extra, opt) {
++  var st = (opt && opt.status) || 'used', stamp = (opt && opt.stamp) || 'used_at', txType = (opt && opt.txType) || 'use';
++  var ops = [], byGrade = {}, gradeOrder = [];
++  plan.take.forEach(function (t) {
++    ops.push(function (b) {
++      if (t.whole) {
++        var upd = { status: st }; upd[stamp] = now;
++        if (typeof t.data.count !== 'number') upd.count = t.units;      // 옛 낱장 문서에도 장수를 적어 둔다
++        b.update(t.doc.ref, upd);
++      } else {
++        b.update(t.doc.ref, { count: tkCnt(t.data) - t.units });
++        var part = Object.assign({}, t.data, { count: t.units, status: st }); part[stamp] = now;
++        b.set(db.collection('user_tickets').doc(), part);
+       }
+-      if (got >= n) return { docs: take, change: got - n, last: take[take.length - 1] };
+-      if (snap.docs.length < size) return null;  // 다 읽었는데 모자란다
+-      return page(snap.docs[snap.docs.length - 1]);
+     });
+-  }
+-  return page(null).catch(function (e) {
+-    console.warn('[티켓 차감] 나눠 읽기 실패 → 전부 읽습니다', e && e.message);
+-    return ppPlanTicketUseAll(n);
++    var g = t.data.grade;
++    if (!byGrade[g]) { byGrade[g] = 0; gradeOrder.push(g); }
++    byGrade[g] += t.units;
+   });
+-}
+-function ppTicketUseOps(plan, via, now, extra) {
+-  var ops = [];
+-  plan.docs.forEach(function (doc) {
+-    var g = doc.data().grade;
++  gradeOrder.forEach(function (g) {
+     ops.push(function (b) {
+-      b.update(doc.ref, { status: 'used', used_at: now });
+-      var tx = Object.assign({ user_id: PP.uid, ticket_grade: g, type: 'use', postback_id: null, created_at: now }, extra || {});
++      var tx = Object.assign({ user_id: PP.uid, ticket_grade: g, type: txType, qty: byGrade[g], postback_id: null, created_at: now }, extra || {});
+       if (via) tx.via = via;
+       b.set(db.collection('ticket_transactions').doc(), tx);
+     });
+   });
+-  var src = plan.change ? plan.last.data() : null;
+-  for (var i = 0; i < plan.change; i++) {
++  if (plan.change > 0) {
++    var src = plan.last;
+     ops.push(function (b) {
+       b.set(db.collection('user_tickets').doc(), {
+-        user_id: PP.uid, grade: PP_TICKET_GRADE, status: 'active', postback_id: null,
++        user_id: PP.uid, grade: PP_TICKET_GRADE, status: 'active', count: plan.change, postback_id: null,
+         earned_at: src.earned_at || now, confirmed_at: src.confirmed_at || now, expires_at: src.expires_at || (ppTicketExpDate(src) ? FS.Timestamp.fromDate(ppTicketExpDate(src)) : ppTicketExpiry()),
+       });
+-      b.set(db.collection('ticket_transactions').doc(), { user_id: PP.uid, ticket_grade: PP_TICKET_GRADE, type: 'earn', postback_id: null, via: 'grade_exchange', created_at: now });
++      b.set(db.collection('ticket_transactions').doc(), { user_id: PP.uid, ticket_grade: PP_TICKET_GRADE, type: 'earn', qty: plan.change, postback_id: null, via: 'grade_exchange', created_at: now });
+     });
+   }
+   return ops;
+ }
+ function ppAfterTicketUse(plan) {
+-  plan.docs.forEach(function (doc) { var g = doc.data().grade; PP.tickets[g] = Math.max(0, (PP.tickets[g] || 0) - 1); });
++  plan.take.forEach(function (t) { var g = t.data.grade; PP.tickets[g] = Math.max(0, (PP.tickets[g] || 0) - t.units); });
+   PP.tickets[PP_TICKET_GRADE] = (PP.tickets[PP_TICKET_GRADE] || 0) + plan.change;
+   ppTicketsSync();
+ }
+-/* 티켓 n장 새로 주기 — 작업 묶음(ops)만 만든다 */
++/* 티켓 n장 새로 주기 — 묶음 1건 + 원장 1건(작업 묶음만 만든다) */
+ function ppTicketGrantOps(n, via, now, extraDoc, extraTx) {
+-  var ops = [];
+-  for (var i = 0; i < n; i++) {
+-    ops.push(function (b) {
+-      b.set(db.collection('user_tickets').doc(), Object.assign({ user_id: PP.uid, grade: PP_TICKET_GRADE, status: 'active', postback_id: null, earned_at: now, confirmed_at: now, expires_at: ppTicketExpiry() }, extraDoc || {}));
+-      b.set(db.collection('ticket_transactions').doc(), Object.assign({ user_id: PP.uid, ticket_grade: PP_TICKET_GRADE, type: 'earn', postback_id: null, via: via, created_at: now }, extraTx || {}));
++  if (!(n > 0)) return [];
++  return [function (b) {
++    b.set(db.collection('user_tickets').doc(), Object.assign({ user_id: PP.uid, grade: PP_TICKET_GRADE, status: 'active', count: n, postback_id: null, earned_at: now, confirmed_at: now, expires_at: ppTicketExpiry() }, extraDoc || {}));
++    b.set(db.collection('ticket_transactions').doc(), Object.assign({ user_id: PP.uid, ticket_grade: PP_TICKET_GRADE, type: 'earn', qty: n, postback_id: null, via: via, created_at: now }, extraTx || {}));
++  }];
++}
++/* 이벤트 티켓 n장 쓰기 — 받은 날 오래된 묶음부터. requireConfirmed 면 승인(confirmed_at)된 것만.
++   extraTx: 원장에 더 적을 값, moreOps(now): 같은 배치에 함께 쓸 작업. 모자라면 false. */
++function ppSpendEvent(n, requireConfirmed, extraTx, moreOps) {
++  return db.collection('user_tickets').where('user_id', '==', PP.uid).where('grade', '==', 'event').where('status', '==', 'active').get()
++    .then(function (snap) {
++      var docs = snap.docs.filter(function (d) { return requireConfirmed ? !!d.data().confirmed_at : true; }).sort(ppByEarned);
++      var plan = ppPlanFrom(docs, n, function () { return 1; });
++      if (!plan) return false;
++      var now = FS.FieldValue.serverTimestamp();
++      var ops = ppTicketUseOps(plan, null, now, extraTx).concat(moreOps ? moreOps(now) : []);
++      return ppCommitOps(ops).then(function () { return true; });
+     });
+-  }
+-  return ops;
+ }
+-
+ /* ── 티켓 전환 실행 (공통) ──
+    이벤트티켓 교환 탭이 쓴다. 허용 방향 검사를 여기서
+    한 번 더 하므로, 어떤 화면에서 부르든 화이트리스트에 없는 방향은 쓰기가 일어나지 않는다.
+@@ -22406,26 +22317,13 @@ function ppExecuteTicketSwap(from, to, consume, receive) {
+   }
+   return db.collection('user_tickets').where('user_id', '==', PP.uid).where('grade', '==', from).where('status', '==', 'active').get()
+     .then(function(snap) {
+-      var docs = snap.docs.slice().sort(function(a, b) {
+-        var ea = a.data().earned_at, eb = b.data().earned_at;
+-        var ta = (ea && ea.toMillis) ? ea.toMillis() : 0;
+-        var tb = (eb && eb.toMillis) ? eb.toMillis() : 0;
+-        return ta - tb;
+-      });
+-      if (docs.length < consume) { showToast('티켓이 부족합니다'); return false; }
++      /* 받은 날 오래된 묶음부터 consume 개를 고른다(묶음 저장 2026-10-19 — 1개 = 1장으로 센다) */
++      var plan = ppPlanFrom(snap.docs.slice().sort(ppByEarned), consume, function () { return 1; });
++      if (!plan) { showToast('티켓이 부족합니다'); return false; }
+       // 쓰기 직전 최종 가드 — 이 지점을 통과하지 못하면 user_tickets 문서가 만들어지지 않는다
+       if (!ppSwapAllowed(from, to)) { console.error('blocked ticket swap', from, '→', to); showToast(ppSwapDenyReason(from, to)); return false; }
+       var now = FS.FieldValue.serverTimestamp();
+-      var ops = [];
+-      docs.slice(0, consume).forEach(function(doc) {
+-        ops.push(function (b) {
+-          b.update(doc.ref, { status: 'used', used_at: now });
+-          b.set(db.collection('ticket_transactions').doc(), {
+-            user_id: PP.uid, ticket_grade: from, type: 'use', postback_id: null, via: 'grade_exchange', created_at: now,
+-          });
+-        });
+-      });
+-      ops = ops.concat(ppTicketGrantOps(receive, 'grade_exchange', now));
++      var ops = ppTicketUseOps(plan, 'grade_exchange', now).concat(ppTicketGrantOps(receive, 'grade_exchange', now));
+       return ppCommitOps(ops).then(function() { return true; });
+     })
+     .then(function(ok) {
+diff --git a/cms/index.html b/cms/index.html
+index 60f66ec..9c81b16 100644
+--- a/cms/index.html
++++ b/cms/index.html
+@@ -7835,6 +7835,40 @@ function ppCountAll(list) {
+   return Promise.all(lanes).then(function () { return failed ? null : out; });
+ }
+ window.ppCount = ppCount; window.ppCountAll = ppCountAll;
++/* 합계 조회 — list: [[컬렉션, 조건, 더할 필드], …]. 하나라도 실패하면 null. 12개씩 나눠 보낸다. */
++function ppSumAll(list) {
++  var out = new Array(list.length), next = 0, failed = false;
++  function worker() {
++    if (failed || next >= list.length) return Promise.resolve();
++    var i = next++;
++    return ppAggregate(list[i][0], list[i][1], [{ alias: 's', sum: { field: { fieldPath: list[i][2] } } }]).then(function (r) {
++      if (!r) { failed = true; return; }
++      out[i] = r.s;
++      return worker();
++    });
++  }
++  var lanes = [];
++  for (var k = 0; k < Math.min(12, list.length); k++) lanes.push(worker());
++  return Promise.all(lanes).then(function () { return failed ? null : out; });
++}
++/* ── 티켓 묶음 저장 (2026-10-19, 김반장 확정) — 앱(app/index.html)과 같은 규칙 ──
++   user_tickets 문서 1건 = 같은 조건으로 함께 받은 티켓 묶음, count = 장수(없으면 1 — 옛 낱장 문서).
++   ticket_transactions 문서 1건 = 원장 기록 1번, qty = 장수(없으면 1).
++   쓸 때·환수할 때는 받은 날 오래된 묶음부터 — 통째면 상태만 바꾸고, 일부면 남은 장수로 줄인 뒤 쓴 장수만큼 문서를 새로 만든다. */
++function tkCnt(d) { var c = d && d.count; return (typeof c === 'number' && c > 0) ? c : 1; }
++function txQty(t) { var q = t && t.qty; return (typeof q === 'number' && q > 0) ? q : 1; }
++window.tkCnt = tkCnt; window.txQty = txQty;
++/* 낱장 문서를 묶음으로 옮기는 일(이관)이 끝났는지 — settings/ticket_storage.version >= 2.
++   끝난 뒤에야 장수 합계를 합계 조회(qty·count 합)로 구할 수 있다 — 옮기기 전 낱장 문서에는 qty·count 가 없어
++   합계 조회에서 빠지기 때문이다. 끝나기 전에는 문서를 읽어 더한다(숫자는 같고 읽기만 많다). */
++var PP_TK_V2 = null;
++function ppTicketStorageV2() {
++  if (!PP_TK_V2) PP_TK_V2 = db.collection('settings').doc('ticket_storage').get()
++    .then(function (d) { return !!(d.exists && d.data().version >= 2); })
++    .catch(function () { return false; });
++  return PP_TK_V2;
++}
++window.ppTicketStorageV2 = ppTicketStorageV2;
+ /* ── 시험 문서 거르기 ──
+    권한을 살펴보느라 gifticon_exchanges 에 만들어졌다가 지우지 못한 문서가 있다
+    (id 가 zz- 로 시작, 2026-09-17). 구매내역 목록은 exchanged_at 으로 정렬해 조회하므로
+@@ -8111,23 +8145,24 @@ function recompNet(){
+   if (window.__ppCommission==null || window.__ppGifticonRev==null || window.__ppTicketCost==null) return;
+   setKpi('kpi-net', kpiWon(window.__ppCommission + window.__ppGifticonRev - window.__ppTicketCost));
+ }
+-/* 대시보드의 티켓 숫자 셋 — 발행 티켓(적립 건수) · 티켓 적립 비용 · 적립 TOP 3 (2026-10-16)
+-   예전엔 셋 다 티켓 원장의 적립 기록을 통째로 읽어 셌다(티켓 1장 = 1건이라 수만 건). 이제 개수만 묻는다.
+-   · 발행 티켓 = 적립(earn) 건수
+-   · 비용 = 종류별 적립 건수 × 단가 — 옛 브론즈·실버·골드는 티켓 1·10·20장 × 티켓 1장 값, 이벤트 티켓은 그 값 그대로.
+-     단가가 있는 종류는 TK_KIND_WEIGHT · TA_TICKET_VALUE 에 적힌 것뿐이라 그 종류만 세면 합이 같다.
+-   · TOP 3 = 회원별 적립 건수(회원 수만큼 묻는다 — 한 번에 1건씩)
+-   개수 조회가 안 되면 예전처럼 적립 기록을 읽어 센다. 돌려주는 값은 둘 다 { total, cost, byUser }. */
++/* 대시보드의 티켓 숫자 셋 — 발행 티켓 · 티켓 적립 비용 · 적립 TOP 3
++   원장 기록 1건 = qty 장(2026-10-19 묶음 저장, 옛 기록은 1).
++   · 발행 티켓 = 적립(earn) 장수 합
++   · 비용 = 종류별 적립 장수 × 단가 — 옛 브론즈·실버·골드는 티켓 1·10·20장 × 티켓 1장 값, 이벤트 티켓은 그 값 그대로.
++     단가가 있는 종류는 TK_KIND_WEIGHT · TA_TICKET_VALUE 에 적힌 것뿐이라 그 종류만 더하면 합이 같다.
++   · TOP 3 = 회원별 적립 장수
++   이관이 끝났으면(ppTicketStorageV2) 합계 조회로 구하고, 아니면 적립 기록을 읽어 더한다. 돌려주는 값은 { total, cost, byUser }. */
+ function dashEarnStats() {
+   var kinds = Object.keys(TK_KIND_WEIGHT);
+   Object.keys(TA_TICKET_VALUE).forEach(function (k) { if (kinds.indexOf(k) < 0) kinds.push(k); });
+-  var earn = function (extra) { return ['ticket_transactions', [['type', '==', 'earn']].concat(extra || [])]; };
++  var earn = function (extra) { return ['ticket_transactions', [['type', '==', 'earn']].concat(extra || []), 'qty']; };
+   var usersP = ppAll('users');
+-  var byCount = Promise.all([taLoadTicketValue(), usersP]).then(function (res) {
++  var bySum = Promise.all([taLoadTicketValue(), usersP, ppTicketStorageV2()]).then(function (res) {
++    if (!res[2]) return null;
+     var ids = res[1].docs.map(function (d) { return d.id; });
+     var q = [earn()].concat(kinds.map(function (g) { return earn([['ticket_grade', '==', g]]); }))
+       .concat(ids.map(function (u) { return earn([['user_id', '==', u]]); }));
+-    return ppCountAll(q).then(function (n) {
++    return ppSumAll(q).then(function (n) {
+       if (!n) return null;
+       var cost = 0, byUser = {};
+       kinds.forEach(function (g, i) { var w = TK_KIND_WEIGHT[g]; cost += n[1 + i] * (w ? w * TA_TICKET_VALUE.bronze : (TA_TICKET_VALUE[g] || 0)); });
+@@ -8135,16 +8170,17 @@ function dashEarnStats() {
+       return { total: n[0], cost: cost, byUser: byUser };
+     });
+   });
+-  return byCount.then(function (st) {
++  return bySum.then(function (st) {
+     if (st) return st;
+     return Promise.all([taLoadTicketValue(), ppAllWhere('ticket_transactions', 'type', 'earn')]).then(function (res) {
+-      var snap = res[1], cost = 0, byUser = {};
++      var snap = res[1], total = 0, cost = 0, byUser = {};
+       snap.docs.forEach(function (d) {
+-        var x = d.data(), g = x.ticket_grade, w = TK_KIND_WEIGHT[g];
+-        cost += w ? w * TA_TICKET_VALUE.bronze : (TA_TICKET_VALUE[g] || 0);
+-        var uid = x.user_id || ''; byUser[uid] = (byUser[uid] || 0) + 1;
++        var x = d.data(), g = x.ticket_grade, w = TK_KIND_WEIGHT[g], q = txQty(x);
++        total += q;
++        cost += q * (w ? w * TA_TICKET_VALUE.bronze : (TA_TICKET_VALUE[g] || 0));
++        var uid = x.user_id || ''; byUser[uid] = (byUser[uid] || 0) + q;
+       });
+-      return { total: snap.size, cost: cost, byUser: byUser };
++      return { total: total, cost: cost, byUser: byUser };
+     });
+   });
+ }
+@@ -8867,51 +8903,34 @@ function dmNewTicketCounter() {
+   return { pendingBundles: {}, pending: { bronze:0, silver:0, gold:0, ticket:0 }, active: { bronze:0, silver:0, gold:0, ticket:0, event:0 } };
+ }
+ function dmClassifyTicketInto(c, d) {
+-  var w = TK_KIND_WEIGHT[d.grade];
++  var w = TK_KIND_WEIGHT[d.grade], n = tkCnt(d);   /* 묶음 1건 = count 개(2026-10-19) */
+   if (d.status === 'pending') {
+     if (d.postback_id) c.pendingBundles[d.postback_id] = true;
+-    if (w) { c.pending[d.grade]++; c.pending.ticket += w; }
++    if (w) { c.pending[d.grade] += n; c.pending.ticket += w * n; }
+   } else if (d.status === 'active') {
+-    if (w) { c.active[d.grade]++; c.active.ticket += w; }
+-    else if (d.grade === 'event') c.active.event++;
++    if (w) { c.active[d.grade] += n; c.active.ticket += w * n; }
++    else if (d.grade === 'event') c.active.event += n;
+   }
+ }
+ 
+-/* 회원별 티켓 집계 (2026-10-16) — 보유(active)는 종류별 개수만 묻고, 대기(pending)만 문서를 읽는다.
+-   예전엔 회원 티켓을 상태와 상관없이 전부 읽었다(다 쓴 티켓까지 — 티켓 1장 = 1건이라 회원 한 명에 수백~수천 건).
+-   대기분은 랜덤 티켓 묶음 수(구매 건 수)를 세야 해서 문서를 읽는다. 세는 기준은 dmClassifyTicketInto 그대로다.
+-   개수 조회가 안 되면 예전처럼 전부 읽어 센다. 돌려주는 값: { uid: dmNewTicketCounter() 모양 } */
+-var DM_HELD_KINDS = ['bronze', 'silver', 'gold', 'event'];
++/* 회원별 티켓 집계 — 보유(active)·대기(pending) 묶음만 읽어 장수를 더한다(2026-10-19 묶음 저장).
++   예전엔 회원 티켓을 상태와 상관없이 1장 = 1건으로 전부 읽었다(다 쓴 티켓까지). 세는 기준은 dmClassifyTicketInto 그대로다.
++   돌려주는 값: { uid: dmNewTicketCounter() 모양 } */
+ function dmTicketCountsFor(userIds) {
+   var counts = {};
+   userIds.forEach(function(uid) { counts[uid] = dmNewTicketCounter(); });
+   var chunks = [];
+   for (var i = 0; i < userIds.length; i += 10) chunks.push(userIds.slice(i, i + 10));
+-  var readAll = function(statusOnly) {
+-    return Promise.all(chunks.map(function(chunk) {
+-      var q = db.collection('user_tickets').where('user_id', 'in', chunk);
+-      if (statusOnly) q = q.where('status', '==', statusOnly);
+-      return q.get().then(function(snap) {
++  return Promise.all(chunks.map(function(chunk) {
++    return Promise.all(['active', 'pending'].map(function(st) {
++      return db.collection('user_tickets').where('user_id', 'in', chunk).where('status', '==', st).get().then(function(snap) {
+         snap.forEach(function(doc) {
+           var c = counts[doc.data().user_id];
+           if (c) dmClassifyTicketInto(c, doc.data());
+         });
+-      }).catch(function(e) { console.error('loadMemberTicketCounts', e); });
+-    }));
+-  };
+-  var q = [];
+-  userIds.forEach(function(u) { DM_HELD_KINDS.forEach(function(g) { q.push(['user_tickets', [['user_id', '==', u], ['status', '==', 'active'], ['grade', '==', g]]]); }); });
+-  return ppCountAll(q).then(function(n) {
+-    if (!n) return readAll(null);
+-    userIds.forEach(function(u, i) {
+-      var a = counts[u].active;
+-      DM_HELD_KINDS.forEach(function(g, j) {
+-        var k = n[i * DM_HELD_KINDS.length + j], w = TK_KIND_WEIGHT[g];
+-        if (w) { a[g] += k; a.ticket += w * k; } else if (g === 'event') a.event += k;
+       });
+-    });
+-    return readAll('pending');
+-  }).then(function() { return counts; });
++    })).catch(function(e) { console.error('loadMemberTicketCounts', e); });
++  })).then(function() { return counts; });
+ }
+ function loadMemberTicketCounts(userIds) {
+   if (!userIds || !userIds.length) return;
+@@ -10576,23 +10595,10 @@ function loadHoldTickets(uids) {
+   var list = [];
+   (uids || []).forEach(function(u){ if (u && list.indexOf(u) < 0) list.push(u); });
+   if (!list.length) return Promise.resolve({});
+-  /* 장수만 필요하다 — 회원 × 종류별 보유(active) 개수만 묻는다(2026-10-16, 티켓 1장 = 1건이라 보유 티켓을
+-     다 읽으면 회원 한 명에 수백~수천 건). 개수 조회가 안 되면 아래 예전 방식으로 읽어 센다.
+-     보유 티켓이 하나도 없는 회원은 map 에 넣지 않는다(holdCell 이 「—」로 그린다 — 예전과 같다). */
+-  var HOLD_KINDS = ['bronze', 'silver', 'gold', 'event'];
+-  var q = [];
+-  list.forEach(function(u){ HOLD_KINDS.forEach(function(g){ q.push(['user_tickets', [['user_id', '==', u], ['status', '==', 'active'], ['grade', '==', g]]]); }); });
+-  return ppCountAll(q).then(function(n) {
+-    if (!n) return loadHoldTicketsAll(list);
+-    var map = {};
+-    list.forEach(function(u, i) {
+-      var row = {}, any = false;
+-      HOLD_KINDS.forEach(function(g, j) { var c = n[i * HOLD_KINDS.length + j]; if (c) { row[g] = c; any = true; } });
+-      if (any) map[u] = row;
+-    });
+-    return map;
+-  });
++  return loadHoldTicketsAll(list);
+ }
++/* 보유(active) 묶음을 읽어 종류별 장수(count)를 더한다(2026-10-19 묶음 저장).
++   보유 티켓이 하나도 없는 회원은 map 에 넣지 않는다(holdCell 이 「—」로 그린다). */
+ function loadHoldTicketsAll(list) {
+   var chunks = [];
+   for (var i = 0; i < list.length; i += 10) chunks.push(list.slice(i, i + 10));
+@@ -10603,7 +10609,7 @@ function loadHoldTicketsAll(list) {
+         snap.forEach(function(d) {
+           var t = d.data();
+           if (!map[t.user_id]) map[t.user_id] = {};
+-          map[t.user_id][t.grade] = (map[t.user_id][t.grade] || 0) + 1;
++          map[t.user_id][t.grade] = (map[t.user_id][t.grade] || 0) + tkCnt(t);
+         });
+       }).catch(function(e){ console.error('holdTickets', e); });
+   })).then(function(){ return map; });
