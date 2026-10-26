@@ -500,7 +500,7 @@ function fetchUsersByIds(ids) {
      탈퇴한 계정 앱 탈퇴(performWithdraw)가 nickname·kakao_login_id를 지우고 status를
                  withdrawn으로 바꾼다. 그런데 linked_kakao는 지우지 않아 옛 값이 남는다.
                  그 잔재를 「연동」이라 내보이면 거짓이 되니 카카오도 비운다.
-     정지된 계정 status=suspended. 회원 정보는 살아 있으니 카카오는 그대로 보여준다.
+     차단된 계정 status=suspended. 회원 정보는 살아 있으니 카카오는 그대로 보여준다.
      정상        닉네임이 비어 있을 수 있다(가입 중) → 그때도 칸은 「―」로 비운다. */
 function userState(uid) {
   var u = USERS[uid];
@@ -525,7 +525,7 @@ function accTag(uid) {
   var s = userState(uid);
   if (s.kind === 'missing') return '<span class="tag tag-bad">없는 계정</span>';
   if (s.kind === 'withdrawn') return '<span class="tag tag-bad">탈퇴</span>';
-  if (s.kind === 'suspended') return '<span class="tag tag-warn">정지</span>';
+  if (s.kind === 'suspended') return '<span class="tag tag-warn">차단</span>';
   return '';
 }
 function rowDim(uid) {
@@ -1387,7 +1387,7 @@ function refreshAccHint() {
     }
     if (st === 'suspended') {
       el.className = 'lookup-hint bad';
-      el.innerHTML = '<b>정지된 계정</b>입니다 · 닉네임 <b>' + esc(u.nickname || '(없음)') + '</b>';
+      el.innerHTML = '<b>차단된 계정</b>입니다 · 닉네임 <b>' + esc(u.nickname || '(없음)') + '</b>';
       return;
     }
     el.innerHTML = '닉네임 <b>' + esc(u.nickname || '(없음)') + '</b> · 카카오 '
@@ -1487,7 +1487,7 @@ load();
   "연동": "Liên kết",
   "미연동": "Chưa LK",
   "탈퇴한 계정": "Tài khoản đã rút",
-  "정지된 계정": "Tài khoản bị đình chỉ",
+  "차단된 계정": "Tài khoản bị chặn",
   "없는 계정": "Tài khoản không tồn tại",
   "계정 추가": "Thêm tài khoản",
   "계정 수정": "Sửa tài khoản",
@@ -1530,7 +1530,7 @@ load();
   "닫기": "Đóng",
   "프라이스픽 데모 계정 관리": "Quản lý tài khoản demo PricePick",
   "탈퇴": "Đã rút",
-  "정지": "Bị đình chỉ"
+  "차단": "Bị chặn"
 };
   var _orig=new Map(), _tracked=new Set(), _applying=false;
   function hasKo(s){ return /[가-힯ᄀ-ᇿ㄰-㆏]/.test(s); }
