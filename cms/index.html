@@ -3316,7 +3316,7 @@ window.CMS_FEATURES = {
               <div class="policy-item"><div class="policy-label">개별 상품 제외</div><div class="policy-value">운영자 지정</div><div class="policy-desc">고가 가전 등 마진 이슈 상품. 앱에는 "일부 고가 가전(운영자 지정)"으로 통합 표시.</div></div>
               <div class="policy-item"><div class="policy-label">제외 처리</div><div class="policy-value">티켓 미지급</div><div class="policy-desc">제외 대상 구매는 적립 계산에서 제외. 배송비·쿠폰·캐시도 계산 제외 후 산정.</div></div>
             </div>
-            <div class="info-box" style="margin-top:14px">제외 대상 카테고리·상품은 적립 계산에서 제외되며, 앱 10e 화면에 "적립 제외 상품"으로 안내됩니다.</div>
+            <div class="info-box" style="margin-top:14px">제외 대상 카테고리·상품은 적립 계산에서 제외되며, 앱에서 "적립 제외 상품"으로 안내됩니다.</div>
           </div>
 
         </div>
@@ -6843,7 +6843,7 @@ window.giSaveImageEdit = giSaveImageEdit;
   ": 벤더사(Giftishow 등)와 사전 계약 + API 연동 필수. 마진 -10% 미만은 적자.":": Hợp đồng trước với nhà cung cấp (Giftishow v.v.) + Bắt buộc liên kết API. Biên dưới -10% là lỗ.",
   "— 약관 변경 시 법적 요건을 반드시 확인하고, 변경 30일 전 회원에게 사전 공지 후 적용하세요.":"— Khi thay đổi điều khoản, bắt buộc xác nhận yêu cầu pháp lý và thông báo trước cho thành viên 30 ngày trước khi áp dụng.",
   "· 성사 기준 피초대자 첫 구매 완료(성사 시점 양쪽 지급) · 초대자 월 최대 50명. 상세 정책은":"· Tiêu chuẩn thành công: người được mời hoàn thành lần mua đầu tiên (cấp cả hai khi thành công) · Người mời tối đa 50 người/tháng. Chính sách chi tiết xem",
-  "제외 대상 카테고리·상품은 적립 계산에서 제외되며, 앱 10e 화면에 \"적립 제외 상품\"으로 안내됩니다.":"Danh mục·sản phẩm loại trừ không tính vào tích lũy, được thông báo là \"Sản phẩm loại trừ tích lũy\" trên màn hình 10e của ứng dụng.",
+  "제외 대상 카테고리·상품은 적립 계산에서 제외되며, 앱에서 \"적립 제외 상품\"으로 안내됩니다.":"Danh mục·sản phẩm loại trừ không tính vào tích lũy, được thông báo trên ứng dụng là \"Sản phẩm loại trừ tích lũy\".",
   "랜덤 티켓: 구매 후 전환 대기일 수가 지나면 티켓으로 전환. 취소 시 자동 환수.":"Vé ngẫu nhiên: Sau mua, khi xác nhận số ngày chuyển đổi theo từng sàn chuyển thành vé. Tự động thu hồi khi hủy.",
   "— 친구초대 보상 = 양쪽 각 500P(포인트), 초대자 월 최대 50명. (이벤트 티켓 → 포인트 변경)":"— Thưởng mời bạn = mỗi bên 500P (điểm), người mời tối đa 50 người/tháng. (Vé sự kiện → đổi thành Điểm)",
   "동안 철회 가능, 이후 개인정보 영구 삭제. 처리 누락 시 개인정보보호법 위반 + Apple 심사 거절 사유.":"Có thể thu hồi trong thời gian đó, sau đó xóa vĩnh viễn thông tin cá nhân. Nếu bỏ sót: vi phạm Luật bảo vệ TTCN + lý do từ chối kiểm duyệt Apple.",
@@ -7081,7 +7081,7 @@ Object.assign(KO2VI,{
 "상자 열기 기록":"Nhật ký mở hộp",
 "실제 연 횟수 집계":"Thống kê số lượt mở thực tế",
 "받은 보상 원화 환산":"Quy đổi phần thưởng đã nhận ra tiền",
-"가장 큰 선물":"Phần quà lớn nhất",
+"최고 보상":"Phần thưởng cao nhất",
 "선물 상자 종류":"Loại hộp quà",
   "잭팟 룰렛":"Vòng quay Jackpot",
   "매일 행운 룰렛 = 출석(쿠팡 구경하기) 시 1일 1회 무료 룰렛":"Vòng quay may mắn hằng ngày = vòng quay miễn phí 1 lần/ngày khi điểm danh (dạo Coupang)",
@@ -18745,8 +18745,8 @@ var JKR_DEFAULT_LIMITS = { daily_spin_cap: 10, event_ticket_daily_cap: 5, event_
 var RLT_WORDS = {
   daily:      { cell: '슬롯',   screen: '룰렛을',      miss: '꽝',        top: 'JACKPOT',      spins: '실제 돌린 횟수 집계', logEmpty: '룰렛 실행 로그가 없습니다.' },
   jackpot:    { cell: '슬롯',   screen: '룰렛을',      miss: '꽝',        top: 'JACKPOT',      spins: '실제 돌린 횟수 집계', logEmpty: '룰렛 실행 로그가 없습니다.' },
-  giftDaily:  { cell: '보상칸', screen: '선물 상자를', miss: '보상 없음', top: '가장 큰 선물', spins: '실제 연 횟수 집계',   logEmpty: '상자 열기 기록이 없습니다.' },
-  giftRandom: { cell: '보상칸', screen: '선물 상자를', miss: '보상 없음', top: '가장 큰 선물', spins: '실제 연 횟수 집계',   logEmpty: '상자 열기 기록이 없습니다.' }
+  giftDaily:  { cell: '보상칸', screen: '선물 상자를', miss: '보상 없음', top: '최고 보상', spins: '실제 연 횟수 집계',   logEmpty: '상자 열기 기록이 없습니다.' },
+  giftRandom: { cell: '보상칸', screen: '선물 상자를', miss: '보상 없음', top: '최고 보상', spins: '실제 연 횟수 집계',   logEmpty: '상자 열기 기록이 없습니다.' }
 };
 function rltW(k) { return RLT_WORDS[k] || RLT_WORDS.daily; }
 function rltCloneSlots(list) {
