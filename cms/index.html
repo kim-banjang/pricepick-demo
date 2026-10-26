@@ -1424,6 +1424,10 @@ window.CMS_FEATURES = {
               <span class="sb-item-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13"/><path d="M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7"/><path d="M7.5 8a2.5 2.5 0 0 1 0-5A4.8 8 0 0 1 12 8a4.8 8 0 0 1 4.5-5 2.5 2.5 0 0 1 0 5"/></svg></span>
               <span class="sb-item-lbl" id="nav-label-giftbox-random">랜덤 선물 상자 열기</span>
             </button>
+          <button class="sb-item" id="nav-streak-mission" data-label="연속구매 미션" onclick="go('streak-mission',this)">
+            <span class="sb-item-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg></span>
+            <span class="sb-item-lbl" id="nav-label-streak-mission">연속구매 미션</span>
+          </button>
         </div>
       </div>
 
@@ -2501,6 +2505,21 @@ window.CMS_FEATURES = {
       </div>
     </div>
 
+
+    <!-- ── 연속구매 미션 (조회 전용) ── -->
+    <div class="section" id="sec-streak-mission">
+      <div class="card">
+        <div class="card-header"><div><div class="card-title">현재 적용 중인 미션</div><div class="card-sub">조회 전용</div></div></div>
+        <table>
+          <thead><tr><th>단계</th><th>연속 구매 횟수</th><th>기간</th><th>보상</th></tr></thead>
+          <tbody id="sm-tbody"></tbody>
+        </table>
+      </div>
+      <div class="card">
+        <div class="policy-item"><div class="policy-label">연속 인정</div><div class="policy-value" id="sm-gap">—</div></div>
+        <div class="policy-item"><div class="policy-label">앱 홈 표시</div><div class="policy-value" id="sm-home">—</div></div>
+      </div>
+    </div>
 
     <!-- ── 기프티콘 발급 (신규) ── -->
     <div class="section" id="sec-gifticons">
@@ -5214,6 +5233,7 @@ const I18N = {
     'nav.jackpot-roulette': '잭팟 룰렛', 'page.jackpot-roulette.title': '잭팟 룰렛', 'page.jackpot-roulette.bc': '티켓 · 보상',
   'nav.giftbox-daily': '매일 선물 상자 열기', 'page.giftbox-daily.title': '매일 선물 상자 열기', 'page.giftbox-daily.bc': '티켓 · 보상',
   'nav.giftbox-random': '랜덤 선물 상자 열기', 'page.giftbox-random.title': '랜덤 선물 상자 열기', 'page.giftbox-random.bc': '티켓 · 보상',
+  'nav.streak-mission': '연속구매 미션', 'page.streak-mission.title': '연속구매 미션', 'page.streak-mission.bc': '티켓 · 보상',
     'nav.group.points': '포인트 관리',
     'nav.points': '포인트 내역', 'page.points.title': '포인트 내역', 'page.points.bc': '포인트 관리',
     'nav.point-attendance': '출석체크 설정', 'page.point-attendance.title': '출석체크 설정', 'page.point-attendance.bc': '포인트 관리',
@@ -5261,6 +5281,7 @@ function applyLang() {
     'nav-group-label-points': 'nav.group.points',
     'nav-label-points': 'nav.points',
     'nav-label-point-attendance': 'nav.point-attendance',
+    'nav-label-streak-mission': 'nav.streak-mission',
     'nav-label-point-policy': 'nav.point-policy',
     'nav-label-gifticons': 'nav.gifticons',
     'nav-label-gifticon-unused': 'nav.gifticon-unused',
@@ -5494,6 +5515,7 @@ function go(id, navEl) {
   if (id === 'jackpot-roulette' && window.rltLoad) window.rltLoad('jackpot');
   if (id === 'giftbox-daily' && window.rltLoad) window.rltLoad('giftDaily');
   if (id === 'giftbox-random' && window.rltLoad) window.rltLoad('giftRandom');
+  if (id === 'streak-mission' && window.smLoad) window.smLoad();
   if (window.aspShow) window.aspShow(id.indexOf('asp-') === 0 ? id.slice(4) : null);
   /* 원장을 통째로 읽는 화면은 처음 열 때 채운다(2026-10-16) — loadAllData 의 PP_LAZY 참고 */
   if (window.ppLazyLoad) window.ppLazyLoad(id);
@@ -6235,6 +6257,10 @@ window.giSaveImageEdit = giSaveImageEdit;
     "이벤트 수정":"Chỉnh sửa sự kiện","유형":"Loại",
     "이벤트가 저장되었습니다.":"Sự kiện đã được lưu.",
     "수동 티켓 지급 / 환수":"Cấp/Thu hồi vé thủ công",
+    "연속구매 미션":"Nhiệm vụ mua liên tiếp","현재 적용 중인 미션":"Nhiệm vụ đang áp dụng","조회 전용":"Chỉ xem",
+    "단계":"Bước","연속 구매 횟수":"Số lần mua liên tiếp","기간":"Thời gian","보상":"Phần thưởng",
+    "연속 인정":"Điều kiện tính liên tiếp","앱 홈 표시":"Hiển thị ở trang chủ app",
+    "앱에서 미션 값을 찾지 못했습니다.":"Không tìm thấy giá trị nhiệm vụ trong app.",
     "외부 ID":"ID bên ngoài","연결":"Liên kết","미연결":"Chưa liên kết","(닉네임 없음)":"(không có biệt danh)",
     "처리자":"Người xử lý","사유":"Lý do","자동":"Tự động","사유 (필수)":"Lý do (bắt buộc)",
     "상태 변경 이력":"Lịch sử thay đổi trạng thái","상태를 바꿀 때 사유 (필수)":"Lý do khi đổi trạng thái (bắt buộc)",
@@ -13314,6 +13340,46 @@ window.cbShowDetail = function(id) {
   document.getElementById('cb-user').textContent = d._userLabel || '—';
   document.getElementById('cb-at').textContent = ppDt(d.created_at) + ' ' + ppTm(d.created_at);
   openModal('m-clawback-detail');
+};
+
+/* ── sec-streak-mission (연속구매 미션 · 조회 전용) ──
+   연속구매 미션 값은 Firestore 설정이 없고 앱 코드(app/index.html)에 들어 있다:
+     SM2_STEP_TARGETS(연속 구매 횟수) · SM2_STEP_WINDOWS(기간, 일) · SM2_STEP_REWARDS(보상, 이벤트 티켓 장수),
+     연속 인정 = computePurchaseStreakInfo 의 「gapDays <= N」, 홈 카드 문구 = 「연속구매」 카드의 hmc-reward.
+   값을 여기 따로 적어 두면 앱과 어긋난다 — 같은 출처(앱 파일)를 읽어 그대로 보여준다.
+   못 찾은 값은 「—」로 둔다. 편집 기능은 없다. */
+window.smLoad = function() {
+  var tb = document.getElementById('sm-tbody');
+  if (!tb) return;
+  var dash = '<span style="color:var(--text-3)">—</span>';
+  tb.innerHTML = ppEmpty(4, '불러오는 중…');
+  var arr = function(src, name) {
+    var m = new RegExp('var ' + name + '\\s*=\\s*\\[([^\\]]*)\\]').exec(src);
+    if (!m) return null;
+    var a = m[1].split(',').map(function(x) { return parseInt(x, 10); });
+    return a.every(function(n) { return !isNaN(n); }) ? a : null;
+  };
+  fetch('/app/index.html', { cache: 'no-cache' }).then(function(r) {
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    return r.text();
+  }).then(function(src) {
+    var tg = arr(src, 'SM2_STEP_TARGETS'), wd = arr(src, 'SM2_STEP_WINDOWS'), rw = arr(src, 'SM2_STEP_REWARDS');
+    var n = tg ? tg.length : 0;
+    tb.innerHTML = n ? tg.map(function(t, i) {
+      return '<tr><td>' + (i + 1) + '단계</td><td>' + t + '회</td>'
+        + '<td>' + ((wd && wd[i] != null) ? wd[i] + '일 내' : dash) + '</td>'
+        + '<td>' + ((rw && rw[i] != null) ? '이벤트 티켓 ' + rw[i] + '장' : dash) + '</td></tr>';
+    }).join('') : ppEmpty(4, '앱에서 미션 값을 찾지 못했습니다.');
+    var g = /gapDays\s*<=\s*(\d+)/.exec(src);
+    document.getElementById('sm-gap').textContent = g ? ('확정 구매 사이 간격 ' + g[1] + '일 이내') : '—';
+    var h = /<div class="hmc-title">연속구매<\/div>\s*<div class="hmc-reward">([\s\S]*?)<\/div>/.exec(src);
+    document.getElementById('sm-home').textContent = h ? h[1].replace(/<[^>]+>/g, '').trim() : '—';
+  }).catch(function(e) {
+    console.error('smLoad', e);
+    tb.innerHTML = ppEmpty(4, '불러오지 못했습니다.');
+    document.getElementById('sm-gap').textContent = '—';
+    document.getElementById('sm-home').textContent = '—';
+  });
 };
 
 /* ── sec-point-attendance (출석체크 설정) ── settings/point_attendance(설정) + daily_visits(KPI) */
