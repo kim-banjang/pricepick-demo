@@ -4087,7 +4087,7 @@ window.CMS_FEATURES = {
       <div class="card">
         <div class="card-header"><div class="card-title">최근 포인트 이력</div></div>
         <table>
-          <thead><tr><th>닉네임 / 카카오톡 ID / 식별 아이디</th><th>유형</th><th>포인트</th><th>교환 후 잔액</th><th>일시</th></tr></thead>
+          <thead><tr><th>닉네임 / 카카오톡 ID / 식별 아이디</th><th>유형</th><th>사유</th><th>포인트</th><th>교환 후 잔액</th><th>처리자</th><th>일시</th></tr></thead>
           <tbody>
           </tbody>
         </table>
@@ -4287,6 +4287,11 @@ window.CMS_FEATURES = {
         <div style="margin-top:6px;font-size:11px;color:var(--text3)">랜덤 티켓: 구매 후 전환 대기일 수가 지나면 티켓으로 전환. 취소 시 자동 환수.</div>
       </div>
       <div class="form-group">
+        <label class="form-label">상태 변경 이력</label>
+        <input class="form-input" placeholder="상태를 바꿀 때 사유 (필수)" id="m-status-reason" style="margin-bottom:6px">
+        <div id="m-status-history" style="border:1px solid var(--border);border-radius:var(--r-sm);max-height:160px;overflow-y:auto"></div>
+      </div>
+      <div class="form-group">
         <label class="form-label">받은 알림</label>
         <div id="m-noti-received" style="border:1px solid var(--border);border-radius:var(--r-sm);max-height:200px;overflow-y:auto"></div>
         <div class="form-hint">수신 기록은 90일 보관 후 삭제됩니다.</div>
@@ -4296,6 +4301,7 @@ window.CMS_FEATURES = {
         <div style="display:flex;gap:8px">
           <select class="form-select" style="width:120px;" id="m-ticket-grade"><option value="bronze">티켓</option><option value="event">이벤트 티켓</option></select>
           <input class="form-input" placeholder="수량" type="number" min="1" style="width:100px" id="m-ticket-qty">
+          <input class="form-input" placeholder="사유 (필수)" style="flex:1;min-width:0" id="m-ticket-reason">
           <button class="btn btn-success" id="m-ticket-btn" onclick="dmMemberDetailGrant()">지급</button>
         </div>
         <div class="form-hint">지급 이력은 티켓 내역에 '관리자 지급'으로 기록됩니다.</div>
@@ -6227,6 +6233,9 @@ window.giSaveImageEdit = giSaveImageEdit;
     "이벤트 수정":"Chỉnh sửa sự kiện","유형":"Loại",
     "이벤트가 저장되었습니다.":"Sự kiện đã được lưu.",
     "수동 티켓 지급 / 환수":"Cấp/Thu hồi vé thủ công",
+    "처리자":"Người xử lý","사유":"Lý do","자동":"Tự động","사유 (필수)":"Lý do (bắt buộc)",
+    "상태 변경 이력":"Lịch sử thay đổi trạng thái","상태를 바꿀 때 사유 (필수)":"Lý do khi đổi trạng thái (bắt buộc)",
+    "상태 변경 이력이 없습니다.":"Không có lịch sử thay đổi trạng thái.",
     "수동 처리는 로그에 기록되며 되돌릴 수 없습니다.":"Xử lý thủ công được ghi vào nhật ký và không thể hoàn tác.",
     "대상 회원 닉네임 또는 식별번호":"Biệt danh hoặc mã định danh thành viên",
     "처리 유형":"Loại xử lý","티켓 등급":"Hạng vé","수량":"Số lượng","사유":"Lý do",
@@ -13364,19 +13373,37 @@ function ptReasonHtml(d) {
   if (cat === 'onboarding' && d.reason) return d.reason;
   return PT_CATEGORY_LABEL[cat] || (d.reason || cat || '—');
 }
+/* 사유 — 관리자가 손으로 지급·환수한 기록만 사유를 받는다(수동 지급 양식 필수 입력).
+   자동 적립(출석·초대 등)은 유형 칸이 곧 사유라 여기서는 비운다. */
+function ptManualReason(d) {
+  return (d.manual && d.reason) ? ppEsc(d.reason) : '—';
+}
+/* 처리자 — 수동 처리 때 저장한 관리자 이름. 자동 적립은 「자동」.
+   처리자 기록을 남기기 전(2026-10-26 이전)의 수동 기록은 이름이 없어 「—」로 둔다(지어내지 않는다). */
+function ppActorOf(d) {
+  if (d.admin_name || d.admin_username) return ppEsc(d.admin_name || d.admin_username);
+  return d.manual ? '—' : '자동';
+}
+/* 수동 처리 기록에 함께 남기는 처리자 — logAdmin 과 같은 출처(window.currentAdmin) */
+function ppAdminStamp() {
+  var a = window.currentAdmin || {};
+  return { admin_username: a.username || '', admin_name: a.displayName || a.username || '' };
+}
 var POINTS_CTRL = window.POINTS_CTRL = ppMakeListController(20, function(pageItems, state, totalPages) {
   var tbody = document.querySelector('#sec-points table tbody');
   var pag = document.getElementById('points-pagination');
   if (!tbody) return;
-  if (!pageItems.length) { tbody.innerHTML = ppEmpty(5,'조건에 맞는 포인트 이력이 없습니다.'); if (pag) pag.innerHTML = ''; return; }
+  if (!pageItems.length) { tbody.innerHTML = ppEmpty(7,'조건에 맞는 포인트 이력이 없습니다.'); if (pag) pag.innerHTML = ''; return; }
   tbody.innerHTML = pageItems.map(function(d) {
     var amt = ppPtAmtCms(d);
     var sign = amt >= 0 ? '+' : '';
     var color = amt >= 0 ? 'color:var(--success);font-weight:700' : 'color:var(--danger);font-weight:700';
     return '<tr><td>' + renderMemberIdentity(d._user, d.user_id, { maskKakao: true }) + '</td>'
       + '<td>' + ptReasonHtml(d) + '</td>'
+      + '<td>' + ptManualReason(d) + '</td>'
       + '<td style="text-align:center;' + color + '">' + sign + ppN(amt) + 'P</td>'
       + '<td style="text-align:center;font-weight:600">—</td>'
+      + '<td style="text-align:center">' + ppActorOf(d) + '</td>'
       + '<td style="color:var(--text-3);font-size:12px;text-align:center"><div style="font-weight:700;color:#333">' + ppDt(d.created_at) + '</div><div>' + ppTm(d.created_at) + '</div></td></tr>';
   }).join('');
   if (pag) pag.innerHTML = ppPaginationHtml('POINTS_CTRL', state.page, totalPages);
@@ -13412,7 +13439,7 @@ function loadPoints() {
       var items = snap.docs.map(function(doc) { return Object.assign({ _id: doc.id, _user: userMap[doc.data().user_id] }, doc.data()); });
       POINTS_CTRL.setRows(items);
     });
-  }).catch(function(e){ console.error('loadPoints',e); tbody.innerHTML = ppEmpty(5,'로드 오류'); });
+  }).catch(function(e){ console.error('loadPoints',e); tbody.innerHTML = ppEmpty(7,'로드 오류'); });
   /* 전체 원장 기준 통계 */
   db.collection('point_transactions').get().then(function(all){
     var earned=0, used=0, expired=0;
@@ -16412,9 +16439,9 @@ window.csvExportPoints = function() {
     return dmFetchUsersByIds(snap.docs.map(function(doc){ return doc.data().user_id; })).then(function(userMap) {
       var rows = snap.docs.map(function(doc) {
         var d = doc.data();
-        return [(userMap[d.user_id]||{}).nickname || d.user_id || '', d.type||'', ppPtAmtCms(d), ppDateInputValue(d.created_at&&d.created_at.toDate?d.created_at.toDate():new Date())];
+        return [(userMap[d.user_id]||{}).nickname || d.user_id || '', d.type||'', (d.manual && d.reason) || '', ppPtAmtCms(d), d.admin_name || d.admin_username || (d.manual ? '' : '자동'), ppDateInputValue(d.created_at&&d.created_at.toDate?d.created_at.toDate():new Date())];
       });
-      ppDownloadCsv('포인트내역_' + ppTodayStr() + '.csv', ['회원','유형','포인트','일시'], rows);
+      ppDownloadCsv('포인트내역_' + ppTodayStr() + '.csv', ['회원','유형','사유','포인트','처리자','일시'], rows);
       toast('CSV 내보내기 완료');
     });
   }).catch(function(e){ toast('내보내기 실패: ' + (e.message||e)); });
@@ -17283,7 +17310,7 @@ function tmGrantTickets(userId, grade, qty, reason) {
   for (var i = 0; i < qty; i++) {
     ops.push(function(b) {
       b.set(db.collection('user_tickets').doc(), { user_id: userId, grade: grade, status: 'active', postback_id: null, earned_at: now, expires_at: expiresAt, manual: true, reason: reason });
-      b.set(db.collection('ticket_transactions').doc(), { user_id: userId, ticket_grade: grade, type: 'earn', postback_id: null, created_at: now, manual: true, reason: reason });
+      b.set(db.collection('ticket_transactions').doc(), Object.assign({ user_id: userId, ticket_grade: grade, type: 'earn', postback_id: null, created_at: now, manual: true, reason: reason }, ppAdminStamp()));
     });
   }
   return tmCommitOps(ops).then(function() {
@@ -17358,7 +17385,11 @@ window.openMemberDetail = function(id) {
         + '<span style="display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:5px;background:#FEE500;font-size:11px;font-weight:700;">K</span>'
         + '<span>' + (u.kakao_login_id || '(카카오 로그인ID 미등록)') + '</span></div>'
       : '<span style="font-size:12px;color:var(--text-3);">게스트(비연동)</span>';
+    document.getElementById('m-status').dataset.orig = document.getElementById('m-status').value;
+    document.getElementById('m-status-reason').value = '';
+    document.getElementById('m-ticket-reason').value = '';
     openModal('m-member');
+    dmLoadStatusHistory(id);
     if (window.notiLoadReceived) notiLoadReceived(id);
     return dmLoadMemberDetailTickets(id);
   }).then(function(c) {
@@ -17390,10 +17421,13 @@ window.dmMemberDetailGrant = function() {
   var grade = document.getElementById('m-ticket-grade').value;
   var qty = parseInt(document.getElementById('m-ticket-qty').value, 10) || 0;
   if (qty < 1) { dmShowToast('수량을 입력하세요.', true); return; }
-  tmGrantTickets(userId, grade, qty, '관리자 지급(회원 상세)').then(function(result) {
+  var reason = (document.getElementById('m-ticket-reason').value || '').trim();
+  if (!reason) { dmShowToast('사유를 입력하세요.', true); return; }
+  tmGrantTickets(userId, grade, qty, reason).then(function(result) {
     dmShowToast(result.message);
     document.getElementById('m-ticket-qty').value = '';
-    logAdmin('수동 티켓 지급(회원 상세): ' + userId + ' · ' + (TM_GRADE_KO[grade] || grade) + ' · ' + result.count + '장');
+    document.getElementById('m-ticket-reason').value = '';
+    logAdmin('수동 티켓 지급(회원 상세): ' + userId + ' · ' + (TM_GRADE_KO[grade] || grade) + ' · ' + result.count + '장 · 사유: ' + reason);
     if (typeof loadMemberTicketCounts === 'function') loadMemberTicketCounts([userId]);
     return dmLoadMemberDetailTickets(userId);
   }).then(function(c) {
@@ -17435,14 +17469,55 @@ function cmsBindAllNickInputs() {
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', cmsBindAllNickInputs);
 else cmsBindAllNickInputs();
 
+/* 회원 상태 변경 이력 — admin_logs 에 대상 회원(target_user_id)을 달아 남기고, 회원 상세에서 그 회원 것만 읽는다.
+   admin_logs 는 생성만 되고 고칠 수 없는 감사 기록이라(firestore.rules) 이력으로 그대로 쓴다. */
+function dmRecordStatusChange(userId, fromKo, toKo, reason) {
+  var a = window.currentAdmin || {};
+  return db.collection('admin_logs').add({
+    admin_username: a.username || '',
+    admin_name: a.displayName || a.username || '',
+    action: '회원 상태 변경: ' + userId + ' · ' + fromKo + ' → ' + toKo + ' · 사유: ' + reason,
+    kind: 'member_status', target_user_id: userId, from_status: fromKo, to_status: toKo, reason: reason,
+    ip: '—',
+    at: firebase.firestore.FieldValue.serverTimestamp()
+  });
+}
+function dmLoadStatusHistory(userId) {
+  var box = document.getElementById('m-status-history');
+  if (!box) return;
+  var empty = function(t){ return '<div style="padding:12px;text-align:center;color:var(--text-3);font-size:12px">' + t + '</div>'; };
+  box.innerHTML = empty('불러오는 중…');
+  db.collection('admin_logs').where('target_user_id', '==', userId).get().then(function(snap) {
+    var rows = snap.docs.map(function(d){ return d.data(); }).filter(function(d){ return d.kind === 'member_status'; })
+      .sort(function(x, y){ return ((y.at && y.at.toMillis) ? y.at.toMillis() : 0) - ((x.at && x.at.toMillis) ? x.at.toMillis() : 0); });
+    box.innerHTML = rows.length ? rows.map(function(r) {
+      return '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 10px;border-bottom:1px solid var(--border)">'
+        + '<div style="min-width:0"><div style="font-weight:600;font-size:12px">' + ppEsc(r.from_status || '—') + ' → ' + ppEsc(r.to_status || '—') + '</div>'
+        + '<div style="font-size:11px;color:var(--text-3)">' + ppEsc(r.reason || '—') + '</div></div>'
+        + '<div style="text-align:right;flex-shrink:0;font-size:11px;color:var(--text-3)"><div style="font-weight:600;color:var(--text-2)">' + ppEsc(r.admin_name || r.admin_username || '—') + '</div>'
+        + '<div>' + ppDt(r.at) + ' ' + ppTm(r.at) + '</div></div></div>';
+    }).join('') : empty('상태 변경 이력이 없습니다.');
+  }).catch(function(e) {
+    box.innerHTML = empty('불러오지 못했습니다.');
+    console.error('dmLoadStatusHistory', e);
+  });
+}
+
 window.dmMemberDetailSave = function() {
   var userId = document.getElementById('m-member-id').value;
   if (!userId) return;
   var nickname = cmsCleanNick(document.getElementById('m-name').value);
   document.getElementById('m-name').value = nickname;
   if (!nickname) { dmShowToast('닉네임을 입력하세요.', true); return; }
-  var statusEn = MEMBER_STATUS_KO_TO_EN[document.getElementById('m-status').value] || 'active';
+  var statusSel = document.getElementById('m-status');
+  var statusEn = MEMBER_STATUS_KO_TO_EN[statusSel.value] || 'active';
+  var fromKo = statusSel.dataset.orig || '', toKo = statusSel.value;
+  var changed = fromKo && fromKo !== toKo;
+  var statusReason = (document.getElementById('m-status-reason').value || '').trim();
+  if (changed && !statusReason) { dmShowToast('상태를 바꿀 때는 사유를 입력하세요.', true); return; }
   db.collection('users').doc(userId).set({ nickname: nickname, status: statusEn, updated_at: FS.Timestamp.now() }, { merge: true }).then(function() {
+    if (changed) return dmRecordStatusChange(userId, fromKo, toKo, statusReason);
+  }).then(function() {
     if (window.ppAllDrop) ppAllDrop('users');   /* 바뀐 값을 다시 읽게 한다 */
     dmShowToast('회원 정보가 저장되었습니다.');
     closeModal('m-member');
@@ -17498,7 +17573,7 @@ window.pmSubmit = function() {
 function pmGrantPoints(userId, amount, reason) {
   var now = FS.Timestamp.now();
   var b = db.batch();
-  b.set(db.collection('point_transactions').doc(), { user_id: userId, amount: amount, type: 'earn', category: 'admin_grant', reason: reason, manual: true, created_at: now });
+  b.set(db.collection('point_transactions').doc(), Object.assign({ user_id: userId, amount: amount, type: 'earn', category: 'admin_grant', reason: reason, manual: true, created_at: now }, ppAdminStamp()));
   b.set(db.collection('user_points').doc(userId), { user_id: userId, balance: firebase.firestore.FieldValue.increment(amount), updated_at: now }, { merge: true });
   return b.commit().then(function() { return { amount: amount }; });
 }
@@ -17512,7 +17587,7 @@ function pmRevokePoints(userId, amount, reason) {
     if (actual <= 0) return { amount: 0 };
     var now = FS.Timestamp.now();
     var b = db.batch();
-    b.set(db.collection('point_transactions').doc(), { user_id: userId, amount: -actual, type: 'spend', category: 'admin_revoke', reason: reason, manual: true, created_at: now });
+    b.set(db.collection('point_transactions').doc(), Object.assign({ user_id: userId, amount: -actual, type: 'spend', category: 'admin_revoke', reason: reason, manual: true, created_at: now }, ppAdminStamp()));
     b.set(db.collection('user_points').doc(userId), { user_id: userId, balance: firebase.firestore.FieldValue.increment(-actual), updated_at: now }, { merge: true });
     return b.commit().then(function() { return { amount: actual }; });
   });
