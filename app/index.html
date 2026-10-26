@@ -11556,6 +11556,7 @@ window.PP_FEATURES = {
               </div>
             </div>
           </div>
+          <div class="C-tip" id="mall12-app" style="display:none"></div>
           <div class="C-tip" id="mall12-tip">쿠팡 앱이 이미 열려 있다면 종료 후 바로가기를 눌러주세요. 적립 추적이 정확해져요.</div>
           <div class="C-notice" id="mall12-notice" style="display:none"></div>
         </div>
@@ -17061,6 +17062,10 @@ Object.assign(KO2VI, {
     "친구의 초대코드를 입력하면": "Nhập mã mời của bạn bè",
     "나와 친구 모두 500P를 받을 수 있어요": "Cả tôi và bạn ấy đều nhận được 500P",
     "친구가 첫 구매를 완료하면 지급": "Chi trả khi bạn bè hoàn tất mua hàng lần đầu",
+    "앱 구매도 적립돼요": "Mua trên app cũng được tích lũy",
+    "앱에서 구매하면 적립되지 않아요 · 웹에서 구매해 주세요": "Mua trên app sẽ không được tích lũy · Vui lòng mua trên web",
+    "안드로이드 앱 구매만 적립돼요": "Chỉ mua trên app Android được tích lũy",
+    "iOS 앱 구매만 적립돼요": "Chỉ mua trên app iOS được tích lũy",
     "초대코드": "Mã mời",
     "등록하기": "Đăng ký",
     "이미 초대코드를 입력했어요": "Bạn đã nhập mã mời rồi",
@@ -18054,6 +18059,9 @@ function ppLoadMalls() {
         commPct: rate,
         returnDay: (typeof a.return_day === 'number') ? a.return_day : null,
         payStd: a.commission_payment_standard || '',
+        /* 앱 구매 적립 여부 — CMS 「티켓 적립 설정」 앱(AOS·iOS) 칸과 같은 값(app_android_yn · app_ios_yn) */
+        appAos: a.app_android_yn || '',
+        appIos: a.app_ios_yn || '',
         /* 링크프라이스가 내려준 기본링크 그대로. 우리가 조립하지 않는다. */
         clickUrl: a.click_url || '',
         notice: ppOfferwallClean(a.notice),
@@ -18217,6 +18225,22 @@ function ppFillMallDetail(domain) {
     var head = '구매하신 내역은 제휴몰을 통해 <b>자동으로 감지</b>돼요.<br>'
       + '지금 앱에서 따로 입력하실 건 없어요.<br>구매가 확인되면 <b>적립 대기(가지급)</b> 티켓이 생겨요.';
     shopTxt.innerHTML = confirmKo ? (head + '<br>' + confirmKo) : head;
+  }
+
+  /* 앱 구매 지원 여부 — CMS 앱(AOS·iOS) 값(Y/N)이 둘 다 있을 때만 띄운다. 값이 없으면 지어내지 않고 감춘다.
+     쿠팡은 직접 제휴라 이 값이 없다. */
+  var appEl = document.getElementById('mall12-app');
+  if (appEl) {
+    var aos = m && !isCoupang ? String(m.appAos || '').toUpperCase() : '';
+    var ios = m && !isCoupang ? String(m.appIos || '').toUpperCase() : '';
+    var appTxt = '';
+    if (/^[YN]$/.test(aos) && /^[YN]$/.test(ios)) {
+      appTxt = (aos === 'Y' && ios === 'Y') ? '앱 구매도 적립돼요'
+        : (aos === 'N' && ios === 'N') ? '앱에서 구매하면 적립되지 않아요 · 웹에서 구매해 주세요'
+        : (aos === 'Y') ? '안드로이드 앱 구매만 적립돼요' : 'iOS 앱 구매만 적립돼요';
+    }
+    appEl.textContent = appTxt;
+    appEl.style.display = appTxt ? '' : 'none';
   }
 
   if (isCoupang || !m) { ppRenumberSteps(); return; }
