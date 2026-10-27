@@ -9415,7 +9415,6 @@ window.PP_FEATURES = {
               <div style="font-size:var(--fs-caption);font-weight:700;color:var(--main);margin-bottom:10px;letter-spacing:0.3px;">카카오 연동 보상 (지금 지급)</div>
               <div style="display:flex;flex-direction:column;gap:8px;">
                 <div style="display:flex;align-items:center;gap:8px;font-size:var(--fs-caption);color:var(--text2);"><span style="color:var(--green);display:inline-flex;flex-shrink:0;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5 10 17.5 19 7"/></svg></span> 이벤트 티켓 <b style="color:var(--text1);">1장</b> 즉시 지급</div>
-                <div style="display:flex;align-items:center;gap:8px;font-size:var(--fs-caption);color:var(--text2);"><span style="color:var(--green);display:inline-flex;flex-shrink:0;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5 10 17.5 19 7"/></svg></span> 가입 축하 <b style="color:var(--text1);">20P</b> 즉시 지급</div>
                 <div style="display:flex;align-items:center;gap:8px;font-size:var(--fs-caption);color:var(--text2);"><span style="color:var(--green);display:inline-flex;flex-shrink:0;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5 10 17.5 19 7"/></svg></span> 티켓·포인트·내역 영구 보관 (재설치·기기변경 안전)</div>
               </div>
             </div>
@@ -11217,6 +11216,14 @@ window.PP_FEATURES = {
           <!-- 도움 / 약관 -->
           <div class="my-section-title">도움말</div>
           <div class="my-section">
+            <div class="my-row" data-jump="pw-23">
+              <div class="my-row-ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg></div>
+              <div class="my-row-body">
+                <div class="my-row-name">쇼핑 적립 방법</div>
+              </div>
+              <div class="my-row-right">›</div>
+            </div>
+
             <div class="my-row" data-jump="pw-30-cs">
               <div class="my-row-ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
               <div class="my-row-body">
@@ -17042,7 +17049,7 @@ function csSubmitInquiry(btn) {
   Object.assign(KO2VI, {"티켓 10장": "10 vé", "티켓은 구매 확정 후 지급(카카오톡 연동 D+7 / 미연동 D+30) · 이벤트 티켓·축하 포인트는 카카오 연동 시 지급": "Vé cấp sau xác nhận mua (liên kết KakaoTalk D+7 / chưa liên kết D+30) · vé sự kiện·điểm chúc mừng cấp khi liên kết Kakao"});
   Object.assign(KO2VI, {"보유한 포인트보다 많아요": "Nhiều hơn số điểm đang có"});
   /* 2026-10-27 데모 미반영 수정분 */
-  Object.assign(KO2VI, {"쿠팡 · 구매 확정 후": "Coupang · sau khi xác nhận mua", "링크프라이스 제휴몰": "Sàn liên kết LinkPrice", "익익월 6일 확정 후": "Sau khi chốt ngày 6 của tháng thứ hai sau đó", "D+30 후 사용": "Dùng sau D+30", "링크프라이스 제휴몰은 구매한 달의 익익월 6일에 확정돼요.": "Sàn liên kết LinkPrice được chốt vào ngày 6 của tháng thứ hai sau tháng mua.", "카카오 연동 후 교환할 수 있어요.": "Có thể đổi sau khi liên kết Kakao.", "초대코드를 다시 확인해 주세요.": "Vui lòng kiểm tra lại mã mời.", "내 초대코드는 사용할 수 없어요.": "Không thể dùng mã mời của chính mình.", "잠시 후 다시 시도해 주세요.": "Vui lòng thử lại sau giây lát."});
+  Object.assign(KO2VI, {"쇼핑 적립 방법": "Cách tích lũy khi mua sắm", "신규": "Mới", "가입 축하 20P를 받았어요": "Đã nhận 20P chúc mừng đăng ký", "쿠팡 · 구매 확정 후": "Coupang · sau khi xác nhận mua", "링크프라이스 제휴몰": "Sàn liên kết LinkPrice", "익익월 6일 확정 후": "Sau khi chốt ngày 6 của tháng thứ hai sau đó", "D+30 후 사용": "Dùng sau D+30", "링크프라이스 제휴몰은 구매한 달의 익익월 6일에 확정돼요.": "Sàn liên kết LinkPrice được chốt vào ngày 6 của tháng thứ hai sau tháng mua.", "카카오 연동 후 교환할 수 있어요.": "Có thể đổi sau khi liên kết Kakao.", "초대코드를 다시 확인해 주세요.": "Vui lòng kiểm tra lại mã mời.", "내 초대코드는 사용할 수 없어요.": "Không thể dùng mã mời của chính mình.", "잠시 후 다시 시도해 주세요.": "Vui lòng thử lại sau giây lát."});
   Object.assign(KO2VI, {"쿠팡은 카카오톡 연동 시 7일, 미연동 시 30일이에요.": "Coupang là 7 ngày nếu đã liên kết KakaoTalk, 30 ngày nếu chưa.", "다른 쇼핑몰은 쇼핑몰마다 정해진 대기 기간을 따라요.": "Các sàn khác theo thời gian chờ được đặt riêng cho từng sàn.", "카카오 연동하러 가기 →": "Đi liên kết Kakao →"});
   /* 데모 전용 화면 명시 문구 (2026.07.10 — 실제 서비스에 없는 화면 고지) */
   Object.assign(KO2VI, {
@@ -19067,6 +19074,8 @@ function checkExistingUser() {
   db.collection('users').doc(PP.uid).get().then(function(doc) {
     if (doc.exists) {
       PP.user = doc.data();
+      /* 최근 접속 — CMS 회원 목록 「최근 접속」 (검수 10-05 04-12) */
+      db.collection('users').doc(PP.uid).set({ last_seen_at: FS.FieldValue.serverTimestamp() }, { merge: true }).catch(function () {});
       var cs = ppActiveScreen();
       if (!cs || cs === 'pw-00' || cs === 'pw-01' || cs === 'pw-01b' || cs === 'pw-02-nick') {
         window.showScreen('pw-10', false);
@@ -19220,6 +19229,8 @@ function bindNickname() {
     }, { merge: true });
     batch.commit().then(function() {
       PP.user = { nickname: nickname, linked_kakao: false, created_at: new Date(), nickname_auto: nickname === window.PP_NICK_SUGGESTED };
+      /* 가입 축하 포인트는 가입 시점에 준다 — 미연동 회원도 받는다. 이벤트 티켓은 카카오 연동 시 (검수 10-02 20, 2026-10-27 확정) */
+      if (window.ppGrantPoints) window.ppGrantPoints(20, '가입 축하', 'onboarding').then(function () { showToast('가입 축하 20P를 받았어요'); });
       btn.textContent = prevText;
       window.showScreen('pw-10');
       ppTryAutoRedeemPendingInvite();
@@ -20567,7 +20578,6 @@ function bindKakaoComplete() {
          실제 Kakao SDK 없이는 "기존 데이터 인식"을 구현할 수 없어 정적 미리보기로 유지. */
       if (sid === 'pw-02-K-new') {
         if (window.ppGrantEventTicket) window.ppGrantEventTicket(1, '카카오 신규 연동 보상', 'kakao_link');
-        if (window.ppGrantPoints) window.ppGrantPoints(20, '카카오 연동 가입 축하', 'onboarding');
       }
     }, true);
   });
@@ -22487,7 +22497,10 @@ function renderAppNotices() {
       var body = (n.content || '').replace(/<[^>]+>/g, '');
       return '<div data-nt="' + i + '" style="padding:16px;border-bottom:1px solid var(--border);cursor:pointer;">'
         + '<div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;">'
-        + '<span style="font-size:var(--fs-caption);color:var(--text3);">' + ppFmt(d) + '</span></div>'
+        + '<span style="font-size:var(--fs-caption);color:var(--text3);">' + ppFmt(d) + '</span>'
+        /* 게시일로부터 7일간 「신규」 (검수 10-05 05-24, 2026-10-27 확정) */
+        + (d && (Date.now() - d.getTime()) < 7 * 86400000 ? '<span style="font-size:10px;font-weight:800;color:#fff;background:var(--main);border-radius:99px;padding:1px 7px;">신규</span>' : '')
+        + '</div>'
         + '<div style="font-size:var(--fs-body);font-weight:700;color:var(--text1);">' + ppEsc(n.title || '공지') + '</div>'
         + '<div style="font-size:var(--fs-caption);color:var(--text2);margin-top:4px;">' + ppEsc(body.slice(0, 40)) + (body.length > 40 ? '…' : '') + '</div></div>';
     }).join('');

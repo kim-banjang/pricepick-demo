@@ -755,13 +755,14 @@ textarea.form-input{resize:vertical;min-height:80px;height:auto;}
 #sec-members table th:nth-child(1){width:120px;}  /* 닉네임 */
 #sec-members table th:nth-child(2){width:160px;}  /* 가입 유형 */
 #sec-members table th:nth-child(3){width:90px;}   /* 가입일 */
-#sec-members table th:nth-child(4){width:70px;}   /* 랜덤 티켓 */
-#sec-members table th:nth-child(5){width:90px;}   /* 전환예정 */
-#sec-members table th:nth-child(6){width:160px;}  /* 등급 티켓 */
-#sec-members table th:nth-child(7){width:70px;}   /* 이벤트 티켓 */
-#sec-members table th:nth-child(8){width:90px;}   /* 마케팅 수신 */
-#sec-members table th:nth-child(9){width:60px;}   /* 상태 */
-#sec-members table th:nth-child(10){width:60px;}  /* 관리 */
+#sec-members table th:nth-child(4){width:90px;}   /* 최근 접속 */
+#sec-members table th:nth-child(5){width:70px;}   /* 랜덤 티켓 */
+#sec-members table th:nth-child(6){width:90px;}   /* 전환예정 */
+#sec-members table th:nth-child(7){width:160px;}  /* 등급 티켓 */
+#sec-members table th:nth-child(8){width:70px;}   /* 이벤트 티켓 */
+#sec-members table th:nth-child(9){width:90px;}   /* 마케팅 수신 */
+#sec-members table th:nth-child(10){width:60px;}  /* 상태 */
+#sec-members table th:nth-child(11){width:60px;}  /* 관리 */
 #sec-members table td,#sec-members table th{vertical-align:middle;}
 #sec-members table td{white-space:normal;overflow:hidden;text-overflow:ellipsis;}
 
@@ -1700,9 +1701,8 @@ window.CMS_FEATURES = {
     <!-- ── 대시보드 ── -->
     <div class="section active" id="sec-dashboard">
       <div class="stats-grid">
-        <div class="stat-card green"><div class="stat-label">순수익 (추정)</div><div class="stat-value" id="kpi-net">—</div><div class="stat-change neutral">실집계</div></div>
+        <div class="stat-card green"><div class="stat-label">순수익 (추정)</div><div class="stat-value" id="kpi-net">—</div><div class="stat-change neutral">제휴 수수료 − 티켓 적립 비용</div></div>
         <div class="stat-card purple"><div class="stat-label">제휴 수수료 매출</div><div class="stat-value" id="kpi-commission">—</div><div class="stat-change neutral">포스트백 확정 기준</div></div>
-        <div class="stat-card info"><div class="stat-label">기프티콘 판매 수익</div><div class="stat-value" id="kpi-gifticon-rev">—</div><div class="stat-change neutral">구매 마진</div></div>
         <div class="stat-card amber"><div class="stat-label">티켓 적립 비용</div><div class="stat-value" id="kpi-ticket-cost">—</div><div class="stat-change neutral">차감 항목</div></div>
       </div>
       <div class="stats-grid">
@@ -1787,7 +1787,7 @@ window.CMS_FEATURES = {
       </div>
       <div class="card">
         <table>
-          <thead><tr><th>닉네임(카카오ID)</th><th>연동 상태</th><th>가입일</th><th>랜덤 티켓</th><th>전환예정</th><th>티켓</th><th>이벤트 티켓</th><th>마케팅 수신</th><th>상태</th><th>관리</th></tr></thead>
+          <thead><tr><th>닉네임(카카오ID)</th><th>연동 상태</th><th>가입일</th><th>최근 접속</th><th>랜덤 티켓</th><th>전환예정</th><th>티켓</th><th>이벤트 티켓</th><th>마케팅 수신</th><th>상태</th><th>관리</th></tr></thead>
           <tbody id="members-tbody">
           </tbody>
         </table>
@@ -3315,7 +3315,7 @@ window.CMS_FEATURES = {
             </div>
             <div class="card-header" style="margin-top:18px"><div class="card-title">온보딩 보상 <span style="font-size:11px;color:var(--success);font-weight:600">정책 확정</span></div></div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
-              <div class="policy-item"><div class="policy-label">가입 즉시</div><div class="policy-value">이벤트 티켓 1장 + 20P</div><div class="policy-desc">어뷰징 방지 — 티켓·이벤트 티켓 보너스는 카카오 연동 후 지급.</div></div>
+              <div class="policy-item"><div class="policy-label">가입 완료 시</div><div class="policy-value">20P</div><div class="policy-desc">닉네임 가입 즉시 지급 — 카카오 미연동 회원 포함.</div></div> <div class="policy-item"><div class="policy-label">카카오 연동 시</div><div class="policy-value">이벤트 티켓 1장</div><div class="policy-desc">어뷰징 방지 — 이벤트 티켓은 카카오 연동 후 지급.</div></div>
               <div class="policy-item"><div class="policy-label">첫 쿠팡 구경하기</div><div class="policy-value">10P</div><div class="policy-desc">최초 쿠팡 경유 방문 시 지급.</div></div>
               <div class="policy-item"><div class="policy-label">첫 경유 구매 (가입 7일 내)</div><div class="policy-value">티켓 10장</div><div class="policy-desc">구매 확정 후 지급 (쿠팡 기준 카카오톡 연동 D+7 / 미연동 D+30 · 취소 먹튀 방지).</div></div>
               <div class="policy-item"><div class="policy-label">친구초대</div><div class="policy-value">양쪽 각 500P</div><div class="policy-desc">피초대자 첫 구매 성사 시 양쪽 지급.</div></div>
@@ -4309,7 +4309,7 @@ window.CMS_FEATURES = {
           <label class="form-label">연동 계정</label>
           <div id="m-accounts" style="display:flex;flex-direction:column;gap:6px;margin-top:4px;"></div>
         </div>
-        <div class="form-group"><label class="form-label">상태</label><select class="form-select" id="m-status"><option>정상</option><option>차단</option><option>탈퇴</option></select></div>
+        <div class="form-group"><label class="form-label">상태</label><select class="form-select" id="m-status" onchange="dmBlockPeriodToggle()"><option>정상</option><option>차단</option><option>탈퇴</option></select></div>
         <div class="form-group"><label class="form-label">가입 유형</label><input class="form-input" id="m-join-type" disabled></div>
         <div class="form-group"><label class="form-label">식별 아이디</label><input class="form-input" id="m-doc-id" disabled style="font-family:monospace;font-size:12px;"></div>
       </div>
@@ -4341,6 +4341,8 @@ window.CMS_FEATURES = {
       <div class="form-group">
         <label class="form-label">상태 변경 이력</label>
         <input class="form-input" placeholder="상태를 바꿀 때 사유 (필수)" id="m-status-reason" style="margin-bottom:6px">
+        <select class="form-select" id="m-block-period" style="margin-bottom:6px;display:none"><option value="permanent">차단 기간 · 영구</option><option value="7">차단 기간 · 7일</option><option value="30">차단 기간 · 30일</option></select>
+        <div id="m-block-info" style="display:none;margin-bottom:6px;padding:8px 10px;border-radius:var(--r-sm);background:var(--danger-soft,#fef2f2);font-size:12px;color:var(--danger,#dc2626)"></div>
         <div id="m-status-history" style="border:1px solid var(--border);border-radius:var(--r-sm);max-height:160px;overflow-y:auto"></div>
       </div>
       <div class="form-group">
@@ -4349,12 +4351,12 @@ window.CMS_FEATURES = {
         <div class="form-hint">수신 기록은 90일 보관 후 삭제됩니다.</div>
       </div>
       <div class="form-group" id="m-ticket-section">
-        <label class="form-label">티켓 수동 지급</label>
+        <label class="form-label">티켓 수동 지급 · 차감</label>
         <div style="display:flex;gap:8px">
           <select class="form-select" style="width:120px;" id="m-ticket-grade"><option value="bronze">티켓</option><option value="event">이벤트 티켓</option></select>
           <input class="form-input" placeholder="수량" type="number" min="1" style="width:100px" id="m-ticket-qty">
           <input class="form-input" placeholder="사유 (필수)" style="flex:1;min-width:0" id="m-ticket-reason">
-          <button class="btn btn-success" id="m-ticket-btn" onclick="dmMemberDetailGrant()">지급</button>
+          <button class="btn btn-success" id="m-ticket-btn" onclick="dmMemberDetailGrant()">지급</button> <button class="btn btn-ghost" onclick="dmMemberDetailRevoke()">차감</button>
         </div>
         <div class="form-hint">지급 이력은 티켓 내역에 '관리자 지급'으로 기록됩니다.</div>
       </div>
@@ -8177,8 +8179,9 @@ function ppAllWhere(col, field, value) {
 function setKpi(id, txt){ var el=document.getElementById(id); if(el) el.textContent=txt; }
 function kpiWon(n){ return (Math.round(n)||0).toLocaleString('ko-KR')+'원'; }
 function recompNet(){
-  if (window.__ppCommission==null || window.__ppGifticonRev==null || window.__ppTicketCost==null) return;
-  setKpi('kpi-net', kpiWon(window.__ppCommission + window.__ppGifticonRev - window.__ppTicketCost));
+  /* 기프티콘 판매 수익은 순수익에 넣지 않는다 — 기프티콘 구매는 회원이 보유 티켓을 쓰는 것이라 수익이 아니다 (검수 10-05 04-01) */
+  if (window.__ppCommission==null || window.__ppTicketCost==null) return;
+  setKpi('kpi-net', kpiWon(window.__ppCommission - window.__ppTicketCost));
 }
 /* 대시보드의 티켓 숫자 셋 — 발행 티켓(적립 건수) · 티켓 적립 비용 · 적립 TOP 3 (2026-10-16)
    예전엔 셋 다 티켓 원장의 적립 기록을 통째로 읽어 셌다(티켓 1장 = 1건이라 수만 건). 이제 개수만 묻는다.
@@ -8859,7 +8862,7 @@ var MEM_CTRL = window.MEM_CTRL = ppMakeListController(20, function(pageItems, st
   var tbody = document.getElementById('members-tbody');
   var pag = document.getElementById('members-pagination');
   if (!tbody) return;
-  if (!pageItems.length) { tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;padding:32px;color:var(--text-3);">조건에 맞는 회원이 없습니다.</td></tr>'; if (pag) pag.innerHTML = ''; return; }
+  if (!pageItems.length) { tbody.innerHTML = '<tr><td colspan="11" style="text-align:center;padding:32px;color:var(--text-3);">조건에 맞는 회원이 없습니다.</td></tr>'; if (pag) pag.innerHTML = ''; return; }
   tbody.innerHTML = pageItems.map(function(u) {
     var kakaoType = u.linked_kakao
       ? '<span class="member-type-kakao">카카오 연동</span>'
@@ -8869,6 +8872,8 @@ var MEM_CTRL = window.MEM_CTRL = ppMakeListController(20, function(pageItems, st
       + '<td>' + renderMemberIdentityListOnly(u, u._id, { maskKakao: true }) + '</td>'
       + '<td>' + kakaoType + '</td>'
       + '<td style="text-align:center;white-space:nowrap"><div style="font-weight:700;">' + ppDt(u.created_at) + '</div><div style="color:var(--text-3);font-size:11px">' + ppTm(u.created_at) + '</div></td>'
+      /* 최근 접속 — 앱이 열릴 때 남기는 시각, 없으면 「-」 (검수 10-05 04-12) */
+      + '<td style="text-align:center;white-space:nowrap">' + (u.last_seen_at ? '<div style="font-weight:700;">' + ppDt(u.last_seen_at) + '</div><div style="color:var(--text-3);font-size:11px">' + ppTm(u.last_seen_at) + '</div>' : '-') + '</td>'
       + '<td style="text-align:center"><span id="mem-rand-' + u._id + '">…</span></td>'
       + '<td style="text-align:center"><span id="mem-upcoming-' + u._id + '" style="font-size:11px;color:var(--text-3)">…</span></td>'
       + '<td style="text-align:center"><span id="mem-grade-' + u._id + '">…</span></td>'
@@ -17561,6 +17566,17 @@ window.openMemberDetail = function(id) {
     document.getElementById('m-status').dataset.orig = document.getElementById('m-status').value;
     document.getElementById('m-status-reason').value = '';
     document.getElementById('m-ticket-reason').value = '';
+    /* 차단 중이면 사유·기간을 보여 준다 (검수 10-02 03) */
+    var bi = document.getElementById('m-block-info');
+    if (bi) {
+      if (u.status === 'blocked' && (u.block_reason || u.block_period)) {
+        var per = u.block_period === 'permanent' || !u.block_period ? '영구' : (u.block_period + '일' + (u.blocked_until ? ' (' + ppDt(u.blocked_until) + '까지)' : ''));
+        bi.textContent = '차단 사유: ' + (u.block_reason || '—') + ' · 차단 기간: ' + per;
+        bi.style.display = '';
+      } else { bi.textContent = ''; bi.style.display = 'none'; }
+    }
+    var bp = document.getElementById('m-block-period'); if (bp) { bp.value = u.block_period || 'permanent'; }
+    dmBlockPeriodToggle();
     openModal('m-member');
     dmLoadStatusHistory(id);
     if (window.notiLoadReceived) notiLoadReceived(id);
@@ -17615,6 +17631,25 @@ window.dmMemberDetailGrant = function() {
   }).catch(function(e) {
     dmShowToast('지급 실패: ' + (e.message||e), true);
   });
+};
+
+/* 회원 상세 티켓 차감 — 티켓 내역에 「관리자 환수」로 남는다 (검수 10-05 04-11) */
+window.dmMemberDetailRevoke = function() {
+  var userId = document.getElementById('m-member-id').value;
+  if (!userId) return;
+  var grade = document.getElementById('m-ticket-grade').value;
+  var qty = parseInt(document.getElementById('m-ticket-qty').value, 10) || 0;
+  if (qty < 1) { dmShowToast('수량을 입력하세요.', true); return; }
+  var reason = (document.getElementById('m-ticket-reason').value || '').trim();
+  if (!reason) { dmShowToast('사유를 입력하세요.', true); return; }
+  tmRevokeTickets(userId, grade, qty, reason).then(function(result) {
+    dmShowToast(result.message);
+    document.getElementById('m-ticket-qty').value = '';
+    document.getElementById('m-ticket-reason').value = '';
+    logAdmin('수동 티켓 차감(회원 상세): ' + userId + ' · ' + (TM_GRADE_KO[grade] || grade) + ' · ' + result.count + '장 · 사유: ' + reason);
+    if (typeof loadMemberTicketCounts === 'function') loadMemberTicketCounts([userId]);
+    return dmLoadMemberDetailTickets(userId);
+  }).then(function(c) { if (c) dmRenderMemberDetailTickets(c); }).catch(function(e) { dmShowToast('차감 실패: ' + (e.message||e), true); });
 };
 
 /* ── 닉네임 규칙 ──
@@ -17683,6 +17718,10 @@ function dmLoadStatusHistory(userId) {
   });
 }
 
+window.dmBlockPeriodToggle = function() {
+  var st = document.getElementById('m-status'), bp = document.getElementById('m-block-period');
+  if (st && bp) bp.style.display = st.value === '차단' ? '' : 'none';
+};
 window.dmMemberDetailSave = function() {
   var userId = document.getElementById('m-member-id').value;
   if (!userId) return;
@@ -17695,8 +17734,19 @@ window.dmMemberDetailSave = function() {
   var changed = fromKo && fromKo !== toKo;
   var statusReason = (document.getElementById('m-status-reason').value || '').trim();
   if (changed && !statusReason) { dmShowToast('상태를 바꿀 때는 사유를 입력하세요.', true); return; }
-  db.collection('users').doc(userId).set({ nickname: nickname, status: statusEn, updated_at: FS.Timestamp.now() }, { merge: true }).then(function() {
-    if (changed) return dmRecordStatusChange(userId, fromKo, toKo, statusReason);
+  var upd = { nickname: nickname, status: statusEn, updated_at: FS.Timestamp.now() };
+  var periodNote = '';
+  if (changed && toKo === '차단') {
+    /* 차단 기간 영구 / 7일 / 30일 (검수 10-02 03, 2026-10-27 확정) */
+    var per = (document.getElementById('m-block-period') || {}).value || 'permanent';
+    var until = null;
+    if (per !== 'permanent') { until = new Date(); until.setDate(until.getDate() + parseInt(per, 10)); }
+    upd.block_reason = statusReason; upd.block_period = per; upd.blocked_at = FS.Timestamp.now();
+    upd.blocked_until = until ? FS.Timestamp.fromDate(until) : null;
+    periodNote = ' · 기간: ' + (per === 'permanent' ? '영구' : per + '일');
+  }
+  db.collection('users').doc(userId).set(upd, { merge: true }).then(function() {
+    if (changed) return dmRecordStatusChange(userId, fromKo, toKo, statusReason + periodNote);
   }).then(function() {
     if (window.ppAllDrop) ppAllDrop('users');   /* 바뀐 값을 다시 읽게 한다 */
     dmShowToast('회원 정보가 저장되었습니다.');
