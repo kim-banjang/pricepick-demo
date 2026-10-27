@@ -1,0 +1,318 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ──────────────────────────────────────────
+    // Helpers
+    // ──────────────────────────────────────────
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    // CMS admin: Firebase Auth user with @pricepick-cms.internal domain
+    function isAdmin() {
+      return isSignedIn() &&
+             request.auth.token.email != null &&
+             request.auth.token.email.matches('.*@pricepick-cms\\.internal');
+    }
+
+    // The requesting user owns this document
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    // App user writing their own data (uid matches the user_id field)
+    function isMyData(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    // ──────────────────────────────────────────
+    // A. Users / Auth / Device
+    // ──────────────────────────────────────────
+    match /users/{userId} {
+      // read를 isSignedIn()까지 완화: 앱의 "카카오 연동 회원 시뮬 로그인"이 CMS에 세팅된
+      // 다른 회원 프로필을 조회해서 보여줘야 하기 때문(실제 Kakao SDK 연동 없이 데모용으로 흉내만 냄).
+      allow read: if isSignedIn();
+      // App users can create/update their own doc; admin can do anything
+      allow create: if isOwner(userId) || isAdmin();
+      allow update: if isOwner(userId) || isAdmin();
+      allow delete: if isAdmin();
+
+      match /auth_providers/{providerId} {
+        allow read: if isOwner(userId) || isAdmin();
+        allow write: if isAdmin();
+      }
+      match /consents/{consentId} {
+        allow read: if isOwner(userId) || isAdmin();
+        allow write: if isAdmin();
+      }
+      match /devices/{deviceId} {
+        allow read: if isOwner(userId) || isAdmin();
+        allow write: if isAdmin();
+      }
+    }
+
+    // ──────────────────────────────────────────
+    // B. Master Data (admin write, anyone can read)
+    // ──────────────────────────────────────────
+    match /affiliate_malls/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /ticket_grades/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /grade_exchange_rules/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    // 운영 설정 싱글턴 문서 (예: settings/roulette = 행운룰렛 6칸 구성). 앱은 읽기만, 편집은 CMS(admin) 전용.
+    match /settings/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // ──────────────────────────────────────────
+    // C. Purchase Attribution
+    // ──────────────────────────────────────────
+    match /click_logs/{docId} {
+      allow read: if isAdmin() || isSignedIn();
+      allow create: if isSignedIn();
+      allow update, delete: if isAdmin();
+    }
+    match /postbacks/{docId} {
+      // read/create를 isSignedIn()까지 완화: "카카오 연동 회원 시뮬 로그인"으로 들어온 세션은
+      // Firebase Auth uid가 CMS 세팅 회원의 실제 문서 ID와 다르므로 uid 일치 검사를 통과할 수 없다.
+      // 앱은 postback을 "구매 발생" 이벤트로 생성만 하고(recordPurchase) 이후 상태 변경은 하지 않으므로
+      // update는 owner-uid 검증을 유지한다.
+      // delete: 데모 — /demo-accounts 「가상 데이터 넣기」의 「비우고 새로」가 자기가 만든 랜덤 티켓 구매 건
+      // (seeded == true)만 지운다. 실제·앱 시뮬 구매 건은 그대로 admin 전용(김반장 2026-10-15).
+      allow read: if isSignedIn();
+      allow create: if isSignedIn();
+      allow update: if isAdmin() || (isSignedIn() && resource.data.user_id == request.auth.uid);
+      allow delete: if isAdmin() || resource.data.seeded == true;
+    }
+    match /click_postback_matches/{docId} {
+      allow read: if isAdmin() || isSignedIn();
+      allow create: if isSignedIn();
+      allow update, delete: if isAdmin();
+    }
+
+    // Immutable ledger – append-only. 수정 불가(불변). 단, 데모 리셋을 위해 admin 삭제만 허용.
+    // read를 isSignedIn()까지 완화: "활동내역" 화면이 시뮬 로그인 회원의 원장을 조회해야 함.
+    // 앱은 이 컬렉션에 쓰지 않는다(등급 확정·차감 계산은 백엔드 몫) — create는 owner-uid 검증 유지.
+    match /ticket_transactions/{docId} {
+      allow read: if isSignedIn();
+      allow create: if isAdmin() || (isSignedIn() && request.resource.data.user_id == request.auth.uid);
+      allow update: if false;
+      allow delete: if isAdmin();
+    }
+
+    // ──────────────────────────────────────────
+    // D. User Assets
+    // ──────────────────────────────────────────
+    // 데모 — /demo-accounts 의 「가상 데이터 넣기」가 남의 uid 앞으로 티켓을 넣고 비운다.
+    // 시연용 저장소라 로그인 없이 쓰기·지우기를 연다(demo_accounts 와 같은 취급).
+    match /user_tickets/{docId} {
+      allow read: if isSignedIn();
+      allow create, update, delete: if true;
+    }
+    // 데모 — /demo-accounts 의 「가상 데이터 넣기」가 남의 uid 앞으로 포인트 잔액을 넣고 덮는다.
+    // 시연용 저장소라 로그인 없이 쓰기를 연다(user_tickets 와 같은 취급, 김반장 2026-10-15).
+    match /user_points/{userId} {
+      allow read: if isSignedIn();
+      allow write: if true;
+    }
+
+    // Immutable ledger – append-only. 수정 불가(불변).
+    // read를 isSignedIn()까지 완화: /app(html 프로토타입)의 "카카오 연동 회원 시뮬 로그인"이
+    // 포인트 내역(마이 > 포인트)을 조회해야 함 — 다른 컬렉션과 동일한 이유(uid 불일치, postbacks 주석 참고).
+    // 데모 — /demo-accounts 의 「가상 데이터 넣기」가 남의 uid 앞으로 적립 기록을 넣고 「비우고 새로」로 지운다.
+    // 그래서 create·delete 를 로그인 없이 연다(김반장 2026-10-15). update 는 그대로 막는다(원장 불변).
+    match /point_transactions/{docId} {
+      allow read: if isSignedIn();
+      allow create, delete: if true;
+      allow update: if false;
+    }
+
+    // ──────────────────────────────────────────
+    // E. Gifticards
+    // ──────────────────────────────────────────
+    match /gifticons/{docId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+    match /gifticon_stock/{docId} {
+      // 재고 차감은 백엔드 몫 — 앱은 요청만 남기고 재고를 직접 건드리지 않으므로 admin 전용으로 유지.
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+    match /gifticon_exchanges/{docId} {
+      // 데모 — /demo-accounts 의 「가상 데이터 넣기」가 남의 uid 앞으로 구매 내역을 넣고 비운다.
+      // 시연용 저장소라 로그인 없이 쓰기·지우기를 연다(demo_accounts 와 같은 취급).
+      allow read: if isSignedIn();
+      allow create, update, delete: if true;
+    }
+
+    // ──────────────────────────────────────────
+    // F. Contests / Events
+    // ──────────────────────────────────────────
+    match /raffles/{docId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+    match /raffle_entries/{docId} {
+      allow read: if isAdmin() || (isSignedIn() && resource.data.user_id == request.auth.uid);
+      allow create: if isSignedIn();
+      allow update, delete: if isAdmin();
+    }
+    match /weekly_draws/{docId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+    match /invites/{docId} {
+      // read를 isSignedIn()까지 완화: "친구초대" 화면이 본인이 초대한 친구 목록을 보여줘야 함
+      // (원래 admin 전용이라 본인도 못 읽던 규칙 — 노출 화면 추가하며 최소한으로 열었다).
+      // create: 피초대자가 초대코드를 등록하는 시점에 본인을 invitee_id로 하는 관계 문서를
+      // 직접 생성(자기 uid만 invitee_id로 쓸 수 있어 타인 명의 도용 불가).
+      // update: 초대자(첫 구매 완료 처리 데모 트리거)·피초대자(보상 셀프 클레임) 둘 다 본인이
+      // 당사자인 문서의 상태만 갱신 가능 — 포인트 잔액 자체는 이 컬렉션이 아니라
+      // user_points/point_transactions 쪽 "본인 전용 쓰기" 규칙이 그대로 지켜준다.
+      allow read: if isSignedIn();
+      allow create: if isAdmin() || (isSignedIn() && request.resource.data.invitee_id == request.auth.uid);
+      allow update: if isAdmin() || (isSignedIn() && (resource.data.inviter_id == request.auth.uid || resource.data.invitee_id == request.auth.uid));
+      allow delete: if isAdmin();
+    }
+    match /daily_visits/{docId} {
+      // read/create를 isSignedIn()까지 완화: 시뮬 로그인 지원 + "출석체크" 화면의 최소 액션 기록.
+      // points_earned 등 보상 계산은 앱이 채우지 않는다 — 백엔드가 방문 기록을 보고 처리해야 할 몫.
+      allow read: if isSignedIn();
+      allow create: if isSignedIn();
+      allow update, delete: if isAdmin();
+    }
+    match /banners/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /events/{docId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+
+    // ──────────────────────────────────────────
+    // G. Operations / System
+    // ──────────────────────────────────────────
+    match /notices/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /notifications/{docId} {
+      // read를 isSignedIn()까지 완화: 시뮬 로그인 지원(알림 화면). 생성은 백엔드/CMS 전용 유지.
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+    match /inquiries/{docId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn();
+      allow update, delete: if isAdmin();
+    }
+    match /withdrawals/{docId} {
+      allow read: if isAdmin();
+      allow write: if isAdmin();
+    }
+    match /admin_accounts/{docId} {
+      allow read: if isAdmin();
+      allow write: if isAdmin();
+    }
+    // 관리자 행위/접근 로그 — 생성만 허용, 수정·삭제 불가(불변 감사 로그)
+    match /admin_logs/{docId} {
+      allow read: if isAdmin();
+      allow create: if isAdmin();
+      allow update, delete: if false;
+    }
+
+    // 데모 시나리오 정의 (CMS 시나리오 관리 — 데모 전용, admin 전용)
+    match /demo_scenarios/{docId} {
+      allow read, write: if isAdmin();
+    }
+
+    // 경품 당첨자 (추첨 관리 · 경품/응모 관리 — 당첨/발송 처리)
+    match /prize_winners/{docId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+
+    // 약관 본문 (약관 관리 CMS 탭 — 앱은 게시된 약관을 읽어야 하므로 공개 read)
+    match /terms/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // 앱 최소/강제 버전 게이트 (앱 진입 시 읽음)
+    match /app_versions/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // 배치 스케줄러 상태·설정 (실제 cron 실행은 데모 범위 밖 — 상태·설정만 저장)
+    match /scheduler_jobs/{docId} {
+      allow read, write: if isAdmin();
+    }
+
+    // 데모 계정 명부 (demo-accounts 페이지) — 데모에서 앱 테스트할 때 가상 데이터를
+    // 어느 계정에 넣을지 적어 두는 명부다. 개인정보도 비밀도 없고, PC·모바일 아무
+    // 브라우저에서나 로그인 없이 적을 수 있어야 해서 이 컬렉션 하나만 공개로 둔다
+    // (김반장 확정 2026-09-16 — "보안이 필요 없는 것이니 그냥 공개하면 된다").
+    // 다른 컬렉션 규칙은 그대로다.
+    match /demo_accounts/{docId} {
+      allow read, write: if true;
+    }
+
+    // 검수 자료 처리 현황 (pricepick.vercel.app/devqa/qa-review-20261005.html)
+    // 개발자가 검수 74건마다 상태·메모를 남기는 작업판이다. 공개 URL의 정적 문서라
+    // 로그인이 없고, 페이지 쪽에서 쓰기 암호로 한 번 거른다. 개인정보도 비밀도 없어
+    // 이 컬렉션 하나만 공개로 둔다 (demo_accounts 와 같은 취급).
+    // 다른 컬렉션 규칙은 그대로다. 문서 ID 는 04-01 … 06-13 고정.
+    match /qa_review_20261005/{docId} {
+      allow read, write: if true;
+    }
+
+    // 추가 점검 처리 현황 (pricepick.vercel.app/devqa/qa-extra-20261002.html)
+    // 위 qa_review_20261005 와 같은 작업판이다. 상태가 74건과 섞이지 않게 컬렉션을 나눴다.
+    // 문서 ID 는 LP · 01 … 24 · 27 고정 (22·25·26 없음).
+    match /qa_extra_20261002/{docId} {
+      allow read, write: if true;
+    }
+
+    // 추가 점검 처리 현황 (pricepick.vercel.app/devqa/qa-extra-20261021.html)
+    // qa_extra_20261002 와 같은 작업판이다. 상태가 앞선 점검과 섞이지 않게 컬렉션을 나눴다.
+    // 문서 ID 는 01 … 17 고정.
+    match /qa_extra_20261021/{docId} {
+      allow read, write: if true;
+    }
+
+    // 개인정보처리방침 확정 문의 (pricepick.vercel.app/devqa/qa-privacy-20261027.html)
+    // qa_extra_20261021 와 같은 작업판이다. 상태가 앞선 점검과 섞이지 않게 컬렉션을 나눴다.
+    // 문서 ID 는 01 … 05 고정.
+    match /qa_privacy_20261027/{docId} {
+      allow read, write: if true;
+    }
+
+    // 해리 회신 답변 처리 현황 (pricepick.vercel.app/devqa/qa-harry-20261022.html)
+    // qa_extra_20261021 와 같은 작업판이다. 상태가 원 검수와 섞이지 않게 컬렉션을 나눴다.
+    // 문서 ID 는 01 · 02 · 03 · 06 · 07 · 08 · 09 · 13 · 14 · 15 · 16 · 17 고정.
+    match /qa_harry_20261022/{docId} {
+      allow read, write: if true;
+    }
+
+    // 행운룰렛 하루 1회 제한 — {uid}_{날짜} 문서를 스핀 시점에 생성. create만 허용해
+    // 같은 문서에 대한 두 번째 쓰기는 update로 분류돼 자동 거부(클라이언트 우회 방지).
+    match /roulette_spins/{docId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() && request.resource.data.user_id == request.auth.uid;
+      allow update, delete: if isAdmin();
+    }
+  }
+}
