@@ -16368,7 +16368,8 @@ window.rfLoad = function() {
     // 대기를 안 지난 건뿐이라 「지급 완료」가 0원으로 찍힌다 — 넓게 보면 지난 달치가
     // 바로 보인다. 좁혀 보실 때는 줄을 누르거나 조회 기간을 줄이면 된다.
     var today = new Date();
-    var from = new Date(today); from.setDate(from.getDate() - (RF_DEMO_DAYS - 1));
+    /* 기본 조회 기간 = 오늘 기준 최근 1개월 (검수 10-05 04-03, 2026-10-05 확정). 더 긴 기간은 운영자가 직접 지정 */
+    var from = new Date(today); from.setMonth(from.getMonth() - 1);
     var fEl = document.getElementById('rf-period-from');
     var tEl = document.getElementById('rf-period-to');
     var dEl = document.getElementById('rf-period-day');
@@ -19243,7 +19244,8 @@ function rltUseDemoLog(k) {
   rltRenderLog(k);
 }
 /* 실행 기록 문서의 kind — 2026-07-31 이전에 앱이 남긴 문서엔 kind가 없다(전부 매일 행운 룰렛) */
-function rltSpinKind(d) { return d.kind === 'jackpot' ? 'jackpot' : 'daily'; }
+/* 선물 상자 실행 기록은 kind 에 giftDaily · giftRandom 을 그대로 쓴다 (검수 10-02 18 · 10-05 05-20 · 06-07) */
+function rltSpinKind(d) { if (d.kind && RLT_KINDS[d.kind]) return d.kind; return d.kind === 'jackpot' ? 'jackpot' : 'daily'; }
 function rltLoadLog(k) {
   var tbody = document.getElementById(RLT_KINDS[k].p + '-log-tbody');
   if (!tbody) return;

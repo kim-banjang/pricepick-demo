@@ -15256,6 +15256,7 @@ function gbOpen(kind) {
       var memo = (kind === 'gb1') ? '매일 선물 상자 열기' : '랜덤 선물 상자 열기';
       var src = (kind === 'gb1') ? 'giftbox_daily' : 'giftbox_random';
       ppApplySlotGrant(slot, qty, memo, src).then(function (granted) {
+        if (window.ppLogGiftboxOpen) window.ppLogGiftboxOpen(kind === 'gb1' ? 'giftDaily' : 'giftRandom', slot, granted);
         gbShowResult(kind, slot, granted);
         _gbBusy[kind] = false;
         gbApplyState(kind);
@@ -18831,6 +18832,16 @@ window.ppLogJackpotSpin = function(slot, grantedQty) {
     .set(ppSpinRecord('jackpot', slot, grantedQty))
     .then(function() { return true; })
     .catch(function(e) { console.error('ppLogJackpotSpin', e); return false; });
+};
+/* 선물 상자 실행 기록 — CMS 매일·랜덤 선물 상자 화면의 이번 달 열기 횟수·실행 기록이 이 문서를 센다
+   (검수 10-02 18 · 10-05 05-20 · 06-07). 하루 1회 판정에 쓰는 문서와 ID가 겹치지 않게 시각을 붙인다. */
+window.ppLogGiftboxOpen = function(kind, slot, grantedQty) {
+  if (!PP.uid) return Promise.resolve(false);
+  var id = PP.uid + '_' + kind + '_' + ppRouletteDateKey() + '_' + Date.now();
+  return db.collection('roulette_spins').doc(id)
+    .set(ppSpinRecord(kind, slot, grantedQty))
+    .then(function() { return true; })
+    .catch(function(e) { console.error('ppLogGiftboxOpen', e); return false; });
 };
 window.ppJackpotSpinsToday = function() {
   if (!PP.uid) return Promise.resolve(0);
