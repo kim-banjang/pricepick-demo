@@ -1222,6 +1222,7 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
    data-cms-feature 가 붙은 요소는 CMS_FEATURES 의 해당 값이 false 일 때만 숨는다.
    섹션 마크업·저장 로직은 그대로 남아 있으므로 플래그만 true 로 되돌리면 복구된다. */
 body.cms-hide-roulette [data-cms-feature="roulette"]{display:none !important;}
+  body.cms-hide-weeklyRaffle [data-cms-feature="weeklyRaffle"]{display:none !important;}
 
 /* ══════════════════════════════════════════════════════════════════
    폼 요소 규격 — CMS 공통 (김반장 2026-09-07)
@@ -1269,12 +1270,13 @@ textarea.form-input,textarea.terms-editor,.terms-editor{
      되살리려면 값을 true 로 바꾸기만 하면 원상 복구된다. -->
 <script>
 window.CMS_FEATURES = {
+  weeklyRaffle: false, // 주간 경품 추첨 — 정책서 「추첨 · 경품 Hold, 실사용자 1만 명 달성 시 부활」 (검수 10-21 10). 숨김이지 삭제가 아니다
   roulette: false   // 매일 행운 룰렛 · 잭팟 룰렛 (2026-08-27 확정: 구글플레이 App Content: Gambling 대응.
                     // 행운 룰렛 → 매일 선물 상자 열기, 잭팟 룰렛 → 랜덤 선물 상자 열기로 대체. 숨김이지 삭제가 아니다)
 };
 (function(){
   var f = window.CMS_FEATURES, c = document.body.classList;
-  if (!f.roulette) c.add('cms-hide-roulette');
+  if (!f.roulette) c.add('cms-hide-roulette'); if (!f.weeklyRaffle) c.add('cms-hide-weeklyRaffle');
 })();
 </script>
 
@@ -1404,7 +1406,7 @@ window.CMS_FEATURES = {
             <span class="sb-item-lbl" id="nav-label-tickets">티켓 내역</span>
             
           </button>
-          <button class="sb-item" id="nav-weekly-draws" data-label="주간 이벤트 추첨 관리" onclick="go('weekly-draws',this)">
+          <button class="sb-item" id="nav-weekly-draws" data-cms-feature="weeklyRaffle" data-label="주간 이벤트 추첨 관리" onclick="go('weekly-draws',this)">
             <span class="sb-item-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13"/><path d="M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7"/><path d="M7.5 8a2.5 2.5 0 0 1 0-5A4.8 8 0 0 1 12 8a4.8 8 0 0 1 4.5-5 2.5 2.5 0 0 1 0 5"/></svg></span>
             <span class="sb-item-lbl" id="nav-label-weekly-draws">주간 이벤트 추첨 관리</span>
           </button>
@@ -3349,15 +3351,14 @@ window.CMS_FEATURES = {
     <!-- ── 1:1 문의 (신규) ── -->
     <div class="section" id="sec-inquiries">
       <div class="info-box">1:1 문의 처리 — 수정에서 <strong>처리 상태는 '완료' 건도 변경(재오픈) 가능</strong>합니다. 재오픈 시 변경 사유·이력(누가·언제)을 기록합니다.</div>
-      <div class="stats-grid" style="grid-template-columns:repeat(4,1fr)">
+      <div class="stats-grid" style="grid-template-columns:repeat(3,1fr)">
         <div class="stat-card red"><div class="stat-label">미처리</div><div class="stat-value">0</div><div class="stat-change down">빠른 처리 필요</div></div>
-        <div class="stat-card amber"><div class="stat-label">처리 중</div><div class="stat-value">0</div><div class="stat-change neutral">답변 대기</div></div>
-        <div class="stat-card green"><div class="stat-label">완료</div><div class="stat-value">0</div><div class="stat-change neutral">누적</div></div>
+        <div class="stat-card green"><div class="stat-label">처리 완료</div><div class="stat-value">0</div><div class="stat-change neutral">누적</div></div>
         <div class="stat-card purple"><div class="stat-label">평균 응답 시간</div><div class="stat-value">—</div><div class="stat-change neutral">답변 완료 기준</div></div>
       </div>
       <div class="toolbar">
         <input class="search-box" id="inq-search" placeholder="닉네임, 제목 검색..." onkeydown="if(event.key==='Enter')inqApplyFilters()">
-        <select class="filter-sel" id="inq-filter-status" onchange="inqApplyFilters()"><option value="">전체 상태</option><option value="pending">미처리</option><option value="processing">처리 중</option><option value="answered">완료</option></select>
+        <select class="filter-sel" id="inq-filter-status" onchange="inqApplyFilters()"><option value="">전체 상태</option><option value="pending">미처리</option><option value="answered">처리 완료</option></select>
         <select class="filter-sel" id="inq-filter-cat" onchange="inqApplyFilters()"><option value="">전체 유형</option><option value="postback">적립 문의</option><option value="account">계정 문의</option><option value="gifticon">기프티콘 문의</option><option value="general">기타</option></select>
         <button class="btn btn-primary btn-sm" onclick="inqApplyFilters()">검색</button>
       </div>
@@ -3407,7 +3408,7 @@ window.CMS_FEATURES = {
       <div class="card">
         <div class="card-header"><div class="card-title">탈퇴 회원 목록</div></div>
         <table>
-          <thead><tr><th>닉네임 / 카카오톡 ID / 식별 아이디</th><th style="text-align:center">가입 유형(탈퇴 전)</th><th style="text-align:center">탈퇴일시</th><th style="text-align:center">상태</th><th style="text-align:center">상세</th></tr></thead>
+          <thead><tr><th>닉네임 / 카카오톡 ID / 식별 아이디</th><th style="text-align:center">가입 유형(탈퇴 전)</th><th style="text-align:center">탈퇴일시</th><th style="text-align:center">상태</th></tr></thead>
           <tbody>
           </tbody>
         </table>
@@ -4871,7 +4872,7 @@ window.CMS_FEATURES = {
         <div style="background:var(--main-soft);border-radius:var(--r-md);padding:12px;font-size:13px;line-height:1.6" id="inq-prev-answer"></div>
       </div>
       <div class="form-group"><label class="form-label">답변 작성</label><textarea class="form-input" id="inq-answer" style="min-height:100px;" placeholder="답변을 입력하세요..."></textarea></div>
-      <div class="form-group"><label class="form-label">처리 상태</label><select class="form-select" id="inq-status"><option value="pending">미처리</option><option value="processing">처리 중</option><option value="answered" selected>완료</option></select></div>
+      <div class="form-group"><label class="form-label">처리 상태</label><select class="form-select" id="inq-status"><option value="pending">미처리</option><option value="answered" selected>처리 완료</option></select></div>
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModal('m-inquiry')">닫기</button>
@@ -9420,7 +9421,7 @@ function cmsGiSaleWon(x, priceOf) {
 }
 var TK_GRADE_CHIPS = { ticket:'<span class="tk-chip bronze bare">티켓</span>', event:'<span class="tk-chip event bare">이벤트 티켓</span>' };
 var TK_STATUS_MAP = {
-  earn: '<span style="display:inline-block;font-size:11px;font-weight:700;color:#1f9d57;background:#e6f7ec;border:1px solid #b6e6c8;border-radius:20px;padding:3px 10px">보유 중</span>',
+  earn: '<span style="display:inline-block;font-size:11px;font-weight:700;color:#1f9d57;background:#e6f7ec;border:1px solid #b6e6c8;border-radius:20px;padding:3px 10px">지급</span>',
   use:  '<span style="display:inline-block;font-size:11px;font-weight:700;color:#6b7280;background:#f3f4f6;border:1px solid #e5e7eb;border-radius:20px;padding:3px 10px">사용 완료</span>',
   clawback:'<span style="display:inline-block;font-size:11px;font-weight:700;color:#dc2626;background:#fef2f2;border:1px solid #fecaca;border-radius:20px;padding:3px 10px">환수</span>',
   expire:'<span style="display:inline-block;font-size:11px;font-weight:700;color:#6b7280;background:#f3f4f6;border:1px solid #e5e7eb;border-radius:20px;padding:3px 10px">만료</span>',
@@ -11809,7 +11810,7 @@ window.notiLoadReceived = function(userId) {
 };
 
 /* ── sec-inquiries ── inquiries collection */
-var INQ_STATUS_BADGE = { pending:'<span class="badge badge-red">미처리</span>', processing:'<span class="badge badge-amber">처리 중</span>', answered:'<span class="badge badge-green">완료</span>', completed:'<span class="badge badge-green">완료</span>' };
+var INQ_STATUS_BADGE = { pending:'<span class="badge badge-red">미처리</span>', processing:'<span class="badge badge-red">미처리</span>', answered:'<span class="badge badge-green">처리 완료</span>', completed:'<span class="badge badge-green">완료</span>' };
 var INQ_CAT_LABEL = { postback:'적립 문의', account:'계정 문의', gifticon:'기프티콘 문의', general:'기타' };
 var INQUIRIES_CACHE = {};
 var INQUIRIES_CTRL = window.INQUIRIES_CTRL = ppMakeListController(20, function(pageItems, state, totalPages) {
@@ -11851,7 +11852,7 @@ function loadInquiries() {
     var statCards = document.querySelectorAll('#sec-inquiries .stat-card');
     if (snap.empty) {
       INQUIRIES_CTRL.setRows([]);
-      ['0','0','0','—'].forEach(function(v,i){ if(statCards[i]) statCards[i].querySelector('.stat-value').textContent=v; });
+      ['0','0','—'].forEach(function(v,i){ if(statCards[i]) statCards[i].querySelector('.stat-value').textContent=v; });
       return;
     }
     snap.docs.sort(function(a,b){
@@ -11863,19 +11864,18 @@ function loadInquiries() {
     dmFetchUsersByIds(snap.docs.map(function(doc){ return doc.data().user_id; })).then(function(userMap) {
       var items = snap.docs.map(function(doc) {
         var d = doc.data();
-        if (d.status === 'pending') pending++;
-        else if (d.status === 'processing') processing++;
+        /* 「처리 중」은 없앴다 — 예전 기록은 미처리로 센다 (검수 10-05 04-28) */
+        if (d.status === 'pending' || d.status === 'processing') pending++;
         else done++;
         INQUIRIES_CACHE[doc.id] = Object.assign({}, d, { _userLabel: (userMap[d.user_id]||{}).nickname || d.user_id || '' });
         return Object.assign({ _id: doc.id, _user: userMap[d.user_id] }, d);
       });
       INQUIRIES_CTRL.setRows(items);
       if (statCards[0]) statCards[0].querySelector('.stat-value').textContent = ppN(pending);
-      if (statCards[1]) statCards[1].querySelector('.stat-value').textContent = ppN(processing);
-      if (statCards[2]) statCards[2].querySelector('.stat-value').textContent = ppN(done);
+      if (statCards[1]) statCards[1].querySelector('.stat-value').textContent = ppN(done);
       var bi=document.getElementById('badge-inquiries'); if(bi){ bi.textContent=pending; bi.style.display=pending>0?'':'none'; }
       var rt=[]; snap.docs.forEach(function(doc){ var d=doc.data(); var c=(d.created_at&&d.created_at.toDate)?d.created_at.toDate():null; var a=(d.answered_at&&d.answered_at.toDate)?d.answered_at.toDate():null; if(c&&a&&a>c) rt.push((a-c)/3600000); });
-      if (statCards[3]) statCards[3].querySelector('.stat-value').textContent = rt.length ? (rt.reduce(function(x,y){return x+y;},0)/rt.length).toFixed(1)+'h' : '—';
+      if (statCards[2]) statCards[2].querySelector('.stat-value').textContent = rt.length ? (rt.reduce(function(x,y){return x+y;},0)/rt.length).toFixed(1)+'h' : '—';
     });
   }).catch(function(e){ console.error('loadInquiries',e); list.innerHTML='<div style="padding:24px;color:var(--text-3);text-align:center">로드 오류: '+e.message+'</div>'; });
 }
@@ -11951,7 +11951,7 @@ function loadWithdrawal() {
       var db2 = (tb && tb.toDate) ? tb.toDate().getTime() : 0;
       return db2 - da;
     });
-    if (!docs.length) { tbody.innerHTML = ppEmpty(5, '탈퇴 회원이 없습니다.'); }
+    if (!docs.length) { tbody.innerHTML = ppEmpty(4, '탈퇴 회원이 없습니다.'); }
     else {
       var rows = docs.map(function(doc) {
         var d = doc.data();
@@ -11962,13 +11962,12 @@ function loadWithdrawal() {
         return '<tr><td>' + renderMemberIdentity(d, doc.id) + '</td>'
           + '<td style="text-align:center">' + joinType + '</td>'
           + '<td style="text-align:center">' + ppDt(d.withdrawn_at) + '</td>'
-          + '<td style="text-align:center"><span class="badge badge-gray">탈퇴 완료</span></td>'
-          + '<td><button class="btn btn-ghost btn-sm" onclick="wdShowDetail(\'' + doc.id + '\')">상세</button></td></tr>';
+          + '<td style="text-align:center"><span class="badge badge-gray">탈퇴 완료</span></td></tr>';
       });
       tbody.innerHTML = rows.join('');
     }
     updateWithdrawalStats(docs.map(function(doc){ return doc.data(); }));
-  }).catch(function(e) { console.error('loadWithdrawal users', e); tbody.innerHTML = ppEmpty(5, '탈퇴 회원이 없습니다.'); });
+  }).catch(function(e) { console.error('loadWithdrawal users', e); tbody.innerHTML = ppEmpty(4, '탈퇴 회원이 없습니다.'); });
 }
 
 function updateWithdrawalStats(list) {
