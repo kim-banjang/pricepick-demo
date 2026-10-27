@@ -17569,7 +17569,7 @@ window.openMemberDetail = function(id) {
     /* 차단 중이면 사유·기간을 보여 준다 (검수 10-02 03) */
     var bi = document.getElementById('m-block-info');
     if (bi) {
-      if (u.status === 'blocked' && (u.block_reason || u.block_period)) {
+      if (u.status === 'suspended' && (u.block_reason || u.block_period)) {
         var per = u.block_period === 'permanent' || !u.block_period ? '영구' : (u.block_period + '일' + (u.blocked_until ? ' (' + ppDt(u.blocked_until) + '까지)' : ''));
         bi.textContent = '차단 사유: ' + (u.block_reason || '—') + ' · 차단 기간: ' + per;
         bi.style.display = '';
