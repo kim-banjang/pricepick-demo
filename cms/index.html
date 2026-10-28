@@ -4119,7 +4119,6 @@ window.CMS_FEATURES = {
             <option value="onboarding">온보딩 보상</option>
             <option value="roulette">매일 선물 상자</option>
             <option value="giftbox_random">랜덤 선물 상자</option>
-            <option value="ticket_to_point">티켓→포인트 전환</option>
             <option value="admin_grant">관리자 지급</option>
           </optgroup>
           <optgroup label="사용·차감">
@@ -7033,6 +7032,7 @@ Object.assign(KO2VI,{"쿠팡은 주문번호가 오지 않습니다.":"Coupang k
 Object.assign(KO2VI,{"1단계 발송 채널은 ":"Kênh gửi giai đoạn 1 là ","앱 푸시 단일":"chỉ Push app","입니다 — 카카오 알림톡은 서드파티 비용이 발생해 도입하지 않습니다. 마케팅성 알림은 수신 동의 회원에게만 발송됩니다. 서비스 필수 알림(티켓 지급·기프티콘 발송·경품 당첨)은 동의 여부와 무관하게 발송됩니다. ":". Kakao AlimTalk phát sinh chi phí bên thứ ba nên chưa đưa vào áp dụng. Thông báo mang tính marketing chỉ gửi cho hội viên đã đồng ý nhận. Thông báo bắt buộc của dịch vụ (cấp vé·gửi Gifticon·trúng thưởng) được gửi bất kể có đồng ý hay không. "," — 실제 FCM 발송 연동은 없고, 발송 내역만 DB에 기록됩니다(대상 인원은 실집계).":" — chưa có tích hợp gửi FCM thực tế, chỉ ghi lại lịch sử gửi vào DB (số người nhận là số liệu thật).","앱 푸시":"Push app"});
 Object.assign(KO2VI, {"카카오 연동 회원과 미연동(게스트) 회원이 모두 존재(로그인 정책 변경). 미연동 회원은 적립 확정 대기": "Tồn tại cả thành viên đã liên kết Kakao và chưa liên kết (Guest) (thay đổi chính sách đăng nhập). Thành viên chưa liên kết phải chờ xác nhận tích lũy", "계정 모델:": "Mô hình tài khoản:", "게스트(닉네임)로 시작": "Bắt đầu bằng Guest (biệt danh)", "→ 앱 내": "→ trong ứng dụng", "카카오 연동": "Liên kết Kakao", "(애플·구글 로그인 폐지). 게스트는 적립만 누적, 사용·교환은 연동 후 가능.": "(bỏ đăng nhập Apple·Google). Guest chỉ tích lũy, việc sử dụng·đổi chỉ thực hiện được sau khi liên kết.", "전체 연동상태": "Tất cả trạng thái liên kết", "게스트(미연동)": "Guest (chưa liên kết)", "닉네임(카카오ID)": "Biệt danh (ID Kakao)", "연동 상태": "Trạng thái liên kết", "연동 2024/08/12": "Liên kết 2024/08/12", "연동 2024/11/03": "Liên kết 2024/11/03", "적립만 누적 · 사용 불가": "Chỉ tích lũy · không thể sử dụng", "연동 2025/05/14": "Liên kết 2025/05/14", "가지급(대기)": "Tạm cấp (chờ)", "좌측 메뉴 (1) 배지 = 관리자 처리 대기 추첨 건수": "Badge (1) ở menu trái = số đợt rút thăm đang chờ admin xử lý", "— 마감됐으나 아직 '당첨 처리(추첨 실행)'를 안 한 회차 수입니다. 해당 회차의 당첨 처리를 완료하면 카운트가 줄고, 0이 되면 배지가 사라집니다.": "— là số đợt đã đóng nhưng chưa thực hiện 'Xử lý trúng thưởng (chạy rút thăm)'. Hoàn tất xử lý trúng thưởng của đợt đó thì số đếm giảm, bằng 0 thì badge biến mất.", "추첨 방식: 매주 월요일 자동 발표 (자동/수동 전환 가능)": "Phương thức rút thăm: tự động công bố mỗi Thứ Hai (chuyển đổi tự động/thủ công được)", "마감 · 처리 대기": "Đã đóng · chờ xử lý", "당첨 처리(추첨 실행)": "Xử lý trúng thưởng (chạy rút thăm)", "닫기":"Đóng", "· 등수당 1행(중복 등수 금지), 한 등수에 경품 여러 개 가능": "· Mỗi hạng 1 dòng (cấm trùng hạng), một hạng có thể nhiều quà", "경품 변경 이력": "Lịch sử thay đổi giải thưởng", "현재 버전 v4 · 변경·공표 추적(누가·언제·전후·공표 여부)": "Phiên bản hiện tại v4 · theo dõi thay đổi·công bố (ai·khi nào·trước-sau·đã công bố?)", "변경 내용 (전 → 후)": "Nội dung thay đổi (trước → sau)", "변경자": "Người thay đổi", "변경일시": "Thời điểm thay đổi", "공표": "Công bố", "2등 경품 '편의점 상품권 1만' → '편의점 아이스크림 교환권'": "Quà hạng 2 'Phiếu cửa hàng tiện lợi 10.000' → 'Phiếu đổi kem cửa hàng tiện lợi'", "공표됨 · 13회차~": "Đã công bố · từ đợt 13~", "1등 당첨 확률 3% → 5%": "Xác suất trúng hạng 1: 3% → 5%", "공표됨 · 11회차~": "Đã công bố · từ đợt 11~", "3등 '꽝(재도전)' 신설": "Lập mới hạng 3 'Trượt (thử lại)'", "공표됨 · 9회차~": "Đã công bố · từ đợt 9~", "최초 경품 구성 등록": "Đăng ký cấu hình quà ban đầu", "공표됨": "Đã công bố", "홈 상단 슬라이드 · 현재 2개 노출 · 카드 순서 드래그로 노출 순서 변경": "Slide đầu trang chủ · hiện hiển thị 2 cái · kéo thứ tự thẻ để đổi thứ tự hiển thị", "노출 전환": "Chuyển hiển thị", "— 온보딩·이벤트 보상 확정 적용. 이벤트 생성·수정 시": "— Áp dụng xác nhận thưởng onboarding·sự kiện. Khi tạo·sửa sự kiện", "운영정책과의 보상 정합 검증": "kiểm tra tính nhất quán thưởng với chính sách vận hành", "(중복 보상·만료 충돌 차단) 후 저장.": "(chặn trùng thưởng·xung đột hết hạn) rồi lưu.", "+ 이벤트 생성": "+ Tạo sự kiện", "발송 완료 건은 불변 로그 · '예약' 상태만 발송 전 취소·수정 가능": "Lượt đã gửi là log bất biến · chỉ trạng thái 'đặt trước' mới hủy·sửa được trước khi gửi", "상태 / 액션": "Trạng thái / Hành động", "10:00 예정": "Dự kiến 10:00", "6월 첫째주 추첨 안내": "Thông báo rút thăm tuần đầu tháng 6", "운영 정책은": "Chính sách vận hành là", "입니다 — 정책 수치·기준 변경은 별도 승인 절차로 반영되며 이 화면에서 직접 수정하지 않습니다.": "— việc thay đổi số liệu·tiêu chuẩn chính sách được phản ánh qua quy trình phê duyệt riêng và không sửa trực tiếp ở màn này.", "500P + 이벤트티켓 1장": "500P + 1 vé sự kiện", "1:1 문의 처리 — 수정에서": "Xử lý hỏi đáp 1:1 — ở phần sửa", "처리 상태는 '완료' 건도 변경(재오픈) 가능": "trạng thái xử lý của cả lượt 'hoàn tất' cũng có thể đổi (mở lại)", "합니다. 재오픈 시 변경 사유·이력(누가·언제)을 기록합니다.": ". Khi mở lại sẽ ghi lý do thay đổi·nhật ký (ai·khi nào).", "탈퇴 사유 분포": "Phân bố lý do hủy tài khoản", "이번 달": "Tháng này", "지난 달": "Tháng trước", "최근 3개월": "3 tháng gần đây", "사용자 지정": "Tùy chọn", "강제 업데이트 게이트": "Cổng ép cập nhật", "— '최소 지원 버전' 미만 사용자는 앱 진입 시 강제 업데이트로 차단합니다(결함·보안 패치 시 구버전 차단 필수).": "— người dùng dưới 'phiên bản hỗ trợ tối thiểu' bị chặn bằng ép cập nhật khi vào ứng dụng (bắt buộc chặn bản cũ khi vá lỗi·bảo mật).", "제휴몰 API 모니터링 — 키 상태·일일 호출 한도·장애를 추적합니다.": "Giám sát API cửa hàng LK — theo dõi trạng thái khóa·hạn mức gọi mỗi ngày·sự cố.", "쿠팡 파트너스 우선 연동": "Ưu tiên liên kết Coupang Partners", ", 나머지 제휴몰은 표시·추후 연동 단계.": ", các cửa hàng LK còn lại ở bước chỉ hiển thị·liên kết sau.", "시스템 정의 배치 — 생성·삭제 없음 · 활성/비활성 토글·주기 조정·즉시 실행만 제공": "Batch do hệ thống định nghĩa — không tạo·xóa · chỉ cung cấp toggle bật/tắt·điều chỉnh chu kỳ·chạy ngay", "IP 마스킹 저장 · 보존 90일 · 정책/계정/API키 변경은 별도 강조 로깅": "Lưu IP dạng ẩn · giữ 90 ngày · thay đổi chính sách/tài khoản/khóa API được log nổi bật riêng", "500P+이벤트티켓 지급": "Cấp 500P + vé sự kiện", "500P + 이벤트 티켓 1장": "500P + 1 vé sự kiện", "주간 이벤트 추첨 설정 수정": "Sửa cài đặt rút thăm sự kiện tuần", "당첨 확률 (%)": "Xác suất trúng (%)", "자동 (매주 월요일 00:00)": "Tự động (mỗi Thứ Hai 00:00)", "수동 (관리자 실행)": "Thủ công (admin chạy)", "추첨 요일": "Thứ rút thăm", "월요일": "Thứ Hai", "화요일": "Thứ Ba", "수요일": "Thứ Tư", "목요일": "Thứ Năm", "금요일": "Thứ Sáu", "추첨 시각": "Giờ rút thăm", "당첨 보상 구성": "Cấu hình quà trúng thưởng", "이벤트 티켓 만료 (발급일+100일 고정)": "Hết hạn vé sự kiện (cố định ngày phát hành+100 ngày)", "이월 없음 (당회 미응모 시 소멸)": "Không rollover (chưa dự thưởng đợt này thì tiêu hủy)", "변경 시 변경 이력(누가·언제·전후)이 기록됩니다.": "Khi thay đổi sẽ ghi nhật ký (ai·khi nào·trước-sau).", "포인트 정책 수정": "Sửa chính sách điểm", "교환 비율 (P = 원)": "Tỷ lệ đổi (P = won)", "적립일 + 1년 (먼저 적립된 것부터 소멸)": "Ngày tích lũy + 1 năm (tiêu hủy theo thứ tự tích lũy trước)", "적립일 + 6개월": "Ngày tích lũy + 6 tháng", "만료 없음": "Không hết hạn", "양방향 (포인트 ↔ 티켓)": "Hai chiều (điểm ↔ vé)", "단방향 (포인트 → 티켓)": "Một chiều (điểm → vé)", "적용 시점": "Thời điểm áp dụng", "즉시 적용": "Áp dụng ngay", "예약 적용": "Áp dụng theo hẹn", "포인트 환율·만료는 비용·민원 직결. 저장 시 변경 전후 비교 + 변경 이력이 기록됩니다.": "Tỷ giá·hết hạn điểm liên quan trực tiếp chi phí·khiếu nại. Khi lưu sẽ ghi so sánh trước-sau + nhật ký thay đổi.", "유예 기간 (일)": "Thời gian gia hạn (ngày)", "재가입 쿨타임": "Thời gian chờ đăng ký lại", "없음 (즉시 재가입)": "Không có (đăng ký lại ngay)", "7일": "7 ngày", "유예 만료 시 환수": "Thu hồi khi hết gia hạn", "통계용 보존 항목 (익명화)": "Mục lưu giữ cho thống kê (ẩn danh)", "설정값이 바뀌면 탈퇴 처리 절차·D-day 계산이 이 값을 따라 동적으로 반영됩니다.": "Khi đổi giá trị cài đặt thì quy trình xử lý hủy·tính D-day sẽ tự động phản ánh theo giá trị này.", "티켓 환수·소멸 상세": "Chi tiết thu hồi·tiêu hủy vé", "원본 티켓": "Vé gốc", "환수 사유": "Lý do thu hồi", "반품 (구매 취소)": "Trả hàng (hủy mua)", "환수 전후 잔액": "Số dư trước-sau thu hồi","사용 가능 잔액에서 즉시 차감.": "Trừ ngay từ số dư khả dụng.", "관련 환수 부채": "Khoản nợ thu hồi liên quan", "없음 (잔액 충분, 즉시 환수)": "Không có (đủ số dư, thu hồi ngay)", "잔액 부족 시 음수 부채로 기록 후 다음 적립 시 자동 상계.": "Khi thiếu số dư thì ghi thành nợ âm rồi tự bù khi tích lũy lần sau."});
 /* ── i18n 보강 2차 (2026-07-21) — select 옵션 ── */
+Object.assign(KO2VI,{"취소됨":"Đã hủy","취소":"Hủy","(탈퇴 회원)":"(Hội viên đã rút)","(회원 정보 없음)":"(Không có thông tin hội viên)","(닉네임 없음)":"(Không có biệt danh)","예약 발송을 취소했습니다.":"Đã hủy gửi hẹn giờ.","예약 상태인 건만 취소할 수 있습니다.":"Chỉ hủy được mục đang hẹn giờ."});
 Object.assign(KO2VI,{"전체 거래유형":"Tất cả loại giao dịch","구매 대기(등급 미정)":"Chờ mua (chưa định hạng)","출석 보너스":"Thưởng điểm danh","룰렛 당첨":"Trúng vòng quay","매일 선물 상자":"Hộp quà mỗi ngày","랜덤 선물 상자":"Hộp quà ngẫu nhiên","카카오 연동 보상":"Thưởng liên kết Kakao","기프티콘 사용":"Sử dụng Gifticon","경품 응모":"Dự thưởng quà","포인트 전환":"Chuyển đổi điểm","등급 전환":"Chuyển hạng","관리자 환수":"Admin thu hồi","환불(취소·반품)":"Hoàn tiền (hủy·trả hàng)","꽝":"Trượt","이벤트티켓":"Vé sự kiện","출석(쿠팡 구경하기)":"Điểm danh (Dạo Coupang)","매일 행운 룰렛 당첨":"Trúng vòng quay may mắn hằng ngày","티켓→포인트 전환":"Chuyển vé→điểm","포인트→티켓 전환":"Chuyển điểm→vé","전체 기간":"Toàn bộ thời gian","사용완료":"Đã sử dụng","취소됨":"Đã hủy","기프티콘 문의":"Hỏi đáp Gifticon","정상(확정)":"Bình thường (đã xác nhận)","대기":"Chờ","환불":"Hoàn tiền"});
 /* ── i18n 보강 (2026-07-21) — VI 전환 시 한국어로 남던 문구 ── */
 Object.assign(KO2VI,{"이벤트 티켓 일 획득 상한":"Giới hạn nhận vé sự kiện mỗi ngày","장 / 1일":"vé / 1 ngày","회원 1명이 하루에 받을 수 있는 이벤트 티켓 총량입니다. 적립 정책의 하루 5건 한도와 같은 기준입니다.":"Tổng số vé sự kiện 1 hội viên có thể nhận trong một ngày. Cùng chuẩn với hạn mức 5 lượt/ngày của chính sách tích lũy.","일 획득 상한이 월 획득 상한보다 큽니다.":"Giới hạn ngày lớn hơn giới hạn tháng."});
@@ -9332,7 +9332,7 @@ function renderMemberIdentity(u, docId, opts) {
      적어 넣지 않는다. 카카오 ID 줄이 차 있으면 연동, 비어 있으면 미연동이다.
      식별 아이디는 길어 말줄임하므로 눌러서 통째로 복사할 수 있게 둔다. */
   u = u || {};
-  var nick = u.nickname || '';
+  var nick = u.nickname || memberNoNickLabel(u);
   var kakao = (u.linked_kakao && u.kakao_login_id) ? u.kakao_login_id : '';
   if (opts && opts.maskKakao) kakao = maskKakaoEmail(kakao);
   var uid = docId || '';
@@ -9347,6 +9347,14 @@ function renderMemberIdentity(u, docId, opts) {
 }
 // 회원 목록 리스트 전용 — 세로 2행(닉네임 / 카카오ID). 식별 아이디(내부 문서ID)는 상세에서만 노출.
 // 카카오 연동 회원은 카카오 로그인 ID, 미연동(게스트) 회원은 "미연동"으로 표기.
+/* 닉네임이 없을 때 쓰는 말 — 빈칸은 고장처럼 보인다(2026-10-28).
+   탈퇴하면 닉네임이 비식별 처리로 지워진다(검수 10-02 01). 회원 문서가 없거나 가입일조차 없는 것은 회원 정보 없음. */
+function memberNoNickLabel(u) {
+  u = u || {};
+  if (u.status === 'withdrawn') return '(탈퇴 회원)';
+  if (!u.created_at) return '(회원 정보 없음)';
+  return '(닉네임 없음)';
+}
 function renderMemberIdentityListOnly(u, docId, opts) {
   u = u || {};
   var idLine = (u.linked_kakao && u.kakao_login_id)
@@ -10600,7 +10608,7 @@ window.giCancelExchange = function(id) {
   if (reason === null) return;
   db.collection('gifticon_exchanges').doc(id).update({
     status: 'cancelled',
-    cancelled_at: FS.FieldValue.serverTimestamp(),
+    cancelled_at: window.FS.FieldValue.serverTimestamp(),
     cancel_reason: reason || '관리자 취소',
   }).then(function() {
     if (window.ppAllDrop) ppAllDrop('gifticon_exchanges');   /* 바뀐 값을 다시 읽게 한다 */
@@ -11474,7 +11482,7 @@ function loadNotifications() {
     snap.docs.forEach(function(doc) {
       var d = doc.data();
       var ca = d.created_at && d.created_at.toDate ? d.created_at.toDate() : null;
-      if (ca && ca >= monthStart) monthCount++;
+      if (ca && ca >= monthStart && d.status !== 'cancelled') monthCount++;
       if (d.status === 'scheduled') scheduled++;
     });
     if (statCards[0]) statCards[0].querySelector('.stat-value').textContent = ppN(monthCount) + '건';
@@ -11484,16 +11492,17 @@ function loadNotifications() {
     set('noti-kpi-scheduled', ppN(scheduled) + '건');
 
     if (snap.empty) { tbody.innerHTML = ppEmpty(10,'발송 내역이 없습니다.'); return; }
-    var STATUS_BADGE = { sent:'<span class="badge badge-green">발송완료</span>', scheduled:'<span class="badge badge-amber">예약</span>', test:'<span class="badge badge-gray">테스트</span>' };
+    var STATUS_BADGE = { sent:'<span class="badge badge-green">발송완료</span>', scheduled:'<span class="badge badge-amber">예약</span>', cancelled:'<span class="badge badge-gray">취소됨</span>', test:'<span class="badge badge-gray">테스트</span>' };
     NOTI_DOCS = {};
     tbody.innerHTML = snap.docs.map(function(doc) {
       var d = doc.data();
       NOTI_DOCS[doc.id] = d;
       var total = d.recipient_count || 0;
       /* 예약 건은 아직 나가지 않았으므로 성공·실패가 없다 */
-      var r = (d.status === 'scheduled') ? null : notiResultCount(doc.id, d);
+      var r = (d.status === 'scheduled' || d.status === 'cancelled') ? null : notiResultCount(doc.id, d);
       var act = (d.status === 'scheduled')
         ? '<button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();notiOpenTest(\'' + doc.id + '\')">테스트 발송</button>'
+          + ' <button class="btn btn-ghost btn-sm" style="color:var(--danger)" onclick="event.stopPropagation();notiCancelScheduled(\'' + doc.id + '\')">취소</button>'
         : '';
       return '<tr style="cursor:pointer" onclick="notiOpenRecipients(\'' + doc.id + '\')">'
         + '<td style="text-align:center;white-space:nowrap"><div style="font-weight:700;color:#333">' + ppDt(d.created_at) + '</div><div style="color:var(--text-3);font-size:11px">' + ppTm(d.created_at) + '</div></td>'
@@ -11643,6 +11652,20 @@ function notiTestPredicate() {
 window.notiTestFilter = function() { NOTI_TEST_CTRL.applyFilter(notiTestPredicate()); };
 
 /* 작성 중인 알림(인자 없음) 또는 예약 건(docId)을 테스트 대상으로 연다. */
+/* 예약 건 취소 — 지우지 않고 「취소됨」 상태로 남긴다. 발송 완료 건에는 취소가 없다. */
+window.notiCancelScheduled = function(docId) {
+  var d = NOTI_DOCS[docId];
+  if (!d || d.status !== 'scheduled') { toast('예약 상태인 건만 취소할 수 있습니다.'); return; }
+  if (!confirm('예약 발송을 취소하시겠습니까?\n' + (d.title || '') + '\n취소한 건은 「취소됨」으로 남고 발송되지 않습니다.')) return;
+  db.collection('notifications').doc(docId).update({
+    status: 'cancelled',
+    cancelled_at: window.FS.FieldValue.serverTimestamp()
+  }).then(function() {
+    logAdmin('예약 알림 취소: ' + (d.title || docId));
+    toast('예약 발송을 취소했습니다.');
+    loadNotifications();
+  }).catch(function(e) { toast('취소하지 못했습니다: ' + (e.message || e)); });
+};
 window.notiOpenTest = function(docId) {
   var title, body;
   if (docId && NOTI_DOCS[docId]) {
@@ -11771,8 +11794,8 @@ window.notiOpenRecipients = function(docId) {
   var sub = document.getElementById('noti-rcp-sub');
   var sum = document.getElementById('noti-rcp-summary');
   if (sum) sum.innerHTML = '';
-  if (d.status === 'scheduled') {
-    if (sub) sub.textContent = (d.title || '') + ' · 예약 건은 아직 발송 전입니다';
+  if (d.status === 'scheduled' || d.status === 'cancelled') {
+    if (sub) sub.textContent = (d.title || '') + (d.status === 'cancelled' ? ' · 취소된 예약 건이라 발송되지 않았습니다' : ' · 예약 건은 아직 발송 전입니다');
     NOTI_RCP_ROWS = [];
     NOTI_RCP_CTRL.setRows([]);
     return;
