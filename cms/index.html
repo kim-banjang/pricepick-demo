@@ -270,6 +270,9 @@ html,body{font-family:var(--font);background:var(--bg);color:var(--text);-webkit
 .stat-label{font-size:11px;color:var(--text-2);margin-bottom:10px;font-weight:600;letter-spacing:-.1px;}
 .stat-value{font-size:28px;font-weight:800;letter-spacing:-1px;line-height:1.1;font-variant-numeric:tabular-nums;}
 .stat-change{font-size:11px;color:var(--success);margin-top:6px;font-weight:600;}
+/* 한 카드에 두 수치 — 대시보드 발행 티켓(티켓 · 이벤트 티켓, 검수 10-05 04-02) */
+.stat-pair{display:flex;gap:20px;align-items:flex-end;}
+.stat-pair .sp-l{display:block;font-size:11px;font-weight:600;color:var(--text-2);letter-spacing:-.1px;margin-bottom:4px;}
 .stat-change.down{color:var(--danger);}
 .stat-change.neutral{color:var(--text-2);}
 
@@ -1714,7 +1717,7 @@ window.CMS_FEATURES = {
       </div>
       <div class="stats-grid">
         <div class="stat-card purple"><div class="stat-label">전체 회원</div><div class="stat-value" id="kpi-users">—</div><div class="stat-change neutral">실데이터</div></div>
-        <div class="stat-card green"><div class="stat-label">발행 티켓 (누적 적립)</div><div class="stat-value" id="kpi-tickets">—</div><div class="stat-change neutral">적립 확정 기준</div></div>
+        <div class="stat-card green"><div class="stat-label">발행 티켓 (누적 적립)</div><div class="stat-value stat-pair"><span class="sp-i"><span class="sp-l">티켓</span><span id="kpi-tickets">—</span></span><span class="sp-i"><span class="sp-l">이벤트 티켓</span><span id="kpi-tickets-event">—</span></span></div><div class="stat-change neutral">적립 확정 기준</div></div>
         <div class="stat-card amber"><div class="stat-label">미처리 문의</div><div class="stat-value" id="kpi-inquiries">—</div><div class="stat-change neutral">미처리 상태</div></div>
         <div class="stat-card red"><div class="stat-label">미처리 추첨</div><div class="stat-value" id="kpi-draws">—</div><div class="stat-change neutral">마감 후 미처리</div></div>
       </div>
@@ -8195,7 +8198,7 @@ function recompNet(){
 }
 /* 대시보드의 티켓 숫자 셋 — 발행 티켓(적립 건수) · 티켓 적립 비용 · 적립 TOP 3 (2026-10-16)
    예전엔 셋 다 티켓 원장의 적립 기록을 통째로 읽어 셌다(티켓 1장 = 1건이라 수만 건). 이제 개수만 묻는다.
-   · 발행 티켓 = 적립(earn) 건수
+   · 발행 티켓 = 적립(earn) 건수. 이벤트 티켓(ticket_grade 'event')과 나머지(티켓)로 나눠 보인다 (검수 10-05 04-02 확정 2026-10-28)
    · 비용 = 종류별 적립 건수 × 단가 — 옛 브론즈·실버·골드는 티켓 1·10·20장 × 티켓 1장 값, 이벤트 티켓은 그 값 그대로.
      단가가 있는 종류는 TK_KIND_WEIGHT · TA_TICKET_VALUE 에 적힌 것뿐이라 그 종류만 세면 합이 같다.
    · TOP 3 = 회원별 적립 건수(회원 수만큼 묻는다 — 한 번에 1건씩)
@@ -8214,19 +8217,21 @@ function dashEarnStats() {
       var cost = 0, byUser = {};
       kinds.forEach(function (g, i) { var w = TK_KIND_WEIGHT[g]; cost += n[1 + i] * (w ? w * TA_TICKET_VALUE.bronze : (TA_TICKET_VALUE[g] || 0)); });
       ids.forEach(function (u, i) { var c = n[1 + kinds.length + i]; if (c) byUser[u] = c; });
-      return { total: n[0], cost: cost, byUser: byUser };
+      var ei = kinds.indexOf('event');
+      return { total: n[0], event: ei < 0 ? 0 : n[1 + ei], cost: cost, byUser: byUser };
     });
   });
   return byCount.then(function (st) {
     if (st) return st;
     return Promise.all([taLoadTicketValue(), ppAllWhere('ticket_transactions', 'type', 'earn')]).then(function (res) {
-      var snap = res[1], cost = 0, byUser = {};
+      var snap = res[1], cost = 0, ev = 0, byUser = {};
       snap.docs.forEach(function (d) {
         var x = d.data(), g = x.ticket_grade, w = TK_KIND_WEIGHT[g];
         cost += w ? w * TA_TICKET_VALUE.bronze : (TA_TICKET_VALUE[g] || 0);
+        if (g === 'event') ev++;
         var uid = x.user_id || ''; byUser[uid] = (byUser[uid] || 0) + 1;
       });
-      return { total: snap.size, cost: cost, byUser: byUser };
+      return { total: snap.size, event: ev, cost: cost, byUser: byUser };
     });
   });
 }
@@ -8239,7 +8244,8 @@ function loadDashboardStats() {
   /* 발행 티켓(누적 적립) + 티켓 적립 비용 — settings/ticket_value 반영(2026-08-12) */
   var earnStats = dashEarnStats();
   earnStats.then(function(st) {
-    setKpi('kpi-tickets', st.total.toLocaleString('ko-KR'));
+    setKpi('kpi-tickets', (st.total - st.event).toLocaleString('ko-KR'));
+    setKpi('kpi-tickets-event', st.event.toLocaleString('ko-KR'));
     setKpi('kpi-ticket-cost', kpiWon(st.cost));
     window.__ppTicketCost = st.cost; recompNet();
   }).catch(function(){});
