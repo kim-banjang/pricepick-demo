@@ -11604,7 +11604,7 @@ var NOTI_TEST_CTRL = window.NOTI_TEST_CTRL = ppMakeListController(8, function(pa
     var on = !!NOTI_TEST_PICK[u.id];
     return '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 10px;border-bottom:1px solid var(--border)">'
       + '<div style="min-width:0"><div style="font-weight:600;font-size:12px">' + ppEsc(u.nickname) + '</div>'
-      + '<div style="font-size:11px;color:var(--text-3);font-family:monospace">' + ppEsc(u.id) + '</div></div>'
+      + '<div style="font-size:11px;color:var(--text-3);font-family:monospace">' + ppEsc(maskUid(u.id)) + '</div></div>'
       + '<button class="btn btn-ghost btn-sm" onclick="notiTestPick(\'' + ppEsc(u.id) + '\')"' + (on ? ' disabled' : '') + '>'
       + (on ? '선택됨' : '선택') + '</button></div>';
   }).join('') : '<div style="padding:14px;text-align:center;color:var(--text-3);font-size:12px">검색 결과가 없습니다.</div>';
@@ -11756,7 +11756,7 @@ var NOTI_RCP_CTRL = window.NOTI_RCP_CTRL = ppMakeListController(10, function(pag
   if (!tb) return;
   tb.innerHTML = pageItems.length ? pageItems.map(function(r) {
     return '<tr><td>' + ppEsc(r.nickname) + '</td>'
-      + '<td style="font-family:monospace;font-size:11px;color:var(--text-2)">' + ppEsc(r.id) + '</td>'
+      + '<td style="font-family:monospace;font-size:11px;color:var(--text-2);cursor:pointer" title="눌러서 식별 아이디 전체 복사" onclick="ppCopyId(this,&quot;' + ppEsc(r.id) + '&quot;)">' + ppEsc(maskUid(r.id)) + '</td>'
       + '<td style="text-align:center">' + (r.ok ? '<span class="badge badge-green">성공</span>' : '<span class="badge badge-red">실패</span>') + '</td>'
       + '<td style="color:var(--text-2);font-size:12px">' + (r.reason ? ppEsc(r.reason) : '—') + '</td></tr>';
   }).join('') : ppEmpty(4, '조건에 맞는 수신자가 없습니다.');
@@ -11899,7 +11899,7 @@ function loadInquiries() {
         /* 「처리 중」은 없앴다 — 예전 기록은 미처리로 센다 (검수 10-05 04-28) */
         if (d.status === 'pending' || d.status === 'processing') pending++;
         else done++;
-        INQUIRIES_CACHE[doc.id] = Object.assign({}, d, { _userLabel: (userMap[d.user_id]||{}).nickname || d.user_id || '' });
+        INQUIRIES_CACHE[doc.id] = Object.assign({}, d, { _userLabel: (userMap[d.user_id]||{}).nickname || maskUid(d.user_id || '') });
         return Object.assign({ _id: doc.id, _user: userMap[d.user_id] }, d);
       });
       INQUIRIES_CTRL.setRows(items);
@@ -12766,7 +12766,7 @@ var COUPANG_PB_CTRL = window.COUPANG_PB_CTRL = ppMakeListController(20, function
     var main = '<tr class="pb-row" aria-expanded="false" onclick="pbToggleRow(this)">'
       + '<td style="white-space:nowrap">' + pbTimeCell(r.purchaseTime, r.at) + '</td>'
       + '<td>' + kindCell + '</td>'
-      + '<td><div class="pb-uid" title="' + pbEsc(r.subid) + '">' + pbRaw(r.subid) + '</div></td>'
+      + '<td><div class="pb-uid">' + (r.subid ? pbEsc(maskUid(r.subid)) : pbRaw(r.subid)) + '</div></td>'
       + '<td>' + pbMemberCell(r) + '</td>'
       + '<td><div class="pb-ord" title="' + pbEsc(r.orderId) + '">' + pbRaw(r.orderId) + '</div></td>'
       + '<td>' + pidCell + '</td>'
@@ -13393,7 +13393,7 @@ function loadClawback() {
           var items = docs.map(function(doc) {
             var d = doc.data();
             var item = Object.assign({ _id: doc.id, _user: userMap[d.user_id] }, d);
-            CLAWBACK_CACHE[doc.id] = Object.assign({}, d, { _userLabel: (userMap[d.user_id]||{}).nickname || d.user_id || '' });
+            CLAWBACK_CACHE[doc.id] = Object.assign({}, d, { _userLabel: (userMap[d.user_id]||{}).nickname || maskUid(d.user_id || '') });
             return item;
           });
           CLAWBACK_CTRL.setRows(items);
