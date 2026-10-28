@@ -307,6 +307,13 @@ service cloud.firestore {
       allow read, write: if true;
     }
 
+    // 추가 확인 사항 처리 현황 (pricepick.vercel.app/devqa/qa-extra-20261028.html)
+    // qa_extra_20261027 와 같은 작업판이다. 검수 외 항목(우리가 화면 점검 중 찾은 것)이라 컬렉션을 나눴다.
+    // 문서 ID 는 01 … 18 고정.
+    match /qa_extra_20261028/{docId} {
+      allow read, write: if true;
+    }
+
     // 해리 회신 답변 처리 현황 (pricepick.vercel.app/devqa/qa-harry-20261022.html)
     // qa_extra_20261021 와 같은 작업판이다. 상태가 원 검수와 섞이지 않게 컬렉션을 나눴다.
     // 문서 ID 는 01 · 02 · 03 · 06 · 07 · 08 · 09 · 13 · 14 · 15 · 16 · 17 고정.
