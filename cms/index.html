@@ -14344,7 +14344,7 @@ function taStatusBadgeClass(status) {
 }
 var TA_STATUS_VALUES = ['승인', '승인대기', '거부', '미신청'];
 /* subscript — APR 승인 완료 · DEN 승인 거부 · REQ 광고주에게 승인 요청 상태 */
-var TA_SUBSCRIPT_KO = { APR: '승인', DEN: '거부', REQ: '승인대기' };
+var TA_SUBSCRIPT_KO = { APR: '승인', DEN: '거부', REQ: '승인대기' };   /* 빈 값('')은 미신청 — 카탈로그 값으로 떨어진다 */
 /* 커미션은 "2%"·"3.5% 또는 700원"·"" 같은 문자열이다. 수수료 기본값으로 쓸 %만 뽑는다. */
 function taPctOf(v) {
   var m = String(v == null ? '' : v).match(/([\d.]+)\s*%/);
@@ -14389,9 +14389,8 @@ function taRenderRow(m, showHideCol) {
      Affiliate Center 자료가 없다. 자리는 「링크프라이스 상태」 다음이다. */
   var api = isCatalogRow ? taApiOf(m.code) : null;
   var app = api ? { aos: api.app_android_yn, ios: api.app_ios_yn } : null;
-  /* 광고주 조회 API 를 apr(승인)로 부르므로 승인 안 된 몰은 응답에 아예 없다.
-     그런 몰에 「갱신 필요」를 적으면 누르면 채워질 것처럼 보인다 — 「—」로 둔다
-     (김반장 확정 2026-09-22). 승인된 몰만 갱신으로 채워질 수 있는 칸이다. */
+  /* 광고주 조회 API 는 승인 거부·미신청 몰까지 받는다(검수 외-9 확정 2026-10-28). 값이 없는 몰은
+     승인이면 「갱신 필요」, 아니면 「—」로 둔다(김반장 확정 2026-09-22). */
   var approved = (m.status === '승인');
   var noVal = approved ? '<span class="ta-needsync">갱신 필요</span>' : '—';
   var commCell = !showHideCol ? '' : ('<td class="ta-tight">'

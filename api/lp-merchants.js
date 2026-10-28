@@ -13,8 +13,10 @@
  */
 
 const AFFILIATE_ID = process.env.LINKPRICE_AFFILIATE_ID || 'A100706012';
+/* 승인(apr)만이 아니라 승인 거부·미신청 몰까지 받는다 — 스테이징 목록과 같게(검수 외-9 확정 2026-10-28).
+   apr 자리에 apr 이 아닌 값을 넣으면 링크프라이스가 상태 구분 없이 전체 목록을 준다(2026-10-28 조회 확인, 110곳). */
 const ENDPOINT = 'http://api.linkprice.com/ci/service/all_merchant/'
-  + AFFILIATE_ID + '/apr/cps/detail';
+  + AFFILIATE_ID + '/all/cps/detail';
 const DOC_PATH = ['settings', 'linkprice_merchants'];
 
 /* 역슬래시+n 두 글자 */
@@ -117,12 +119,14 @@ module.exports = async function handler(req, res) {
 
   let prevCount = 0;
   let prevFetchedMs = lastFetchedAtMs;
+  let prevMerchants = {};
   if (ref) {
     try {
       const snap = await ref.get();
       if (snap.exists) {
         const d = snap.data();
         prevCount = Number(d.count) || 0;
+        prevMerchants = d.merchants || {};
         const t = Date.parse(d.fetched_at || '');
         if (!isNaN(t)) prevFetchedMs = Math.max(prevFetchedMs, t);
       }
@@ -171,6 +175,12 @@ module.exports = async function handler(req, res) {
     const id = m && m.merchant_id;
     if (id) merchants[id] = m;
   });
+  /* 이번 응답에서 빠진 몰은 지우지 않고 직전 값을 그대로 둔다 — 링크프라이스 목록에서 내려간 몰도
+     스테이징처럼 값이 남아 있어야 한다. 카탈로그의 「빠진 몰은 자동으로 지우지 않는다」와 같은 원칙이다. */
+  let kept = 0;
+  Object.keys(prevMerchants).forEach(function (id) {
+    if (!merchants[id]) { merchants[id] = prevMerchants[id]; kept++; }
+  });
 
   if (!ref) {
     lastFetchedAtMs = Date.parse(startedAt);
@@ -188,6 +198,7 @@ module.exports = async function handler(req, res) {
       affiliate_id: AFFILIATE_ID,
       fetched_at: startedAt,
       count: count,
+      kept_count: kept,
       merchants: merchants,
     });
   } catch (e) {
@@ -197,5 +208,5 @@ module.exports = async function handler(req, res) {
     });
   }
 
-  return res.status(200).json({ ok: true, count: count, prev_count: prevCount, fetched_at: startedAt });
+  return res.status(200).json({ ok: true, count: count, kept_count: kept, prev_count: prevCount, fetched_at: startedAt });
 };
