@@ -10860,6 +10860,14 @@ window.gsRevLoad = function () {
       }).catch(function () {});
     }
   }).then(function () {
+    /* 기본 조회 기간 = 오늘 기준 최근 1개월 — 제휴 수수료 매출과 같다. 열자마자 오늘이 든 구간이 보인다 (검수 10-05 04-04 확정 2026-10-28) */
+    var today = new Date(), from = new Date(today); from.setMonth(from.getMonth() - 1);
+    var fEl = document.getElementById('gs-period-from'), tEl = document.getElementById('gs-period-to');
+    var dEl = document.getElementById('gs-period-day'), mEl = document.getElementById('gs-period-month');
+    if (fEl && !fEl.value) fEl.value = ppDateInputValue(from);
+    if (tEl && !tEl.value) tEl.value = ppDateInputValue(today);
+    if (dEl && !dEl.value) dEl.value = ppDateInputValue(today);
+    if (mEl && !mEl.value) mEl.value = ppDateInputValue(today).slice(0, 7);
     gsRender();
   }).catch(function (e) {
     console.error('gsRevLoad', e);
