@@ -7256,7 +7256,7 @@ Object.assign(KO2VI,{
   "전환 대기일 수 적용":"Áp dụng số ngày chờ chuyển đổi",
   "선택한 몰에 한꺼번에 적용할 전환 대기일 수":"Số ngày chờ chuyển đổi áp dụng hàng loạt cho các sàn đã chọn",
   "카카오톡 연동 D+7 / 미연동 D+30":"Liên kết KakaoTalk D+7 / Chưa liên kết D+30",
-  "쿠팡은 직접 제휴라 카카오톡 연동 기준을 그대로 씁니다. 고정값이라 수정할 수 없습니다.":"Coupang là liên kết trực tiếp nên dùng đúng tiêu chuẩn liên kết KakaoTalk. Đây là giá trị cố định, không sửa được.",
+  "쿠팡은 직계약 제휴몰이라 대기일 수가 고정값입니다. 이 화면에서 수정할 수 없습니다.":"Coupang là sàn liên kết hợp đồng trực tiếp nên số ngày chờ là giá trị cố định. Không thể sửa trên màn hình này.",
   "티켓 적립 설정 Notice":"Lưu ý — Thiết lập tích lũy vé",
   "수수료 · 적립률":"Hoa hồng · Tỷ lệ tích lũy",
   "제휴몰별로 정합니다. 적립률 기본값은 수수료의 60%이고, 남는 40%가 우리 수익입니다.":"Đặt riêng cho từng sàn liên kết. Tỷ lệ tích lũy mặc định là 60% hoa hồng, 40% còn lại là lợi nhuận của chúng ta.",
@@ -14436,7 +14436,7 @@ function taRenderRow(m, showHideCol) {
     + '<td class="ta-margin">—</td>'
     + whenCell
     + (!showHideCol
-        ? '<td><span class="ta-days-fixed" title="쿠팡은 직접 제휴라 카카오톡 연동 기준을 그대로 씁니다. 고정값이라 수정할 수 없습니다.">' + TA_COUPANG_WAIT_LABEL + '</span></td>'
+        ? '<td><span class="ta-days-fixed" title="쿠팡은 직계약 제휴몰이라 대기일 수가 고정값입니다. 이 화면에서 수정할 수 없습니다.">' + TA_COUPANG_WAIT_LABEL + '</span></td>'
         : '<td><span class="ta-days-fixed" title="링크프라이스 제휴몰은 실적 월의 익익월 6일 이후 확정 건을 대조해 등급 티켓으로 전환합니다. 몰마다 다르지 않습니다.">' + TA_LP_CONVERT_LABEL + '</span></td>')
     + '<td><button type="button" class="btn btn-ghost btn-sm" onclick="taOpenSim(\'' + m.code + '\')">시뮬레이터</button></td>'
     + appliedCell
