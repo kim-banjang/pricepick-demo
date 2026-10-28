@@ -14580,6 +14580,9 @@ window.taLoad = function() {
     TA_CATALOG = catalogAll;   // 상세정보 모달도 이 배열을 쓴다
     LP_BY_CODE = null;
 
+    /* 링크프라이스 경유 「쿠팡」(lp:coupang, 승인 거부)은 목록에 올리지 않는다 — 쿠팡은 대표 제휴몰에 따로 있고,
+       스테이징 목록에도 없다(검수 외-9 확정 2026-10-28, 몰 구성은 스테이징 기준). 카탈로그 원본은 그대로 둔다. */
+    catalogAll = catalogAll.filter(function(x) { return x['머천트ID'] !== 'coupang'; });
     var secondaryAll = catalogAll.map(function(x) {
       var rawId = x['머천트ID'];
       var code = 'lp:' + rawId;
