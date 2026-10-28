@@ -4157,7 +4157,7 @@ window.CMS_FEATURES = {
 
     <!-- ── 출석체크 설정 ── -->
     <div class="section" id="sec-point-attendance">
-      <div class="info-box"><strong>출석체크 = 제휴몰 방문 후 복귀 시 적립</strong> — 회원이 연결 제휴몰을 방문하고 앱으로 복귀하면 일일 포인트가 지급됩니다. (폴센트형 UX) · 5일 연속 달성 시 이벤트 티켓 1장 추가 지급.</div>
+      <div class="info-box"><strong>출석체크 = 쿠팡 방문 후 복귀 시 적립</strong> — 회원이 쿠팡을 방문하고 앱으로 복귀하면 일일 포인트가 지급됩니다. (폴센트형 UX) · 5일 연속 달성 시 이벤트 티켓 1장 추가 지급.</div>
       <div class="stats-grid" style="grid-template-columns:repeat(3,1fr)">
         <div class="stat-card purple"><div class="stat-label">오늘 출석 회원</div><div class="stat-value" id="pa-kpi-visits">—</div><div class="stat-change neutral">오늘 기준</div></div>
         <div class="stat-card green"><div class="stat-label">오늘 지급 포인트</div><div class="stat-value" id="pa-kpi-points">—</div><div class="stat-change neutral">오늘 기준</div></div>
@@ -4178,7 +4178,7 @@ window.CMS_FEATURES = {
               <div style="display:flex;align-items:center;gap:8px"><select class="form-select" id="pa-streak-bonus" style="max-width:200px"><option value="이벤트 티켓 1장" selected>이벤트 티켓 1장</option><option value="이벤트 티켓 2장">이벤트 티켓 2장</option><option value="보너스 포인트">보너스 포인트</option></select></div>
             </div>
             <div class="form-group"><label class="form-label">출석 인정 조건</label>
-              <select class="form-select" id="pa-condition"><option value="제휴몰 방문 후 복귀 시 인정" selected>제휴몰 방문 후 복귀 시 인정</option></select>
+              <select class="form-select" id="pa-condition"><option value="제휴몰 방문 후 복귀 시 인정" selected>쿠팡 방문 후 복귀 시 인정</option></select>
             </div>
             <div class="form-group" style="margin-bottom:0"><label class="form-label">초기화 시각</label>
               <input class="form-input" type="time" id="pa-reset-time" value="00:00" style="max-width:140px">
@@ -4188,8 +4188,8 @@ window.CMS_FEATURES = {
         <div class="card">
           <div class="card-header"><div class="card-title">현재 적용 정책</div></div>
           <div>
-            <div class="policy-item"><div class="policy-label">일일 지급</div><div class="policy-value" id="pa-disp-points">10P (10원 상당)</div><div class="policy-desc">1일 1회, 제휴몰 방문 후 복귀 시 지급</div></div>
-            <div class="policy-item"><div class="policy-label">연결 제휴몰</div><div class="policy-value" id="pa-disp-mall">쿠팡 단독</div><div class="policy-desc">브릿지 경유 방문 추적</div></div>
+            <div class="policy-item"><div class="policy-label">일일 지급</div><div class="policy-value" id="pa-disp-points">10P (10원 상당)</div><div class="policy-desc">1일 1회, 쿠팡 방문 후 복귀 시 지급</div></div>
+            <div class="policy-item"><div class="policy-label">연결 제휴몰</div><div class="policy-value" id="pa-disp-mall">쿠팡</div><div class="policy-desc">브릿지 경유 방문 추적</div></div>
             <div class="policy-item"><div class="policy-label">연속 보너스</div><div class="policy-value" id="pa-disp-streak">5일 연속 → 이벤트 티켓 1장</div></div>
             <div class="policy-item"><div class="policy-label">초기화</div><div class="policy-value" id="pa-disp-reset">매일 00:00 자동 초기화</div></div>
           </div>
@@ -6837,6 +6837,10 @@ window.giSaveImageEdit = giSaveImageEdit;
   "입니다. 정산은 제휴몰별 D+30 확정.":"đây. Quyết toán xác nhận D+30 theo cửa hàng LK.",
   "(회원이 제휴몰에서 구매할 때 발생) ②":"(Phát sinh khi thành viên mua tại cửa hàng LK) ②",
   "개인정보처리방침 개정 안내 (시행 6/1)":"Hướng dẫn sửa đổi chính sách bảo mật (áp dụng 1/6)",
+  "출석체크 = 쿠팡 방문 후 복귀 시 적립":"Điểm danh = Tích lũy khi quay lại sau khi thăm Coupang",
+  "1일 1회, 쿠팡 방문 후 복귀 시 지급":"1 lần/ngày, cấp khi quay lại sau khi thăm Coupang",
+  "쿠팡 방문 후 복귀 시 인정":"Công nhận khi quay lại sau khi thăm Coupang",
+  "— 회원이 쿠팡을 방문하고 앱으로 복귀하면 일일 포인트가 지급됩니다. (폴센트형 UX) · 5일 연속 달성 시 이벤트 티켓 1장 추가 지급.":"— Khi thành viên thăm Coupang rồi quay lại ứng dụng sẽ được cấp điểm hằng ngày. (UX kiểu Fallcent) · Đạt 5 ngày liên tiếp được tặng thêm 1 vé sự kiện.",
   "출석체크 = 제휴몰 방문 후 복귀 시 적립":"Điểm danh = Tích lũy khi quay lại sau khi thăm cửa hàng LK",
   "(친구초대·광고시청은 포인트 경로로 이동)":"(Mời bạn·xem quảng cáo chuyển sang đường điểm)",
   "1일 1회, 제휴몰 방문 후 복귀 시 지급":"1 lần/ngày, cấp khi quay lại sau khi thăm cửa hàng LK",
