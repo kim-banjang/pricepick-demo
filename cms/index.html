@@ -14395,8 +14395,10 @@ function taRenderRow(m, showHideCol) {
      승인이면 「갱신 필요」, 아니면 「—」로 둔다(김반장 확정 2026-09-22). */
   var approved = (m.status === '승인');
   var noVal = approved ? '<span class="ta-needsync">갱신 필요</span>' : '—';
+  /* 「21% 또는 56,000원」처럼 정률·정액이 같이 오면 스테이징처럼 앞의 %만 적는다(검수 외-9 확정 2026-10-28) */
+  function taCommShown(v) { var m = String(v).match(/^\s*([\d.]+%)\s*또는/); return m ? m[1] : String(v); }
   var commCell = !showHideCol ? '' : ('<td class="ta-tight">'
-    + ((api && api.max_commission_mobile) ? taEsc(api.max_commission_mobile) : noVal) + '</td>');
+    + ((api && api.max_commission_mobile) ? taEsc(taCommShown(api.max_commission_mobile)) : noVal) + '</td>');
   var appCell = !showHideCol ? '' : (function() {
     if (!app || !app.aos) return '<td class="ta-tight">' + noVal + '</td>';
     /* 값 그대로 적는다. 엑셀의 APP 커미션 칸과 어긋나는 몰이 있어(현대홈쇼핑) 판정하지 않는다. */
