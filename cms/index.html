@@ -1773,7 +1773,7 @@ window.CMS_FEATURES = {
       <div class="toolbar">
         <input class="search-box" id="mem-search" placeholder="닉네임 검색..." onkeydown="if(event.key==='Enter')memApplyFilters()">
         <select class="filter-sel" id="mem-filter-linked" onchange="memApplyFilters()"><option value="">전체 연동상태</option><option value="guest">게스트(미연동)</option><option value="kakao">카카오 연동</option></select>
-        <select class="filter-sel" id="mem-filter-status" onchange="memApplyFilters()"><option value="">전체 상태</option><option value="active">정상</option><option value="suspended">차단</option><option value="withdrawn">탈퇴</option></select>
+        <select class="filter-sel" id="mem-filter-status" onchange="memApplyFilters()"><option value="">전체 상태</option><option value="active" selected>정상</option><option value="suspended">차단</option><option value="withdrawn">탈퇴</option></select>
         <button class="btn btn-primary btn-sm" onclick="memApplyFilters()">검색</button>
         <div style="margin-left:auto;display:flex;gap:8px;" id="member-hdr-actions"></div>
       </div>
@@ -1782,6 +1782,9 @@ window.CMS_FEATURES = {
         <div style="display:flex;align-items:center;gap:16px;font-size:12px;">
           <span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--main);margin-right:5px;vertical-align:middle;"></span>카카오 연동 <strong style="color:var(--main-hover)" id="mem-kakao">—</strong></span>
           <span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#d97a17;margin-right:5px;vertical-align:middle;"></span>게스트(미연동) <strong style="color:#d97a17" id="mem-guest">—</strong></span>
+          <span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--success);margin-right:5px;vertical-align:middle;"></span>정상 <strong style="color:var(--success)" id="mem-st-active">—</strong></span>
+          <span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--danger);margin-right:5px;vertical-align:middle;"></span>차단 <strong style="color:var(--danger)" id="mem-st-suspended">—</strong></span>
+          <span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--text-3);margin-right:5px;vertical-align:middle;"></span>탈퇴 <strong style="color:var(--text-2)" id="mem-st-withdrawn">—</strong></span>
           <span style="color:var(--text-3)">마케팅 수신 동의 <strong style="color:var(--text-2)" id="mem-mkt">—</strong></span>
         </div>
       </div>
@@ -8221,9 +8224,10 @@ function dashEarnStats() {
   });
 }
 function loadDashboardStats() {
-  /* 전체 회원 */
+  /* 전체 회원 — 정상 회원 기준(2026-10-28 확정, 회원 목록 상단과 같은 수) */
   ppAll('users').then(function(snap) {
-    setKpi('kpi-users', snap.size.toLocaleString('ko-KR'));
+    var n = 0; snap.docs.forEach(function(d){ var u = d.data(); if (u.created_at && (u.status || 'active') === 'active') n++; });
+    setKpi('kpi-users', n.toLocaleString('ko-KR'));
   }).catch(function(){});
   /* 발행 티켓(누적 적립) + 티켓 적립 비용 — settings/ticket_value 반영(2026-08-12) */
   var earnStats = dashEarnStats();
@@ -8911,11 +8915,18 @@ function loadMembers() {
       }
       var items = snap.docs.map(function(doc) { return Object.assign({ _id: doc.id }, doc.data()); });
       MEM_CTRL.setRows(items);
+      memApplyFilters();  /* 거르개에 걸린 값(처음엔 정상)대로 다시 거른다 — 상단 수치와 같은 기준 */
     }).catch(function(e){ console.error('members', e); });
-  /* 전체 회원 집계 (연동/게스트/마케팅 동의) */
+  /* 회원 수 집계 — 정상 회원 기준(2026-10-28 확정). 상단 총수·연동/게스트·마케팅 동의는 정상 회원으로 세고,
+     상태별 수(정상·차단·탈퇴)를 따로 보인다. 가입일이 없는 문서는 회원이 아니라 세지 않는다(목록과 같은 기준). */
   ppAll('users').then(function(s){
-    var total = s.size, kakao = 0, mkt = 0;
-    s.docs.forEach(function(d){ var u=d.data(); if(u.linked_kakao) kakao++; if(u.marketing_consent===true||u.marketing_agree===true) mkt++; });
+    var total = 0, kakao = 0, mkt = 0, byStatus = { active:0, suspended:0, withdrawn:0 };
+    s.docs.forEach(function(d){
+      var u=d.data(); if(!u.created_at) return;
+      var st=u.status||'active'; if(byStatus[st]!=null) byStatus[st]++;
+      if(st!=='active') return;
+      total++; if(u.linked_kakao) kakao++; if(u.marketing_consent===true||u.marketing_agree===true) mkt++;
+    });
     var guest = total - kakao;
     var pct = function(n){ return total ? ' (' + (n/total*100).toFixed(1) + '%)' : ''; };
     var set = function(id,t){ var e=document.getElementById(id); if(e) e.textContent=t; };
@@ -8923,6 +8934,7 @@ function loadMembers() {
     set('mem-kakao', kakao.toLocaleString('ko-KR') + '명' + pct(kakao));
     set('mem-guest', guest.toLocaleString('ko-KR') + '명' + pct(guest));
     set('mem-mkt', mkt > 0 ? (mkt.toLocaleString('ko-KR') + '명' + pct(mkt)) : '운영 데이터 없음');
+    ['active','suspended','withdrawn'].forEach(function(k){ set('mem-st-' + k, byStatus[k].toLocaleString('ko-KR') + '명'); });
   }).catch(function(){});
 }
 
