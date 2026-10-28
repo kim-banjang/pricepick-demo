@@ -3524,6 +3524,12 @@ window.CMS_FEATURES = {
       </button>
 
       <div class="toolbar">
+        <!-- 보는 순서 — 단위(월별·일별·기간별) → 기간 → 거르기 → 검색. 기본 일별 (검수 10-05 04-04 확정 2026-10-28) -->
+        <select class="filter-sel" id="rf-view" onchange="rfViewChanged()">
+          <option value="month">월별</option>
+          <option value="day" selected>일별</option>
+          <option value="range">기간별</option>
+        </select>
         <span class="rf-tb-label">조회 기간</span>
         <select class="filter-sel" id="rf-period-mode" onchange="rfPeriodModeChanged()">
           <option value="day">하루</option>
@@ -3598,13 +3604,8 @@ window.CMS_FEATURES = {
 
         <div class="card">
           <div class="card-header">
-            <div><div class="card-title"><span id="rf-bd-title">월별 내역</span> <span style="font-weight:400;font-size:12px;color:var(--text-3)">링크프라이스</span></div><div class="card-sub" id="rf-bd-sub">—</div></div>
+            <div><div class="card-title"><span id="rf-bd-title">일별 내역</span> <span style="font-weight:400;font-size:12px;color:var(--text-3)">링크프라이스</span></div><div class="card-sub" id="rf-bd-sub">—</div></div>
             <div style="display:flex;gap:8px;align-items:center">
-              <select class="filter-sel" id="rf-view" onchange="rfViewChanged()">
-                <option value="month" selected>월별</option>
-                <option value="day">일별</option>
-                <option value="range">기간별</option>
-              </select>
               <!-- 엑셀 내려받기 단추를 물렸다 — 김반장 지시 2026-09-03. 셈은 그대로 두었으니 이 줄만 살리면 돌아온다.
               <button class="btn btn-ghost btn-sm" onclick="rfDownloadXlsx()">엑셀 내려받기</button> -->
             </div>
@@ -3811,6 +3812,11 @@ window.CMS_FEATURES = {
          취소 건은 합계에서 뺀다 — 건수만 요약 카드에 따로 적는다. -->
     <div class="section" id="sec-revenue-gifti">
       <div class="toolbar">
+        <!-- 단위 선택창 — 제휴 수수료 매출과 같은 자리 · 같은 기본값(일별) (검수 10-05 04-04 확정 2026-10-28) -->
+        <select class="filter-sel" id="gs-view" onchange="gsViewChanged()">
+          <option value="month">월별</option>
+          <option value="day" selected>일별</option>
+        </select>
         <span class="rf-tb-label">조회 기간</span>
         <select class="filter-sel" id="gs-period-mode" onchange="gsPeriodModeChanged()">
           <option value="day">하루</option>
@@ -3842,13 +3848,7 @@ window.CMS_FEATURES = {
 
       <div class="card">
         <div class="card-header">
-          <div><div class="card-title"><span id="gs-bd-title">월별 내역</span></div><div class="card-sub" id="gs-bd-sub">—</div></div>
-          <div style="display:flex;gap:8px;align-items:center">
-            <select class="filter-sel" id="gs-view" onchange="gsViewChanged()">
-              <option value="month" selected>월별</option>
-              <option value="day">일별</option>
-            </select>
-          </div>
+          <div><div class="card-title"><span id="gs-bd-title">일별 내역</span></div><div class="card-sub" id="gs-bd-sub">—</div></div>
         </div>
         <table id="gs-bd-table">
           <colgroup><col style="width:22%"><col style="width:14%"><col style="width:34%"><col style="width:30%"></colgroup>
@@ -10793,10 +10793,10 @@ window.gsPeriodModeChanged = gsPeriodModeChanged;
 
 /* 지금 무엇을 보고 있나 — 'month'(전체를 달로) · 'day'(한 달을 날로) · 'detail'(하루의 건별).
    월별 표의 「기간」을 누르면 day, 일별 표의 「기간」을 누르면 detail 로 내려간다. */
-var GSREV_LV = { level: 'month', month: '', day: '' };
+var GSREV_LV = { level: 'day', month: '', day: '' };
 
 function gsViewChanged() {
-  var v = (document.getElementById('gs-view') || {}).value || 'month';
+  var v = (document.getElementById('gs-view') || {}).value || 'day';
   /* 선택칸을 직접 바꾸면 파고든 자리를 빠져나온다 — 전체 범위로 되돌린다. */
   GSREV_LV = { level: (v === 'day') ? 'day' : 'month', month: '', day: '' };
   gsRender();
@@ -10866,7 +10866,7 @@ window.gsRevLoad = function () {
     toast('기프티샵 판매 매출을 불러오지 못했습니다.');
   });
 };
-function gsReload() { GSREV_LV = { level: 'month', month: '', day: '' }; gsRender(); }
+function gsReload() { GSREV_LV = { level: (((document.getElementById('gs-view') || {}).value || 'day') === 'day') ? 'day' : 'month', month: '', day: '' }; gsRender(); }
 window.gsReload = gsReload;
 
 /* 한 건이 쓴 티켓 조합 — 기록에 조합이 있으면 그대로, 없으면 단일 등급 한 벌 */
@@ -10928,7 +10928,7 @@ function gsRender() {
   /* 되돌아갈 길 — CMS 에 이미 있는 파고들기 띠(rf-drill)를 그대로 쓴다 */
   var drill = document.getElementById('gs-drill');
   if (drill) {
-    if (lv === 'month') { drill.style.display = 'none'; }
+    if (lv === 'month' || (lv === 'day' && !GSREV_LV.month)) { drill.style.display = 'none'; }
     else {
       drill.style.display = 'flex';
       set('gs-drill-text', (lv === 'day')
@@ -15745,10 +15745,9 @@ function rfPeriodRange() {
 
 /* ── 보기(월별 / 일별 / 기간별) ────────────────────────────────────
    조회 기간은 「어디부터 어디까지」, 보기는 「그 안을 어떻게 쪼갤지」다.
-   기본은 월별(김반장 2026-08-27) — 최근 30일만 잡으면 티켓 지급 대기(쿠팡 미연동·
-   링크프라이스 기본이 30일이다)를 안 지난 건뿐이라 「지급 완료」가 통째로 0원으로
-   찍힌다. 월별로 넓게 보면 지난 달 지급 완료가 바로 보인다. */
-function rfView() { return (document.getElementById('rf-view') || {}).value || 'month'; }
+   기본은 일별(검수 10-05 04-04 확정 2026-10-28). 선택창은 조회 기간 줄 맨 왼쪽에 있다.
+   줄은 최근 것이 위로 온다 — 열자마자 오늘이 든 구간이 보인다. */
+function rfView() { return (document.getElementById('rf-view') || {}).value || 'day'; }
 window.rfViewChanged = function() { RF.sel = null; rfReload(); };
 window.rfClearSelection = function() { RF.sel = null; rfRefreshDrill(); };
 
@@ -15915,7 +15914,7 @@ function rfBuildBuckets() {
     }
     map[k][o.kind === 'coupang' ? 'cp' : 'lp'].push(o);
   });
-  order.sort();
+  order.sort().reverse();
   RF.buckets = order.map(function(k) {
     var r = rfBucketRange(k, view, p);
     return {
