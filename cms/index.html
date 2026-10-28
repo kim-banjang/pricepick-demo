@@ -4311,7 +4311,7 @@ window.CMS_FEATURES = {
         </div>
         <div class="form-group"><label class="form-label">상태</label><select class="form-select" id="m-status" onchange="dmBlockPeriodToggle()"><option>정상</option><option>차단</option><option>탈퇴</option></select></div>
         <div class="form-group"><label class="form-label">가입 유형</label><input class="form-input" id="m-join-type" disabled></div>
-        <div class="form-group"><label class="form-label">식별 아이디</label><input class="form-input" id="m-doc-id" readonly title="눌러서 식별 아이디 전체 복사" onclick="ppCopyId(this, document.getElementById('m-member-id').value)" style="font-family:monospace;font-size:12px;cursor:pointer;background:var(--bg-2,#f5f6f8);"></div>
+        <div class="form-group"><label class="form-label">식별 아이디</label><input class="form-input" id="m-doc-id" disabled style="font-family:monospace;font-size:12px;"></div>
       </div>
       <div class="form-group">
         <label class="form-label">티켓 보유 현황</label>
@@ -9319,18 +9319,13 @@ function maskKakaoEmail(email) {
   if (at < 0) return email.slice(0, 2) + '***';
   return email.slice(0, Math.min(2, at)) + '***' + email.slice(at);
 }
-// 식별 아이디 가림 — 화면에는 뒤 네 자리만 남긴다(***kAb3). 복사·검색·저장에는 원래 값을 쓴다.
-function maskUid(uid) {
-  uid = uid == null ? '' : String(uid);
-  return uid.length > 4 ? '***' + uid.slice(-4) : uid;
-}
 function memberIdShort(docId, len) {
   docId = docId || '';
   len = len || 18;
   return docId.length > len ? (docId.slice(0, len) + '…') : docId;
 }
 // 세로 3행용 — 닉네임 / 카카오톡ID(또는 게스트) / 식별 아이디(내부 users 문서ID)
-// 카카오 이메일은 maskKakaoEmail로, 식별 아이디는 maskUid로 늘 가린다. 식별 아이디를 누르면 원래 값이 복사된다.
+// opts.maskKakao — 목록 화면에서 카카오 이메일을 maskKakaoEmail로 가린다.
 function renderMemberIdentity(u, docId, opts) {
   /* 줄 자리는 늘 셋을 지키고, 없는 값은 빈 채로 둔다 — 줄 수가 1·2·3으로 들쭉날쭉하면
      행 높이가 제각각이 된다(김반장 2026-09-16). 없다는 말(「닉네임없음」·「게스트(비연동)」)은
@@ -9339,7 +9334,7 @@ function renderMemberIdentity(u, docId, opts) {
   u = u || {};
   var nick = u.nickname || '';
   var kakao = (u.linked_kakao && u.kakao_login_id) ? u.kakao_login_id : '';
-  kakao = maskKakaoEmail(kakao);
+  if (opts && opts.maskKakao) kakao = maskKakaoEmail(kakao);
   var uid = docId || '';
   var uidAttr = uid
     ? ' title="눌러서 식별 아이디 전체 복사" onclick="event.stopPropagation();ppCopyId(this,&quot;' + ppEsc(uid) + '&quot;)"'
@@ -9347,7 +9342,7 @@ function renderMemberIdentity(u, docId, opts) {
   return '<div class="idc">'
     + '<div class="idc-nick">' + ppEsc(nick) + '</div>'
     + '<div class="idc-sub">' + ppEsc(kakao) + '</div>'
-    + '<div class="idc-uid"' + uidAttr + '>' + ppEsc(maskUid(uid)) + '</div>'
+    + '<div class="idc-uid"' + uidAttr + '>' + ppEsc(uid) + '</div>'
     + '</div>';
 }
 // 회원 목록 리스트 전용 — 세로 2행(닉네임 / 카카오ID). 식별 아이디(내부 문서ID)는 상세에서만 노출.
@@ -9355,7 +9350,7 @@ function renderMemberIdentity(u, docId, opts) {
 function renderMemberIdentityListOnly(u, docId, opts) {
   u = u || {};
   var idLine = (u.linked_kakao && u.kakao_login_id)
-    ? maskKakaoEmail(u.kakao_login_id)
+    ? ((opts && opts.maskKakao) ? maskKakaoEmail(u.kakao_login_id) : u.kakao_login_id)
     : '미연동';
   return '<div style="font-weight:500;">' + (u.nickname || '닉네임없음') + '</div>'
     + '<div style="font-size:11px;color:var(--text-2);font-family:monospace;">' + idLine + '</div>';
@@ -9363,8 +9358,7 @@ function renderMemberIdentityListOnly(u, docId, opts) {
 // 드롭다운 등 세로 공간이 없는 곳용 — 한 줄 "닉네임 · 카카오톡ID(또는 게스트) · 식별 아이디"
 function renderMemberIdentityInline(u, docId) {
   u = u || {};
-  var kakao = (u.linked_kakao && u.kakao_login_id) ? maskKakaoEmail(u.kakao_login_id) : '게스트(비연동)';
-  return (u.nickname || '닉네임없음') + ' · ' + kakao + ' · ' + maskUid(docId || '');
+  return (u.nickname || '닉네임없음') + ' · ' + memberKakaoLabel(u) + ' · ' + (docId || '');
 }
 // 여러 문서에 박힌 user_id들을 한 번에 조회해 {uid: userData} 맵으로 반환.
 // 회원 표기가 필요한 목록 화면들이 전부 이걸로 users와 조인한 뒤 위 렌더 함수를 쓴다.
@@ -11604,7 +11598,7 @@ var NOTI_TEST_CTRL = window.NOTI_TEST_CTRL = ppMakeListController(8, function(pa
     var on = !!NOTI_TEST_PICK[u.id];
     return '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 10px;border-bottom:1px solid var(--border)">'
       + '<div style="min-width:0"><div style="font-weight:600;font-size:12px">' + ppEsc(u.nickname) + '</div>'
-      + '<div style="font-size:11px;color:var(--text-3);font-family:monospace">' + ppEsc(maskUid(u.id)) + '</div></div>'
+      + '<div style="font-size:11px;color:var(--text-3);font-family:monospace">' + ppEsc(u.id) + '</div></div>'
       + '<button class="btn btn-ghost btn-sm" onclick="notiTestPick(\'' + ppEsc(u.id) + '\')"' + (on ? ' disabled' : '') + '>'
       + (on ? '선택됨' : '선택') + '</button></div>';
   }).join('') : '<div style="padding:14px;text-align:center;color:var(--text-3);font-size:12px">검색 결과가 없습니다.</div>';
@@ -11756,7 +11750,7 @@ var NOTI_RCP_CTRL = window.NOTI_RCP_CTRL = ppMakeListController(10, function(pag
   if (!tb) return;
   tb.innerHTML = pageItems.length ? pageItems.map(function(r) {
     return '<tr><td>' + ppEsc(r.nickname) + '</td>'
-      + '<td style="font-family:monospace;font-size:11px;color:var(--text-2);cursor:pointer" title="눌러서 식별 아이디 전체 복사" onclick="ppCopyId(this,&quot;' + ppEsc(r.id) + '&quot;)">' + ppEsc(maskUid(r.id)) + '</td>'
+      + '<td style="font-family:monospace;font-size:11px;color:var(--text-2)">' + ppEsc(r.id) + '</td>'
       + '<td style="text-align:center">' + (r.ok ? '<span class="badge badge-green">성공</span>' : '<span class="badge badge-red">실패</span>') + '</td>'
       + '<td style="color:var(--text-2);font-size:12px">' + (r.reason ? ppEsc(r.reason) : '—') + '</td></tr>';
   }).join('') : ppEmpty(4, '조건에 맞는 수신자가 없습니다.');
@@ -11899,7 +11893,7 @@ function loadInquiries() {
         /* 「처리 중」은 없앴다 — 예전 기록은 미처리로 센다 (검수 10-05 04-28) */
         if (d.status === 'pending' || d.status === 'processing') pending++;
         else done++;
-        INQUIRIES_CACHE[doc.id] = Object.assign({}, d, { _userLabel: (userMap[d.user_id]||{}).nickname || maskUid(d.user_id || '') });
+        INQUIRIES_CACHE[doc.id] = Object.assign({}, d, { _userLabel: (userMap[d.user_id]||{}).nickname || d.user_id || '' });
         return Object.assign({ _id: doc.id, _user: userMap[d.user_id] }, d);
       });
       INQUIRIES_CTRL.setRows(items);
@@ -12766,7 +12760,7 @@ var COUPANG_PB_CTRL = window.COUPANG_PB_CTRL = ppMakeListController(20, function
     var main = '<tr class="pb-row" aria-expanded="false" onclick="pbToggleRow(this)">'
       + '<td style="white-space:nowrap">' + pbTimeCell(r.purchaseTime, r.at) + '</td>'
       + '<td>' + kindCell + '</td>'
-      + '<td><div class="pb-uid">' + (r.subid ? pbEsc(maskUid(r.subid)) : pbRaw(r.subid)) + '</div></td>'
+      + '<td><div class="pb-uid" title="' + pbEsc(r.subid) + '">' + pbRaw(r.subid) + '</div></td>'
       + '<td>' + pbMemberCell(r) + '</td>'
       + '<td><div class="pb-ord" title="' + pbEsc(r.orderId) + '">' + pbRaw(r.orderId) + '</div></td>'
       + '<td>' + pidCell + '</td>'
@@ -13266,7 +13260,7 @@ function renderAccessLog() {
     logTbody.innerHTML = docs.map(function(x){
       return '<tr><td style="text-align:center"><div style="font-weight:600;color:#333">'+ppDt(x.at)+'</div><div style="color:var(--text-3);font-size:11px">'+ppTm(x.at)+'</div></td>'
         + '<td>'+(x.admin_name||x.admin_username||'-')+'</td>'
-        + '<td>'+(x.action ? String(x.action).replace(/\b[A-Za-z0-9]{28}\b/g, maskUid) : '-')+'</td>'
+        + '<td>'+(x.action||'-')+'</td>'
         + '<td style="font-family:monospace;font-size:11px;color:var(--text-3)">'+(x.ip||'—')+'</td></tr>';
     }).join('');
   }).catch(function(e){ console.error('renderAccessLog',e); logTbody.innerHTML = ppEmpty(4,'접근 로그가 없습니다.'); });
@@ -13393,7 +13387,7 @@ function loadClawback() {
           var items = docs.map(function(doc) {
             var d = doc.data();
             var item = Object.assign({ _id: doc.id, _user: userMap[d.user_id] }, d);
-            CLAWBACK_CACHE[doc.id] = Object.assign({}, d, { _userLabel: (userMap[d.user_id]||{}).nickname || maskUid(d.user_id || '') });
+            CLAWBACK_CACHE[doc.id] = Object.assign({}, d, { _userLabel: (userMap[d.user_id]||{}).nickname || d.user_id || '' });
             return item;
           });
           CLAWBACK_CTRL.setRows(items);
@@ -17562,12 +17556,12 @@ window.openMemberDetail = function(id) {
     document.getElementById('m-name').value = u.nickname || '';
     document.getElementById('m-status').value = MEMBER_STATUS_KO[u.status] || '정상';
     document.getElementById('m-join-type').value = u.linked_kakao ? '카카오 연동' : '게스트';
-    document.getElementById('m-doc-id').value = maskUid(id);
+    document.getElementById('m-doc-id').value = id;
     var accEl = document.getElementById('m-accounts');
     accEl.innerHTML = u.linked_kakao
       ? '<div style="display:flex;align-items:center;gap:6px;font-size:12px;">'
         + '<span style="display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:5px;background:#FEE500;font-size:11px;font-weight:700;">K</span>'
-        + '<span>' + (u.kakao_login_id ? ppEsc(maskKakaoEmail(u.kakao_login_id)) : '(카카오 로그인ID 미등록)') + '</span></div>'
+        + '<span>' + (u.kakao_login_id || '(카카오 로그인ID 미등록)') + '</span></div>'
       : '<span style="font-size:12px;color:var(--text-3);">게스트(비연동)</span>';
     document.getElementById('m-status').dataset.orig = document.getElementById('m-status').value;
     document.getElementById('m-status-reason').value = '';
@@ -19301,7 +19295,7 @@ function rltRenderLog(k) {
       var parts = String(r[0]).split(' ');
       return '<tr>'
         + '<td style="white-space:nowrap;font-size:12px"><div style="font-weight:700;color:#333333">' + parts[0].replace(/-/g, '/') + '</div><div style="color:var(--text-3)">' + (parts[1] || '') + '</div></td>'
-        + '<td><div style="font-weight:500">' + ppEsc(r[1]) + '</div><div style="font-size:11px;color:var(--text-2);font-family:monospace">' + (r[2] ? '(' + ppEsc(maskKakaoEmail(r[2])) + ')' : '카카오 미연동') + '</div></td>'
+        + '<td><div style="font-weight:500">' + ppEsc(r[1]) + '</div><div style="font-size:11px;color:var(--text-2);font-family:monospace">' + (r[2] ? '(' + ppEsc(r[2]) + ')' : '카카오 미연동') + '</div></td>'
         + '<td style="color:var(--text-2)">' + kind.name + '</td>'
         + '<td>' + rltLogResultText(r[3], r[4], k) + '</td>'
         + '<td style="text-align:center">' + rltLogStatusChip(r[5]) + '</td>'
