@@ -19386,7 +19386,7 @@ function rltRenderLog(k) {
     }).join('');
   }
   var cnt = document.getElementById(kind.p + '-log-count');
-  if (cnt) cnt.textContent = '최근 ' + rows.length + '건 · ' + cur + ' / ' + total + ' 페이지';
+  if (cnt) cnt.textContent = rows.length + '건';  /* STG와 같게 — 건수만. 쪽 위치는 아래 페이저가 보여 준다 */
   var pager = document.getElementById(kind.p + '-log-pager');
   if (pager) {
     pager.innerHTML = ppStgPagerHtml({ total: rows.length, page: cur, size: size,
