@@ -1262,6 +1262,13 @@ textarea.form-input,textarea.terms-editor,.terms-editor{
 /* 세로 가운데 정렬 */
 .toolbar,.card-header,.modal-footer,.dm-field{align-items:center;}
 
+.pp-pager{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 18px;border-top:1px solid var(--border);}
+.pp-pager-l{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text-2);}
+.pp-pager-l select{height:26.5px;width:60px;padding:4px;font-size:12px;color:var(--text-2);background:var(--surface-2);border:1px solid var(--border);border-radius:6px;cursor:pointer;}
+.pp-pager-r{display:flex;align-items:center;gap:4px;}
+.pp-pager-r button{height:30px;min-width:30px;padding:0 4px;font-size:12px;color:var(--text-2);background:transparent;border:1px solid var(--border);border-radius:6px;cursor:pointer;}
+.pp-pager-r button:disabled{opacity:.4;cursor:not-allowed;}
+.pp-pager-range{padding:0 8px;font-size:12px;color:var(--text);font-variant-numeric:tabular-nums;}
 </style>
 </head>
 <body>
@@ -2271,7 +2278,7 @@ window.CMS_FEATURES = {
           </thead>
           <tbody id="rlt-log-tbody"></tbody>
         </table>
-        <div class="pagination" id="rlt-log-pager"></div>
+        <div id="rlt-log-pager"></div>
       </div>
     </div>
 
@@ -2357,7 +2364,7 @@ window.CMS_FEATURES = {
           </thead>
           <tbody id="jkr-log-tbody"></tbody>
         </table>
-        <div class="pagination" id="jkr-log-pager"></div>
+        <div id="jkr-log-pager"></div>
       </div>
     </div>
 
@@ -2421,7 +2428,7 @@ window.CMS_FEATURES = {
           </thead>
           <tbody id="gbd-log-tbody"></tbody>
         </table>
-        <div class="pagination" id="gbd-log-pager"></div>
+        <div id="gbd-log-pager"></div>
       </div>
     </div>
 
@@ -2508,7 +2515,7 @@ window.CMS_FEATURES = {
           </thead>
           <tbody id="gbr-log-tbody"></tbody>
         </table>
-        <div class="pagination" id="gbr-log-pager"></div>
+        <div id="gbr-log-pager"></div>
       </div>
     </div>
 
@@ -2634,7 +2641,7 @@ window.CMS_FEATURES = {
           <thead><tr><th style="width:52px">No</th><th>카테고리</th><th>브랜드</th><th style="width:70px">이미지</th><th>상품명</th><th>상품코드</th><th>상품판매종료일</th><th>유효기간</th><th>판매가격</th><th style="width:96px">상태</th></tr></thead>
           <tbody id="gifticon-tbody"></tbody>
         </table>
-        <div class="gip-pager" id="gip-pager"></div>
+        <div id="gip-pager"></div>
       </div>
     </div>
 <!-- 6. 다우테크 오류 로그 — 기프티콘 발급 연동에서 난 오류를 모아 보는 자리.
@@ -8460,15 +8467,7 @@ function gipRender() {
   if (pager) {
     var lo = total ? from + 1 : 0;
     var hi = Math.min(from + GIP_SIZE, total);
-    pager.innerHTML = '<span>페이지 당 행:</span>'
-      + '<select class="filter-sel" onchange="gipSetSize(this.value)">'
-      + [10,25,50,100].map(function(v){ return '<option value="' + v + '"' + (v===GIP_SIZE?' selected':'') + '>' + v + '</option>'; }).join('')
-      + '</select>'
-      + '<span class="gip-pager-range">' + lo + '\u2013' + hi + ' / ' + total + '</span>'
-      + '<span style="display:flex;gap:4px;">'
-      + '<button class="btn btn-ghost btn-sm" ' + (GIP_PAGE<=1?'disabled':'onclick="gipGo(-1)"') + '>이전</button>'
-      + '<button class="btn btn-ghost btn-sm" ' + (GIP_PAGE>=pages?'disabled':'onclick="gipGo(1)"') + '>다음</button>'
-      + '</span>';
+    pager.innerHTML = ppStgPagerHtml({ total: total, page: GIP_PAGE, size: GIP_SIZE, onSize: 'gipSetSize(this.value)', onPrev: 'gipGo(-1)', onNext: 'gipGo(1)' });
   }
 }
 
@@ -8764,12 +8763,12 @@ function identityMatch(u, uid, q) {
 function gexTwoLine(top, sub) {
   return '<div style="font-weight:700;">' + top + '</div>' + (sub ? '<div class="cell-sub">' + sub + '</div>' : '');
 }
-var GEX_CTRL = window.GEX_CTRL = ppMakeListController(20, function(pageItems, state, totalPages) {
+var GEX_CTRL = window.GEX_CTRL = ppMakeListController(10, function(pageItems, state, totalPages) {
   var sec = document.getElementById('sec-gifticons');
   var tbody = sec && sec.querySelector('table tbody');
   var pag = document.getElementById('gex-pagination');
   if (!tbody) return;
-  if (!pageItems.length) { tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:32px;color:var(--text-3);">조건에 맞는 구매내역이 없습니다.</td></tr>'; if (pag) pag.innerHTML = ''; return; }
+  if (!pageItems.length) { tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:32px;color:var(--text-3);">조건에 맞는 구매내역이 없습니다.</td></tr>'; if (pag) pag.innerHTML = ppCtrlPagerHtml('GEX_CTRL', state); return; }
   tbody.innerHTML = pageItems.map(function(g) {
     var isCancelled = g.status === 'cancelled';
     /* 취소는 「기프티콘 미사용 취소」 화면이 맡는다 — 여기 정리에는 취소 단추가 없다. */
@@ -8788,7 +8787,7 @@ var GEX_CTRL = window.GEX_CTRL = ppMakeListController(20, function(pageItems, st
       + '<td>' + usedTicketCell(g, false) + '</td>'
       + '</tr>';
   }).join('');
-  if (pag) pag.innerHTML = ppPaginationHtml('GEX_CTRL', state.page, totalPages);
+  if (pag) pag.innerHTML = ppCtrlPagerHtml('GEX_CTRL', state);
 });
 /* 포인츠허브 원본의 limitDate는 455건 모두 361589(판매종료일 2999-12-30까지의 날수)라
    상품별 유효기간이 아니다. 그래서 일괄 등록에서 이 값을 유효일수로 옮기지 않고,
@@ -8862,11 +8861,11 @@ window.loadGifticonExchanges = loadGifticonExchanges;
 // 회원 목록/상세 팝업의 상태 한글 라벨 (저장값 active/suspended/withdrawn은 그대로)
 var MEMBER_STATUS_KO = { active:'정상', suspended:'차단', withdrawn:'탈퇴' };
 var MEMBER_STATUS_KO_TO_EN = { '정상':'active', '차단':'suspended', '탈퇴':'withdrawn' };
-var MEM_CTRL = window.MEM_CTRL = ppMakeListController(20, function(pageItems, state, totalPages) {
+var MEM_CTRL = window.MEM_CTRL = ppMakeListController(10, function(pageItems, state, totalPages) {
   var tbody = document.getElementById('members-tbody');
   var pag = document.getElementById('members-pagination');
   if (!tbody) return;
-  if (!pageItems.length) { tbody.innerHTML = '<tr><td colspan="11" style="text-align:center;padding:32px;color:var(--text-3);">조건에 맞는 회원이 없습니다.</td></tr>'; if (pag) pag.innerHTML = ''; return; }
+  if (!pageItems.length) { tbody.innerHTML = '<tr><td colspan="11" style="text-align:center;padding:32px;color:var(--text-3);">조건에 맞는 회원이 없습니다.</td></tr>'; if (pag) pag.innerHTML = ppCtrlPagerHtml('MEM_CTRL', state); return; }
   tbody.innerHTML = pageItems.map(function(u) {
     var kakaoType = u.linked_kakao
       ? '<span class="member-type-kakao">카카오 연동</span>'
@@ -8887,7 +8886,7 @@ var MEM_CTRL = window.MEM_CTRL = ppMakeListController(20, function(pageItems, st
       + '<td style="text-align:center"><div style="display:flex;gap:5px;justify-content:center;"><button class="btn btn-ghost btn-sm" onclick="openMemberDetail(\'' + u._id + '\')">상세</button></div></td>'
       + '</tr>';
   }).join('');
-  if (pag) pag.innerHTML = ppPaginationHtml('MEM_CTRL', state.page, totalPages);
+  if (pag) pag.innerHTML = ppCtrlPagerHtml('MEM_CTRL', state);
   loadMemberTicketCounts(pageItems.map(function(u){ return u._id; }));
 });
 
@@ -9082,12 +9081,57 @@ function ppMakeListController(pageSize, renderFn) {
   }
   return {
     setRows: function(rows) { state.rows = rows; state.filtered = rows.slice(); state.page = 1; render(); },
+    setPageSize: function(n) { state.pageSize = parseInt(n, 10) || 10; state.page = 1; render(); },
     applyFilter: function(predicate) { state.filtered = predicate ? state.rows.filter(predicate) : state.rows.slice(); state.page = 1; render(); },
     nextPage: function() { var totalPages = Math.max(1, Math.ceil(state.filtered.length / state.pageSize)); if (state.page < totalPages) { state.page++; render(); } },
     prevPage: function() { if (state.page > 1) { state.page--; render(); } },
     state: state,
   };
 }
+/* STG와 같은 목록 아래 페이저 — 왼쪽 「페이지당 [10] 행」, 오른쪽 「이전 · 1–10 / 159 · 다음」 (2026-10-28).
+   0건이면 범위 자리에 「총 0건」(검수 10-02 23). */
+var PP_PAGE_SIZES = [10, 25, 50, 100];
+function ppStgPagerHtml(o) {
+  var pages = Math.max(1, Math.ceil(o.total / o.size));
+  var lo = o.total ? (o.page - 1) * o.size + 1 : 0, hi = Math.min(o.page * o.size, o.total);
+  return '<div class="pp-pager"><div class="pp-pager-l"><span>페이지당</span>'
+    + '<select onchange="' + o.onSize + '">' + PP_PAGE_SIZES.map(function(v) { return '<option value="' + v + '"' + (v === o.size ? ' selected' : '') + '>' + v + '</option>'; }).join('') + '</select>'
+    + '<span>행</span></div><div class="pp-pager-r">'
+    + '<button type="button" aria-label="Previous page"' + (o.page <= 1 ? ' disabled' : ' onclick="' + o.onPrev + '"') + '>이전</button>'
+    + '<span class="pp-pager-range">' + (o.total ? lo + '\u2013' + hi + ' / ' + o.total : '총 0건') + '</span>'
+    + '<button type="button" aria-label="Next page"' + (o.page >= pages ? ' disabled' : ' onclick="' + o.onNext + '"') + '>다음</button>'
+    + '</div></div>';
+}
+/* 목록 장치(ppMakeListController)용 */
+function ppCtrlPagerHtml(name, state) {
+  return ppStgPagerHtml({ total: state.filtered.length, page: state.page, size: state.pageSize,
+    onSize: name + '.setPageSize(this.value)', onPrev: name + '.prevPage()', onNext: name + '.nextPage()' });
+}
+/* 한 번에 그리던 목록(공지사항·알림·탈퇴 처리)용 — 행 HTML을 받아 나눠 그리고, 표 바로 아래에 페이저를 둔다.
+   다시 불러와도 보던 쪽과 페이지당 행 수는 그대로 둔다. */
+var PP_PAGED = {};
+function ppPaged(key, tbody, rows, emptyHtml) {
+  var p = PP_PAGED[key];
+  PP_PAGED[key] = { tbody: tbody, rows: rows, empty: emptyHtml, page: p ? p.page : 1, size: p ? p.size : 10 };
+  ppPagedRender(key);
+}
+function ppPagedRender(key) {
+  var p = PP_PAGED[key]; if (!p) return;
+  var pages = Math.max(1, Math.ceil(p.rows.length / p.size));
+  if (p.page > pages) p.page = pages;
+  if (p.page < 1) p.page = 1;
+  var from = (p.page - 1) * p.size;
+  p.tbody.innerHTML = p.rows.length ? p.rows.slice(from, from + p.size).join('') : p.empty;
+  var tbl = p.tbody.closest('table'), host = tbl.nextElementSibling;
+  if (!host || !host.classList.contains('pp-pager-host')) {
+    host = document.createElement('div'); host.className = 'pp-pager-host';
+    tbl.parentNode.insertBefore(host, tbl.nextSibling);
+  }
+  host.innerHTML = ppStgPagerHtml({ total: p.rows.length, page: p.page, size: p.size,
+    onSize: "ppPagedSize('" + key + "',this.value)", onPrev: "ppPagedGo('" + key + "',-1)", onNext: "ppPagedGo('" + key + "',1)" });
+}
+window.ppPagedGo = function(key, d) { var p = PP_PAGED[key]; if (!p) return; p.page += d; ppPagedRender(key); };
+window.ppPagedSize = function(key, v) { var p = PP_PAGED[key]; if (!p) return; p.size = parseInt(v, 10) || 10; p.page = 1; ppPagedRender(key); };
 function ppPaginationHtml(idPrefix, page, totalPages) {
   return '<div style="display:flex;align-items:center;justify-content:space-between;padding:12px 18px;border-top:1px solid var(--border)">'
     + '<span style="font-size:12px;color:var(--text-2)">' + page + ' / ' + totalPages + ' 페이지</span>'
@@ -9559,11 +9603,11 @@ function tkGroupForDisplay(items) {
   return rows;
 }
 
-var TICKETS_CTRL = window.TICKETS_CTRL = ppMakeListController(20, function(pageItems, state, totalPages) {
+var TICKETS_CTRL = window.TICKETS_CTRL = ppMakeListController(10, function(pageItems, state, totalPages) {
   var tbody = document.querySelector('#sec-tickets table tbody');
   var pag = document.getElementById('tickets-pagination');
   if (!tbody) return;
-  if (!pageItems.length) { tbody.innerHTML = ppEmpty(5,'조건에 맞는 티켓 이력이 없습니다.'); if (pag) pag.innerHTML = ''; return; }
+  if (!pageItems.length) { tbody.innerHTML = ppEmpty(5,'조건에 맞는 티켓 이력이 없습니다.'); if (pag) pag.innerHTML = ppCtrlPagerHtml('TICKETS_CTRL', state); return; }
   tbody.innerHTML = pageItems.map(function(d) {
     return '<tr><td>' + renderMemberIdentity(d._user, d.user_id, { maskKakao: true }) + '</td>'
       + '<td>' + d._reasonHtml + '</td>'
@@ -9571,7 +9615,7 @@ var TICKETS_CTRL = window.TICKETS_CTRL = ppMakeListController(20, function(pageI
       + '<td style="text-align:center">' + d._statusHtml + '</td>'
       + '<td style="color:var(--text-3);font-size:12px;text-align:center"><div style="font-weight:700;color:#333">' + ppDt(d.created_at) + '</div><div>' + ppTm(d.created_at) + '</div></td></tr>';
   }).join('');
-  if (pag) pag.innerHTML = ppPaginationHtml('TICKETS_CTRL', state.page, totalPages);
+  if (pag) pag.innerHTML = ppCtrlPagerHtml('TICKETS_CTRL', state);
 });
 
 window.tkApplyFilters = function() {
@@ -10941,11 +10985,11 @@ function gsRender() {
 
 /* ── 3. 기프티콘 미사용 취소 ──
    아직 쓰지 않은(취소되지 않은) 교환 건을 골라 취소하는 자리. */
-var GUN_CTRL = window.GUN_CTRL = ppMakeListController(20, function(pageItems, state, totalPages) {
+var GUN_CTRL = window.GUN_CTRL = ppMakeListController(10, function(pageItems, state, totalPages) {
   var tbody = document.querySelector('#sec-gifticon-unused table tbody');
   var pag = document.getElementById('gun-pagination');
   if (!tbody) return;
-  if (!pageItems.length) { tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:32px;color:var(--text-3);">조건에 맞는 미사용 기프티콘이 없습니다.</td></tr>'; if (pag) pag.innerHTML = ''; return; }
+  if (!pageItems.length) { tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:32px;color:var(--text-3);">조건에 맞는 미사용 기프티콘이 없습니다.</td></tr>'; if (pag) pag.innerHTML = ppCtrlPagerHtml('GUN_CTRL', state); return; }
   tbody.innerHTML = pageItems.map(function(g) {
     var u = g._user || {};
     /* 칸은 포인츠허브 정리 그대로 일곱이다. 취소는 칸을 늘리지 않고 행을 눌러서 한다. */
@@ -10959,7 +11003,7 @@ var GUN_CTRL = window.GUN_CTRL = ppMakeListController(20, function(pageItems, st
       + '<td>' + usedTicketCell(g, false) + '</td>'
       + '</tr>';
   }).join('');
-  if (pag) pag.innerHTML = ppPaginationHtml('GUN_CTRL', state.page, totalPages);
+  if (pag) pag.innerHTML = ppCtrlPagerHtml('GUN_CTRL', state);
 });
 
 function gunDateInRange(g) {
@@ -11084,11 +11128,11 @@ window.csvExportGifticonUnused = function() {
 };
 
 /* ── 4. 취소내역 (포인츠허브 구조) ── */
-var GCANCEL_CTRL = window.GCANCEL_CTRL = ppMakeListController(20, function(pageItems, state, totalPages) {
+var GCANCEL_CTRL = window.GCANCEL_CTRL = ppMakeListController(10, function(pageItems, state, totalPages) {
   var tbody = document.querySelector('#sec-gifticon-cancel table tbody');
   var pag = document.getElementById('gcancel-pagination');
   if (!tbody) return;
-  if (!pageItems.length) { tbody.innerHTML = ppEmpty(8,'조건에 맞는 취소내역이 없습니다.'); if (pag) pag.innerHTML = ''; return; }
+  if (!pageItems.length) { tbody.innerHTML = ppEmpty(8,'조건에 맞는 취소내역이 없습니다.'); if (pag) pag.innerHTML = ppCtrlPagerHtml('GCANCEL_CTRL', state); return; }
   tbody.innerHTML = pageItems.map(function(g, i) {
     var u = g._user || {};
     return '<tr>'
@@ -11102,7 +11146,7 @@ var GCANCEL_CTRL = window.GCANCEL_CTRL = ppMakeListController(20, function(pageI
       + '<td style="text-align:center">' + holdCell(g.user_id) + '</td>'
       + '</tr>';
   }).join('');
-  if (pag) pag.innerHTML = ppPaginationHtml('GCANCEL_CTRL', state.page, totalPages);
+  if (pag) pag.innerHTML = ppCtrlPagerHtml('GCANCEL_CTRL', state);
 });
 
 window.gcancelApplyFilters = function() {
@@ -11369,13 +11413,14 @@ window.noticeSetStatus = function(id, status) {
 function loadNotices() {
   var tbody = document.querySelector('#sec-notice table tbody');
   if (!tbody) return;
-  db.collection('notices').orderBy('created_at','desc').limit(20).get().then(function(snap) {
+  db.collection('notices').orderBy('created_at','desc').limit(500).get().then(function(snap) {
     var nc = document.getElementById('notice-count');
     if (snap.empty) {
       tbody.innerHTML = ppEmpty(6,'등록된 공지사항이 없습니다.');
       var sc = document.querySelectorAll('#sec-notice .stat-card');
       ['0건','0건','0건'].forEach(function(v,i){ if(sc[i]) sc[i].querySelector('.stat-value').textContent=v; });
       if (nc) nc.textContent = '총 0건';
+      ppPaged('notices', tbody, [], ppEmpty(6,'등록된 공지사항이 없습니다.'));
       return;
     }
     if (nc) nc.textContent = '총 ' + snap.size + '건';
@@ -11395,7 +11440,7 @@ function loadNotices() {
         + '<td style="text-align:center">' + ppN(n.view_count||0) + '</td><td style="text-align:center">' + statusBadge + '</td>'
         + '<td style="text-align:center;white-space:nowrap">' + toggleBtn + '<button class="btn btn-ghost btn-sm" onclick="noticeEdit(\'' + doc.id + '\')">수정</button> <button class="btn btn-ghost btn-sm" onclick="noticeDelete(\'' + doc.id + '\')">삭제</button></td></tr>';
     });
-    tbody.innerHTML = rows.join('');
+    ppPaged('notices', tbody, rows, ppEmpty(6,'등록된 공지사항이 없습니다.'));
     var statCards = document.querySelectorAll('#sec-notice .stat-card');
     var published = snap.docs.filter(function(d){ return noticeStatusOf(d.data())==='published'; }).length;
     var draft = snap.docs.filter(function(d){ return d.data().status==='draft'; }).length;
@@ -11487,7 +11532,7 @@ function loadNotifications() {
      명세표를 덮어쓴다 — 2026-09-11 에 그 카드가 발송 이력 위로 들어오면서 생긴 일이다. */
   var tbody = document.getElementById('noti-hist-tbody');
   if (!tbody) return;
-  db.collection('notifications').orderBy('created_at', 'desc').limit(20).get().then(function(snap) {
+  db.collection('notifications').orderBy('created_at', 'desc').limit(500).get().then(function(snap) {
     var statCards = document.querySelectorAll('#sec-notifications .stat-card');
     var monthStart = new Date(); monthStart.setDate(1); monthStart.setHours(0,0,0,0);
     var monthCount = 0, scheduled = 0;
@@ -11503,10 +11548,10 @@ function loadNotifications() {
     set('noti-kpi-month', ppN(monthCount) + '건');
     set('noti-kpi-scheduled', ppN(scheduled) + '건');
 
-    if (snap.empty) { tbody.innerHTML = ppEmpty(10,'발송 내역이 없습니다.'); return; }
+    if (snap.empty) { ppPaged('notifications', tbody, [], ppEmpty(10,'발송 내역이 없습니다.')); return; }
     var STATUS_BADGE = { sent:'<span class="badge badge-green">발송완료</span>', scheduled:'<span class="badge badge-amber">예약</span>', cancelled:'<span class="badge badge-gray">취소됨</span>', test:'<span class="badge badge-gray">테스트</span>' };
     NOTI_DOCS = {};
-    tbody.innerHTML = snap.docs.map(function(doc) {
+    ppPaged('notifications', tbody, snap.docs.map(function(doc) {
       var d = doc.data();
       NOTI_DOCS[doc.id] = d;
       var total = d.recipient_count || 0;
@@ -11528,7 +11573,7 @@ function loadNotifications() {
         + '<td style="text-align:center">' + (r ? ppN(Math.max(0, total - (r.ok || 0) - (r.fail || 0))) + '명' : '—') + '</td>'
         + '<td style="text-align:center">—</td>'
         + '<td style="text-align:center">' + (STATUS_BADGE[d.status]||'<span class="badge badge-gray">' + (d.status||'') + '</span>') + ' ' + act + '</td></tr>';
-    }).join('');
+    }), ppEmpty(10,'발송 내역이 없습니다.'));
   }).catch(function(e){ console.error('loadNotifications', e); tbody.innerHTML = ppEmpty(7,'로드 오류'); });
 }
 
@@ -11872,11 +11917,11 @@ window.notiLoadReceived = function(userId) {
 var INQ_STATUS_BADGE = { pending:'<span class="badge badge-red">미처리</span>', processing:'<span class="badge badge-red">미처리</span>', answered:'<span class="badge badge-green">처리 완료</span>', completed:'<span class="badge badge-green">완료</span>' };
 var INQ_CAT_LABEL = { postback:'적립 문의', account:'계정 문의', gifticon:'기프티콘 문의', general:'기타' };
 var INQUIRIES_CACHE = {};
-var INQUIRIES_CTRL = window.INQUIRIES_CTRL = ppMakeListController(20, function(pageItems, state, totalPages) {
+var INQUIRIES_CTRL = window.INQUIRIES_CTRL = ppMakeListController(10, function(pageItems, state, totalPages) {
   var list = document.getElementById('inquiry-list');
   var pag = document.getElementById('inquiries-pagination');
   if (!list) return;
-  if (!pageItems.length) { list.innerHTML = ppEmpty(7, '조건에 맞는 문의가 없습니다.'); if (pag) pag.innerHTML = ''; return; }
+  if (!pageItems.length) { list.innerHTML = ppEmpty(7, '조건에 맞는 문의가 없습니다.'); if (pag) pag.innerHTML = ppCtrlPagerHtml('INQUIRIES_CTRL', state); return; }
   list.innerHTML = pageItems.map(function(d) {
     var badge = INQ_STATUS_BADGE[d.status] || '<span class="badge badge-gray">알 수 없음</span>';
     var cat = INQ_CAT_LABEL[d.category] || d.category || '기타';
@@ -11890,7 +11935,7 @@ var INQUIRIES_CTRL = window.INQUIRIES_CTRL = ppMakeListController(20, function(p
       + '<td style="text-align:center">' + badge + '</td>'
       + '<td style="text-align:center"><button class="btn btn-ghost btn-sm" onclick="inqOpen(\'' + d._id + '\')">' + answerBtnLabel + '</button> <button class="btn btn-ghost btn-sm" onclick="inqDelete(\'' + d._id + '\')">삭제</button></td></tr>';
   }).join('');
-  if (pag) pag.innerHTML = ppPaginationHtml('INQUIRIES_CTRL', state.page, totalPages);
+  if (pag) pag.innerHTML = ppCtrlPagerHtml('INQUIRIES_CTRL', state);
 });
 
 window.inqApplyFilters = function() {
@@ -12004,7 +12049,7 @@ var WITHDRAWAL_CACHE = {};
 function loadWithdrawal() {
   var tbody = document.querySelector('#sec-withdrawal table tbody');
   if (!tbody) return;
-  db.collection('users').where('status', '==', 'withdrawn').limit(50).get().then(function(snap) {
+  db.collection('users').where('status', '==', 'withdrawn').limit(500).get().then(function(snap) {
     WITHDRAWAL_CACHE = {};
     var docs = snap.docs.slice().sort(function(a, b) {
       var ta = a.data().withdrawn_at, tb = b.data().withdrawn_at;
@@ -12012,7 +12057,7 @@ function loadWithdrawal() {
       var db2 = (tb && tb.toDate) ? tb.toDate().getTime() : 0;
       return db2 - da;
     });
-    if (!docs.length) { tbody.innerHTML = ppEmpty(4, '탈퇴 회원이 없습니다.'); }
+    if (!docs.length) { ppPaged('withdrawal', tbody, [], ppEmpty(4, '탈퇴 회원이 없습니다.')); }
     else {
       var rows = docs.map(function(doc) {
         var d = doc.data();
@@ -12025,7 +12070,7 @@ function loadWithdrawal() {
           + '<td style="text-align:center">' + ppDt(d.withdrawn_at) + '</td>'
           + '<td style="text-align:center"><span class="badge badge-gray">탈퇴 완료</span></td></tr>';
       });
-      tbody.innerHTML = rows.join('');
+      ppPaged('withdrawal', tbody, rows, ppEmpty(4, '탈퇴 회원이 없습니다.'));
     }
     updateWithdrawalStats(docs.map(function(doc){ return doc.data(); }));
   }).catch(function(e) { console.error('loadWithdrawal users', e); tbody.innerHTML = ppEmpty(4, '탈퇴 회원이 없습니다.'); });
@@ -13601,11 +13646,11 @@ function ppAdminStamp() {
   var a = window.currentAdmin || {};
   return { admin_username: a.username || '', admin_name: a.displayName || a.username || '' };
 }
-var POINTS_CTRL = window.POINTS_CTRL = ppMakeListController(20, function(pageItems, state, totalPages) {
+var POINTS_CTRL = window.POINTS_CTRL = ppMakeListController(10, function(pageItems, state, totalPages) {
   var tbody = document.querySelector('#sec-points table tbody');
   var pag = document.getElementById('points-pagination');
   if (!tbody) return;
-  if (!pageItems.length) { tbody.innerHTML = ppEmpty(7,'조건에 맞는 포인트 이력이 없습니다.'); if (pag) pag.innerHTML = ''; return; }
+  if (!pageItems.length) { tbody.innerHTML = ppEmpty(7,'조건에 맞는 포인트 이력이 없습니다.'); if (pag) pag.innerHTML = ppCtrlPagerHtml('POINTS_CTRL', state); return; }
   tbody.innerHTML = pageItems.map(function(d) {
     var amt = ppPtAmtCms(d);
     var sign = amt >= 0 ? '+' : '';
@@ -13618,7 +13663,7 @@ var POINTS_CTRL = window.POINTS_CTRL = ppMakeListController(20, function(pageIte
       + '<td style="text-align:center">' + ppActorOf(d) + '</td>'
       + '<td style="color:var(--text-3);font-size:12px;text-align:center"><div style="font-weight:700;color:#333">' + ppDt(d.created_at) + '</div><div>' + ppTm(d.created_at) + '</div></td></tr>';
   }).join('');
-  if (pag) pag.innerHTML = ppPaginationHtml('POINTS_CTRL', state.page, totalPages);
+  if (pag) pag.innerHTML = ppCtrlPagerHtml('POINTS_CTRL', state);
 });
 
 window.ptApplyFilters = function() {
@@ -19309,8 +19354,10 @@ function rltLogStatusChip(st) {
   if (st === 'capped') return '<span style="display:inline-block;font-size:11px;font-weight:700;color:#b4791a;background:#fdf3e2;border:1px solid #f2ddb4;border-radius:20px;padding:3px 10px;white-space:nowrap">한도초과</span>';
   return '<span style="display:inline-block;font-size:11px;font-weight:700;color:#8a8a99;background:#f2f2f6;border:1px solid #e0e0e8;border-radius:20px;padding:3px 10px;white-space:nowrap">해당없음</span>';
 }
+function rltLogSize(k) { return rltState[k].logSize || RLT_LOG_PAGE_SIZE; }
+window.rltLogSetSize = function(k, v) { rltState[k].logSize = parseInt(v, 10) || RLT_LOG_PAGE_SIZE; rltState[k].logPage = 1; rltRenderLog(k); };
 window.rltLogGoPage = function(k, p) {
-  var total = Math.max(1, Math.ceil(rltState[k].logRows.length / RLT_LOG_PAGE_SIZE));
+  var total = Math.max(1, Math.ceil(rltState[k].logRows.length / rltLogSize(k)));
   if (p < 1 || p > total || p === rltState[k].logPage) return;
   rltState[k].logPage = p;
   rltRenderLog(k);
@@ -19320,13 +19367,14 @@ function rltRenderLog(k) {
   var tbody = document.getElementById(kind.p + '-log-tbody');
   if (!tbody) return;
   var rows = rltState[k].logRows;
-  var total = Math.max(1, Math.ceil(rows.length / RLT_LOG_PAGE_SIZE));
+  var size = rltLogSize(k);
+  var total = Math.max(1, Math.ceil(rows.length / size));
   if (rltState[k].logPage > total) rltState[k].logPage = total;
   var cur = rltState[k].logPage;
-  var from = (cur - 1) * RLT_LOG_PAGE_SIZE;
+  var from = (cur - 1) * size;
   if (!rows.length) { tbody.innerHTML = ppEmpty(5, rltW(k).logEmpty); }
   else {
-    tbody.innerHTML = rows.slice(from, from + RLT_LOG_PAGE_SIZE).map(function(r) {
+    tbody.innerHTML = rows.slice(from, from + size).map(function(r) {
       var parts = String(r[0]).split(' ');
       return '<tr>'
         + '<td style="white-space:nowrap;font-size:12px"><div style="font-weight:700;color:#333333">' + parts[0].replace(/-/g, '/') + '</div><div style="color:var(--text-3)">' + (parts[1] || '') + '</div></td>'
@@ -19341,12 +19389,8 @@ function rltRenderLog(k) {
   if (cnt) cnt.textContent = '최근 ' + rows.length + '건 · ' + cur + ' / ' + total + ' 페이지';
   var pager = document.getElementById(kind.p + '-log-pager');
   if (pager) {
-    if (total <= 1) { pager.innerHTML = ''; return; }
-    var dim = 'opacity:.35;cursor:default';
-    var html = '<button class="page-btn" onclick="rltLogGoPage(\'' + k + '\', ' + (cur - 1) + ')"' + (cur === 1 ? ' disabled style="' + dim + '"' : '') + '>‹</button>';
-    for (var p = 1; p <= total; p++) html += '<button class="page-btn' + (p === cur ? ' active' : '') + '" onclick="rltLogGoPage(\'' + k + '\', ' + p + ')">' + p + '</button>';
-    html += '<button class="page-btn" onclick="rltLogGoPage(\'' + k + '\', ' + (cur + 1) + ')"' + (cur === total ? ' disabled style="' + dim + '"' : '') + '>›</button>';
-    pager.innerHTML = html;
+    pager.innerHTML = ppStgPagerHtml({ total: rows.length, page: cur, size: size,
+      onSize: "rltLogSetSize('" + k + "',this.value)", onPrev: "rltLogGoPage('" + k + "'," + (cur - 1) + ")", onNext: "rltLogGoPage('" + k + "'," + (cur + 1) + ")" });
   }
 }
 function rltUseDemoLog(k) {
