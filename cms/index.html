@@ -3527,6 +3527,7 @@ window.CMS_FEATURES = {
 
       <div class="toolbar">
         <!-- 보는 순서 — 단위(월별·일별·기간별) → 기간 → 거르기 → 검색. 기본 일별 (검수 10-05 04-04 확정 2026-10-28) -->
+        <span class="rf-tb-label">조회 단위</span>
         <select class="filter-sel" id="rf-view" onchange="rfViewChanged()">
           <option value="month">월별</option>
           <option value="day" selected>일별</option>
@@ -3815,6 +3816,7 @@ window.CMS_FEATURES = {
     <div class="section" id="sec-revenue-gifti">
       <div class="toolbar">
         <!-- 단위 선택창 — 제휴 수수료 매출과 같은 자리 · 같은 기본값(일별) (검수 10-05 04-04 확정 2026-10-28) -->
+        <span class="rf-tb-label">조회 단위</span>
         <select class="filter-sel" id="gs-view" onchange="gsViewChanged()">
           <option value="month">월별</option>
           <option value="day" selected>일별</option>
@@ -7366,6 +7368,7 @@ Object.assign(KO2VI,{
   "직접 제휴":"Hợp tác trực tiếp",
   "링크프라이스 제휴몰":"cửa hàng LK Linkprice",
   "조회 기간":"Khoảng xem",
+  "조회 단위":"Đơn vị xem",
   "보기":"Kiểu xem",
   "하루":"Một ngày",
   "한 달":"Một tháng",
@@ -15769,7 +15772,14 @@ function rfPeriodRange() {
    기본은 일별(검수 10-05 04-04 확정 2026-10-28). 선택창은 조회 기간 줄 맨 왼쪽에 있다.
    줄은 최근 것이 위로 온다 — 열자마자 오늘이 든 구간이 보인다. */
 function rfView() { return (document.getElementById('rf-view') || {}).value || 'day'; }
-window.rfViewChanged = function() { RF.sel = null; rfReload(); };
+/* 단위가 바꾸는 것은 「기간별 매출」 판뿐이다 — 다른 판(건별 내역·제휴몰별)을 보고 있으면
+   바꿔도 화면이 그대로라 동작하지 않는 것처럼 보였다(해리 문의 2026-10-29). 단위를 바꾸면 그 판으로 넘어간다. */
+window.rfViewChanged = function() {
+  RF.sel = null;
+  var tab = document.querySelector('#sec-revenue-fee .terms-tab[onclick*="rf-tab-period"]');
+  if (tab && !tab.classList.contains('active')) rfSwitchTab(tab, 'rf-tab-period');
+  rfReload();
+};
 window.rfClearSelection = function() { RF.sel = null; rfRefreshDrill(); };
 
 function rfBucketKey(d, view) {
