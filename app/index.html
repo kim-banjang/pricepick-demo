@@ -8922,6 +8922,193 @@ body.pp-hide-exchange-entry .home-ticket-card .htc-grades { margin-bottom: 0; }
 /* 혜택 탭 내 티켓 카드: CTA 두 개(기프티콘 구매·경품 응모)가 둘 다 숨으면 빈 행 자체를 접는다 */
 body.pp-hide-exchange-entry.pp-hide-weekly-raffle .mtc-cta-row { display: none !important; }
 </style>
+<style id="pp-guide-style">
+/* ── 쇼핑 가이드 (시안 design/guide-20261103.html, 2026-11-03 이식) ──
+   시안 CSS는 전부 #pp-guide(홈 투어 오버레이)·#pp-guide-page(pw-23g) 안으로 가뒀다.
+   키프레임은 pp-g- 접두사, 데모 .splash 와 겹치는 클래스는 pp-g-splash. 좌표는 데모 폭 390 기준 */
+#pp-guide,#pp-guide-page{--line:#9B78FF;--gold-a:#FFD93B;--gold-b:#E6A800;--fw-regular:400;--fw-bold:700;--fw-emphasis:800;
+  --shadow-p:0 12px 30px rgba(108,74,182,.18),0 2px 6px rgba(108,74,182,.10);
+  font-family:"Pretendard Variable",Pretendard,-apple-system,BlinkMacSystemFont,system-ui,sans-serif;color:var(--text1)}
+#pp-guide{position:absolute;inset:0;z-index:90;overflow:hidden;background:linear-gradient(180deg,var(--sub-4) 0%,var(--sub-3) 100%);
+  opacity:0;pointer-events:none;visibility:hidden;transition:opacity .25s,visibility 0s .25s}
+/* 닫힌 뒤에도 마지막 장(.fin)은 pointer-events:auto 라 홈 버튼을 가린다 — visibility 로 통째로 끈다 */
+#pp-guide.open{opacity:1;pointer-events:auto;visibility:visible;transition:opacity .25s}
+#pp-guide-page{position:relative;height:100%;overflow:hidden;background:var(--bg)}
+:is(#pp-guide,#pp-guide-page) > .statusbar{position:absolute;top:0;left:0;right:0;z-index:30;pointer-events:none}
+:is(#pp-guide,#pp-guide-page) button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+/* 가이드 페이지 맨 아래: 기존 적립 조건 화면(pw-23)으로 */
+:is(#pp-guide,#pp-guide-page) .rule{display:flex;align-items:center;justify-content:space-between;width:calc(100% - 32px);margin:-24px 16px 48px;height:52px;padding:0 16px;
+  border-radius:var(--r-lg);background:#fff;border:1px solid var(--border);font-size:var(--fs-body);font-weight:var(--fw-bold);color:var(--text2);text-align:left}
+/* 홈 헤더 「가이드」 버튼 */
+.top-icons .top-icon-btn.pp-guide-btn{width:auto;height:30px;align-self:center;margin-right:2px;padding:0 12px;border-radius:15px;background:var(--sub-4);
+  color:var(--main);font-family:inherit;font-size:var(--fs-caption);font-weight:700;white-space:nowrap}
+.top-icons .top-icon-btn.pp-guide-btn:hover{background:var(--sub-3)}
+/* 쇼핑 가이드 페이지 */
+:is(#pp-guide,#pp-guide-page) .page{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;padding-top:47px;scrollbar-width:none}
+:is(#pp-guide,#pp-guide-page) .page::-webkit-scrollbar{display:none}
+:is(#pp-guide,#pp-guide-page) .appbar{position:sticky;top:0;z-index:5;height:52px;display:flex;align-items:center;gap:4px;padding:0 12px 0 4px;background:rgba(250,250,250,.94);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+:is(#pp-guide,#pp-guide-page) .appbar .back{width:40px;height:40px;display:grid;place-items:center;color:var(--text1)}
+:is(#pp-guide,#pp-guide-page) .appbar h1{font-size:var(--fs-title);font-weight:var(--fw-bold)}
+:is(#pp-guide,#pp-guide-page) .head{padding:12px 16px 0}
+:is(#pp-guide,#pp-guide-page) .head h2{font-size:var(--fs-title);font-weight:var(--fw-bold);line-height:1.4;letter-spacing:-.3px;word-break:keep-all}
+:is(#pp-guide,#pp-guide-page) .head p{margin-top:8px;font-size:var(--fs-body);font-weight:var(--fw-regular);color:var(--text3)}
+:is(#pp-guide,#pp-guide-page) .overview{display:block;width:calc(100% - 32px);margin:24px 16px 0;padding:18px 16px 20px;border-radius:var(--r-xl);
+  background:linear-gradient(165deg,var(--sub-4) 0%,var(--sub-3) 100%);border:1px solid var(--border);
+  box-shadow:0 4px 16px rgba(132,94,238,0.13);text-align:left;color:var(--text1);transition:transform .15s}
+:is(#pp-guide,#pp-guide-page) .overview:active{transform:scale(.985)}
+:is(#pp-guide,#pp-guide-page) .overview .top{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+:is(#pp-guide,#pp-guide-page) .overview .top b{font-size:var(--fs-label);font-weight:var(--fw-bold)}
+:is(#pp-guide,#pp-guide-page) .overview .top span{display:flex;align-items:center;gap:4px;font-size:var(--fs-caption);font-weight:var(--fw-bold);color:var(--main)}
+:is(#pp-guide,#pp-guide-page) .mini{position:relative;height:calc(2505px * var(--s));overflow:hidden;pointer-events:none}
+:is(#pp-guide,#pp-guide-page) .mini .cv{left:50%;margin-left:-195px;transform:scale(var(--s));transform-origin:50% 0}
+:is(#pp-guide,#pp-guide-page) .mini .ln{stroke-width:9;stroke-dasharray:20 14}
+:is(#pp-guide,#pp-guide-page) .mini .rv{stroke-width:16}
+:is(#pp-guide,#pp-guide-page) .mini .hd{transform:scale(1.5);transform-box:fill-box;transform-origin:50% 100%}
+:is(#pp-guide,#pp-guide-page) .steps{padding:24px 16px 48px;display:flex;flex-direction:column;gap:12px}
+:is(#pp-guide,#pp-guide-page) .step{display:flex;gap:12px;align-items:center;width:100%;padding:14px;background:#fff;border-radius:var(--r-lg);text-align:left;
+  box-shadow:0 4px 16px rgba(132,94,238,0.13);transition:transform .15s}
+:is(#pp-guide,#pp-guide-page) .step:active{transform:scale(.985)}
+:is(#pp-guide,#pp-guide-page) .step .th{flex:none;width:72px;height:72px;overflow:visible;display:grid;place-items:center;padding:4px}
+:is(#pp-guide,#pp-guide-page) .step .th img{max-width:100%;max-height:100%;display:block}
+:is(#pp-guide,#pp-guide-page) .step .th{position:relative}
+:is(#pp-guide,#pp-guide-page) .step .th .malls{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) scale(.22)}
+:is(#pp-guide,#pp-guide-page) .step .th .chip{animation:none}
+:is(#pp-guide,#pp-guide-page) .step .tx{min-width:0}
+:is(#pp-guide,#pp-guide-page) .step .no{display:inline-grid;place-items:center;min-width:24px;height:24px;padding:0 8px;border-radius:20px;background:var(--sub-4);color:var(--main);font-size:var(--fs-caption);font-weight:var(--fw-bold)}
+:is(#pp-guide,#pp-guide-page) .step b{display:block;margin-top:8px;font-size:var(--fs-label);font-weight:var(--fw-bold);line-height:1.4;word-break:keep-all}
+:is(#pp-guide,#pp-guide-page) .step p{margin-top:4px;font-size:var(--fs-body);font-weight:var(--fw-regular);line-height:1.5;color:var(--text2);word-break:keep-all}
+/* 흐름도 캔버스 (투어·축소판 공용) */
+:is(#pp-guide,#pp-guide-page) .cv{position:absolute;top:0;left:0;width:390px;height:2505px;transform-origin:195px 0}
+:is(#pp-guide,#pp-guide-page) .cv svg{position:absolute;inset:0;overflow:visible}
+/* 화살표: 보이는 선은 점선(아래로 흐름), 그려지는 효과는 마스크 안의 실선이 자라며 드러낸다 */
+:is(#pp-guide,#pp-guide-page) .ln{fill:none;stroke:var(--line);stroke-width:4;stroke-linecap:round;stroke-dasharray:10 8;animation:pp-g-flow 1.6s linear infinite}
+:is(#pp-guide,#pp-guide-page) .rv{fill:none;stroke:#fff;stroke-width:12;stroke-linecap:round;stroke-dasharray:calc(var(--L) * 1px);stroke-dashoffset:calc(var(--L) * 1px);transition:stroke-dashoffset 420ms ease-out}
+:is(#pp-guide,#pp-guide-page) .hd{fill:var(--line);opacity:0;transition:opacity 120ms 320ms}
+@keyframes pp-g-flow{to{stroke-dashoffset:-18}}
+:is(#pp-guide,#pp-guide-page) .ar{filter:drop-shadow(0 2px 6px rgba(132,94,238,.35))}
+:is(#pp-guide,#pp-guide-page) .ar.l{--line:#845EEE}
+:is(#pp-guide,#pp-guide-page) .ar.r{--line:var(--gold-b);filter:drop-shadow(0 2px 6px rgba(230,168,0,.4))}
+/* 노드 라벨 */
+:is(#pp-guide,#pp-guide-page) .lab{position:absolute;font-size:var(--fs-caption);font-weight:var(--fw-bold);color:var(--text2);white-space:nowrap;pointer-events:none}
+:is(#pp-guide,#pp-guide-page) .lab.b{top:calc(100% + 8px);left:50%;transform:translateX(-50%)}
+:is(#pp-guide,#pp-guide-page) .ar:not(.on),:is(#pp-guide,#pp-guide-page) .nd:not(.on){opacity:0;visibility:hidden}
+:is(#pp-guide,#pp-guide-page) .ar.on .rv{stroke-dashoffset:0}
+:is(#pp-guide,#pp-guide-page) .ar.on .hd{opacity:1}
+:is(#pp-guide,#pp-guide-page) .nd{position:absolute;display:flex;align-items:center;justify-content:center}
+:is(#pp-guide,#pp-guide-page) .nd .fx{width:100%;height:100%;display:flex;align-items:center;justify-content:center;transition:transform 420ms ease-out,opacity 420ms ease-out}
+:is(#pp-guide,#pp-guide-page) .nd .pop{position:relative;isolation:isolate;width:100%;height:100%;display:flex;align-items:center;justify-content:center;opacity:0;transform:translateY(24px) scale(.88);transition:transform 520ms cubic-bezier(.34,1.45,.5,1),opacity 260ms ease-out}
+:is(#pp-guide,#pp-guide-page) .nd.on .pop{opacity:1;transform:none}
+:is(#pp-guide,#pp-guide-page) .nd.cur .fx{transform:scale(1.06)}
+/* 화면 가장자리에 붙는 갈래 노드와 세로로 꽉 차는 스플래시는 키우지 않는다(잘림 방지) */
+:is(#pp-guide,#pp-guide-page) .nd.edge.cur .fx{transform:none}
+:is(#pp-guide,#pp-guide-page) .nd.past .fx{opacity:.55}
+/* 노드 뒤 보라 글로우, 아래 타원 그림자 */
+:is(#pp-guide,#pp-guide-page) .nd.lift .pop::before{content:'';position:absolute;left:50%;top:50%;width:var(--gw);height:var(--gh);transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(closest-side,rgba(132,94,238,.35),rgba(132,94,238,0));filter:blur(36px);z-index:-2;pointer-events:none}
+:is(#pp-guide,#pp-guide-page) .nd.lift .pop::after{content:'';position:absolute;left:50%;bottom:-20px;width:var(--fw);height:16px;margin-left:calc(var(--fw) / -2);border-radius:50%;background:rgba(108,74,182,.22);filter:blur(8px);z-index:-1;pointer-events:none}
+/* 노드는 카드 없이 오브젝트만. 노드 박스 전체를 오브젝트가 차지, 그림자는 윤곽을 따라(drop-shadow). 글로우·바닥 타원은 .lift가 유지 */
+:is(#pp-guide,#pp-guide-page) .ncard{width:100%;height:100%}
+:is(#pp-guide,#pp-guide-page) .ncard img{display:block;width:100%;height:100%;object-fit:contain}
+:is(#pp-guide,#pp-guide-page) .ncard > img,:is(#pp-guide,#pp-guide-page) .ncard > .obj,:is(#pp-guide,#pp-guide-page) .ncard > .tks{filter:drop-shadow(0 10px 18px rgba(108,74,182,.30))}
+/* 정면 폰 + 프라이스픽 스플래시 화면(이전: 앱 아이콘 pricepick-appicon.png, 홈 화면 pricepick-home.png, 파일 보존). 폰 이미지(512x816)의 화면 영역 실측: left 15.2% top 9.6% w 69.7% h 82.1%
+   스플래시는 화면 영역을 꽉 채운다 */
+:is(#pp-guide,#pp-guide-page) .obj{position:relative;display:block;width:100%;height:100%}
+:is(#pp-guide,#pp-guide-page) .obj{container-type:size}
+/* 화면 영역 전체에 스플래시(390x844, design-splash-login-20260729.html 1b 렌더) — cover·위쪽 정렬, 모서리 = 화면 폭의 8%(폰 폭 기준 5.58cqw), 경계 안쪽 그림자 */
+:is(#pp-guide,#pp-guide-page) .obj .scr{position:absolute;left:15.2%;top:9.6%;width:69.7%;height:82.1%;overflow:hidden;border-radius:5.58cqw}
+:is(#pp-guide,#pp-guide-page) .obj .scr img{display:block;width:100%;height:100%;max-width:none;max-height:none;object-fit:cover;object-position:top center}
+:is(#pp-guide,#pp-guide-page) .obj .scr::after{content:'';position:absolute;inset:0;border-radius:inherit;box-shadow:inset 0 0 6px rgba(0,0,0,.12);pointer-events:none}
+:is(#pp-guide,#pp-guide-page) .nd.on .scr{animation:pp-g-scrIn 420ms cubic-bezier(.34,1.45,.5,1) 120ms both}
+@keyframes pp-g-scrIn{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:none}}
+@keyframes pp-g-iconIn{from{opacity:0;transform:scale(.8)}to{opacity:1;transform:none}}
+:is(#pp-guide,#pp-guide-page) .step .th .obj{height:100%;width:auto;aspect-ratio:512/816}
+:is(#pp-guide,#pp-guide-page) .step .th .obj img{max-width:none;max-height:none}
+:is(#pp-guide,#pp-guide-page) .step .th .obj img:first-child{width:100%;height:100%}
+/* 티켓(김반장 2D 아이콘 ticket-gold.svg, 입체는 SVG 안에서 처리). viewBox 512 중 티켓 실체는 약 290px라 1.76배로 키워 카드를 채운다 */
+:is(#pp-guide,#pp-guide-page) .tks{position:relative;display:block;width:100%;height:100%;container-type:size}
+:is(#pp-guide,#pp-guide-page) .tks img{position:absolute;left:50%;top:50%;width:var(--s);height:var(--s);max-width:none;max-height:none;margin:calc(var(--s) / -2) 0 0 calc(var(--s) / -2);transform:translate(var(--dx,0),var(--dy,0))}
+:is(#pp-guide,#pp-guide-page) .tks.one img{--s:150cqmin}
+/* 대기: 빨강 랜덤 티켓 3장 겹침(확정 전·가지급). 구매 확정을 지나면 금색 티켓으로 바뀐다 */
+:is(#pp-guide,#pp-guide-page) .tks.wait img{--s:128cqmin}
+:is(#pp-guide,#pp-guide-page) .tks.wait img:nth-child(1){--dx:-13cqmin;--dy:-11cqmin}
+:is(#pp-guide,#pp-guide-page) .tks.wait img:nth-child(3){--dx:13cqmin;--dy:11cqmin}
+/* 확정: 티켓 이미지 오른쪽 위 끝(스텁 모서리)에 초록 체크 배지 */
+:is(#pp-guide,#pp-guide-page) .tks .chk{position:absolute;left:calc(50% + 23cqmin);top:calc(50% - 55cqmin);width:26cqmin;height:26cqmin;border-radius:50%;background:var(--green);border:2px solid #fff;box-shadow:0 4px 10px rgba(34,197,94,.4);display:grid;place-items:center}
+:is(#pp-guide,#pp-guide-page) .tks .chk svg{width:58%;height:58%}
+:is(#pp-guide,#pp-guide-page) .nd.on .chk{animation:pp-g-iconIn 420ms cubic-bezier(.34,1.45,.5,1) 160ms both}
+:is(#pp-guide,#pp-guide-page) .step .th .tks{width:64px;height:64px}
+:is(#pp-guide,#pp-guide-page) .step .th > img,:is(#pp-guide,#pp-guide-page) .step .th > .obj,:is(#pp-guide,#pp-guide-page) .step .th > .tks{filter:drop-shadow(0 4px 8px rgba(108,74,182,.30))}
+/* 1단계: 폰 목업 없이 스플래시 화면을 라운드 사각으로 직접 보여준다(폭 = 화면의 58%) */
+:is(#pp-guide,#pp-guide-page) .pp-g-splash{display:block;width:100%;height:100%;border-radius:28px;overflow:hidden;border:1px solid rgba(255,255,255,.7);box-shadow:0 18px 36px rgba(108,74,182,.30)}
+:is(#pp-guide,#pp-guide-page) .pp-g-splash img{display:block;width:100%;height:100%;max-width:none;max-height:none;object-fit:cover}
+:is(#pp-guide,#pp-guide-page) .step .th .pp-g-splash{width:auto;height:64px;aspect-ratio:390/844;border-radius:8px;box-shadow:0 4px 10px rgba(108,74,182,.30)}
+:is(#pp-guide,#pp-guide-page) .snap,:is(#pp-guide,#pp-guide-page) .snap *{transition:none!important}
+/* 제휴몰 카드 5장 계단식 겹침 — 전부 순백, 층은 그림자로만 */
+/* 2단계: 제휴몰 로고 칩 한 줄(46px x5 + 간격 10px = 270px) + 대표 카드 한 장(286x60). 폭 390 안에 좌우 여백 52px 이상 */
+:is(#pp-guide,#pp-guide-page) .malls{width:286px;height:128px;display:flex;flex-direction:column;align-items:center}
+:is(#pp-guide,#pp-guide-page) .chips{display:flex;gap:10px;height:46px;align-items:center}
+:is(#pp-guide,#pp-guide-page) .chip{width:46px;height:46px;flex:none}
+:is(#pp-guide,#pp-guide-page) .nd.on .chip{animation:pp-g-chipIn 520ms cubic-bezier(.34,1.45,.5,1) calc(var(--i) * 60ms) both}
+@keyframes pp-g-chipIn{from{opacity:0;transform:translateY(14px) scale(.7)}to{opacity:1;transform:none}}
+:is(#pp-guide,#pp-guide-page) .chip .c{width:100%;height:100%;border-radius:50%;background:#fff;display:grid;place-items:center;box-shadow:0 6px 16px rgba(108,74,182,.18)}
+:is(#pp-guide,#pp-guide-page) .chip .c img{width:34px;height:34px;border-radius:50%;object-fit:contain;display:block}
+:is(#pp-guide,#pp-guide-page) .chip.hot .c{transform:scale(1.08);box-shadow:0 0 0 3px var(--main),0 6px 16px rgba(108,74,182,.22)}
+:is(#pp-guide,#pp-guide-page) .mall{margin-top:24px;width:286px;height:60px;flex:none;border-radius:var(--r-lg);background:var(--card);border:1px solid var(--border);box-shadow:0 10px 26px rgba(108,74,182,.20);display:flex;align-items:center;gap:10px;padding:0 16px}
+:is(#pp-guide,#pp-guide-page) .badge{flex:none;width:38px;height:38px;border-radius:50%;background:var(--card);overflow:hidden;box-shadow:0 0 0 1px var(--border);display:grid;place-items:center}
+:is(#pp-guide,#pp-guide-page) .badge img{width:100%;height:100%;object-fit:contain}
+:is(#pp-guide,#pp-guide-page) .mall b{flex:1;font-size:var(--fs-label);font-weight:var(--fw-bold);color:var(--text1)}
+:is(#pp-guide,#pp-guide-page) .mall span.go{height:34px;padding:0 16px;border-radius:20px;background:var(--main);color:#fff;font-size:var(--fs-caption);font-weight:var(--fw-bold);display:grid;place-items:center;box-shadow:0 4px 14px rgba(132,94,238,0.28);animation:pp-g-pulse 1.8s ease-in-out infinite}
+@keyframes pp-g-pulse{50%{transform:scale(1.06)}}
+:is(#pp-guide,#pp-guide-page) .pill{height:30px;padding:0 12px;border-radius:20px;color:#fff;font-size:var(--fs-caption);font-weight:var(--fw-bold);display:grid;place-items:center;white-space:nowrap}
+:is(#pp-guide,#pp-guide-page) .pill.g{background:var(--green);box-shadow:0 6px 16px rgba(34,197,94,.35),0 2px 4px rgba(34,197,94,.2)}
+:is(#pp-guide,#pp-guide-page) .pill.y{border:2px solid transparent;background:linear-gradient(var(--card),var(--card)) padding-box,linear-gradient(90deg,var(--gold-a),var(--gold-b)) border-box;color:var(--main);box-shadow:0 6px 16px rgba(230,168,0,.35),0 2px 4px rgba(132,94,238,.15)}
+/* 가이드 투어 */
+:is(#pp-guide,#pp-guide-page) .tour{position:absolute;inset:0;z-index:20;color:var(--text1);opacity:0;pointer-events:none;transition:opacity .25s;cursor:pointer;user-select:none;-webkit-user-select:none}
+:is(#pp-guide,#pp-guide-page) .tour.open{opacity:1;pointer-events:auto}
+:is(#pp-guide,#pp-guide-page) .bgfx{position:absolute;inset:0;overflow:hidden;pointer-events:none}
+:is(#pp-guide,#pp-guide-page) .blob{position:absolute;border-radius:50%;filter:blur(60px)}
+:is(#pp-guide,#pp-guide-page) .blob.b1{width:320px;height:320px;left:-90px;top:40px;background:rgba(132,94,238,.28)}
+:is(#pp-guide,#pp-guide-page) .blob.b2{width:260px;height:260px;right:-80px;top:300px;background:rgba(255,217,59,.22)}
+:is(#pp-guide,#pp-guide-page) .blob.b3{width:300px;height:300px;left:-100px;bottom:40px;background:rgba(155,120,255,.22)}
+:is(#pp-guide,#pp-guide-page) .deco{position:absolute;animation:pp-g-bob var(--d) ease-in-out var(--dl) infinite}
+:is(#pp-guide,#pp-guide-page) .deco svg{display:block;width:100%;height:100%}
+:is(#pp-guide,#pp-guide-page) .deco.soft{filter:blur(1.5px)}
+@keyframes pp-g-bob{50%{transform:translateY(-14px)}}
+:is(#pp-guide,#pp-guide-page) .tour .vp{position:absolute;inset:0;overflow:hidden;
+  -webkit-mask-image:linear-gradient(to bottom,transparent var(--m0,124px),#000 var(--m1,168px),#000 calc(var(--clip,600px) - 16px),transparent calc(var(--clip,600px) - 2px));
+          mask-image:linear-gradient(to bottom,transparent var(--m0,124px),#000 var(--m1,168px),#000 calc(var(--clip,600px) - 16px),transparent calc(var(--clip,600px) - 2px))}
+:is(#pp-guide,#pp-guide-page) .tour.final .vp{
+  -webkit-mask-image:linear-gradient(to bottom,transparent 136px,#000 152px,#000 732px,transparent 748px);
+          mask-image:linear-gradient(to bottom,transparent 136px,#000 152px,#000 732px,transparent 748px)}
+:is(#pp-guide,#pp-guide-page) .tour .cv{transition:transform 640ms ease-in-out}
+:is(#pp-guide,#pp-guide-page) .tour .bar{position:absolute;top:47px;left:0;right:0;display:flex;align-items:center;gap:20px;padding:12px 16px 0 36px;z-index:2}
+:is(#pp-guide,#pp-guide-page) .tour .prog{flex:1;display:flex;gap:4px}
+:is(#pp-guide,#pp-guide-page) .tour .prog span{flex:1;height:3px;border-radius:2px;background:var(--sub-3);transition:background .3s}
+:is(#pp-guide,#pp-guide-page) .tour .prog span.done{background:var(--main)}
+:is(#pp-guide,#pp-guide-page) .tour .x{width:36px;height:36px;display:grid;place-items:center;color:var(--text2)}
+:is(#pp-guide,#pp-guide-page) .tour .skip{position:absolute;top:96px;left:8px;z-index:2;height:36px;padding:0 8px;font-size:var(--fs-body);font-weight:var(--fw-regular);color:var(--text2);transition:opacity .2s}
+:is(#pp-guide,#pp-guide-page) .tour.final .skip{opacity:0;pointer-events:none}
+:is(#pp-guide,#pp-guide-page) .tour .txt{position:absolute;left:16px;right:16px;bottom:22px;display:flex;flex-direction:column;align-items:center;transition:opacity .2s;z-index:2}
+:is(#pp-guide,#pp-guide-page) .tour .tcard{width:100%;background:rgba(255,255,255,.92);border-radius:var(--r-xl);padding:20px;box-shadow:0 8px 24px rgba(108,74,182,.14);
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);text-align:center}
+:is(#pp-guide,#pp-guide-page) .tour .txt .lines{min-height:96px;display:flex;flex-direction:column;justify-content:center}
+:is(#pp-guide,#pp-guide-page) .tour .txt.out .lines{opacity:0;transform:translateY(-6px);transition:opacity 120ms,transform 120ms}
+:is(#pp-guide,#pp-guide-page) .tour .txt.in .lines{animation:pp-g-fadeUp 320ms cubic-bezier(.2,.7,.3,1) both}
+:is(#pp-guide,#pp-guide-page) .tour h3{font-size:var(--fs-title);font-weight:var(--fw-emphasis);line-height:1.4;color:var(--text1);letter-spacing:-.4px;word-break:keep-all}
+:is(#pp-guide,#pp-guide-page) .tour .desc{margin-top:8px;font-size:var(--fs-body);font-weight:var(--fw-regular);line-height:1.55;color:var(--text2);word-break:keep-all}
+:is(#pp-guide,#pp-guide-page) .tour .more{margin-top:8px;height:40px;padding:0 8px;font-size:var(--fs-body);font-weight:var(--fw-bold);color:var(--main)}
+:is(#pp-guide,#pp-guide-page) .tour.final .txt{opacity:0;pointer-events:none}
+@keyframes pp-g-fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+:is(#pp-guide,#pp-guide-page) .tour .fin{position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity .3s;z-index:2}
+:is(#pp-guide,#pp-guide-page) .tour.final .fin{opacity:1;pointer-events:auto;cursor:default}
+:is(#pp-guide,#pp-guide-page) .tour .fin h3{position:absolute;top:96px;left:0;right:0;text-align:center}
+:is(#pp-guide,#pp-guide-page) .tour .btns{position:absolute;left:16px;right:16px;bottom:40px;display:flex;gap:8px}
+:is(#pp-guide,#pp-guide-page) .tour .btns button{flex:1;height:52px;border-radius:var(--r);font-size:var(--fs-label);font-weight:var(--fw-bold)}
+:is(#pp-guide,#pp-guide-page) .tour .btns .ghost{background:rgba(132,94,238,0.1);border:1.5px solid rgba(132,94,238,0.3);color:var(--main)}
+:is(#pp-guide,#pp-guide-page) .tour .btns .fill{background:var(--main);color:#fff;box-shadow:0 4px 14px rgba(132,94,238,0.28)}
+:is(#pp-guide,#pp-guide-page) .tour .btns .fill:active{background:var(--main-dark)}
+:is(#pp-guide,#pp-guide-page) .tour.final .fin h3,:is(#pp-guide,#pp-guide-page) .tour.final .btns{animation:pp-g-fadeUp 320ms 180ms cubic-bezier(.2,.7,.3,1) both}
+@media (prefers-reduced-motion:reduce){:is(#pp-guide,#pp-guide-page) .tour *,:is(#pp-guide,#pp-guide-page) .tour,:is(#pp-guide,#pp-guide-page) .ln{transition:none!important;animation:none!important}}
+</style>
 
 <body>
 
@@ -9703,6 +9890,7 @@ window.PP_FEATURES = {
         <div class="home-top">
           <div class="brand-logo"><div class="brand-symbol"><svg width="28" height="28" viewBox="0 0 360 363" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M178.702 82.6926C125.372 82.6926 82.1367 125.942 82.1367 179.289V277.43H115.611V252.409C132.535 267.036 154.589 275.873 178.702 275.873C232.032 275.873 275.267 232.624 275.267 179.276C275.267 125.929 232.032 82.6797 178.702 82.6797V82.6926ZM178.702 242.401C143.851 242.401 115.611 214.151 115.611 179.289C115.611 144.428 143.851 116.178 178.702 116.178C213.552 116.178 241.792 144.428 241.792 179.289C241.792 214.151 213.552 242.401 178.702 242.401Z" fill="#634C9E"/><path d="M180 0C80.593 0 0 80.6195 0 180.059V363H62.3962V316.368C93.9416 343.627 135.042 360.118 180 360.118C279.407 360.118 360 279.499 360 180.059C360 80.6195 279.42 0 180 0ZM180 297.702C115.045 297.702 62.3962 245.023 62.3962 180.059C62.3962 115.095 115.058 62.4168 180 62.4168C244.942 62.4168 297.604 115.095 297.604 180.059C297.604 245.023 244.942 297.702 180 297.702Z" fill="#7A49DE"/><path d="M208.118 189.436L204.118 182.814C203.278 181.338 202.518 178.546 202.518 176.91V166.818C202.518 153.814 191.918 143.203 178.838 143.203C165.758 143.203 155.158 153.814 155.158 166.818V176.91C155.158 178.546 154.398 181.338 153.558 182.774L149.518 189.436C147.918 192.108 147.558 195.06 148.558 197.773C149.518 200.445 151.798 202.52 154.758 203.517C162.518 206.15 170.678 207.426 178.838 207.426C186.998 207.426 195.158 206.15 202.918 203.557C205.718 202.639 207.878 200.525 208.918 197.773C209.958 195.02 209.678 191.989 208.118 189.436Z" fill="#532E95"/><path d="M187.757 144.883C184.997 143.806 181.997 143.207 178.837 143.207C175.717 143.207 172.717 143.766 169.957 144.883C171.677 141.652 175.077 139.617 178.837 139.617C182.637 139.617 185.997 141.652 187.757 144.883Z" fill="#532E95"/><path d="M190.077 211.462C188.397 216.089 183.957 219.4 178.757 219.4C175.597 219.4 172.477 218.123 170.277 215.85C168.997 214.653 168.037 213.057 167.477 211.422C167.997 211.502 168.517 211.542 169.077 211.621C169.997 211.741 170.957 211.861 171.917 211.94C174.197 212.14 176.517 212.26 178.837 212.26C181.117 212.26 183.397 212.14 185.637 211.94C186.477 211.861 187.317 211.821 188.117 211.701C188.757 211.621 189.397 211.542 190.077 211.462Z" fill="#532E95"/></svg></div><div class="brand-wordmark"><span class="bw-light">PRICE</span><span class="bw-bold">PICK</span></div></div>
           <div class="top-icons">
+            <button class="top-icon-btn pp-guide-btn" aria-label="가이드" data-ip-bound="1">가이드</button>
             <button class="top-icon-btn" aria-label="알림"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 10.5175C11.59 10.5175 11.25 10.1775 11.25 9.7675V6.4375C11.25 6.0275 11.59 5.6875 12 5.6875C12.41 5.6875 12.75 6.0275 12.75 6.4375V9.7675C12.75 10.1875 12.41 10.5175 12 10.5175Z" fill="currentColor"/><path d="M12.0208 20.3522C9.44084 20.3522 6.87084 19.9422 4.42084 19.1222C3.51084 18.8222 2.82084 18.1722 2.52084 17.3522C2.22084 16.5322 2.32084 15.5922 2.81084 14.7722L4.08084 12.6522C4.36084 12.1822 4.61084 11.3022 4.61084 10.7522V8.65219C4.61084 4.56219 7.93084 1.24219 12.0208 1.24219C16.1108 1.24219 19.4308 4.56219 19.4308 8.65219V10.7522C19.4308 11.2922 19.6808 12.1822 19.9608 12.6522L21.2308 14.7722C21.7008 15.5522 21.7808 16.4822 21.4708 17.3322C21.1608 18.1822 20.4808 18.8322 19.6208 19.1222C17.1708 19.9522 14.6008 20.3522 12.0208 20.3522ZM12.0208 2.75219C8.76084 2.75219 6.11084 5.40219 6.11084 8.66219V10.7622C6.11084 11.5722 5.79084 12.7422 5.37084 13.4322L4.10084 15.5622C3.84084 15.9922 3.78084 16.4522 3.93084 16.8522C4.08084 17.2522 4.42084 17.5522 4.90084 17.7122C9.50084 19.2422 14.5608 19.2422 19.1608 17.7122C19.5908 17.5722 19.9208 17.2522 20.0708 16.8322C20.2308 16.4122 20.1808 15.9522 19.9508 15.5622L18.6808 13.4422C18.2608 12.7522 17.9408 11.5822 17.9408 10.7722V8.67219C17.9308 5.40219 15.2808 2.75219 12.0208 2.75219Z" fill="currentColor"/><path d="M12.0019 22.9003C10.9319 22.9003 9.88187 22.4603 9.12187 21.7003C8.36187 20.9403 7.92188 19.8903 7.92188 18.8203H9.42188C9.42188 19.5003 9.70188 20.1603 10.1819 20.6403C10.6619 21.1203 11.3219 21.4003 12.0019 21.4003C13.4219 21.4003 14.5819 20.2403 14.5819 18.8203H16.0819C16.0819 21.0703 14.2519 22.9003 12.0019 22.9003Z" fill="currentColor"/></svg><div class="top-icon-dot"></div></button>
             <button class="top-icon-btn" aria-label="설정"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 15C13.6569 15 15 13.6569 15 12C15 10.3431 13.6569 9 12 9C10.3431 9 9 10.3431 9 12C9 13.6569 10.3431 15 12 15Z" stroke="currentColor" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 12.8814V11.1214C2 10.0814 2.85 9.2214 3.9 9.2214C5.71 9.2214 6.45 7.9414 5.54 6.3714C5.02 5.4714 5.33 4.3014 6.24 3.7814L7.97 2.7914C8.76 2.3214 9.78 2.6014 10.25 3.3914L10.36 3.5814C11.26 5.1514 12.74 5.1514 13.65 3.5814L13.76 3.3914C14.23 2.6014 15.25 2.3214 16.04 2.7914L17.77 3.7814C18.68 4.3014 18.99 5.4714 18.47 6.3714C17.56 7.9414 18.3 9.2214 20.11 9.2214C21.15 9.2214 22.01 10.0714 22.01 11.1214V12.8814C22.01 13.9214 21.16 14.7814 20.11 14.7814C18.3 14.7814 17.56 16.0614 18.47 17.6314C18.99 18.5414 18.68 19.7014 17.77 20.2214L16.04 21.2114C15.25 21.6814 14.23 21.4014 13.76 20.6114L13.65 20.4214C12.75 18.8514 11.27 18.8514 10.36 20.4214L10.25 20.6114C9.78 21.4014 8.76 21.6814 7.97 21.2114L6.24 20.2214C5.33 19.7014 5.02 18.5314 5.54 17.6314C6.45 16.0614 5.71 14.7814 3.9 14.7814C2.85 14.7814 2 13.9214 2 12.8814Z" stroke="currentColor" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
           </div>
@@ -11216,7 +11404,7 @@ window.PP_FEATURES = {
           <!-- 도움 / 약관 -->
           <div class="my-section-title">도움말</div>
           <div class="my-section">
-            <div class="my-row" data-jump="pw-23">
+            <div class="my-row" data-jump="pw-23g">
               <div class="my-row-ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg></div>
               <div class="my-row-body">
                 <div class="my-row-name">쇼핑 적립 방법</div>
@@ -13520,6 +13708,15 @@ window.PP_FEATURES = {
   </div>
 
   <!-- 34. 구매 내역 -->
+  <!-- pw-23g 쇼핑 가이드 (시안 탭 B) — 마이 「쇼핑 적립 방법」에서 진입. 내용은 #pp-guide-script 가 그린다 -->
+  <div class="phone-wrap" id="pw-23g" data-screen="05g">
+    <div class="phone">
+      <div id="pp-guide-page">
+        <div class="statusbar"><span>9:41</span><div class="statusbar-icons"><svg width="17" height="12" viewBox="0 0 17 12" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><rect x="0" y="4" width="3" height="8" rx="1"/><rect x="4.5" y="2.5" width="3" height="9.5" rx="1"/><rect x="9" y="1" width="3" height="11" rx="1"/><rect x="13.5" y="0" width="3" height="12" rx="1"/></svg><svg width="16" height="12" viewBox="0 0 16 12" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M8 2.5C10.2 2.5 12.2 3.4 13.6 4.9L15 3.4C13.2 1.5 10.7 0.3 8 0.3C5.3 0.3 2.8 1.5 1 3.4L2.4 4.9C3.8 3.4 5.8 2.5 8 2.5Z"/><path d="M8 5.5C9.4 5.5 10.7 6.1 11.6 7L13 5.5C11.7 4.2 10 3.3 8 3.3C6 3.3 4.3 4.2 3 5.5L4.4 7C5.3 6.1 6.6 5.5 8 5.5Z"/><circle cx="8" cy="10" r="1.8"/></svg><svg width="25" height="12" viewBox="0 0 25 12" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="currentColor" stroke-opacity="0.35"/><rect x="2" y="2" width="17" height="8" rx="2" fill="currentColor"/><path d="M23 4V8C23.8 7.6 24.5 6.9 24.5 6C24.5 5.1 23.8 4.4 23 4Z" fill="currentColor" fill-opacity="0.4"/></svg></div></div>
+      </div>
+    </div>
+  </div>
+
   <div class="phone-wrap" id="pw-34" data-screen="06d">
     <div class="phone-label"><span class="num">34</span>구매 내역<span class="pill-cat">마이</span></div>
     <div class="phone">
@@ -13603,6 +13800,359 @@ window.PP_FEATURES = {
   </div>
 </div>
 
+<template id="pp-guide-tpl">
+  <div class="page">
+    <div class="appbar">
+      <button class="back" aria-label="뒤로"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button>
+      <h1>쇼핑 가이드</h1>
+    </div>
+    <div class="head">
+      <h2>쓰던 쇼핑몰, 프라이스픽에서 들어가면 티켓이 쌓여요</h2>
+      <p>처음이라면 위에서부터 차례로 읽어 보세요</p>
+    </div>
+    <button class="overview" data-act="overview">
+      <div class="top"><b>한눈에 보는 프라이스픽</b><span>누르면 처음부터 봐요<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></span></div>
+      <div class="mini" style="--s:.24" data-mini></div>
+    </button>
+    <div class="steps" data-steps></div>
+    <button class="rule" data-act="rule"><span>적립 조건 자세히 보기</span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></button>
+  </div>
+
+  <div class="tour" data-tour>
+    <div class="bgfx" data-bgfx><span class="blob b1"></span><span class="blob b2"></span><span class="blob b3"></span></div>
+    <div class="vp" data-vp></div>
+    <div class="bar">
+      <div class="prog" data-prog></div>
+      <button class="x" data-act="close" aria-label="닫기"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    </div>
+    <button class="skip" data-act="skip">건너뛰기</button>
+    <div class="txt" data-txt>
+      <div class="tcard"><div class="lines"><h3 data-title></h3><p class="desc" data-desc></p></div></div>
+      <button class="more" data-act="more">가이드 자세히 보기 ›</button>
+    </div>
+    <div class="fin">
+      <h3>한눈에 보는 프라이스픽</h3>
+      <div class="btns">
+        <button class="ghost" data-act="replay">다시 보기</button>
+        <button class="fill" data-act="start">시작하기</button>
+      </div>
+    </div>
+  </div>
+
+</template>
+<script id="pp-guide-script">
+(function () {
+
+/* 캔버스 좌표 (폭 390 기준 — 데모 화면 폭. 시안 375 좌표를 x × 390/375 로 환산). 이미지 노드는 흰 카드(안쪽 14px) 크기, 오브젝트는 그 안에 비율대로 */
+/* 2단계 제휴몰: 로고 칩 한 줄(쿠팡 강조) + 쿠팡 대표 카드 */
+const MALL_LOGOS = ['coupang.jpg', 'gmarket.png', '11st.png', 'nsmall.png', 'cjthemarket.jpg'];
+const MALLS = '<div class="malls"><div class="chips">' +
+  MALL_LOGOS.map((f, i) => `<span class="chip${i ? '' : ' hot'}" style="--i:${i}"><span class="c"><img src="/app/assets/guide/mall/${f}" alt=""></span></span>`).join('') +
+  '</div><div class="mall"><span class="badge"><img src="/app/assets/guide/mall/coupang.jpg" alt=""></span><b>쿠팡</b><span class="go">바로가기</span></div></div>';
+const CV_H = 2505;
+/* lab: 노드 라벨 — 전부 오브젝트 아래 8px, 가운데 정렬.
+   오브젝트는 1.35배(제휴몰 칩·카드 제외). 갈래 노드는 좌우로 나란히 두면 화면 폭을 넘으므로
+   왼쪽(대기→확정 티켓) 사이 빈 구간 옆에 오른쪽(포인트)을 끼워 세로로 엇갈리게 둔다 */
+const NODES = {
+  phone:  { x: 195,   y: 40,   w: 218, h: 472, img: 'sp', lab: '프라이스픽', at: 'b', edge: true },
+  mall:   { x: 195,   y: 640,  w: 286, h: 130, html: MALLS, lab: '제휴몰', at: 'b' },
+  bag:    { x: 195,   y: 898,  w: 279, h: 308, img: 'o2', lab: '구매 완료', at: 'b' },
+  wait:   { x: 110,   y: 1362, w: 227, h: 193, img: 'tw', lab: '랜덤 티켓(구매 확정 전)', at: 'b', edge: true },
+  ok:     { x: 110,   y: 1755, w: 100, h: 30,  html: '<span class="pill g">구매 확정</span>' },
+  ticket: { x: 110,   y: 1830, w: 261, h: 220, img: 'tk', lab: '사용 가능 티켓', at: 'b', edge: true },
+  coin:   { x: 261,   y: 1595, w: 227, h: 162, img: 'o5', lab: '포인트', at: 'b', edge: true },
+  rate:   { x: 261,   y: 1900, w: 130, h: 30,  html: '<span class="pill y">10P = 티켓 1장</span>' },
+  gift:   { x: 195,   y: 2248, w: 301, h: 185, img: 'o6', lab: '기프티콘', at: 'b' },
+};
+/* 화살표: 끝점은 항상 아래 방향. 선은 촉 길이만큼 짧게 끝낸다.
+   5번째 값: 곡선 종류, 6번째 값: 갈래 색(l 티켓 길 보라 / r 포인트 길 골드),
+   7번째 값: 곡선 시작 y — 그 전까지는 수직선(합류 곡선 두 개를 같은 크기로 맞춘다)
+   8번째 값: 곡선 끝 y — 그 뒤로는 수직선(분기 곡선 두 개를 같은 크기로 맞춘다) */
+const ARROWS = {
+  a1: [195, 548, 195, 630],
+  a2: [195, 806, 195, 888],
+  sl: [195, 1242, 110, 1352, 'curve', 'l'],
+  sr: [195, 1242, 261, 1585, 'curve', 'r', null, 1340],
+  al: [110, 1591, 110, 1820, null, 'l'],
+  ar: [261, 1793, 261, 1890, null, 'r'],
+  ml: [110, 2086, 179, 2238, 'curve', 'l'],
+  mr: [261, 1940, 211, 2238, 'curve', 'r', 2086],
+};
+const STEPS = [
+  { t: '프라이스픽에서 출발해요', d: '쇼핑하기 전에 프라이스픽을 먼저 열어요',
+    seq: [['phone']] },
+  { t: "제휴몰에서 '바로가기'를 눌러요", d: '열린 창에서 평소처럼 결제하면 돼요',
+    seq: [['a1'], ['mall']] },
+  { t: '상품은 집으로 오고', d: '프라이스픽에는 티켓이 쌓여요',
+    seq: [['a2'], ['bag']] },
+  { t: '쌓인 티켓은 사용 대기예요', d: '반품·취소 기간이 지나야 확정돼요',
+    seq: [['sl'], ['wait']] },
+  { t: '확정되면 바로 쓸 수 있어요', d: '티켓이 사용 가능 상태로 바뀌어요',
+    seq: [['al'], ['ok', 'ticket']] },
+  { t: '포인트 10P는 티켓 1장이 돼요', d: '다양한 방식으로 모은 포인트는 티켓으로 전환이 가능해요',
+    seq: [['sr'], ['coin'], ['ar'], ['rate']] },
+  { t: '티켓으로 기프티콘을 사요', d: '다양한 방법으로 모은 티켓으로 기프티콘을 구매할 수 있어요',
+    seq: [['ml', 'mr'], ['gift']] },
+];
+const THUMB = ['sp', null, 'o2', 'tw', 'tk', 'o5', 'o6'];
+const DRAW = 420, GAP = 300;
+const FIN = { top: 152, h: 576 };
+const src = k => `/app/assets/guide/${k}.png`;
+/* 오브젝트 그림. 폰(o1)은 화면 자리에 스플래시 화면을 얹는다 */
+/* 티켓: tw = 대기(빨강 랜덤 티켓 3장 겹침), tk = 확정(금색 티켓 1장 + 체크 배지) */
+const TK = '/app/assets/guide/ticket-gold.svg', TR = '/app/assets/guide/ticket-random.svg';
+const CHK = '<span class="chk"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>';
+const SPLASH = '/app/assets/guide/pricepick-splash.png';
+const objHTML = k => k === 'sp' ? `<span class="pp-g-splash"><img src="${SPLASH}" alt=""></span>`
+  : k === 'o1'
+  ? `<span class="obj"><img src="${src('o1')}" alt=""><span class="scr"><img src="/app/assets/guide/pricepick-splash.png" alt=""></span></span>`
+  : k === 'tw' ? `<span class="tks wait">${`<img src="${TR}" alt="">`.repeat(3)}</span>`
+  : k === 'tk' ? `<span class="tks one"><img src="${TK}" alt="">${CHK}</span>`
+  : `<img src="${src(k)}" alt="">`;
+[TK, TR, SPLASH].forEach(u => new Image().src = u);
+Object.values(NODES).forEach(n => n.img && n.img[0] === 'o' && (new Image().src = src(n.img)));
+
+function arrowPath([x1, y1, x2, y2, kind, , cy, ce]) {
+  const tip = y2 - 12;
+  if (!kind) return `M${x1} ${y1}L${x2} ${tip}`;
+  if (ce) return arrowPath([x1, y1, x2, ce + 12, kind]) + `L${x2} ${tip}`;
+  if (cy) return `M${x1} ${y1}L${x1} ${cy}` + arrowPath([x1, cy, x2, y2, kind]).slice(`M${x1} ${cy}`.length);
+  /* 큰 S 곡선: 시작 제어점을 아래로 당겨 어깨를 둥글게, 끝은 수직으로 꽂힌다 */
+  const H = tip - y1;
+  return `M${x1} ${y1}C${x1} ${y1 + H * .6} ${x2} ${y1 + H * .4} ${x2} ${tip}`;
+}
+let cvSeq = 0;
+function canvasHTML() {
+  const id = `cv${++cvSeq}`;
+  const svg = Object.entries(ARROWS).map(([k, a]) => {
+    const d = arrowPath(a), m = `${id}-${k}`;
+    /* 포인트 길은 디자인 시스템 Gold 그라디언트(#FFD93B → #E6A800)를 선 방향으로 */
+    const gold = a[5] === 'r'
+      ? `<linearGradient id="${m}-g" gradientUnits="userSpaceOnUse" x1="${a[0]}" y1="${a[1]}" x2="${a[2]}" y2="${a[3]}"><stop offset="0" stop-color="#FFD93B"/><stop offset="1" stop-color="#E6A800"/></linearGradient>`
+      : '';
+    return `<g class="ar${a[5] ? ' ' + a[5] : ''}" data-k="${k}">` + gold +
+      `<mask id="${m}" maskUnits="userSpaceOnUse" x="0" y="0" width="390" height="${CV_H}"><path class="rv" d="${d}"/></mask>` +
+      `<path class="ln" d="${d}" mask="url(#${m})"${gold ? ` style="stroke:url(#${m}-g)"` : ''}/>` +
+      `<path class="hd" d="M${a[2] - 10} ${a[3] - 14}Q${a[2]} ${a[3] - 11} ${a[2] + 10} ${a[3] - 14}L${a[2]} ${a[3]}Z"/></g>`;
+  }).join('');
+  const nodes = Object.entries(NODES).map(([k, n]) =>
+    `<div class="nd${n.html && k !== 'mall' ? '' : ' lift'}${n.edge ? ' edge' : ''}" data-k="${k}" style="left:${n.x - n.w / 2}px;top:${n.y}px;width:${n.w}px;height:${n.h}px;` +
+    `--gw:${n.w + 60}px;--gh:${n.h + 50}px;--fw:${Math.round(n.w * .72)}px">` +
+    `<div class="fx"><div class="pop">${n.img ? `<div class="ncard">${objHTML(n.img)}</div>` : n.html}` +
+    `${n.lab ? `<span class="lab ${n.at}">${n.lab}</span>` : ''}</div></div></div>`).join('');
+  return `<div class="cv"><svg width="390" height="${CV_H}" viewBox="0 0 390 ${CV_H}">${svg}</svg>${nodes}</div>`;
+}
+/* 배경에 떠다니는 장식 — 티켓·코인·반짝임 */
+const DECO_SHAPE = {
+  ticket: c => `<svg viewBox="0 0 24 16"><path fill="${c}" d="M3 0h18a3 3 0 0 1 3 3v2.5a2.5 2.5 0 0 0 0 5V13a3 3 0 0 1-3 3H3a3 3 0 0 1-3-3v-2.5a2.5 2.5 0 0 0 0-5V3a3 3 0 0 1 3-3Z"/></svg>`,
+  coin:   c => `<svg viewBox="0 0 20 20"><circle cx="10" cy="10" r="10" fill="${c}"/><circle cx="10" cy="10" r="6" fill="none" stroke="${c}" stroke-width="2"/></svg>`,
+  spark:  c => `<svg viewBox="0 0 20 20"><path fill="${c}" d="M10 0c.9 5.4 4.6 9.1 10 10-5.4.9-9.1 4.6-10 10-.9-5.4-4.6-9.1-10-10C5.4 9.1 9.1 5.4 10 0Z"/></svg>`,
+};
+const P = 'rgba(132,94,238,.18)', Y = 'rgba(230,168,0,.22)';
+const DECO = [ // [모양, x, y, 크기, 색, 주기(s), 지연(s), 흐림]
+  ['spark', 312, 92, 18, Y, 7, 0, 0], ['ticket', 29, 150, 24, P, 9, -2, 0], ['coin', 343, 200, 14, Y, 6.5, -1, 1],
+  ['spark', 54, 262, 12, P, 8, -4, 0], ['coin', 19, 380, 22, Y, 10, -3, 1], ['ticket', 331, 360, 20, P, 8.5, -5, 0],
+  ['spark', 354, 470, 26, P, 11, -1, 1], ['coin', 73, 500, 10, P, 6, -2, 0], ['ticket', 302, 560, 16, Y, 9.5, -6, 1],
+  ['spark', 25, 590, 16, Y, 7.5, -3, 0], ['coin', 359, 640, 18, P, 10.5, -4, 0], ['ticket', 125, 120, 14, Y, 8, -7, 1],
+  ['spark', 208, 610, 10, P, 6.5, -2, 1],
+];
+function decoHTML() {
+  return DECO.map(([t, x, y, sz, c, d, dl, b]) =>
+    `<span class="deco${b ? ' soft' : ''}" style="left:${x}px;top:${y}px;width:${sz}px;height:${t === 'ticket' ? Math.round(sz * .67) : sz}px;--d:${d}s;--dl:${dl}s">${DECO_SHAPE[t](c)}</span>`).join('');
+}
+
+function measure(root) {
+  root.querySelectorAll('.rv').forEach(p => {
+    let L = 0;
+    try { L = p.getTotalLength(); } catch (e) {}
+    if (!L) { const n = p.getAttribute('d').match(/-?[\d.]+/g).map(Number); L = Math.hypot(n[n.length - 2] - n[0], n[n.length - 1] - n[1]) * 1.3; }
+    p.style.setProperty('--L', Math.ceil(L) + 1);
+  });
+}
+function mountPage(screen) {
+  screen.appendChild(document.getElementById('pp-guide-tpl').content.cloneNode(true));
+  screen.querySelector('[data-tour]').remove();
+  const $ = s => screen.querySelector(s);
+
+  /* 페이지: 축소판 흐름도 + 단계 카드 */
+  const mini = $('[data-mini]');
+  mini.innerHTML = canvasHTML();
+  measure(mini);
+  mini.classList.add('snap');
+  mini.querySelectorAll('.ar,.nd').forEach(el => el.classList.add('on'));
+  $('[data-steps]').innerHTML = STEPS.map((s, i) =>
+    `<button class="step" data-go="${i}"><span class="th">${THUMB[i] ? objHTML(THUMB[i]) : MALLS}</span>` +
+    `<span class="tx"><span class="no">${i + 1}</span><b>${s.t}</b><p>${s.d}</p></span></button>`).join('');
+  return { screen };
+}
+
+function mountTour(screen, onClose) {
+  screen.appendChild(document.getElementById('pp-guide-tpl').content.cloneNode(true));
+  screen.querySelector('.page').remove();
+  screen.classList.add('is-tour');
+  const $ = s => screen.querySelector(s);
+  const tour = $('[data-tour]'), txt = $('[data-txt]');
+
+  /* 투어 */
+  $('[data-vp]').innerHTML = canvasHTML();
+  measure($('[data-vp]'));
+  $('[data-bgfx]').insertAdjacentHTML('beforeend', decoHTML());
+  const cv = $('[data-vp] .cv');
+  const el = k => cv.querySelector(`[data-k="${k}"]`);
+  $('[data-prog]').innerHTML = STEPS.map(() => '<span></span>').join('');
+  const bars = [...screen.querySelectorAll('[data-prog] span')];
+
+  let idx = -1, timers = [];
+  const later = (ms, fn) => timers.push(setTimeout(fn, ms));
+  const stop = () => { timers.forEach(clearTimeout); timers = []; };
+  const nodesOf = i => STEPS[i].seq.flat().filter(k => NODES[k]);
+  const camTo = (y, s = 1) => { cv.style.transform = `translateY(${y}px) scale(${s})`; };
+  /* 카메라: i 단계 노드 묶음(라벨 포함)의 세로 중앙을 진행 바 아래 ~ 문구 카드 위 구간의 세로 중앙에 둔다.
+     위쪽 가림 마스크는 현재 노드 바로 위까지만 내려와 현재 노드를 자르지 않는다 */
+  const vp = $('[data-vp]'), prog = $('[data-prog]');
+  function camAt(i) {
+    const ks = nodesOf(i);
+    const top = Math.min(...ks.map(k => NODES[k].y));
+    const bot = Math.max(...ks.map(k => NODES[k].y + NODES[k].h + (NODES[k].lab ? 26 : 0)));
+    const tr = tour.getBoundingClientRect();
+    const barBot = (prog.getBoundingClientRect().bottom - tr.top) * (tour.offsetHeight / (tr.height || tour.offsetHeight || 1));
+    const y = (barBot + txt.offsetTop) / 2 - (top + bot) / 2;
+    vp.style.setProperty('--m0', Math.min(124, top + y - 44) + 'px');
+    vp.style.setProperty('--m1', Math.min(168, top + y - 4) + 'px');
+    camTo(y);
+  }
+  const snap = fn => { tour.classList.add('snap'); fn(); void tour.offsetWidth; tour.classList.remove('snap'); };
+
+  function focus(i) {
+    const cur = new Set(nodesOf(i));
+    cv.querySelectorAll('.nd').forEach(n => {
+      const k = n.dataset.k;
+      n.classList.toggle('cur', cur.has(k));
+      n.classList.toggle('past', !cur.has(k) && n.classList.contains('on'));
+    });
+  }
+  function setText(i, animate) {
+    const put = () => {
+      $('[data-title]').textContent = STEPS[i].t;
+      $('[data-desc]').textContent = STEPS[i].d;
+      txt.classList.remove('out', 'in'); void txt.offsetWidth; txt.classList.add('in');
+      /* 흐름도는 문구 카드 위쪽 경계에서 끝난다 — 지난 노드·라벨이 카드 뒤로 비치지 않게 */
+      $('[data-vp]').style.setProperty('--clip', txt.offsetTop + 'px');
+    };
+    if (!animate) return put();
+    txt.classList.remove('in'); txt.classList.add('out');
+    later(130, put);
+  }
+  /* i 단계 이전까지는 즉시 완성 상태로 맞춘다 */
+  function settle(i) {
+    snap(() => {
+      cv.querySelectorAll('.ar,.nd').forEach(n => n.classList.remove('on', 'cur', 'past'));
+      for (let s = 0; s < i; s++) STEPS[s].seq.flat().forEach(k => el(k).classList.add('on'));
+      if (i > 0) { focus(i - 1); camAt(i - 1); } else camAt(0);
+    });
+  }
+  function go(i) {
+    stop();
+    const wasFinal = tour.classList.contains('final');
+    if (wasFinal || i !== idx + 1) settle(i);
+    else if (idx >= 0) snap(() => STEPS[idx].seq.flat().forEach(k => el(k).classList.add('on')));
+    tour.classList.remove('final');
+    idx = i;
+    bars.forEach((b, k) => b.classList.toggle('done', k <= i));
+    setText(i, txt.querySelector('[data-title]').textContent !== '' && !wasFinal);
+
+    let t = 0, panned = false;
+    STEPS[i].seq.forEach(group => {
+      const isArrow = !!ARROWS[group[0]];
+      later(t, () => {
+        group.forEach((k, n) => isArrow ? el(k).classList.add('on')
+          : setTimeout(() => el(k).classList.add('on'), n * 80));
+        if (!isArrow && !panned) { panned = true; focus(i); camAt(i); }
+      });
+      t += isArrow ? DRAW : GAP;
+    });
+  }
+  function final() {
+    stop();
+    idx = STEPS.length;
+    snap(() => cv.querySelectorAll('.ar,.nd').forEach(n => n.classList.add('on')));
+    cv.querySelectorAll('.nd').forEach(n => n.classList.remove('cur', 'past'));
+    const s = FIN.h / CV_H;
+    camTo(FIN.top + (FIN.h - CV_H * s) / 2, s);
+    bars.forEach(b => b.classList.add('done'));
+    tour.classList.add('final');
+  }
+  function open(i = 0) {
+    tour.classList.remove('final');
+    $('[data-title]').textContent = '';
+    idx = -1; settle(i);
+    tour.classList.add('open');
+    go(i);
+  }
+  function close() {
+    stop();
+    tour.classList.remove('open');
+  }
+
+  tour.addEventListener('click', e => {
+    const act = e.target.closest('[data-act]')?.dataset.act;
+    if (act === 'close' || act === 'start' || act === 'more') { close(); return onClose(); }
+    if (act === 'skip') return final();
+    if (act === 'replay') return open(0);
+    if (tour.classList.contains('final')) return;
+    idx < STEPS.length - 1 ? go(idx + 1) : final();
+  });
+
+  return { open, close, screen };
+}
+
+/* ── 데모 연결 ──
+   탭 A(투어) = 홈 pw-10 .phone 위 오버레이 #pp-guide (기본 숨김, 홈 「가이드」 버튼으로 연다)
+   탭 B(페이지) = pw-23g #pp-guide-page. 페이지의 흐름도·단계 카드를 누르면 같은 오버레이를 pw-23g 위로 옮겨 재생
+   투어를 닫으면(닫기·시작하기·가이드 자세히 보기) 가이드 페이지로 — 시안과 같다 */
+const homePhone = document.querySelector('#pw-10 .phone');
+const pageRoot = document.getElementById('pp-guide-page');
+if (!homePhone || !pageRoot) return;
+const pagePhone = pageRoot.closest('.phone');
+const wrap = document.createElement('div');
+wrap.id = 'pp-guide';
+const sb = homePhone.querySelector('.statusbar');
+if (sb) wrap.appendChild(sb.cloneNode(true));
+homePhone.appendChild(wrap);
+let host = 'home';
+const A = mountTour(wrap, () => {
+  wrap.classList.remove('open');
+  if (host === 'home') showScreen('pw-23g');
+});
+const B = mountPage(pageRoot);
+function openTour(where, i) {
+  host = where;
+  const phone = where === 'home' ? homePhone : pagePhone;
+  if (wrap.parentNode !== phone) phone.appendChild(wrap);
+  wrap.classList.add('open');
+  A.open(i);
+}
+function closeTour() { A.close(); wrap.classList.remove('open'); }
+
+B.screen.querySelector('[data-act="overview"]').addEventListener('click', e => { e.stopPropagation(); openTour('page', 0); });
+B.screen.querySelectorAll('[data-go]').forEach(b =>
+  b.addEventListener('click', e => { e.stopPropagation(); openTour('page', +b.dataset.go); }));
+const guideBtn = document.querySelector('#pw-10 .pp-guide-btn');
+if (guideBtn) guideBtn.addEventListener('click', e => { e.stopPropagation(); openTour('home', 0); });
+/* 투어 안의 클릭이 데모 전역 처리로 새지 않게 */
+wrap.addEventListener('click', e => e.stopPropagation());
+/* Esc: 투어가 열려 있으면 화면 뒤로 가기 대신 투어만 닫는다 */
+window.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && wrap.classList.contains('open')) { e.stopPropagation(); closeTour(); }
+}, true);
+/* catch-all(bindCatchAll)이 가이드 요소를 가로채지 않게 표시. 뒤로·적립 조건 줄은 FLOW_MAP 이 바인딩한다 */
+[wrap, pageRoot].forEach(r => r.querySelectorAll('*').forEach(el => {
+  if (!el.matches('.appbar .back, [data-act="rule"]')) el.dataset.ipBound = '1';
+}));
+wrap.dataset.ipBound = '1';
+window.ppGuideOpen = i => openTour('home', i || 0);
+})();
+</script>
 <script>
 // ===== INTERACTIVE PROTOTYPE ENGINE v2 =====
 
@@ -13640,6 +14190,7 @@ const SCREEN_MAP = {
   'pw-21':          { id:'21',             name:'내 티켓 & 포인트' },
   'pw-22':          { id:'22',             name:'티켓 & 포인트 교환소' },
   'pw-23':          { id:'23',             name:'적립 조건 안내' },
+  'pw-23g':         { id:'23g',            name:'쇼핑 가이드' },
   'pw-24':          { id:'24',             name:'기프티샵 (카탈로그)' },
   'pw-24h':         { id:'24h',            name:'기프티콘 구매 내역' },
   'pw-25':          { id:'25',             name:'기프티콘 구매 상세' },
@@ -13704,6 +14255,8 @@ const FLOW_MAP = [
   ['pw-22', '.back-btn',                   'pw-21', '뒤로 → 21'],
   // pw-22 pt-cta-btn·ev-cta-btn: 실핸들러 = bindPointTicketExchange()·bindEventSwapScreen() (FLOW_MAP 범용 라우팅 제외 — 실차감/지급 우회 방지)
   ['pw-23', '.back-btn, .close-btn', 'pw-20', '닫기 → 혜택'],
+  ['pw-23g', '.appbar .back',        null,    '뒤로 → 이전 화면'],
+  ['pw-23g', '[data-act="rule"]',    'pw-23', '적립 조건 자세히 보기 → 23'],
   ['pw-24', '.ex-item',                    'pw-25', '기프티콘 → 25'],
   ['pw-24', '.back-btn, .reward-top-btn',  'pw-20', '뒤로 → 혜택'],
   ['pw-24h', '.back-btn',                  'pw-24', '뒤로 → 기프티샵'],
@@ -13714,6 +14267,7 @@ const FLOW_MAP = [
   ['pw-30', '[class*="menu-row"]:nth-child(1)',       'pw-21',         '내 티켓 → 21'],
   ['pw-30', '[class*="menu-row"]:nth-child(2)',       'pw-32',         '활동내역 → 32'],
   ['pw-30', '.my-row[data-jump="pw-34"]', 'pw-34', '구매내역 → 34'],
+  ['pw-30', '.my-row[data-jump="pw-23g"]', 'pw-23g', '쇼핑 적립 방법 → 23g 쇼핑 가이드'],
   ['pw-34', '.back-btn', 'pw-30', '뒤로 → 마이'],
   ['pw-30', '[class*="setting"], [class*="config"]',  'pw-31',         '설정 → 31'],
   ['pw-30', '[class*="withdraw"], [class*="leave"]',  'pw-33',         '탈퇴 → 06c'],
@@ -16259,12 +16813,12 @@ function bindHomeScreen() {
     });
   });
 
-  // 알림 아이콘 → S2
-  const topBtns = screen.querySelectorAll('.top-icon-btn');
-  if (topBtns[0] && !topBtns[0].dataset.ipBound) {
-    topBtns[0].dataset.ipBound = '1';
-    topBtns[0].style.cursor = 'pointer';
-    topBtns[0].addEventListener('click', function(e) {
+  // 알림 아이콘 → S2 (순서 번호 대신 aria-label 로 찾는다 — 앞에 「가이드」 버튼이 있다)
+  const bellBtn = screen.querySelector('.top-icon-btn[aria-label="알림"]');
+  if (bellBtn && !bellBtn.dataset.ipBound) {
+    bellBtn.dataset.ipBound = '1';
+    bellBtn.style.cursor = 'pointer';
+    bellBtn.addEventListener('click', function(e) {
       e.stopPropagation();
       showScreen('pw-S1');
     });
@@ -17048,6 +17602,8 @@ function csSubmitInquiry(btn) {
   Object.assign(KO2VI, {"중복 확인": "Kiểm tra trùng", "사용할 수 있는 닉네임이에요": "Biệt danh này có thể sử dụng", "이미 쓰고 있는 닉네임이에요": "Biệt danh này đã được sử dụng", "중복 확인을 먼저 해주세요": "Vui lòng kiểm tra trùng trước", "방금 다른 분이 먼저 사용했어요. 다른 닉네임을 입력해주세요": "Người khác vừa sử dụng biệt danh này. Vui lòng nhập biệt danh khác", "2~10자로 입력해주세요": "Vui lòng nhập 2-10 ký tự"});
   Object.assign(KO2VI, {"티켓 10장": "10 vé", "티켓은 구매 확정 후 지급(카카오톡 연동 D+7 / 미연동 D+30) · 이벤트 티켓·축하 포인트는 카카오 연동 시 지급": "Vé cấp sau xác nhận mua (liên kết KakaoTalk D+7 / chưa liên kết D+30) · vé sự kiện·điểm chúc mừng cấp khi liên kết Kakao"});
   Object.assign(KO2VI, {"보유한 포인트보다 많아요": "Nhiều hơn số điểm đang có"});
+  /* 쇼핑 가이드 (홈 투어 · pw-23g) — 2026-11-03 */
+  Object.assign(KO2VI, {"가이드": "Hướng dẫn", "쇼핑 가이드": "Hướng dẫn mua sắm", "쓰던 쇼핑몰, 프라이스픽에서 들어가면 티켓이 쌓여요": "Vào sàn quen thuộc qua PricePick là tích lũy được vé", "처음이라면 위에서부터 차례로 읽어 보세요": "Nếu là lần đầu, hãy đọc lần lượt từ trên xuống", "한눈에 보는 프라이스픽": "PricePick trong nháy mắt", "누르면 처음부터 봐요": "Nhấn để xem từ đầu", "프라이스픽에서 출발해요": "Bắt đầu từ PricePick", "쇼핑하기 전에 프라이스픽을 먼저 열어요": "Trước khi mua sắm, hãy mở PricePick trước", "제휴몰에서 '바로가기'를 눌러요": "Nhấn 'Truy cập' ở sàn liên kết", "열린 창에서 평소처럼 결제하면 돼요": "Thanh toán như bình thường trong cửa sổ vừa mở", "상품은 집으로 오고": "Hàng được giao về nhà", "프라이스픽에는 티켓이 쌓여요": "Còn PricePick thì tích lũy vé cho bạn", "쌓인 티켓은 사용 대기예요": "Vé tích lũy đang chờ sử dụng", "반품·취소 기간이 지나야 확정돼요": "Vé được xác nhận sau khi hết hạn đổi trả, hủy", "확정되면 바로 쓸 수 있어요": "Xác nhận xong là dùng được ngay", "티켓이 사용 가능 상태로 바뀌어요": "Vé chuyển sang trạng thái có thể dùng", "포인트 10P는 티켓 1장이 돼요": "10P điểm đổi được 1 vé", "다양한 방식으로 모은 포인트는 티켓으로 전환이 가능해요": "Điểm tích lũy bằng nhiều cách có thể đổi sang vé", "티켓으로 기프티콘을 사요": "Dùng vé để mua Gifticon", "다양한 방법으로 모은 티켓으로 기프티콘을 구매할 수 있어요": "Có thể mua Gifticon bằng vé tích lũy từ nhiều cách", "제휴몰": "Sàn liên kết", "구매 완료": "Đã mua xong", "랜덤 티켓(구매 확정 전)": "Vé ngẫu nhiên (chờ xác nhận)", "10P = 티켓 1장": "10P = 1 vé", "건너뛰기": "Bỏ qua", "가이드 자세히 보기 ›": "Xem hướng dẫn chi tiết ›", "다시 보기": "Xem lại", "적립 조건 자세히 보기": "Xem chi tiết điều kiện tích lũy"});
   /* 2026-10-27 데모 미반영 수정분 */
   Object.assign(KO2VI, {"쇼핑 적립 방법": "Cách tích lũy khi mua sắm", "신규": "Mới", "가입 축하 20P를 받았어요": "Đã nhận 20P chúc mừng đăng ký", "쿠팡 · 구매 확정 후": "Coupang · sau khi xác nhận mua", "링크프라이스 제휴몰": "Sàn liên kết LinkPrice", "익익월 6일 확정 후": "Sau khi chốt ngày 6 của tháng thứ hai sau đó", "D+30 후 사용": "Dùng sau D+30", "링크프라이스 제휴몰은 구매한 달의 익익월 6일에 확정돼요.": "Sàn liên kết LinkPrice được chốt vào ngày 6 của tháng thứ hai sau tháng mua.", "카카오 연동 후 교환할 수 있어요.": "Có thể đổi sau khi liên kết Kakao.", "초대코드를 다시 확인해 주세요.": "Vui lòng kiểm tra lại mã mời.", "내 초대코드는 사용할 수 없어요.": "Không thể dùng mã mời của chính mình.", "잠시 후 다시 시도해 주세요.": "Vui lòng thử lại sau giây lát."});
   Object.assign(KO2VI, {"쿠팡은 카카오톡 연동 시 7일, 미연동 시 30일이에요.": "Coupang là 7 ngày nếu đã liên kết KakaoTalk, 30 ngày nếu chưa.", "다른 쇼핑몰은 쇼핑몰마다 정해진 대기 기간을 따라요.": "Các sàn khác theo thời gian chờ được đặt riêng cho từng sàn.", "카카오 연동하러 가기 →": "Đi liên kết Kakao →"});
