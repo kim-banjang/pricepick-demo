@@ -1367,9 +1367,9 @@ window.CMS_FEATURES = {
             <span class="sb-item-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span>
             <span class="sb-item-lbl" id="nav-label-revenue-fee">제휴 수수료 매출</span>
           </button>
-          <button class="sb-item" id="nav-revenue-gifti" data-label="기프티샵 판매 매출" onclick="go('revenue-gifti',this)">
+          <button class="sb-item" id="nav-revenue-gifti" data-label="판매 내역" onclick="go('revenue-gifti',this)">
             <span class="sb-item-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="13" rx="2"/><path d="M3 12h18M12 8v13"/><path d="M12 8S10.5 4 8 4a2.5 2.5 0 0 0 0 5h4z"/><path d="M12 8s1.5-4 4-4a2.5 2.5 0 0 1 0 5h-4z"/></svg></span>
-            <span class="sb-item-lbl" id="nav-label-revenue-gifti">기프티샵 판매 매출</span>
+            <span class="sb-item-lbl" id="nav-label-revenue-gifti">판매 내역</span>
           </button>
           <!-- 「기프티콘 판매 매출」 메뉴 폐기(김반장 2026-09-16) — 기프티콘 구매은 매출이 아니라
                제휴 수수료로 내준 티켓을 털어내는 자리다. 지급 원가·잔여 부채 화면은 별도 기획 건.
@@ -2440,7 +2440,7 @@ window.CMS_FEATURES = {
 
     <!-- ── 랜덤 선물 상자 열기 (이벤트 티켓 1장 = 1회) — 2026-08-25 신설 ── -->
     <div class="section" id="sec-giftbox-random">
-      <div class="info-box"><strong>랜덤 선물 상자 열기 = 이벤트 티켓 1장으로 1회 여는 선물 상자</strong> — 매일 선물 상자 열기와 구조는 같고 보상 구성·확률만 다릅니다. 보상칸은 6개 고정입니다. 보상칸별 보상 내용과 받을 확률을 운영자가 직접 수정하며, 확률 합계가 100%가 아니면 저장되지 않습니다. 악용 방지 제한(하루 참여 상한 · 이벤트 티켓 일/월 획득 상한)도 아래에서 조정합니다.</div>
+      <div class="info-box"><strong>랜덤 선물 상자 열기 = 이벤트 티켓 1장으로 1회 여는 선물 상자</strong> — 매일 선물 상자 열기와 구조는 같고 보상 구성·확률만 다릅니다. 보상칸은 5개입니다(2026-11-04 확정표). 보상칸별 보상 내용과 받을 확률을 운영자가 직접 수정하며, 확률 합계가 100%가 아니면 저장되지 않습니다. 악용 방지 제한(하루 참여 상한 · 이벤트 티켓 일/월 획득 상한)도 아래에서 조정합니다.</div>
       <div class="stats-grid" style="grid-template-columns:repeat(3,1fr)">
         <div class="stat-card purple"><div class="stat-label">이번 달 상자 열기</div><div class="stat-value" id="gbr-stat-spins">—</div><div class="stat-change neutral" id="gbr-stat-spins-sub">실제 연 횟수 집계</div></div>
         <div class="stat-card green"><div class="stat-label">이번 달 지급 총액</div><div class="stat-value" id="gbr-stat-payout">—</div><div class="stat-change neutral" id="gbr-stat-payout-sub">지급완료 건 원화 환산</div></div>
@@ -2853,7 +2853,7 @@ window.CMS_FEATURES = {
 
 가. 계정 생성 시
   - 필수: 닉네임
-  - 선택(카카오 연동 시): 카카오 회원번호, 프로필 닉네임, 프로필 이미지
+  - 선택(카카오 연동 시): 카카오 회원번호, 카카오계정(이메일), 프로필 닉네임, 프로필 이미지
 
 나. 서비스 이용 시 자동 수집
   - 기기 광고식별자(Android ADID / iOS IDFA): 쿠팡 경유 구매 실적과 이용자 매칭. iOS의 경우 이용자가 앱 추적을 허용한 때에만 수집합니다.
@@ -2881,7 +2881,7 @@ window.CMS_FEATURES = {
   - 서비스 이용 과정에서의 자동 생성·수집
 
 3. 개인정보의 이용 목적
-  - 회원 식별 및 계정 관리: 닉네임, 카카오 회원번호, 기기 식별정보
+  - 회원 식별 및 계정 관리: 닉네임, 카카오 회원번호, 카카오계정(이메일), 기기 식별정보
   - 경유 구매 실적 확인 및 리워드 지급: 광고식별자, 경유 클릭 식별값, 주문번호, 구매금액, 구매일시
   - 구매 취소·환불에 따른 리워드 정정: 구매 취소·환불 여부, 주문번호
   - 구매 내역 인증 처리: 주문번호, 구매금액, 구매일시, 캡처 이미지
@@ -4612,8 +4612,7 @@ window.CMS_FEATURES = {
         <li><span class="k">수수료 · 적립률</span>제휴몰별로 정합니다. 적립률 기본값은 수수료의 60%이고, 남는 40%가 우리 수익입니다.</li>
         <li><span class="k">쿠팡</span>대표 제휴몰로 목록과 별도 표시됩니다.</li>
         <li><span class="k">쿠팡 전환 대기일 수</span><span>카카오톡 연동 D+7 / 미연동 D+30</span>. <strong>고정값이라 수정할 수 없습니다.</strong></li>
-        <li><span class="k">링크프라이스 제휴몰 전환 시점</span>익익월 6일 확정 후.</li>
-        <li><span class="k">대기일 수를 줄이면</span>이미 발급된 랜덤 티켓도 앞당겨 전환됩니다. 늘려도 이미 확정된 티켓은 되돌리지 않습니다.</li>
+        <li><span class="k">링크프라이스</span>구매월 기준 익익월 6일 확정 후 지급</li>
         <li><span class="k">티켓 환산</span>적립액 ÷ 티켓 1장 값, 남는 잔돈은 버립니다.</li>
       </ul>
     </div>
@@ -5256,8 +5255,8 @@ const I18N = {
     'page.abuse.title': '어뷰징·이상적립 모니터링', 'page.abuse.bc': '운영',
     'page.stats.title': '수익 분석', 'page.stats.bc': '매출 · 수익',
     'nav.revenue-fee': '제휴 수수료 매출',
-    'nav.revenue-gifti': '기프티샵 판매 매출', 'page.revenue-fee.title': '제휴 수수료 매출', 'page.revenue-fee.bc': '매출 · 수익',
-    'page.revenue-gifti.title': '기프티샵 판매 매출', 'page.revenue-gifti.bc': '매출 · 수익',
+    'nav.revenue-gifti': '판매 내역', 'page.revenue-fee.title': '제휴 수수료 매출', 'page.revenue-fee.bc': '매출 · 수익',
+    'page.revenue-gifti.title': '판매 내역', 'page.revenue-gifti.bc': '매출 · 수익',
     'nav.revenue-gifticon': '기프티콘 판매 매출', 'page.revenue-gifticon.title': '기프티콘 판매 매출', 'page.revenue-gifticon.bc': '매출 · 수익',
     'page.settlement.title': '정산 내역', 'page.settlement.bc': '매출 · 수익',
     'page.postback.title': '포스트백 로그', 'page.postback.bc': '시스템',
@@ -5940,7 +5939,7 @@ window.giSaveImageEdit = giSaveImageEdit;
     "관리자 계정":"Tài khoản quản trị","운영 정책":"Chính sách vận hành",
     "환수 이력":"Lịch sử thu hồi","포인트 내역":"Lịch sử điểm",
     "출석체크 설정":"Cài đặt điểm danh","포인트 정책":"Chính sách điểm",
-    "포인트 관리":"Quản lý điểm","기프티샵 판매 매출":"Doanh thu bán Gifti Shop","판매 건수":"Số lượt bán","원화 환산액":"Giá trị quy đổi ra won","취소 건수":"Số lượt hủy","매출에서 뺀 건":"Đã trừ khỏi doanh thu","소진 티켓":"Vé đã tiêu","해당 기간에 판매가 없습니다.":"Không có lượt bán trong kỳ này.","되돌아가기":"Quay lại","해당 날짜에 판매가 없습니다.":"Không có lượt bán trong ngày này.","구매내역":"Lịch sử mua","취소내역":"Lịch sử hủy","기프티콘 관리":"Quản lý Gifticon",
+    "포인트 관리":"Quản lý điểm","기프티샵 판매 매출":"Doanh thu bán Gifti Shop","판매 내역":"Lịch sử bán","판매 내역을 불러오지 못했습니다.":"Không tải được lịch sử bán.","판매 건수":"Số lượt bán","원화 환산액":"Giá trị quy đổi ra won","취소 건수":"Số lượt hủy","매출에서 뺀 건":"Đã trừ khỏi doanh thu","소진 티켓":"Vé đã tiêu","해당 기간에 판매가 없습니다.":"Không có lượt bán trong kỳ này.","되돌아가기":"Quay lại","해당 날짜에 판매가 없습니다.":"Không có lượt bán trong ngày này.","구매내역":"Lịch sử mua","취소내역":"Lịch sử hủy","기프티콘 관리":"Quản lý Gifticon",
     "회원 관리":"Quản lý thành viên","티켓 · 보상":"Vé · Phần thưởng",
     "콘텐츠":"Nội dung","운영":"Vận hành","매출 · 수익":"Doanh thu · Lợi nhuận",
     "시스템":"Hệ thống","계정 관리":"Quản lý tài khoản",
@@ -7274,7 +7273,7 @@ Object.assign(KO2VI,{
   "쿠팡 전환 대기일 수":"Số ngày chờ chuyển đổi của Coupang",
   "고정값이라 수정할 수 없습니다.":"Là giá trị cố định, không sửa được.",
   "링크프라이스 제휴몰 전환 대기일 수":"Số ngày chờ chuyển đổi của sàn Linkprice",
-  "링크프라이스 제휴몰 전환 시점":"Thời điểm chuyển đổi của sàn Linkprice","익익월 6일 확정 후.":"Sau khi chốt ngày 6 của tháng sau nữa.",
+  "링크프라이스 제휴몰 전환 시점":"Thời điểm chuyển đổi của sàn Linkprice","구매월 기준 익익월 6일 확정 후 지급":"Trả sau khi chốt ngày 6 của tháng thứ hai sau tháng mua","익익월 6일 확정 후.":"Sau khi chốt ngày 6 của tháng sau nữa.",
   "대기일 수를 줄이면":"Nếu giảm số ngày chờ",
   "이미 발급된 랜덤 티켓도 앞당겨 전환됩니다. 늘려도 이미 확정된 티켓은 되돌리지 않습니다.":"vé ngẫu nhiên đã phát hành cũng được chuyển đổi sớm hơn. Dù tăng lên thì vé đã xác nhận cũng không bị hoàn lại.",
   "티켓 환산":"Quy đổi vé",
@@ -10883,7 +10882,7 @@ window.gsRevLoad = function () {
     gsRender();
   }).catch(function (e) {
     console.error('gsRevLoad', e);
-    toast('기프티샵 판매 매출을 불러오지 못했습니다.');
+    toast('판매 내역을 불러오지 못했습니다.');
   });
 };
 function gsReload() { GSREV_LV = { level: (((document.getElementById('gs-view') || {}).value || 'day') === 'day') ? 'day' : 'month', month: '', day: '' }; gsRender(); }
@@ -18932,13 +18931,14 @@ var RLT_KINDS = {
   },
   giftRandom: {
     p: 'gbr', name: '랜덤 선물 상자 열기', doc: 'giftbox_random', fallbackDoc: 'jackpot_roulette', live: true, legacyWheel: false,
-    defaults: [                              /* 잭팟 룰렛과 동일 — 1회 기대값 40원 */
-      { type: 'ticket',        qty: 200,  prob: 0.4  },
-      { type: 'point',         qty: 100,  prob: 5    },
-      { type: 'ticket',        qty: 10,   prob: 12   },
-      { type: 'miss',          qty: 0,    prob: 31.6 },
-      { type: 'point',         qty: 10,   prob: 50   },
-      { type: 'ticket',        qty: 100,  prob: 1    }
+    /* 2026-11-04 확정 확률표(수정 요청 A-3) — 꽝 삭제, 5보상칸 · 확률 합 100% · 1회 기대값 40원(이벤트 티켓 40원 기준).
+       티켓 1장 = 10원 · 1P = 1원. 매일 선물 상자 표는 따로 두고 이 표로 덮어쓰지 않는다 */
+    defaults: [
+      { type: 'ticket',        qty: 200,  prob: 0.3  },   /* 2,000원 상당 */
+      { type: 'ticket',        qty: 100,  prob: 0.7  },   /* 1,000원 상당 */
+      { type: 'point',         qty: 100,  prob: 3    },   /* 100원 상당 */
+      { type: 'event_ticket',  qty: 2,    prob: 8    },
+      { type: 'point',         qty: 20,   prob: 88   }    /* 20원 상당 */
     ]
   },
   jackpot: {
