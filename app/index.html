@@ -20138,7 +20138,8 @@ function ppMaybeAutoGuide(uid) {
     ppGuideChecking = false;
     if (uid !== PP.uid || !doc.exists) return;
     var d = doc.data();
-    if (d.status === 'withdrawn') return;
+    /* 가입을 마친 회원만 — 가입(닉네임 저장) 전에 다른 기능이 만든 반쪽 문서(초대 코드 등)는 제외 */
+    if (d.status === 'withdrawn' || !d.nickname) return;
     if (d.guide_seen_at) { if (PP.user) PP.user.guide_seen_at = d.guide_seen_at; return; }
     if (ppActiveScreen() !== 'pw-10' || !window.ppGuideAutoOpen || (window.ppGuideIsOpen && window.ppGuideIsOpen())) return;
     window.ppGuideAutoOpen();
