@@ -1711,10 +1711,12 @@ window.CMS_FEATURES = {
     <!-- ── 대시보드 ── -->
     <div class="section active" id="sec-dashboard">
       <div class="stats-grid">
-        <div class="stat-card green"><div class="stat-label">순수익 (추정)</div><div class="stat-value" id="kpi-net">—</div><div class="stat-change neutral">제휴 수수료 − 티켓 적립 비용</div></div>
-        <div class="stat-card purple"><div class="stat-label">제휴 수수료 매출</div><div class="stat-value" id="kpi-commission">—</div><div class="stat-change neutral">포스트백 확정 기준</div></div>
-        <div class="stat-card amber"><div class="stat-label">티켓 적립 비용</div><div class="stat-value" id="kpi-ticket-cost">—</div><div class="stat-change neutral">차감 항목</div></div>
+        <!-- 위 세 장은 「매출·수익 > 제휴 수수료 매출」을 이번 달(한 달)로 조회한 값과 같다 — 같은 월 · 같은 수수료 기준 · 취소 제외 (11-04 A-5) -->
+        <div class="stat-card green"><div class="stat-label">이번달 순수익</div><div class="stat-value" id="kpi-net">—</div><div class="stat-change neutral">제휴 수수료 − 유저 적립</div></div>
+        <div class="stat-card purple"><div class="stat-label">이번달 제휴 수수료 매출</div><div class="stat-value" id="kpi-commission">—</div><div class="stat-change neutral">쿠팡 + 링크프라이스 · 취소 제외</div></div>
+        <div class="stat-card amber"><div class="stat-label">이번달 유저 적립</div><div class="stat-value" id="kpi-ticket-cost">—</div><div class="stat-change neutral">수수료에서 차감한 비용</div></div>
       </div>
+      <div class="dash-basis" style="margin:-6px 0 14px;font-size:12px;color:var(--text-2);line-height:1.6"><span>순수익 = 제휴 수수료에서 회원에게 적립해 준 티켓 비용(유저 적립)을 차감한 금액입니다. 기프티콘 판매 수익은 넣지 않습니다.</span> <span>기준 월</span> <strong id="kpi-month">—</strong> <span>· 매출·수익 > 제휴 수수료 매출에서 같은 월(한 달)로 조회한 값과 같습니다.</span></div>
       <div class="stats-grid">
         <div class="stat-card purple"><div class="stat-label">전체 회원</div><div class="stat-value" id="kpi-users">—</div><div class="stat-change neutral">실데이터</div></div>
         <div class="stat-card green"><div class="stat-label">발행 티켓 (누적 적립)</div><div class="stat-value stat-pair"><span class="sp-i"><span class="sp-l">티켓</span><span id="kpi-tickets">—</span></span><span class="sp-i"><span class="sp-l">이벤트 티켓</span><span id="kpi-tickets-event">—</span></span></div><div class="stat-change neutral">적립 확정 기준</div></div>
@@ -3129,7 +3131,7 @@ window.CMS_FEATURES = {
       <div class="card">
         <div class="card-header"><div><div class="card-title">알림 발송 내역</div><div class="card-sub">발송 완료 건은 불변 로그 · '예약' 상태만 발송 전 취소·수정 가능 · 건을 누르면 수신자 목록 · 수신 기록은 90일 보관 후 삭제</div></div><div id="noti-hdr-actions"></div></div>
         <table>
-          <thead><tr><th style="text-align:center">발송일시</th><th style="text-align:center">채널</th><th>제목</th><th style="text-align:center">대상 조건</th><th style="text-align:center">대상 수</th><th style="text-align:center">성공</th><th style="text-align:center">실패</th><th style="text-align:center">미처리</th><th style="text-align:center">열람율</th><th style="text-align:center">상태 / 액션</th></tr></thead>
+          <thead><tr><th style="text-align:center">발송일시</th><th style="text-align:center">채널</th><th>제목</th><th style="text-align:center">대상 조건</th><th style="text-align:center">대상 수</th><th style="text-align:center">성공</th><th style="text-align:center">실패</th><th style="text-align:center">미처리</th><th style="text-align:center">확인 불가</th><th style="text-align:center">열람율</th><th style="text-align:center">상태 / 액션</th></tr></thead>
           <tbody id="noti-hist-tbody">
           </tbody>
         </table>
@@ -3372,7 +3374,7 @@ window.CMS_FEATURES = {
         <div class="stat-card purple"><div class="stat-label">평균 응답 시간</div><div class="stat-value">—</div><div class="stat-change neutral">답변 완료 기준</div></div>
       </div>
       <div class="toolbar">
-        <input class="search-box" id="inq-search" placeholder="닉네임, 제목 검색..." onkeydown="if(event.key==='Enter')inqApplyFilters()">
+        <input class="search-box" id="inq-search" placeholder="닉네임, 제목 검색..." onkeydown="if(event.key==='Enter')inqApplyFilters()" oninput="if(!this.value.trim())inqApplyFilters()">
         <select class="filter-sel" id="inq-filter-status" onchange="inqApplyFilters()"><option value="">전체 상태</option><option value="pending">미처리</option><option value="answered">처리 완료</option></select>
         <select class="filter-sel" id="inq-filter-cat" onchange="inqApplyFilters()"><option value="">전체 유형</option><option value="postback">적립 문의</option><option value="account">계정 문의</option><option value="gifticon">기프티콘 문의</option><option value="general">기타</option></select>
         <button class="btn btn-primary btn-sm" onclick="inqApplyFilters()">검색</button>
@@ -4428,7 +4430,7 @@ window.CMS_FEATURES = {
       <div id="noti-rcp-summary" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px"></div>
       <input class="search-box" id="noti-rcp-q" style="width:100%;margin-bottom:10px" placeholder="닉네임 또는 식별 아이디" oninput="notiRcpFilter()">
       <table>
-        <thead><tr><th>닉네임</th><th>식별 아이디</th><th style="text-align:center">결과</th><th>실패 사유</th></tr></thead>
+        <thead><tr><th>닉네임</th><th>식별 아이디</th><th style="text-align:center">결과</th><th>사유</th></tr></thead>
         <tbody id="noti-rcp-tbody"></tbody>
       </table>
       <div id="noti-rcp-pager"></div>
@@ -7492,6 +7494,20 @@ Object.assign(KO2VI,{
   /* 기프티샵 판매 매출 — 파고들기 자국 */
   "월별 내역":"Lịch sử theo tháng"
 });
+/* ── 11-04 수정 요청 반영 (A-5 대시보드 이번달 · A-13 알림 수신 결과 넷) ── */
+Object.assign(KO2VI,{
+  "이번달 유저 적립":"Tích lũy cho người dùng tháng này",
+  "제휴 수수료 − 유저 적립":"Hoa hồng LK − tích lũy cho người dùng",
+  "쿠팡 + 링크프라이스 · 취소 제외":"Coupang + LinkPrice · không tính đơn hủy",
+  "수수료에서 차감한 비용":"Chi phí đã trừ khỏi hoa hồng",
+  "순수익 = 제휴 수수료에서 회원에게 적립해 준 티켓 비용(유저 적립)을 차감한 금액입니다. 기프티콘 판매 수익은 넣지 않습니다.":"Lợi nhuận ròng = hoa hồng LK trừ đi chi phí vé đã tích lũy cho hội viên (tích lũy cho người dùng). Không tính doanh thu bán Gifticon.",
+  "기준 월":"Tháng tính",
+  "· 매출·수익 > 제휴 수수료 매출에서 같은 월(한 달)로 조회한 값과 같습니다.":"· Bằng giá trị tra cứu cùng tháng (một tháng) tại Doanh thu·Lợi nhuận > Doanh thu hoa hồng.",
+  "확인 불가":"Không thể xác nhận",
+  "결과 미수신":"Chưa nhận kết quả",
+  "수신 기록 없음 (탈퇴 등)":"Không có bản ghi nhận (đã hủy tài khoản, v.v.)",
+  "(회원 기록 없음)":"(Không có bản ghi hội viên)"
+});
 
 
   var _orig=new Map(), _tracked=new Set(), _applying=false;
@@ -8200,10 +8216,23 @@ function ppAllWhere(col, field, value) {
 
 function setKpi(id, txt){ var el=document.getElementById(id); if(el) el.textContent=txt; }
 function kpiWon(n){ return (Math.round(n)||0).toLocaleString('ko-KR')+'원'; }
-function recompNet(){
-  /* 기프티콘 판매 수익은 순수익에 넣지 않는다 — 기프티콘 구매는 회원이 보유 티켓을 쓰는 것이라 수익이 아니다 (검수 10-05 04-01) */
-  if (window.__ppCommission==null || window.__ppTicketCost==null) return;
-  setKpi('kpi-net', kpiWon(window.__ppCommission - window.__ppTicketCost));
+function recompNet(){ /* 11-04 A-5 부터 이번달 세 장은 dashMonthRevenue() 가 채운다 — 남은 호출은 아무 일도 안 한다 */ }
+/* 대시보드 이번달 순수익 · 제휴 수수료 매출 · 유저 적립 (11-04 A-5)
+   예전엔 수수료는 포스트백 누적, 비용은 티켓 원장 누적으로 따로 셌다 — 「이번달」이 아니었고
+   매출·수익 화면(제휴 수수료 매출)과 표본도 달라 같은 달을 조회하면 숫자가 어긋났다.
+   이제 매출·수익 화면과 같은 표본(RF)을 이번 달 1일~말일로 잘라 같은 함수(rfSplit)로 센다 — 취소 제외.
+   기프티콘 판매 수익은 순수익에 넣지 않는다 — 기프티콘 구매는 회원이 보유 티켓을 쓰는 것이라 수익이 아니다 (검수 10-05 04-01) */
+function dashMonthRevenue() {
+  if (typeof rfEnsureBuilt !== 'function') return;
+  rfEnsureBuilt().then(function() {
+    var n = new Date(), from = new Date(n.getFullYear(), n.getMonth(), 1), to = new Date(n.getFullYear(), n.getMonth() + 1, 0);
+    from.setHours(0, 0, 0, 0); to.setHours(23, 59, 59, 999);
+    var A = rfSplit(RF.orders.filter(function(o) { return o.at >= from && o.at <= to; })).live;
+    setKpi('kpi-commission', kpiWon(A.comm));
+    setKpi('kpi-ticket-cost', '− ' + kpiWon(A.earn));
+    setKpi('kpi-net', kpiWon(A.net));
+    setKpi('kpi-month', rfMonthKey(n));
+  }).catch(function(e) { console.error('dashMonthRevenue', e); });
 }
 /* 대시보드의 티켓 숫자 셋 — 발행 티켓(적립 건수) · 티켓 적립 비용 · 적립 TOP 3 (2026-10-16)
    예전엔 셋 다 티켓 원장의 적립 기록을 통째로 읽어 셌다(티켓 1장 = 1건이라 수만 건). 이제 개수만 묻는다.
@@ -8245,6 +8274,7 @@ function dashEarnStats() {
   });
 }
 function loadDashboardStats() {
+  dashMonthRevenue();
   /* 전체 회원 — 정상 회원 기준(2026-10-28 확정, 회원 목록 상단과 같은 수) */
   ppAll('users').then(function(snap) {
     var n = 0; snap.docs.forEach(function(d){ var u = d.data(); if (u.created_at && (u.status || 'active') === 'active') n++; });
@@ -8255,8 +8285,7 @@ function loadDashboardStats() {
   earnStats.then(function(st) {
     setKpi('kpi-tickets', (st.total - st.event).toLocaleString('ko-KR'));
     setKpi('kpi-tickets-event', st.event.toLocaleString('ko-KR'));
-    setKpi('kpi-ticket-cost', kpiWon(st.cost));
-    window.__ppTicketCost = st.cost; recompNet();
+    window.__ppTicketCost = st.cost;   /* 이번달 유저 적립 카드는 dashMonthRevenue() 가 채운다 (11-04 A-5) */
   }).catch(function(){});
   /* 미처리 문의 */
   db.collection('inquiries').where('status','==','pending').get().then(function(snap) {
@@ -8280,8 +8309,7 @@ function loadDashboardStats() {
     var MR = { '쿠팡':0.03,'11번가':0.035,'G마켓':0.03,'알리익스프레스':0.05,'아이허브':0.05 };
     var commission = 0;
     snap.docs.forEach(function(doc){ var d=doc.data(); if(d.status!=='confirmed') return; commission += Math.round((d.purchase_amount||0)*(MR[d.mall_name]||0.03)); });
-    setKpi('kpi-commission', kpiWon(commission));
-    window.__ppCommission = commission; recompNet();
+    window.__ppCommission = commission;   /* 카드는 dashMonthRevenue() 가 채운다 (11-04 A-5) */
     /* dash-recent-tbody: top 3 recent postbacks */
     var recentTbody = document.getElementById('dash-recent-tbody');
     if (recentTbody) {
@@ -9115,13 +9143,14 @@ function ppStgPagerHtml(o) {
     + '<select onchange="' + o.onSize + '">' + PP_PAGE_SIZES.map(function(v) { return '<option value="' + v + '"' + (v === o.size ? ' selected' : '') + '>' + v + '</option>'; }).join('') + '</select>'
     + '<span>행</span></div><div class="pp-pager-r">'
     + '<button type="button" aria-label="Previous page"' + (o.page <= 1 ? ' disabled' : ' onclick="' + o.onPrev + '"') + '>이전</button>'
-    + '<span class="pp-pager-range">' + (o.total ? lo + '\u2013' + hi + ' / ' + o.total : '총 0건') + '</span>'
+    /* 1:1 문의는 0건도 범위 꼴 그대로 「0–0 / 0」 (11-04 B-2) — 다른 목록은 「총 0건」 유지 */
+    + '<span class="pp-pager-range">' + (o.total ? lo + '\u2013' + hi + ' / ' + o.total : (o.zeroRange ? '0\u20130 / 0' : '총 0건')) + '</span>'
     + '<button type="button" aria-label="Next page"' + (o.page >= pages ? ' disabled' : ' onclick="' + o.onNext + '"') + '>다음</button>'
     + '</div></div>';
 }
 /* 목록 장치(ppMakeListController)용 */
-function ppCtrlPagerHtml(name, state) {
-  return ppStgPagerHtml({ total: state.filtered.length, page: state.page, size: state.pageSize,
+function ppCtrlPagerHtml(name, state, opt) {
+  return ppStgPagerHtml({ total: state.filtered.length, page: state.page, size: state.pageSize, zeroRange: !!(opt && opt.zeroRange),
     onSize: name + '.setPageSize(this.value)', onPrev: name + '.prevPage()', onNext: name + '.nextPage()' });
 }
 /* 한 번에 그리던 목록(공지사항·알림·탈퇴 처리)용 — 행 HTML을 받아 나눠 그리고, 표 바로 아래에 페이저를 둔다.
@@ -11557,7 +11586,10 @@ function loadNotifications() {
      명세표를 덮어쓴다 — 2026-09-11 에 그 카드가 발송 이력 위로 들어오면서 생긴 일이다. */
   var tbody = document.getElementById('noti-hist-tbody');
   if (!tbody) return;
-  db.collection('notifications').orderBy('created_at', 'desc').limit(500).get().then(function(snap) {
+  /* 수신 결과 넷(성공·실패·미처리·확인 불가)을 세려면 회원 목록이 먼저 있어야 한다 — 없으면 전원이 「확인 불가」로 잡힌다 */
+  notiLoadUsers().catch(function(){ return []; }).then(function() {
+    return db.collection('notifications').orderBy('created_at', 'desc').limit(500).get();
+  }).then(function(snap) {
     var statCards = document.querySelectorAll('#sec-notifications .stat-card');
     var monthStart = new Date(); monthStart.setDate(1); monthStart.setHours(0,0,0,0);
     var monthCount = 0, scheduled = 0;
@@ -11573,7 +11605,7 @@ function loadNotifications() {
     set('noti-kpi-month', ppN(monthCount) + '건');
     set('noti-kpi-scheduled', ppN(scheduled) + '건');
 
-    if (snap.empty) { ppPaged('notifications', tbody, [], ppEmpty(10,'발송 내역이 없습니다.')); return; }
+    if (snap.empty) { ppPaged('notifications', tbody, [], ppEmpty(11,'발송 내역이 없습니다.')); return; }
     var STATUS_BADGE = { sent:'<span class="badge badge-green">발송완료</span>', scheduled:'<span class="badge badge-amber">예약</span>', cancelled:'<span class="badge badge-gray">취소됨</span>', test:'<span class="badge badge-gray">테스트</span>' };
     NOTI_DOCS = {};
     ppPaged('notifications', tbody, snap.docs.map(function(doc) {
@@ -11594,11 +11626,12 @@ function loadNotifications() {
         + '<td style="text-align:center">' + ppN(total) + '명</td>'
         + '<td style="text-align:center">' + (r ? ppN(r.ok) + '명' : '—') + '</td>'
         + '<td style="text-align:center">' + (r ? (r.fail ? '<span style="color:var(--danger);font-weight:700">' + ppN(r.fail) + '명</span>' : '0명') : '—') + '</td>'
-        /* 미처리 = 대상 − 성공 − 실패. 세 칸 합계가 대상 수와 맞는다 (검수 10-21 16) */
-        + '<td style="text-align:center">' + (r ? ppN(Math.max(0, total - (r.ok || 0) - (r.fail || 0))) + '명' : '—') + '</td>'
+        /* 대상 = 성공 + 실패 + 미처리 + 확인 불가. 네 칸 합계가 대상 수와 언제나 맞는다 (검수 10-21 16 · 11-04 A-13) */
+        + '<td style="text-align:center">' + (r ? ppN(r.pending) + '명' : '—') + '</td>'
+        + '<td style="text-align:center">' + (r ? (r.unknown ? '<span style="color:var(--text-2);font-weight:700">' + ppN(r.unknown) + '명</span>' : '0명') : '—') + '</td>'
         + '<td style="text-align:center">—</td>'
         + '<td style="text-align:center">' + (STATUS_BADGE[d.status]||'<span class="badge badge-gray">' + (d.status||'') + '</span>') + ' ' + act + '</td></tr>';
-    }), ppEmpty(10,'발송 내역이 없습니다.'));
+    }), ppEmpty(11,'발송 내역이 없습니다.'));
   }).catch(function(e){ console.error('loadNotifications', e); tbody.innerHTML = ppEmpty(7,'로드 오류'); });
 }
 
@@ -11820,14 +11853,29 @@ function notiTargetLabel(d) {
   }
   return NOTI_TARGET_KO[d.target] || d.target || '—';
 }
-/* 그 발송 건의 수신자 — 테스트는 고른 회원, 그 밖은 대상 조건에 맞는 회원이다. */
+/* 수신 결과는 넷이다 (11-04 A-13) — 대상 수 = 성공 + 실패 + 미처리 + 확인 불가.
+     성공      기기에 도착
+     실패      보냈으나 거절됨(사유가 있다)
+     미처리    발송 요청은 했으나 결과를 아직 받지 못함
+     확인 불가 수신 기록이 없어 결과를 알 수 없음(탈퇴 등으로 회원 기록이 없다) — 과거 결과를 짐작해 채우지 않는다
+   ⚠ 데모는 실제 푸시를 보내지 않는다. 성공·실패·미처리는 발송 건과 회원을 섞은 값으로 정한다(같은 건은 늘 같은 결과). */
+var NOTI_RESULT = {
+  ok:      { ko: '성공',      badge: 'badge-green' },
+  fail:    { ko: '실패',      badge: 'badge-red' },
+  pending: { ko: '미처리',    badge: 'badge-amber' },
+  unknown: { ko: '확인 불가', badge: 'badge-gray' },
+};
+function notiResultBadge(st) { var m = NOTI_RESULT[st] || NOTI_RESULT.unknown; return '<span class="badge ' + m.badge + '">' + m.ko + '</span>'; }
+/* 그 발송 건의 수신자 — 테스트는 고른 회원, 그 밖은 대상 조건에 맞는 회원이다.
+   대상 수(recipient_count)보다 지금 남은 회원이 적으면, 모자란 만큼은 「확인 불가」 줄로 채워 합계를 맞춘다. */
 function notiRecipientsOf(docId, d) {
   var users = NOTI_USERS || [];
   var rows;
   if (d.test_uids && d.test_uids.length) {
     rows = d.test_uids.map(function(uid, i) {
       var u = users.filter(function(x){ return x.id === uid; })[0];
-      return { id: uid, nickname: (u && u.nickname) || (d.test_names && d.test_names[i]) || '(알 수 없음)' };
+      return u ? { id: uid, nickname: u.nickname }
+               : { id: uid, nickname: (d.test_names && d.test_names[i]) || '(알 수 없음)', gone: true };
     });
   } else {
     rows = users.slice();
@@ -11835,18 +11883,21 @@ function notiRecipientsOf(docId, d) {
     else if (d.target === 'guest') rows = rows.filter(function(u){ return !u.linked; });
     var cap = d.recipient_count || rows.length;
     if (rows.length > cap) rows = rows.slice(0, cap);
+    for (var gi = rows.length; gi < cap; gi++) rows.push({ id: '', nickname: '(회원 기록 없음)', gone: true });
   }
   return rows.map(function(u) {
-    var h = notiHash(docId + '|' + u.id);
-    var failed = (h % 100) < 5;          /* 스무 명에 한 명꼴로 실패 */
-    return { id: u.id, nickname: u.nickname, ok: !failed,
-             reason: failed ? NOTI_FAIL_REASONS[h % NOTI_FAIL_REASONS.length] : '' };
+    if (u.gone) return { id: u.id, nickname: u.nickname, status: 'unknown', ok: false, reason: '수신 기록 없음 (탈퇴 등)' };
+    var h = notiHash(docId + '|' + u.id), b = h % 100;
+    var st = b < 5 ? 'fail' : (b < 8 ? 'pending' : 'ok');     /* 스무 명에 한 명꼴 실패, 서른 명에 한 명꼴 미처리 */
+    return { id: u.id, nickname: u.nickname, status: st, ok: st === 'ok',
+             reason: st === 'fail' ? NOTI_FAIL_REASONS[h % NOTI_FAIL_REASONS.length] : (st === 'pending' ? '결과 미수신' : '') };
   });
 }
 function notiResultCount(docId, d) {
-  var rows = notiRecipientsOf(docId, d);
-  var fail = rows.filter(function(r){ return !r.ok; }).length;
-  return { ok: rows.length - fail, fail: fail, total: rows.length };
+  var rows = notiRecipientsOf(docId, d), c = { ok: 0, fail: 0, pending: 0, unknown: 0 };
+  rows.forEach(function(r){ c[r.status]++; });
+  c.total = rows.length;
+  return c;
 }
 
 var NOTI_RCP_ROWS = [];
@@ -11855,8 +11906,8 @@ var NOTI_RCP_CTRL = window.NOTI_RCP_CTRL = ppMakeListController(10, function(pag
   if (!tb) return;
   tb.innerHTML = pageItems.length ? pageItems.map(function(r) {
     return '<tr><td>' + ppEsc(r.nickname) + '</td>'
-      + '<td style="font-family:monospace;font-size:11px;color:var(--text-2)">' + ppEsc(r.id) + '</td>'
-      + '<td style="text-align:center">' + (r.ok ? '<span class="badge badge-green">성공</span>' : '<span class="badge badge-red">실패</span>') + '</td>'
+      + '<td style="font-family:monospace;font-size:11px;color:var(--text-2)">' + (r.id ? ppEsc(r.id) : '—') + '</td>'
+      + '<td style="text-align:center">' + notiResultBadge(r.status) + '</td>'
       + '<td style="color:var(--text-2);font-size:12px">' + (r.reason ? ppEsc(r.reason) : '—') + '</td></tr>';
   }).join('') : ppEmpty(4, '조건에 맞는 수신자가 없습니다.');
   var pg = document.getElementById('noti-rcp-pager');
@@ -11884,19 +11935,20 @@ window.notiOpenRecipients = function(docId) {
   }
   notiLoadUsers().then(function() {
     NOTI_RCP_ROWS = notiRecipientsOf(docId, d);
-    var fail = NOTI_RCP_ROWS.filter(function(r){ return !r.ok; });
+    var fail = NOTI_RCP_ROWS.filter(function(r){ return r.status === 'fail'; });
+    var cnt = notiResultCount(docId, d);
     if (sub) {
-      var total = d.recipient_count || NOTI_RCP_ROWS.length;
       sub.textContent = (d.title || '') + ' · ' + notiTargetLabel(d).replace(/<[^>]*>/g, '')
-        + ' · 대상 ' + ppN(total) + '명'
-        + (NOTI_RCP_ROWS.length < total ? (' 중 ' + ppN(NOTI_RCP_ROWS.length) + '명 표시') : '');
+        + ' · 대상 ' + ppN(cnt.total) + '명';
     }
     if (sum) {
       /* 실패 사유별 묶음 */
       var by = {};
       fail.forEach(function(r){ by[r.reason] = (by[r.reason] || 0) + 1; });
-      var chips = ['<span class="badge badge-green">성공 ' + ppN(NOTI_RCP_ROWS.length - fail.length) + '명</span>',
-                   '<span class="badge badge-red">실패 ' + ppN(fail.length) + '명</span>'];
+      /* 네 상태 합계 = 대상 수 (11-04 A-13) */
+      var chips = ['ok', 'fail', 'pending', 'unknown'].map(function(k) {
+        return '<span class="badge ' + NOTI_RESULT[k].badge + '"><span>' + NOTI_RESULT[k].ko + '</span>&nbsp;' + ppN(cnt[k]) + '<span>명</span></span>';
+      });
       Object.keys(by).forEach(function(k) {
         chips.push('<span class="badge badge-gray">' + ppEsc(k) + ' ' + ppN(by[k]) + '명</span>');
       });
@@ -11922,15 +11974,14 @@ window.notiLoadReceived = function(userId) {
       if (d.status === 'scheduled') return;
       var hit = notiRecipientsOf(doc.id, d).filter(function(r){ return r.id === userId; })[0];
       if (!hit) return;
-      rows.push({ title: d.title || '', at: d.created_at, test: d.status === 'test', ok: hit.ok, reason: hit.reason });
+      rows.push({ title: d.title || '', at: d.created_at, test: d.status === 'test', status: hit.status, reason: hit.reason });
     });
     box.innerHTML = rows.length ? rows.map(function(r) {
       return '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 10px;border-bottom:1px solid var(--border)">'
         + '<div style="min-width:0"><div style="font-weight:600;font-size:12px">' + ppEsc(r.title)
         + (r.test ? ' <span class="badge badge-gray">테스트</span>' : '') + '</div>'
         + '<div style="font-size:11px;color:var(--text-3)">' + ppDt(r.at) + ' ' + ppTm(r.at) + '</div></div>'
-        + (r.ok ? '<span class="badge badge-green">성공</span>'
-                : '<span class="badge badge-red">실패 · ' + ppEsc(r.reason) + '</span>') + '</div>';
+        + (r.status === 'fail' ? '<span class="badge badge-red">실패 · ' + ppEsc(r.reason) + '</span>' : notiResultBadge(r.status)) + '</div>';
     }).join('') : '<div style="padding:12px;text-align:center;color:var(--text-3);font-size:12px">받은 알림이 없습니다.</div>';
   }).catch(function(e) {
     box.innerHTML = '<div style="padding:12px;text-align:center;color:var(--text-3);font-size:12px">불러오지 못했습니다.</div>';
@@ -11946,7 +11997,8 @@ var INQUIRIES_CTRL = window.INQUIRIES_CTRL = ppMakeListController(10, function(p
   var list = document.getElementById('inquiry-list');
   var pag = document.getElementById('inquiries-pagination');
   if (!list) return;
-  if (!pageItems.length) { list.innerHTML = ppEmpty(7, '조건에 맞는 문의가 없습니다.'); if (pag) pag.innerHTML = ppCtrlPagerHtml('INQUIRIES_CTRL', state); return; }
+  /* 검색 결과가 0건이면 하단도 0건으로 다시 그린다 — 이전 건수가 남으면 안 된다 (11-04 B-2) */
+  if (!pageItems.length) { list.innerHTML = ppEmpty(7, '조건에 맞는 문의가 없습니다.'); if (pag) pag.innerHTML = ppCtrlPagerHtml('INQUIRIES_CTRL', state, { zeroRange: true }); return; }
   list.innerHTML = pageItems.map(function(d) {
     var badge = INQ_STATUS_BADGE[d.status] || '<span class="badge badge-gray">알 수 없음</span>';
     var cat = INQ_CAT_LABEL[d.category] || d.category || '기타';
@@ -11960,7 +12012,7 @@ var INQUIRIES_CTRL = window.INQUIRIES_CTRL = ppMakeListController(10, function(p
       + '<td style="text-align:center">' + badge + '</td>'
       + '<td style="text-align:center"><button class="btn btn-ghost btn-sm" onclick="inqOpen(\'' + d._id + '\')">' + answerBtnLabel + '</button> <button class="btn btn-ghost btn-sm" onclick="inqDelete(\'' + d._id + '\')">삭제</button></td></tr>';
   }).join('');
-  if (pag) pag.innerHTML = ppCtrlPagerHtml('INQUIRIES_CTRL', state);
+  if (pag) pag.innerHTML = ppCtrlPagerHtml('INQUIRIES_CTRL', state, { zeroRange: true });
 });
 
 window.inqApplyFilters = function() {
@@ -16496,14 +16548,25 @@ window.rfDownloadXlsx = function() {
 };
 
 /* ── 진입 ── */
-window.rfLoad = function() {
-  if (RF.built) { rfReload(); return; }
-  var tb = document.getElementById('rf-mall-tbody');
-  if (tb) tb.innerHTML = ppEmpty(6, '불러오는 중…');
-  rfLoadRoster().then(function(roster) {
+/* 표본은 한 번만 만든다 — 대시보드(이번달 세 장)와 이 화면이 같은 표본을 본다 (11-04 A-5) */
+var RF_BUILD_P = null;
+function rfEnsureBuilt() {
+  if (RF.built) return Promise.resolve(RF);
+  if (!RF_BUILD_P) RF_BUILD_P = rfLoadRoster().then(function(roster) {
     RF.roster = roster;
     RF.orders = rfBuildOrders(roster);
     RF.built = true;
+    return RF;
+  });
+  return RF_BUILD_P;
+}
+window.rfEnsureBuilt = rfEnsureBuilt;
+window.rfLoad = function() {
+  if (RF.inited) { rfReload(); return; }
+  var tb = document.getElementById('rf-mall-tbody');
+  if (tb) tb.innerHTML = ppEmpty(6, '불러오는 중…');
+  rfEnsureBuilt().then(function() {
+    RF.inited = true;
     // 기본 = 최근 6개월 · 월별 보기(김반장 2026-08-27). 30일만 잡으면 티켓 지급
     // 대기를 안 지난 건뿐이라 「지급 완료」가 0원으로 찍힌다 — 넓게 보면 지난 달치가
     // 바로 보인다. 좁혀 보실 때는 줄을 누르거나 조회 기간을 줄이면 된다.
