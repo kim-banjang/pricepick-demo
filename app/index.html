@@ -14003,7 +14003,7 @@ function mountPage(screen) {
   return { screen };
 }
 
-function mountTour(screen, onClose) {
+function mountTour(screen, onClose, onAct) {
   screen.appendChild(document.getElementById('pp-guide-tpl').content.cloneNode(true));
   screen.querySelector('.page').remove();
   screen.classList.add('is-tour');
@@ -14163,7 +14163,8 @@ function mountTour(screen, onClose) {
 
   tour.addEventListener('click', e => {
     const act = e.target.closest('[data-act]')?.dataset.act;
-    if (act === 'close' || act === 'start' || act === 'more') { close(); return onClose(); }
+    if (act && onAct) onAct(act);
+    if (act === 'close' || act === 'start' || act === 'more') { close(); return onClose(act); }
     if (act === 'skip') return final();
     if (act === 'replay') return open(0);
     if (tour.classList.contains('final')) return;
@@ -14187,19 +14188,27 @@ const sb = homePhone.querySelector('.statusbar');
 if (sb) wrap.appendChild(sb.cloneNode(true));
 homePhone.appendChild(wrap);
 let host = 'home';
-const A = mountTour(wrap, () => {
+/* 가입 후 1회 자동 노출(ppGuideAutoOpen)로 연 투어는 건너뛰기·X·시작하기·가이드 자세히 보기·Esc 어느 쪽으로 끝내든
+   회원 정보에 「봤음」을 남긴다(window.ppGuideMarkSeen). GUIDE 버튼·가이드 페이지에서 연 투어는 기록하지 않는다.
+   자동으로 연 투어는 닫으면 홈에 머문다(「가이드 자세히 보기」만 가이드 페이지로) */
+let auto = false;
+const markSeen = () => { if (!auto) return; auto = false; if (window.ppGuideMarkSeen) window.ppGuideMarkSeen(); };
+let autoClose = false;
+const A = mountTour(wrap, act => {
   wrap.classList.remove('open');
-  if (host === 'home') showScreen('pw-23g');
-});
+  if (host === 'home' && (!autoClose || act === 'more')) showScreen('pw-23g');
+  autoClose = false;
+}, act => { if (/^(close|start|more|skip)$/.test(act)) markSeen(); });
 const B = mountPage(pageRoot);
-function openTour(where, i) {
+function openTour(where, i, isAuto) {
   host = where;
+  auto = autoClose = !!isAuto;
   const phone = where === 'home' ? homePhone : pagePhone;
   if (wrap.parentNode !== phone) phone.appendChild(wrap);
   wrap.classList.add('open');
   A.open(i);
 }
-function closeTour() { A.close(); wrap.classList.remove('open'); }
+function closeTour() { markSeen(); autoClose = false; A.close(); wrap.classList.remove('open'); }
 
 B.screen.querySelector('[data-act="overview"]').addEventListener('click', e => { e.stopPropagation(); openTour('page', 0); });
 B.screen.querySelectorAll('[data-go]').forEach(b =>
@@ -14218,6 +14227,8 @@ window.addEventListener('keydown', e => {
 }));
 wrap.dataset.ipBound = '1';
 window.ppGuideOpen = i => openTour('home', i || 0);
+window.ppGuideAutoOpen = () => openTour('home', 0, true);
+window.ppGuideIsOpen = () => wrap.classList.contains('open');
 })();
 </script>
 <script>
@@ -20076,7 +20087,7 @@ function refreshHomeData() {
 function ppReadHomeData() {
   if (!PP.uid) return;
   var uid = PP.uid;
-  ppHomeTickets(uid).then(function(r) {
+  var pT = ppHomeTickets(uid).then(function(r) {
       if (uid !== PP.uid) return;   // 읽는 사이 다른 회원으로 바뀌었다
       var c = r.c;
       PP.tickets = { bronze: c.bronze, silver: c.silver, gold: c.gold, event: c.event };
@@ -20088,12 +20099,50 @@ function ppReadHomeData() {
       renderWithdrawLoss();
       if (typeof renderPointTicketExchange === 'function') renderPointTicketExchange();
     }).catch(function(e){ console.error('tickets', e); });
-  db.collection('user_points').doc(PP.uid).get().then(function(doc) {
+  var pP = db.collection('user_points').doc(PP.uid).get().then(function(doc) {
     PP.points = doc.exists ? (doc.data().balance || 0) : 0;
     renderHomePoints();
     renderWithdrawLoss();
     if (typeof renderPointTicketExchange === 'function') renderPointTicketExchange();
   }).catch(function(e){ console.error('points', e); });
+  /* 티켓·포인트가 화면에 그려진 뒤에 가이드 자동 노출을 판단한다(빈 홈 위로 덮지 않게) */
+  Promise.all([pT, pP]).then(function() { ppMaybeAutoGuide(uid); });
+}
+
+/* ── 가입 후 가이드 1회 자동 노출 (2026-11-04 확정) ──
+   가입한 회원(users 문서가 있고 탈퇴 아님)이 홈에 들어왔을 때 users.guide_seen_at 이 비어 있으면 투어를 자동으로 연다.
+   어떤 경로로 닫든 guide_seen_at 에 서버 시각을 남긴다 — 기기 저장이 아니라 회원 정보라 재설치·기기 변경 후에도 다시 뜨지 않는다.
+   저장이 실패하면 조용히 넘어가고 다음 홈 진입 때 저장만 다시 시도한다(이번 실행에서 다시 띄우지는 않는다).
+   GUIDE 버튼으로 연 투어는 이 필드를 건드리지 않는다. 스플래시·로그인·가입 화면 위에는 띄우지 않는다(홈 pw-10 활성일 때만) */
+var ppGuidePending = null;   // 저장 실패로 남은 uid
+function ppGuideMarkSeen() {
+  var uid = PP.uid;
+  if (!uid) return;
+  if (PP.user) PP.user.guide_seen_at = PP.user.guide_seen_at || new Date();
+  ppGuidePending = uid;
+  db.collection('users').doc(uid).set({ guide_seen_at: FS.FieldValue.serverTimestamp() }, { merge: true })
+    .then(function() { if (ppGuidePending === uid) ppGuidePending = null; })
+    .catch(function(e) { console.warn('guideSeen', e); });
+}
+window.ppGuideMarkSeen = ppGuideMarkSeen;
+var ppGuideChecking = false;
+function ppMaybeAutoGuide(uid) {
+  if (uid !== PP.uid) return;
+  /* 카카오 연동 회원 시뮬 로그인(페르소나)은 남의 회원 문서라 보안 규칙상 기록을 못 남긴다 — 자동 노출 제외 */
+  if (PP.personaUserId) return;
+  if (ppGuidePending === uid) { ppGuideMarkSeen(); return; }
+  if (!PP.user || PP.user.guide_seen_at || ppGuideChecking) return;
+  ppGuideChecking = true;
+  /* 다른 기기에서 이미 봤을 수 있으니 회원 문서를 다시 읽어서 판단한다 */
+  db.collection('users').doc(uid).get().then(function(doc) {
+    ppGuideChecking = false;
+    if (uid !== PP.uid || !doc.exists) return;
+    var d = doc.data();
+    if (d.status === 'withdrawn') return;
+    if (d.guide_seen_at) { if (PP.user) PP.user.guide_seen_at = d.guide_seen_at; return; }
+    if (ppActiveScreen() !== 'pw-10' || !window.ppGuideAutoOpen || (window.ppGuideIsOpen && window.ppGuideIsOpen())) return;
+    window.ppGuideAutoOpen();
+  }).catch(function(e) { ppGuideChecking = false; console.warn('guideCheck', e); });
 }
 
 function renderHomeTickets() {
