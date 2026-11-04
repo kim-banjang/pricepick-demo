@@ -8946,11 +8946,11 @@ body #pp-guide-page .page{padding-top:max(47px,env(safe-area-inset-top,0px))}
 /* 가이드 페이지 맨 아래: 기존 적립 조건 화면(pw-23)으로 */
 :is(#pp-guide,#pp-guide-page) .rule{display:flex;align-items:center;justify-content:space-between;width:calc(100% - 32px);margin:-24px 16px 48px;height:52px;padding:0 16px;
   border-radius:var(--r-lg);background:#fff;border:1px solid var(--border);font-size:var(--fs-body);font-weight:var(--fw-bold);color:var(--text2);text-align:left}
-/* 홈 헤더 「가이드」: 로고 바로 오른쪽 테두리 알약. margin-right:auto 로 종·톱니는 오른쪽 끝 그대로 */
-.home-top .pp-guide-btn{flex:none;display:inline-flex;align-items:center;height:32px;padding:0 14px;margin:0 auto 0 10px;border:0;border-radius:16px;
-  /* 테두리 1.5px solid --main. Chrome은 border 1.5px를 1px로 내려 그려서 같은 굵기의 안쪽 그림자로 그린다 */
-  box-shadow:inset 0 0 0 1.5px var(--main);background:transparent;color:var(--main);font-family:inherit;font-size:15px;font-weight:700;line-height:1;white-space:nowrap;cursor:pointer}
-.home-top .pp-guide-btn:active{background:var(--sub-4)}
+/* 홈 헤더 「가이드」: 로고 오른쪽 8px, 테두리 없는 연보라 알약(--sub-4, 누르면 --sub-3). margin-right:auto 로 종·톱니는 오른쪽 끝 그대로.
+   자리가 모자라면(폭 320 + 베트남어) 종·톱니를 밀지 않고 버튼이 줄어들며 글자 끝을 …로 줄인다 */
+.home-top .pp-guide-btn{flex:0 1 auto;min-width:0;display:block;align-self:center;height:26px;padding:0 10px;margin:0 auto 0 8px;border:0;border-radius:13px;
+  background:var(--sub-4);color:var(--main);font-family:inherit;font-size:12px;font-weight:700;line-height:26px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.home-top .pp-guide-btn:active{background:var(--sub-3)}
 .home-top .brand-logo,.home-top .top-icons{flex:none}
 /* 쇼핑 가이드 페이지 */
 :is(#pp-guide,#pp-guide-page) .page{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;padding-top:47px;scrollbar-width:none}
