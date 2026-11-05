@@ -297,6 +297,14 @@ tr:hover td{background:var(--surface-2);}
 .ta-notice:hover{border-color:var(--main);}
 .ta-notice-mark{display:inline-flex;align-items:center;justify-content:center;
   width:18px;height:18px;border-radius:50%;background:var(--main);color:#fff;font-size:12px;line-height:1;}
+/* 알림 관리 ① 자동 알림 문구 (2026-11-05) */
+.ntpl-table td{font-size:12px;vertical-align:top;line-height:1.55;}
+.ntpl-var{display:inline-block;padding:0 5px;border-radius:4px;background:var(--surface-2);color:var(--main);font-family:monospace;font-size:11px;white-space:nowrap;}
+.ntpl-off td{color:var(--text-3);background:var(--surface-2);}
+.ntpl-pv-card{border:1px solid var(--border);border-radius:12px;padding:12px 14px;background:#fff;}
+.ntpl-pv-tag{display:inline-block;font-size:10px;font-weight:700;padding:1px 7px;border-radius:99px;background:var(--surface-2);color:var(--text-2);margin-bottom:6px;}
+.ntpl-pv-head{font-size:14px;font-weight:700;color:var(--text);margin-bottom:3px;}
+.ntpl-pv-desc{font-size:12px;color:var(--text-2);line-height:1.55;}
 .ta-notice-list{margin:0;padding:0;list-style:none;}
 .ta-notice-list li{padding:9px 0;border-bottom:1px solid var(--border);font-size:13px;line-height:1.6;color:var(--text-2);}
 .ta-notice-list li:last-child{border-bottom:none;}
@@ -3065,35 +3073,22 @@ window.CMS_FEATURES = {
         <div class="stat-card purple"><div class="stat-label">이번달 발송</div><div class="stat-value" id="noti-kpi-month">—</div><div class="stat-change neutral">이번달 누적</div></div>
         <div class="stat-card amber"><div class="stat-label">예약 대기</div><div class="stat-value" id="noti-kpi-scheduled">—</div><div class="stat-change neutral">발송 예정</div></div>
       </div>
+      <!-- 알림 관리 재기획 (김반장 승인 2026-11-05) — ① 자동 알림 문구 ② 알림 작성 · 발송 ③ 발송 기록(수동 · 자동) ④ 발송 정책.
+           설명은 화면에 늘어놓지 않고 Notice 안에 둔다. -->
+      <button type="button" class="ta-notice" onclick="openModal('m-noti-notice')">
+        <span>알림 관리 Notice</span>
+        <span class="ta-notice-mark">!</span>
+      </button>
+      <!-- ① 자동 알림 문구 — 앱 코드에 흩어져 있던 자동 알림 문구를 한 표로 모은다. settings/notif_templates 에 저장하고
+           앱 renderNotifications()·ppDemoCancelNotifs() 가 읽는다(문서가 없거나 못 읽으면 앱에 박힌 문구 그대로). -->
       <div class="card">
-        <div class="card-header"><div class="card-title">FCM 푸시 발송 상한 정책 <span style="font-size:11px;color:var(--success);font-weight:600">정책 확정</span></div></div>
-        <div style="padding:16px">
-          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px">
-            <div class="policy-item"><div class="policy-label">거래 알림 (구매·확정·환불)</div><div class="policy-value">상한 없음</div><div class="policy-desc">서비스 필수 알림 — 발송 제한 없음.</div></div>
-            <div class="policy-item"><div class="policy-label">기타 알림 (미션·만료·추첨)</div><div class="policy-value">일 2건</div><div class="policy-desc">1인 1일 최대 2건.</div></div>
-            <div class="policy-item"><div class="policy-label">야간 발송</div><div class="policy-value">22:00~08:00 미발송</div><div class="policy-desc">야간 시간대 푸시 발송 차단.</div></div>
-          </div>
-        </div>
+        <div class="card-header"><div class="card-title">자동 알림 문구</div></div>
+        <table class="ntpl-table">
+          <thead><tr><th style="text-align:center">갈래</th><th>발송 상황</th><th>제목</th><th>본문</th><th>쓰이는 변수</th><th style="text-align:center">앱 알림함 묶음</th><th style="text-align:center">필수 여부</th><th style="text-align:center">상태</th><th style="text-align:center">관리</th></tr></thead>
+          <tbody id="ntpl-tbody"></tbody>
+        </table>
       </div>
-      <!-- 취소·환수 자동 알림 문구 — 김반장 확정 2026-09-11 · DEVQA 존 답변 app-john-20260911.
-           운영자가 쓰는 것이 아니라 앱이 자동으로 내보내는 거래 알림이라 조회 전용이다.
-           앱 「알림」 목록에 뜨는 문구와 글자 그대로 같아야 한다 — 두 화면이 다르면 안 된다. -->
-      <div class="card">
-        <div class="card-header"><div class="card-title">취소 · 환수 자동 알림 문구 <span style="font-size:11px;color:var(--success);font-weight:600">정책 확정</span></div><div class="card-sub">조회 전용 · 앱이 자동 발송 · 쿠팡 전용(링크프라이스는 취소 통보 미수신) · 2026-09-14 개정</div></div>
-        <div style="padding:16px">
-          <table>
-            <thead><tr><th>취소 범위</th><th>시점</th><th>앱 배지</th><th>알림 제목</th><th>알림 내용</th></tr></thead>
-            <tbody>
-              <tr><td>전체 취소</td><td>전환 전</td><td>미전환 환수</td><td>적립 예정 티켓 취소</td><td>{제휴몰} {구매금액}원 구매 취소 · 적립 예정이던 랜덤 티켓 {대기 장수}장이 취소되었습니다.</td></tr>
-              <tr><td>전체 취소</td><td>전환 후</td><td>전환 후 환수</td><td>지급 티켓 환수</td><td>{제휴몰} {구매금액}원 구매 취소 · 지급된 티켓 {환수 장수}장이 환수되었습니다.</td></tr>
-              <tr><td>부분 취소</td><td>전환 전</td><td>미전환 환수</td><td>적립 예정 티켓 취소</td><td>{제휴몰} {구매금액}원 중 {취소금액}원 취소 · 적립 예정이던 랜덤 티켓 {대기 장수}장이 취소되었습니다.</td></tr>
-              <tr><td>부분 취소</td><td>전환 후</td><td>부분 환수</td><td>지급 티켓 부분 환수</td><td>{제휴몰} {구매금액}원 중 {취소금액}원 취소 · 티켓 {환수 장수}장이 환수되었습니다. 남은 {잔여 장수}장은 그대로 사용하실 수 있습니다.</td></tr>
-              <tr><td>회수 예정 발생</td><td>전환 후 공통</td><td>—</td><td>—</td><td>보유하신 티켓이 모자라 {회수 예정 장수}장은 회수 예정으로 남았습니다. 다음에 티켓을 받으실 때 자동으로 차감됩니다. (회수할 티켓이 모자랄 때만 끝에 덧붙임)</td></tr>
-            </tbody>
-          </table>
-          <div class="info-box" style="margin-top:14px">티켓은 <strong>「티켓 N장」</strong> 하나로 적습니다. 구매 금액 원본은 덮어쓰지 않고, 분할 취소는 취소 금액을 누적해 취소 수신 회차마다 1건씩 발송합니다. 거래 알림이라 발송 상한이 없고 야간에도 즉시 나갑니다.<br><br>회수할 티켓이 모자라면 <strong>티켓 안에서만</strong> 차감하고, 그래도 모자란 몫은 <strong>회수 예정(부채)</strong>으로 남겨 다음 적립 때 자동 상계합니다. 앱 화면과 알림 문구에는 <strong>음수를 쓰지 않습니다</strong>.</div>
-        </div>
-      </div>
+      <!-- ② 알림 작성 · 발송 -->
       <div class="card">
         <div class="card-header"><div class="card-title">알림 작성 · 발송</div></div>
         <div style="padding:18px">
@@ -3127,16 +3122,43 @@ window.CMS_FEATURES = {
               <button class="btn btn-primary" id="noti-send-btn" onclick="notiSend()">발송</button>
             </div>
           </div>
-          <div class="info-box" style="margin-top:14px">1단계 발송 채널은 <strong>앱 푸시 단일</strong>입니다 — 카카오 알림톡은 서드파티 비용이 발생해 도입하지 않습니다. 마케팅성 알림은 수신 동의 회원에게만 발송됩니다. 서비스 필수 알림(티켓 지급·기프티콘 발송·경품 당첨)은 동의 여부와 무관하게 발송됩니다. 실제 FCM 발송 연동은 없고, 발송 내역만 DB에 기록됩니다(대상 인원은 실집계).</div>
         </div>
       </div>
+      <!-- ③ 발송 기록 — 수동(notifications) · 자동(notif_logs) 탭을 가른다. 두 기록은 섞지 않는다. -->
       <div class="card">
-        <div class="card-header"><div><div class="card-title">알림 발송 내역</div><div class="card-sub">발송 완료 건은 불변 로그 · '예약' 상태만 발송 전 취소·수정 가능 · 건을 누르면 수신자 목록 · 수신 기록은 90일 보관 후 삭제</div></div><div id="noti-hdr-actions"></div></div>
-        <table>
-          <thead><tr><th style="text-align:center">발송일시</th><th style="text-align:center">채널</th><th>제목</th><th style="text-align:center">대상 조건</th><th style="text-align:center">대상 수</th><th style="text-align:center">성공</th><th style="text-align:center">실패</th><th style="text-align:center">미처리</th><th style="text-align:center">확인 불가</th><th style="text-align:center">열람율</th><th style="text-align:center">상태 / 액션</th></tr></thead>
-          <tbody id="noti-hist-tbody">
-          </tbody>
-        </table>
+        <div class="card-header"><div class="card-title">발송 기록</div><div id="noti-hdr-actions"></div></div>
+        <div style="padding:0 18px">
+          <div class="terms-nav" style="margin-bottom:0">
+            <div class="terms-tab active" onclick="notiSwitchTab(this,'noti-tab-manual')">수동 발송</div>
+            <div class="terms-tab" onclick="notiSwitchTab(this,'noti-tab-auto')">자동 발송</div>
+          </div>
+        </div>
+        <div id="noti-tab-manual">
+          <table>
+            <thead><tr><th style="text-align:center">발송일시</th><th style="text-align:center">채널</th><th>제목</th><th style="text-align:center">대상 조건</th><th style="text-align:center">대상 수</th><th style="text-align:center">성공</th><th style="text-align:center">실패</th><th style="text-align:center">미처리</th><th style="text-align:center">확인 불가</th><th style="text-align:center">열람율</th><th style="text-align:center">상태 / 액션</th></tr></thead>
+            <tbody id="noti-hist-tbody">
+            </tbody>
+          </table>
+        </div>
+        <div id="noti-tab-auto" style="display:none">
+          <table>
+            <thead><tr><th style="text-align:center">발송일시</th><th>알림 종류</th><th>대상 회원</th><th style="text-align:center">결과</th><th>사유</th></tr></thead>
+            <tbody id="ntlog-tbody">
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <!-- ④ 발송 정책 — 조회 전용. 출처 policy-09-push.html 「푸시 알림 상한」. -->
+      <div class="card">
+        <div class="card-header"><div class="card-title">FCM 푸시 발송 상한 정책 <span style="font-size:11px;color:var(--success);font-weight:600">정책 확정</span></div></div>
+        <div style="padding:16px">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+            <div class="policy-item"><div class="policy-label">거래 알림 (구매·확정·환불)</div><div class="policy-value">상한 없음</div><div class="policy-desc">서비스 필수 알림 — 발송 제한 없음. 야간에도 즉시 발송.</div></div>
+            <div class="policy-item"><div class="policy-label">기타 알림 (미션·만료·추첨)</div><div class="policy-value">일 2건</div><div class="policy-desc">1인 1일 최대 2건.</div></div>
+            <div class="policy-item"><div class="policy-label">야간 발송</div><div class="policy-value">22:00~08:00 미발송</div><div class="policy-desc">야간 시간대 푸시 발송 차단. 모았다가 아침에 묶음 발송.</div></div>
+            <div class="policy-item"><div class="policy-label">우선순위 · 중복 억제</div><div class="policy-value">거래 > 만료 임박 > 미션 > 추첨</div><div class="policy-desc">같은 사유의 알림은 묶어 중복 발송을 억제(하루 상한 안에서).</div></div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -4444,6 +4466,61 @@ window.CMS_FEATURES = {
   </div>
 </div>
 
+<!-- ── 모달: 알림 관리 Notice (2026-11-05) ── 화면에 두던 안내 문구를 여기로 모았다 -->
+<div class="modal-overlay" id="m-noti-notice">
+  <div class="modal" style="width:540px">
+    <div class="modal-header">
+      <div class="modal-title">알림 관리 Notice</div>
+      <button class="modal-close" onclick="closeModal('m-noti-notice')"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <ul class="ta-notice-list">
+        <li><span class="k">자동 알림 문구</span>앱이 상황에 따라 저절로 보내는 알림의 제목·본문입니다. <strong>수정 → 미리보기 → 이대로 저장</strong>을 거쳐야 저장되고, 저장하면 앱 알림함에 바로 반영됩니다.</li>
+        <li><span class="k">변수</span>중괄호로 감싼 낱말은 발송할 때 실제 값으로 바뀝니다. 그 줄에 적힌 변수만 쓸 수 있습니다. 값이 비는 알림에는 앱에 들어 있는 기본 문구가 나갑니다.</li>
+        <li><span class="k">미구현</span>정책서에는 있으나 아직 발송되지 않는 알림입니다. 문구를 고칠 수 없습니다.</li>
+        <li><span class="k">필수 · 선택</span>정책서 기준 분류입니다. 거래 알림은 필수(동의 무관), 이벤트·마케팅성 알림은 선택(동의 필요)입니다.</li>
+        <li><span class="k">발송 채널</span>1단계 발송 채널은 <strong>앱 푸시 단일</strong>입니다. 카카오 알림톡은 서드파티 비용이 발생해 도입하지 않습니다.</li>
+        <li><span class="k">수동 발송 대상</span>마케팅성 알림이라 <strong>마케팅 정보 수신에 동의한 회원</strong>만 셉니다. 테스트 발송은 고른 회원에게만 나갑니다.</li>
+        <li><span class="k">내용 변수</span><span>{닉네임}</span> · <span>{보유티켓}</span>은 받는 회원의 닉네임과 보유 티켓 장수로 바뀝니다.</li>
+        <li><span class="k">예약 발송</span>예약 시각이 지난 건은 이 화면을 열 때 <strong>발송완료</strong>로 넘어갑니다. '예약' 상태만 발송 전 취소할 수 있습니다.</li>
+        <li><span class="k">수동 발송 기록</span>발송 완료 건은 불변 로그입니다. 건을 누르면 수신자 목록이 열립니다. 수신 기록은 90일 보관 후 삭제합니다.</li>
+        <li><span class="k">자동 발송 기록</span>자동 알림이 회원 앱 알림함에 쌓일 때마다 한 줄씩 남습니다.</li>
+        <li><span class="k">데모</span>실제 FCM 발송 연동은 없고 발송 내역만 DB에 기록됩니다. 수동 발송의 성공·실패·미처리는 시연용 값이고, 자동 발송은 앱 알림함에 쌓인 시점을 발송으로 기록합니다.</li>
+        <li><span class="k">발송 정책</span>정책서 「푸시 알림 상한」을 그대로 옮긴 조회 전용 카드입니다.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+<!-- ── 모달: 자동 알림 문구 수정 ── 저장 단추는 두지 않는다 — 미리보기 창의 「이대로 저장」으로만 저장된다 -->
+<div class="modal-overlay" id="m-ntpl-edit">
+  <div class="modal" style="width:540px">
+    <div class="modal-header"><div><div class="modal-title">자동 알림 문구 수정</div><div class="card-sub" id="ntpl-ctx"></div></div><button class="modal-close" onclick="closeModal('m-ntpl-edit')"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
+    <div class="modal-body">
+      <input type="hidden" id="ntpl-key">
+      <div class="form-group" id="ntpl-title-wrap"><label class="form-label">제목</label><input class="form-input" id="ntpl-title"></div>
+      <div class="form-group"><label class="form-label">본문</label><textarea class="form-input" id="ntpl-body" rows="3" style="resize:vertical"></textarea></div>
+      <div class="form-group"><label class="form-label">쓸 수 있는 변수</label><div id="ntpl-vars"></div></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('m-ntpl-edit')">닫기</button>
+      <button class="btn btn-primary" onclick="ntplPreview()">미리보기</button>
+    </div>
+  </div>
+</div>
+<!-- ── 모달: 자동 알림 문구 미리보기 ── 예시 값을 넣어 앱 알림함 카드 모양 그대로 보여 준다 -->
+<div class="modal-overlay" id="m-ntpl-preview">
+  <div class="modal" style="width:440px">
+    <div class="modal-header"><div class="modal-title">미리보기</div><button class="modal-close" onclick="closeModal('m-ntpl-preview')"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
+    <div class="modal-body">
+      <label class="form-label">앱 알림함에 보이는 모습 (예시 값)</label>
+      <div id="ntpl-pv"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="ntplBackToEdit()">다시 고치기</button>
+      <button class="btn btn-primary" id="ntpl-save-btn" onclick="ntplSave()">이대로 저장</button>
+    </div>
+  </div>
+</div>
 <!-- ── 모달: 배너 ── -->
 <div class="modal-overlay" id="m-banner">
   <div class="modal">
@@ -5561,6 +5638,7 @@ function go(id, navEl) {
   if (id === 'demo-mgmt' && window.dmLoadStats) window.dmLoadStats();
   if (id === 'ticket-value' && window.tvLoad) window.tvLoad();
   if (id === 'ticket-accrual' && window.taLoad) window.taLoad();
+  if (id === 'notifications' && typeof loadNotifications === 'function') loadNotifications();
   if (id === 'revenue-fee' && window.rfLoad) window.rfLoad();
   if (id === 'revenue-gifti' && window.gsRevLoad) window.gsRevLoad();
   if (id === 'roulette-settings' && window.rltLoad) window.rltLoad('daily');
@@ -7495,6 +7573,88 @@ Object.assign(KO2VI,{
   "저장소에 올린 파일 경로를 넣습니다. 비우면 자리표시 그림으로 표시됩니다.":"Hãy nhập đường dẫn tệp đã tải lên kho. Để trống sẽ hiển thị hình giữ chỗ.",
   /* 기프티샵 판매 매출 — 파고들기 자국 */
   "월별 내역":"Lịch sử theo tháng"
+});
+/* ── 알림 관리 재기획 (김반장 승인 2026-11-05) — 라벨·안내만 옮긴다. 자동 알림 문구 원문({변수} 포함)은
+   회원에게 나가는 한국어 발송본이라 번역하지 않는다(취소·환수 문구 표와 같은 기준). ── */
+Object.assign(KO2VI,{
+  "알림 관리 Notice":"Lưu ý — Quản lý thông báo",
+  "자동 알림 문구":"Nội dung thông báo tự động",
+  "갈래":"Nhóm",
+  "발송 상황":"Tình huống gửi",
+  "본문":"Nội dung",
+  "쓰이는 변수":"Biến được dùng",
+  "앱 알림함 묶음":"Nhóm trong hộp thông báo app",
+  "필수 여부":"Bắt buộc hay không",
+  "발송 기록":"Lịch sử gửi",
+  "수동 발송":"Gửi thủ công",
+  "자동 발송":"Gửi tự động",
+  "알림 종류":"Loại thông báo",
+  "대상 회원":"Hội viên nhận",
+  "우선순위 · 중복 억제":"Ưu tiên · chặn trùng lặp",
+  "거래 > 만료 임박 > 미션 > 추첨":"Giao dịch > Sắp hết hạn > Nhiệm vụ > Bốc thăm",
+  "같은 사유의 알림은 묶어 중복 발송을 억제(하루 상한 안에서).":"Gộp các thông báo cùng lý do để chặn gửi trùng (trong giới hạn mỗi ngày).",
+  "야간 시간대 푸시 발송 차단. 모았다가 아침에 묶음 발송.":"Chặn gửi push ban đêm. Gom lại và gửi một lần vào buổi sáng.",
+  "서비스 필수 알림 — 발송 제한 없음. 야간에도 즉시 발송.":"Thông báo bắt buộc của dịch vụ — không giới hạn gửi. Gửi ngay cả ban đêm.",
+  "자동 알림 문구 수정":"Sửa nội dung thông báo tự động",
+  "쓸 수 있는 변수":"Biến có thể dùng",
+  "다시 고치기":"Sửa lại",
+  "이대로 저장":"Lưu như thế này",
+  "앱 알림함에 보이는 모습 (예시 값)":"Hiển thị trong hộp thông báo app (giá trị ví dụ)",
+  "사용 중":"Đang dùng",
+  "미구현":"Chưa triển khai",
+  "필수(동의 무관)":"Bắt buộc (không cần đồng ý)",
+  "선택(동의 필요)":"Tùy chọn (cần đồng ý)",
+  "취소 · 환수":"Hủy · thu hồi",
+  "티켓 지급":"Cấp vé",
+  "제휴몰 구매 접수 (구매 확정 전)":"Ghi nhận mua tại sàn LK (trước khi xác nhận mua)",
+  "구매 확정 · 티켓 적립 완료":"Xác nhận mua · tích lũy vé xong",
+  "취소 범위 토막 — 전체 취소 (아래 취소·환수 본문의 {취소범위})":"Đoạn phạm vi hủy — hủy toàn phần ({취소범위} trong nội dung hủy·thu hồi bên dưới)",
+  "취소 범위 토막 — 부분 취소 (아래 취소·환수 본문의 {취소범위})":"Đoạn phạm vi hủy — hủy một phần ({취소범위} trong nội dung hủy·thu hồi bên dưới)",
+  "구매 취소 — 티켓 전환 전 (전체 · 부분)":"Hủy mua — trước khi chuyển đổi vé (toàn phần · một phần)",
+  "구매 취소 — 티켓 전환 후, 전부 환수":"Hủy mua — sau khi chuyển đổi vé, thu hồi toàn bộ",
+  "부분 취소 — 티켓 전환 후, 남은 티켓 있음":"Hủy một phần — sau khi chuyển đổi vé, còn vé dư",
+  "회수할 티켓이 모자람 (환수 알림 본문 끝에 덧붙임)":"Thiếu vé để thu hồi (thêm vào cuối nội dung thông báo thu hồi)",
+  "친구가 내 초대 코드를 입력":"Bạn bè nhập mã mời của tôi",
+  "포인트 적립 (출석 · 가입 축하 · 친구초대 · 선물 상자 · 티켓→포인트 교환 · 운영자 지급)":"Tích lũy điểm (điểm danh · chúc mừng đăng ký · mời bạn · hộp quà · đổi vé→điểm · quản trị viên cấp)",
+  "주간 경품 추첨 당첨 (주간 추첨 숨김 중)":"Trúng bốc thăm giải thưởng tuần (đang ẩn bốc thăm tuần)",
+  "티켓 만료 임박 (D-30 · D-7)":"Vé sắp hết hạn (D-30 · D-7)",
+  "포인트 만료 임박 (D-30 · D-7)":"Điểm sắp hết hạn (D-30 · D-7)",
+  "선물 상자 · 미션 티켓 지급":"Cấp vé từ hộp quà · nhiệm vụ",
+  "운영자 티켓 지급":"Quản trị viên cấp vé",
+  "기프티콘 구매 취소":"Hủy mua Gifticon",
+  "공지 게시":"Đăng thông báo chung",
+  "자동 발송 기록이 없습니다.":"Không có lịch sử gửi tự động.",
+  "제목과 본문을 입력하세요.":"Hãy nhập tiêu đề và nội dung.",
+  "저장했습니다.":"Đã lưu.",
+  "발송완료":"Đã gửi",
+  /* Notice */
+  "변수":"Biến",
+  "필수 · 선택":"Bắt buộc · tùy chọn",
+  "수동 발송 대상":"Đối tượng gửi thủ công",
+  "내용 변수":"Biến nội dung",
+  "수동 발송 기록":"Lịch sử gửi thủ công",
+  "자동 발송 기록":"Lịch sử gửi tự động",
+  "데모":"Demo",
+  "발송 정책":"Chính sách gửi",
+  "앱이 상황에 따라 저절로 보내는 알림의 제목·본문입니다.":"Là tiêu đề·nội dung của các thông báo app tự gửi theo tình huống.",
+  "수정 → 미리보기 → 이대로 저장":"Sửa → Xem trước → Lưu như thế này",
+  "을 거쳐야 저장되고, 저장하면 앱 알림함에 바로 반영됩니다.":"thì mới được lưu, và khi lưu sẽ phản ánh ngay vào hộp thông báo app.",
+  "중괄호로 감싼 낱말은 발송할 때 실제 값으로 바뀝니다. 그 줄에 적힌 변수만 쓸 수 있습니다. 값이 비는 알림에는 앱에 들어 있는 기본 문구가 나갑니다.":"Từ đặt trong ngoặc nhọn sẽ được thay bằng giá trị thực khi gửi. Chỉ dùng được các biến ghi ở dòng đó. Thông báo có giá trị trống sẽ gửi nội dung mặc định có sẵn trong app.",
+  "정책서에는 있으나 아직 발송되지 않는 알림입니다. 문구를 고칠 수 없습니다.":"Là thông báo có trong tài liệu chính sách nhưng chưa được gửi. Không sửa được nội dung.",
+  "정책서 기준 분류입니다. 거래 알림은 필수(동의 무관), 이벤트·마케팅성 알림은 선택(동의 필요)입니다.":"Phân loại theo tài liệu chính sách. Thông báo giao dịch là bắt buộc (không cần đồng ý), thông báo sự kiện·tiếp thị là tùy chọn (cần đồng ý).",
+  "1단계 발송 채널은":"Kênh gửi ở giai đoạn 1 là",
+  "앱 푸시 단일":"chỉ push app",
+  "입니다. 카카오 알림톡은 서드파티 비용이 발생해 도입하지 않습니다.":". Không dùng Kakao AlimTalk vì phát sinh chi phí bên thứ ba.",
+  "마케팅성 알림이라":"Vì là thông báo tiếp thị nên chỉ đếm",
+  "마케팅 정보 수신에 동의한 회원":"hội viên đã đồng ý nhận thông tin tiếp thị",
+  "만 셉니다. 테스트 발송은 고른 회원에게만 나갑니다.":". Gửi thử chỉ gửi tới hội viên đã chọn.",
+  "은 받는 회원의 닉네임과 보유 티켓 장수로 바뀝니다.":"được thay bằng biệt danh và số vé đang giữ của hội viên nhận.",
+  "예약 시각이 지난 건은 이 화면을 열 때":"Mục hẹn giờ đã qua thời điểm hẹn sẽ chuyển sang",
+  "로 넘어갑니다. '예약' 상태만 발송 전 취소할 수 있습니다.":"khi mở màn hình này. Chỉ mục ở trạng thái 'Hẹn giờ' mới hủy được trước khi gửi.",
+  "발송 완료 건은 불변 로그입니다. 건을 누르면 수신자 목록이 열립니다. 수신 기록은 90일 보관 후 삭제합니다.":"Mục đã gửi là nhật ký bất biến. Bấm vào mục sẽ mở danh sách người nhận. Bản ghi nhận được lưu 90 ngày rồi xóa.",
+  "자동 알림이 회원 앱 알림함에 쌓일 때마다 한 줄씩 남습니다.":"Mỗi lần thông báo tự động vào hộp thông báo app của hội viên sẽ ghi lại một dòng.",
+  "실제 FCM 발송 연동은 없고 발송 내역만 DB에 기록됩니다. 수동 발송의 성공·실패·미처리는 시연용 값이고, 자동 발송은 앱 알림함에 쌓인 시점을 발송으로 기록합니다.":"Chưa tích hợp gửi FCM thật, chỉ ghi lịch sử gửi vào DB. Thành công·thất bại·chưa xử lý của gửi thủ công là giá trị minh họa; gửi tự động ghi thời điểm thông báo vào hộp thông báo app là thời điểm gửi.",
+  "정책서 「푸시 알림 상한」을 그대로 옮긴 조회 전용 카드입니다.":"Thẻ chỉ xem, chép nguyên mục 「Giới hạn thông báo push」 của tài liệu chính sách."
 });
 /* ── 11-04 수정 요청 반영 (A-5 대시보드 이번달 · A-13 알림 수신 결과 넷) ── */
 Object.assign(KO2VI,{
@@ -11590,6 +11750,166 @@ window.noticeSubmit = function(status) {
   });
 };
 
+/* ── ① 자동 알림 문구 (알림 관리 재기획 · 김반장 승인 2026-11-05) ─────────────────────
+   앱이 상황에 따라 저절로 내보내는 알림의 제목·본문을 한 표로 모은다. 저장은 settings/notif_templates
+   { items: { <key>: { title, body } } }. 앱 renderNotifications()·ppDemoCancelNotifs() 가 같은 key 로 읽는다 —
+   문서가 없거나 못 읽거나, 변수 값이 비면 앱에 박힌 문구를 그대로 쓴다(기존 동작 유지).
+   아래 title·body 기본값은 앱에 박힌 문구를 변수 자리만 비워 옮긴 것이다 — 글자를 바꾸면 앱 기본 문구와 어긋난다.
+   frag: 다른 알림 본문에 끼워 들어가는 토막(제목 없음). scope: 그 알림이 쓰는 「취소범위」 토막.
+   상태 'off' = 정책서에는 있으나 아직 발송되지 않는 알림(미구현) — 문구 편집을 막는다. */
+var NTPL_DEF = [
+  { key: 'purchase_pending',     group: '구매',        situ: '제휴몰 구매 접수 (구매 확정 전)',                 title: '{몰} 구매로 티켓 적립', body: '{금액}원 · 구매 확정 대기', vars: ['몰', '금액'], box: '구매', req: 'must', on: true },
+  { key: 'purchase_confirmed',   group: '구매',        situ: '구매 확정 · 티켓 적립 완료',                      title: '{몰} 구매로 티켓 적립', body: '{금액}원 · 적립 완료', vars: ['몰', '금액'], box: '구매', req: 'must', on: true },
+  { key: 'cancel_scope_full',    group: '취소 · 환수', situ: '취소 범위 토막 — 전체 취소 (아래 취소·환수 본문의 {취소범위})', title: null, body: '{몰} {구매금액}원 구매 취소', vars: ['몰', '구매금액'], box: '구매', req: 'must', on: true, frag: true, parent: 'cancel_pre' },
+  { key: 'cancel_scope_partial', group: '취소 · 환수', situ: '취소 범위 토막 — 부분 취소 (아래 취소·환수 본문의 {취소범위})', title: null, body: '{몰} {구매금액}원 중 {취소금액}원 취소', vars: ['몰', '구매금액', '취소금액'], box: '구매', req: 'must', on: true, frag: true, parent: 'claw_partial' },
+  { key: 'cancel_pre',           group: '취소 · 환수', situ: '구매 취소 — 티켓 전환 전 (전체 · 부분)',         title: '적립 예정 티켓 취소', body: '{취소범위} · 적립 예정이던 랜덤 티켓 {장수}장이 취소되었습니다.', vars: ['취소범위', '장수'], box: '구매', req: 'must', on: true, scope: 'cancel_scope_full' },
+  { key: 'claw_full',            group: '취소 · 환수', situ: '구매 취소 — 티켓 전환 후, 전부 환수',            title: '지급 티켓 환수', body: '{취소범위} · 지급된 {환수내역}이 환수되었습니다.', vars: ['취소범위', '환수내역'], box: '구매', req: 'must', on: true, scope: 'cancel_scope_full' },
+  { key: 'claw_partial',         group: '취소 · 환수', situ: '부분 취소 — 티켓 전환 후, 남은 티켓 있음',       title: '지급 티켓 부분 환수', body: '{취소범위} · {환수내역}이 환수되었습니다. 남은 {잔여}장은 그대로 사용하실 수 있습니다.', vars: ['취소범위', '환수내역', '잔여'], box: '구매', req: 'must', on: true, scope: 'cancel_scope_partial' },
+  { key: 'claw_debt',            group: '취소 · 환수', situ: '회수할 티켓이 모자람 (환수 알림 본문 끝에 덧붙임)', title: null, body: '보유하신 티켓이 모자라 {회수예정}장은 회수 예정으로 남았습니다. 다음에 티켓을 받으실 때 자동으로 차감됩니다.', vars: ['회수예정'], box: '구매', req: 'must', on: true, frag: true, parent: 'claw_full' },
+  { key: 'gifticon_purchase',    group: '기프티콘',    situ: '기프티콘 구매',                                   title: '기프티콘 구매 완료', body: '티켓 {장수}장 사용', vars: ['장수'], box: '티켓', req: 'must', on: true },
+  { key: 'invite_done',          group: '친구초대',    situ: '친구가 내 초대 코드를 입력',                       title: '친구 초대 완료', body: '초대 보상 지급', vars: [], box: '이벤트', req: 'opt', on: true },
+  { key: 'point_earn',           group: '포인트',      situ: '포인트 적립 (출석 · 가입 축하 · 친구초대 · 선물 상자 · 티켓→포인트 교환 · 운영자 지급)', title: '{사유}', body: '+{포인트}P 적립', vars: ['사유', '포인트'], box: '이벤트', req: 'opt', on: true },
+  { key: 'prize_win',            group: '경품',        situ: '주간 경품 추첨 당첨 (주간 추첨 숨김 중)',          title: '경품 추첨에 당첨되셨어요!', body: '당첨을 축하해요! 경품 수령 정보를 1:1 문의로 보내주세요.', vars: [], box: '이벤트', req: '', on: true },
+  { key: 'expire_ticket',        group: '만료',        situ: '티켓 만료 임박 (D-30 · D-7)',                     title: null, body: null, vars: [], box: '', req: 'opt', on: false },
+  { key: 'expire_point',         group: '만료',        situ: '포인트 만료 임박 (D-30 · D-7)',                   title: null, body: null, vars: [], box: '', req: 'opt', on: false },
+  { key: 'grant_ticket_event',   group: '티켓 지급',   situ: '선물 상자 · 미션 티켓 지급',                      title: null, body: null, vars: [], box: '', req: 'opt', on: false },
+  { key: 'grant_ticket_admin',   group: '티켓 지급',   situ: '운영자 티켓 지급',                                title: null, body: null, vars: [], box: '', req: '', on: false },
+  { key: 'gifticon_cancel',      group: '기프티콘',    situ: '기프티콘 구매 취소',                              title: null, body: null, vars: [], box: '', req: 'must', on: false },
+  { key: 'inquiry_answered',     group: '1:1 문의',    situ: '1:1 문의 답변',                                   title: null, body: null, vars: [], box: '', req: 'must', on: false },
+  { key: 'notice_posted',        group: '공지',        situ: '공지 게시',                                       title: null, body: null, vars: [], box: '', req: '', on: false }
+];
+var NTPL_REQ_KO = { must: '필수(동의 무관)', opt: '선택(동의 필요)' };
+/* 미리보기 예시 값 — 실제 발송 값이 아니다 */
+var NTPL_EX = { '몰': '쿠팡', '금액': '35,000', '구매금액': '70,000', '취소금액': '22,320', '장수': '3', '환수내역': '티켓 2장', '잔여': '1', '회수예정': '1', '사유': '쿠팡 구경 출석체크', '포인트': '10' };
+var NTPL_SAVED = {};
+function ntplDef(key) { return NTPL_DEF.filter(function(d) { return d.key === key; })[0]; }
+/* 지금 쓰이는 문구 — 저장본이 있으면 저장본, 없으면 앱 기본 문구 */
+function ntplCur(key) {
+  var d = ntplDef(key) || {}, sv = NTPL_SAVED[key] || {};
+  return { title: (d.title == null) ? null : (sv.title != null ? sv.title : d.title), body: sv.body != null ? sv.body : d.body };
+}
+function ntplFill(str, vars) {
+  return String(str == null ? '' : str).replace(/\{([^{}]+)\}/g, function(m, k) { return (vars[k] != null && vars[k] !== '') ? String(vars[k]) : m; });
+}
+function ntplVarsHtml(str) {
+  return ppEsc(str == null ? '' : str).replace(/\{([^{}]+)\}/g, '<span class="ntpl-var">{$1}</span>');
+}
+function ntplRender() {
+  var tb = document.getElementById('ntpl-tbody');
+  if (!tb) return;
+  tb.innerHTML = NTPL_DEF.map(function(d) {
+    var c = ntplCur(d.key), off = !d.on;
+    return '<tr' + (off ? ' class="ntpl-off"' : '') + '>'
+      + '<td style="text-align:center;white-space:nowrap">' + d.group + '</td>'
+      + '<td>' + d.situ + '</td>'
+      + '<td>' + (off || c.title == null ? '—' : ntplVarsHtml(c.title)) + '</td>'
+      + '<td>' + (off ? '—' : ntplVarsHtml(c.body)) + '</td>'
+      + '<td>' + (d.vars.length ? d.vars.map(function(v) { return '<span class="ntpl-var">{' + v + '}</span>'; }).join(' ') : '—') + '</td>'
+      + '<td style="text-align:center">' + (d.box || '—') + '</td>'
+      + '<td style="text-align:center;white-space:nowrap">' + (NTPL_REQ_KO[d.req] || '—') + '</td>'
+      + '<td style="text-align:center">' + (off ? '<span class="badge badge-gray">미구현</span>' : '<span class="badge badge-green">사용 중</span>') + '</td>'
+      + '<td style="text-align:center">' + (off ? '<button class="btn btn-ghost btn-sm" disabled>수정</button>' : '<button class="btn btn-ghost btn-sm" onclick="ntplEdit(\'' + d.key + '\')">수정</button>') + '</td></tr>';
+  }).join('');
+}
+function ntplLoad() {
+  return db.collection('settings').doc('notif_templates').get().then(function(doc) {
+    NTPL_SAVED = (doc.exists && doc.data().items) || {};
+  }).catch(function(e) { console.error('ntplLoad', e); NTPL_SAVED = {}; }).then(ntplRender);
+}
+window.ntplEdit = function(key) {
+  var d = ntplDef(key);
+  if (!d || !d.on) return;
+  var c = ntplCur(key);
+  document.getElementById('ntpl-key').value = key;
+  document.getElementById('ntpl-ctx').textContent = d.group + ' · ' + d.situ;
+  document.getElementById('ntpl-title-wrap').style.display = d.frag ? 'none' : '';
+  document.getElementById('ntpl-title').value = c.title || '';
+  document.getElementById('ntpl-body').value = c.body || '';
+  document.getElementById('ntpl-vars').innerHTML = d.vars.length ? d.vars.map(function(v) { return '<span class="ntpl-var">{' + v + '}</span>'; }).join(' ') : '—';
+  openModal('m-ntpl-edit');
+};
+/* 수정 중인 값 — 비었거나 그 줄에 없는 변수를 쓰면 막는다 */
+function ntplDraft() {
+  var key = document.getElementById('ntpl-key').value, d = ntplDef(key);
+  if (!d) return null;
+  var title = d.frag ? null : document.getElementById('ntpl-title').value.trim();
+  var body = document.getElementById('ntpl-body').value.trim();
+  if ((!d.frag && !title) || !body) { toast('제목과 본문을 입력하세요.'); return null; }
+  var bad = [];
+  ((title || '') + ' ' + body).replace(/\{([^{}]+)\}/g, function(m, k) { if (d.vars.indexOf(k) < 0 && bad.indexOf(m) < 0) bad.push(m); return m; });
+  if (bad.length) { toast('쓸 수 없는 변수입니다: ' + bad.join(', ')); return null; }
+  return { key: key, def: d, title: title, body: body };
+}
+/* 그 문구가 들어간 앱 알림 한 건을 예시 값으로 만든다 — 토막(frag)은 끼워 들어가는 알림 안에서 보여 준다 */
+function ntplCompose(dr) {
+  var ex = Object.assign({}, NTPL_EX);
+  function scopeText(scopeKey) { return ntplFill(scopeKey === dr.key ? dr.body : ntplCur(scopeKey).body, ex); }
+  var key = dr.def.frag ? dr.def.parent : dr.key, pd = ntplDef(key);
+  var cur = (key === dr.key) ? { title: dr.title, body: dr.body } : ntplCur(key);
+  if (pd.scope) ex['취소범위'] = scopeText(pd.scope);
+  var desc = ntplFill(cur.body, ex);
+  if (dr.key === 'claw_debt') desc += ' ' + ntplFill(dr.body, ex);
+  return { box: pd.box, head: ntplFill(cur.title, ex), desc: desc };
+}
+window.ntplPreview = function() {
+  var dr = ntplDraft();
+  if (!dr) return;
+  NTPL_PENDING = dr;
+  var v = ntplCompose(dr);
+  document.getElementById('ntpl-pv').innerHTML = '<div class="ntpl-pv-card">'
+    + '<span class="ntpl-pv-tag">' + ppEsc(v.box) + '</span>'
+    + '<div class="ntpl-pv-head">' + ppEsc(v.head) + '</div>'
+    + '<div class="ntpl-pv-desc">' + ppEsc(v.desc) + '</div></div>';
+  closeModal('m-ntpl-edit');
+  openModal('m-ntpl-preview');
+};
+var NTPL_PENDING = null;
+window.ntplBackToEdit = function() { closeModal('m-ntpl-preview'); openModal('m-ntpl-edit'); };
+window.ntplSave = function() {
+  var dr = NTPL_PENDING;
+  if (!dr) return;
+  var btn = document.getElementById('ntpl-save-btn');
+  if (btn) btn.disabled = true;
+  var item = { body: dr.body, updated_at: FS.Timestamp.now() };
+  if (!dr.def.frag) item.title = dr.title;
+  var patch = { items: {} }; patch.items[dr.key] = item;
+  db.collection('settings').doc('notif_templates').set(Object.assign(patch, { updated_at: FS.FieldValue.serverTimestamp() }, ppAdminStamp()), { merge: true }).then(function() {
+    NTPL_SAVED[dr.key] = item;
+    logAdmin('자동 알림 문구 저장: ' + dr.def.group + ' · ' + dr.def.situ);
+    toast('저장했습니다.');
+    closeModal('m-ntpl-preview');
+    NTPL_PENDING = null;
+    ntplRender();
+  }).catch(function(e) { toast('저장하지 못했습니다: ' + (e.message || e)); }).finally(function() { if (btn) btn.disabled = false; });
+};
+
+/* ③ 발송 기록 탭 — 수동(notifications) · 자동(notif_logs) */
+window.notiSwitchTab = function(el, id) {
+  el.parentNode.querySelectorAll('.terms-tab').forEach(function(x) { x.classList.remove('active'); });
+  el.classList.add('active');
+  ['noti-tab-manual', 'noti-tab-auto'].forEach(function(tid) {
+    var e2 = document.getElementById(tid);
+    if (e2) e2.style.display = tid === id ? 'block' : 'none';
+  });
+};
+/* 자동 발송 기록 — 앱이 알림함을 그릴 때 새로 생긴 자동 알림을 한 건씩 남긴다(1:1 발송이라 집계 칸이 없다).
+   데모는 실제 푸시가 없어 알림함에 쌓인 시점을 발송으로 본다. */
+function loadNotifLogs() {
+  var tbody = document.getElementById('ntlog-tbody');
+  if (!tbody) return;
+  db.collection('notif_logs').orderBy('sent_at', 'desc').limit(500).get().then(function(snap) {
+    ppPaged('notif_logs', tbody, snap.docs.map(function(doc) {
+      var d = doc.data(), def = ntplDef(d.tpl_key) || {};
+      return '<tr>'
+        + '<td style="text-align:center;white-space:nowrap"><div style="font-weight:700;color:#333">' + ppDt(d.sent_at) + '</div><div style="color:var(--text-3);font-size:11px">' + ppTm(d.sent_at) + '</div></td>'
+        + '<td>' + (def.situ ? '<div>' + def.situ + '</div>' : '') + '<div style="color:var(--text-3);font-size:11px">' + ppEsc(d.title || '') + '</div></td>'
+        + '<td><div style="font-weight:600">' + ppEsc(d.nickname || '(닉네임 없음)') + '</div><div style="font-size:11px;color:var(--text-3);font-family:monospace">' + ppEsc(d.user_id || '') + '</div></td>'
+        + '<td style="text-align:center">' + notiResultBadge(d.result || 'unknown') + '</td>'
+        + '<td style="color:var(--text-2);font-size:12px">' + (d.reason ? ppEsc(d.reason) : '—') + '</td></tr>';
+    }), ppEmpty(5, '자동 발송 기록이 없습니다.'));
+  }).catch(function(e) { console.error('loadNotifLogs', e); tbody.innerHTML = ppEmpty(5, '로드 오류'); });
+}
+
 /* ── sec-notifications ── notifications collection (실쿼리 + 실 발송기록) */
 var NOTI_CHANNEL_KO = { push:'앱 푸시', kakao:'카카오 알림톡', push_kakao:'푸시+알림톡' };
 var NOTI_TARGET_KO = { all:'전체 회원', kakao:'카카오 연동 회원', guest:'미연동(게스트) 회원', inactive30:'30일 미접속', new7:'신규 가입(7일 이내)', purchased:'구매 이력 있는 회원', custom:'커스텀 세그먼트', test:'테스트(본인)' };
@@ -11599,9 +11919,30 @@ function loadNotifications() {
   var tbody = document.getElementById('noti-hist-tbody');
   if (!tbody) return;
   /* 수신 결과 넷(성공·실패·미처리·확인 불가)을 세려면 회원 목록이 먼저 있어야 한다 — 없으면 전원이 「확인 불가」로 잡힌다 */
+  ntplLoad();
+  loadNotifLogs();
   notiLoadUsers().catch(function(){ return []; }).then(function() {
     return db.collection('notifications').orderBy('created_at', 'desc').limit(500).get();
   }).then(function(snap) {
+    /* 예약 시각이 지난 예약 건 — 화면을 열 때 대상을 다시 세어 「발송완료」로 넘긴다(2026-11-05) */
+    var due = snap.docs.filter(function(doc) {
+      var d = doc.data();
+      return d.status === 'scheduled' && d.schedule_at && new Date(d.schedule_at).getTime() <= Date.now();
+    });
+    if (due.length && !NOTI_DUE_RUNNING) {
+      NOTI_DUE_RUNNING = true;
+      NOTI_USERS = null;
+      Promise.all(due.map(function(doc) {
+        var d = doc.data();
+        return notiTargetUids(d.target).then(function(uids) {
+          return doc.ref.update({ status: 'sent', sent_at: FS.Timestamp.fromDate(new Date(d.schedule_at)), recipient_uids: uids, recipient_count: uids.length, marketing_only: true });
+        }).then(function() { logAdmin('예약 알림 발송완료 처리: ' + (d.title || doc.id)); });
+      })).catch(function(e) { console.error('notiProcessDue', e); }).then(function() {
+        NOTI_DUE_RUNNING = false;
+        loadNotifications();
+      });
+      return;
+    }
     var statCards = document.querySelectorAll('#sec-notifications .stat-card');
     var monthStart = new Date(); monthStart.setDate(1); monthStart.setHours(0,0,0,0);
     var monthCount = 0, scheduled = 0;
@@ -11631,7 +11972,7 @@ function loadNotifications() {
           + ' <button class="btn btn-ghost btn-sm" style="color:var(--danger)" onclick="event.stopPropagation();notiCancelScheduled(\'' + doc.id + '\')">취소</button>'
         : '';
       return '<tr style="cursor:pointer" onclick="notiOpenRecipients(\'' + doc.id + '\')">'
-        + '<td style="text-align:center;white-space:nowrap"><div style="font-weight:700;color:#333">' + ppDt(d.created_at) + '</div><div style="color:var(--text-3);font-size:11px">' + ppTm(d.created_at) + '</div></td>'
+        + '<td style="text-align:center;white-space:nowrap"><div style="font-weight:700;color:#333">' + ppDt(d.sent_at || d.created_at) + '</div><div style="color:var(--text-3);font-size:11px">' + ppTm(d.sent_at || d.created_at) + '</div></td>'
         + '<td style="text-align:center">' + (NOTI_CHANNEL_KO[d.channel]||d.channel||'—') + '</td>'
         + '<td>' + (d.title||'') + '</td>'
         + '<td style="text-align:center">' + notiTargetLabel(d) + '</td>'
@@ -11647,33 +11988,31 @@ function loadNotifications() {
   }).catch(function(e){ console.error('loadNotifications', e); tbody.innerHTML = ppEmpty(7,'로드 오류'); });
 }
 
-/* 발송 대상 인원 실집계 — PricePick엔 "회원 등급"이 없다(티켓 등급은 회원이 아니라 개별
+/* 발송 대상 — PricePick엔 "회원 등급"이 없다(티켓 등급은 회원이 아니라 개별
    티켓의 등급이라 발송 대상 분류에 못 씀 — 해리 지적, 김반장 확정). 대신 실제 DB에 있는
-   값(연동 상태·가입일·구매 이력)으로만 세그먼트를 나눈다. */
-function notiCountTarget(target) {
-  if (target === 'kakao') {
-    return db.collection('users').where('linked_kakao', '==', true).get().then(function(s){ return s.size; });
-  }
-  if (target === 'guest') {
-    return db.collection('users').where('linked_kakao', '==', false).get().then(function(s){ return s.size; });
-  }
-  if (target === 'inactive30') {
-    var cutoff30 = FS.Timestamp.fromMillis(Date.now() - 30 * 86400000);
-    return db.collection('users').where('updated_at', '<', cutoff30).get().then(function(s){ return s.size; });
-  }
-  if (target === 'new7') {
-    var cutoff7 = FS.Timestamp.fromMillis(Date.now() - 7 * 86400000);
-    return db.collection('users').where('created_at', '>=', cutoff7).get().then(function(s){ return s.size; });
-  }
-  if (target === 'purchased') {
-    return db.collection('postbacks').get().then(function(s){
-      var uniq = {};
-      s.forEach(function(d){ var uid = d.data().user_id; if (uid) uniq[uid] = true; });
-      return Object.keys(uniq).length;
-    });
-  }
-  return db.collection('users').get().then(function(s){ return s.size; });
+   값(연동 상태·가입일·구매 이력)으로만 세그먼트를 나눈다.
+   수동 발송은 마케팅성이라 마케팅 정보 수신에 동의한 회원(users.notif_marketing === true)만 센다(2026-11-05).
+   발송 시점의 대상 회원 id 를 recipient_uids 로 남긴다 — 수신자 목록과 앱 알림함이 같은 명단을 쓴다. */
+var NOTI_DUE_RUNNING = false;
+function notiTargetUids(target) {
+  var pbP = (target === 'purchased')
+    ? db.collection('postbacks').get().then(function(s) { var u = {}; s.forEach(function(d) { var x = d.data().user_id; if (x) u[x] = true; }); return u; })
+    : Promise.resolve(null);
+  return Promise.all([notiLoadUsers(), pbP]).then(function(r) {
+    var users = r[0], bought = r[1], now = Date.now();
+    return users.filter(function(u) {
+      if (!u.mkt) return false;
+      if (target === 'kakao') return u.linked;
+      if (target === 'guest') return !u.linked;
+      if (target === 'inactive30') return !!u.updatedMs && u.updatedMs < now - 30 * 86400000;
+      if (target === 'new7') return !!u.createdMs && u.createdMs >= now - 7 * 86400000;
+      if (target === 'purchased') return !!bought[u.id];
+      return true;
+    }).map(function(u) { return u.id; });
+  });
 }
+/* 내용 변수 — 앱이 받는 회원 값으로 바꿔 넣는다(app ppManualNotifFill) */
+var NOTI_VARS = ['닉네임', '보유티켓'];
 
 window.notiSend = function() {
   var title = document.getElementById('noti-title').value.trim();
@@ -11685,11 +12024,15 @@ window.notiSend = function() {
   var scheduleAt = document.getElementById('noti-schedule-at').value;
   if (timing === 'scheduled' && !scheduleAt) { toast('예약 발송 시각을 입력하세요.'); return; }
   var btn = document.getElementById('noti-send-btn');
+  var bad = [];
+  (title + ' ' + body).replace(/\{([^{}]+)\}/g, function(m, k) { if (NOTI_VARS.indexOf(k) < 0 && bad.indexOf(m) < 0) bad.push(m); return m; });
+  if (bad.length) { toast('쓸 수 없는 변수입니다: ' + bad.join(', ')); return; }
   if (btn) { btn.disabled = true; btn.textContent = '처리 중…'; }
-  notiCountTarget(target).then(function(count) {
+  NOTI_USERS = null;
+  notiTargetUids(target).then(function(uids) {
     return db.collection('notifications').add({
       title: title, body: body, channel: channel, target: target,
-      recipient_count: count,
+      recipient_count: uids.length, recipient_uids: uids, marketing_only: true,
       status: timing === 'scheduled' ? 'scheduled' : 'sent',
       schedule_at: timing === 'scheduled' ? scheduleAt : null,
       created_at: FS.FieldValue.serverTimestamp(),
@@ -11721,7 +12064,9 @@ function notiLoadUsers() {
   return db.collection('users').get().then(function(snap) {
     NOTI_USERS = snap.docs.map(function(d) {
       var u = d.data();
-      return { id: d.id, nickname: u.nickname || '(닉네임 없음)', linked: !!u.linked_kakao };
+      var ms = function(v) { return v ? (v.toDate ? v.toDate().getTime() : new Date(v).getTime()) : 0; };
+      return { id: d.id, nickname: u.nickname || '(닉네임 없음)', linked: !!u.linked_kakao,
+               mkt: u.notif_marketing === true, createdMs: ms(u.created_at), updatedMs: ms(u.updated_at) };
     });
     return NOTI_USERS;
   });
@@ -11888,6 +12233,12 @@ function notiRecipientsOf(docId, d) {
       var u = users.filter(function(x){ return x.id === uid; })[0];
       return u ? { id: uid, nickname: u.nickname }
                : { id: uid, nickname: (d.test_names && d.test_names[i]) || '(알 수 없음)', gone: true };
+    });
+  } else if (Array.isArray(d.recipient_uids)) {
+    /* 2026-11-05 이후 발송 건 — 발송 시점 명단 그대로. 지금 회원 기록이 없으면 「확인 불가」 */
+    rows = d.recipient_uids.map(function(uid) {
+      var u = users.filter(function(x){ return x.id === uid; })[0];
+      return u ? { id: uid, nickname: u.nickname } : { id: uid, nickname: '(회원 기록 없음)', gone: true };
     });
   } else {
     rows = users.slice();
