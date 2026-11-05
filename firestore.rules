@@ -213,6 +213,13 @@ service cloud.firestore {
       allow read: if isSignedIn();
       allow write: if isAdmin();
     }
+    // 자동 알림 발송 기록 (알림 관리 재기획 2026-11-05) — 앱이 자기 알림함에 쌓인 자동 알림을 1건씩 남긴다.
+    // 수동 발송 기록(notifications)과 섞지 않는다. 남긴 기록은 회원이 고치거나 지우지 못한다.
+    match /notif_logs/{docId} {
+      allow read: if isAdmin() || (isSignedIn() && resource.data.user_id == request.auth.uid);
+      allow create: if isSignedIn() && request.resource.data.user_id == request.auth.uid;
+      allow update, delete: if isAdmin();
+    }
     match /inquiries/{docId} {
       allow read: if isSignedIn();
       allow create: if isSignedIn();
