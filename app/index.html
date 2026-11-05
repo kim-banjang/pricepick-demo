@@ -9111,6 +9111,8 @@ body #pp-guide-page .page{padding-top:max(47px,env(safe-area-inset-top,0px))}
 @keyframes pp-g-chipIn{from{opacity:0;transform:translateY(14px) scale(.7)}to{opacity:1;transform:none}}
 :is(#pp-guide,#pp-guide-page) .chip .c{width:100%;height:100%;border-radius:50%;background:#fff;display:grid;place-items:center;box-shadow:0 6px 16px rgba(108,74,182,.18)}
 :is(#pp-guide,#pp-guide-page) .chip .c img{width:34px;height:34px;border-radius:50%;object-fit:contain;display:block}
+:is(#pp-guide,#pp-guide-page) .lgfb::after{content:attr(data-l);display:grid;place-items:center;width:34px;height:34px;border-radius:50%;background:var(--main);color:#fff;font-size:15px;font-weight:800;line-height:1}
+:is(#pp-guide,#pp-guide-page) .badge.lgfb::after{width:100%;height:100%}
 :is(#pp-guide,#pp-guide-page) .chip.hot .c{transform:scale(1.08);box-shadow:0 0 0 3px var(--main),0 6px 16px rgba(108,74,182,.22)}
 :is(#pp-guide,#pp-guide-page) .mall{margin-top:24px;width:286px;height:60px;flex:none;border-radius:var(--r-lg);background:var(--card);border:1px solid var(--border);box-shadow:0 10px 26px rgba(108,74,182,.20);display:flex;align-items:center;gap:10px;padding:0 16px}
 :is(#pp-guide,#pp-guide-page) .badge{flex:none;width:38px;height:38px;border-radius:50%;background:var(--card);overflow:hidden;box-shadow:0 0 0 1px var(--border);display:grid;place-items:center}
@@ -13955,10 +13957,13 @@ window.PP_FEATURES = {
 
 /* 캔버스 좌표 (폭 375 기준). 이미지 노드는 흰 카드(안쪽 14px) 크기, 오브젝트는 그 안에 비율대로 */
 /* 2단계 제휴몰: 로고 칩 한 줄(쿠팡 강조) + 쿠팡 대표 카드 */
-const MALL_LOGOS = ['coupang.jpg', 'gmarket.png', '11st.png', 'nsmall.png', 'cjthemarket.jpg'];
+/* 로고 파일명은 폴더의 실제 파일명 그대로(다섯 개 모두 .png). 그림이 안 열리면 몰 이름 첫 글자 원형 뱃지(.lgfb)로 바꿔 ? 네모가 안 뜨게 한다 */
+const MALL_LOGOS = [['coupang.png', '쿠팡'], ['gmarket.png', 'G마켓'], ['11st.png', '11번가'], ['ns.png', 'NS몰'], ['cj.png', 'CJ더마켓']];
+const LOGO_FB = "this.parentNode.dataset.l=this.dataset.l;this.parentNode.classList.add('lgfb');this.remove()";
+const logoImg = ([f, n]) => `<img src="/app/assets/guide/mall/${f}" alt="" data-l="${n[0]}" onerror="${LOGO_FB}">`;
 const MALLS = '<div class="malls"><div class="chips">' +
-  MALL_LOGOS.map((f, i) => `<span class="chip${i ? '' : ' hot'}" style="--i:${i}"><span class="c"><img src="assets/guide/mall/${f}" alt=""></span></span>`).join('') +
-  '</div><div class="mall"><span class="badge"><img src="assets/guide/mall/coupang.jpg" alt=""></span><b>쿠팡</b><span class="go">바로가기</span></div></div>';
+  MALL_LOGOS.map((m, i) => `<span class="chip${i ? '' : ' hot'}" style="--i:${i}"><span class="c">${logoImg(m)}</span></span>`).join('') +
+  `</div><div class="mall"><span class="badge">${logoImg(MALL_LOGOS[0])}</span><b>쿠팡</b><span class="go">바로가기</span></div></div>`;
 /* 캔버스 = 마지막 장 화면(375x812 기준, 가로:세로 1:2.165)을 3.12배로 키운 것. 노드 중심(fx·fy)과 가로 크기(fw)는
    그 화면에서 김반장 레이아웃을 잰 비율 그대로 — 마지막 장은 캔버스를 화면에 그대로 얹어(finLayout) 이 비율대로 놓인다.
    투어 단계도 같은 캔버스. 세로 크기는 그림 원래 비율(w0 x h0), 제휴몰 묶음(HTML)은 안쪽을 g 배로 키운다.
@@ -14058,15 +14063,15 @@ const DRAW = 560, GAP = 300, POP_AT = 700, TEXT_AT = 300;
 /* 마지막 장 흐름도 구간: 제목 아래 25px ~ 버튼 위 24px (기준 화면에서 152~696px) */
 const FIN = { gapTop: 25, gapBot: 24 };
 const EDGE = 4;   /* 노드·라벨과 화면 좌우 끝 사이 최소 여백 */
-const src = k => `assets/guide/${k}.png`;
+const src = k => `/app/assets/guide/${k}.png`;
 /* 오브젝트 그림. 폰(o1)은 화면 자리에 스플래시 화면을 얹는다 */
 /* 티켓: tw = 대기(빨강 랜덤 티켓 3장 겹침), tk = 확정(금색 티켓 1장 + 체크 배지) */
-const TK = 'assets/guide/ticket-gold.svg', TR = 'assets/guide/ticket-random.svg';
+const TK = '/app/assets/guide/ticket-gold.svg', TR = '/app/assets/guide/ticket-random.svg';
 const CHK = '<span class="chk"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>';
-const SPLASH = 'assets/guide/pricepick-splash.png';
+const SPLASH = '/app/assets/guide/pricepick-splash.png';
 const objHTML = k => k === 'sp' ? `<span class="pp-g-splash"><img src="${SPLASH}" alt=""></span>`
   : k === 'o1'
-  ? `<span class="obj"><img src="${src('o1')}" alt=""><span class="scr"><img src="assets/guide/pricepick-splash.png" alt=""></span></span>`
+  ? `<span class="obj"><img src="${src('o1')}" alt=""><span class="scr"><img src="/app/assets/guide/pricepick-splash.png" alt=""></span></span>`
   : k === 'tw' ? `<span class="tks wait">${`<img src="${TR}" alt="">`.repeat(3)}</span>`
   : k === 'tk' ? `<span class="tks one"><img src="${TK}" alt="">${CHK}</span>`
   : `<img src="${src(k)}" alt="">`;
