@@ -15997,7 +15997,7 @@ function rlApplyDailyLock() {
 /* ===== 선물 상자 열기 (gb-) — 2026-08-24 신설 =====
    보상 구성·확률·한도는 각각 대응하는 룰렛 설정을 그대로 읽어 쓴다.
      매일 선물 상자  ← settings/roulette         (RL_ACTIVE_WHEEL)
-     랜덤 선물 상자  ← settings/jackpot_roulette (JP_ACTIVE_SLOTS)
+     랜덤 선물 상자  ← GB_RANDOM_DEFAULT_SLOTS (2026-11-04 확정표 · 잭팟 룰렛을 더는 물려받지 않는다)
    기존 룰렛 화면·함수·상태는 건드리지 않는다. 하루 1회 판정도 룰렛의 서버 문서
    (roulette_spins)를 쓰지 않고 별도 키를 둬서, 룰렛 쪽 상태가 바뀌지 않게 했다.
    — 초안 단계라 그렇게 뒀다. 정식 반영 때 서버 판정으로 올리면 된다. */
@@ -16019,12 +16019,22 @@ function gbMarkPlayed() { try { localStorage.setItem(GB_LS_KEY, gbTodayStr()); }
    그대로 쓴다 — 「보상 값은 대응 룰렛과 동일」이라는 확정에 맞춘 기본값이다. */
 var GB_ACTIVE = { gb1: null, gb2: null };
 var GB_DOC = { gb1: 'giftbox_daily', gb2: 'giftbox_random' };
-var GB_FALLBACK_DOC = { gb1: 'roulette', gb2: 'jackpot_roulette' };
+/* 랜덤 선물 상자는 대응 룰렛을 물려받지 않는다 — 잭팟 룰렛 구성에 꽝(31.6%)이 있어서다(11-04 수정 요청 A-3).
+   CMS 랜덤 선물 상자 기본값과 같은 확정표: 티켓 200장 0.3% · 티켓 100장 0.7% · 100P 3% · 이벤트 티켓 2장 8% · 20P 88% */
+var GB_FALLBACK_DOC = { gb1: 'roulette' };
+var GB_RANDOM_DEFAULT_SLOTS = [
+  { type:'ticket',        qty:200,  prob:0.3 },
+  { type:'ticket',        qty:100,  prob:0.7 },
+  { type:'point',         qty:100,  prob:3   },
+  { type:'event_ticket',  qty:2,    prob:8   },
+  { type:'point',         qty:20,   prob:88  }
+];
 function gbLoadConfig(kind) {
   if (!window.ppLoadRouletteSlots) return Promise.resolve();
   return window.ppLoadRouletteSlots(GB_DOC[kind]).then(function (cfg) {
     if (cfg && cfg.slots && cfg.slots.length) { GB_ACTIVE[kind] = cfg.slots; return; }
-    /* 아직 CMS에서 저장한 적이 없으면 대응하는 룰렛 구성을 그대로 쓴다 — CMS 화면과 같은 규칙 */
+    /* 아직 CMS에서 저장한 적이 없으면 대응하는 룰렛 구성을 그대로 쓴다 — CMS 화면과 같은 규칙. 랜덤은 확정표(gbSlots) */
+    if (!GB_FALLBACK_DOC[kind]) return;
     return window.ppLoadRouletteSlots(GB_FALLBACK_DOC[kind]).then(function (f) {
       if (f && f.slots && f.slots.length) GB_ACTIVE[kind] = f.slots;
     });
@@ -16033,7 +16043,7 @@ function gbLoadConfig(kind) {
 function gbSlots(kind) {
   if (GB_ACTIVE[kind] && GB_ACTIVE[kind].length) return GB_ACTIVE[kind];
   if (kind === 'gb1') return (typeof RL_ACTIVE_WHEEL !== 'undefined' && RL_ACTIVE_WHEEL.length) ? RL_ACTIVE_WHEEL : RL_DEFAULT_SLOTS;
-  return (typeof JP_ACTIVE_SLOTS !== 'undefined' && JP_ACTIVE_SLOTS.length) ? JP_ACTIVE_SLOTS : JP_DEFAULT_SLOTS;
+  return GB_RANDOM_DEFAULT_SLOTS;
 }
 
 /* 상자 그림 — 시안이 준 것 그대로. 매일은 보라, 랜덤은 금색이다. */
