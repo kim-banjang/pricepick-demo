@@ -21920,6 +21920,109 @@ function ppNotifIcon(i) {
   if (i.type === 'pick') return bagSvg + (i.dom ? '<img src="https://www.google.com/s2/favicons?domain=' + ppEsc(i.dom) + '&sz=64" alt="" onerror="this.remove()">' : '');
   return bagSvg;
 }
+/* ── 자동 알림 문구 (CMS 알림 관리 ① · 김반장 승인 2026-11-05) ──
+   settings/notif_templates { items: { <key>: { title, body } } } 를 읽어 자동 알림 문구로 쓴다.
+   문서가 없거나 못 읽으면, 또는 문구에 든 변수 값이 비면 아래에 박혀 있는 기본 문구를 그대로 쓴다
+   (기존 동작 유지). key 는 CMS NTPL_DEF 와 같다. */
+var PP_NOTIF_TPL = {};
+function ppLoadNotifTpl() {
+  return db.collection('settings').doc('notif_templates').get().then(function (d) {
+    PP_NOTIF_TPL = (d.exists && d.data().items) || {};
+  }).catch(function (e) { console.error('ppLoadNotifTpl', e); PP_NOTIF_TPL = {}; });
+}
+/* 변수를 채운다 — 값이 빈 변수가 하나라도 있으면 null(기본 문구로 돌아간다) */
+function ppNotifFill(str, vars) {
+  var ok = true;
+  var out = String(str).replace(/\{([^{}]+)\}/g, function (m, k) {
+    var v = vars[k];
+    if (v == null || v === '') { ok = false; return m; }
+    return String(v);
+  });
+  return ok ? out : null;
+}
+function ppNotifText(key, vars, head, desc) {
+  var t = PP_NOTIF_TPL[key];
+  if (!t) return { head: head, desc: desc };
+  var h = (t.title != null && t.title !== '') ? ppNotifFill(t.title, vars) : null;
+  var b = (t.body != null && t.body !== '') ? ppNotifFill(t.body, vars) : null;
+  return { head: h == null ? head : h, desc: b == null ? desc : b };
+}
+/* 다른 알림 본문에 끼워 들어가는 토막(취소 범위 · 회수 예정 문장) */
+function ppNotifFrag(key, vars, fallback) {
+  var t = PP_NOTIF_TPL[key];
+  if (!t || t.body == null || t.body === '') return fallback;
+  var b = ppNotifFill(t.body, vars);
+  return b == null ? fallback : b;
+}
+
+/* ── CMS 「알림 관리」 수동 발송 (notifications) — 앱 알림함 「이벤트」 묶음에 합친다 (2026-11-05) ──
+   보이는 조건: 발송완료 건, 또는 예약 시각이 지난 예약 건(CMS 가 아직 넘기지 않았어도 같은 기준). 취소됨은 안 보인다.
+   테스트 발송은 고른 회원(test_uids)에게만. 그 밖은 발송 시점 명단(recipient_uids)에 든 회원에게만 —
+   명단이 없는 옛 발송 건은 대상 조건과 마케팅 정보 수신 동의로 가린다(CMS notiTargetUids 와 같은 기준). */
+function ppMs(v) { var d = ppDate(v); return d ? d.getTime() : 0; }
+function ppManualNotifSentAt(n) {
+  if (n.status === 'sent') return ppDate(n.sent_at) || ppDate(n.created_at);
+  if (n.status === 'test') return ppDate(n.created_at);
+  if (n.status === 'scheduled' && n.schedule_at) {
+    var t = new Date(n.schedule_at);
+    return (!isNaN(t.getTime()) && t.getTime() <= Date.now()) ? t : null;
+  }
+  return null;
+}
+function ppManualNotifForMe(n, pbs) {
+  var uid = PP.uid, u = PP.user || {};
+  if (n.status === 'test' || n.target === 'test') return (n.test_uids || []).indexOf(uid) >= 0;
+  if (Array.isArray(n.recipient_uids)) return n.recipient_uids.indexOf(uid) >= 0;
+  if (u.notif_marketing !== true) return false;
+  var at = ppMs(n.sent_at) || ppMs(n.created_at);
+  if (n.target === 'kakao') return u.linked_kakao === true;
+  if (n.target === 'guest') return u.linked_kakao !== true;
+  if (n.target === 'new7') { var c = ppMs(u.created_at); return !!c && c >= at - 7 * 86400000 && c <= at; }
+  if (n.target === 'inactive30') { var up = ppMs(u.updated_at); return !!up && up < at - 30 * 86400000; }
+  if (n.target === 'purchased') return (pbs || []).some(function (p) { var pc = ppMs(p.created_at); return pc && pc <= at; });
+  return true;
+}
+/* 내용 변수 {닉네임} · {보유티켓} — 받는 회원 값으로 바꿔 넣는다 */
+function ppManualNotifFill(str) {
+  var t = PP.tickets || {};
+  var own = (typeof t.ticket === 'number') ? t.ticket : ((t.bronze || 0) + (t.silver || 0) + (t.gold || 0));
+  return String(str || '').replace(/\{닉네임\}/g, (PP.user && PP.user.nickname) || '회원').replace(/\{보유티켓\}/g, own.toLocaleString('ko-KR'));
+}
+
+/* ── 자동 발송 기록 (notif_logs) — 데모는 실제 푸시가 없으므로 알림함에 새로 쌓인 자동 알림을 1건씩 남긴다 ──
+   문서 id = 회원 id + 알림 key 라 같은 알림은 한 번만 남는다. 수동 발송(nt:)은 남기지 않는다 — notifications 가 기록이다. */
+var PP_NOTIF_LOGGED = null;
+var PP_NOTIF_LOGGING = false;
+function ppLogAutoNotifs(items) {
+  var uid = PP.uid;
+  if (!uid || PP_NOTIF_LOGGING) return;
+  var auto = items.filter(function (i) { return i.tpl && i.key.indexOf('nt:') !== 0; });
+  if (!auto.length) return;
+  PP_NOTIF_LOGGING = true;
+  var idOf = function (k) { return (uid + '__' + k).replace(/\//g, '_'); };
+  var seenP = PP_NOTIF_LOGGED ? Promise.resolve(PP_NOTIF_LOGGED)
+    : db.collection('notif_logs').where('user_id', '==', uid).get().then(function (snap) {
+        var m = {}; snap.forEach(function (d) { m[d.id] = true; }); PP_NOTIF_LOGGED = m; return m;
+      });
+  seenP.then(function (seen) {
+    var fresh = auto.filter(function (i) { return !seen[idOf(i.key)]; });
+    var chunks = [];
+    for (var c = 0; c < fresh.length; c += 400) chunks.push(fresh.slice(c, c + 400));
+    return chunks.reduce(function (pr, part) {
+      return pr.then(function () {
+        var b = db.batch();
+        part.forEach(function (i) {
+          b.set(db.collection('notif_logs').doc(idOf(i.key)), {
+            user_id: uid, nickname: (PP.user && PP.user.nickname) || '', item_key: i.key, tpl_key: i.tpl,
+            title: i.head, body: i.desc, sent_at: FS.Timestamp.fromDate(i.d), result: 'ok', reason: '',
+            logged_at: FS.FieldValue.serverTimestamp()
+          });
+        });
+        return b.commit().then(function () { part.forEach(function (i) { seen[idOf(i.key)] = true; }); });
+      });
+    }, Promise.resolve());
+  }).catch(function (e) { console.error('ppLogAutoNotifs', e); }).then(function () { PP_NOTIF_LOGGING = false; });
+}
 /* ── 알림 (pw-S1) — 실제 이벤트 기반 ── */
 function renderNotifications() {
   if (!PP.uid) return;
@@ -21936,27 +22039,49 @@ function renderNotifications() {
        전환 후인지로 문구가 갈린다(김반장 확정 2026-09-11 · DEVQA 존 답변).
        티켓은 연출에 걸린 구매 건의 장수만 센다(ppDemoCancelTicketCounts, 2026-10-16). */
     ppDemoCancelTicketCounts(ntPbP),
+    /* 자동 알림 문구(CMS ①)와 CMS 수동 발송 — 못 읽어도 나머지는 그대로 그린다 */
+    ppLoadNotifTpl(),
+    db.collection('notifications').orderBy('created_at', 'desc').limit(100).get().then(function (snap) {
+      var out = []; snap.forEach(function (d) { var x = d.data(); x._id = d.id; out.push(x); }); return out;
+    }).catch(function (e) { console.error('q notifications', e); return []; }),
   ]).then(function (res) {
-    var pbs = res[0], gex = res[1], inv = res[2], ptx = res[3], pzw = res[4], items = [];
+    var pbs = res[0], gex = res[1], inv = res[2], ptx = res[3], pzw = res[4], nts = res[7] || [], items = [];
     items = items.concat(ppDemoCancelNotifs(pbs, res[5] || {}));
     pbs.forEach(function (p) {
-      items.push({ key: 'pb:' + p._id, type: 'pick', dom: p.mall_domain || '', d: ppDate(p.created_at), tag: '구매', head: (p.mall_name || '쇼핑몰') + ' 구매로 티켓 적립', desc: (p.purchase_amount ? p.purchase_amount.toLocaleString('ko-KR') + '원 · ' : '') + (p.status === 'confirmed' ? '적립 완료' : '구매 확정 대기') });
+      var mall = p.mall_name || '쇼핑몰', amt = p.purchase_amount ? p.purchase_amount.toLocaleString('ko-KR') : '';
+      var done = p.status === 'confirmed', tk = done ? 'purchase_confirmed' : 'purchase_pending';
+      var t = ppNotifText(tk, { '몰': mall, '금액': amt }, mall + ' 구매로 티켓 적립', (amt ? amt + '원 · ' : '') + (done ? '적립 완료' : '구매 확정 대기'));
+      items.push({ key: 'pb:' + p._id, tpl: tk, type: 'pick', dom: p.mall_domain || '', d: ppDate(p.created_at), tag: '구매', head: t.head, desc: t.desc });
     });
     gex.forEach(function (x) {
-      items.push({ key: 'gx:' + x._id, type: 'ticket', d: ppDate(x.exchanged_at), tag: '티켓', head: '기프티콘 구매 완료', desc: '티켓 ' + ppTicketsUsedCount(x) + '장 사용' });
+      var n = ppTicketsUsedCount(x);
+      var t = ppNotifText('gifticon_purchase', { '장수': n }, '기프티콘 구매 완료', '티켓 ' + n + '장 사용');
+      items.push({ key: 'gx:' + x._id, tpl: 'gifticon_purchase', type: 'ticket', d: ppDate(x.exchanged_at), tag: '티켓', head: t.head, desc: t.desc });
     });
     inv.forEach(function (x) {
-      items.push({ key: 'iv:' + x._id, type: 'event', d: ppDate(x.created_at), tag: '이벤트', head: '친구 초대 완료', desc: '초대 보상 지급' });
+      var t = ppNotifText('invite_done', {}, '친구 초대 완료', '초대 보상 지급');
+      items.push({ key: 'iv:' + x._id, tpl: 'invite_done', type: 'event', d: ppDate(x.created_at), tag: '이벤트', head: t.head, desc: t.desc });
     });
     ptx.forEach(function (p) {
       var amt = ppPtAmt(p);
-      if (amt > 0) items.push({ key: 'pt:' + p._id, type: 'event', d: ppDate(p.created_at), tag: '이벤트', head: (ppReasonText(p.reason) || '포인트 적립'), desc: '+' + amt + 'P 적립' });
+      if (!(amt > 0)) return;
+      var why = ppReasonText(p.reason) || '';
+      var t = ppNotifText('point_earn', { '사유': why, '포인트': amt }, (why || '포인트 적립'), '+' + amt + 'P 적립');
+      items.push({ key: 'pt:' + p._id, tpl: 'point_earn', type: 'event', d: ppDate(p.created_at), tag: '이벤트', head: t.head, desc: t.desc });
     });
     /* 주간 경품 추첨 숨김 중에는 당첨 알림도 노출하지 않는다 (PP_FEATURES.weeklyRaffle) */
     if ((window.PP_FEATURES || {}).weeklyRaffle) pzw.forEach(function (w) {
-      items.push({ key: 'pw:' + w._id, type: 'event', d: ppDate(w.created_at), tag: '이벤트', head: '경품 추첨에 당첨되셨어요!', desc: '당첨을 축하해요! 경품 수령 정보를 1:1 문의로 보내주세요.' });
+      var t = ppNotifText('prize_win', {}, '경품 추첨에 당첨되셨어요!', '당첨을 축하해요! 경품 수령 정보를 1:1 문의로 보내주세요.');
+      items.push({ key: 'pw:' + w._id, tpl: 'prize_win', type: 'event', d: ppDate(w.created_at), tag: '이벤트', head: t.head, desc: t.desc });
+    });
+    /* CMS 수동 발송 — 이벤트 묶음 */
+    nts.forEach(function (n) {
+      var at = ppManualNotifSentAt(n);
+      if (!at || !ppManualNotifForMe(n, pbs)) return;
+      items.push({ key: 'nt:' + n._id, type: 'event', d: at, tag: '이벤트', head: ppManualNotifFill(n.title), desc: ppManualNotifFill(n.body) });
     });
     items = items.filter(function (i) { return i.d; }).sort(function (a, b) { return b.d - a.d; });
+    ppLogAutoNotifs(items);
     var readSet = {};
     (PP.user && PP.user.read_notif_ids || []).forEach(function (k) { readSet[k] = true; });
     /* 필터 뱃지 */
@@ -22841,34 +22966,39 @@ function ppDemoCancelNotifs(pbs, byPb) {
     var part = mt21DemoPartial(pb);
     var amtKrw = pb.purchase_amount || 0;
     var mall = pb.mall_name || '쇼핑몰';
-    /* 전체와 부분을 가르는 건 이 한 토막뿐이다 — 「A원 구매 취소」 / 「A원 중 B원 취소」 */
+    /* 전체와 부분을 가르는 건 이 한 토막뿐이다 — 「A원 구매 취소」 / 「A원 중 B원 취소」.
+       문구는 CMS 알림 관리 ①(settings/notif_templates)이 있으면 그것을, 없으면 아래 박힌 문구를 쓴다(2026-11-05) */
     var scope = (part && part.amount)
-      ? mall + ' ' + money(amtKrw) + '원 중 ' + money(part.amount) + '원 취소'
-      : mall + ' ' + money(amtKrw) + '원 구매 취소';
-    var head, desc;
+      ? ppNotifFrag('cancel_scope_partial', { '몰': mall, '구매금액': money(amtKrw), '취소금액': money(part.amount) }, mall + ' ' + money(amtKrw) + '원 중 ' + money(part.amount) + '원 취소')
+      : ppNotifFrag('cancel_scope_full', { '몰': mall, '구매금액': money(amtKrw) }, mall + ' ' + money(amtKrw) + '원 구매 취소');
+    var head, desc, tk, tt;
     if (!b.settled) {
-      head = '적립 예정 티켓 취소';
-      desc = scope + ' · 적립 예정이던 랜덤 티켓 ' + (b.pending || 1) + '장이 취소되었습니다.';
+      tk = 'cancel_pre';
+      tt = ppNotifText(tk, { '취소범위': scope, '장수': (b.pending || 1) }, '적립 예정 티켓 취소', scope + ' · 적립 예정이던 랜덤 티켓 ' + (b.pending || 1) + '장이 취소되었습니다.');
+      head = tt.head; desc = tt.desc;
     } else {
       /* 티켓 1종 통합(2026-10-14) — 「티켓 N장」 하나로 적는다. */
       var total = greedyTickets(amtKrw, pb).total, names = total ? [GRADE_KO.ticket + ' ' + total + '장'] : [];
       if (!total) return;
       if (part && part.remain) {
-        head = '지급 티켓 부분 환수';
-        desc = scope + ' · ' + (part.grades || ('티켓 ' + part.claw + '장'))
-          + '이 환수되었습니다. 남은 ' + part.remain + '장은 그대로 사용하실 수 있습니다.';
+        var clawTxt = part.grades || ('티켓 ' + part.claw + '장');
+        tk = 'claw_partial';
+        tt = ppNotifText(tk, { '취소범위': scope, '환수내역': clawTxt, '잔여': part.remain }, '지급 티켓 부분 환수',
+          scope + ' · ' + clawTxt + '이 환수되었습니다. 남은 ' + part.remain + '장은 그대로 사용하실 수 있습니다.');
       } else {
-        head = '지급 티켓 환수';
-        desc = scope + ' · 지급된 ' + names.join(' · ') + '이 환수되었습니다.';
+        tk = 'claw_full';
+        tt = ppNotifText(tk, { '취소범위': scope, '환수내역': names.join(' · ') }, '지급 티켓 환수',
+          scope + ' · 지급된 ' + names.join(' · ') + '이 환수되었습니다.');
       }
+      head = tt.head; desc = tt.desc;
       /* 회수할 티켓이 모자라면 그만큼 「회수 예정」으로 남고 다음 적립 때 자동 상계된다
          (백엔드 #13 2026-08-19 · Kelvin 2026-08-20). 한 문장 붙이지 않으면 회원은 다음에
          적립을 받아도 안 늘어나는 이유를 모른다. */
       var pending = part ? part.used : 0;
-      if (pending) desc += ' 보유하신 티켓이 모자라 ' + pending + '장은 회수 예정으로 남았습니다. 다음에 티켓을 받으실 때 자동으로 차감됩니다.';
+      if (pending) desc += ' ' + ppNotifFrag('claw_debt', { '회수예정': pending }, '보유하신 티켓이 모자라 ' + pending + '장은 회수 예정으로 남았습니다. 다음에 티켓을 받으실 때 자동으로 차감됩니다.');
     }
     out.push({
-      key: 'cx:' + pb._id, type: 'pick', dom: pb.mall_domain || '',
+      key: 'cx:' + pb._id, tpl: tk, type: 'pick', dom: pb.mall_domain || '',
       d: new Date(on.replace(/\./g, '/')), tag: '구매', head: head, desc: desc
     });
   });
