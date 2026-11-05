@@ -15885,7 +15885,7 @@ var RL_POINT_SVG = '<div style="width:100%;height:100%;border-radius:50%;backgro
 // JACKPOT = 원화 환산 가치가 가장 높은 슬롯(확률 기준이 아니다 — 2026-08-03 확정).
 // 운영자가 확률만 바꿔도 "제일 좋은 상" 표기가 엉뚱한 칸으로 옮겨가지 않는다.
 // 동점이면 함께 표기하되 최대 2칸까지.
-var PP_SLOT_UNIT_VALUE = { miss: 0, point: 1, event_ticket: 20, ticket: 10 };  /* 포인트 1P = 1원(2026-10-15) */
+var PP_SLOT_UNIT_VALUE = { miss: 0, point: 1, event_ticket: 40, ticket: 10 };  /* 포인트 1P = 1원(2026-10-15) */
 function ppSlotValue(slot) {
   if (!slot || slot.type === 'miss') return 0;
   return (Number(slot.qty) || 0) * (PP_SLOT_UNIT_VALUE[slot.type] || 0);
@@ -19667,7 +19667,7 @@ window.ppEventTicketBalance = function() { return (PP.tickets && PP.tickets.even
    원화 환산가치. 여기서 읽은 값이 PP_SLOT_UNIT_VALUE(룰렛 잭팟 판정)·PT_TICKET_RATE
    (포인트↔티켓 교환)·등급 교환(pw-22) 표시 비율에 전부 반영된다(ppApplyTicketValue).
    문서가 없거나 조회 실패 시 지금까지 코드에 박혀 있던 값을 그대로 기본값으로 쓴다. */
-var PP_TICKET_VALUE_DEFAULT = { bronze: 10, silver: 100, gold: 200, event: 20 };  /* 이벤트 티켓 20원 = 티켓 2장(2026-11-05) */
+var PP_TICKET_VALUE_DEFAULT = { bronze: 10, silver: 100, gold: 200, event: 40 };
 var PP_TICKET_VALUE_CACHE = null;
 window.ppLoadTicketValue = function() {
   if (PP_TICKET_VALUE_CACHE) return Promise.resolve(PP_TICKET_VALUE_CACHE);
