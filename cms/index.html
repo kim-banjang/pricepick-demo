@@ -2442,7 +2442,7 @@ window.CMS_FEATURES = {
 
     <!-- ── 랜덤 선물 상자 열기 (이벤트 티켓 1장 = 1회) — 2026-08-25 신설 ── -->
     <div class="section" id="sec-giftbox-random">
-      <div class="info-box"><strong>랜덤 선물 상자 열기 = 이벤트 티켓 1장으로 1회 여는 선물 상자</strong> — 매일 선물 상자 열기와 구조는 같고 보상 구성·확률만 다릅니다. 보상칸은 5개입니다(2026-11-04 확정표). 보상칸별 보상 내용과 받을 확률을 운영자가 직접 수정하며, 확률 합계가 100%가 아니면 저장되지 않습니다. 악용 방지 제한(하루 참여 상한 · 이벤트 티켓 일/월 획득 상한)도 아래에서 조정합니다.</div>
+      <div class="info-box"><strong>랜덤 선물 상자 열기 = 이벤트 티켓 1장으로 1회 여는 선물 상자</strong> — 매일 선물 상자 열기와 구조는 같고 보상 구성·확률만 다릅니다. 보상칸은 6개 고정입니다. 보상칸별 보상 내용과 받을 확률을 운영자가 직접 수정하며, 확률 합계가 100%가 아니면 저장되지 않습니다. 악용 방지 제한(하루 참여 상한 · 이벤트 티켓 일/월 획득 상한)도 아래에서 조정합니다.</div>
       <div class="stats-grid" style="grid-template-columns:repeat(3,1fr)">
         <div class="stat-card purple"><div class="stat-label">이번 달 상자 열기</div><div class="stat-value" id="gbr-stat-spins">—</div><div class="stat-change neutral" id="gbr-stat-spins-sub">실제 연 횟수 집계</div></div>
         <div class="stat-card green"><div class="stat-label">이번 달 지급 총액</div><div class="stat-value" id="gbr-stat-payout">—</div><div class="stat-change neutral" id="gbr-stat-payout-sub">지급완료 건 원화 환산</div></div>
@@ -18994,7 +18994,8 @@ var RLT_KINDS = {
   },
   giftRandom: {
     p: 'gbr', name: '랜덤 선물 상자 열기', doc: 'giftbox_random', live: true, legacyWheel: false,
-    /* 2026-11-04 확정 확률표(수정 요청 A-3) — 꽝 삭제, 5보상칸 · 확률 합 100% · 1회 기대값 40원(이벤트 티켓 40원 기준).
+    /* 2026-11-04 확정 확률표(수정 요청 A-3) — 6보상칸 고정 · 확률 합 100% · 1회 기대값 40원(이벤트 티켓 40원 기준).
+       꽝은 칸째 지우지 않고 6번 칸에 확률 0%로 남긴다 — 다시 쓸지는 운영자가 확률로 정한다(김반장 2026-11-05).
        티켓 1장 = 10원 · 1P = 1원. 매일 선물 상자 표는 따로 두고 이 표로 덮어쓰지 않는다.
        저장 문서가 없을 때 잭팟 룰렛 구성(꽝 포함)을 물려받던 fallbackDoc 을 걷었다 — 없으면 이 확정표를 보여준다 */
     defaults: [
@@ -19002,7 +19003,8 @@ var RLT_KINDS = {
       { type: 'ticket',        qty: 100,  prob: 0.7  },   /* 1,000원 상당 */
       { type: 'point',         qty: 100,  prob: 3    },   /* 100원 상당 */
       { type: 'event_ticket',  qty: 2,    prob: 8    },
-      { type: 'point',         qty: 20,   prob: 88   }    /* 20원 상당 */
+      { type: 'point',         qty: 20,   prob: 88   },   /* 20원 상당 */
+      { type: 'miss',          qty: 0,    prob: 0    }    /* 꽝 — 0%, 칸은 유지 */
     ]
   },
   jackpot: {
