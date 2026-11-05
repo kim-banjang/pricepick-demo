@@ -18993,9 +18993,10 @@ var RLT_KINDS = {
     ]
   },
   giftRandom: {
-    p: 'gbr', name: '랜덤 선물 상자 열기', doc: 'giftbox_random', fallbackDoc: 'jackpot_roulette', live: true, legacyWheel: false,
+    p: 'gbr', name: '랜덤 선물 상자 열기', doc: 'giftbox_random', live: true, legacyWheel: false,
     /* 2026-11-04 확정 확률표(수정 요청 A-3) — 꽝 삭제, 5보상칸 · 확률 합 100% · 1회 기대값 40원(이벤트 티켓 40원 기준).
-       티켓 1장 = 10원 · 1P = 1원. 매일 선물 상자 표는 따로 두고 이 표로 덮어쓰지 않는다 */
+       티켓 1장 = 10원 · 1P = 1원. 매일 선물 상자 표는 따로 두고 이 표로 덮어쓰지 않는다.
+       저장 문서가 없을 때 잭팟 룰렛 구성(꽝 포함)을 물려받던 fallbackDoc 을 걷었다 — 없으면 이 확정표를 보여준다 */
     defaults: [
       { type: 'ticket',        qty: 200,  prob: 0.3  },   /* 2,000원 상당 */
       { type: 'ticket',        qty: 100,  prob: 0.7  },   /* 1,000원 상당 */
@@ -19223,7 +19224,7 @@ window.rltLoad = function(k) {
       });
     } else {
       rltState[k].slots = rltCloneSlots(kind.defaults);
-      rltSetStatus(k, '확정 기본값(6슬롯) 표시 중 · 저장하면 이 구성이 앱에 적용됩니다.');
+      rltSetStatus(k, '확정 기본값(' + (rltW(k).cell === '보상칸' ? kind.defaults.length + '보상칸' : '6슬롯') + ') 표시 중 · 저장하면 이 구성이 앱에 적용됩니다.');
     }
     rltRenderSlots(k);
     if (k === 'jackpot') jkrApplyLimits(data && data.limits);
