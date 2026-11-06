@@ -739,6 +739,10 @@ td.rf-net-col{font-weight:700;color:var(--success);}
 .ncf-when{margin-top:20px;display:flex;align-items:center;gap:8px;font-size:15px;font-weight:400;color:var(--text1);}
 .ncf-when svg{flex:none;width:16px;height:16px;color:var(--text3);}
 .ncf-ask{margin-top:28px;text-align:center;font-size:16px;font-weight:700;color:var(--text1);}
+/* 수신자 목록 — 칸 폭 고정, 넘치는 글은 말줄임(가로 스크롤 없음) */
+#m-noti-recipients .modal{overflow-x:hidden;}
+.noti-rcp-table{table-layout:fixed;}
+.noti-rcp-table td{overflow:hidden;text-overflow:ellipsis;}
 .ntt-col{display:flex;flex-direction:column;min-width:0;min-height:0;}
 .ntt-box{flex:1;min-height:0;display:flex;flex-direction:column;border:1px solid var(--border);border-radius:var(--r-sm);overflow:hidden;}
 .ntt-list{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;}
@@ -4541,6 +4545,7 @@ window.CMS_FEATURES = {
       <div class="ntt-col">
         <label class="form-label">회원 검색</label>
         <input class="search-box" id="noti-test-q" style="width:100%;min-width:0;margin-bottom:10px" placeholder="닉네임 또는 식별 아이디" oninput="notiTestFilter()">
+        <label class="form-label">검색 결과</label>
         <div class="ntt-box">
           <div class="ntt-list" id="noti-test-results"></div>
           <div id="noti-test-pager"></div>
@@ -4565,13 +4570,15 @@ window.CMS_FEATURES = {
 <!-- ── 모달: 알림 수신자 목록 (DEVQA 24번) ──
      전체 발송은 대상이 많아 한 번에 뿌리지 않는다 — 검색·페이징이 기본이다. -->
 <div class="modal-overlay" id="m-noti-recipients">
-  <div class="modal" style="max-width:860px">
+  <!-- 폭 960px — 네 칸이 잘리지 않게(선택 개별 발송 대상 선택 창과 같은 기준). 공용 .modal 폭 500px 에 묶여 사유가 잘렸다(김반장 2026-11-06) -->
+  <div class="modal" style="width:960px;max-width:96vw">
     <div class="modal-header"><div><div class="modal-title">수신자 목록</div><div class="card-sub" id="noti-rcp-sub"></div></div><button class="modal-close" onclick="closeModal('m-noti-recipients')"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
     <div class="modal-body">
       <div id="noti-rcp-summary" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px"></div>
       <input class="search-box" id="noti-rcp-q" style="width:100%;margin-bottom:10px" placeholder="닉네임 또는 식별 아이디" oninput="notiRcpFilter()">
-      <table>
-        <thead><tr><th>닉네임</th><th>식별 아이디</th><th style="text-align:center">결과</th><th>사유</th></tr></thead>
+      <table class="noti-rcp-table">
+        <colgroup><col style="width:200px"><col style="width:300px"><col style="width:110px"><col></colgroup>
+        <thead><tr><th>닉네임</th><th>식별 아이디</th><th style="text-align:center">결과</th><th>실패 사유</th></tr></thead>
         <tbody id="noti-rcp-tbody"></tbody>
       </table>
       <div id="noti-rcp-pager"></div>
@@ -12409,8 +12416,9 @@ var NOTI_RCP_CTRL = window.NOTI_RCP_CTRL = ppMakeListController(10, function(pag
       + '<td style="text-align:center">' + notiResultBadge(r.status) + '</td>'
       + '<td style="color:var(--text-2);font-size:12px">' + (r.reason ? ppEsc(r.reason) : '—') + '</td></tr>';
   }).join('') : ppEmpty(4, '조건에 맞는 수신자가 없습니다.');
+  /* STG 와 같이 10명을 넘을 때만 페이저를 둔다 — 한 페이지면 목록 · 안내 · 닫기만 */
   var pg = document.getElementById('noti-rcp-pager');
-  if (pg) pg.innerHTML = ppPaginationHtml('NOTI_RCP_CTRL', state.page, totalPages);
+  if (pg) pg.innerHTML = totalPages > 1 ? ppPaginationHtml('NOTI_RCP_CTRL', state.page, totalPages) : '';
 });
 
 window.notiRcpFilter = function() {
