@@ -33,6 +33,7 @@
   --success:#16A34A;
   --success-soft:rgba(22,163,74,.1);
   --danger:#DC2626;
+  --red:#FF4452;          /* 디자인 시스템 빨강 — 입력 빈 칸 경고(알림 작성, 2026-11-06) */
   --danger-soft:rgba(220,38,38,.1);
   --warning:#D97706;
   --warning-soft:rgba(217,119,6,.1);
@@ -693,6 +694,13 @@ td.rf-net-col{font-weight:700;color:var(--success);}
 #m-noti-test .modal{width:960px;max-width:96vw;height:min(780px,88vh);display:flex;flex-direction:column;overflow:hidden;}
 #m-noti-test .modal-header,#m-noti-test .modal-footer{flex:none;}
 #m-noti-test .modal-body{flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-rows:minmax(0,1fr);gap:16px;padding:16px 22px;overflow:hidden;}
+/* 알림 작성 빈 칸 경고 — STG 방식: 빨간 테두리 + 칸 바로 아래 빨간 안내. 글자를 넣으면 바로 사라진다 */
+#noti-compose .noti-field-err{border-color:var(--red)!important;}
+.noti-err-msg{display:none;margin-top:6px;font-size:12px;line-height:1.4;color:var(--red);}
+.noti-err-msg.on{display:block;}
+.noti-time-wrap{position:relative;}
+.noti-time-wrap .noti-err-msg{position:absolute;left:0;top:100%;white-space:nowrap;}
+#noti-compose .noti-time-row.err{margin-bottom:22px;}
 /* 알림 발송 최종 확인 — 항목 이름 · 값 두 칸 */
 .ncf-row{display:grid;grid-template-columns:96px minmax(0,1fr);gap:12px;padding:9px 0;border-bottom:1px solid var(--border);font-size:13px;line-height:1.6;}
 .ncf-k{font-size:11px;font-weight:700;color:var(--text-2);text-transform:uppercase;letter-spacing:.4px;padding-top:2px;}
@@ -3167,18 +3175,23 @@ window.CMS_FEATURES = {
             </div>
             <div style="margin-bottom:14px">
               <label style="font-size:11px;color:var(--text-2);font-weight:600;display:block;margin-bottom:6px;text-transform:uppercase;letter-spacing:.4px">제목</label>
-              <input class="search-box" id="noti-title" style="width:100%" placeholder="예: 이번 주 추첨 마감 D-1">
+              <input class="search-box" id="noti-title" style="width:100%" placeholder="예: 이번 주 추첨 마감 D-1" oninput="notiClearErr('noti-title')">
+              <div class="noti-err-msg" id="noti-title-err">제목을 입력해주세요.</div>
             </div>
             <div style="margin-bottom:14px">
               <label style="font-size:11px;color:var(--text-2);font-weight:600;display:block;margin-bottom:6px;text-transform:uppercase;letter-spacing:.4px">내용</label>
-              <textarea class="terms-editor" id="noti-body" style="min-height:110px" placeholder="알림 본문을 입력하세요. 변수: {닉네임}, {보유티켓}"></textarea>
+              <textarea class="terms-editor" id="noti-body" style="min-height:110px" placeholder="알림 본문을 입력하세요. 변수: {닉네임}, {보유티켓}" oninput="notiClearErr('noti-body')"></textarea>
+              <div class="noti-err-msg" id="noti-body-err">내용을 입력해주세요.</div>
             </div>
-            <div style="display:flex;align-items:flex-end;gap:14px;flex-wrap:wrap">
+            <div class="noti-time-row" style="display:flex;align-items:flex-end;gap:14px;flex-wrap:wrap">
               <div>
                 <label style="font-size:11px;color:var(--text-2);font-weight:600;display:block;margin-bottom:6px;text-transform:uppercase;letter-spacing:.4px">발송 시점</label>
-                <select class="filter-sel" id="noti-timing"><option value="now">즉시 발송</option><option value="scheduled">예약 발송</option></select>
+                <select class="filter-sel" id="noti-timing" onchange="if(this.value!=='scheduled')notiClearErr('noti-schedule-at')"><option value="now">즉시 발송</option><option value="scheduled">예약 발송</option></select>
               </div>
-              <input type="datetime-local" class="search-box" id="noti-schedule-at" style="width:auto">
+              <div class="noti-time-wrap">
+                <input type="datetime-local" class="search-box" id="noti-schedule-at" style="width:auto" oninput="notiClearErr('noti-schedule-at')" onchange="notiClearErr('noti-schedule-at')">
+                <div class="noti-err-msg" id="noti-schedule-at-err">발송 시각을 입력해주세요.</div>
+              </div>
               <div style="margin-left:auto;display:flex;gap:8px">
                 <button class="btn btn-ghost btn-sm" id="noti-test-btn" onclick="notiSendTest()">테스트 발송</button>
                 <button class="btn btn-primary" id="noti-send-btn" onclick="notiSend()">발송</button>
@@ -7725,8 +7738,9 @@ Object.assign(KO2VI,{
   "미동의":"Chưa đồng ý",
   "제외":"loại trừ",
   "예시 값을 넣은 모습":"Hiển thị với giá trị ví dụ",
-  "제목을 입력하세요.":"Hãy nhập tiêu đề.",
-  "내용을 입력하세요.":"Hãy nhập nội dung.",
+  "제목을 입력해주세요.":"Vui lòng nhập tiêu đề.",
+  "내용을 입력해주세요.":"Vui lòng nhập nội dung.",
+  "발송 시각을 입력해주세요.":"Vui lòng nhập thời gian gửi.",
   "대상 회원을 세지 못했습니다: ":"Không đếm được hội viên nhận: ",
   "앱이 상황에 따라 저절로 보내는 알림의 제목·본문입니다.":"Là tiêu đề·nội dung của các thông báo app tự gửi theo tình huống.",
   "수정 → 미리보기 → 이대로 저장":"Sửa → Xem trước → Lưu như thế này",
@@ -12133,20 +12147,31 @@ var NOTI_VARS = ['닉네임', '보유티켓'];
 var NOTI_EX = { '닉네임': '픽픽이', '보유티켓': '12' };
 var NOTI_PENDING = null;
 function notiSchedLabel(v) { return String(v || '').replace('T', ' '); }
+/* 빈 칸 표시 — 칸 테두리와 바로 아래 안내를 함께 켜고 끈다 */
+function notiSetErr(id, on) {
+  var f = document.getElementById(id), m = document.getElementById(id + '-err');
+  if (f) f.classList.toggle('noti-field-err', !!on);
+  if (m) m.classList.toggle('on', !!on);
+  if (id === 'noti-schedule-at') { var row = f && f.closest('.noti-time-row'); if (row) row.classList.toggle('err', !!on); }
+}
+window.notiClearErr = function(id) {
+  var f = document.getElementById(id);
+  if (f && (id === 'noti-schedule-at' || f.value.trim())) notiSetErr(id, false);
+};
 window.notiSend = function() {
   var title = document.getElementById('noti-title').value.trim();
   var body = document.getElementById('noti-body').value.trim();
-  if (!title || !body) {
-    toast(!title && !body ? '제목과 내용을 입력하세요.' : (!title ? '제목을 입력하세요.' : '내용을 입력하세요.'));
-    var miss = document.getElementById(!title ? 'noti-title' : 'noti-body');
-    if (miss) miss.focus();
-    return;
-  }
   var channel = document.getElementById('noti-channel').value;
   var target = document.getElementById('noti-target').value;
   var timing = document.getElementById('noti-timing').value;
   var scheduleAt = document.getElementById('noti-schedule-at').value;
-  if (timing === 'scheduled' && !scheduleAt) { toast('예약 발송 시각을 입력하세요.'); return; }
+  /* 비어 있는 칸은 모두 한꺼번에 표시하고 발송을 막는다(STG 와 같이) */
+  var miss = [];
+  [['noti-title', !title], ['noti-body', !body], ['noti-schedule-at', timing === 'scheduled' && !scheduleAt]].forEach(function(x) {
+    notiSetErr(x[0], x[1]);
+    if (x[1]) miss.push(x[0]);
+  });
+  if (miss.length) { var mf = document.getElementById(miss[0]); if (mf) mf.focus(); return; }
   var btn = document.getElementById('noti-send-btn');
   var bad = [];
   (title + ' ' + body).replace(/\{([^{}]+)\}/g, function(m, k) { if (NOTI_VARS.indexOf(k) < 0 && bad.indexOf(m) < 0) bad.push(m); return m; });
