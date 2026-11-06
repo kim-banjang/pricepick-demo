@@ -1352,6 +1352,7 @@ tr.manual-edited td { background:rgba(254,243,199,0.15); }
    섹션 마크업·저장 로직은 그대로 남아 있으므로 플래그만 true 로 되돌리면 복구된다. */
 body.cms-hide-roulette [data-cms-feature="roulette"]{display:none !important;}
   body.cms-hide-weeklyRaffle [data-cms-feature="weeklyRaffle"]{display:none !important;}
+  body.cms-hide-notifTemplates [data-cms-feature="notifTemplates"]{display:none !important;}
 
 /* ══════════════════════════════════════════════════════════════════
    폼 요소 규격 — CMS 공통 (김반장 2026-09-07)
@@ -1406,6 +1407,7 @@ textarea.form-input,textarea.terms-editor,.terms-editor{
      되살리려면 값을 true 로 바꾸기만 하면 원상 복구된다. -->
 <script>
 window.CMS_FEATURES = {
+  notifTemplates: false, // 알림 관리 「자동 알림 문구」 탭 (김반장 2026-11-06). 숨김이지 삭제가 아니다 — 표·문구(NTPL_DEF)·VI 는 그대로 있다
   weeklyRaffle: false, // 주간 경품 추첨 — 정책서 「추첨 · 경품 Hold, 실사용자 1만 명 달성 시 부활」 (검수 10-21 10). 숨김이지 삭제가 아니다
   roulette: false   // 매일 행운 룰렛 · 잭팟 룰렛 (2026-08-27 확정: 구글플레이 App Content: Gambling 대응.
                     // 행운 룰렛 → 매일 선물 상자 열기, 잭팟 룰렛 → 랜덤 선물 상자 열기로 대체. 숨김이지 삭제가 아니다)
@@ -1413,6 +1415,7 @@ window.CMS_FEATURES = {
 (function(){
   var f = window.CMS_FEATURES, c = document.body.classList;
   if (!f.roulette) c.add('cms-hide-roulette'); if (!f.weeklyRaffle) c.add('cms-hide-weeklyRaffle');
+  if (!f.notifTemplates) c.add('cms-hide-notifTemplates');
 })();
 </script>
 
@@ -3195,7 +3198,7 @@ window.CMS_FEATURES = {
       <div class="terms-nav" id="noti-main-nav">
         <div class="terms-tab active" data-noti-tab="send" onclick="notiMainTab('send')">수동 발송</div>
         <div class="terms-tab" data-noti-tab="history" onclick="notiMainTab('history')">발송 기록</div>
-        <div class="terms-tab" data-noti-tab="templates" onclick="notiMainTab('templates')">자동 알림 문구</div>
+        <div class="terms-tab" data-noti-tab="templates" data-cms-feature="notifTemplates" onclick="notiMainTab('templates')">자동 알림 문구</div>
       </div>
       <div id="noti-pane-send">
         <!-- ④ 발송 정책 — 조회 전용. 출처 policy-09-push.html 「푸시 알림 상한」. -->
@@ -3273,7 +3276,7 @@ window.CMS_FEATURES = {
           </div>
         </div>
       </div>
-      <div id="noti-pane-templates" style="display:none">
+      <div id="noti-pane-templates" data-cms-feature="notifTemplates" style="display:none">
         <!-- ① 자동 알림 문구 — 실제 서비스 백엔드(inetkr/pricepick-backend)가 보내는 알림 문구 그대로. 조회 전용(서버 코드에 박혀 있다). -->
         <div class="card">
           <div class="card-header"><div><div class="card-title">자동 알림 문구</div><div class="card-sub">서버에서 자동으로 발송하는 알림입니다. 문구 변경은 개발 배포가 필요합니다.</div><div class="card-sub" style="font-size:10px;color:var(--text-3)"><span>기준</span> <span class="no-vi" id="ntpl-base"></span></div></div></div>
@@ -12130,6 +12133,8 @@ ntplRender();
 var NOTI_MAIN_TABS = ['send', 'history', 'templates'];
 window.notiMainTab = function(key, keepUrl) {
   if (NOTI_MAIN_TABS.indexOf(key) < 0) key = 'send';
+  /* 숨긴 탭(CMS_FEATURES.notifTemplates=false)은 주소로 들어와도 열지 않는다 — 첫 탭으로 */
+  if (key === 'templates' && !(window.CMS_FEATURES || {}).notifTemplates) key = 'send';
   document.querySelectorAll('#noti-main-nav .terms-tab').forEach(function(x) { x.classList.toggle('active', x.getAttribute('data-noti-tab') === key); });
   NOTI_MAIN_TABS.forEach(function(k) {
     var e2 = document.getElementById('noti-pane-' + k);
