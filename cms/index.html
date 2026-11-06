@@ -3096,7 +3096,7 @@ window.CMS_FEATURES = {
         <div class="card-header"><div class="card-title">자동 알림 문구</div></div>
         <table class="ntpl-table">
           <colgroup><col style="width:124px"><col style="width:200px"><col style="width:170px"><col><col style="width:84px"><col style="width:68px"></colgroup>
-          <thead><tr><th>갈래</th><th>발송 상황</th><th>제목</th><th>본문</th><th>상태</th><th>관리</th></tr></thead>
+          <thead><tr><th>카테고리</th><th>발송 상황</th><th>제목</th><th>본문</th><th>상태</th><th>관리</th></tr></thead>
           <tbody id="ntpl-tbody"></tbody>
         </table>
       </div>
@@ -7591,7 +7591,6 @@ Object.assign(KO2VI,{
 Object.assign(KO2VI,{
   "알림 관리 Notice":"Lưu ý — Quản lý thông báo",
   "자동 알림 문구":"Nội dung thông báo tự động",
-  "갈래":"Nhóm",
   "발송 상황":"Tình huống gửi",
   "본문":"Nội dung",
   "알림함":"Hộp thông báo",
@@ -18859,7 +18858,7 @@ window.dmTidyLegacyProducts = function() {
       var sameCat = ph.filter(function(x){ return catHit(g.category, x.category) || catHit(x.category, g.category); });
       if (sameCat.length) {
         hit = sameCat.filter(function(x){ return x.price === price; })[0];
-        if (hit) return { pick: hit, why: '같은 갈래 · 같은 값' };
+        if (hit) return { pick: hit, why: '같은 카테고리 · 같은 값' };
       }
       hit = ph.filter(function(x){ return x.price === price; })[0];
       if (hit) return { pick: hit, why: '같은 값' };
