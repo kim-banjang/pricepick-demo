@@ -330,13 +330,12 @@ tr:hover td{background:var(--surface-2);}
 .ntpl-sort-ic{width:12px;height:12px;margin-left:4px;vertical-align:middle;color:var(--text-3);opacity:.45;}
 .ntpl-sort-th[aria-sort="ascending"] .ntpl-sort-ic,.ntpl-sort-th[aria-sort="descending"] .ntpl-sort-ic{opacity:1;color:var(--main);}
 .ntpl-sort-th[aria-sort="ascending"] .ntpl-sort-ic .dn,.ntpl-sort-th[aria-sort="descending"] .ntpl-sort-ic .up{opacity:.25;}
-.ntpl-gbar{display:flex;flex-wrap:wrap;align-items:center;gap:4px 2px;padding:0 18px 12px;font-size:12px;color:var(--text-3);}
-.ntpl-gbtn{background:none;border:none;padding:2px 4px;border-radius:4px;font:inherit;font-size:12px;color:var(--text-2);cursor:pointer;}
-.ntpl-gbtn b{font-weight:700;color:var(--text);margin-left:3px;}
-.ntpl-gbtn:hover{background:var(--surface-2);}
-.ntpl-gbtn.on{background:var(--main-soft);color:var(--main-hover);}
-.ntpl-gbtn.on b{color:var(--main-hover);}
-.ntpl-gsep{color:var(--text-3);}
+.ntpl-gbar{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:0 18px 16px;}
+.ntpl-gbtn{display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 14px;border-radius:16px;border:1px solid var(--border);background:var(--surface);font:inherit;font-size:13px;font-weight:700;color:var(--text-2);cursor:pointer;white-space:nowrap;transition:background .15s,border-color .15s;}
+.ntpl-gbtn b{font-weight:400;color:var(--text-3);}
+.ntpl-gbtn:hover{background:var(--sub-4,#F1EEFF);}
+.ntpl-gbtn.on,.ntpl-gbtn.on:hover{background:var(--main);border-color:var(--main);color:#fff;}
+.ntpl-gbtn.on b{color:rgba(255,255,255,.75);}
 .ta-notice-list{margin:0;padding:0;list-style:none;}
 .ta-notice-list li{padding:9px 0;border-bottom:1px solid var(--border);font-size:13px;line-height:1.6;color:var(--text-2);}
 .ta-notice-list li:last-child{border-bottom:none;}
@@ -11894,9 +11893,12 @@ function ntplGroupBar() {
   if (!bar) return;
   var order = [], cnt = {};
   NTPL_DEF.forEach(function(d) { if (!cnt[d.group]) { cnt[d.group] = 0; order.push(d.group); } cnt[d.group]++; });
-  bar.innerHTML = order.map(function(g) {
-    return '<button type="button" class="ntpl-gbtn' + (NTPL_FILTER === g ? ' on' : '') + '" onclick="ntplFilterClick(this)" data-g="' + ppEsc(g) + '" aria-pressed="' + (NTPL_FILTER === g) + '"><span>' + g + '</span><b>' + cnt[g] + '</b></button>';
-  }).join('<span class="ntpl-gsep">·</span>');
+  var chip = function(g, label, n) {
+    var on = NTPL_FILTER === g;
+    return '<button type="button" class="ntpl-gbtn' + (on ? ' on' : '') + '" onclick="ntplFilterClick(this)" data-g="' + ppEsc(g) + '" aria-pressed="' + on + '"><span>' + label + '</span><b>' + n + '</b></button>';
+  };
+  /* 맨 앞 「전체」 — 처음 들어오면 이것이 선택돼 있다 */
+  bar.innerHTML = chip('', '전체', NTPL_DEF.length) + order.map(function(g) { return chip(g, g, cnt[g]); }).join('');
 }
 window.ntplSortClick = function() {
   NTPL_SORT = NTPL_SORT === 0 ? 1 : (NTPL_SORT === 1 ? -1 : 0);
@@ -11905,8 +11907,9 @@ window.ntplSortClick = function() {
   ntplRender();
 };
 window.ntplFilterClick = function(el) {
-  var g = el.getAttribute('data-g');
-  NTPL_FILTER = NTPL_FILTER === g ? '' : g;
+  /* 「전체」를 누르면 전부, 구분을 누르면 그 구분만. 고른 구분을 다시 눌러도 전체로 돌아간다 */
+  var g = el.getAttribute('data-g') || '';
+  NTPL_FILTER = (g && NTPL_FILTER !== g) ? g : '';
   ntplRender();
 };
 function ntplFill(str, vars) {
