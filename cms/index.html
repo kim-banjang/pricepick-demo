@@ -3118,86 +3118,97 @@ window.CMS_FEATURES = {
         <span>알림 관리 Notice</span>
         <span class="ta-notice-mark">!</span>
       </button>
-      <!-- ① 자동 알림 문구 — 앱 코드에 흩어져 있던 자동 알림 문구를 한 표로 모은다. settings/notif_templates 에 저장하고
-           앱 renderNotifications()·ppDemoCancelNotifs() 가 읽는다(문서가 없거나 못 읽으면 앱에 박힌 문구 그대로). -->
-      <div class="card">
-        <div class="card-header"><div class="card-title">자동 알림 문구</div></div>
-        <table class="ntpl-table">
-          <colgroup><col style="width:124px"><col style="width:200px"><col style="width:170px"><col><col style="width:84px"><col style="width:68px"></colgroup>
-          <thead><tr><th>카테고리</th><th>발송 상황</th><th>제목</th><th>본문</th><th>상태</th><th>관리</th></tr></thead>
-          <tbody id="ntpl-tbody"></tbody>
-        </table>
+      <!-- 화면 탭 (김반장 2026-11-06) — 위의 집계 카드·Notice 는 공통, 아래만 탭으로 가른다.
+           탭은 주소 #notifications/<탭> 에 남아 새로고침해도 그 탭으로 돌아온다(첫 탭은 #notifications). -->
+      <div class="terms-nav" id="noti-main-nav">
+        <div class="terms-tab active" data-noti-tab="send" onclick="notiMainTab('send')">수동 발송</div>
+        <div class="terms-tab" data-noti-tab="history" onclick="notiMainTab('history')">발송 기록</div>
+        <div class="terms-tab" data-noti-tab="templates" onclick="notiMainTab('templates')">자동 알림 문구</div>
       </div>
-      <!-- ② 알림 작성 · 발송 -->
-      <div class="card">
-        <div class="card-header"><div class="card-title">알림 작성 · 발송</div></div>
-        <div style="padding:18px">
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
-            <div>
-              <label style="font-size:11px;color:var(--text-2);font-weight:600;display:block;margin-bottom:6px;text-transform:uppercase;letter-spacing:.4px">발송 채널</label>
-              <div class="filter-sel" style="width:100%;cursor:default">앱 푸시</div>
-              <input type="hidden" id="noti-channel" value="push">
-            </div>
-            <div>
-              <label style="font-size:11px;color:var(--text-2);font-weight:600;display:block;margin-bottom:6px;text-transform:uppercase;letter-spacing:.4px">발송 대상</label>
-              <select class="filter-sel" id="noti-target" style="width:100%"><option value="all">전체 회원</option><option value="kakao">카카오 연동 회원</option><option value="guest">미연동(게스트) 회원</option><option value="inactive30">30일 미접속</option><option value="new7">신규 가입(7일 이내)</option><option value="purchased">구매 이력 있는 회원</option></select>
+      <div id="noti-pane-send">
+        <!-- ④ 발송 정책 — 조회 전용. 출처 policy-09-push.html 「푸시 알림 상한」. -->
+        <div class="card">
+          <div class="card-header"><div class="card-title">FCM 푸시 발송 상한 정책 <span style="font-size:11px;color:var(--success);font-weight:600">정책 확정</span></div></div>
+          <div style="padding:16px">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+              <div class="policy-item"><div class="policy-label">거래 알림 (구매·확정·환불)</div><div class="policy-value">상한 없음</div><div class="policy-desc">서비스 필수 알림 — 발송 제한 없음. 야간에도 즉시 발송.</div></div>
+              <div class="policy-item"><div class="policy-label">기타 알림 (미션·만료·추첨)</div><div class="policy-value">일 2건</div><div class="policy-desc">1인 1일 최대 2건.</div></div>
+              <div class="policy-item"><div class="policy-label">야간 발송</div><div class="policy-value">22:00~08:00 미발송</div><div class="policy-desc">야간 시간대 푸시 발송 차단. 모았다가 아침에 묶음 발송.</div></div>
+              <div class="policy-item"><div class="policy-label">우선순위 · 중복 억제</div><div class="policy-value">거래 > 만료 임박 > 미션 > 추첨</div><div class="policy-desc">같은 사유의 알림은 묶어 중복 발송을 억제(하루 상한 안에서).</div></div>
             </div>
           </div>
-          <div style="margin-bottom:14px">
-            <label style="font-size:11px;color:var(--text-2);font-weight:600;display:block;margin-bottom:6px;text-transform:uppercase;letter-spacing:.4px">제목</label>
-            <input class="search-box" id="noti-title" style="width:100%" placeholder="예: 이번 주 추첨 마감 D-1">
-          </div>
-          <div style="margin-bottom:14px">
-            <label style="font-size:11px;color:var(--text-2);font-weight:600;display:block;margin-bottom:6px;text-transform:uppercase;letter-spacing:.4px">내용</label>
-            <textarea class="terms-editor" id="noti-body" style="min-height:90px" placeholder="알림 본문을 입력하세요. 변수: {닉네임}, {보유티켓}"></textarea>
-          </div>
-          <div style="display:flex;align-items:flex-end;gap:14px;flex-wrap:wrap">
-            <div>
-              <label style="font-size:11px;color:var(--text-2);font-weight:600;display:block;margin-bottom:6px;text-transform:uppercase;letter-spacing:.4px">발송 시점</label>
-              <select class="filter-sel" id="noti-timing"><option value="now">즉시 발송</option><option value="scheduled">예약 발송</option></select>
+        </div>
+        <!-- ② 알림 작성 · 발송 -->
+        <div class="card">
+          <div class="card-header"><div class="card-title">알림 작성 · 발송</div></div>
+          <div style="padding:18px">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
+              <div>
+                <label style="font-size:11px;color:var(--text-2);font-weight:600;display:block;margin-bottom:6px;text-transform:uppercase;letter-spacing:.4px">발송 채널</label>
+                <div class="filter-sel" style="width:100%;cursor:default">앱 푸시</div>
+                <input type="hidden" id="noti-channel" value="push">
+              </div>
+              <div>
+                <label style="font-size:11px;color:var(--text-2);font-weight:600;display:block;margin-bottom:6px;text-transform:uppercase;letter-spacing:.4px">발송 대상</label>
+                <select class="filter-sel" id="noti-target" style="width:100%"><option value="all">전체 회원</option><option value="kakao">카카오 연동 회원</option><option value="guest">미연동(게스트) 회원</option><option value="inactive30">30일 미접속</option><option value="new7">신규 가입(7일 이내)</option><option value="purchased">구매 이력 있는 회원</option></select>
+              </div>
             </div>
-            <input type="datetime-local" class="search-box" id="noti-schedule-at" style="width:auto">
-            <div style="margin-left:auto;display:flex;gap:8px">
-              <button class="btn btn-ghost btn-sm" id="noti-test-btn" onclick="notiSendTest()">테스트 발송</button>
-              <button class="btn btn-primary" id="noti-send-btn" onclick="notiSend()">발송</button>
+            <div style="margin-bottom:14px">
+              <label style="font-size:11px;color:var(--text-2);font-weight:600;display:block;margin-bottom:6px;text-transform:uppercase;letter-spacing:.4px">제목</label>
+              <input class="search-box" id="noti-title" style="width:100%" placeholder="예: 이번 주 추첨 마감 D-1">
+            </div>
+            <div style="margin-bottom:14px">
+              <label style="font-size:11px;color:var(--text-2);font-weight:600;display:block;margin-bottom:6px;text-transform:uppercase;letter-spacing:.4px">내용</label>
+              <textarea class="terms-editor" id="noti-body" style="min-height:90px" placeholder="알림 본문을 입력하세요. 변수: {닉네임}, {보유티켓}"></textarea>
+            </div>
+            <div style="display:flex;align-items:flex-end;gap:14px;flex-wrap:wrap">
+              <div>
+                <label style="font-size:11px;color:var(--text-2);font-weight:600;display:block;margin-bottom:6px;text-transform:uppercase;letter-spacing:.4px">발송 시점</label>
+                <select class="filter-sel" id="noti-timing"><option value="now">즉시 발송</option><option value="scheduled">예약 발송</option></select>
+              </div>
+              <input type="datetime-local" class="search-box" id="noti-schedule-at" style="width:auto">
+              <div style="margin-left:auto;display:flex;gap:8px">
+                <button class="btn btn-ghost btn-sm" id="noti-test-btn" onclick="notiSendTest()">테스트 발송</button>
+                <button class="btn btn-primary" id="noti-send-btn" onclick="notiSend()">발송</button>
+              </div>
             </div>
           </div>
         </div>
       </div>
-      <!-- ③ 발송 기록 — 수동(notifications) · 자동(notif_logs) 탭을 가른다. 두 기록은 섞지 않는다. -->
-      <div class="card">
-        <div class="card-header"><div class="card-title">발송 기록</div><div id="noti-hdr-actions"></div></div>
-        <div style="padding:0 18px">
-          <div class="terms-nav" style="margin-bottom:0">
-            <div class="terms-tab active" onclick="notiSwitchTab(this,'noti-tab-manual')">수동 발송</div>
-            <div class="terms-tab" onclick="notiSwitchTab(this,'noti-tab-auto')">자동 발송</div>
+      <div id="noti-pane-history" style="display:none">
+        <!-- ③ 발송 기록 — 수동(notifications) · 자동(notif_logs) 탭을 가른다. 두 기록은 섞지 않는다. -->
+        <div class="card">
+          <div class="card-header"><div class="card-title">발송 기록</div><div id="noti-hdr-actions"></div></div>
+          <div style="display:flex;gap:4px;padding:12px 16px 0;border-bottom:1px solid var(--border)">
+            <button type="button" class="dm-tab active" onclick="notiSwitchTab(this,'noti-tab-manual')">수동 발송</button>
+            <button type="button" class="dm-tab" onclick="notiSwitchTab(this,'noti-tab-auto')">자동 발송</button>
+          </div>
+          <div id="noti-tab-manual">
+            <table>
+              <thead><tr><th style="text-align:center">발송일시</th><th style="text-align:center">채널</th><th>제목</th><th style="text-align:center">대상 조건</th><th style="text-align:center">대상 수</th><th style="text-align:center">성공</th><th style="text-align:center">실패</th><th style="text-align:center">미처리</th><th style="text-align:center">확인 불가</th><th style="text-align:center">열람율</th><th style="text-align:center">상태 / 액션</th></tr></thead>
+              <tbody id="noti-hist-tbody">
+              </tbody>
+            </table>
+          </div>
+          <div id="noti-tab-auto" style="display:none">
+            <table>
+              <thead><tr><th style="text-align:center">발송일시</th><th>알림 종류</th><th>대상 회원</th><th style="text-align:center">결과</th><th>사유</th></tr></thead>
+              <tbody id="ntlog-tbody">
+              </tbody>
+            </table>
           </div>
         </div>
-        <div id="noti-tab-manual">
-          <table>
-            <thead><tr><th style="text-align:center">발송일시</th><th style="text-align:center">채널</th><th>제목</th><th style="text-align:center">대상 조건</th><th style="text-align:center">대상 수</th><th style="text-align:center">성공</th><th style="text-align:center">실패</th><th style="text-align:center">미처리</th><th style="text-align:center">확인 불가</th><th style="text-align:center">열람율</th><th style="text-align:center">상태 / 액션</th></tr></thead>
-            <tbody id="noti-hist-tbody">
-            </tbody>
+      </div>
+      <div id="noti-pane-templates" style="display:none">
+        <!-- ① 자동 알림 문구 — 앱 코드에 흩어져 있던 자동 알림 문구를 한 표로 모은다. settings/notif_templates 에 저장하고
+             앱 renderNotifications()·ppDemoCancelNotifs() 가 읽는다(문서가 없거나 못 읽으면 앱에 박힌 문구 그대로). -->
+        <div class="card">
+          <div class="card-header"><div class="card-title">자동 알림 문구</div></div>
+          <table class="ntpl-table">
+            <colgroup><col style="width:124px"><col style="width:200px"><col style="width:170px"><col><col style="width:84px"><col style="width:68px"></colgroup>
+            <thead><tr><th>카테고리</th><th>발송 상황</th><th>제목</th><th>본문</th><th>상태</th><th>관리</th></tr></thead>
+            <tbody id="ntpl-tbody"></tbody>
           </table>
-        </div>
-        <div id="noti-tab-auto" style="display:none">
-          <table>
-            <thead><tr><th style="text-align:center">발송일시</th><th>알림 종류</th><th>대상 회원</th><th style="text-align:center">결과</th><th>사유</th></tr></thead>
-            <tbody id="ntlog-tbody">
-            </tbody>
-          </table>
-        </div>
-      </div>
-      <!-- ④ 발송 정책 — 조회 전용. 출처 policy-09-push.html 「푸시 알림 상한」. -->
-      <div class="card">
-        <div class="card-header"><div class="card-title">FCM 푸시 발송 상한 정책 <span style="font-size:11px;color:var(--success);font-weight:600">정책 확정</span></div></div>
-        <div style="padding:16px">
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
-            <div class="policy-item"><div class="policy-label">거래 알림 (구매·확정·환불)</div><div class="policy-value">상한 없음</div><div class="policy-desc">서비스 필수 알림 — 발송 제한 없음. 야간에도 즉시 발송.</div></div>
-            <div class="policy-item"><div class="policy-label">기타 알림 (미션·만료·추첨)</div><div class="policy-value">일 2건</div><div class="policy-desc">1인 1일 최대 2건.</div></div>
-            <div class="policy-item"><div class="policy-label">야간 발송</div><div class="policy-value">22:00~08:00 미발송</div><div class="policy-desc">야간 시간대 푸시 발송 차단. 모았다가 아침에 묶음 발송.</div></div>
-            <div class="policy-item"><div class="policy-label">우선순위 · 중복 억제</div><div class="policy-value">거래 > 만료 임박 > 미션 > 추첨</div><div class="policy-desc">같은 사유의 알림은 묶어 중복 발송을 억제(하루 상한 안에서).</div></div>
-          </div>
         </div>
       </div>
     </div>
@@ -5641,6 +5652,9 @@ function applyRole(role) {
 // 한 곳만 채우면 된다.
 
 function go(id, navEl) {
+  /* 「섹션/탭」 주소(#notifications/history) — 섹션 이름만 떼어 쓰고 탭은 그 섹션이 연다(2026-11-06) */
+  var subTab = '';
+  if (typeof id === 'string' && id.indexOf('/') > 0) { subTab = id.slice(id.indexOf('/') + 1); id = id.slice(0, id.indexOf('/')); }
   // 저장 안 한 변경이 있는 채로 다른 메뉴로 이동하려 하면 한 번 물어본다(2026-08-11).
   // 이 함수가 모든 메뉴 전환의 유일한 통로라 여기서 잡는다 — 특정 섹션 이름은 여기
   // 안 박아두고, 그 섹션이 정의해둔 훅(taHasUnsavedChanges 등)이 있으면만 확인한다.
@@ -5674,6 +5688,7 @@ function go(id, navEl) {
   if (id === 'demo-mgmt' && window.dmLoadStats) window.dmLoadStats();
   if (id === 'ticket-value' && window.tvLoad) window.tvLoad();
   if (id === 'ticket-accrual' && window.taLoad) window.taLoad();
+  if (id === 'notifications' && window.notiMainTab) subTab = window.notiMainTab(subTab, true);
   if (id === 'notifications' && typeof loadNotifications === 'function') loadNotifications();
   if (id === 'revenue-fee' && window.rfLoad) window.rfLoad();
   if (id === 'revenue-gifti' && window.gsRevLoad) window.gsRevLoad();
@@ -5688,7 +5703,8 @@ function go(id, navEl) {
   // 모바일: 메뉴 항목 선택 시 드로어 닫기
   if (window.innerWidth <= 768) closeMobileSidebar();
   // 새로고침/뒤로가기 복원을 위해 현재 섹션을 URL 해시에 반영
-  if (location.hash.replace('#', '') !== id) location.hash = id;
+  var wantHash = id + (id === 'notifications' && subTab && subTab !== 'send' ? '/' + subTab : '');
+  if (location.hash.replace('#', '') !== wantHash) location.hash = wantHash;
 }
 
 /* ── ASP 매체 (2026-10-12) ──
@@ -5764,7 +5780,7 @@ function selColor(el) {
 }
 
 function switchTerms(el, id) {
-  document.querySelectorAll('.terms-tab').forEach(t => t.classList.remove('active'));
+  el.parentNode.querySelectorAll('.terms-tab').forEach(t => t.classList.remove('active'));
   el.classList.add('active');
   ['t-service','t-privacy','t-reward','t-marketing'].forEach(tid => {
     const el2 = document.getElementById(tid);
@@ -8186,8 +8202,9 @@ function showApp(user) {
   loadAllData();
   // 새로고침/딥링크 시 URL 해시로 보던 섹션 복원 (없거나 유효하지 않으면 기본 대시보드)
   var hashId = (location.hash || '').replace('#', '');
-  if (hashId && typeof go === 'function' && document.getElementById('sec-' + hashId)) {
-    go(hashId, document.getElementById('nav-' + hashId));
+  var hashSec = hashId.split('/')[0];
+  if (hashId && typeof go === 'function' && document.getElementById('sec-' + hashSec)) {
+    go(hashId, document.getElementById('nav-' + hashSec));
   }
 }
 
@@ -11918,9 +11935,25 @@ window.ntplSave = function() {
   }).catch(function(e) { toast('저장하지 못했습니다: ' + (e.message || e)); }).finally(function() { if (btn) btn.disabled = false; });
 };
 
+/* 화면 탭 — 수동 발송 · 발송 기록 · 자동 알림 문구. 내용은 숨긴 채로도 다 그려 둔다(크기를 재는 곳이 없다).
+   누를 때는 주소만 바꿔 끼우고(replaceState) 다시 읽지 않는다. 메뉴로 들어오면 첫 탭. */
+var NOTI_MAIN_TABS = ['send', 'history', 'templates'];
+window.notiMainTab = function(key, keepUrl) {
+  if (NOTI_MAIN_TABS.indexOf(key) < 0) key = 'send';
+  document.querySelectorAll('#noti-main-nav .terms-tab').forEach(function(x) { x.classList.toggle('active', x.getAttribute('data-noti-tab') === key); });
+  NOTI_MAIN_TABS.forEach(function(k) {
+    var e2 = document.getElementById('noti-pane-' + k);
+    if (e2) e2.style.display = k === key ? 'block' : 'none';
+  });
+  if (!keepUrl) {
+    var h = '#notifications' + (key === 'send' ? '' : '/' + key);
+    try { if (location.hash !== h) history.replaceState(null, '', h); } catch (e) { location.hash = h; }
+  }
+  return key;
+};
 /* ③ 발송 기록 탭 — 수동(notifications) · 자동(notif_logs) */
 window.notiSwitchTab = function(el, id) {
-  el.parentNode.querySelectorAll('.terms-tab').forEach(function(x) { x.classList.remove('active'); });
+  el.parentNode.querySelectorAll('.dm-tab').forEach(function(x) { x.classList.remove('active'); });
   el.classList.add('active');
   ['noti-tab-manual', 'noti-tab-auto'].forEach(function(tid) {
     var e2 = document.getElementById(tid);
@@ -17564,7 +17597,7 @@ window.dmLoadStats = function() {
 // 탭 전환
 // ──────────────────────────────────────────
 window.dmSwitchTab = function(el, col) {
-  document.querySelectorAll('.dm-tab').forEach(function(t) { t.classList.remove('active'); });
+  el.parentNode.querySelectorAll('.dm-tab').forEach(function(t) { t.classList.remove('active'); });
   el.classList.add('active');
   DM.col = col;
   dmRenderTab(col);
