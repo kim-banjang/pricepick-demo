@@ -686,6 +686,34 @@ td.rf-net-col{font-weight:700;color:var(--success);}
   width:500px;max-width:95vw;max-height:88vh;overflow-y:auto;box-shadow:var(--shadow-lg);
   animation:modalIn .22s cubic-bezier(.22,1,.36,1);}
 @keyframes modalIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+/* 알림 테스트 발송 대상 선택 — 머리(안내)·발 단추는 붙여 두고 두 목록만 안에서 세로로 스크롤한다.
+   창 높이는 화면의 88%를 넘지 않는다(공용 .modal 과 같은 상한). 가로로는 넘치지 않게 막는다. */
+#m-noti-test .modal{width:960px;max-width:96vw;height:min(780px,88vh);display:flex;flex-direction:column;overflow:hidden;}
+#m-noti-test .modal-header,#m-noti-test .modal-footer{flex:none;}
+#m-noti-test .modal-body{flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-rows:minmax(0,1fr);gap:16px;padding:16px 22px;overflow:hidden;}
+.ntt-col{display:flex;flex-direction:column;min-width:0;min-height:0;}
+.ntt-box{flex:1;min-height:0;display:flex;flex-direction:column;border:1px solid var(--border);border-radius:var(--r-sm);overflow:hidden;}
+.ntt-list{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;}
+.ntt-box .pp-pager{flex:none;padding:8px 12px;}
+.ntt-row{display:flex;align-items:center;gap:8px;padding:2px 10px;border-bottom:1px solid var(--border);min-height:30px;}
+.ntt-row.on{background:var(--main-soft);}
+.ntt-nick{flex:1 10 60px;min-width:40px;font-weight:600;font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.ntt-id{flex:0 1 auto;min-width:0;font-size:11px;color:var(--text-3);font-family:monospace;word-break:break-all;text-align:right;}
+.ntt-row .btn{flex:none;min-width:58px;}
+.ntt-empty{padding:14px;text-align:center;color:var(--text-3);font-size:12px;}
+.ntt-preview{flex:none;max-height:96px;overflow-y:auto;border:1px solid var(--border);border-radius:var(--r-sm);padding:8px 12px;font-size:12px;color:var(--text-2);line-height:1.55;margin-bottom:12px;}
+/* 「선택됨」은 눌러서 푸는 단추다 — 올리면 「해제」로 바뀐다 */
+.ntt-on{background:var(--main-soft);color:var(--main-hover);border:1px solid var(--main-line);}
+.ntt-on .ntt-off-l{display:none;}
+.ntt-on:hover{background:var(--danger-soft);color:var(--danger);border-color:rgba(239,68,68,.28);}
+.ntt-on:hover .ntt-on-l{display:none;}
+.ntt-on:hover .ntt-off-l{display:inline;}
+@media(max-width:760px){
+  #m-noti-test .modal{height:auto;max-height:92vh;}
+  #m-noti-test .modal-body{display:block;overflow-y:auto;}
+  .ntt-col{margin-bottom:14px;}
+  .ntt-box{max-height:360px;}
+}
 .modal-header{padding:18px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;
   justify-content:space-between;position:sticky;top:0;background:var(--surface);z-index:1;}
 .modal-title{font-size:15px;font-weight:700;letter-spacing:-.2px;}
@@ -4425,28 +4453,24 @@ window.CMS_FEATURES = {
 <!-- ── 모달: 알림 테스트 발송 대상 선택 (DEVQA 23번) ──
      기존 회원 검색을 그대로 쓴다 — 테스트 계정을 따로 등록하는 메뉴는 두지 않는다. -->
 <div class="modal-overlay" id="m-noti-test">
-  <div class="modal" style="max-width:760px">
-    <div class="modal-header"><div class="modal-title">테스트 발송 대상 선택</div><button class="modal-close" onclick="closeModal('m-noti-test')"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
+  <div class="modal">
+    <div class="modal-header"><div><div class="modal-title">테스트 발송 대상 선택</div><div class="card-sub">선택한 회원에게만 즉시 발송합니다. 발송 내역에는 <strong>테스트</strong> 배지로 남아 실제 발송 건수와 섞이지 않습니다.</div></div><button class="modal-close" onclick="closeModal('m-noti-test')"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
     <div class="modal-body">
       <input type="hidden" id="noti-test-src">
-      <div class="info-box" style="margin-bottom:12px">선택한 회원에게만 즉시 발송합니다. 발송 내역에는 <strong>테스트</strong> 배지로 남아 실제 발송 건수와 섞이지 않습니다.</div>
-      <div class="form-group">
-        <label class="form-label">발송 내용</label>
-        <div id="noti-test-preview" style="border:1px solid var(--border);border-radius:var(--r-sm);padding:10px 12px;font-size:12px;color:var(--text-2);line-height:1.6"></div>
-      </div>
-      <div class="form-group">
+      <div class="ntt-col">
         <label class="form-label">회원 검색</label>
-        <input class="search-box" id="noti-test-q" style="width:100%" placeholder="닉네임 또는 식별 아이디" oninput="notiTestFilter()">
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
-        <div>
-          <label class="form-label">검색 결과</label>
-          <div id="noti-test-results" style="border:1px solid var(--border);border-radius:var(--r-sm);max-height:240px;overflow-y:auto"></div>
+        <input class="search-box" id="noti-test-q" style="width:100%;min-width:0;margin-bottom:10px" placeholder="닉네임 또는 식별 아이디" oninput="notiTestFilter()">
+        <div class="ntt-box">
+          <div class="ntt-list" id="noti-test-results"></div>
           <div id="noti-test-pager"></div>
         </div>
-        <div>
-          <label class="form-label">선택한 회원 <span id="noti-test-count" style="color:var(--text-3);font-weight:600"></span></label>
-          <div id="noti-test-chosen" style="border:1px solid var(--border);border-radius:var(--r-sm);max-height:240px;overflow-y:auto"></div>
+      </div>
+      <div class="ntt-col">
+        <label class="form-label">발송 내용</label>
+        <div class="ntt-preview" id="noti-test-preview"></div>
+        <label class="form-label">선택한 회원 <span id="noti-test-count" style="color:var(--text-3);font-weight:600"></span></label>
+        <div class="ntt-box">
+          <div class="ntt-list" id="noti-test-chosen"></div>
         </div>
       </div>
     </div>
@@ -12083,19 +12107,22 @@ function notiLoadUsers() {
   });
 }
 
-var NOTI_TEST_CTRL = window.NOTI_TEST_CTRL = ppMakeListController(8, function(pageItems, state, totalPages) {
+/* 한 쪽 25명(다른 목록과 같은 「페이지당 [n] 행」 페이저). 목록은 창 안에서 세로로만 스크롤한다.
+   「선택됨」은 막아 두지 않는다 — 다시 누르면 선택이 풀린다(김반장 지적 2026-11-06). */
+var NOTI_TEST_CTRL = window.NOTI_TEST_CTRL = ppMakeListController(25, function(pageItems, state, totalPages) {
   var box = document.getElementById('noti-test-results');
   if (!box) return;
   box.innerHTML = pageItems.length ? pageItems.map(function(u) {
-    var on = !!NOTI_TEST_PICK[u.id];
-    return '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 10px;border-bottom:1px solid var(--border)">'
-      + '<div style="min-width:0"><div style="font-weight:600;font-size:12px">' + ppEsc(u.nickname) + '</div>'
-      + '<div style="font-size:11px;color:var(--text-3);font-family:monospace">' + ppEsc(u.id) + '</div></div>'
-      + '<button class="btn btn-ghost btn-sm" onclick="notiTestPick(\'' + ppEsc(u.id) + '\')"' + (on ? ' disabled' : '') + '>'
-      + (on ? '선택됨' : '선택') + '</button></div>';
-  }).join('') : '<div style="padding:14px;text-align:center;color:var(--text-3);font-size:12px">검색 결과가 없습니다.</div>';
+    var on = !!NOTI_TEST_PICK[u.id], q = '\'' + ppEsc(u.id) + '\'';
+    return '<div class="ntt-row' + (on ? ' on' : '') + '">'
+      + '<div class="ntt-nick">' + ppEsc(u.nickname) + '</div>'
+      + '<div class="ntt-id">' + ppEsc(u.id) + '</div>'
+      + (on ? '<button class="btn btn-sm ntt-on" aria-pressed="true" onclick="notiTestDrop(' + q + ')"><span class="ntt-on-l">선택됨</span><span class="ntt-off-l">해제</span></button>'
+            : '<button class="btn btn-ghost btn-sm" aria-pressed="false" onclick="notiTestPick(' + q + ')">선택</button>')
+      + '</div>';
+  }).join('') : '<div class="ntt-empty">검색 결과가 없습니다.</div>';
   var pg = document.getElementById('noti-test-pager');
-  if (pg) pg.innerHTML = ppPaginationHtml('NOTI_TEST_CTRL', state.page, totalPages);
+  if (pg) pg.innerHTML = ppCtrlPagerHtml('NOTI_TEST_CTRL', state);
 });
 
 function notiTestRenderChosen() {
@@ -12106,11 +12133,11 @@ function notiTestRenderChosen() {
   if (cnt) cnt.innerHTML = ids.length ? ('· ' + ids.length + ' <span>명</span>') : '';
   if (!box) return;
   box.innerHTML = ids.length ? ids.map(function(id) {
-    return '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 10px;border-bottom:1px solid var(--border)">'
-      + '<div style="min-width:0"><div style="font-weight:600;font-size:12px">' + ppEsc(NOTI_TEST_PICK[id]) + '</div>'
-      + '<div style="font-size:11px;color:var(--text-3);font-family:monospace">' + ppEsc(id) + '</div></div>'
+    return '<div class="ntt-row">'
+      + '<div class="ntt-nick">' + ppEsc(NOTI_TEST_PICK[id]) + '</div>'
+      + '<div class="ntt-id">' + ppEsc(id) + '</div>'
       + '<button class="btn btn-ghost btn-sm" onclick="notiTestDrop(\'' + ppEsc(id) + '\')">해제</button></div>';
-  }).join('') : '<div style="padding:14px;text-align:center;color:var(--text-3);font-size:12px">선택한 회원이 없습니다.</div>';
+  }).join('') : '<div class="ntt-empty">선택한 회원이 없습니다.</div>';
 }
 
 window.notiTestPick = function(id) {
@@ -12160,7 +12187,7 @@ window.notiOpenTest = function(docId) {
   }
   document.getElementById('noti-test-src').value = docId || '';
   document.getElementById('noti-test-preview').innerHTML =
-    '<div style="font-weight:700;color:var(--text-1);margin-bottom:4px">' + ppEsc(title) + '</div>' + ppEsc(body);
+    '<div style="font-weight:700;color:var(--text);margin-bottom:2px">' + ppEsc(title) + '</div>' + ppEsc(body);
   NOTI_TEST_PICK = {};
   notiTestRenderChosen();
   var q = document.getElementById('noti-test-q'); if (q) q.value = '';
