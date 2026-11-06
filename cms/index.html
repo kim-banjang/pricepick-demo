@@ -754,6 +754,14 @@ td.rf-net-col{font-weight:700;color:var(--success);}
 .noti-rcp-table td{overflow:hidden;text-overflow:ellipsis;}
 .noti-badge-sched{padding:3px 7px;gap:3px;}
 .noti-badge-sched .pre{color:var(--text-3);}
+/* 발송 결과 기준 — 물음표는 칸 폭에 안 들어가게 오른쪽 여백을 되돌린다(margin-right 음수) */
+.noti-q{display:inline-flex;align-items:center;justify-content:center;width:14px;height:14px;margin:0 -16px 0 2px;padding:0;border:none;background:none;color:var(--text-3);cursor:pointer;vertical-align:-2px;}
+.noti-q svg{width:14px;height:14px;}
+.noti-q:hover{color:var(--main);}
+.noti-rule-lead{font-size:13px;font-weight:700;color:var(--text);margin-bottom:12px;}
+.noti-rule-table{table-layout:fixed;}
+.noti-rule-table th,.noti-rule-table td{text-align:left!important;white-space:normal;font-size:13px;padding:10px 12px;}
+.noti-rule-foot{margin-top:8px;font-size:12px;color:var(--text-3);}
 .noti-reg-at{margin-top:2px;font-size:13px;color:var(--text-3);}
 .noti-plan-at{font-weight:700;color:var(--text-3);}
 .ncx-ask{font-size:16px;font-weight:700;color:var(--text);text-align:center;margin-top:8px;}
@@ -3258,7 +3266,7 @@ window.CMS_FEATURES = {
               <button class="btn btn-primary btn-sm" onclick="notiHistSearch()">검색</button>
             </div>
             <table>
-              <thead><tr><th style="text-align:center">발송일시</th><th style="text-align:center">채널</th><th>제목</th><th style="text-align:center">대상 조건</th><th style="text-align:center">대상 수</th><th style="text-align:center">성공</th><th style="text-align:center">실패</th><th style="text-align:center">미처리</th><th style="text-align:center">확인 불가</th><th style="text-align:center">열람률</th><th style="text-align:center">상태 / 액션</th></tr></thead>
+              <thead><tr><th style="text-align:center">발송일시</th><th style="text-align:center">채널</th><th>제목</th><th style="text-align:center">대상 조건</th><th style="text-align:center">대상 수</th><th style="text-align:center">성공<button type="button" class="noti-q" onclick="event.stopPropagation();openModal('m-noti-rule')" aria-label="발송 결과 기준"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M9.6 9.2a2.5 2.5 0 0 1 4.8.9c0 1.7-2.4 2.2-2.4 3.6"/><line x1="12" y1="17.2" x2="12" y2="17.3"/></svg></button></th><th style="text-align:center">실패</th><th style="text-align:center">미처리</th><th style="text-align:center">확인 불가</th><th style="text-align:center">열람률</th><th style="text-align:center">상태 / 액션</th></tr></thead>
               <tbody id="noti-hist-tbody">
               </tbody>
             </table>
@@ -4551,6 +4559,29 @@ window.CMS_FEATURES = {
       <button class="btn btn-ghost" onclick="closeModal('m-noti-confirm')">취소</button>
       <button class="btn btn-primary" id="ncf-send-btn" onclick="notiSendConfirmed()">발송</button>
     </div>
+  </div>
+</div>
+
+<!-- ── 모달: 발송 결과 기준 (김반장 2026-11-06) ── 발송 기록 「성공」 칸 머리의 물음표로 연다. 화면에는 설명을 두지 않는다 -->
+<div class="modal-overlay" id="m-noti-rule">
+  <div class="modal" style="width:560px">
+    <div class="modal-header"><div class="modal-title">발송 결과 기준</div><button class="modal-close" onclick="closeModal('m-noti-rule')"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
+    <div class="modal-body">
+      <div class="noti-rule-lead">시도했는데 안 된 것은 실패, 시도할 주소조차 없던 것은 미처리입니다.</div>
+      <table class="noti-rule-table">
+        <colgroup><col style="width:84px"><col style="width:170px"><col></colgroup>
+        <thead><tr><th>구분</th><th>기준</th><th>해당하는 경우</th></tr></thead>
+        <tbody>
+          <tr><td><span class="badge badge-green">성공</span></td><td>푸시 서버가 접수함</td><td>정상 발송</td></tr>
+          <tr><td><span class="badge badge-red">실패</span></td><td>보내려 했으나 거절당함</td><td>기기 토큰 만료 · 앱 삭제 · 잘못된 토큰 · 네트워크 오류</td></tr>
+          <tr><td><span class="badge badge-amber">미처리</span></td><td>보낼 주소가 없어 시도하지 못함</td><td>푸시 토큰 없음 · 알림 권한 거부 · 수신 거부</td></tr>
+          <tr><td><span class="badge badge-gray">확인 불가</span></td><td>결과를 알 수 없음</td><td>응답 없음 · 과거 기록에 결과가 남지 않은 건</td></tr>
+        </tbody>
+      </table>
+      <div class="noti-rule-foot">네 칸의 합은 대상 수와 일치합니다.</div>
+      <div class="noti-rule-foot">마케팅 수신 미동의 회원은 대상 수에 포함되지 않습니다.</div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('m-noti-rule')">닫기</button></div>
   </div>
 </div>
 
@@ -7693,7 +7724,11 @@ Object.assign(KO2VI,{
   "푸시 미발송":"Không gửi push",
   "문구를 불러오지 못했습니다":"Không tải được nội dung",
   "받을 회원이 없습니다. 발송 대상을 다시 선택해 주세요.":"Không có hội viên nhận. Hãy chọn lại đối tượng gửi.","받을 회원이 없습니다. 수신 동의 회원이 없어 전원 제외되었습니다.":"Không có hội viên nhận. Không có hội viên đồng ý nhận nên tất cả bị loại.",
-  "예약 등록":"Đăng ký hẹn giờ","구매·적립":"Mua·tích lũy","보상·이벤트":"Thưởng·sự kiện","사용·만료":"Sử dụng·hết hạn","운영·계정":"Vận hành·tài khoản","예약 /":"Hẹn giờ /","예약 발송분":"Mục gửi hẹn giờ","예약 발송 취소":"Hủy gửi hẹn giờ","예약 발송을 취소하시겠습니까?":"Hủy gửi hẹn giờ này?","취소한 건은 「취소됨」으로 남고 발송되지 않습니다.":"Mục đã hủy sẽ ở trạng thái 「Đã hủy」 và không được gửi.",
+  "예약 등록":"Đăng ký hẹn giờ","발송 결과 기준":"Tiêu chí kết quả gửi","시도했는데 안 된 것은 실패, 시도할 주소조차 없던 것은 미처리입니다.":"Đã thử gửi nhưng không được là thất bại; không có địa chỉ để thử là chưa xử lý.","해당하는 경우":"Trường hợp áp dụng",
+  "푸시 서버가 접수함":"Máy chủ push đã tiếp nhận","정상 발송":"Gửi bình thường","보내려 했으나 거절당함":"Đã thử gửi nhưng bị từ chối","보낼 주소가 없어 시도하지 못함":"Không có địa chỉ nên không thử gửi","결과를 알 수 없음":"Không rõ kết quả",
+  "기기 토큰 만료 · 앱 삭제 · 잘못된 토큰 · 네트워크 오류":"Token thiết bị hết hạn · Xóa app · Token sai · Lỗi mạng","푸시 토큰 없음 · 알림 권한 거부 · 수신 거부":"Không có push token · Từ chối quyền thông báo · Từ chối nhận","응답 없음 · 과거 기록에 결과가 남지 않은 건":"Không phản hồi · Bản ghi cũ không lưu kết quả",
+  "네 칸의 합은 대상 수와 일치합니다.":"Tổng bốn cột bằng số đối tượng.","마케팅 수신 미동의 회원은 대상 수에 포함되지 않습니다.":"Hội viên chưa đồng ý nhận tiếp thị không được tính vào số đối tượng.",
+  "기기 토큰 만료":"Token thiết bị hết hạn","앱 삭제":"Xóa app","잘못된 토큰":"Token sai","네트워크 오류":"Lỗi mạng","푸시 토큰 없음":"Không có push token","알림 권한 거부":"Từ chối quyền thông báo","수신 거부":"Từ chối nhận","구매·적립":"Mua·tích lũy","보상·이벤트":"Thưởng·sự kiện","사용·만료":"Sử dụng·hết hạn","운영·계정":"Vận hành·tài khoản","예약 /":"Hẹn giờ /","예약 발송분":"Mục gửi hẹn giờ","예약 발송 취소":"Hủy gửi hẹn giờ","예약 발송을 취소하시겠습니까?":"Hủy gửi hẹn giờ này?","취소한 건은 「취소됨」으로 남고 발송되지 않습니다.":"Mục đã hủy sẽ ở trạng thái 「Đã hủy」 và không được gửi.",
   "예약 건은 발송 시점에 대상이 정해집니다.":"Đối tượng của mục hẹn giờ được xác định lúc gửi.","현재 조건 기준":"Theo điều kiện hiện tại","명입니다.":"người.",
   "발송 조건":"Điều kiện gửi","출처":"Nguồn","변수 없음":"Không có biến","푸시 전용":"Chỉ push","알림함 미저장":"Không lưu hộp thông báo","푸시 · 수신 설정 무관":"Push · không phụ thuộc cài đặt nhận","1:1 문의":"Hỏi đáp 1:1",
   "차감이 없을 때":"Khi không bị trừ","이전 구매 취소분을 차감했을 때":"Khi đã trừ phần hủy mua trước","전체 취소일 때":"Khi hủy toàn bộ","부분 취소일 때":"Khi hủy một phần",
@@ -12450,7 +12485,9 @@ window.notiTestSend = function() {
    ⚠ 데모는 실제 푸시를 보내지 않으므로 수신 결과가 없다. 발송 건과 회원을 섞은
    값으로 성공·실패를 정해 시연용 목록을 만든다 — 같은 건은 늘 같은 결과가 나온다.
    실제 연동이 붙으면 이 자리에 수신 기록 컬렉션을 그대로 읽어 넣으면 된다. */
-var NOTI_FAIL_REASONS = ['기기 토큰 만료', '앱 삭제', '수신 거부', '네트워크 오류'];
+/* 실패 = 보내려 했으나 거절됨 · 미처리 = 보낼 주소가 없어 시도 못함(발송 결과 기준, 김반장 2026-11-06). 수신 거부는 실패가 아니라 미처리다 */
+var NOTI_FAIL_REASONS = ['기기 토큰 만료', '앱 삭제', '잘못된 토큰', '네트워크 오류'];
+var NOTI_PENDING_REASONS = ['푸시 토큰 없음', '알림 권한 거부', '수신 거부'];
 
 function notiHash(str) {
   var h = 2166136261;
@@ -12508,7 +12545,7 @@ function notiRecipientsOf(docId, d) {
     var h = notiHash(docId + '|' + u.id), b = h % 100;
     var st = b < 5 ? 'fail' : (b < 8 ? 'pending' : 'ok');     /* 스무 명에 한 명꼴 실패, 서른 명에 한 명꼴 미처리 */
     return { id: u.id, nickname: u.nickname, status: st, ok: st === 'ok',
-             reason: st === 'fail' ? NOTI_FAIL_REASONS[h % NOTI_FAIL_REASONS.length] : (st === 'pending' ? '결과 미수신' : '') };
+             reason: st === 'fail' ? NOTI_FAIL_REASONS[h % NOTI_FAIL_REASONS.length] : (st === 'pending' ? NOTI_PENDING_REASONS[(h >>> 3) % NOTI_PENDING_REASONS.length] : '') };
   });
 }
 function notiResultCount(docId, d) {
