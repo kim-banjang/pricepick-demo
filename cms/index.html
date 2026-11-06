@@ -743,6 +743,10 @@ td.rf-net-col{font-weight:700;color:var(--success);}
 #m-noti-recipients .modal{overflow-x:hidden;}
 .noti-rcp-table{table-layout:fixed;}
 .noti-rcp-table td{overflow:hidden;text-overflow:ellipsis;}
+.noti-reg-at{margin-top:2px;font-size:13px;color:var(--text-3);}
+.ncx-ask{font-size:16px;font-weight:700;color:var(--text);text-align:center;margin-top:8px;}
+.ncx-title{margin-top:14px;padding:12px 14px;border:1px solid var(--border);border-radius:12px;font-size:15px;font-weight:700;color:var(--text);text-align:center;overflow-wrap:anywhere;}
+.ncx-note{margin-top:12px;font-size:13px;color:var(--text-3);text-align:center;}
 .ntt-col{display:flex;flex-direction:column;min-width:0;min-height:0;}
 .ntt-box{flex:1;min-height:0;display:flex;flex-direction:column;border:1px solid var(--border);border-radius:var(--r-sm);overflow:hidden;}
 .ntt-list{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;}
@@ -4535,6 +4539,22 @@ window.CMS_FEATURES = {
   </div>
 </div>
 
+<!-- ── 모달: 예약 발송 취소 확인 (2026-11-06) ── 브라우저 기본 confirm 대신 CMS 공용 창(발송 확인창과 같은 꼴) -->
+<div class="modal-overlay" id="m-noti-cancel">
+  <div class="modal" style="width:520px">
+    <div class="modal-header" style="border-bottom:none;padding-bottom:6px"><div class="modal-title">예약 발송 취소</div><button class="modal-close" onclick="closeModal('m-noti-cancel')"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
+    <div class="modal-body" style="padding:8px 24px 4px">
+      <div class="ncx-ask">예약 발송을 취소하시겠습니까?</div>
+      <div class="ncx-title no-vi" id="ncx-title"></div>
+      <div class="ncx-note">취소한 건은 「취소됨」으로 남고 발송되지 않습니다.</div>
+    </div>
+    <div class="modal-footer" style="border-top:none;padding:16px 24px 22px">
+      <button class="btn btn-ghost" onclick="closeModal('m-noti-cancel')">취소</button>
+      <button class="btn btn-primary" id="ncx-ok-btn" onclick="notiCancelConfirmed()">확인</button>
+    </div>
+  </div>
+</div>
+
 <!-- ── 모달: 알림 테스트 발송 대상 선택 (DEVQA 23번) ──
      기존 회원 검색을 그대로 쓴다 — 테스트 계정을 따로 등록하는 메뉴는 두지 않는다. -->
 <div class="modal-overlay" id="m-noti-test">
@@ -7657,6 +7677,8 @@ Object.assign(KO2VI,{
   "푸시 · 설정 무관":"Push · không phụ thuộc cài đặt",
   "푸시 미발송":"Không gửi push",
   "문구를 불러오지 못했습니다":"Không tải được nội dung",
+  "예약 등록":"Đăng ký hẹn giờ","예약 발송 취소":"Hủy gửi hẹn giờ","예약 발송을 취소하시겠습니까?":"Hủy gửi hẹn giờ này?","취소한 건은 「취소됨」으로 남고 발송되지 않습니다.":"Mục đã hủy sẽ ở trạng thái 「Đã hủy」 và không được gửi.",
+  "예약 건은 발송 시점에 대상이 정해집니다.":"Đối tượng của mục hẹn giờ được xác định lúc gửi.","현재 조건 기준":"Theo điều kiện hiện tại","명입니다.":"người.",
   "발송 조건":"Điều kiện gửi","출처":"Nguồn","변수 없음":"Không có biến","푸시 전용":"Chỉ push","알림함 미저장":"Không lưu hộp thông báo","푸시 · 수신 설정 무관":"Push · không phụ thuộc cài đặt nhận","1:1 문의":"Hỏi đáp 1:1",
   "차감이 없을 때":"Khi không bị trừ","이전 구매 취소분을 차감했을 때":"Khi đã trừ phần hủy mua trước","전체 취소일 때":"Khi hủy toàn bộ","부분 취소일 때":"Khi hủy một phần",
   "보유 티켓으로 전부 환수할 때":"Khi thu hồi đủ từ vé đang giữ","보유 티켓이 일부 모자랄 때":"Khi vé đang giữ thiếu một phần","보유 티켓이 없을 때":"Khi không có vé đang giữ","남은 티켓이 있을 때":"Khi còn vé","보유 티켓이 모자랄 때":"Khi vé đang giữ không đủ","남은 금액이 티켓 1장에 못 미칠 때":"Khi số tiền còn lại không đủ 1 vé","보유 티켓으로 전부 회수할 때":"Khi thu hồi đủ từ vé đang giữ",
@@ -12022,7 +12044,7 @@ function loadNotifications() {
           + ' <button class="btn btn-ghost btn-sm" style="color:var(--danger)" onclick="event.stopPropagation();notiCancelScheduled(\'' + doc.id + '\')">취소</button>'
         : '';
       var html = '<tr style="cursor:pointer" onclick="notiOpenRecipients(\'' + doc.id + '\')">'
-        + '<td style="text-align:center;white-space:nowrap"><div style="font-weight:700;color:#333">' + ppDt(d.sent_at || d.created_at) + '</div><div style="color:var(--text-3);font-size:11px">' + ppTm(d.sent_at || d.created_at) + '</div></td>'
+        + notiWhenCell(d)
         + '<td style="text-align:center">' + (NOTI_CHANNEL_KO[d.channel]||d.channel||'—') + '</td>'
         + '<td>' + (d.title||'') + '</td>'
         + '<td style="text-align:center">' + notiTargetLabel(d) + '</td>'
@@ -12040,6 +12062,19 @@ function loadNotifications() {
   }).catch(function(e){ console.error('loadNotifications', e); tbody.innerHTML = ppEmpty(7,'로드 오류'); });
 }
 
+/* 발송일시 칸 — 예약 상태면 나갈 시각(schedule_at)을 STG 와 같이 날짜 / 시:분으로, 그 아래 예약 등록 시각.
+   발송완료 뒤에는 실제 나간 시각(sent_at). 예약 시각이 없는 옛 건은 등록 시각만(2026-11-06) */
+function notiHm(v) { var t = v ? (v.toDate ? v.toDate() : new Date(v)) : null; return t && !isNaN(t) ? String(t.getHours()).padStart(2, '0') + ':' + String(t.getMinutes()).padStart(2, '0') : ''; }
+function notiMd(v) { var t = v ? (v.toDate ? v.toDate() : new Date(v)) : null; return t && !isNaN(t) ? String(t.getMonth() + 1).padStart(2, '0') + '/' + String(t.getDate()).padStart(2, '0') : ''; }
+function notiWhenCell(d) {
+  if (d.status === 'scheduled' && d.schedule_at) {
+    return '<td style="text-align:center;white-space:nowrap"><div style="font-weight:700;color:#333">' + ppDt(d.schedule_at) + '</div>'
+      + '<div style="color:var(--text-3);font-size:11px">' + notiHm(d.schedule_at) + '</div>'
+      + '<div class="noti-reg-at"><span>예약 등록</span> ' + notiMd(d.created_at) + ' ' + notiHm(d.created_at) + '</div></td>';
+  }
+  var at = d.sent_at || d.created_at;
+  return '<td style="text-align:center;white-space:nowrap"><div style="font-weight:700;color:#333">' + ppDt(at) + '</div><div style="color:var(--text-3);font-size:11px">' + ppTm(at) + '</div></td>';
+}
 /* 수동 발송 기록 검색 — 제목(포함·대소문자 무시) · 대상 · 상태를 함께 건다. 「검색」을 누를 때 적용하고 1쪽으로 돌아간다.
    다시 불러올 때(발송·취소 뒤)는 걸어 둔 조건과 보던 쪽을 그대로 둔다. */
 var NOTI_HIST_ROWS = [];
@@ -12270,15 +12305,27 @@ window.notiTestFilter = function() { NOTI_TEST_CTRL.applyFilter(notiTestPredicat
 window.notiCancelScheduled = function(docId) {
   var d = NOTI_DOCS[docId];
   if (!d || d.status !== 'scheduled') { toast('예약 상태인 건만 취소할 수 있습니다.'); return; }
-  if (!confirm('예약 발송을 취소하시겠습니까?\n' + (d.title || '') + '\n취소한 건은 「취소됨」으로 남고 발송되지 않습니다.')) return;
+  NOTI_CANCEL_ID = docId;
+  document.getElementById('ncx-title').textContent = d.title || '';
+  openModal('m-noti-cancel');
+};
+var NOTI_CANCEL_ID = null;
+window.notiCancelConfirmed = function() {
+  var docId = NOTI_CANCEL_ID, d = NOTI_DOCS[docId];
+  if (!docId || !d) { closeModal('m-noti-cancel'); return; }
+  var btn = document.getElementById('ncx-ok-btn');
+  if (btn) btn.disabled = true;
   db.collection('notifications').doc(docId).update({
     status: 'cancelled',
     cancelled_at: window.FS.FieldValue.serverTimestamp()
   }).then(function() {
+    NOTI_CANCEL_ID = null;
+    closeModal('m-noti-cancel');
     logAdmin('예약 알림 취소: ' + (d.title || docId));
     toast('예약 발송을 취소했습니다.');
     loadNotifications();
-  }).catch(function(e) { toast('취소하지 못했습니다: ' + (e.message || e)); });
+  }).catch(function(e) { toast('취소하지 못했습니다: ' + (e.message || e)); })
+    .finally(function() { if (btn) btn.disabled = false; });
 };
 window.notiOpenTest = function(docId) {
   var title, body;
@@ -12431,6 +12478,10 @@ window.notiOpenRecipients = function(docId) {
   if (!d) return;
   openModal('m-noti-recipients');
   var q = document.getElementById('noti-rcp-q'); if (q) q.value = '';
+  /* 예약·취소 건은 발송 전이라 찾을 수신자가 없다 — 검색창·페이저를 감춘다(STG 와 같이) */
+  var pre = d.status === 'scheduled' || d.status === 'cancelled';
+  if (q) q.style.display = pre ? 'none' : '';
+  var pgEl = document.getElementById('noti-rcp-pager'); if (pgEl) pgEl.style.display = pre ? 'none' : '';
   var sub = document.getElementById('noti-rcp-sub');
   var sum = document.getElementById('noti-rcp-summary');
   if (sum) sum.innerHTML = '';
@@ -12438,6 +12489,13 @@ window.notiOpenRecipients = function(docId) {
     if (sub) sub.textContent = (d.title || '') + (d.status === 'cancelled' ? ' · 취소된 예약 건이라 발송되지 않았습니다' : ' · 예약 건은 아직 발송 전입니다');
     NOTI_RCP_ROWS = [];
     NOTI_RCP_CTRL.setRows([]);
+    var tb0 = document.getElementById('noti-rcp-tbody');
+    if (d.status === 'scheduled' && tb0) {
+      /* 대상은 발송 시점에 다시 센다 — 지금 조건으로 센 인원을 함께 적는다 */
+      tb0.innerHTML = ppEmpty(4, '<span>예약 건은 발송 시점에 대상이 정해집니다.</span> <span>현재 조건 기준</span> <span id="noti-rcp-pre-n">' + ppN(d.recipient_count || 0) + '</span><span>명입니다.</span>');
+      NOTI_USERS = null;
+      notiTargetUids(d.target).then(function(uids) { var e = document.getElementById('noti-rcp-pre-n'); if (e) e.textContent = ppN(uids.length); }).catch(function() {});
+    }
     return;
   }
   notiLoadUsers().then(function() {
