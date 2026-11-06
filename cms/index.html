@@ -698,14 +698,27 @@ td.rf-net-col{font-weight:700;color:var(--success);}
 #noti-compose .noti-field-err{border-color:var(--red)!important;}
 .noti-err-msg{display:none;margin-top:6px;font-size:12px;line-height:1.4;color:var(--red);}
 .noti-err-msg.on{display:block;}
-/* 알림 발송 최종 확인 — 항목 이름 · 값 두 칸 */
-.ncf-row{display:grid;grid-template-columns:96px minmax(0,1fr);gap:12px;padding:9px 0;border-bottom:1px solid var(--border);font-size:13px;line-height:1.6;}
-.ncf-k{font-size:11px;font-weight:700;color:var(--text-2);text-transform:uppercase;letter-spacing:.4px;padding-top:2px;}
-.ncf-v{color:var(--text);overflow-wrap:anywhere;white-space:pre-wrap;}
-.ncf-sub{margin-top:6px;padding:8px 10px;border-radius:var(--r-sm);background:var(--surface-2);font-size:12px;color:var(--text-2);white-space:pre-wrap;}
-.ncf-sub-k{display:block;font-size:11px;font-weight:700;color:var(--text-3);margin-bottom:2px;}
-.ncf-note{font-size:12px;color:var(--text-2);}
-.ncf-ask{margin-top:16px;font-size:14px;font-weight:700;color:var(--text);}
+/* 알림 발송 최종 확인 (김반장 2026-11-06 재디자인) — 구분선 없이 여백으로 나눈다.
+   색은 디자인 시스템(designsystem.html) 값을 이 창 안에서만 쓴다. 굵기는 400/700/800. */
+#m-noti-confirm .modal{width:520px;--text1:#1A1130;--text2:#5A5370;--text3:#9B93B0;--ds-border:#EEEAF3;--sub-4:#F1EEFF;--red:#FF4452;--main:#845EEE;}
+#m-noti-confirm .modal-header{border-bottom:none;padding-bottom:6px;}
+#m-noti-confirm .modal-body{padding:8px 24px 4px;}
+#m-noti-confirm .modal-footer{border-top:none;padding:16px 24px 22px;}
+.ncf-cap{font-size:13px;font-weight:400;color:var(--text3);margin-bottom:8px;}
+.ncf-push{display:flex;gap:14px;align-items:flex-start;background:#fff;border:1px solid var(--ds-border);border-radius:16px;padding:16px;box-shadow:0 4px 16px rgba(26,17,48,.06);}
+.ncf-push-icon{flex:none;width:48px;height:48px;border-radius:12px;display:block;}
+.ncf-push-txt{min-width:0;flex:1;}
+.ncf-push-title{font-size:16px;font-weight:700;color:var(--text1);line-height:1.4;overflow-wrap:anywhere;}
+.ncf-push-body{margin-top:4px;font-size:15px;font-weight:400;color:var(--text2);line-height:1.5;white-space:pre-wrap;overflow-wrap:anywhere;}
+.ncf-ex{margin-top:8px;font-size:13px;font-weight:400;color:var(--text3);}
+.ncf-who{margin-top:28px;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;}
+.ncf-who-cond{font-size:15px;font-weight:400;color:var(--text2);}
+.ncf-who-n{font-size:28px;font-weight:800;color:var(--main);line-height:1.1;}
+.ncf-who-sub{margin-top:4px;font-size:13px;font-weight:400;color:var(--text3);}
+.ncf-who-sub.warn{color:var(--red);}
+.ncf-when{margin-top:20px;display:flex;align-items:center;gap:8px;font-size:15px;font-weight:400;color:var(--text1);}
+.ncf-when svg{flex:none;width:16px;height:16px;color:var(--text3);}
+.ncf-ask{margin-top:28px;text-align:center;font-size:16px;font-weight:700;color:var(--text1);}
 .ntt-col{display:flex;flex-direction:column;min-width:0;min-height:0;}
 .ntt-box{flex:1;min-height:0;display:flex;flex-direction:column;border:1px solid var(--border);border-radius:var(--r-sm);overflow:hidden;}
 .ntt-list{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;}
@@ -4491,10 +4504,19 @@ window.CMS_FEATURES = {
      「발송」은 되돌릴 수 없어 보낼 내용을 한 번 더 보여 준다. 즉시·예약 모두 거치고, 테스트 발송은 거치지 않는다.
      「취소」는 창만 닫는다 — 입력한 제목·내용은 그대로 남는다. -->
 <div class="modal-overlay" id="m-noti-confirm">
-  <div class="modal" style="width:560px">
+  <div class="modal">
     <div class="modal-header"><div class="modal-title">발송 확인</div><button class="modal-close" onclick="closeModal('m-noti-confirm')"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
     <div class="modal-body">
-      <div id="ncf-rows"></div>
+      <!-- ① 회원이 받을 푸시 모양 · ② 받는 사람 · ③ 발송 시점 — 구분선 없이 여백으로 나눈다 -->
+      <div class="ncf-cap">회원에게 이렇게 보입니다</div>
+      <div class="ncf-push">
+        <img class="ncf-push-icon" src="/apple-touch-icon.png?v=2" alt="">
+        <div class="ncf-push-txt"><div class="ncf-push-title" id="ncf-title"></div><div class="ncf-push-body" id="ncf-body"></div></div>
+      </div>
+      <div class="ncf-ex" id="ncf-ex" style="display:none">{닉네임}·{보유티켓}에 예시 값을 넣은 모습입니다</div>
+      <div class="ncf-who"><span class="ncf-who-cond" id="ncf-cond"></span><span class="ncf-who-n"><span id="ncf-n"></span><span>명</span></span></div>
+      <div class="ncf-who-sub" id="ncf-sub"><span>수신 동의 회원만</span> · <span>미동의</span> <span id="ncf-excl"></span><span>명</span> <span>제외</span></div>
+      <div class="ncf-when"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span id="ncf-when"></span></div>
       <div class="ncf-ask">위와 같이 발송하시겠습니까?</div>
     </div>
     <div class="modal-footer">
@@ -7735,7 +7757,8 @@ Object.assign(KO2VI,{
   "수신 동의 회원만":"Chỉ hội viên đã đồng ý nhận",
   "미동의":"Chưa đồng ý",
   "제외":"loại trừ",
-  "예시 값을 넣은 모습":"Hiển thị với giá trị ví dụ",
+  "회원에게 이렇게 보입니다":"Hội viên sẽ thấy như thế này",
+  "{닉네임}·{보유티켓}에 예시 값을 넣은 모습입니다":"Đây là hiển thị với giá trị ví dụ cho {닉네임}·{보유티켓}",
   "제목 검색":"Tìm theo tiêu đề",
   "전체 대상":"Tất cả đối tượng",
   "테스트":"Thử nghiệm",
@@ -12230,17 +12253,19 @@ window.notiSend = function() {
   notiTargetSplit(target).then(function(r) {
     NOTI_PENDING = { title: title, body: body, channel: channel, target: target, timing: timing, scheduleAt: scheduleAt, uids: r.uids };
     var hasVar = /\{[^{}]+\}/.test(title + body);
-    var ex = function(label, str) { return '<div class="ncf-sub"><span class="ncf-sub-k">' + label + '</span>' + ppEsc(ntplFill(str, NOTI_EX)) + '</div>'; };
-    var row = function(k, v) { return '<div class="ncf-row"><div class="ncf-k">' + k + '</div><div class="ncf-v">' + v + '</div></div>'; };
-    /* 「명」·안내 낱말은 사전이 아는 낱말이라 따로 떼어 둔다 — 붙여 쓰면 통째 일치가 깨져 한국어로 남는다 */
-    var who = '<span>' + (NOTI_TARGET_KO[target] || target) + '</span> · <strong>' + ppN(r.uids.length) + '</strong><span>명</span>'
-      + '<div class="ncf-note"><span>수신 동의 회원만</span> · <span>미동의</span> ' + ppN(r.excluded) + '<span>명</span> <span>제외</span></div>';
-    document.getElementById('ncf-rows').innerHTML =
-        row('발송 채널', '<span>' + (channel === 'push' ? '앱 푸시' : ppEsc(channel)) + '</span>')
-      + row('발송 대상', who)
-      + row('제목', ntplVarsHtml(title) + (hasVar && /\{[^{}]+\}/.test(title) ? ex('예시 값을 넣은 모습', title) : ''))
-      + row('내용', ntplVarsHtml(body) + (hasVar && /\{[^{}]+\}/.test(body) ? ex('예시 값을 넣은 모습', body) : ''))
-      + row('발송 시점', timing === 'scheduled' ? '<span>예약 발송</span> · ' + ppEsc(notiSchedLabel(scheduleAt)) : '<span>즉시 발송</span>');
+    var set = function(id, v) { var e = document.getElementById(id); if (e) e.textContent = v; };
+    /* 회원에게 보일 모습 — 변수는 예시 값으로 채운다(글자 그대로 두지 않는다) */
+    set('ncf-title', ntplFill(title, NOTI_EX));
+    set('ncf-body', ntplFill(body, NOTI_EX));
+    document.getElementById('ncf-ex').style.display = hasVar ? '' : 'none';
+    set('ncf-cond', NOTI_TARGET_KO[target] || target);
+    set('ncf-n', ppN(r.uids.length));
+    set('ncf-excl', ppN(r.excluded));
+    /* 빠지는 사람이 받는 사람보다 많으면 빨간 글씨 — 250명 중 7명만 받는 일이 한눈에 보이게 */
+    document.getElementById('ncf-sub').classList.toggle('warn', r.excluded > r.uids.length);
+    /* 「즉시 발송」「예약 발송」은 사전이 아는 낱말이라 날짜와 떼어 둔다 */
+    document.getElementById('ncf-when').innerHTML = timing === 'scheduled'
+      ? '<span>예약 발송</span> · ' + ppEsc(notiSchedLabel(scheduleAt)) : '<span>즉시 발송</span>';
     openModal('m-noti-confirm');
   }).catch(function(e) {
     toast('대상 회원을 세지 못했습니다: ' + (e.message || e));
