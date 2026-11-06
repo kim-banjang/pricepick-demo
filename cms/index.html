@@ -693,6 +693,14 @@ td.rf-net-col{font-weight:700;color:var(--success);}
 #m-noti-test .modal{width:960px;max-width:96vw;height:min(780px,88vh);display:flex;flex-direction:column;overflow:hidden;}
 #m-noti-test .modal-header,#m-noti-test .modal-footer{flex:none;}
 #m-noti-test .modal-body{flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-rows:minmax(0,1fr);gap:16px;padding:16px 22px;overflow:hidden;}
+/* 알림 발송 최종 확인 — 항목 이름 · 값 두 칸 */
+.ncf-row{display:grid;grid-template-columns:96px minmax(0,1fr);gap:12px;padding:9px 0;border-bottom:1px solid var(--border);font-size:13px;line-height:1.6;}
+.ncf-k{font-size:11px;font-weight:700;color:var(--text-2);text-transform:uppercase;letter-spacing:.4px;padding-top:2px;}
+.ncf-v{color:var(--text);overflow-wrap:anywhere;white-space:pre-wrap;}
+.ncf-sub{margin-top:6px;padding:8px 10px;border-radius:var(--r-sm);background:var(--surface-2);font-size:12px;color:var(--text-2);white-space:pre-wrap;}
+.ncf-sub-k{display:block;font-size:11px;font-weight:700;color:var(--text-3);margin-bottom:2px;}
+.ncf-note{font-size:12px;color:var(--text-2);}
+.ncf-ask{margin-top:16px;font-size:14px;font-weight:700;color:var(--text);}
 .ntt-col{display:flex;flex-direction:column;min-width:0;min-height:0;}
 .ntt-box{flex:1;min-height:0;display:flex;flex-direction:column;border:1px solid var(--border);border-radius:var(--r-sm);overflow:hidden;}
 .ntt-list{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;}
@@ -4466,6 +4474,23 @@ window.CMS_FEATURES = {
   </div>
 </div>
 
+<!-- ── 모달: 알림 발송 최종 확인 (김반장 2026-11-06) ──
+     「발송」은 되돌릴 수 없어 보낼 내용을 한 번 더 보여 준다. 즉시·예약 모두 거치고, 테스트 발송은 거치지 않는다.
+     「취소」는 창만 닫는다 — 입력한 제목·내용은 그대로 남는다. -->
+<div class="modal-overlay" id="m-noti-confirm">
+  <div class="modal" style="width:560px">
+    <div class="modal-header"><div class="modal-title">발송 확인</div><button class="modal-close" onclick="closeModal('m-noti-confirm')"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
+    <div class="modal-body">
+      <div id="ncf-rows"></div>
+      <div class="ncf-ask">위와 같이 발송하시겠습니까?</div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('m-noti-confirm')">취소</button>
+      <button class="btn btn-primary" id="ncf-send-btn" onclick="notiSendConfirmed()">발송</button>
+    </div>
+  </div>
+</div>
+
 <!-- ── 모달: 알림 테스트 발송 대상 선택 (DEVQA 23번) ──
      기존 회원 검색을 그대로 쓴다 — 테스트 계정을 따로 등록하는 메뉴는 두지 않는다. -->
 <div class="modal-overlay" id="m-noti-test">
@@ -7693,6 +7718,15 @@ Object.assign(KO2VI,{
   "데모":"Demo",
   "발송 정책":"Chính sách gửi",
   "수신 동의":"Đồng ý nhận",
+  "발송 확인":"Xác nhận gửi",
+  "위와 같이 발송하시겠습니까?":"Gửi với nội dung như trên?",
+  "수신 동의 회원만":"Chỉ hội viên đã đồng ý nhận",
+  "미동의":"Chưa đồng ý",
+  "제외":"loại trừ",
+  "예시 값을 넣은 모습":"Hiển thị với giá trị ví dụ",
+  "제목을 입력하세요.":"Hãy nhập tiêu đề.",
+  "내용을 입력하세요.":"Hãy nhập nội dung.",
+  "대상 회원을 세지 못했습니다: ":"Không đếm được hội viên nhận: ",
   "앱이 상황에 따라 저절로 보내는 알림의 제목·본문입니다.":"Là tiêu đề·nội dung của các thông báo app tự gửi theo tình huống.",
   "수정 → 미리보기 → 이대로 저장":"Sửa → Xem trước → Lưu như thế này",
   "을 거쳐야 저장되고, 저장하면 앱 알림함에 바로 반영됩니다.":"thì mới được lưu, và khi lưu sẽ phản ánh ngay vào hộp thông báo app.",
@@ -12070,29 +12104,43 @@ function loadNotifications() {
    발송 시점의 대상 회원 id 를 recipient_uids 로 남긴다 — 수신자 목록과 앱 알림함이 같은 명단을 쓴다. */
 var NOTI_DUE_RUNNING = false;
 function notiTargetUids(target) {
+  return notiTargetSplit(target).then(function(r) { return r.uids; });
+}
+/* 조건에 맞는 회원 중 수신 동의자(uids)와 빠지는 미동의 인원(excluded) — 발송 확인창이 함께 쓴다 */
+function notiTargetSplit(target) {
   var pbP = (target === 'purchased')
     ? db.collection('postbacks').get().then(function(s) { var u = {}; s.forEach(function(d) { var x = d.data().user_id; if (x) u[x] = true; }); return u; })
     : Promise.resolve(null);
   return Promise.all([notiLoadUsers(), pbP]).then(function(r) {
     var users = r[0], bought = r[1], now = Date.now();
-    return users.filter(function(u) {
-      if (!u.mkt) return false;
+    var hit = users.filter(function(u) {
       if (target === 'kakao') return u.linked;
       if (target === 'guest') return !u.linked;
       if (target === 'inactive30') return !!u.updatedMs && u.updatedMs < now - 30 * 86400000;
       if (target === 'new7') return !!u.createdMs && u.createdMs >= now - 7 * 86400000;
       if (target === 'purchased') return !!bought[u.id];
       return true;
-    }).map(function(u) { return u.id; });
+    });
+    var ok = hit.filter(function(u) { return u.mkt; });
+    return { uids: ok.map(function(u) { return u.id; }), excluded: hit.length - ok.length };
   });
 }
 /* 내용 변수 — 앱이 받는 회원 값으로 바꿔 넣는다(app ppManualNotifFill) */
 var NOTI_VARS = ['닉네임', '보유티켓'];
 
+/* 확인창 예시 값 — 실제 발송 값이 아니다(앱은 받는 회원의 값으로 바꾼다) */
+var NOTI_EX = { '닉네임': '픽픽이', '보유티켓': '12' };
+var NOTI_PENDING = null;
+function notiSchedLabel(v) { return String(v || '').replace('T', ' '); }
 window.notiSend = function() {
   var title = document.getElementById('noti-title').value.trim();
   var body = document.getElementById('noti-body').value.trim();
-  if (!title || !body) { toast('제목과 내용을 입력하세요.'); return; }
+  if (!title || !body) {
+    toast(!title && !body ? '제목과 내용을 입력하세요.' : (!title ? '제목을 입력하세요.' : '내용을 입력하세요.'));
+    var miss = document.getElementById(!title ? 'noti-title' : 'noti-body');
+    if (miss) miss.focus();
+    return;
+  }
   var channel = document.getElementById('noti-channel').value;
   var target = document.getElementById('noti-target').value;
   var timing = document.getElementById('noti-timing').value;
@@ -12102,9 +12150,35 @@ window.notiSend = function() {
   var bad = [];
   (title + ' ' + body).replace(/\{([^{}]+)\}/g, function(m, k) { if (NOTI_VARS.indexOf(k) < 0 && bad.indexOf(m) < 0) bad.push(m); return m; });
   if (bad.length) { toast('쓸 수 없는 변수입니다: ' + bad.join(', ')); return; }
-  if (btn) { btn.disabled = true; btn.textContent = '처리 중…'; }
+  if (btn) btn.disabled = true;
   NOTI_USERS = null;
-  notiTargetUids(target).then(function(uids) {
+  notiTargetSplit(target).then(function(r) {
+    NOTI_PENDING = { title: title, body: body, channel: channel, target: target, timing: timing, scheduleAt: scheduleAt, uids: r.uids };
+    var hasVar = /\{[^{}]+\}/.test(title + body);
+    var ex = function(label, str) { return '<div class="ncf-sub"><span class="ncf-sub-k">' + label + '</span>' + ppEsc(ntplFill(str, NOTI_EX)) + '</div>'; };
+    var row = function(k, v) { return '<div class="ncf-row"><div class="ncf-k">' + k + '</div><div class="ncf-v">' + v + '</div></div>'; };
+    /* 「명」·안내 낱말은 사전이 아는 낱말이라 따로 떼어 둔다 — 붙여 쓰면 통째 일치가 깨져 한국어로 남는다 */
+    var who = '<span>' + (NOTI_TARGET_KO[target] || target) + '</span> · <strong>' + ppN(r.uids.length) + '</strong><span>명</span>'
+      + '<div class="ncf-note"><span>수신 동의 회원만</span> · <span>미동의</span> ' + ppN(r.excluded) + '<span>명</span> <span>제외</span></div>';
+    document.getElementById('ncf-rows').innerHTML =
+        row('발송 채널', '<span>' + (channel === 'push' ? '앱 푸시' : ppEsc(channel)) + '</span>')
+      + row('발송 대상', who)
+      + row('제목', ntplVarsHtml(title) + (hasVar && /\{[^{}]+\}/.test(title) ? ex('예시 값을 넣은 모습', title) : ''))
+      + row('내용', ntplVarsHtml(body) + (hasVar && /\{[^{}]+\}/.test(body) ? ex('예시 값을 넣은 모습', body) : ''))
+      + row('발송 시점', timing === 'scheduled' ? '<span>예약 발송</span> · ' + ppEsc(notiSchedLabel(scheduleAt)) : '<span>즉시 발송</span>');
+    openModal('m-noti-confirm');
+  }).catch(function(e) {
+    toast('대상 회원을 세지 못했습니다: ' + (e.message || e));
+  }).finally(function() { if (btn) btn.disabled = false; });
+};
+window.notiSendConfirmed = function() {
+  var P = NOTI_PENDING;
+  if (!P) { closeModal('m-noti-confirm'); return; }
+  var title = P.title, body = P.body, channel = P.channel, target = P.target, timing = P.timing, scheduleAt = P.scheduleAt;
+  var btn = document.getElementById('noti-send-btn'), cbtn = document.getElementById('ncf-send-btn');
+  if (btn) { btn.disabled = true; btn.textContent = '처리 중…'; }
+  if (cbtn) cbtn.disabled = true;
+  Promise.resolve(P.uids).then(function(uids) {
     return db.collection('notifications').add({
       title: title, body: body, channel: channel, target: target,
       recipient_count: uids.length, recipient_uids: uids, marketing_only: true,
@@ -12113,6 +12187,8 @@ window.notiSend = function() {
       created_at: FS.FieldValue.serverTimestamp(),
     });
   }).then(function() {
+    NOTI_PENDING = null;
+    closeModal('m-noti-confirm');
     toast(timing === 'scheduled' ? '예약 발송이 등록되었습니다.' : '알림이 발송되었습니다.');
     logAdmin('알림 발송: ' + title + ' · ' + NOTI_TARGET_KO[target]);
     document.getElementById('noti-title').value = '';
@@ -12122,6 +12198,7 @@ window.notiSend = function() {
     toast('발송 실패: ' + (e.message||e));
   }).finally(function() {
     if (btn) { btn.disabled = false; btn.textContent = '발송'; }
+    if (cbtn) cbtn.disabled = false;
   });
 };
 
