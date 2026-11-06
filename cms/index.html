@@ -3203,6 +3203,13 @@ window.CMS_FEATURES = {
             <button type="button" class="dm-tab" onclick="notiSwitchTab(this,'noti-tab-auto')">자동 발송</button>
           </div>
           <div id="noti-tab-manual">
+            <!-- 검색 줄 — STG 발송 내역 표 위와 같은 구성(제목 · 대상 · 상태 · 검색). 자동 발송 탭에는 두지 않는다(STG 에 없음, 2026-11-06) -->
+            <div class="srch-row" style="padding:12px 16px;border-bottom:1px solid var(--border)">
+              <input class="search-box" id="noti-h-q" placeholder="제목 검색">
+              <select class="filter-sel" id="noti-h-target"><option value="">전체 대상</option><option value="all">전체 회원</option><option value="kakao">카카오 연동 회원</option><option value="guest">미연동(게스트) 회원</option><option value="inactive30">30일 미접속</option><option value="new7">신규 가입(7일 이내)</option><option value="purchased">구매 이력 있는 회원</option></select>
+              <select class="filter-sel" id="noti-h-status"><option value="">전체 상태</option><option value="sent">발송완료</option><option value="scheduled">예약</option><option value="cancelled">취소됨</option><option value="test">테스트</option></select>
+              <button class="btn btn-primary btn-sm" onclick="notiHistSearch()">검색</button>
+            </div>
             <table>
               <thead><tr><th style="text-align:center">발송일시</th><th style="text-align:center">채널</th><th>제목</th><th style="text-align:center">대상 조건</th><th style="text-align:center">대상 수</th><th style="text-align:center">성공</th><th style="text-align:center">실패</th><th style="text-align:center">미처리</th><th style="text-align:center">확인 불가</th><th style="text-align:center">열람율</th><th style="text-align:center">상태 / 액션</th></tr></thead>
               <tbody id="noti-hist-tbody">
@@ -7725,6 +7732,9 @@ Object.assign(KO2VI,{
   "미동의":"Chưa đồng ý",
   "제외":"loại trừ",
   "예시 값을 넣은 모습":"Hiển thị với giá trị ví dụ",
+  "제목 검색":"Tìm theo tiêu đề",
+  "전체 대상":"Tất cả đối tượng",
+  "테스트":"Thử nghiệm",
   "제목을 입력해주세요.":"Vui lòng nhập tiêu đề.",
   "내용을 입력해주세요.":"Vui lòng nhập nội dung.",
   "대상 회원을 세지 못했습니다: ":"Không đếm được hội viên nhận: ",
@@ -12068,10 +12078,10 @@ function loadNotifications() {
     set('noti-kpi-month', ppN(monthCount) + '건');
     set('noti-kpi-scheduled', ppN(scheduled) + '건');
 
-    if (snap.empty) { ppPaged('notifications', tbody, [], ppEmpty(11,'발송 내역이 없습니다.')); return; }
+    if (snap.empty) { NOTI_HIST_ROWS = []; notiHistApply(false); return; }
     var STATUS_BADGE = { sent:'<span class="badge badge-green">발송완료</span>', scheduled:'<span class="badge badge-amber">예약</span>', cancelled:'<span class="badge badge-gray">취소됨</span>', test:'<span class="badge badge-gray">테스트</span>' };
     NOTI_DOCS = {};
-    ppPaged('notifications', tbody, snap.docs.map(function(doc) {
+    NOTI_HIST_ROWS = snap.docs.map(function(doc) {
       var d = doc.data();
       NOTI_DOCS[doc.id] = d;
       var total = d.recipient_count || 0;
@@ -12081,7 +12091,7 @@ function loadNotifications() {
         ? '<button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();notiOpenTest(\'' + doc.id + '\')">테스트 발송</button>'
           + ' <button class="btn btn-ghost btn-sm" style="color:var(--danger)" onclick="event.stopPropagation();notiCancelScheduled(\'' + doc.id + '\')">취소</button>'
         : '';
-      return '<tr style="cursor:pointer" onclick="notiOpenRecipients(\'' + doc.id + '\')">'
+      var html = '<tr style="cursor:pointer" onclick="notiOpenRecipients(\'' + doc.id + '\')">'
         + '<td style="text-align:center;white-space:nowrap"><div style="font-weight:700;color:#333">' + ppDt(d.sent_at || d.created_at) + '</div><div style="color:var(--text-3);font-size:11px">' + ppTm(d.sent_at || d.created_at) + '</div></td>'
         + '<td style="text-align:center">' + (NOTI_CHANNEL_KO[d.channel]||d.channel||'—') + '</td>'
         + '<td>' + (d.title||'') + '</td>'
@@ -12094,9 +12104,34 @@ function loadNotifications() {
         + '<td style="text-align:center">' + (r ? (r.unknown ? '<span style="color:var(--text-2);font-weight:700">' + ppN(r.unknown) + '명</span>' : '0명') : '—') + '</td>'
         + '<td style="text-align:center">—</td>'
         + '<td style="text-align:center">' + (STATUS_BADGE[d.status]||'<span class="badge badge-gray">' + (d.status||'') + '</span>') + ' ' + act + '</td></tr>';
-    }), ppEmpty(11,'발송 내역이 없습니다.'));
+      return { html: html, title: d.title || '', target: d.target || '', status: d.status || '' };
+    });
+    notiHistApply(false);
   }).catch(function(e){ console.error('loadNotifications', e); tbody.innerHTML = ppEmpty(7,'로드 오류'); });
 }
+
+/* 수동 발송 기록 검색 — 제목(포함·대소문자 무시) · 대상 · 상태를 함께 건다. 「검색」을 누를 때 적용하고 1쪽으로 돌아간다.
+   다시 불러올 때(발송·취소 뒤)는 걸어 둔 조건과 보던 쪽을 그대로 둔다. */
+var NOTI_HIST_ROWS = [];
+var NOTI_HIST_F = { q: '', target: '', status: '' };
+function notiHistApply(toFirst) {
+  var tbody = document.getElementById('noti-hist-tbody');
+  if (!tbody) return;
+  var f = NOTI_HIST_F, q = f.q.toLowerCase(), on = !!(f.q || f.target || f.status);
+  var rows = NOTI_HIST_ROWS.filter(function(r) {
+    return (!q || r.title.toLowerCase().indexOf(q) >= 0) && (!f.target || r.target === f.target) && (!f.status || r.status === f.status);
+  }).map(function(r) { return r.html; });
+  if (toFirst && PP_PAGED['notifications']) PP_PAGED['notifications'].page = 1;
+  ppPaged('notifications', tbody, rows, ppEmpty(11, on && NOTI_HIST_ROWS.length ? '검색 결과가 없습니다.' : '발송 내역이 없습니다.'));
+}
+window.notiHistSearch = function() {
+  NOTI_HIST_F = {
+    q: ((document.getElementById('noti-h-q') || {}).value || '').trim(),
+    target: (document.getElementById('noti-h-target') || {}).value || '',
+    status: (document.getElementById('noti-h-status') || {}).value || ''
+  };
+  notiHistApply(true);
+};
 
 /* 발송 대상 — PricePick엔 "회원 등급"이 없다(티켓 등급은 회원이 아니라 개별
    티켓의 등급이라 발송 대상 분류에 못 씀 — 해리 지적, 김반장 확정). 대신 실제 DB에 있는
