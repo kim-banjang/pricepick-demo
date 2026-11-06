@@ -12041,7 +12041,7 @@ function loadNotifications() {
       /* 예약 건은 아직 나가지 않았으므로 성공·실패가 없다 */
       var r = (d.status === 'scheduled' || d.status === 'cancelled') ? null : notiResultCount(doc.id, d);
       var act = (d.status === 'scheduled')
-        ? '<button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();notiOpenTest(\'' + doc.id + '\')">선택 개별 발송</button>'
+        ? '<button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();notiOpenTest(\'' + doc.id + '\')">테스트 발송</button>'
           + ' <button class="btn btn-ghost btn-sm" style="color:var(--danger)" onclick="event.stopPropagation();notiCancelScheduled(\'' + doc.id + '\')">취소</button>'
         : '';
       var html = '<tr style="cursor:pointer" onclick="notiOpenRecipients(\'' + doc.id + '\')">'
