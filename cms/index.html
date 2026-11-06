@@ -698,9 +698,6 @@ td.rf-net-col{font-weight:700;color:var(--success);}
 #noti-compose .noti-field-err{border-color:var(--red)!important;}
 .noti-err-msg{display:none;margin-top:6px;font-size:12px;line-height:1.4;color:var(--red);}
 .noti-err-msg.on{display:block;}
-.noti-time-wrap{position:relative;}
-.noti-time-wrap .noti-err-msg{position:absolute;left:0;top:100%;white-space:nowrap;}
-#noti-compose .noti-time-row.err{margin-bottom:22px;}
 /* 알림 발송 최종 확인 — 항목 이름 · 값 두 칸 */
 .ncf-row{display:grid;grid-template-columns:96px minmax(0,1fr);gap:12px;padding:9px 0;border-bottom:1px solid var(--border);font-size:13px;line-height:1.6;}
 .ncf-k{font-size:11px;font-weight:700;color:var(--text-2);text-transform:uppercase;letter-spacing:.4px;padding-top:2px;}
@@ -3149,12 +3146,10 @@ window.CMS_FEATURES = {
           <div class="card-header"><div class="card-title">FCM 푸시 발송 상한 정책 <span style="font-size:11px;color:var(--success);font-weight:600">정책 확정</span></div></div>
           <div style="padding:16px">
             <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px">
-              <div class="policy-item"><div class="policy-label">거래 알림 (구매·확정·환불)</div><div class="policy-value">상한 없음</div><div class="policy-desc">서비스 필수 알림 — 발송 제한 없음. 야간에도 즉시 발송.</div></div>
+              <div class="policy-item"><div class="policy-label">거래 알림 (구매·확정·환불)</div><div class="policy-value">상한 없음</div><div class="policy-desc">서비스 필수 알림 — 발송 제한 없음.</div></div>
               <div class="policy-item"><div class="policy-label">기타 알림 (미션·만료·추첨)</div><div class="policy-value">일 2건</div><div class="policy-desc">1인 1일 최대 2건.</div></div>
-              <div class="policy-item"><div class="policy-label">야간 발송</div><div class="policy-value">22:00~08:00 미발송</div><div class="policy-desc">야간 시간대 푸시 발송 차단. 모았다가 아침에 묶음 발송.</div></div>
+              <div class="policy-item"><div class="policy-label">야간 발송</div><div class="policy-value">22:00~08:00 미발송</div><div class="policy-desc">야간 시간대 푸시 발송 차단.</div></div>
             </div>
-            <!-- 우선순위 · 중복 억제 — 칸을 늘리지 않고 한 줄로 붙인다(STG 세 칸 배치 유지, 김반장 2026-11-06) -->
-            <div style="margin-top:12px;font-size:11px;color:var(--text-2);line-height:1.6"><strong style="color:var(--text)">우선순위 · 중복 억제</strong> — <span>거래 > 만료 임박 > 미션 > 추첨</span> · <span>같은 사유의 알림은 묶어 중복 발송을 억제(하루 상한 안에서).</span></div>
           </div>
         </div>
         <!-- ② 알림 작성 · 발송 — 입력란 높이 40px · 내용 110px 은 STG 값(이 카드 안에서만, 2026-11-06) -->
@@ -3183,15 +3178,12 @@ window.CMS_FEATURES = {
               <textarea class="terms-editor" id="noti-body" style="min-height:110px" placeholder="알림 본문을 입력하세요. 변수: {닉네임}, {보유티켓}" oninput="notiClearErr('noti-body')"></textarea>
               <div class="noti-err-msg" id="noti-body-err">내용을 입력해주세요.</div>
             </div>
-            <div class="noti-time-row" style="display:flex;align-items:flex-end;gap:14px;flex-wrap:wrap">
+            <div style="display:flex;align-items:flex-end;gap:14px;flex-wrap:wrap">
               <div>
                 <label style="font-size:11px;color:var(--text-2);font-weight:600;display:block;margin-bottom:6px;text-transform:uppercase;letter-spacing:.4px">발송 시점</label>
-                <select class="filter-sel" id="noti-timing" onchange="if(this.value!=='scheduled')notiClearErr('noti-schedule-at')"><option value="now">즉시 발송</option><option value="scheduled">예약 발송</option></select>
+                <select class="filter-sel" id="noti-timing"><option value="now">즉시 발송</option><option value="scheduled">예약 발송</option></select>
               </div>
-              <div class="noti-time-wrap">
-                <input type="datetime-local" class="search-box" id="noti-schedule-at" style="width:auto" oninput="notiClearErr('noti-schedule-at')" onchange="notiClearErr('noti-schedule-at')">
-                <div class="noti-err-msg" id="noti-schedule-at-err">발송 시각을 입력해주세요.</div>
-              </div>
+              <input type="datetime-local" class="search-box" id="noti-schedule-at" style="width:auto">
               <div style="margin-left:auto;display:flex;gap:8px">
                 <button class="btn btn-ghost btn-sm" id="noti-test-btn" onclick="notiSendTest()">테스트 발송</button>
                 <button class="btn btn-primary" id="noti-send-btn" onclick="notiSend()">발송</button>
@@ -7685,11 +7677,6 @@ Object.assign(KO2VI,{
   "자동 발송":"Gửi tự động",
   "알림 종류":"Loại thông báo",
   "대상 회원":"Hội viên nhận",
-  "우선순위 · 중복 억제":"Ưu tiên · chặn trùng lặp",
-  "거래 > 만료 임박 > 미션 > 추첨":"Giao dịch > Sắp hết hạn > Nhiệm vụ > Bốc thăm",
-  "같은 사유의 알림은 묶어 중복 발송을 억제(하루 상한 안에서).":"Gộp các thông báo cùng lý do để chặn gửi trùng (trong giới hạn mỗi ngày).",
-  "야간 시간대 푸시 발송 차단. 모았다가 아침에 묶음 발송.":"Chặn gửi push ban đêm. Gom lại và gửi một lần vào buổi sáng.",
-  "서비스 필수 알림 — 발송 제한 없음. 야간에도 즉시 발송.":"Thông báo bắt buộc của dịch vụ — không giới hạn gửi. Gửi ngay cả ban đêm.",
   "자동 알림 문구 수정":"Sửa nội dung thông báo tự động",
   "쓸 수 있는 변수":"Biến có thể dùng",
   "다시 고치기":"Sửa lại",
@@ -7740,7 +7727,6 @@ Object.assign(KO2VI,{
   "예시 값을 넣은 모습":"Hiển thị với giá trị ví dụ",
   "제목을 입력해주세요.":"Vui lòng nhập tiêu đề.",
   "내용을 입력해주세요.":"Vui lòng nhập nội dung.",
-  "발송 시각을 입력해주세요.":"Vui lòng nhập thời gian gửi.",
   "대상 회원을 세지 못했습니다: ":"Không đếm được hội viên nhận: ",
   "앱이 상황에 따라 저절로 보내는 알림의 제목·본문입니다.":"Là tiêu đề·nội dung của các thông báo app tự gửi theo tình huống.",
   "수정 → 미리보기 → 이대로 저장":"Sửa → Xem trước → Lưu như thế này",
@@ -12152,11 +12138,10 @@ function notiSetErr(id, on) {
   var f = document.getElementById(id), m = document.getElementById(id + '-err');
   if (f) f.classList.toggle('noti-field-err', !!on);
   if (m) m.classList.toggle('on', !!on);
-  if (id === 'noti-schedule-at') { var row = f && f.closest('.noti-time-row'); if (row) row.classList.toggle('err', !!on); }
 }
 window.notiClearErr = function(id) {
   var f = document.getElementById(id);
-  if (f && (id === 'noti-schedule-at' || f.value.trim())) notiSetErr(id, false);
+  if (f && f.value.trim()) notiSetErr(id, false);
 };
 window.notiSend = function() {
   var title = document.getElementById('noti-title').value.trim();
@@ -12167,11 +12152,12 @@ window.notiSend = function() {
   var scheduleAt = document.getElementById('noti-schedule-at').value;
   /* 비어 있는 칸은 모두 한꺼번에 표시하고 발송을 막는다(STG 와 같이) */
   var miss = [];
-  [['noti-title', !title], ['noti-body', !body], ['noti-schedule-at', timing === 'scheduled' && !scheduleAt]].forEach(function(x) {
+  [['noti-title', !title], ['noti-body', !body]].forEach(function(x) {
     notiSetErr(x[0], x[1]);
     if (x[1]) miss.push(x[0]);
   });
   if (miss.length) { var mf = document.getElementById(miss[0]); if (mf) mf.focus(); return; }
+  if (timing === 'scheduled' && !scheduleAt) { toast('예약 발송 시각을 입력하세요.'); return; }
   var btn = document.getElementById('noti-send-btn');
   var bad = [];
   (title + ' ' + body).replace(/\{([^{}]+)\}/g, function(m, k) { if (NOTI_VARS.indexOf(k) < 0 && bad.indexOf(m) < 0) bad.push(m); return m; });
