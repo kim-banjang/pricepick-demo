@@ -21991,40 +21991,7 @@ function ppManualNotifFill(str) {
   return String(str || '').replace(/\{닉네임\}/g, (PP.user && PP.user.nickname) || '회원').replace(/\{보유티켓\}/g, own.toLocaleString('ko-KR'));
 }
 
-/* ── 자동 발송 기록 (notif_logs) — 데모는 실제 푸시가 없으므로 알림함에 새로 쌓인 자동 알림을 1건씩 남긴다 ──
-   문서 id = 회원 id + 알림 key 라 같은 알림은 한 번만 남는다. 수동 발송(nt:)은 남기지 않는다 — notifications 가 기록이다. */
-var PP_NOTIF_LOGGED = null;
-var PP_NOTIF_LOGGING = false;
-function ppLogAutoNotifs(items) {
-  var uid = PP.uid;
-  if (!uid || PP_NOTIF_LOGGING) return;
-  var auto = items.filter(function (i) { return i.tpl && i.key.indexOf('nt:') !== 0; });
-  if (!auto.length) return;
-  PP_NOTIF_LOGGING = true;
-  var idOf = function (k) { return (uid + '__' + k).replace(/\//g, '_'); };
-  var seenP = PP_NOTIF_LOGGED ? Promise.resolve(PP_NOTIF_LOGGED)
-    : db.collection('notif_logs').where('user_id', '==', uid).get().then(function (snap) {
-        var m = {}; snap.forEach(function (d) { m[d.id] = true; }); PP_NOTIF_LOGGED = m; return m;
-      });
-  seenP.then(function (seen) {
-    var fresh = auto.filter(function (i) { return !seen[idOf(i.key)]; });
-    var chunks = [];
-    for (var c = 0; c < fresh.length; c += 400) chunks.push(fresh.slice(c, c + 400));
-    return chunks.reduce(function (pr, part) {
-      return pr.then(function () {
-        var b = db.batch();
-        part.forEach(function (i) {
-          b.set(db.collection('notif_logs').doc(idOf(i.key)), {
-            user_id: uid, nickname: (PP.user && PP.user.nickname) || '', item_key: i.key, tpl_key: i.tpl,
-            title: i.head, body: i.desc, sent_at: FS.Timestamp.fromDate(i.d), result: 'ok', reason: '',
-            logged_at: FS.FieldValue.serverTimestamp()
-          });
-        });
-        return b.commit().then(function () { part.forEach(function (i) { seen[idOf(i.key)] = true; }); });
-      });
-    }, Promise.resolve());
-  }).catch(function (e) { console.error('ppLogAutoNotifs', e); }).then(function () { PP_NOTIF_LOGGING = false; });
-}
+/* 자동 발송 기록(notif_logs)은 쌓지 않는다 — CMS 자동 발송 기록 화면을 뺐다(김반장 2026-11-06). */
 /* ── 알림 (pw-S1) — 실제 이벤트 기반 ── */
 function renderNotifications() {
   if (!PP.uid) return;
@@ -22083,7 +22050,6 @@ function renderNotifications() {
       items.push({ key: 'nt:' + n._id, type: 'event', d: at, tag: '이벤트', head: ppManualNotifFill(n.title), desc: ppManualNotifFill(n.body) });
     });
     items = items.filter(function (i) { return i.d; }).sort(function (a, b) { return b.d - a.d; });
-    ppLogAutoNotifs(items);
     var readSet = {};
     (PP.user && PP.user.read_notif_ids || []).forEach(function (k) { readSet[k] = true; });
     /* 필터 뱃지 */
