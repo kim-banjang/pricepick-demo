@@ -299,20 +299,31 @@ tr:hover td{background:var(--surface-2);}
 .ta-notice-mark{display:inline-flex;align-items:center;justify-content:center;
   width:18px;height:18px;border-radius:50%;background:var(--main);color:#fff;font-size:12px;line-height:1;}
 /* 알림 관리 ① 자동 알림 문구 (2026-11-05) */
-/* 자동 알림 문구 표 — 6칸 고정 폭. 전역 td 의 nowrap·가운데 정렬을 이 표에서만 푼다(1400px 창에서 가로 스크롤 없이 관리 칸까지 보이게). */
+/* 자동 알림 문구 표 (김반장 2026-11-06 재디자인) — 접힌 줄은 한 줄 높이로 고정, 넘치면 말줄임.
+   누르면 아래 줄이 펼쳐지고(여러 줄 동시), 코드 글꼴은 펼친 자리의 변수 이름에만 쓴다. */
 .ntpl-table{table-layout:fixed;}
-.ntpl-table th{padding:10px 8px;white-space:normal;}
-.ntpl-table td{font-size:12px;vertical-align:top;line-height:1.55;padding:10px 8px;white-space:normal;word-break:keep-all;overflow-wrap:anywhere;}
+.ntpl-table th{padding:10px 10px;white-space:normal;}
+.ntpl-table td{font-size:13px;line-height:1.5;padding:11px 10px;vertical-align:middle;}
 .ntpl-table td.ntpl-l{text-align:left!important;}
-.ntpl-table .badge{white-space:normal;line-height:1.3;}
-.ntpl-group{font-weight:700;color:var(--text);margin-bottom:5px;}
-.ntpl-chips{display:flex;flex-direction:column;align-items:center;gap:3px;}
-.ntpl-chip{display:inline-block;max-width:100%;padding:1px 6px;border-radius:99px;font-size:10px;font-weight:600;line-height:1.35;border:1px solid var(--border);color:var(--text-2);background:var(--surface);}
+.ntpl-table td.ntpl-1l{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.ntpl-row{cursor:pointer;}
+.ntpl-row.open td{background:var(--surface-2);}
+.ntpl-cell1{display:flex;align-items:center;gap:6px;min-width:0;white-space:nowrap;}
+.ntpl-chev{flex:none;width:14px;height:14px;color:var(--text-3);transition:transform .15s;}
+.ntpl-row.open .ntpl-chev{transform:rotate(90deg);}
+.ntpl-group{font-weight:700;color:var(--text);overflow:hidden;text-overflow:ellipsis;}
+.ntpl-chip{flex:none;display:inline-block;padding:1px 7px;border-radius:99px;font-size:11px;font-weight:700;line-height:1.5;border:1px solid var(--border);color:var(--text-2);background:var(--surface);white-space:nowrap;}
 .ntpl-chip-must{border-color:transparent;background:var(--main-soft);color:var(--main-hover);}
-.ntpl-chip b{font-weight:700;margin-right:3px;}
-.ntpl-var{display:inline-block;padding:0 5px;border-radius:4px;background:var(--surface-2);color:var(--main);font-family:monospace;font-size:11px;white-space:nowrap;}
-.ntpl-src{margin-top:4px;font-size:10px;color:var(--text-3);font-family:monospace;}
-.ntpl-note{margin-top:6px;font-size:11px;color:var(--text-3);}
+.ntpl-drow td{background:var(--surface-2);padding:0 10px 14px 34px;text-align:left!important;white-space:normal;}
+.ntpl-det{display:grid;grid-template-columns:72px minmax(0,1fr);gap:8px 14px;font-size:13px;color:var(--text);}
+.ntpl-det-k{font-size:11px;font-weight:700;color:var(--text-3);padding-top:2px;}
+.ntpl-det ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:4px;}
+.ntpl-det-cases li{line-height:1.55;}
+.ntpl-case-k{display:inline-block;margin-right:8px;font-size:12px;font-weight:700;color:var(--text-2);}
+.ntpl-det-vars li{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap;color:var(--text-2);}
+.ntpl-code{font-family:monospace;font-size:12px;color:var(--main);background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:0 5px;}
+.ntpl-det-chips{display:flex;gap:6px;flex-wrap:wrap;}
+.ntpl-det-src{grid-column:1 / -1;font-size:13px;color:var(--text-3);}
 .ta-notice-list{margin:0;padding:0;list-style:none;}
 .ta-notice-list li{padding:9px 0;border-bottom:1px solid var(--border);font-size:13px;line-height:1.6;color:var(--text-2);}
 .ta-notice-list li:last-child{border-bottom:none;}
@@ -3223,7 +3234,7 @@ window.CMS_FEATURES = {
         <div class="card">
           <div class="card-header"><div><div class="card-title">자동 알림 문구</div><div class="card-sub">서버에서 자동으로 발송하는 알림입니다. 문구 변경은 개발 배포가 필요합니다.</div><div class="card-sub" style="font-size:10px;color:var(--text-3)"><span>기준</span> <span class="no-vi" id="ntpl-base"></span></div></div></div>
           <table class="ntpl-table">
-            <colgroup><col style="width:132px"><col style="width:210px"><col style="width:200px"><col><col style="width:84px"></colgroup>
+            <colgroup><col style="width:168px"><col style="width:220px"><col style="width:230px"><col><col style="width:84px"></colgroup>
             <thead><tr><th>구분</th><th>발송 상황</th><th>제목</th><th>본문</th><th>상태</th></tr></thead>
             <tbody id="ntpl-tbody"></tbody>
           </table>
@@ -7624,6 +7635,9 @@ Object.assign(KO2VI,{
   "푸시 · 설정 무관":"Push · không phụ thuộc cài đặt",
   "푸시 미발송":"Không gửi push",
   "문구를 불러오지 못했습니다":"Không tải được nội dung",
+  "발송 조건":"Điều kiện gửi","출처":"Nguồn","변수 없음":"Không có biến","푸시 전용":"Chỉ push","알림함 미저장":"Không lưu hộp thông báo","푸시 · 수신 설정 무관":"Push · không phụ thuộc cài đặt nhận","1:1 문의":"Hỏi đáp 1:1",
+  "차감이 없을 때":"Khi không bị trừ","이전 구매 취소분을 차감했을 때":"Khi đã trừ phần hủy mua trước","전체 취소일 때":"Khi hủy toàn bộ","부분 취소일 때":"Khi hủy một phần",
+  "보유 티켓으로 전부 환수할 때":"Khi thu hồi đủ từ vé đang giữ","보유 티켓이 일부 모자랄 때":"Khi vé đang giữ thiếu một phần","보유 티켓이 없을 때":"Khi không có vé đang giữ","남은 티켓이 있을 때":"Khi còn vé","보유 티켓이 모자랄 때":"Khi vé đang giữ không đủ","남은 금액이 티켓 1장에 못 미칠 때":"Khi số tiền còn lại không đủ 1 vé","보유 티켓으로 전부 회수할 때":"Khi thu hồi đủ từ vé đang giữ",
   "기준":"Cơ sở",
   "야간 발송 허용":"Cho phép gửi ban đêm",
   "티켓 적립":"Tích lũy vé","만료":"Hết hạn","운영자 지급":"Quản trị viên cấp","전환":"Chuyển đổi","출석":"Điểm danh","카카오 연동":"Liên kết Kakao","미션":"Nhiệm vụ","선물 상자":"Hộp quà",
@@ -11769,78 +11783,78 @@ window.noticeSubmit = function(status) {
   });
 };
 
-/* ── ① 자동 알림 문구 — 실제 서비스 백엔드 문구 (김반장 2026-11-06) ─────────────────────
-   출처: inetkr/pricepick-backend stg 브랜치(2c8a103, 2026-11-05) notificationService.notify()·notifyBulk() 호출부.
-   제목·본문은 코드 문자열 그대로다(변수도 코드 이름 그대로 ${...}). 문구는 서버 코드에 박혀 있어 CMS 에서 고칠 수 없다 —
-   그래서 수정 단추·미리보기·저장을 두지 않는다. 문구가 바뀌면 이 표도 손으로 맞춘다.
-   box: 앱 알림함 묶음(NOTIFICATION_CATEGORY). push: purchase=구매 알림 설정 · event=이벤트·티켓 알림 설정 · none=설정 무관 · off=푸시 없이 알림함만.
-   여러 토막을 이어 붙이는 문구(쿠팡 취소·환수)는 이어 붙이는 식 그대로 적고, 토막 정의는 note 에 적는다. */
+/* ── ① 자동 알림 문구 — 실제 서비스 백엔드 문구 (김반장 2026-11-06 재디자인) ─────────────────────
+   출처: inetkr/pricepick-backend stg 브랜치(2c8a103, 2026-11-05) notificationService.notify()·notifyBulk() 호출부 + qnaService 직접 푸시.
+   문구는 서버 코드에 박혀 있어 CMS 에서 고칠 수 없다(조회 전용). 백엔드 문구가 바뀌면 이 표도 손으로 맞춘다.
+   cases: 회원이 받는 완성 문장 — 변수 자리에 예시 값(쿠팡 · 50,000원 · 픽픽이 · 백엔드 상수값)을 넣었다. 문장 꼴은 백엔드 그대로다.
+          첫 줄이 접힌 표에 보이는 대표 문장이고, 조건에 따라 갈리는 문장은 펼치면 경우마다 나온다.
+   vars:  코드의 변수 이름과 그 자리에 들어가는 값. box: 앱 알림 유형(NOTIFICATION_CATEGORY). push: purchase=구매 알림 설정 · event=이벤트·티켓 알림 설정 · none=수신 설정 무관 · off=푸시 미발송 */
 var NTPL_DEF = [
-  { group: '구매', situ: '제휴몰 구매 접수', title: '구매가 감지됐어요', body: '쇼핑몰 구매 내역이 확인됐어요. 잠시 후 랜덤 티켓이 적립될 예정이에요.', box: '구매', push: 'purchase', src: 'ticketService.ts:286' },
-  { group: '티켓 적립', situ: '구매 접수 · 랜덤 티켓 가지급', title: '랜덤 티켓 1장이 적립 대기 중이에요', body: '구매 확정까지 카카오 연동 시 D+7, 미연동 시 D+30 남았어요. 확정되면 티켓 수량이 공개돼요.', box: '티켓', push: 'purchase', src: 'ticketService.ts:345' },
-  { group: '티켓 적립', situ: '구매 접수 · 일·월 적립 한도 초과', title: '이번 구매는 적립 대상이 아니에요', body: '일/월 구매 적립 한도를 초과해 이번 건은 랜덤 티켓이 지급되지 않아요. (일 ${PURCHASE_TICKET_LIMIT.DAILY}건·월 ${PURCHASE_TICKET_LIMIT.MONTHLY}건)', box: '티켓', push: 'purchase', src: 'ticketService.ts:336' },
-  { group: '티켓 적립', situ: '구매 확정 · 적립 한도 초과로 거절', title: '이번 구매는 적립 대상이 아니에요', body: '일/월 구매 적립 한도를 초과해 이번 건은 랜덤 티켓이 지급되지 않아요. (일 5건·월 50건)', box: '티켓', push: 'purchase', src: 'ticketService.ts:1087' },
-  { group: '티켓 적립', situ: '구매 확정 · 티켓 수량 공개', title: '티켓 수량이 공개됐어요!', body: '${summary}이 지금 사용 가능해요.', box: '티켓', push: 'purchase', src: 'ticketService.ts:1059' },
-  { group: '티켓 적립', situ: '구매 확정 · 이전 취소분 차감 후 공개', title: '티켓 수량이 공개됐어요!', body: '${summary}이 지금 사용 가능해요. (이전 구매 취소분 ${repaidTotal}장 차감 후)', box: '티켓', push: 'purchase', src: 'ticketService.ts:1059' },
-  { group: '티켓 적립', situ: '첫 구매 확정 보너스', title: '첫 구매 완료! ${ticketTypeLabel(TicketType.TICKET)} ${bonusAmount}장', body: '가입 후 첫 구매가 확정되어 ${ticketTypeLabel(TicketType.TICKET)} ${bonusAmount}장을 받았어요.', box: '티켓', push: 'purchase', src: 'ticketService.ts:430 · 본문 :410' },
-  { group: '취소 · 환수', situ: '구매 확정 · 적립분 전액 이전 취소분 차감', title: '적립 티켓이 이전 취소분에 차감됐어요', body: '이전 구매 취소로 회수하지 못한 티켓이 있어 ${revokedSummary}이 이번 적립분에서 차감됐어요.', box: '티켓', push: 'purchase', src: 'ticketService.ts:1047' },
-  { group: '취소 · 환수', situ: '쿠팡 구매 취소 — 티켓 확정 전 (전체 · 부분)', title: '적립 예정 티켓 취소', body: '${head} · 적립 예정이던 랜덤 티켓 1장이 취소되었습니다.', box: '티켓', push: 'purchase', night: true, src: 'ticketService.ts:2398 · 문구 :2339–2340', note: 'head' },
-  { group: '취소 · 환수', situ: '쿠팡 구매 취소 — 티켓 확정 후, 전체 취소', title: '지급 티켓 환수', body: '${head} · ${joinSentences(summary ? `지급된 ${summary}이 환수되었습니다.` : \'\', debtSentence)}', box: '티켓', push: 'purchase', night: true, src: 'ticketService.ts:2398 · 문구 :2373–2374', note: 'head debt' },
-  { group: '취소 · 환수', situ: '쿠팡 구매 취소 — 티켓 확정 후, 부분 취소', title: '지급 티켓 부분 환수', body: '${head} · ${joinSentences(summary ? `${summary}이 환수되었습니다.` : \'\', debtSentence, remainingTickets > 0 ? `남은 ${remainingTickets}장은 그대로 사용하실 수 있습니다.` : \'\')}', box: '티켓', push: 'purchase', night: true, src: 'ticketService.ts:2398 · 문구 :2388–2394', note: 'head debt' },
-  { group: '취소 · 환수', situ: '구매 취소·환불 · 지급 티켓 회수', title: '적립된 혜택이 회수됐어요', body: '구매 취소·환불이 확인되어 ${summary}이 회수됐어요.', box: '티켓', push: 'purchase', src: 'ticketService.ts:2276' },
-  { group: '취소 · 환수', situ: '구매 취소·환불 · 회수 · 보유 티켓 부족', title: '적립된 혜택이 회수됐어요', body: '구매 취소·환불이 확인되어 ${summary}이 회수됐어요. 보유 티켓이 부족한 ${debtTotal}장은 다음 적립 시 차감돼요.', box: '티켓', push: 'purchase', src: 'ticketService.ts:2276' },
-  { group: '기프티콘', situ: '기프티콘 구매 취소 · 티켓 복구', title: '기프티콘 구매가 취소됐어요', body: '${order.product_name} 구매가 취소되어 ${ticketTypeLabel(TicketType.TICKET)} ${refund.refunded_tickets}장이 복구됐어요.', box: '티켓', push: 'none', src: 'giftOrderService.ts:373' },
-  { group: '만료', situ: '티켓 만료 예고', title: '티켓 만료가 ${days}일 남았어요', body: '보유 중인 ${summary}이 ${days}일 후 만료돼요. 지금 구매해보세요.', box: '티켓', push: 'event', src: 'ticketService.ts:1222' },
-  { group: '만료', situ: '티켓 만료', title: '티켓이 만료됐어요', body: '${ticketTypeLabel(batch.ticket_type)} ${batch.amount}장이 만료돼서 사라졌어요.', box: '티켓', push: 'event', src: 'ticketService.ts:1176' },
-  { group: '만료', situ: '포인트 만료 예고', title: '포인트 만료가 ${days}일 남았어요', body: '보유 중인 ${amount}P가 ${days}일 후 만료돼요. 기프티콘 구매에 사용해보세요.', box: '티켓', push: 'event', src: 'pointService.ts:367' },
-  { group: '만료', situ: '포인트 만료', title: '포인트가 만료됐어요', body: '${batch.amount}P가 만료돼서 사라졌어요.', box: '티켓', push: 'event', src: 'pointService.ts:835' },
-  { group: '운영자 지급', situ: '운영자 티켓 지급', title: '티켓이 지급됐어요', body: '${summary}이 지급됐어요.', box: '티켓', push: 'event', src: 'ticketService.ts:2246' },
-  { group: '운영자 지급', situ: '운영자 티켓 회수', title: '티켓이 회수됐어요', body: '${summary}이 회수됐어요.', box: '티켓', push: 'event', src: 'ticketService.ts:2255' },
-  { group: '운영자 지급', situ: '운영자 포인트 지급', title: '${amount}P가 지급됐어요', body: '관리자에 의해 ${amount}P가 지급됐어요.', box: '티켓', push: 'event', src: 'pointService.ts:498' },
-  { group: '운영자 지급', situ: '운영자 포인트 회수', title: '${amount}P가 회수됐어요', body: '관리자에 의해 ${amount}P가 회수됐어요.', box: '티켓', push: 'event', src: 'pointService.ts:507' },
-  { group: '전환', situ: '이벤트 티켓 → 티켓 전환', title: '${ticketTypeLabel(rule.source)} 전환이 완료됐어요', body: '${ticketTypeLabel(rule.target)} ${yieldedTarget}장으로 전환됐어요.', box: '티켓', push: 'off', src: 'ticketService.ts:4334' },
-  { group: '전환', situ: '포인트 → 티켓 전환', title: '포인트·티켓 전환이 완료됐어요', body: '포인트 ${pointsRequired.toLocaleString()}P를 ${ticketTypeLabel(ticket_type)} ${ticketsToReceive}장으로 전환했어요.', box: '티켓', push: 'off', src: 'pointService.ts:1155' },
-  { group: '전환', situ: '티켓 → 포인트 전환', title: '포인트·티켓 전환이 완료됐어요', body: '${ticketTypeLabel(ticket_type)} ${ticketsToSpend}장을 포인트 ${pointsToReceive.toLocaleString()}P로 전환했어요.', box: '티켓', push: 'off', src: 'pointService.ts:1258' },
-  { group: '출석', situ: '쿠팡 구경 출석 적립', title: '${config.daily_points}P가 적립됐어요', body: '오늘 출석체크로 ${config.daily_points}P를 받았어요.', box: '이벤트', push: 'off', src: 'pointService.ts:270' },
-  { group: '출석', situ: '연속 출석 달성', title: '${config.streak_milestone_days}일 연속 출석 달성!', body: '보너스로 이벤트 티켓 ${streakGrantedAmount}장을 받았어요.', box: '이벤트', push: 'off', src: 'pointService.ts:284' },
-  { group: '출석', situ: '당일 미출석 회원 대상 출석 독려', title: '오늘 출석체크 잊지 마세요!', body: '지금 출석체크하고 포인트를 받아보세요.', box: '이벤트', push: 'event', src: 'pointService.ts:330 (일괄 발송)' },
-  { group: '포인트', situ: '가입 축하 포인트 적립', title: '가입 축하 ${ONBOARDING.REGISTER_POINTS}P!', body: '가입해주셔서 감사해요. ${ONBOARDING.REGISTER_POINTS}P가 즉시 적립됐어요.', box: '이벤트', push: 'off', src: 'userService.ts:386' },
-  { group: '포인트', situ: '첫 쿠팡 구경 포인트 적립', title: '첫 쿠팡 구경 완료! ${ONBOARDING.COUPANG_FIRST_VIEW_POINTS}P', body: '첫 쿠팡 구경으로 ${ONBOARDING.COUPANG_FIRST_VIEW_POINTS}P를 받았어요. 매일 출석 보상과는 별도예요.', box: '이벤트', push: 'off', src: 'pointService.ts:890' },
-  { group: '카카오 연동', situ: '카카오 연동 완료 보상', title: '카카오 연동 완료! 이벤트 티켓 ${grantedAmount}장', body: '카카오 연동을 완료해서 이벤트 티켓 ${grantedAmount}장을 받았어요.', box: '이벤트', push: 'event', src: 'userService.ts:606' },
-  { group: '미션', situ: '연속구매 미션 달성', title: '연속구매 미션 달성!', body: '${g.purchases}회 연속구매를 달성해서 이벤트 티켓 ${granted}장을 받았어요.', box: '이벤트', push: 'event', src: 'ticketService.ts:1419' },
-  { group: '선물 상자', situ: '선물 상자 · 이벤트 티켓 당첨', title: '${label} 당첨!', body: '${label}에서 ${ticketTypeLabel(TicketType.EVENT_TICKET)} ${granted}장을 받았어요.', box: '이벤트', push: 'off', src: 'ticketService.ts:1676', note: 'label' },
-  { group: '선물 상자', situ: '선물 상자 · 포인트 당첨', title: '${label} 당첨!', body: '${label}에서 ${amount}P를 받았어요.', box: '이벤트', push: 'off', src: 'ticketService.ts:1714 · 본문 :1692', note: 'label' },
-  { group: '선물 상자', situ: '선물 상자 · 티켓 당첨', title: '${label} 당첨!', body: '${label}에서 ${ticketLabel} ${amount}장을 받았어요.', box: '이벤트', push: 'off', src: 'ticketService.ts:1796 · 본문 :1732', note: 'label' },
-  { group: '선물 상자', situ: '선물 상자 · 티켓 당첨 · 이전 취소분 차감', title: '${label} 당첨!', body: '${rewardMessage} (이전 구매 취소분 ${debtRepaid}장 차감 후 ${amount - debtRepaid}장 적립)', box: '이벤트', push: 'off', src: 'ticketService.ts:1796 · rewardMessage :1732', note: 'label' },
-  { group: '친구초대', situ: '피초대자 첫 구매 완료 · 초대자 대상', title: '친구 초대 성공! ${rewardPoints}P를 받았어요', body: '${inviterNickname}님이 초대한 친구가 첫 구매를 완료했어요. ${rewardPoints}P가 적립됐어요.', box: '이벤트', push: 'event', src: 'referralService.ts:248 · 제목 :238 · 본문 :203' },
-  { group: '친구초대', situ: '피초대자 첫 구매 완료 · 피초대자 대상', title: '초대 보상 ${rewardPoints}P를 받았어요', body: '첫 구매를 완료해서 친구 초대 보상 ${rewardPoints}P가 적립됐어요.', box: '이벤트', push: 'event', src: 'referralService.ts:248 · 제목 :243 · 본문 :204' },
-  { group: '경품', situ: '주간 경품 추첨 당첨', title: '경품 추첨에 당첨되셨어요!', body: '당첨을 축하해요! 경품 수령 정보를 1:1 문의로 보내주세요.', box: '이벤트', push: 'event', src: 'prizeDrawService.ts:614' }
+  { group: '구매', situ: '제휴몰 구매 접수', title: '구매가 감지됐어요', cases: [['', '쇼핑몰 구매 내역이 확인됐어요. 잠시 후 랜덤 티켓이 적립될 예정이에요.']], vars: [], box: '구매', push: 'purchase', src: 'ticketService.ts:286' },
+  { group: '티켓 적립', situ: '구매 접수 · 랜덤 티켓 가지급', title: '랜덤 티켓 1장이 적립 대기 중이에요', cases: [['', '구매 확정까지 카카오 연동 시 D+7, 미연동 시 D+30 남았어요. 확정되면 티켓 수량이 공개돼요.']], vars: [], box: '티켓', push: 'purchase', src: 'ticketService.ts:345' },
+  { group: '티켓 적립', situ: '구매 접수 · 일·월 적립 한도 초과', title: '이번 구매는 적립 대상이 아니에요', cases: [['', '일/월 구매 적립 한도를 초과해 이번 건은 랜덤 티켓이 지급되지 않아요. (일 5건·월 50건)']], vars: [['PURCHASE_TICKET_LIMIT.DAILY · MONTHLY', '일·월 구매 적립 한도 건수 (현재 5건 · 50건)']], box: '티켓', push: 'purchase', src: 'ticketService.ts:336' },
+  { group: '티켓 적립', situ: '구매 확정 · 적립 한도 초과로 거절', title: '이번 구매는 적립 대상이 아니에요', cases: [['', '일/월 구매 적립 한도를 초과해 이번 건은 랜덤 티켓이 지급되지 않아요. (일 5건·월 50건)']], vars: [['(없음)', '한도 건수가 문장에 5건 · 50건으로 고정돼 있다']], box: '티켓', push: 'purchase', src: 'ticketService.ts:1087' },
+  { group: '티켓 적립', situ: '구매 확정 · 티켓 수량 공개', title: '티켓 수량이 공개됐어요!', cases: [['차감이 없을 때', '티켓 3장이 지금 사용 가능해요.'], ['이전 구매 취소분을 차감했을 때', '티켓 3장이 지금 사용 가능해요. (이전 구매 취소분 1장 차감 후)']], vars: [['summary', '지금 쓸 수 있게 된 티켓 종류·장수'], ['repaidTotal', '이전 구매 취소분으로 차감된 장수']], box: '티켓', push: 'purchase', src: 'ticketService.ts:1059' },
+  { group: '티켓 적립', situ: '첫 구매 확정 보너스', title: '첫 구매 완료! 티켓 10장', cases: [['', '가입 후 첫 구매가 확정되어 티켓 10장을 받았어요.']], vars: [['bonusAmount', '첫 구매 보너스 장수 (현재 10장)'], ['ticketTypeLabel(TicketType.TICKET)', '티켓 종류 이름 (티켓)']], box: '티켓', push: 'purchase', src: 'ticketService.ts:430 · 본문 :410' },
+  { group: '취소 · 환수', situ: '구매 확정 · 적립분 전액 이전 취소분 차감', title: '적립 티켓이 이전 취소분에 차감됐어요', cases: [['', '이전 구매 취소로 회수하지 못한 티켓이 있어 티켓 2장이 이번 적립분에서 차감됐어요.']], vars: [['revokedSummary', '이번 적립분에서 차감된 티켓 종류·장수']], box: '티켓', push: 'purchase', src: 'ticketService.ts:1047' },
+  { group: '취소 · 환수', situ: '쿠팡 구매 취소 · 티켓 확정 전', title: '적립 예정 티켓 취소', cases: [['전체 취소일 때', '쿠팡 50,000원 구매 취소 · 적립 예정이던 랜덤 티켓 1장이 취소되었습니다.'], ['부분 취소일 때', '쿠팡 50,000원 중 20,000원 취소 · 적립 예정이던 랜덤 티켓 1장이 취소되었습니다.']], vars: [['head', '전체 취소면 「쿠팡 {주문 금액} 구매 취소」, 부분 취소면 「쿠팡 {주문 금액} 중 {취소 금액} 취소」'], ['order_total · cancel_amount', '주문 금액 · 이번 취소 금액']], box: '티켓', push: 'purchase', night: true, src: 'ticketService.ts:2398 · 문구 :2339–2340 · head :2329' },
+  { group: '취소 · 환수', situ: '쿠팡 구매 취소 · 확정 후 전체 취소', title: '지급 티켓 환수', cases: [['보유 티켓으로 전부 환수할 때', '쿠팡 50,000원 구매 취소 · 지급된 티켓 3장이 환수되었습니다.'], ['보유 티켓이 일부 모자랄 때', '쿠팡 50,000원 구매 취소 · 지급된 티켓 2장이 환수되었습니다. 보유하신 티켓이 모자라 1장은 회수 예정으로 남았습니다. 다음에 티켓을 받으실 때 자동으로 차감됩니다.'], ['보유 티켓이 없을 때', '쿠팡 50,000원 구매 취소 · 보유하신 티켓이 모자라 3장은 회수 예정으로 남았습니다. 다음에 티켓을 받으실 때 자동으로 차감됩니다.']], vars: [['head', '「쿠팡 {주문 금액} 구매 취소」'], ['summary', '지금 환수한 티켓 종류·장수'], ['debtSentence · debt', '보유 티켓이 모자라 회수 예정으로 남긴 장수와 그 안내 문장']], box: '티켓', push: 'purchase', night: true, src: 'ticketService.ts:2398 · 문구 :2373–2374 · 회수 예정 문장 :2364' },
+  { group: '취소 · 환수', situ: '쿠팡 구매 취소 · 확정 후 부분 취소', title: '지급 티켓 부분 환수', cases: [['남은 티켓이 있을 때', '쿠팡 50,000원 중 20,000원 취소 · 티켓 1장이 환수되었습니다. 남은 2장은 그대로 사용하실 수 있습니다.'], ['보유 티켓이 모자랄 때', '쿠팡 50,000원 중 20,000원 취소 · 보유하신 티켓이 모자라 1장은 회수 예정으로 남았습니다. 다음에 티켓을 받으실 때 자동으로 차감됩니다. 남은 2장은 그대로 사용하실 수 있습니다.'], ['남은 금액이 티켓 1장에 못 미칠 때', '쿠팡 50,000원 중 45,000원 취소 · 티켓 3장이 환수되었습니다.']], vars: [['head', '「쿠팡 {주문 금액} 중 {취소 금액} 취소」'], ['summary', '지금 환수한 티켓 종류·장수'], ['debtSentence · debt', '보유 티켓이 모자라 회수 예정으로 남긴 장수와 그 안내 문장'], ['remainingTickets', '그 주문에서 계속 쓸 수 있는 티켓 장수 (0장이면 문장 생략)']], box: '티켓', push: 'purchase', night: true, src: 'ticketService.ts:2398 · 문구 :2388–2394 · 회수 예정 문장 :2364' },
+  { group: '취소 · 환수', situ: '구매 취소·환불 · 지급 티켓 회수', title: '적립된 혜택이 회수됐어요', cases: [['보유 티켓으로 전부 회수할 때', '구매 취소·환불이 확인되어 티켓 3장이 회수됐어요.'], ['보유 티켓이 모자랄 때', '구매 취소·환불이 확인되어 티켓 2장이 회수됐어요. 보유 티켓이 부족한 1장은 다음 적립 시 차감돼요.']], vars: [['summary', '회수한 티켓 종류·장수'], ['debtTotal', '보유 티켓이 모자라 다음 적립 때 차감할 장수']], box: '티켓', push: 'purchase', src: 'ticketService.ts:2276' },
+  { group: '기프티콘', situ: '기프티콘 구매 취소 · 티켓 복구', title: '기프티콘 구매가 취소됐어요', cases: [['', '스타벅스 카페 아메리카노 T 구매가 취소되어 티켓 5장이 복구됐어요.']], vars: [['order.product_name', '기프티콘 상품명'], ['refund.refunded_tickets', '돌려준 티켓 장수']], box: '티켓', push: 'none', src: 'giftOrderService.ts:373' },
+  { group: '만료', situ: '티켓 만료 예고', title: '티켓 만료가 7일 남았어요', cases: [['', '보유 중인 티켓 3장이 7일 후 만료돼요. 지금 구매해보세요.']], vars: [['days', '만료까지 남은 일수 (30일 · 7일 전에 발송)'], ['summary', '곧 만료되는 티켓 종류·장수']], box: '티켓', push: 'event', src: 'ticketService.ts:1222' },
+  { group: '만료', situ: '티켓 만료', title: '티켓이 만료됐어요', cases: [['', '티켓 2장이 만료돼서 사라졌어요.']], vars: [['ticketTypeLabel(batch.ticket_type) · batch.amount', '만료된 티켓 종류 · 장수']], box: '티켓', push: 'event', src: 'ticketService.ts:1176' },
+  { group: '만료', situ: '포인트 만료 예고', title: '포인트 만료가 7일 남았어요', cases: [['', '보유 중인 300P가 7일 후 만료돼요. 기프티콘 구매에 사용해보세요.']], vars: [['days', '만료까지 남은 일수 (30일 · 7일 전에 발송)'], ['amount', '곧 만료되는 포인트']], box: '티켓', push: 'event', src: 'pointService.ts:367' },
+  { group: '만료', situ: '포인트 만료', title: '포인트가 만료됐어요', cases: [['', '300P가 만료돼서 사라졌어요.']], vars: [['batch.amount', '만료된 포인트']], box: '티켓', push: 'event', src: 'pointService.ts:835' },
+  { group: '운영자 지급', situ: '운영자 티켓 지급', title: '티켓이 지급됐어요', cases: [['', '티켓 5장이 지급됐어요.']], vars: [['summary', '지급한 티켓 종류·장수']], box: '티켓', push: 'event', src: 'ticketService.ts:2246' },
+  { group: '운영자 지급', situ: '운영자 티켓 회수', title: '티켓이 회수됐어요', cases: [['', '티켓 2장이 회수됐어요.']], vars: [['summary', '회수한 티켓 종류·장수']], box: '티켓', push: 'event', src: 'ticketService.ts:2255' },
+  { group: '운영자 지급', situ: '운영자 포인트 지급', title: '500P가 지급됐어요', cases: [['', '관리자에 의해 500P가 지급됐어요.']], vars: [['amount', '지급한 포인트']], box: '티켓', push: 'event', src: 'pointService.ts:498' },
+  { group: '운영자 지급', situ: '운영자 포인트 회수', title: '500P가 회수됐어요', cases: [['', '관리자에 의해 500P가 회수됐어요.']], vars: [['amount', '회수한 포인트']], box: '티켓', push: 'event', src: 'pointService.ts:507' },
+  { group: '전환', situ: '이벤트 티켓 → 티켓 전환', title: '이벤트 티켓 전환이 완료됐어요', cases: [['', '티켓 1장으로 전환됐어요.']], vars: [['ticketTypeLabel(rule.source) · rule.target', '전환 전 · 전환 후 티켓 종류'], ['yieldedTarget', '전환으로 받은 장수']], box: '티켓', push: 'off', src: 'ticketService.ts:4334' },
+  { group: '전환', situ: '포인트 → 티켓 전환', title: '포인트·티켓 전환이 완료됐어요', cases: [['', '포인트 1,000P를 티켓 1장으로 전환했어요.']], vars: [['pointsRequired', '쓴 포인트'], ['ticket_type · ticketsToReceive', '받은 티켓 종류 · 장수']], box: '티켓', push: 'off', src: 'pointService.ts:1155' },
+  { group: '전환', situ: '티켓 → 포인트 전환', title: '포인트·티켓 전환이 완료됐어요', cases: [['', '티켓 1장을 포인트 100P로 전환했어요.']], vars: [['ticket_type · ticketsToSpend', '쓴 티켓 종류 · 장수'], ['pointsToReceive', '받은 포인트']], box: '티켓', push: 'off', src: 'pointService.ts:1258' },
+  { group: '출석', situ: '쿠팡 구경 출석 적립', title: '10P가 적립됐어요', cases: [['', '오늘 출석체크로 10P를 받았어요.']], vars: [['config.daily_points', '하루 출석 포인트 (설정값)']], box: '이벤트', push: 'off', src: 'pointService.ts:270' },
+  { group: '출석', situ: '연속 출석 달성', title: '7일 연속 출석 달성!', cases: [['', '보너스로 이벤트 티켓 1장을 받았어요.']], vars: [['config.streak_milestone_days', '연속 출석 기준 일수 (설정값)'], ['streakGrantedAmount', '받은 이벤트 티켓 장수']], box: '이벤트', push: 'off', src: 'pointService.ts:284' },
+  { group: '출석', situ: '당일 미출석 회원 대상 출석 독려', title: '오늘 출석체크 잊지 마세요!', cases: [['', '지금 출석체크하고 포인트를 받아보세요.']], vars: [], box: '이벤트', push: 'event', src: 'pointService.ts:330 (일괄 발송)' },
+  { group: '포인트', situ: '가입 축하 포인트 적립', title: '가입 축하 20P!', cases: [['', '가입해주셔서 감사해요. 20P가 즉시 적립됐어요.']], vars: [['ONBOARDING.REGISTER_POINTS', '가입 축하 포인트 (현재 20P)']], box: '이벤트', push: 'off', src: 'userService.ts:386' },
+  { group: '포인트', situ: '첫 쿠팡 구경 포인트 적립', title: '첫 쿠팡 구경 완료! 10P', cases: [['', '첫 쿠팡 구경으로 10P를 받았어요. 매일 출석 보상과는 별도예요.']], vars: [['ONBOARDING.COUPANG_FIRST_VIEW_POINTS', '첫 쿠팡 구경 포인트 (현재 10P)']], box: '이벤트', push: 'off', src: 'pointService.ts:890' },
+  { group: '카카오 연동', situ: '카카오 연동 완료 보상', title: '카카오 연동 완료! 이벤트 티켓 1장', cases: [['', '카카오 연동을 완료해서 이벤트 티켓 1장을 받았어요.']], vars: [['grantedAmount', '받은 이벤트 티켓 장수 (현재 1장, 한도에 걸리면 0장)']], box: '이벤트', push: 'event', src: 'userService.ts:606' },
+  { group: '미션', situ: '연속구매 미션 달성', title: '연속구매 미션 달성!', cases: [['', '3회 연속구매를 달성해서 이벤트 티켓 2장을 받았어요.']], vars: [['g.purchases', '달성한 연속구매 횟수'], ['granted', '받은 이벤트 티켓 장수']], box: '이벤트', push: 'event', src: 'ticketService.ts:1419' },
+  { group: '선물 상자', situ: '선물 상자 · 이벤트 티켓 당첨', title: '매일 선물 상자 당첨!', cases: [['', '매일 선물 상자에서 이벤트 티켓 1장을 받았어요.']], vars: [['label', '선물 상자 이름 (매일 선물 상자 / 랜덤 선물 상자)'], ['granted', '받은 이벤트 티켓 장수']], box: '이벤트', push: 'off', src: 'ticketService.ts:1676' },
+  { group: '선물 상자', situ: '선물 상자 · 포인트 당첨', title: '매일 선물 상자 당첨!', cases: [['', '매일 선물 상자에서 50P를 받았어요.']], vars: [['label', '선물 상자 이름 (매일 선물 상자 / 랜덤 선물 상자)'], ['amount', '받은 포인트']], box: '이벤트', push: 'off', src: 'ticketService.ts:1714 · 본문 :1692' },
+  { group: '선물 상자', situ: '선물 상자 · 티켓 당첨', title: '랜덤 선물 상자 당첨!', cases: [['차감이 없을 때', '랜덤 선물 상자에서 티켓 2장을 받았어요.'], ['이전 구매 취소분을 차감했을 때', '랜덤 선물 상자에서 티켓 2장을 받았어요. (이전 구매 취소분 1장 차감 후 1장 적립)']], vars: [['label', '선물 상자 이름 (매일 선물 상자 / 랜덤 선물 상자)'], ['ticketLabel · amount', '받은 티켓 종류 · 장수'], ['debtRepaid', '이전 구매 취소분으로 차감된 장수']], box: '이벤트', push: 'off', src: 'ticketService.ts:1796 · 본문 :1732' },
+  { group: '친구초대', situ: '피초대자 첫 구매 완료 · 초대자 대상', title: '친구 초대 성공! 500P를 받았어요', cases: [['', '픽픽이님이 초대한 친구가 첫 구매를 완료했어요. 500P가 적립됐어요.']], vars: [['inviterNickname', '초대한 회원의 닉네임'], ['rewardPoints', '친구초대 보상 포인트 (현재 500P)']], box: '이벤트', push: 'event', src: 'referralService.ts:248 · 제목 :238 · 본문 :203' },
+  { group: '친구초대', situ: '피초대자 첫 구매 완료 · 피초대자 대상', title: '초대 보상 500P를 받았어요', cases: [['', '첫 구매를 완료해서 친구 초대 보상 500P가 적립됐어요.']], vars: [['rewardPoints', '친구초대 보상 포인트 (현재 500P)']], box: '이벤트', push: 'event', src: 'referralService.ts:248 · 제목 :243 · 본문 :204' },
+  { group: '경품', situ: '주간 경품 추첨 당첨', title: '경품 추첨에 당첨되셨어요!', cases: [['', '당첨을 축하해요! 경품 수령 정보를 1:1 문의로 보내주세요.']], vars: [], box: '이벤트', push: 'event', src: 'prizeDrawService.ts:614' },
+  { group: '1:1 문의', situ: '1:1 문의 답변 등록', title: '문의하신 내용에 답변이 달렸어요', cases: [['', '1:1 문의에 남기신 질문에 답변이 등록됐어요. 확인해보세요.']], vars: [], box: '', push: 'none', pushOnly: true, src: 'qnaService.ts:97–100' }
 ];
-var NTPL_PUSH_KO = { purchase: '푸시 · 구매 알림 설정', event: '푸시 · 이벤트·티켓 알림 설정', none: '푸시 · 설정 무관', off: '푸시 미발송' };
-var NTPL_NOTE = {
-  head: '${head} = 쿠팡 ${won(order_total)} 구매 취소 / 쿠팡 ${won(order_total)} 중 ${won(cancel_amount)} 취소 (:2329)',
-  debt: '${debtSentence} = 보유하신 ${ticketLabel}이 모자라 ${debt}장은 회수 예정으로 남았습니다. 다음에 ${ticketLabel}을 받으실 때 자동으로 차감됩니다. (:2364)',
-  label: '${label} = 매일 선물 상자 / 랜덤 선물 상자 (const.ts:510–511)'
-};
+var NTPL_PUSH_KO = { purchase: '푸시 · 구매 알림 설정', event: '푸시 · 이벤트·티켓 알림 설정', none: '푸시 · 수신 설정 무관', off: '푸시 미발송' };
+/* 문구 기준 — 이 표가 어느 시점 백엔드 문구인지 표 위에 작게 적는다 */
+var NTPL_BASE = 'inetkr/pricepick-backend stg 2c8a103 · 2026-11-05';
+var NTPL_OPEN = {};
 function ntplFill(str, vars) {
   return String(str == null ? '' : str).replace(/\{([^{}]+)\}/g, function(m, k) { return (vars[k] != null && vars[k] !== '') ? String(vars[k]) : m; });
 }
-/* ${...} 자리를 보라색으로 — 안쪽에 중괄호가 한 겹 더 있는 식(${joinSentences(...)})도 통째로 묶는다 */
-function ntplVarsHtml(str) {
-  var s = String(str == null ? '' : str), out = '', i = 0;
-  while (i < s.length) {
-    var j = s.indexOf('${', i);
-    if (j < 0) { out += ppEsc(s.slice(i)); break; }
-    out += ppEsc(s.slice(i, j));
-    var k = j + 2, depth = 1;
-    while (k < s.length && depth) { if (s[k] === '{') depth++; else if (s[k] === '}') depth--; k++; }
-    out += '<span class="ntpl-var">' + ppEsc(s.slice(j, k)) + '</span>';
-    i = k;
-  }
-  return out;
+function ntplChevron() {
+  return '<svg class="ntpl-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 6 15 12 9 18"/></svg>';
 }
-/* 문구 기준 — 이 표가 어느 시점 백엔드 문구인지 표 위에 작게 적는다 */
-var NTPL_BASE = 'inetkr/pricepick-backend stg 2c8a103 · 2026-11-05';
+function ntplDetailHtml(d) {
+  var cases = d.cases.map(function(c) {
+    return '<li>' + (c[0] ? '<span class="ntpl-case-k">' + c[0] + '</span>' : '') + '<span class="no-vi">' + ppEsc(c[1]) + '</span></li>';
+  }).join('');
+  var vars = d.vars.length ? d.vars.map(function(v) {
+    return '<li><code class="ntpl-code">' + ppEsc(v[0]) + '</code><span>' + ppEsc(v[1]) + '</span></li>';
+  }).join('') : '<li><span>변수 없음</span></li>';
+  var chips = '<span class="ntpl-chip' + (d.push === 'purchase' ? ' ntpl-chip-must' : '') + '">' + NTPL_PUSH_KO[d.push] + '</span>'
+    + (d.night ? '<span class="ntpl-chip">야간 발송 허용</span>' : '')
+    + (d.pushOnly ? '<span class="ntpl-chip">알림함 미저장</span>' : '');
+  return '<div class="ntpl-det">'
+    + '<div class="ntpl-det-k">본문</div><ul class="ntpl-det-cases">' + cases + '</ul>'
+    + '<div class="ntpl-det-k">변수</div><ul class="ntpl-det-vars">' + vars + '</ul>'
+    + '<div class="ntpl-det-k">발송 조건</div><div class="ntpl-det-chips">' + chips + '</div>'
+    + '<div class="ntpl-det-src"><span>출처</span> <span class="no-vi">' + ppEsc(d.src) + '</span></div>'
+    + '</div>';
+}
 /* 그리다 실패하거나 행이 0건이면 빈 표로 두지 않고 그 사실을 표 안에 적는다(2026-11-06) */
 function ntplRender() {
   var tb = document.getElementById('ntpl-tbody'), base = document.getElementById('ntpl-base');
@@ -11852,24 +11866,31 @@ function ntplRender() {
   };
   try {
     if (!NTPL_DEF || !NTPL_DEF.length) { fail(''); return; }
-    tb.innerHTML = NTPL_DEF.map(function(d) {
-      var notes = (d.note || '').split(' ').filter(Boolean).map(function(n) { return '<div class="ntpl-note">' + ntplVarsHtml(NTPL_NOTE[n]) + '</div>'; }).join('');
-      return '<tr>'
-        + '<td><div class="ntpl-group">' + d.group + '</div><div class="ntpl-chips">'
-        + '<span class="ntpl-chip"><b>알림 유형</b><span>' + d.box + '</span></span>'
-        + '<span class="ntpl-chip' + (d.push === 'purchase' ? ' ntpl-chip-must' : '') + '">' + NTPL_PUSH_KO[d.push] + '</span>'
-        + (d.night ? '<span class="ntpl-chip">야간 발송 허용</span>' : '')
-        + '</div></td>'
-        + '<td class="ntpl-l">' + d.situ + '<div class="ntpl-src">' + ppEsc(d.src) + '</div></td>'
-        + '<td class="ntpl-l no-vi">' + ntplVarsHtml(d.title) + '</td>'
-        + '<td class="ntpl-l no-vi">' + ntplVarsHtml(d.body) + notes + '</td>'
-        + '<td style="text-align:center"><span class="badge badge-green">사용 중</span></td></tr>';
+    tb.innerHTML = NTPL_DEF.map(function(d, i) {
+      var open = !!NTPL_OPEN[i];
+      return '<tr class="ntpl-row' + (open ? ' open' : '') + '" onclick="ntplToggle(' + i + ')" aria-expanded="' + open + '">'
+        + '<td><div class="ntpl-cell1">' + ntplChevron() + '<span class="ntpl-group">' + d.group + '</span>'
+        + (d.box ? '<span class="ntpl-chip">' + d.box + '</span>' : '<span class="ntpl-chip">푸시 전용</span>') + '</div></td>'
+        + '<td class="ntpl-l ntpl-1l">' + d.situ + '</td>'
+        + '<td class="ntpl-l ntpl-1l no-vi">' + ppEsc(d.title) + '</td>'
+        + '<td class="ntpl-l ntpl-1l no-vi">' + ppEsc(d.cases[0][1]) + '</td>'
+        + '<td style="text-align:center"><span class="badge badge-green">사용 중</span></td></tr>'
+        + '<tr class="ntpl-drow"' + (open ? '' : ' style="display:none"') + '><td colspan="5">' + ntplDetailHtml(d) + '</td></tr>';
     }).join('');
   } catch (e) {
     console.error('ntplRender', e);
     fail((e && e.message) || String(e));
   }
 }
+/* 펼침 — 여러 행을 동시에 열 수 있다(비교용). 연 상태는 다시 그려도 유지한다 */
+window.ntplToggle = function(i) {
+  NTPL_OPEN[i] = !NTPL_OPEN[i];
+  var rows = document.querySelectorAll('#ntpl-tbody tr.ntpl-row');
+  var r = rows[i]; if (!r) return;
+  r.classList.toggle('open', !!NTPL_OPEN[i]);
+  r.setAttribute('aria-expanded', !!NTPL_OPEN[i]);
+  var dr = r.nextElementSibling; if (dr) dr.style.display = NTPL_OPEN[i] ? '' : 'none';
+};
 /* 화면 데이터 읽기(loadNotifications)를 기다리지 않는다 — 문구는 코드에 들어 있으니 스크립트가 읽히는 즉시 그린다 */
 ntplRender();
 /* 화면 탭 — 수동 발송 · 발송 기록 · 자동 알림 문구. 내용은 숨긴 채로도 다 그려 둔다(크기를 재는 곳이 없다).
