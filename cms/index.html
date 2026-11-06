@@ -542,6 +542,8 @@ tr:hover td{background:var(--surface-2);}
   padding:8px 14px;color:var(--text);font-size:13px;outline:none;font-family:var(--font);min-width:200px;transition:border-color .15s;}
 .search-box:focus{border-color:var(--main);}
 .search-box::placeholder{color:var(--text-3);}
+/* 고정 값 select — 브라우저 기본 흐림을 풀고 다른 select 와 같은 글자색으로 둔다 */
+select.filter-sel.noti-fixed-sel:disabled{opacity:1;color:var(--text-2);-webkit-text-fill-color:var(--text-2);cursor:default;}
 .filter-sel{background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r-md);
   padding:8px 12px;color:var(--text-2);font-size:13px;outline:none;cursor:pointer;font-family:var(--font);}
 
@@ -3145,7 +3147,8 @@ window.CMS_FEATURES = {
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
               <div>
                 <label style="font-size:11px;color:var(--text-2);font-weight:600;display:block;margin-bottom:6px;text-transform:uppercase;letter-spacing:.4px">발송 채널</label>
-                <div class="filter-sel" style="width:100%;cursor:default">앱 푸시</div>
+                <!-- 고를 수 없는 고정 값 — 옆 「발송 대상」과 같은 select 로 그려 높이·글자 자리·여백을 맞춘다(김반장 지적 2026-11-06) -->
+                <select class="filter-sel noti-fixed-sel" style="width:100%" disabled aria-label="발송 채널"><option>앱 푸시</option></select>
                 <input type="hidden" id="noti-channel" value="push">
               </div>
               <div>
