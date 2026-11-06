@@ -744,6 +744,7 @@ td.rf-net-col{font-weight:700;color:var(--success);}
 .noti-rcp-table{table-layout:fixed;}
 .noti-rcp-table td{overflow:hidden;text-overflow:ellipsis;}
 .noti-reg-at{margin-top:2px;font-size:13px;color:var(--text-3);}
+.noti-plan-at{font-weight:700;color:var(--text-3);}
 .ncx-ask{font-size:16px;font-weight:700;color:var(--text);text-align:center;margin-top:8px;}
 .ncx-title{margin-top:14px;padding:12px 14px;border:1px solid var(--border);border-radius:12px;font-size:15px;font-weight:700;color:var(--text);text-align:center;overflow-wrap:anywhere;}
 .ncx-note{margin-top:12px;font-size:13px;color:var(--text-3);text-align:center;}
@@ -12062,18 +12063,18 @@ function loadNotifications() {
   }).catch(function(e){ console.error('loadNotifications', e); tbody.innerHTML = ppEmpty(7,'로드 오류'); });
 }
 
-/* 발송일시 칸 — 예약 상태면 나갈 시각(schedule_at)을 STG 와 같이 날짜 / 시:분으로, 그 아래 예약 등록 시각.
-   발송완료 뒤에는 실제 나간 시각(sent_at). 예약 시각이 없는 옛 건은 등록 시각만(2026-11-06) */
+/* 발송일시 칸 (김반장 2026-11-06 정정 — 「발송이 아직 안된건데」)
+   예약 · 취소됨: 아직 나가지 않았으므로 「발송 예정 YYYY/MM/DD HH:MM」을 흐리게(--text-3) 적는다.
+   발송완료: 실제 나간 시각만 진하게(지금과 같다). 예약으로 걸었던 건은 어느 상태든 아래에 「예약 등록 MM/DD HH:MM」을 남긴다. */
 function notiHm(v) { var t = v ? (v.toDate ? v.toDate() : new Date(v)) : null; return t && !isNaN(t) ? String(t.getHours()).padStart(2, '0') + ':' + String(t.getMinutes()).padStart(2, '0') : ''; }
 function notiMd(v) { var t = v ? (v.toDate ? v.toDate() : new Date(v)) : null; return t && !isNaN(t) ? String(t.getMonth() + 1).padStart(2, '0') + '/' + String(t.getDate()).padStart(2, '0') : ''; }
 function notiWhenCell(d) {
-  if (d.status === 'scheduled' && d.schedule_at) {
-    return '<td style="text-align:center;white-space:nowrap"><div style="font-weight:700;color:#333">' + ppDt(d.schedule_at) + '</div>'
-      + '<div style="color:var(--text-3);font-size:11px">' + notiHm(d.schedule_at) + '</div>'
-      + '<div class="noti-reg-at"><span>예약 등록</span> ' + notiMd(d.created_at) + ' ' + notiHm(d.created_at) + '</div></td>';
+  var reg = d.schedule_at ? '<div class="noti-reg-at"><span>예약 등록</span> ' + notiMd(d.created_at) + ' ' + notiHm(d.created_at) + '</div>' : '';
+  if ((d.status === 'scheduled' || d.status === 'cancelled') && d.schedule_at) {
+    return '<td style="text-align:center;white-space:nowrap"><div class="noti-plan-at"><span>발송 예정</span> ' + ppDt(d.schedule_at) + ' ' + notiHm(d.schedule_at) + '</div>' + reg + '</td>';
   }
   var at = d.sent_at || d.created_at;
-  return '<td style="text-align:center;white-space:nowrap"><div style="font-weight:700;color:#333">' + ppDt(at) + '</div><div style="color:var(--text-3);font-size:11px">' + ppTm(at) + '</div></td>';
+  return '<td style="text-align:center;white-space:nowrap"><div style="font-weight:700;color:var(--text)">' + ppDt(at) + '</div><div style="color:var(--text-3);font-size:11px">' + ppTm(at) + '</div>' + reg + '</td>';
 }
 /* 수동 발송 기록 검색 — 제목(포함·대소문자 무시) · 대상 · 상태를 함께 건다. 「검색」을 누를 때 적용하고 1쪽으로 돌아간다.
    다시 불러올 때(발송·취소 뒤)는 걸어 둔 조건과 보던 쪽을 그대로 둔다. */
