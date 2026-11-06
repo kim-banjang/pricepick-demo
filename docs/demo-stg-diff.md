@@ -8,4 +8,4 @@ STG 상태는 실제 CMS 소스(`inetkr/pricepick-cms` staging 브랜치)에서 
 |---|---|---|---|---|
 | 1 | 랜덤 선물 상자 열기 설정 | 데모에서 「기본값 복원」 버튼을 지웠다. 되돌리는 값이 승인된 구성이 아니라 개발 중 코드에 넣어 둔 값이어서다. 「저장」 버튼은 그대로다. | STG는 「기본값 복원」 버튼이 있는 상태다(`src/sections/jackpot-roulette/jackpot-roulette-section.tsx:127`, 매일 선물 상자 화면에도 있다 `daily-lucky-roulette-section.tsx:120`). dc03dd2 기준 | 5a9f03f · 2026-11-05 |
 | 2 | 알림 관리 → 알림 작성 · 발송 | 데모에서 발송 시점이 「즉시 발송」이면 날짜·시각 입력란을 칸째 숨기고, 「예약 발송」일 때만 보이게 했다. 예약에서 즉시로 되돌리면 입력했던 날짜를 비운다. | STG는 입력란이 늘 보이고, 즉시 발송일 때는 흐리게 잠기는 상태다(`disabled`). 입력했던 날짜는 그대로 남는다(`src/components/notification/notification-form-card.tsx:182–190`). dc03dd2 기준 | 206b0a9 · 2026-11-06 |
-| 3 | 알림 관리 → 발송 기록 | 예약 건 액션: 데모는 「취소」만 둔다. | STG는 「테스트 발송」 단추가 함께 있다(`src/components/notification/notification-table.tsx:172`). dc03dd2 기준 | (커밋) · 2026-11-06 |
+| 3 | 알림 관리 → 발송 기록 | 예약 건 액션: 데모는 「취소」만 둔다. | STG는 「테스트 발송」 단추가 함께 있다(`src/components/notification/notification-table.tsx:172`). dc03dd2 기준 | 4a33904 · 2026-11-06 |
