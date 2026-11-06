@@ -330,12 +330,13 @@ tr:hover td{background:var(--surface-2);}
 .ntpl-sort-ic{width:12px;height:12px;margin-left:4px;vertical-align:middle;color:var(--text-3);opacity:.45;}
 .ntpl-sort-th[aria-sort="ascending"] .ntpl-sort-ic,.ntpl-sort-th[aria-sort="descending"] .ntpl-sort-ic{opacity:1;color:var(--main);}
 .ntpl-sort-th[aria-sort="ascending"] .ntpl-sort-ic .dn,.ntpl-sort-th[aria-sort="descending"] .ntpl-sort-ic .up{opacity:.25;}
-.ntpl-gbar{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:0 18px 16px;}
-.ntpl-gbtn{display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 14px;border-radius:16px;border:1px solid var(--border);background:var(--surface);font:inherit;font-size:13px;font-weight:700;color:var(--text-2);cursor:pointer;white-space:nowrap;transition:background .15s,border-color .15s;}
-.ntpl-gbtn b{font-weight:400;color:var(--text-3);}
+/* 구분 칩 — 표를 거드는 크기(김반장 2026-11-06 「여기 디자인 왜이래?」). 1400px 창에서 한 줄 폭을 넘어 좌우 여백은 10px(지시 대체값) */
+.ntpl-gbar{display:flex;flex-wrap:wrap;align-items:center;gap:6px;padding:12px 20px 14px;}
+.ntpl-gbtn{display:inline-flex;align-items:center;height:28px;padding:0 10px;border-radius:14px;border:1px solid var(--border);background:var(--surface);font-family:inherit;font-size:13px;font-weight:700;line-height:1;color:var(--text-2);cursor:pointer;white-space:nowrap;transition:background .15s,border-color .15s;}
+.ntpl-gbtn b{margin-left:4px;font-size:12px;font-weight:400;color:var(--text-3);}
 .ntpl-gbtn:hover{background:var(--sub-4,#F1EEFF);}
 .ntpl-gbtn.on,.ntpl-gbtn.on:hover{background:var(--main);border-color:var(--main);color:#fff;}
-.ntpl-gbtn.on b{color:rgba(255,255,255,.75);}
+.ntpl-gbtn.on b{color:rgba(255,255,255,.7);}
 .ta-notice-list{margin:0;padding:0;list-style:none;}
 .ta-notice-list li{padding:9px 0;border-bottom:1px solid var(--border);font-size:13px;line-height:1.6;color:var(--text-2);}
 .ta-notice-list li:last-child{border-bottom:none;}
