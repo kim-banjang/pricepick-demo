@@ -17988,6 +17988,8 @@ function csSubmitInquiry(btn) {
   Object.assign(KO2VI, {"중복 확인": "Kiểm tra trùng", "사용할 수 있는 닉네임이에요": "Biệt danh này có thể sử dụng", "이미 쓰고 있는 닉네임이에요": "Biệt danh này đã được sử dụng", "중복 확인을 먼저 해주세요": "Vui lòng kiểm tra trùng trước", "방금 다른 분이 먼저 사용했어요. 다른 닉네임을 입력해주세요": "Người khác vừa sử dụng biệt danh này. Vui lòng nhập biệt danh khác", "2~10자로 입력해주세요": "Vui lòng nhập 2-10 ký tự"});
   Object.assign(KO2VI, {"티켓 10장": "10 vé", "티켓은 구매 확정 후 지급(카카오톡 연동 D+7 / 미연동 D+30) · 이벤트 티켓·축하 포인트는 카카오 연동 시 지급": "Vé cấp sau xác nhận mua (liên kết KakaoTalk D+7 / chưa liên kết D+30) · vé sự kiện·điểm chúc mừng cấp khi liên kết Kakao"});
   Object.assign(KO2VI, {"보유한 포인트보다 많아요": "Nhiều hơn số điểm đang có"});
+  /* 기프티샵 빈 화면 — 「갈래」 → 「카테고리」(김반장 2026-11-06) */
+  Object.assign(KO2VI, {"이 카테고리에는 아직 상품이 없어요": "Danh mục này chưa có sản phẩm", "다른 카테고리를 눌러 보세요": "Hãy chọn danh mục khác"});
   /* 쇼핑 가이드 (홈 투어 · pw-23g) — 2026-11-03 */
   Object.assign(KO2VI, {"쇼핑 가이드": "Hướng dẫn mua sắm", "쓰던 쇼핑몰, 프라이스픽에서 들어가면 티켓이 쌓여요": "Vào sàn quen thuộc qua PricePick là tích lũy được vé", "처음이라면 위에서부터 차례로 읽어 보세요": "Nếu là lần đầu, hãy đọc lần lượt từ trên xuống", "한눈에 보는 프라이스픽": "PricePick trong nháy mắt", "누르면 처음부터 봐요": "Nhấn để xem từ đầu", "확정되면 바로 쓸 수 있어요": "Xác nhận xong là dùng được ngay", "제휴몰": "Sàn liên kết", "구매 완료": "Đã mua xong", "랜덤 티켓(구매 확정 전)": "Vé ngẫu nhiên (chờ xác nhận)", "10P = 티켓 1장": "10P = 1 vé", "건너뛰기": "Bỏ qua", "가이드 자세히 보기 ›": "Xem hướng dẫn chi tiết ›", "다시 보기": "Xem lại", "적립 조건 자세히 보기": "Xem chi tiết điều kiện tích lũy", "프라이스픽을 먼저 열어요": "Hãy mở PricePick trước", "여기를 거쳐야 티켓이 쌓여요": "Phải đi qua đây thì vé mới được tích lũy", "쓰던 쇼핑몰 그대로 들어가요": "Vào sàn quen thuộc như mọi khi", "평소처럼 사기만 하면 돼요": "Chỉ cần mua sắm như bình thường", "상품은 집으로, 티켓은 여기로": "Hàng về nhà, vé về đây", "구매가 확인되면 티켓이 들어와요": "Khi đơn mua được xác nhận, vé sẽ được cộng vào", "아직은 랜덤 티켓이에요": "Hiện vẫn là vé ngẫu nhiên", "구매가 확정될 때까지 기다려요": "Hãy chờ đến khi đơn mua được xác nhận", "랜덤 티켓이 티켓으로 바뀌어요": "Vé ngẫu nhiên chuyển thành vé", "포인트도 티켓이 돼요": "Điểm cũng thành vé", "10P 모으면 티켓 한 장": "Gom đủ 10P là được 1 vé", "티켓으로 기프티콘을 바꿔요": "Đổi vé lấy Gifticon", "커피부터 편의점까지": "Từ cà phê đến cửa hàng tiện lợi"});
   /* 2026-10-27 데모 미반영 수정분 */
@@ -21044,11 +21046,11 @@ function renderGifticons() {
   if (!list.length) {
     var why = PP_GI_Q ? '찾는 말과 맞는 상품이 없어요'
       : PP_GI_AVAIL_ONLY ? '지금 구매할 수 있는 상품이 없어요'
-      : PP_GI_BRAND ? '이 갈래에는 아직 상품이 없어요'
+      : PP_GI_BRAND ? '이 카테고리에는 아직 상품이 없어요'
       : '구매할 수 있는 기프티콘이 없어요';
     var how = PP_GI_Q ? '다른 말로 찾아 보세요'
       : PP_GI_AVAIL_ONLY ? '티켓을 더 모으면 여기에 나타나요'
-      : PP_GI_BRAND ? '다른 갈래를 눌러 보세요'
+      : PP_GI_BRAND ? '다른 카테고리를 눌러 보세요'
       : '관리자가 상품을 등록하면 여기에 나타나요';
     grid.innerHTML = '<div class="gs-empty"><div class="gs-empty-t">' + why + '</div><div class="gs-empty-s">' + how + '</div></div>';
     return;
