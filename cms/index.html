@@ -332,13 +332,20 @@ tr:hover td{background:var(--surface-2);}
 .ntpl-sort-th[aria-sort="ascending"] .ntpl-sort-ic .dn,.ntpl-sort-th[aria-sort="descending"] .ntpl-sort-ic .up{opacity:.25;}
 /* 구분 칩 — 표를 거드는 크기(김반장 2026-11-06 「여기 디자인 왜이래?」). 1400px 창에서 한 줄 폭을 넘어 좌우 여백은 10px(지시 대체값) */
 /* 칩 줄 — 카드 머리와 20px, 아래 20px 뒤 옅은 구분선, 구분선과 표 사이 20px. 좌우는 표 머리 글자 시작(칸 안쪽 10px)에 맞춘다 */
-.ntpl-gbar{display:flex;flex-wrap:wrap;align-items:center;gap:6px;padding:20px 10px;margin-bottom:20px;border-bottom:1px solid var(--border);}
-#noti-pane-templates .ntpl-table th:not(:last-child){text-align:left;}
-.ntpl-gbtn{display:inline-flex;align-items:center;height:28px;padding:0 10px;border-radius:14px;border:1px solid var(--border);background:var(--surface);font-family:inherit;font-size:13px;font-weight:700;line-height:1;color:var(--text-2);cursor:pointer;white-space:nowrap;transition:background .15s,border-color .15s;}
-.ntpl-gbtn b{margin-left:4px;font-size:12px;font-weight:400;color:var(--text-3);}
+.ntpl-gbar{display:flex;flex-direction:column;gap:10px;padding:20px 10px;margin-bottom:20px;border-bottom:1px solid var(--border);}
+.ntpl-grow1,.ntpl-grow2{display:flex;flex-wrap:wrap;align-items:center;gap:6px;}
+/* 윗줄 — 큰 묶음 */
+.ntpl-gbtn{display:inline-flex;align-items:center;height:32px;padding:0 12px;border-radius:16px;border:1px solid var(--border);background:var(--surface);font-family:inherit;font-size:14px;font-weight:700;line-height:1;color:var(--text-2);cursor:pointer;white-space:nowrap;transition:background .15s,border-color .15s;}
+.ntpl-gbtn b{margin-left:4px;font-size:13px;font-weight:400;color:var(--text-3);}
 .ntpl-gbtn:hover{background:var(--sub-4,#F1EEFF);}
 .ntpl-gbtn.on,.ntpl-gbtn.on:hover{background:var(--main);border-color:var(--main);color:#fff;}
 .ntpl-gbtn.on b{color:rgba(255,255,255,.7);}
+/* 아랫줄 — 세부 구분(윗줄보다 가볍게) */
+.ntpl-gsub{display:inline-flex;align-items:center;height:26px;padding:0 10px;border-radius:13px;border:1px solid var(--border);background:var(--surface);font-family:inherit;font-size:12px;font-weight:700;line-height:1;color:var(--text-2);cursor:pointer;white-space:nowrap;transition:background .15s,border-color .15s;}
+.ntpl-gsub b{margin-left:4px;font-size:11px;font-weight:400;color:var(--text-3);}
+.ntpl-gsub:hover{background:var(--sub-4,#F1EEFF);}
+.ntpl-gsub.on,.ntpl-gsub.on:hover{background:var(--sub-2,#C6AFFF);border-color:var(--sub-2,#C6AFFF);color:var(--main-dark);}
+.ntpl-gsub.on b{color:var(--main-dark);opacity:.7;}
 .ta-notice-list{margin:0;padding:0;list-style:none;}
 .ta-notice-list li{padding:9px 0;border-bottom:1px solid var(--border);font-size:13px;line-height:1.6;color:var(--text-2);}
 .ta-notice-list li:last-child{border-bottom:none;}
@@ -7686,7 +7693,7 @@ Object.assign(KO2VI,{
   "푸시 미발송":"Không gửi push",
   "문구를 불러오지 못했습니다":"Không tải được nội dung",
   "받을 회원이 없습니다. 발송 대상을 다시 선택해 주세요.":"Không có hội viên nhận. Hãy chọn lại đối tượng gửi.","받을 회원이 없습니다. 수신 동의 회원이 없어 전원 제외되었습니다.":"Không có hội viên nhận. Không có hội viên đồng ý nhận nên tất cả bị loại.",
-  "예약 등록":"Đăng ký hẹn giờ","예약 /":"Hẹn giờ /","예약 발송분":"Mục gửi hẹn giờ","예약 발송 취소":"Hủy gửi hẹn giờ","예약 발송을 취소하시겠습니까?":"Hủy gửi hẹn giờ này?","취소한 건은 「취소됨」으로 남고 발송되지 않습니다.":"Mục đã hủy sẽ ở trạng thái 「Đã hủy」 và không được gửi.",
+  "예약 등록":"Đăng ký hẹn giờ","구매·적립":"Mua·tích lũy","보상·이벤트":"Thưởng·sự kiện","사용·만료":"Sử dụng·hết hạn","운영·계정":"Vận hành·tài khoản","예약 /":"Hẹn giờ /","예약 발송분":"Mục gửi hẹn giờ","예약 발송 취소":"Hủy gửi hẹn giờ","예약 발송을 취소하시겠습니까?":"Hủy gửi hẹn giờ này?","취소한 건은 「취소됨」으로 남고 발송되지 않습니다.":"Mục đã hủy sẽ ở trạng thái 「Đã hủy」 và không được gửi.",
   "예약 건은 발송 시점에 대상이 정해집니다.":"Đối tượng của mục hẹn giờ được xác định lúc gửi.","현재 조건 기준":"Theo điều kiện hiện tại","명입니다.":"người.",
   "발송 조건":"Điều kiện gửi","출처":"Nguồn","변수 없음":"Không có biến","푸시 전용":"Chỉ push","알림함 미저장":"Không lưu hộp thông báo","푸시 · 수신 설정 무관":"Push · không phụ thuộc cài đặt nhận","1:1 문의":"Hỏi đáp 1:1",
   "차감이 없을 때":"Khi không bị trừ","이전 구매 취소분을 차감했을 때":"Khi đã trừ phần hủy mua trước","전체 취소일 때":"Khi hủy toàn bộ","부분 취소일 때":"Khi hủy một phần",
@@ -11886,25 +11893,49 @@ var NTPL_PUSH_KO = { purchase: '푸시 · 구매 알림 설정', event: '푸시 
 var NTPL_BASE = 'inetkr/pricepick-backend stg 2c8a103 · 2026-11-05';
 var NTPL_OPEN = {};
 /* 정렬: 0 원래 순서 · 1 오름차순 · -1 내림차순. 같은 구분 안에서는 원래 순서(발송 흐름 순서)를 지킨다 */
-var NTPL_SORT = 0, NTPL_FILTER = '';
+var NTPL_SORT = 0, NTPL_FILTER = '', NTPL_CAT = '';
+/* 큰 묶음 → 세부 구분(김반장 2026-11-06). 윗줄은 묶음, 묶음을 고르면 아랫줄에 그 안의 구분이 나온다 */
+var NTPL_CATS = [
+  ['구매·적립', ['구매', '티켓 적립', '취소 · 환수']],
+  ['보상·이벤트', ['포인트', '전환', '출석', '미션', '선물 상자', '경품', '친구초대']],
+  ['사용·만료', ['기프티콘', '만료']],
+  ['운영·계정', ['운영자 지급', '카카오 연동', '1:1 문의']]
+];
+function ntplCatGroups(cat) { var c = NTPL_CATS.filter(function(x) { return x[0] === cat; })[0]; return c ? c[1] : []; }
 function ntplOrder() {
   var list = NTPL_DEF.map(function(d, i) { return { d: d, i: i }; });
   if (NTPL_FILTER) list = list.filter(function(x) { return x.d.group === NTPL_FILTER; });
+  else if (NTPL_CAT) { var gs = ntplCatGroups(NTPL_CAT); list = list.filter(function(x) { return gs.indexOf(x.d.group) >= 0; }); }
   if (NTPL_SORT) list.sort(function(a, b) { return NTPL_SORT * a.d.group.localeCompare(b.d.group, 'ko') || a.i - b.i; });
   return list;
 }
 function ntplGroupBar() {
   var bar = document.getElementById('ntpl-gbar');
   if (!bar) return;
-  var order = [], cnt = {};
-  NTPL_DEF.forEach(function(d) { if (!cnt[d.group]) { cnt[d.group] = 0; order.push(d.group); } cnt[d.group]++; });
-  var chip = function(g, label, n) {
-    var on = NTPL_FILTER === g;
-    return '<button type="button" class="ntpl-gbtn' + (on ? ' on' : '') + '" onclick="ntplFilterClick(this)" data-g="' + ppEsc(g) + '" aria-pressed="' + on + '"><span>' + label + '</span><b>' + n + '</b></button>';
+  var cnt = {};
+  NTPL_DEF.forEach(function(d) { cnt[d.group] = (cnt[d.group] || 0) + 1; });
+  var chip = function(cls, on, attr, label, n) {
+    return '<button type="button" class="' + cls + (on ? ' on' : '') + '" ' + attr + ' aria-pressed="' + on + '"><span>' + label + '</span><b>' + n + '</b></button>';
   };
-  /* 맨 앞 「전체」 — 처음 들어오면 이것이 선택돼 있다 */
-  bar.innerHTML = chip('', '전체', NTPL_DEF.length) + order.map(function(g) { return chip(g, g, cnt[g]); }).join('');
+  var top = chip('ntpl-gbtn', !NTPL_CAT, 'onclick="ntplCatClick(this)" data-c=""', '전체', NTPL_DEF.length)
+    + NTPL_CATS.map(function(c) {
+        var n = c[1].reduce(function(a, g) { return a + (cnt[g] || 0); }, 0);
+        return chip('ntpl-gbtn', NTPL_CAT === c[0], 'onclick="ntplCatClick(this)" data-c="' + ppEsc(c[0]) + '"', c[0], n);
+      }).join('');
+  var sub = '';
+  if (NTPL_CAT) {
+    var gs = ntplCatGroups(NTPL_CAT), tot = gs.reduce(function(a, g) { return a + (cnt[g] || 0); }, 0);
+    sub = '<div class="ntpl-grow2">' + chip('ntpl-gsub', !NTPL_FILTER, 'onclick="ntplFilterClick(this)" data-g=""', '전체', tot)
+      + gs.filter(function(g) { return cnt[g]; }).map(function(g) { return chip('ntpl-gsub', NTPL_FILTER === g, 'onclick="ntplFilterClick(this)" data-g="' + ppEsc(g) + '"', g, cnt[g]); }).join('')
+      + '</div>';
+  }
+  bar.innerHTML = '<div class="ntpl-grow1">' + top + '</div>' + sub;
 }
+window.ntplCatClick = function(el) {
+  NTPL_CAT = el.getAttribute('data-c') || '';
+  NTPL_FILTER = '';
+  ntplRender();
+};
 window.ntplSortClick = function() {
   NTPL_SORT = NTPL_SORT === 0 ? 1 : (NTPL_SORT === 1 ? -1 : 0);
   var th = document.getElementById('ntpl-sort-th');
@@ -11912,7 +11943,7 @@ window.ntplSortClick = function() {
   ntplRender();
 };
 window.ntplFilterClick = function(el) {
-  /* 「전체」를 누르면 전부, 구분을 누르면 그 구분만. 고른 구분을 다시 눌러도 전체로 돌아간다 */
+  /* 아랫줄 — 「전체」는 그 묶음 전부, 구분을 누르면 그 구분만. 고른 구분을 다시 눌러도 묶음 전체로 */
   var g = el.getAttribute('data-g') || '';
   NTPL_FILTER = (g && NTPL_FILTER !== g) ? g : '';
   ntplRender();
