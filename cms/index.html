@@ -3198,7 +3198,7 @@ window.CMS_FEATURES = {
               </div>
               <input type="datetime-local" class="search-box" id="noti-schedule-at" style="width:auto">
               <div style="margin-left:auto;display:flex;gap:8px">
-                <button class="btn btn-ghost btn-sm" id="noti-test-btn" onclick="notiSendTest()">테스트 발송</button>
+                <button class="btn btn-ghost btn-sm" id="noti-test-btn" onclick="notiSendTest()">선택 개별 발송</button>
                 <button class="btn btn-primary" id="noti-send-btn" onclick="notiSend()">발송</button>
               </div>
             </div>
@@ -3220,7 +3220,7 @@ window.CMS_FEATURES = {
             <div class="srch-row" style="padding:12px 16px;border-bottom:1px solid var(--border)">
               <input class="search-box" id="noti-h-q" placeholder="제목 검색">
               <select class="filter-sel" id="noti-h-target"><option value="">전체 대상</option><option value="all">전체 회원</option><option value="kakao">카카오 연동 회원</option><option value="guest">미연동(게스트) 회원</option><option value="inactive30">30일 미접속</option><option value="new7">신규 가입(7일 이내)</option><option value="purchased">구매 이력 있는 회원</option></select>
-              <select class="filter-sel" id="noti-h-status"><option value="">전체 상태</option><option value="sent">발송완료</option><option value="scheduled">예약</option><option value="cancelled">취소됨</option><option value="test">테스트</option></select>
+              <select class="filter-sel" id="noti-h-status"><option value="">전체 상태</option><option value="sent">발송완료</option><option value="scheduled">예약</option><option value="cancelled">취소됨</option><option value="test">개별 발송</option></select>
               <button class="btn btn-primary btn-sm" onclick="notiHistSearch()">검색</button>
             </div>
             <table>
@@ -4530,7 +4530,7 @@ window.CMS_FEATURES = {
      기존 회원 검색을 그대로 쓴다 — 테스트 계정을 따로 등록하는 메뉴는 두지 않는다. -->
 <div class="modal-overlay" id="m-noti-test">
   <div class="modal">
-    <div class="modal-header"><div><div class="modal-title">테스트 발송 대상 선택</div><div class="card-sub">선택한 회원에게만 즉시 발송합니다. 발송 내역에는 <strong>테스트</strong> 배지로 남아 실제 발송 건수와 섞이지 않습니다.</div></div><button class="modal-close" onclick="closeModal('m-noti-test')"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
+    <div class="modal-header"><div><div class="modal-title">선택 개별 발송 대상 선택</div><div class="card-sub">선택한 회원에게만 즉시 발송합니다. 발송 내역에는 <strong>개별 발송</strong>으로 남아 전체 발송 건수와 섞이지 않습니다.</div></div><button class="modal-close" onclick="closeModal('m-noti-test')"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
     <div class="modal-body">
       <input type="hidden" id="noti-test-src">
       <div class="ntt-col">
@@ -4593,7 +4593,7 @@ window.CMS_FEATURES = {
         <li><span class="k">필수 · 선택</span>정책서 기준 분류입니다. 거래 알림은 필수(동의 무관), 이벤트·마케팅성 알림은 선택(동의 필요)입니다.</li>
         <li><span class="k">발송 채널</span>1단계 발송 채널은 <strong>앱 푸시 단일</strong>입니다. 카카오 알림톡은 서드파티 비용이 발생해 도입하지 않습니다.</li>
         <li><span class="k">수신 동의</span>마케팅성 알림은 수신 동의 회원에게만 발송됩니다. 서비스 필수 알림(티켓 지급·기프티콘 발송·경품 당첨)은 동의 여부와 무관하게 발송됩니다.</li>
-        <li><span class="k">수동 발송 대상</span>마케팅성 알림이라 <strong>마케팅 정보 수신에 동의한 회원</strong>만 셉니다. 테스트 발송은 고른 회원에게만 나갑니다.</li>
+        <li><span class="k">수동 발송 대상</span>마케팅성 알림이라 <strong>마케팅 정보 수신에 동의한 회원</strong>만 셉니다. 선택 개별 발송은 고른 회원에게만 나갑니다.</li>
         <li><span class="k">내용 변수</span><span>{닉네임}</span> · <span>{보유티켓}</span>은 받는 회원의 닉네임과 보유 티켓 장수로 바뀝니다.</li>
         <li><span class="k">예약 발송</span>예약 시각이 지난 건은 이 화면을 열 때 <strong>발송완료</strong>로 넘어갑니다. '예약' 상태만 발송 전 취소할 수 있습니다.</li>
         <li><span class="k">수동 발송 기록</span>발송 완료 건은 불변 로그입니다. 건을 누르면 수신자 목록이 열립니다. 수신 기록은 90일 보관 후 삭제합니다.</li>
@@ -7761,7 +7761,11 @@ Object.assign(KO2VI,{
   "{닉네임}·{보유티켓}에 예시 값을 넣은 모습입니다":"Đây là hiển thị với giá trị ví dụ cho {닉네임}·{보유티켓}",
   "제목 검색":"Tìm theo tiêu đề",
   "전체 대상":"Tất cả đối tượng",
-  "테스트":"Thử nghiệm",
+  "선택 개별 발송":"Gửi riêng hội viên đã chọn",
+  "선택 개별 발송 대상 선택":"Chọn hội viên nhận gửi riêng",
+  "개별 발송":"Gửi riêng",
+  "으로 남아 전체 발송 건수와 섞이지 않습니다.":"nên không lẫn với số lượng gửi toàn bộ.",
+  "개별 발송할 회원을 선택하세요.":"Hãy chọn hội viên để gửi riêng.",
   "제목을 입력해주세요.":"Vui lòng nhập tiêu đề.",
   "내용을 입력해주세요.":"Vui lòng nhập nội dung.",
   "대상 회원을 세지 못했습니다: ":"Không đếm được hội viên nhận: ",
@@ -7776,7 +7780,7 @@ Object.assign(KO2VI,{
   "입니다. 카카오 알림톡은 서드파티 비용이 발생해 도입하지 않습니다.":". Không dùng Kakao AlimTalk vì phát sinh chi phí bên thứ ba.",
   "마케팅성 알림이라":"Vì là thông báo tiếp thị nên chỉ đếm",
   "마케팅 정보 수신에 동의한 회원":"hội viên đã đồng ý nhận thông tin tiếp thị",
-  "만 셉니다. 테스트 발송은 고른 회원에게만 나갑니다.":". Gửi thử chỉ gửi tới hội viên đã chọn.",
+  "만 셉니다. 선택 개별 발송은 고른 회원에게만 나갑니다.":". Gửi riêng chỉ gửi tới hội viên đã chọn.",
   "은 받는 회원의 닉네임과 보유 티켓 장수로 바뀝니다.":"được thay bằng biệt danh và số vé đang giữ của hội viên nhận.",
   "예약 시각이 지난 건은 이 화면을 열 때":"Mục hẹn giờ đã qua thời điểm hẹn sẽ chuyển sang",
   "로 넘어갑니다. '예약' 상태만 발송 전 취소할 수 있습니다.":"khi mở màn hình này. Chỉ mục ở trạng thái 'Hẹn giờ' mới hủy được trước khi gửi.",
@@ -12083,7 +12087,7 @@ function loadNotifLogs() {
 
 /* ── sec-notifications ── notifications collection (실쿼리 + 실 발송기록) */
 var NOTI_CHANNEL_KO = { push:'앱 푸시', kakao:'카카오 알림톡', push_kakao:'푸시+알림톡' };
-var NOTI_TARGET_KO = { all:'전체 회원', kakao:'카카오 연동 회원', guest:'미연동(게스트) 회원', inactive30:'30일 미접속', new7:'신규 가입(7일 이내)', purchased:'구매 이력 있는 회원', custom:'커스텀 세그먼트', test:'테스트(본인)' };
+var NOTI_TARGET_KO = { all:'전체 회원', kakao:'카카오 연동 회원', guest:'미연동(게스트) 회원', inactive30:'30일 미접속', new7:'신규 가입(7일 이내)', purchased:'구매 이력 있는 회원', custom:'커스텀 세그먼트', test:'개별 발송' };
 function loadNotifications() {
   /* ⚠ 이름으로 집는다. 섹션의 "첫 표"를 집으면 위에 있는 「취소·환수 자동 알림 문구」
      명세표를 덮어쓴다 — 2026-09-11 에 그 카드가 발송 이력 위로 들어오면서 생긴 일이다. */
@@ -12130,7 +12134,7 @@ function loadNotifications() {
     set('noti-kpi-scheduled', ppN(scheduled) + '건');
 
     if (snap.empty) { NOTI_HIST_ROWS = []; notiHistApply(false); return; }
-    var STATUS_BADGE = { sent:'<span class="badge badge-green">발송완료</span>', scheduled:'<span class="badge badge-amber">예약</span>', cancelled:'<span class="badge badge-gray">취소됨</span>', test:'<span class="badge badge-gray">테스트</span>' };
+    var STATUS_BADGE = { sent:'<span class="badge badge-green">발송완료</span>', scheduled:'<span class="badge badge-amber">예약</span>', cancelled:'<span class="badge badge-gray">취소됨</span>', test:'<span class="badge badge-gray">개별 발송</span>' };
     NOTI_DOCS = {};
     NOTI_HIST_ROWS = snap.docs.map(function(doc) {
       var d = doc.data();
@@ -12139,7 +12143,7 @@ function loadNotifications() {
       /* 예약 건은 아직 나가지 않았으므로 성공·실패가 없다 */
       var r = (d.status === 'scheduled' || d.status === 'cancelled') ? null : notiResultCount(doc.id, d);
       var act = (d.status === 'scheduled')
-        ? '<button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();notiOpenTest(\'' + doc.id + '\')">테스트 발송</button>'
+        ? '<button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();notiOpenTest(\'' + doc.id + '\')">선택 개별 발송</button>'
           + ' <button class="btn btn-ghost btn-sm" style="color:var(--danger)" onclick="event.stopPropagation();notiCancelScheduled(\'' + doc.id + '\')">취소</button>'
         : '';
       var html = '<tr style="cursor:pointer" onclick="notiOpenRecipients(\'' + doc.id + '\')">'
@@ -12419,7 +12423,7 @@ window.notiSendTest = function() { notiOpenTest(''); };
 
 window.notiTestSend = function() {
   var ids = Object.keys(NOTI_TEST_PICK);
-  if (!ids.length) { toast('테스트로 보낼 회원을 선택하세요.'); return; }
+  if (!ids.length) { toast('개별 발송할 회원을 선택하세요.'); return; }
   var srcId = document.getElementById('noti-test-src').value;
   var src = srcId ? NOTI_DOCS[srcId] : null;
   var title = src ? (src.title || '(제목 없음)') : (document.getElementById('noti-title').value.trim() || '(제목 없음)');
@@ -12434,12 +12438,12 @@ window.notiTestSend = function() {
     source_id: srcId || null,
     created_at: FS.FieldValue.serverTimestamp(),
   }).then(function() {
-    toast('테스트 발송 완료 · ' + ids.length + '명');
+    toast('선택 개별 발송 완료 · ' + ids.length + '명');
     logAdmin('알림 테스트 발송: ' + title + ' · ' + ids.length + '명');
     closeModal('m-noti-test');
     loadNotifications();
   }).catch(function(e) {
-    toast('테스트 발송 실패: ' + (e.message||e));
+    toast('선택 개별 발송 실패: ' + (e.message||e));
   }).finally(function() {
     if (btn) { btn.disabled = false; btn.textContent = '선택 회원에게 즉시 발송'; }
   });
@@ -12461,7 +12465,8 @@ function notiHash(str) {
 function notiTargetLabel(d) {
   if (d.status === 'test' || d.target === 'test') {
     var names = d.test_names || [];
-    return '테스트' + (names.length ? ' · ' + ppEsc(names.slice(0, 2).join(', ')) + (names.length > 2 ? ' 외 ' + (names.length - 2) + '명' : '') : '');
+    /* 저장 값은 status:'test' 그대로 — 화면에만 「개별 발송」(김반장 2026-11-06) */
+    return '개별 발송' + (names.length ? ' · ' + ppEsc(names.slice(0, 2).join(', ')) + (names.length > 2 ? ' 외 ' + (names.length - 2) + '명' : '') : '');
   }
   return NOTI_TARGET_KO[d.target] || d.target || '—';
 }
