@@ -3211,7 +3211,7 @@ window.CMS_FEATURES = {
               <button class="btn btn-primary btn-sm" onclick="notiHistSearch()">검색</button>
             </div>
             <table>
-              <thead><tr><th style="text-align:center">발송일시</th><th style="text-align:center">채널</th><th>제목</th><th style="text-align:center">대상 조건</th><th style="text-align:center">대상 수</th><th style="text-align:center">성공</th><th style="text-align:center">실패</th><th style="text-align:center">미처리</th><th style="text-align:center">확인 불가</th><th style="text-align:center">열람율</th><th style="text-align:center">상태 / 액션</th></tr></thead>
+              <thead><tr><th style="text-align:center">발송일시</th><th style="text-align:center">채널</th><th>제목</th><th style="text-align:center">대상 조건</th><th style="text-align:center">대상 수</th><th style="text-align:center">성공</th><th style="text-align:center">실패</th><th style="text-align:center">미처리</th><th style="text-align:center">확인 불가</th><th style="text-align:center">열람률</th><th style="text-align:center">상태 / 액션</th></tr></thead>
               <tbody id="noti-hist-tbody">
               </tbody>
             </table>
@@ -4487,14 +4487,14 @@ window.CMS_FEATURES = {
     <div class="modal-header"><div class="modal-title">발송 확인</div><button class="modal-close" onclick="closeModal('m-noti-confirm')"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
     <div class="modal-body">
       <!-- ① 회원이 받을 푸시 모양 · ② 받는 사람 · ③ 발송 시점 — 구분선 없이 여백으로 나눈다 -->
-      <div class="ncf-cap">회원에게 이렇게 보입니다</div>
+      <div class="ncf-cap">회원 화면 미리보기</div>
       <div class="ncf-push">
         <img class="ncf-push-icon" src="/apple-touch-icon.png?v=2" alt="">
         <div class="ncf-push-txt no-vi"><div class="ncf-push-title" id="ncf-title"></div><div class="ncf-push-body" id="ncf-body"></div></div>
       </div>
-      <div class="ncf-ex" id="ncf-ex" style="display:none">{닉네임}·{보유티켓}에 예시 값을 넣은 모습입니다</div>
+      <div class="ncf-ex" id="ncf-ex" style="display:none">{닉네임}·{보유티켓}은 예시 값입니다</div>
       <div class="ncf-who"><span class="ncf-who-cond" id="ncf-cond"></span><span class="ncf-who-n"><span id="ncf-n"></span><span>명</span></span></div>
-      <div class="ncf-who-sub" id="ncf-sub"><span>수신 동의 회원만</span> · <span>미동의</span> <span id="ncf-excl"></span><span>명</span> <span>제외</span></div>
+      <div class="ncf-who-sub" id="ncf-sub"><span>수신 동의 회원 한정</span> · <span>미동의</span> <span id="ncf-excl"></span><span>명</span> <span>제외</span></div>
       <div class="ncf-when"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span id="ncf-when"></span></div>
       <div class="ncf-ask">위와 같이 발송하시겠습니까?</div>
     </div>
@@ -6264,7 +6264,7 @@ window.giSaveImageEdit = giSaveImageEdit;
     "테스트 발송":"Gửi thử","테스트 발송 (본인)":"Gửi thử (bản thân)",
     "마케팅성 알림은 수신 동의 회원에게만 발송됩니다. 서비스 필수 알림(티켓 지급·기프티콘 발송·경품 당첨)은 동의 여부와 무관하게 발송됩니다.":"Thông báo marketing chỉ gửi cho thành viên đã đồng ý. Thông báo bắt buộc (cấp vé·gửi Gifticon·trúng giải) được gửi bất kể đồng ý.",
     "알림 발송 내역":"Lịch sử gửi thông báo","발송일시":"Thời gian gửi","채널":"Kênh",
-    "발송 수":"Số lượt gửi","열람율":"Tỷ lệ mở","맞춤":"Tùy chỉnh","전체":"Tất cả",
+    "발송 수":"Số lượt gửi","열람율":"Tỷ lệ mở","열람률":"Tỷ lệ mở","맞춤":"Tùy chỉnh","전체":"Tất cả",
     /* Op-policy section */
     "조회 전용":"Chỉ xem",
     "적립·보상 정책":"Chính sách tích lũy·phần thưởng","참여·이벤트 정책":"Chính sách tham gia·sự kiện",
@@ -7622,13 +7622,13 @@ Object.assign(KO2VI,{
   "푸시 · 구매 알림 설정":"Push · theo cài đặt thông báo mua hàng",
   "푸시 · 이벤트·티켓 알림 설정":"Push · theo cài đặt thông báo sự kiện·vé",
   "푸시 · 설정 무관":"Push · không phụ thuộc cài đặt",
-  "알림함만":"Chỉ hộp thông báo",
-  "야간에도 발송":"Gửi cả ban đêm",
+  "푸시 미발송":"Không gửi push",
+  "야간 발송 허용":"Cho phép gửi ban đêm",
   "티켓 적립":"Tích lũy vé","만료":"Hết hạn","운영자 지급":"Quản trị viên cấp","전환":"Chuyển đổi","출석":"Điểm danh","카카오 연동":"Liên kết Kakao","미션":"Nhiệm vụ","선물 상자":"Hộp quà",
   "자동 알림 문구":"Nội dung thông báo tự động",
   "발송 상황":"Tình huống gửi",
   "본문":"Nội dung",
-  "알림함":"Hộp thông báo",
+  "알림 유형":"Loại thông báo",
   "발송 기록":"Lịch sử gửi",
   "수동 발송":"Gửi thủ công",
   "자동 발송":"Gửi tự động",
@@ -7651,11 +7651,11 @@ Object.assign(KO2VI,{
   "수신 동의":"Đồng ý nhận",
   "발송 확인":"Xác nhận gửi",
   "위와 같이 발송하시겠습니까?":"Gửi với nội dung như trên?",
-  "수신 동의 회원만":"Chỉ hội viên đã đồng ý nhận",
+  "수신 동의 회원 한정":"Chỉ hội viên đã đồng ý nhận",
   "미동의":"Chưa đồng ý",
   "제외":"loại trừ",
-  "회원에게 이렇게 보입니다":"Hội viên sẽ thấy như thế này",
-  "{닉네임}·{보유티켓}에 예시 값을 넣은 모습입니다":"Đây là hiển thị với giá trị ví dụ cho {닉네임}·{보유티켓}",
+  "회원 화면 미리보기":"Xem trước màn hình hội viên",
+  "{닉네임}·{보유티켓}은 예시 값입니다":"{닉네임}·{보유티켓} là giá trị ví dụ",
   "제목 검색":"Tìm theo tiêu đề",
   "전체 대상":"Tất cả đối tượng",
   "선택 개별 발송":"Gửi riêng hội viên đã chọn",
@@ -7667,7 +7667,7 @@ Object.assign(KO2VI,{
   "개별 발송할 회원을 선택하세요.":"Hãy chọn hội viên để gửi riêng.",
   "제목을 입력해주세요.":"Vui lòng nhập tiêu đề.",
   "내용을 입력해주세요.":"Vui lòng nhập nội dung.",
-  "대상 회원을 세지 못했습니다: ":"Không đếm được hội viên nhận: ",
+  "대상 회원 집계 실패: ":"Không đếm được hội viên nhận: ",
   "마케팅 정보 수신에 동의한 회원":"hội viên đã đồng ý nhận thông tin tiếp thị",
 });
 /* ── 11-04 수정 요청 반영 (A-5 대시보드 이번달 · A-13 알림 수신 결과 넷) ── */
@@ -11774,47 +11774,47 @@ window.noticeSubmit = function(status) {
    box: 앱 알림함 묶음(NOTIFICATION_CATEGORY). push: purchase=구매 알림 설정 · event=이벤트·티켓 알림 설정 · none=설정 무관 · off=푸시 없이 알림함만.
    여러 토막을 이어 붙이는 문구(쿠팡 취소·환수)는 이어 붙이는 식 그대로 적고, 토막 정의는 note 에 적는다. */
 var NTPL_DEF = [
-  { group: '구매', situ: '제휴몰 구매가 들어옴', title: '구매가 감지됐어요', body: '쇼핑몰 구매 내역이 확인됐어요. 잠시 후 랜덤 티켓이 적립될 예정이에요.', box: '구매', push: 'purchase', src: 'ticketService.ts:286' },
-  { group: '티켓 적립', situ: '구매 직후 랜덤 티켓 가지급', title: '랜덤 티켓 1장이 적립 대기 중이에요', body: '구매 확정까지 카카오 연동 시 D+7, 미연동 시 D+30 남았어요. 확정되면 티켓 수량이 공개돼요.', box: '티켓', push: 'purchase', src: 'ticketService.ts:345' },
-  { group: '티켓 적립', situ: '구매 직후, 일·월 적립 한도 초과로 보임', title: '이번 구매는 적립 대상이 아니에요', body: '일/월 구매 적립 한도를 초과해 이번 건은 랜덤 티켓이 지급되지 않아요. (일 ${PURCHASE_TICKET_LIMIT.DAILY}건·월 ${PURCHASE_TICKET_LIMIT.MONTHLY}건)', box: '티켓', push: 'purchase', src: 'ticketService.ts:336' },
-  { group: '티켓 적립', situ: '구매 확정 때 적립 한도 초과로 거절', title: '이번 구매는 적립 대상이 아니에요', body: '일/월 구매 적립 한도를 초과해 이번 건은 랜덤 티켓이 지급되지 않아요. (일 5건·월 50건)', box: '티켓', push: 'purchase', src: 'ticketService.ts:1087' },
+  { group: '구매', situ: '제휴몰 구매 접수', title: '구매가 감지됐어요', body: '쇼핑몰 구매 내역이 확인됐어요. 잠시 후 랜덤 티켓이 적립될 예정이에요.', box: '구매', push: 'purchase', src: 'ticketService.ts:286' },
+  { group: '티켓 적립', situ: '구매 접수 · 랜덤 티켓 가지급', title: '랜덤 티켓 1장이 적립 대기 중이에요', body: '구매 확정까지 카카오 연동 시 D+7, 미연동 시 D+30 남았어요. 확정되면 티켓 수량이 공개돼요.', box: '티켓', push: 'purchase', src: 'ticketService.ts:345' },
+  { group: '티켓 적립', situ: '구매 접수 · 일·월 적립 한도 초과', title: '이번 구매는 적립 대상이 아니에요', body: '일/월 구매 적립 한도를 초과해 이번 건은 랜덤 티켓이 지급되지 않아요. (일 ${PURCHASE_TICKET_LIMIT.DAILY}건·월 ${PURCHASE_TICKET_LIMIT.MONTHLY}건)', box: '티켓', push: 'purchase', src: 'ticketService.ts:336' },
+  { group: '티켓 적립', situ: '구매 확정 · 적립 한도 초과로 거절', title: '이번 구매는 적립 대상이 아니에요', body: '일/월 구매 적립 한도를 초과해 이번 건은 랜덤 티켓이 지급되지 않아요. (일 5건·월 50건)', box: '티켓', push: 'purchase', src: 'ticketService.ts:1087' },
   { group: '티켓 적립', situ: '구매 확정 · 티켓 수량 공개', title: '티켓 수량이 공개됐어요!', body: '${summary}이 지금 사용 가능해요.', box: '티켓', push: 'purchase', src: 'ticketService.ts:1059' },
-  { group: '티켓 적립', situ: '구매 확정 · 이전 구매 취소분을 빼고 공개', title: '티켓 수량이 공개됐어요!', body: '${summary}이 지금 사용 가능해요. (이전 구매 취소분 ${repaidTotal}장 차감 후)', box: '티켓', push: 'purchase', src: 'ticketService.ts:1059' },
+  { group: '티켓 적립', situ: '구매 확정 · 이전 취소분 차감 후 공개', title: '티켓 수량이 공개됐어요!', body: '${summary}이 지금 사용 가능해요. (이전 구매 취소분 ${repaidTotal}장 차감 후)', box: '티켓', push: 'purchase', src: 'ticketService.ts:1059' },
   { group: '티켓 적립', situ: '첫 구매 확정 보너스', title: '첫 구매 완료! ${ticketTypeLabel(TicketType.TICKET)} ${bonusAmount}장', body: '가입 후 첫 구매가 확정되어 ${ticketTypeLabel(TicketType.TICKET)} ${bonusAmount}장을 받았어요.', box: '티켓', push: 'purchase', src: 'ticketService.ts:430 · 본문 :410' },
-  { group: '취소 · 환수', situ: '구매 확정 때 적립분이 전부 이전 취소분에 차감됨', title: '적립 티켓이 이전 취소분에 차감됐어요', body: '이전 구매 취소로 회수하지 못한 티켓이 있어 ${revokedSummary}이 이번 적립분에서 차감됐어요.', box: '티켓', push: 'purchase', src: 'ticketService.ts:1047' },
+  { group: '취소 · 환수', situ: '구매 확정 · 적립분 전액 이전 취소분 차감', title: '적립 티켓이 이전 취소분에 차감됐어요', body: '이전 구매 취소로 회수하지 못한 티켓이 있어 ${revokedSummary}이 이번 적립분에서 차감됐어요.', box: '티켓', push: 'purchase', src: 'ticketService.ts:1047' },
   { group: '취소 · 환수', situ: '쿠팡 구매 취소 — 티켓 확정 전 (전체 · 부분)', title: '적립 예정 티켓 취소', body: '${head} · 적립 예정이던 랜덤 티켓 1장이 취소되었습니다.', box: '티켓', push: 'purchase', night: true, src: 'ticketService.ts:2398 · 문구 :2339–2340', note: 'head' },
   { group: '취소 · 환수', situ: '쿠팡 구매 취소 — 티켓 확정 후, 전체 취소', title: '지급 티켓 환수', body: '${head} · ${joinSentences(summary ? `지급된 ${summary}이 환수되었습니다.` : \'\', debtSentence)}', box: '티켓', push: 'purchase', night: true, src: 'ticketService.ts:2398 · 문구 :2373–2374', note: 'head debt' },
   { group: '취소 · 환수', situ: '쿠팡 구매 취소 — 티켓 확정 후, 부분 취소', title: '지급 티켓 부분 환수', body: '${head} · ${joinSentences(summary ? `${summary}이 환수되었습니다.` : \'\', debtSentence, remainingTickets > 0 ? `남은 ${remainingTickets}장은 그대로 사용하실 수 있습니다.` : \'\')}', box: '티켓', push: 'purchase', night: true, src: 'ticketService.ts:2398 · 문구 :2388–2394', note: 'head debt' },
-  { group: '취소 · 환수', situ: '구매 취소·환불로 지급 티켓 회수', title: '적립된 혜택이 회수됐어요', body: '구매 취소·환불이 확인되어 ${summary}이 회수됐어요.', box: '티켓', push: 'purchase', src: 'ticketService.ts:2276' },
-  { group: '취소 · 환수', situ: '구매 취소·환불로 회수, 보유 티켓이 모자람', title: '적립된 혜택이 회수됐어요', body: '구매 취소·환불이 확인되어 ${summary}이 회수됐어요. 보유 티켓이 부족한 ${debtTotal}장은 다음 적립 시 차감돼요.', box: '티켓', push: 'purchase', src: 'ticketService.ts:2276' },
+  { group: '취소 · 환수', situ: '구매 취소·환불 · 지급 티켓 회수', title: '적립된 혜택이 회수됐어요', body: '구매 취소·환불이 확인되어 ${summary}이 회수됐어요.', box: '티켓', push: 'purchase', src: 'ticketService.ts:2276' },
+  { group: '취소 · 환수', situ: '구매 취소·환불 · 회수 · 보유 티켓 부족', title: '적립된 혜택이 회수됐어요', body: '구매 취소·환불이 확인되어 ${summary}이 회수됐어요. 보유 티켓이 부족한 ${debtTotal}장은 다음 적립 시 차감돼요.', box: '티켓', push: 'purchase', src: 'ticketService.ts:2276' },
   { group: '기프티콘', situ: '기프티콘 구매 취소 · 티켓 복구', title: '기프티콘 구매가 취소됐어요', body: '${order.product_name} 구매가 취소되어 ${ticketTypeLabel(TicketType.TICKET)} ${refund.refunded_tickets}장이 복구됐어요.', box: '티켓', push: 'none', src: 'giftOrderService.ts:373' },
   { group: '만료', situ: '티켓 만료 예고', title: '티켓 만료가 ${days}일 남았어요', body: '보유 중인 ${summary}이 ${days}일 후 만료돼요. 지금 구매해보세요.', box: '티켓', push: 'event', src: 'ticketService.ts:1222' },
   { group: '만료', situ: '티켓 만료', title: '티켓이 만료됐어요', body: '${ticketTypeLabel(batch.ticket_type)} ${batch.amount}장이 만료돼서 사라졌어요.', box: '티켓', push: 'event', src: 'ticketService.ts:1176' },
   { group: '만료', situ: '포인트 만료 예고', title: '포인트 만료가 ${days}일 남았어요', body: '보유 중인 ${amount}P가 ${days}일 후 만료돼요. 기프티콘 구매에 사용해보세요.', box: '티켓', push: 'event', src: 'pointService.ts:367' },
   { group: '만료', situ: '포인트 만료', title: '포인트가 만료됐어요', body: '${batch.amount}P가 만료돼서 사라졌어요.', box: '티켓', push: 'event', src: 'pointService.ts:835' },
-  { group: '운영자 지급', situ: '운영자가 티켓 지급', title: '티켓이 지급됐어요', body: '${summary}이 지급됐어요.', box: '티켓', push: 'event', src: 'ticketService.ts:2246' },
-  { group: '운영자 지급', situ: '운영자가 티켓 회수', title: '티켓이 회수됐어요', body: '${summary}이 회수됐어요.', box: '티켓', push: 'event', src: 'ticketService.ts:2255' },
-  { group: '운영자 지급', situ: '운영자가 포인트 지급', title: '${amount}P가 지급됐어요', body: '관리자에 의해 ${amount}P가 지급됐어요.', box: '티켓', push: 'event', src: 'pointService.ts:498' },
-  { group: '운영자 지급', situ: '운영자가 포인트 회수', title: '${amount}P가 회수됐어요', body: '관리자에 의해 ${amount}P가 회수됐어요.', box: '티켓', push: 'event', src: 'pointService.ts:507' },
-  { group: '전환', situ: '이벤트 티켓을 티켓으로 전환', title: '${ticketTypeLabel(rule.source)} 전환이 완료됐어요', body: '${ticketTypeLabel(rule.target)} ${yieldedTarget}장으로 전환됐어요.', box: '티켓', push: 'off', src: 'ticketService.ts:4334' },
-  { group: '전환', situ: '포인트를 티켓으로 전환', title: '포인트·티켓 전환이 완료됐어요', body: '포인트 ${pointsRequired.toLocaleString()}P를 ${ticketTypeLabel(ticket_type)} ${ticketsToReceive}장으로 전환했어요.', box: '티켓', push: 'off', src: 'pointService.ts:1155' },
-  { group: '전환', situ: '티켓을 포인트로 전환', title: '포인트·티켓 전환이 완료됐어요', body: '${ticketTypeLabel(ticket_type)} ${ticketsToSpend}장을 포인트 ${pointsToReceive.toLocaleString()}P로 전환했어요.', box: '티켓', push: 'off', src: 'pointService.ts:1258' },
-  { group: '출석', situ: '쿠팡 구경 출석 포인트', title: '${config.daily_points}P가 적립됐어요', body: '오늘 출석체크로 ${config.daily_points}P를 받았어요.', box: '이벤트', push: 'off', src: 'pointService.ts:270' },
+  { group: '운영자 지급', situ: '운영자 티켓 지급', title: '티켓이 지급됐어요', body: '${summary}이 지급됐어요.', box: '티켓', push: 'event', src: 'ticketService.ts:2246' },
+  { group: '운영자 지급', situ: '운영자 티켓 회수', title: '티켓이 회수됐어요', body: '${summary}이 회수됐어요.', box: '티켓', push: 'event', src: 'ticketService.ts:2255' },
+  { group: '운영자 지급', situ: '운영자 포인트 지급', title: '${amount}P가 지급됐어요', body: '관리자에 의해 ${amount}P가 지급됐어요.', box: '티켓', push: 'event', src: 'pointService.ts:498' },
+  { group: '운영자 지급', situ: '운영자 포인트 회수', title: '${amount}P가 회수됐어요', body: '관리자에 의해 ${amount}P가 회수됐어요.', box: '티켓', push: 'event', src: 'pointService.ts:507' },
+  { group: '전환', situ: '이벤트 티켓 → 티켓 전환', title: '${ticketTypeLabel(rule.source)} 전환이 완료됐어요', body: '${ticketTypeLabel(rule.target)} ${yieldedTarget}장으로 전환됐어요.', box: '티켓', push: 'off', src: 'ticketService.ts:4334' },
+  { group: '전환', situ: '포인트 → 티켓 전환', title: '포인트·티켓 전환이 완료됐어요', body: '포인트 ${pointsRequired.toLocaleString()}P를 ${ticketTypeLabel(ticket_type)} ${ticketsToReceive}장으로 전환했어요.', box: '티켓', push: 'off', src: 'pointService.ts:1155' },
+  { group: '전환', situ: '티켓 → 포인트 전환', title: '포인트·티켓 전환이 완료됐어요', body: '${ticketTypeLabel(ticket_type)} ${ticketsToSpend}장을 포인트 ${pointsToReceive.toLocaleString()}P로 전환했어요.', box: '티켓', push: 'off', src: 'pointService.ts:1258' },
+  { group: '출석', situ: '쿠팡 구경 출석 적립', title: '${config.daily_points}P가 적립됐어요', body: '오늘 출석체크로 ${config.daily_points}P를 받았어요.', box: '이벤트', push: 'off', src: 'pointService.ts:270' },
   { group: '출석', situ: '연속 출석 달성', title: '${config.streak_milestone_days}일 연속 출석 달성!', body: '보너스로 이벤트 티켓 ${streakGrantedAmount}장을 받았어요.', box: '이벤트', push: 'off', src: 'pointService.ts:284' },
-  { group: '출석', situ: '오늘 출석하지 않은 회원에게 알림', title: '오늘 출석체크 잊지 마세요!', body: '지금 출석체크하고 포인트를 받아보세요.', box: '이벤트', push: 'event', src: 'pointService.ts:330 (여러 명에게 한 번에)' },
-  { group: '포인트', situ: '가입 축하 포인트', title: '가입 축하 ${ONBOARDING.REGISTER_POINTS}P!', body: '가입해주셔서 감사해요. ${ONBOARDING.REGISTER_POINTS}P가 즉시 적립됐어요.', box: '이벤트', push: 'off', src: 'userService.ts:386' },
-  { group: '포인트', situ: '첫 쿠팡 구경 포인트', title: '첫 쿠팡 구경 완료! ${ONBOARDING.COUPANG_FIRST_VIEW_POINTS}P', body: '첫 쿠팡 구경으로 ${ONBOARDING.COUPANG_FIRST_VIEW_POINTS}P를 받았어요. 매일 출석 보상과는 별도예요.', box: '이벤트', push: 'off', src: 'pointService.ts:890' },
+  { group: '출석', situ: '당일 미출석 회원 대상 출석 독려', title: '오늘 출석체크 잊지 마세요!', body: '지금 출석체크하고 포인트를 받아보세요.', box: '이벤트', push: 'event', src: 'pointService.ts:330 (일괄 발송)' },
+  { group: '포인트', situ: '가입 축하 포인트 적립', title: '가입 축하 ${ONBOARDING.REGISTER_POINTS}P!', body: '가입해주셔서 감사해요. ${ONBOARDING.REGISTER_POINTS}P가 즉시 적립됐어요.', box: '이벤트', push: 'off', src: 'userService.ts:386' },
+  { group: '포인트', situ: '첫 쿠팡 구경 포인트 적립', title: '첫 쿠팡 구경 완료! ${ONBOARDING.COUPANG_FIRST_VIEW_POINTS}P', body: '첫 쿠팡 구경으로 ${ONBOARDING.COUPANG_FIRST_VIEW_POINTS}P를 받았어요. 매일 출석 보상과는 별도예요.', box: '이벤트', push: 'off', src: 'pointService.ts:890' },
   { group: '카카오 연동', situ: '카카오 연동 완료 보상', title: '카카오 연동 완료! 이벤트 티켓 ${grantedAmount}장', body: '카카오 연동을 완료해서 이벤트 티켓 ${grantedAmount}장을 받았어요.', box: '이벤트', push: 'event', src: 'userService.ts:606' },
   { group: '미션', situ: '연속구매 미션 달성', title: '연속구매 미션 달성!', body: '${g.purchases}회 연속구매를 달성해서 이벤트 티켓 ${granted}장을 받았어요.', box: '이벤트', push: 'event', src: 'ticketService.ts:1419' },
-  { group: '선물 상자', situ: '선물 상자에서 이벤트 티켓 당첨', title: '${label} 당첨!', body: '${label}에서 ${ticketTypeLabel(TicketType.EVENT_TICKET)} ${granted}장을 받았어요.', box: '이벤트', push: 'off', src: 'ticketService.ts:1676', note: 'label' },
-  { group: '선물 상자', situ: '선물 상자에서 포인트 당첨', title: '${label} 당첨!', body: '${label}에서 ${amount}P를 받았어요.', box: '이벤트', push: 'off', src: 'ticketService.ts:1714 · 본문 :1692', note: 'label' },
-  { group: '선물 상자', situ: '선물 상자에서 티켓 당첨', title: '${label} 당첨!', body: '${label}에서 ${ticketLabel} ${amount}장을 받았어요.', box: '이벤트', push: 'off', src: 'ticketService.ts:1796 · 본문 :1732', note: 'label' },
-  { group: '선물 상자', situ: '선물 상자 티켓 당첨, 이전 취소분 차감', title: '${label} 당첨!', body: '${rewardMessage} (이전 구매 취소분 ${debtRepaid}장 차감 후 ${amount - debtRepaid}장 적립)', box: '이벤트', push: 'off', src: 'ticketService.ts:1796 · rewardMessage :1732', note: 'label' },
-  { group: '친구초대', situ: '초대한 친구가 첫 구매 완료 — 초대한 회원', title: '친구 초대 성공! ${rewardPoints}P를 받았어요', body: '${inviterNickname}님이 초대한 친구가 첫 구매를 완료했어요. ${rewardPoints}P가 적립됐어요.', box: '이벤트', push: 'event', src: 'referralService.ts:248 · 제목 :238 · 본문 :203' },
-  { group: '친구초대', situ: '초대받은 친구가 첫 구매 완료 — 초대받은 회원', title: '초대 보상 ${rewardPoints}P를 받았어요', body: '첫 구매를 완료해서 친구 초대 보상 ${rewardPoints}P가 적립됐어요.', box: '이벤트', push: 'event', src: 'referralService.ts:248 · 제목 :243 · 본문 :204' },
+  { group: '선물 상자', situ: '선물 상자 · 이벤트 티켓 당첨', title: '${label} 당첨!', body: '${label}에서 ${ticketTypeLabel(TicketType.EVENT_TICKET)} ${granted}장을 받았어요.', box: '이벤트', push: 'off', src: 'ticketService.ts:1676', note: 'label' },
+  { group: '선물 상자', situ: '선물 상자 · 포인트 당첨', title: '${label} 당첨!', body: '${label}에서 ${amount}P를 받았어요.', box: '이벤트', push: 'off', src: 'ticketService.ts:1714 · 본문 :1692', note: 'label' },
+  { group: '선물 상자', situ: '선물 상자 · 티켓 당첨', title: '${label} 당첨!', body: '${label}에서 ${ticketLabel} ${amount}장을 받았어요.', box: '이벤트', push: 'off', src: 'ticketService.ts:1796 · 본문 :1732', note: 'label' },
+  { group: '선물 상자', situ: '선물 상자 · 티켓 당첨 · 이전 취소분 차감', title: '${label} 당첨!', body: '${rewardMessage} (이전 구매 취소분 ${debtRepaid}장 차감 후 ${amount - debtRepaid}장 적립)', box: '이벤트', push: 'off', src: 'ticketService.ts:1796 · rewardMessage :1732', note: 'label' },
+  { group: '친구초대', situ: '피초대자 첫 구매 완료 · 초대자 대상', title: '친구 초대 성공! ${rewardPoints}P를 받았어요', body: '${inviterNickname}님이 초대한 친구가 첫 구매를 완료했어요. ${rewardPoints}P가 적립됐어요.', box: '이벤트', push: 'event', src: 'referralService.ts:248 · 제목 :238 · 본문 :203' },
+  { group: '친구초대', situ: '피초대자 첫 구매 완료 · 피초대자 대상', title: '초대 보상 ${rewardPoints}P를 받았어요', body: '첫 구매를 완료해서 친구 초대 보상 ${rewardPoints}P가 적립됐어요.', box: '이벤트', push: 'event', src: 'referralService.ts:248 · 제목 :243 · 본문 :204' },
   { group: '경품', situ: '주간 경품 추첨 당첨', title: '경품 추첨에 당첨되셨어요!', body: '당첨을 축하해요! 경품 수령 정보를 1:1 문의로 보내주세요.', box: '이벤트', push: 'event', src: 'prizeDrawService.ts:614' }
 ];
-var NTPL_PUSH_KO = { purchase: '푸시 · 구매 알림 설정', event: '푸시 · 이벤트·티켓 알림 설정', none: '푸시 · 설정 무관', off: '알림함만' };
+var NTPL_PUSH_KO = { purchase: '푸시 · 구매 알림 설정', event: '푸시 · 이벤트·티켓 알림 설정', none: '푸시 · 설정 무관', off: '푸시 미발송' };
 var NTPL_NOTE = {
   head: '${head} = 쿠팡 ${won(order_total)} 구매 취소 / 쿠팡 ${won(order_total)} 중 ${won(cancel_amount)} 취소 (:2329)',
   debt: '${debtSentence} = 보유하신 ${ticketLabel}이 모자라 ${debt}장은 회수 예정으로 남았습니다. 다음에 ${ticketLabel}을 받으실 때 자동으로 차감됩니다. (:2364)',
@@ -11844,9 +11844,9 @@ function ntplRender() {
     var notes = (d.note || '').split(' ').filter(Boolean).map(function(n) { return '<div class="ntpl-note">' + ntplVarsHtml(NTPL_NOTE[n]) + '</div>'; }).join('');
     return '<tr>'
       + '<td><div class="ntpl-group">' + d.group + '</div><div class="ntpl-chips">'
-      + '<span class="ntpl-chip"><b>알림함</b><span>' + d.box + '</span></span>'
+      + '<span class="ntpl-chip"><b>알림 유형</b><span>' + d.box + '</span></span>'
       + '<span class="ntpl-chip' + (d.push === 'purchase' ? ' ntpl-chip-must' : '') + '">' + NTPL_PUSH_KO[d.push] + '</span>'
-      + (d.night ? '<span class="ntpl-chip">야간에도 발송</span>' : '')
+      + (d.night ? '<span class="ntpl-chip">야간 발송 허용</span>' : '')
       + '</div></td>'
       + '<td class="ntpl-l">' + d.situ + '<div class="ntpl-src">' + ppEsc(d.src) + '</div></td>'
       + '<td class="ntpl-l no-vi">' + ntplVarsHtml(d.title) + '</td>'
@@ -12044,7 +12044,7 @@ window.notiSend = function() {
   var btn = document.getElementById('noti-send-btn');
   var bad = [];
   (title + ' ' + body).replace(/\{([^{}]+)\}/g, function(m, k) { if (NOTI_VARS.indexOf(k) < 0 && bad.indexOf(m) < 0) bad.push(m); return m; });
-  if (bad.length) { toast('쓸 수 없는 변수입니다: ' + bad.join(', ')); return; }
+  if (bad.length) { toast('사용할 수 없는 변수입니다: ' + bad.join(', ')); return; }
   if (btn) btn.disabled = true;
   NOTI_USERS = null;
   notiTargetSplit(target).then(function(r) {
@@ -12065,7 +12065,7 @@ window.notiSend = function() {
       ? '<span>예약 발송</span> · ' + ppEsc(notiSchedLabel(scheduleAt)) : '<span>즉시 발송</span>';
     openModal('m-noti-confirm');
   }).catch(function(e) {
-    toast('대상 회원을 세지 못했습니다: ' + (e.message || e));
+    toast('대상 회원 집계 실패: ' + (e.message || e));
   }).finally(function() { if (btn) btn.disabled = false; });
 };
 window.notiSendConfirmed = function() {
