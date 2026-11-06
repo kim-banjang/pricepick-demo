@@ -3221,7 +3221,7 @@ window.CMS_FEATURES = {
       <div id="noti-pane-templates" style="display:none">
         <!-- ① 자동 알림 문구 — 실제 서비스 백엔드(inetkr/pricepick-backend)가 보내는 알림 문구 그대로. 조회 전용(서버 코드에 박혀 있다). -->
         <div class="card">
-          <div class="card-header"><div><div class="card-title">자동 알림 문구</div><div class="card-sub">서버에서 자동으로 발송하는 알림입니다. 문구 변경은 개발 배포가 필요합니다.</div></div></div>
+          <div class="card-header"><div><div class="card-title">자동 알림 문구</div><div class="card-sub">서버에서 자동으로 발송하는 알림입니다. 문구 변경은 개발 배포가 필요합니다.</div><div class="card-sub" style="font-size:10px;color:var(--text-3)"><span>기준</span> <span class="no-vi" id="ntpl-base"></span></div></div></div>
           <table class="ntpl-table">
             <colgroup><col style="width:132px"><col style="width:210px"><col style="width:200px"><col><col style="width:84px"></colgroup>
             <thead><tr><th>구분</th><th>발송 상황</th><th>제목</th><th>본문</th><th>상태</th></tr></thead>
@@ -7623,6 +7623,8 @@ Object.assign(KO2VI,{
   "푸시 · 이벤트·티켓 알림 설정":"Push · theo cài đặt thông báo sự kiện·vé",
   "푸시 · 설정 무관":"Push · không phụ thuộc cài đặt",
   "푸시 미발송":"Không gửi push",
+  "문구를 불러오지 못했습니다":"Không tải được nội dung",
+  "기준":"Cơ sở",
   "야간 발송 허용":"Cho phép gửi ban đêm",
   "티켓 적립":"Tích lũy vé","만료":"Hết hạn","운영자 지급":"Quản trị viên cấp","전환":"Chuyển đổi","출석":"Điểm danh","카카오 연동":"Liên kết Kakao","미션":"Nhiệm vụ","선물 상자":"Hộp quà",
   "자동 알림 문구":"Nội dung thông báo tự động",
@@ -11837,23 +11839,39 @@ function ntplVarsHtml(str) {
   }
   return out;
 }
+/* 문구 기준 — 이 표가 어느 시점 백엔드 문구인지 표 위에 작게 적는다 */
+var NTPL_BASE = 'inetkr/pricepick-backend stg 2c8a103 · 2026-11-05';
+/* 그리다 실패하거나 행이 0건이면 빈 표로 두지 않고 그 사실을 표 안에 적는다(2026-11-06) */
 function ntplRender() {
-  var tb = document.getElementById('ntpl-tbody');
+  var tb = document.getElementById('ntpl-tbody'), base = document.getElementById('ntpl-base');
   if (!tb) return;
-  tb.innerHTML = NTPL_DEF.map(function(d) {
-    var notes = (d.note || '').split(' ').filter(Boolean).map(function(n) { return '<div class="ntpl-note">' + ntplVarsHtml(NTPL_NOTE[n]) + '</div>'; }).join('');
-    return '<tr>'
-      + '<td><div class="ntpl-group">' + d.group + '</div><div class="ntpl-chips">'
-      + '<span class="ntpl-chip"><b>알림 유형</b><span>' + d.box + '</span></span>'
-      + '<span class="ntpl-chip' + (d.push === 'purchase' ? ' ntpl-chip-must' : '') + '">' + NTPL_PUSH_KO[d.push] + '</span>'
-      + (d.night ? '<span class="ntpl-chip">야간 발송 허용</span>' : '')
-      + '</div></td>'
-      + '<td class="ntpl-l">' + d.situ + '<div class="ntpl-src">' + ppEsc(d.src) + '</div></td>'
-      + '<td class="ntpl-l no-vi">' + ntplVarsHtml(d.title) + '</td>'
-      + '<td class="ntpl-l no-vi">' + ntplVarsHtml(d.body) + notes + '</td>'
-      + '<td style="text-align:center"><span class="badge badge-green">사용 중</span></td></tr>';
-  }).join('');
+  if (base) base.textContent = NTPL_BASE;
+  var fail = function(why) {
+    tb.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:28px;color:var(--danger);font-size:13px">'
+      + '<span>문구를 불러오지 못했습니다</span> · <span>기준</span> ' + ppEsc(NTPL_BASE) + (why ? ' · ' + ppEsc(why) : '') + '</td></tr>';
+  };
+  try {
+    if (!NTPL_DEF || !NTPL_DEF.length) { fail(''); return; }
+    tb.innerHTML = NTPL_DEF.map(function(d) {
+      var notes = (d.note || '').split(' ').filter(Boolean).map(function(n) { return '<div class="ntpl-note">' + ntplVarsHtml(NTPL_NOTE[n]) + '</div>'; }).join('');
+      return '<tr>'
+        + '<td><div class="ntpl-group">' + d.group + '</div><div class="ntpl-chips">'
+        + '<span class="ntpl-chip"><b>알림 유형</b><span>' + d.box + '</span></span>'
+        + '<span class="ntpl-chip' + (d.push === 'purchase' ? ' ntpl-chip-must' : '') + '">' + NTPL_PUSH_KO[d.push] + '</span>'
+        + (d.night ? '<span class="ntpl-chip">야간 발송 허용</span>' : '')
+        + '</div></td>'
+        + '<td class="ntpl-l">' + d.situ + '<div class="ntpl-src">' + ppEsc(d.src) + '</div></td>'
+        + '<td class="ntpl-l no-vi">' + ntplVarsHtml(d.title) + '</td>'
+        + '<td class="ntpl-l no-vi">' + ntplVarsHtml(d.body) + notes + '</td>'
+        + '<td style="text-align:center"><span class="badge badge-green">사용 중</span></td></tr>';
+    }).join('');
+  } catch (e) {
+    console.error('ntplRender', e);
+    fail((e && e.message) || String(e));
+  }
 }
+/* 화면 데이터 읽기(loadNotifications)를 기다리지 않는다 — 문구는 코드에 들어 있으니 스크립트가 읽히는 즉시 그린다 */
+ntplRender();
 /* 화면 탭 — 수동 발송 · 발송 기록 · 자동 알림 문구. 내용은 숨긴 채로도 다 그려 둔다(크기를 재는 곳이 없다).
    누를 때는 주소만 바꿔 끼우고(replaceState) 다시 읽지 않는다. 메뉴로 들어오면 첫 탭. */
 var NOTI_MAIN_TABS = ['send', 'history', 'templates'];
@@ -11864,6 +11882,7 @@ window.notiMainTab = function(key, keepUrl) {
     var e2 = document.getElementById('noti-pane-' + k);
     if (e2) e2.style.display = k === key ? 'block' : 'none';
   });
+  if (key === 'templates') ntplRender();
   if (!keepUrl) {
     var h = '#notifications' + (key === 'send' ? '' : '/' + key);
     try { if (location.hash !== h) history.replaceState(null, '', h); } catch (e) { location.hash = h; }
