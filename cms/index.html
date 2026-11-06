@@ -12017,8 +12017,12 @@ function loadNotifications() {
       Promise.all(due.map(function(doc) {
         var d = doc.data();
         return notiTargetUids(d.target).then(function(uids) {
-          return doc.ref.update({ status: 'sent', sent_at: FS.Timestamp.fromDate(new Date(d.schedule_at)), recipient_uids: uids, recipient_count: uids.length, marketing_only: true });
-        }).then(function() { logAdmin('예약 알림 발송완료 처리: ' + (d.title || doc.id)); });
+          /* 나갈 시점에 받을 회원이 0명이면 기록을 남기지 않는다 — 아무에게도 안 간 「발송완료 0명」 줄이 생기지 않게(김반장 2026-11-06) */
+          if (!uids.length) return doc.ref.delete().then(function() { logAdmin('예약 알림 삭제(발송 시점 대상 0명): ' + (d.title || doc.id)); });
+          /* 대상 수·명단은 이 순간(발송 시점) 값으로 저장하고 이후 다시 세지 않는다 — 지난 기록의 숫자는 바뀌지 않는다 */
+          return doc.ref.update({ status: 'sent', sent_at: FS.Timestamp.fromDate(new Date(d.schedule_at)), recipient_uids: uids, recipient_count: uids.length, marketing_only: true })
+            .then(function() { logAdmin('예약 알림 발송완료 처리: ' + (d.title || doc.id)); });
+        });
       })).catch(function(e) { console.error('notiProcessDue', e); }).then(function() {
         NOTI_DUE_RUNNING = false;
         loadNotifications();
