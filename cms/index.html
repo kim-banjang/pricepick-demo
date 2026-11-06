@@ -3184,9 +3184,10 @@ window.CMS_FEATURES = {
             <div style="display:flex;align-items:flex-end;gap:14px;flex-wrap:wrap">
               <div>
                 <label style="font-size:11px;color:var(--text-2);font-weight:600;display:block;margin-bottom:6px;text-transform:uppercase;letter-spacing:.4px">발송 시점</label>
-                <select class="filter-sel" id="noti-timing"><option value="now">즉시 발송</option><option value="scheduled">예약 발송</option></select>
+                <select class="filter-sel" id="noti-timing" onchange="notiTimingSync()"><option value="now">즉시 발송</option><option value="scheduled">예약 발송</option></select>
               </div>
-              <input type="datetime-local" class="search-box" id="noti-schedule-at" style="width:auto">
+              <!-- 예약 발송일 때만 보인다 — 즉시 발송이면 칸째 접고 값도 비운다(김반장 2026-11-06) -->
+              <input type="datetime-local" class="search-box" id="noti-schedule-at" style="width:auto;display:none">
               <div style="margin-left:auto;display:flex;gap:8px">
                 <button class="btn btn-ghost btn-sm" id="noti-test-btn" onclick="notiSendTest()">선택 개별 발송</button>
                 <button class="btn btn-primary" id="noti-send-btn" onclick="notiSend()">발송</button>
@@ -11879,6 +11880,7 @@ function loadNotifications() {
   if (!tbody) return;
   /* 수신 결과 넷(성공·실패·미처리·확인 불가)을 세려면 회원 목록이 먼저 있어야 한다 — 없으면 전원이 「확인 불가」로 잡힌다 */
   ntplRender();
+  notiTimingSync();
   notiLoadUsers().catch(function(){ return []; }).then(function() {
     return db.collection('notifications').orderBy('created_at', 'desc').limit(500).get();
   }).then(function(snap) {
@@ -12015,6 +12017,14 @@ function notiSetErr(id, on) {
 window.notiClearErr = function(id) {
   var f = document.getElementById(id);
   if (f && f.value.trim()) notiSetErr(id, false);
+};
+/* 발송 시점 — 즉시 발송이면 날짜 칸을 접고 값을 비운다. 숨은 값이 남아 나중에 예약으로 쓰이지 않게 */
+window.notiTimingSync = function() {
+  var sel = document.getElementById('noti-timing'), at = document.getElementById('noti-schedule-at');
+  if (!sel || !at) return;
+  var on = sel.value === 'scheduled';
+  at.style.display = on ? '' : 'none';
+  if (!on) at.value = '';
 };
 window.notiSend = function() {
   var title = document.getElementById('noti-title').value.trim();
