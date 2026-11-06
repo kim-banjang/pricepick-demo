@@ -742,6 +742,8 @@ td.rf-net-col{font-weight:700;color:var(--success);}
 #m-noti-recipients .modal{overflow-x:hidden;}
 .noti-rcp-table{table-layout:fixed;}
 .noti-rcp-table td{overflow:hidden;text-overflow:ellipsis;}
+.noti-badge-sched{padding:3px 7px;gap:3px;}
+.noti-badge-sched .pre{color:var(--text-3);}
 .noti-reg-at{margin-top:2px;font-size:13px;color:var(--text-3);}
 .noti-plan-at{font-weight:700;color:var(--text-3);}
 .ncx-ask{font-size:16px;font-weight:700;color:var(--text);text-align:center;margin-top:8px;}
@@ -3242,7 +3244,7 @@ window.CMS_FEATURES = {
             <div class="srch-row" style="padding:12px 16px;border-bottom:1px solid var(--border)">
               <input class="search-box" id="noti-h-q" placeholder="제목 검색">
               <select class="filter-sel" id="noti-h-target"><option value="">전체 대상</option><option value="all">전체 회원</option><option value="kakao">카카오 연동 회원</option><option value="guest">미연동(게스트) 회원</option><option value="inactive30">30일 미접속</option><option value="new7">신규 가입(7일 이내)</option><option value="purchased">구매 이력 있는 회원</option></select>
-              <select class="filter-sel" id="noti-h-status"><option value="">전체 상태</option><option value="sent">발송완료</option><option value="scheduled">예약</option><option value="cancelled">취소됨</option><option value="test">개별 발송</option></select>
+              <select class="filter-sel" id="noti-h-status"><option value="">전체 상태</option><option value="sent">발송완료</option><option value="scheduled">예약</option><option value="cancelled">취소됨</option><option value="test">개별 발송</option><option value="sched">예약 발송분</option></select>
               <button class="btn btn-primary btn-sm" onclick="notiHistSearch()">검색</button>
             </div>
             <table>
@@ -7681,7 +7683,7 @@ Object.assign(KO2VI,{
   "푸시 미발송":"Không gửi push",
   "문구를 불러오지 못했습니다":"Không tải được nội dung",
   "받을 회원이 없습니다. 발송 대상을 다시 선택해 주세요.":"Không có hội viên nhận. Hãy chọn lại đối tượng gửi.","받을 회원이 없습니다. 수신 동의 회원이 없어 전원 제외되었습니다.":"Không có hội viên nhận. Không có hội viên đồng ý nhận nên tất cả bị loại.",
-  "예약 등록":"Đăng ký hẹn giờ","예약 발송 취소":"Hủy gửi hẹn giờ","예약 발송을 취소하시겠습니까?":"Hủy gửi hẹn giờ này?","취소한 건은 「취소됨」으로 남고 발송되지 않습니다.":"Mục đã hủy sẽ ở trạng thái 「Đã hủy」 và không được gửi.",
+  "예약 등록":"Đăng ký hẹn giờ","예약 /":"Hẹn giờ /","예약 발송분":"Mục gửi hẹn giờ","예약 발송 취소":"Hủy gửi hẹn giờ","예약 발송을 취소하시겠습니까?":"Hủy gửi hẹn giờ này?","취소한 건은 「취소됨」으로 남고 발송되지 않습니다.":"Mục đã hủy sẽ ở trạng thái 「Đã hủy」 và không được gửi.",
   "예약 건은 발송 시점에 대상이 정해집니다.":"Đối tượng của mục hẹn giờ được xác định lúc gửi.","현재 조건 기준":"Theo điều kiện hiện tại","명입니다.":"người.",
   "발송 조건":"Điều kiện gửi","출처":"Nguồn","변수 없음":"Không có biến","푸시 전용":"Chỉ push","알림함 미저장":"Không lưu hộp thông báo","푸시 · 수신 설정 무관":"Push · không phụ thuộc cài đặt nhận","1:1 문의":"Hỏi đáp 1:1",
   "차감이 없을 때":"Khi không bị trừ","이전 구매 취소분을 차감했을 때":"Khi đã trừ phần hủy mua trước","전체 취소일 때":"Khi hủy toàn bộ","부분 취소일 때":"Khi hủy một phần",
@@ -12063,8 +12065,8 @@ function loadNotifications() {
         + '<td style="text-align:center">' + (r ? ppN(r.pending) + '명' : '—') + '</td>'
         + '<td style="text-align:center">' + (r ? (r.unknown ? '<span style="color:var(--text-2);font-weight:700">' + ppN(r.unknown) + '명</span>' : '0명') : '—') + '</td>'
         + '<td style="text-align:center">—</td>'
-        + '<td style="text-align:center">' + (STATUS_BADGE[d.status]||'<span class="badge badge-gray">' + (d.status||'') + '</span>') + ' ' + act + '</td></tr>';
-      return { html: html, title: d.title || '', target: d.target || '', status: d.status || '' };
+        + '<td style="text-align:center">' + notiStatusBadge(d, STATUS_BADGE) + ' ' + act + '</td></tr>';
+      return { html: html, title: d.title || '', target: d.target || '', status: d.status || '', sched: !!d.schedule_at };
     });
     notiHistApply(false);
   }).catch(function(e){ console.error('loadNotifications', e); tbody.innerHTML = ppEmpty(7,'로드 오류'); });
@@ -12083,6 +12085,13 @@ function notiWhenCell(d) {
   var at = d.sent_at || d.created_at;
   return '<td style="text-align:center;white-space:nowrap"><div style="font-weight:700;color:var(--text)">' + ppDt(at) + '</div><div style="color:var(--text-3);font-size:11px">' + ppTm(at) + '</div>' + reg + '</td>';
 }
+/* 상태 배지 — 예약으로 걸었다가 나간 건·취소한 건은 한 배지 안에 「예약 / 발송완료」「예약 / 취소됨」(앞은 흐리게, 김반장 2026-11-06) */
+function notiStatusBadge(d, map) {
+  var cls = { sent: 'badge-green', cancelled: 'badge-gray' }[d.status];
+  var ko = { sent: '발송완료', cancelled: '취소됨' }[d.status];
+  if (d.schedule_at && cls) return '<span class="badge ' + cls + ' noti-badge-sched"><span class="pre">예약 /</span><span>' + ko + '</span></span>';
+  return map[d.status] || '<span class="badge badge-gray">' + (d.status || '') + '</span>';
+}
 /* 수동 발송 기록 검색 — 제목(포함·대소문자 무시) · 대상 · 상태를 함께 건다. 「검색」을 누를 때 적용하고 1쪽으로 돌아간다.
    다시 불러올 때(발송·취소 뒤)는 걸어 둔 조건과 보던 쪽을 그대로 둔다. */
 var NOTI_HIST_ROWS = [];
@@ -12092,7 +12101,7 @@ function notiHistApply(toFirst) {
   if (!tbody) return;
   var f = NOTI_HIST_F, q = f.q.toLowerCase(), on = !!(f.q || f.target || f.status);
   var rows = NOTI_HIST_ROWS.filter(function(r) {
-    return (!q || r.title.toLowerCase().indexOf(q) >= 0) && (!f.target || r.target === f.target) && (!f.status || r.status === f.status);
+    return (!q || r.title.toLowerCase().indexOf(q) >= 0) && (!f.target || r.target === f.target) && (!f.status || (f.status === 'sched' ? r.sched : r.status === f.status));
   }).map(function(r) { return r.html; });
   if (toFirst && PP_PAGED['notifications']) PP_PAGED['notifications'].page = 1;
   ppPaged('notifications', tbody, rows, ppEmpty(11, on && NOTI_HIST_ROWS.length ? '검색 결과가 없습니다.' : '발송 내역이 없습니다.'));
