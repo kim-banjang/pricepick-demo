@@ -3140,16 +3140,17 @@ window.CMS_FEATURES = {
         <div class="card">
           <div class="card-header"><div class="card-title">FCM 푸시 발송 상한 정책 <span style="font-size:11px;color:var(--success);font-weight:600">정책 확정</span></div></div>
           <div style="padding:16px">
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px">
               <div class="policy-item"><div class="policy-label">거래 알림 (구매·확정·환불)</div><div class="policy-value">상한 없음</div><div class="policy-desc">서비스 필수 알림 — 발송 제한 없음. 야간에도 즉시 발송.</div></div>
               <div class="policy-item"><div class="policy-label">기타 알림 (미션·만료·추첨)</div><div class="policy-value">일 2건</div><div class="policy-desc">1인 1일 최대 2건.</div></div>
               <div class="policy-item"><div class="policy-label">야간 발송</div><div class="policy-value">22:00~08:00 미발송</div><div class="policy-desc">야간 시간대 푸시 발송 차단. 모았다가 아침에 묶음 발송.</div></div>
-              <div class="policy-item"><div class="policy-label">우선순위 · 중복 억제</div><div class="policy-value">거래 > 만료 임박 > 미션 > 추첨</div><div class="policy-desc">같은 사유의 알림은 묶어 중복 발송을 억제(하루 상한 안에서).</div></div>
             </div>
+            <!-- 우선순위 · 중복 억제 — 칸을 늘리지 않고 한 줄로 붙인다(STG 세 칸 배치 유지, 김반장 2026-11-06) -->
+            <div style="margin-top:12px;font-size:11px;color:var(--text-2);line-height:1.6"><strong style="color:var(--text)">우선순위 · 중복 억제</strong> — <span>거래 > 만료 임박 > 미션 > 추첨</span> · <span>같은 사유의 알림은 묶어 중복 발송을 억제(하루 상한 안에서).</span></div>
           </div>
         </div>
-        <!-- ② 알림 작성 · 발송 -->
-        <div class="card">
+        <!-- ② 알림 작성 · 발송 — 입력란 높이 40px · 내용 110px 은 STG 값(이 카드 안에서만, 2026-11-06) -->
+        <div class="card" id="noti-compose" style="--ctl-h:40px">
           <div class="card-header"><div class="card-title">알림 작성 · 발송</div></div>
           <div style="padding:18px">
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
@@ -3162,8 +3163,6 @@ window.CMS_FEATURES = {
               <div>
                 <label style="font-size:11px;color:var(--text-2);font-weight:600;display:block;margin-bottom:6px;text-transform:uppercase;letter-spacing:.4px">발송 대상</label>
                 <select class="filter-sel" id="noti-target" style="width:100%"><option value="all">전체 회원</option><option value="kakao">카카오 연동 회원</option><option value="guest">미연동(게스트) 회원</option><option value="inactive30">30일 미접속</option><option value="new7">신규 가입(7일 이내)</option><option value="purchased">구매 이력 있는 회원</option></select>
-                <!-- 대상을 고르는 자리에서 바로 읽히게 화면에 둔다(Notice 에도 같은 문장, 김반장 2026-11-06) -->
-                <div class="info-box" style="margin:8px 0 0">마케팅성 알림은 수신 동의 회원에게만 발송됩니다. 서비스 필수 알림(티켓 지급·기프티콘 발송·경품 당첨)은 동의 여부와 무관하게 발송됩니다.</div>
               </div>
             </div>
             <div style="margin-bottom:14px">
@@ -3172,7 +3171,7 @@ window.CMS_FEATURES = {
             </div>
             <div style="margin-bottom:14px">
               <label style="font-size:11px;color:var(--text-2);font-weight:600;display:block;margin-bottom:6px;text-transform:uppercase;letter-spacing:.4px">내용</label>
-              <textarea class="terms-editor" id="noti-body" style="min-height:90px" placeholder="알림 본문을 입력하세요. 변수: {닉네임}, {보유티켓}"></textarea>
+              <textarea class="terms-editor" id="noti-body" style="min-height:110px" placeholder="알림 본문을 입력하세요. 변수: {닉네임}, {보유티켓}"></textarea>
             </div>
             <div style="display:flex;align-items:flex-end;gap:14px;flex-wrap:wrap">
               <div>
@@ -3185,6 +3184,8 @@ window.CMS_FEATURES = {
                 <button class="btn btn-primary" id="noti-send-btn" onclick="notiSend()">발송</button>
               </div>
             </div>
+            <!-- 수신 동의 안내 — STG 와 같이 카드 맨 아래 전체 폭(Notice 에도 같은 문장, 김반장 2026-11-06) -->
+            <div class="info-box" style="margin:14px 0 0">마케팅성 알림은 수신 동의 회원에게만 발송됩니다. 서비스 필수 알림(티켓 지급·기프티콘 발송·경품 당첨)은 동의 여부와 무관하게 발송됩니다.</div>
           </div>
         </div>
       </div>
