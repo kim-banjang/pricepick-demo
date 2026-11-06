@@ -306,17 +306,13 @@ tr:hover td{background:var(--surface-2);}
 .ntpl-table td.ntpl-l{text-align:left!important;}
 .ntpl-table .badge{white-space:normal;line-height:1.3;}
 .ntpl-group{font-weight:700;color:var(--text);margin-bottom:5px;}
-.ntpl-off .ntpl-group{color:var(--text-3);}
 .ntpl-chips{display:flex;flex-direction:column;align-items:center;gap:3px;}
 .ntpl-chip{display:inline-block;max-width:100%;padding:1px 6px;border-radius:99px;font-size:10px;font-weight:600;line-height:1.35;border:1px solid var(--border);color:var(--text-2);background:var(--surface);}
 .ntpl-chip-must{border-color:transparent;background:var(--main-soft);color:var(--main-hover);}
 .ntpl-chip b{font-weight:700;margin-right:3px;}
 .ntpl-var{display:inline-block;padding:0 5px;border-radius:4px;background:var(--surface-2);color:var(--main);font-family:monospace;font-size:11px;white-space:nowrap;}
-.ntpl-off td{color:var(--text-3);background:var(--surface-2);}
-.ntpl-pv-card{border:1px solid var(--border);border-radius:12px;padding:12px 14px;background:#fff;}
-.ntpl-pv-tag{display:inline-block;font-size:10px;font-weight:700;padding:1px 7px;border-radius:99px;background:var(--surface-2);color:var(--text-2);margin-bottom:6px;}
-.ntpl-pv-head{font-size:14px;font-weight:700;color:var(--text);margin-bottom:3px;}
-.ntpl-pv-desc{font-size:12px;color:var(--text-2);line-height:1.55;}
+.ntpl-src{margin-top:4px;font-size:10px;color:var(--text-3);font-family:monospace;}
+.ntpl-note{margin-top:6px;font-size:11px;color:var(--text-3);}
 .ta-notice-list{margin:0;padding:0;list-style:none;}
 .ta-notice-list li{padding:9px 0;border-bottom:1px solid var(--border);font-size:13px;line-height:1.6;color:var(--text-2);}
 .ta-notice-list li:last-child{border-bottom:none;}
@@ -3222,13 +3218,12 @@ window.CMS_FEATURES = {
         </div>
       </div>
       <div id="noti-pane-templates" style="display:none">
-        <!-- ① 자동 알림 문구 — 앱 코드에 흩어져 있던 자동 알림 문구를 한 표로 모은다. settings/notif_templates 에 저장하고
-             앱 renderNotifications()·ppDemoCancelNotifs() 가 읽는다(문서가 없거나 못 읽으면 앱에 박힌 문구 그대로). -->
+        <!-- ① 자동 알림 문구 — 실제 서비스 백엔드(inetkr/pricepick-backend)가 보내는 알림 문구 그대로. 조회 전용(서버 코드에 박혀 있다). -->
         <div class="card">
-          <div class="card-header"><div class="card-title">자동 알림 문구</div></div>
+          <div class="card-header"><div><div class="card-title">자동 알림 문구</div><div class="card-sub">서버에서 자동으로 발송하는 알림입니다. 문구 변경은 개발 배포가 필요합니다.</div></div></div>
           <table class="ntpl-table">
-            <colgroup><col style="width:124px"><col style="width:200px"><col style="width:170px"><col><col style="width:84px"><col style="width:68px"></colgroup>
-            <thead><tr><th>카테고리</th><th>발송 상황</th><th>제목</th><th>본문</th><th>상태</th><th>관리</th></tr></thead>
+            <colgroup><col style="width:132px"><col style="width:210px"><col style="width:200px"><col><col style="width:84px"></colgroup>
+            <thead><tr><th>카테고리</th><th>발송 상황</th><th>제목</th><th>본문</th><th>상태</th></tr></thead>
             <tbody id="ntpl-tbody"></tbody>
           </table>
         </div>
@@ -4494,7 +4489,7 @@ window.CMS_FEATURES = {
       <div class="ncf-cap">회원에게 이렇게 보입니다</div>
       <div class="ncf-push">
         <img class="ncf-push-icon" src="/apple-touch-icon.png?v=2" alt="">
-        <div class="ncf-push-txt"><div class="ncf-push-title" id="ncf-title"></div><div class="ncf-push-body" id="ncf-body"></div></div>
+        <div class="ncf-push-txt no-vi"><div class="ncf-push-title" id="ncf-title"></div><div class="ncf-push-body" id="ncf-body"></div></div>
       </div>
       <div class="ncf-ex" id="ncf-ex" style="display:none">{닉네임}·{보유티켓}에 예시 값을 넣은 모습입니다</div>
       <div class="ncf-who"><span class="ncf-who-cond" id="ncf-cond"></span><span class="ncf-who-n"><span id="ncf-n"></span><span>명</span></span></div>
@@ -4561,36 +4556,6 @@ window.CMS_FEATURES = {
   </div>
 </div>
 
-<!-- ── 모달: 자동 알림 문구 수정 ── 저장 단추는 두지 않는다 — 미리보기 창의 「이대로 저장」으로만 저장된다 -->
-<div class="modal-overlay" id="m-ntpl-edit">
-  <div class="modal" style="width:540px">
-    <div class="modal-header"><div><div class="modal-title">자동 알림 문구 수정</div><div class="card-sub" id="ntpl-ctx"></div></div><button class="modal-close" onclick="closeModal('m-ntpl-edit')"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
-    <div class="modal-body">
-      <input type="hidden" id="ntpl-key">
-      <div class="form-group" id="ntpl-title-wrap"><label class="form-label">제목</label><input class="form-input" id="ntpl-title"></div>
-      <div class="form-group"><label class="form-label">본문</label><textarea class="form-input" id="ntpl-body" rows="3" style="resize:vertical"></textarea></div>
-      <div class="form-group"><label class="form-label">쓸 수 있는 변수</label><div id="ntpl-vars"></div></div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="closeModal('m-ntpl-edit')">닫기</button>
-      <button class="btn btn-primary" onclick="ntplPreview()">미리보기</button>
-    </div>
-  </div>
-</div>
-<!-- ── 모달: 자동 알림 문구 미리보기 ── 예시 값을 넣어 앱 알림함 카드 모양 그대로 보여 준다 -->
-<div class="modal-overlay" id="m-ntpl-preview">
-  <div class="modal" style="width:440px">
-    <div class="modal-header"><div class="modal-title">미리보기</div><button class="modal-close" onclick="closeModal('m-ntpl-preview')"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
-    <div class="modal-body">
-      <label class="form-label">앱 알림함에 보이는 모습 (예시 값)</label>
-      <div id="ntpl-pv"></div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="ntplBackToEdit()">다시 고치기</button>
-      <button class="btn btn-primary" id="ntpl-save-btn" onclick="ntplSave()">이대로 저장</button>
-    </div>
-  </div>
-</div>
 <!-- ── 모달: 배너 ── -->
 <div class="modal-overlay" id="m-banner">
   <div class="modal">
@@ -7652,45 +7617,27 @@ Object.assign(KO2VI,{
 /* ── 알림 관리 재기획 (김반장 승인 2026-11-05) — 라벨·안내만 옮긴다. 자동 알림 문구 원문({변수} 포함)은
    회원에게 나가는 한국어 발송본이라 번역하지 않는다(취소·환수 문구 표와 같은 기준). ── */
 Object.assign(KO2VI,{
+  "서버에서 자동으로 발송하는 알림입니다. 문구 변경은 개발 배포가 필요합니다.":"Thông báo do máy chủ tự động gửi. Muốn đổi nội dung cần triển khai bản phát triển.",
+  "푸시 · 구매 알림 설정":"Push · theo cài đặt thông báo mua hàng",
+  "푸시 · 이벤트·티켓 알림 설정":"Push · theo cài đặt thông báo sự kiện·vé",
+  "푸시 · 설정 무관":"Push · không phụ thuộc cài đặt",
+  "알림함만":"Chỉ hộp thông báo",
+  "야간에도 발송":"Gửi cả ban đêm",
+  "티켓 적립":"Tích lũy vé","만료":"Hết hạn","운영자 지급":"Quản trị viên cấp","전환":"Chuyển đổi","출석":"Điểm danh","카카오 연동":"Liên kết Kakao","미션":"Nhiệm vụ","선물 상자":"Hộp quà",
   "자동 알림 문구":"Nội dung thông báo tự động",
   "발송 상황":"Tình huống gửi",
   "본문":"Nội dung",
   "알림함":"Hộp thông báo",
-  "필수 여부":"Bắt buộc hay không",
   "발송 기록":"Lịch sử gửi",
   "수동 발송":"Gửi thủ công",
   "자동 발송":"Gửi tự động",
   "대상 회원":"Hội viên nhận",
-  "자동 알림 문구 수정":"Sửa nội dung thông báo tự động",
-  "쓸 수 있는 변수":"Biến có thể dùng",
-  "다시 고치기":"Sửa lại",
-  "이대로 저장":"Lưu như thế này",
-  "앱 알림함에 보이는 모습 (예시 값)":"Hiển thị trong hộp thông báo app (giá trị ví dụ)",
   "사용 중":"Đang dùng",
   "미구현":"Chưa triển khai",
-  "필수(동의 무관)":"Bắt buộc (không cần đồng ý)",
-  "선택(동의 필요)":"Tùy chọn (cần đồng ý)",
   "취소 · 환수":"Hủy · thu hồi",
   "티켓 지급":"Cấp vé",
-  "제휴몰 구매 접수 (구매 확정 전)":"Ghi nhận mua tại sàn LK (trước khi xác nhận mua)",
-  "구매 확정 · 티켓 적립 완료":"Xác nhận mua · tích lũy vé xong",
-  "취소 범위 토막 — 전체 취소 (아래 취소·환수 본문의 {취소범위})":"Đoạn phạm vi hủy — hủy toàn phần ({취소범위} trong nội dung hủy·thu hồi bên dưới)",
-  "취소 범위 토막 — 부분 취소 (아래 취소·환수 본문의 {취소범위})":"Đoạn phạm vi hủy — hủy một phần ({취소범위} trong nội dung hủy·thu hồi bên dưới)",
-  "구매 취소 — 티켓 전환 전 (전체 · 부분)":"Hủy mua — trước khi chuyển đổi vé (toàn phần · một phần)",
-  "구매 취소 — 티켓 전환 후, 전부 환수":"Hủy mua — sau khi chuyển đổi vé, thu hồi toàn bộ",
-  "부분 취소 — 티켓 전환 후, 남은 티켓 있음":"Hủy một phần — sau khi chuyển đổi vé, còn vé dư",
-  "회수할 티켓이 모자람 (환수 알림 본문 끝에 덧붙임)":"Thiếu vé để thu hồi (thêm vào cuối nội dung thông báo thu hồi)",
-  "친구가 내 초대 코드를 입력":"Bạn bè nhập mã mời của tôi",
-  "포인트 적립 (출석 · 가입 축하 · 친구초대 · 선물 상자 · 티켓→포인트 교환 · 운영자 지급)":"Tích lũy điểm (điểm danh · chúc mừng đăng ký · mời bạn · hộp quà · đổi vé→điểm · quản trị viên cấp)",
-  "주간 경품 추첨 당첨 (주간 추첨 숨김 중)":"Trúng bốc thăm giải thưởng tuần (đang ẩn bốc thăm tuần)",
-  "티켓 만료 임박 (D-30 · D-7)":"Vé sắp hết hạn (D-30 · D-7)",
-  "포인트 만료 임박 (D-30 · D-7)":"Điểm sắp hết hạn (D-30 · D-7)",
-  "선물 상자 · 미션 티켓 지급":"Cấp vé từ hộp quà · nhiệm vụ",
-  "운영자 티켓 지급":"Quản trị viên cấp vé",
   "기프티콘 구매 취소":"Hủy mua Gifticon",
-  "공지 게시":"Đăng thông báo chung",
   "불러오는 중…":"Đang tải…",
-  "제목과 본문을 입력하세요.":"Hãy nhập tiêu đề và nội dung.",
   "저장했습니다.":"Đã lưu.",
   "발송완료":"Đã gửi",
   /* Notice */
@@ -7877,6 +7824,8 @@ Object.assign(KO2VI,{
     return /[0-9]$/.test(prevInlineChar(n)) ? ' '+out : out;
   }
   function trNode(n){
+    /* .no-vi 안은 번역하지 않는다 — 회원에게 나가는 알림 원문(자동 알림 문구 표 · 발송 확인 미리보기, 2026-11-06) */
+    if(n.parentNode&&n.parentNode.closest&&n.parentNode.closest('.no-vi')) return;
     var out=tcore(n.nodeValue);
     if(out!=null&&out!==n.nodeValue){
       out=viPad(n,out);
@@ -11817,140 +11766,93 @@ window.noticeSubmit = function(status) {
   });
 };
 
-/* ── ① 자동 알림 문구 (알림 관리 재기획 · 김반장 승인 2026-11-05) ─────────────────────
-   앱이 상황에 따라 저절로 내보내는 알림의 제목·본문을 한 표로 모은다. 저장은 settings/notif_templates
-   { items: { <key>: { title, body } } }. 앱 renderNotifications()·ppDemoCancelNotifs() 가 같은 key 로 읽는다 —
-   문서가 없거나 못 읽거나, 변수 값이 비면 앱에 박힌 문구를 그대로 쓴다(기존 동작 유지).
-   아래 title·body 기본값은 앱에 박힌 문구를 변수 자리만 비워 옮긴 것이다 — 글자를 바꾸면 앱 기본 문구와 어긋난다.
-   frag: 다른 알림 본문에 끼워 들어가는 토막(제목 없음). scope: 그 알림이 쓰는 「취소범위」 토막.
-   상태 'off' = 정책서에는 있으나 아직 발송되지 않는 알림(미구현) — 문구 편집을 막는다. */
+/* ── ① 자동 알림 문구 — 실제 서비스 백엔드 문구 (김반장 2026-11-06) ─────────────────────
+   출처: inetkr/pricepick-backend stg 브랜치(2c8a103, 2026-11-05) notificationService.notify()·notifyBulk() 호출부.
+   제목·본문은 코드 문자열 그대로다(변수도 코드 이름 그대로 ${...}). 문구는 서버 코드에 박혀 있어 CMS 에서 고칠 수 없다 —
+   그래서 수정 단추·미리보기·저장을 두지 않는다. 문구가 바뀌면 이 표도 손으로 맞춘다.
+   box: 앱 알림함 묶음(NOTIFICATION_CATEGORY). push: purchase=구매 알림 설정 · event=이벤트·티켓 알림 설정 · none=설정 무관 · off=푸시 없이 알림함만.
+   여러 토막을 이어 붙이는 문구(쿠팡 취소·환수)는 이어 붙이는 식 그대로 적고, 토막 정의는 note 에 적는다. */
 var NTPL_DEF = [
-  { key: 'purchase_pending',     group: '구매',        situ: '제휴몰 구매 접수 (구매 확정 전)',                 title: '{몰} 구매로 티켓 적립', body: '{금액}원 · 구매 확정 대기', vars: ['몰', '금액'], box: '구매', req: 'must', on: true },
-  { key: 'purchase_confirmed',   group: '구매',        situ: '구매 확정 · 티켓 적립 완료',                      title: '{몰} 구매로 티켓 적립', body: '{금액}원 · 적립 완료', vars: ['몰', '금액'], box: '구매', req: 'must', on: true },
-  { key: 'cancel_scope_full',    group: '취소 · 환수', situ: '취소 범위 토막 — 전체 취소 (아래 취소·환수 본문의 {취소범위})', title: null, body: '{몰} {구매금액}원 구매 취소', vars: ['몰', '구매금액'], box: '구매', req: 'must', on: true, frag: true, parent: 'cancel_pre' },
-  { key: 'cancel_scope_partial', group: '취소 · 환수', situ: '취소 범위 토막 — 부분 취소 (아래 취소·환수 본문의 {취소범위})', title: null, body: '{몰} {구매금액}원 중 {취소금액}원 취소', vars: ['몰', '구매금액', '취소금액'], box: '구매', req: 'must', on: true, frag: true, parent: 'claw_partial' },
-  { key: 'cancel_pre',           group: '취소 · 환수', situ: '구매 취소 — 티켓 전환 전 (전체 · 부분)',         title: '적립 예정 티켓 취소', body: '{취소범위} · 적립 예정이던 랜덤 티켓 {장수}장이 취소되었습니다.', vars: ['취소범위', '장수'], box: '구매', req: 'must', on: true, scope: 'cancel_scope_full' },
-  { key: 'claw_full',            group: '취소 · 환수', situ: '구매 취소 — 티켓 전환 후, 전부 환수',            title: '지급 티켓 환수', body: '{취소범위} · 지급된 {환수내역}이 환수되었습니다.', vars: ['취소범위', '환수내역'], box: '구매', req: 'must', on: true, scope: 'cancel_scope_full' },
-  { key: 'claw_partial',         group: '취소 · 환수', situ: '부분 취소 — 티켓 전환 후, 남은 티켓 있음',       title: '지급 티켓 부분 환수', body: '{취소범위} · {환수내역}이 환수되었습니다. 남은 {잔여}장은 그대로 사용하실 수 있습니다.', vars: ['취소범위', '환수내역', '잔여'], box: '구매', req: 'must', on: true, scope: 'cancel_scope_partial' },
-  { key: 'claw_debt',            group: '취소 · 환수', situ: '회수할 티켓이 모자람 (환수 알림 본문 끝에 덧붙임)', title: null, body: '보유하신 티켓이 모자라 {회수예정}장은 회수 예정으로 남았습니다. 다음에 티켓을 받으실 때 자동으로 차감됩니다.', vars: ['회수예정'], box: '구매', req: 'must', on: true, frag: true, parent: 'claw_full' },
-  { key: 'gifticon_purchase',    group: '기프티콘',    situ: '기프티콘 구매',                                   title: '기프티콘 구매 완료', body: '티켓 {장수}장 사용', vars: ['장수'], box: '티켓', req: 'must', on: true },
-  { key: 'invite_done',          group: '친구초대',    situ: '친구가 내 초대 코드를 입력',                       title: '친구 초대 완료', body: '초대 보상 지급', vars: [], box: '이벤트', req: 'opt', on: true },
-  { key: 'point_earn',           group: '포인트',      situ: '포인트 적립 (출석 · 가입 축하 · 친구초대 · 선물 상자 · 티켓→포인트 교환 · 운영자 지급)', title: '{사유}', body: '+{포인트}P 적립', vars: ['사유', '포인트'], box: '이벤트', req: 'opt', on: true },
-  { key: 'prize_win',            group: '경품',        situ: '주간 경품 추첨 당첨 (주간 추첨 숨김 중)',          title: '경품 추첨에 당첨되셨어요!', body: '당첨을 축하해요! 경품 수령 정보를 1:1 문의로 보내주세요.', vars: [], box: '이벤트', req: '', on: true },
-  { key: 'expire_ticket',        group: '만료',        situ: '티켓 만료 임박 (D-30 · D-7)',                     title: null, body: null, vars: [], box: '', req: 'opt', on: false },
-  { key: 'expire_point',         group: '만료',        situ: '포인트 만료 임박 (D-30 · D-7)',                   title: null, body: null, vars: [], box: '', req: 'opt', on: false },
-  { key: 'grant_ticket_event',   group: '티켓 지급',   situ: '선물 상자 · 미션 티켓 지급',                      title: null, body: null, vars: [], box: '', req: 'opt', on: false },
-  { key: 'grant_ticket_admin',   group: '티켓 지급',   situ: '운영자 티켓 지급',                                title: null, body: null, vars: [], box: '', req: '', on: false },
-  { key: 'gifticon_cancel',      group: '기프티콘',    situ: '기프티콘 구매 취소',                              title: null, body: null, vars: [], box: '', req: 'must', on: false },
-  { key: 'inquiry_answered',     group: '1:1 문의',    situ: '1:1 문의 답변',                                   title: null, body: null, vars: [], box: '', req: 'must', on: false },
-  { key: 'notice_posted',        group: '공지',        situ: '공지 게시',                                       title: null, body: null, vars: [], box: '', req: '', on: false }
+  { group: '구매', situ: '제휴몰 구매가 들어옴', title: '구매가 감지됐어요', body: '쇼핑몰 구매 내역이 확인됐어요. 잠시 후 랜덤 티켓이 적립될 예정이에요.', box: '구매', push: 'purchase', src: 'ticketService.ts:286' },
+  { group: '티켓 적립', situ: '구매 직후 랜덤 티켓 가지급', title: '랜덤 티켓 1장이 적립 대기 중이에요', body: '구매 확정까지 카카오 연동 시 D+7, 미연동 시 D+30 남았어요. 확정되면 티켓 수량이 공개돼요.', box: '티켓', push: 'purchase', src: 'ticketService.ts:345' },
+  { group: '티켓 적립', situ: '구매 직후, 일·월 적립 한도 초과로 보임', title: '이번 구매는 적립 대상이 아니에요', body: '일/월 구매 적립 한도를 초과해 이번 건은 랜덤 티켓이 지급되지 않아요. (일 ${PURCHASE_TICKET_LIMIT.DAILY}건·월 ${PURCHASE_TICKET_LIMIT.MONTHLY}건)', box: '티켓', push: 'purchase', src: 'ticketService.ts:336' },
+  { group: '티켓 적립', situ: '구매 확정 때 적립 한도 초과로 거절', title: '이번 구매는 적립 대상이 아니에요', body: '일/월 구매 적립 한도를 초과해 이번 건은 랜덤 티켓이 지급되지 않아요. (일 5건·월 50건)', box: '티켓', push: 'purchase', src: 'ticketService.ts:1087' },
+  { group: '티켓 적립', situ: '구매 확정 · 티켓 수량 공개', title: '티켓 수량이 공개됐어요!', body: '${summary}이 지금 사용 가능해요.', box: '티켓', push: 'purchase', src: 'ticketService.ts:1059' },
+  { group: '티켓 적립', situ: '구매 확정 · 이전 구매 취소분을 빼고 공개', title: '티켓 수량이 공개됐어요!', body: '${summary}이 지금 사용 가능해요. (이전 구매 취소분 ${repaidTotal}장 차감 후)', box: '티켓', push: 'purchase', src: 'ticketService.ts:1059' },
+  { group: '티켓 적립', situ: '첫 구매 확정 보너스', title: '첫 구매 완료! ${ticketTypeLabel(TicketType.TICKET)} ${bonusAmount}장', body: '가입 후 첫 구매가 확정되어 ${ticketTypeLabel(TicketType.TICKET)} ${bonusAmount}장을 받았어요.', box: '티켓', push: 'purchase', src: 'ticketService.ts:430 · 본문 :410' },
+  { group: '취소 · 환수', situ: '구매 확정 때 적립분이 전부 이전 취소분에 차감됨', title: '적립 티켓이 이전 취소분에 차감됐어요', body: '이전 구매 취소로 회수하지 못한 티켓이 있어 ${revokedSummary}이 이번 적립분에서 차감됐어요.', box: '티켓', push: 'purchase', src: 'ticketService.ts:1047' },
+  { group: '취소 · 환수', situ: '쿠팡 구매 취소 — 티켓 확정 전 (전체 · 부분)', title: '적립 예정 티켓 취소', body: '${head} · 적립 예정이던 랜덤 티켓 1장이 취소되었습니다.', box: '티켓', push: 'purchase', night: true, src: 'ticketService.ts:2398 · 문구 :2339–2340', note: 'head' },
+  { group: '취소 · 환수', situ: '쿠팡 구매 취소 — 티켓 확정 후, 전체 취소', title: '지급 티켓 환수', body: '${head} · ${joinSentences(summary ? `지급된 ${summary}이 환수되었습니다.` : \'\', debtSentence)}', box: '티켓', push: 'purchase', night: true, src: 'ticketService.ts:2398 · 문구 :2373–2374', note: 'head debt' },
+  { group: '취소 · 환수', situ: '쿠팡 구매 취소 — 티켓 확정 후, 부분 취소', title: '지급 티켓 부분 환수', body: '${head} · ${joinSentences(summary ? `${summary}이 환수되었습니다.` : \'\', debtSentence, remainingTickets > 0 ? `남은 ${remainingTickets}장은 그대로 사용하실 수 있습니다.` : \'\')}', box: '티켓', push: 'purchase', night: true, src: 'ticketService.ts:2398 · 문구 :2388–2394', note: 'head debt' },
+  { group: '취소 · 환수', situ: '구매 취소·환불로 지급 티켓 회수', title: '적립된 혜택이 회수됐어요', body: '구매 취소·환불이 확인되어 ${summary}이 회수됐어요.', box: '티켓', push: 'purchase', src: 'ticketService.ts:2276' },
+  { group: '취소 · 환수', situ: '구매 취소·환불로 회수, 보유 티켓이 모자람', title: '적립된 혜택이 회수됐어요', body: '구매 취소·환불이 확인되어 ${summary}이 회수됐어요. 보유 티켓이 부족한 ${debtTotal}장은 다음 적립 시 차감돼요.', box: '티켓', push: 'purchase', src: 'ticketService.ts:2276' },
+  { group: '기프티콘', situ: '기프티콘 구매 취소 · 티켓 복구', title: '기프티콘 구매가 취소됐어요', body: '${order.product_name} 구매가 취소되어 ${ticketTypeLabel(TicketType.TICKET)} ${refund.refunded_tickets}장이 복구됐어요.', box: '티켓', push: 'none', src: 'giftOrderService.ts:373' },
+  { group: '만료', situ: '티켓 만료 예고', title: '티켓 만료가 ${days}일 남았어요', body: '보유 중인 ${summary}이 ${days}일 후 만료돼요. 지금 구매해보세요.', box: '티켓', push: 'event', src: 'ticketService.ts:1222' },
+  { group: '만료', situ: '티켓 만료', title: '티켓이 만료됐어요', body: '${ticketTypeLabel(batch.ticket_type)} ${batch.amount}장이 만료돼서 사라졌어요.', box: '티켓', push: 'event', src: 'ticketService.ts:1176' },
+  { group: '만료', situ: '포인트 만료 예고', title: '포인트 만료가 ${days}일 남았어요', body: '보유 중인 ${amount}P가 ${days}일 후 만료돼요. 기프티콘 구매에 사용해보세요.', box: '티켓', push: 'event', src: 'pointService.ts:367' },
+  { group: '만료', situ: '포인트 만료', title: '포인트가 만료됐어요', body: '${batch.amount}P가 만료돼서 사라졌어요.', box: '티켓', push: 'event', src: 'pointService.ts:835' },
+  { group: '운영자 지급', situ: '운영자가 티켓 지급', title: '티켓이 지급됐어요', body: '${summary}이 지급됐어요.', box: '티켓', push: 'event', src: 'ticketService.ts:2246' },
+  { group: '운영자 지급', situ: '운영자가 티켓 회수', title: '티켓이 회수됐어요', body: '${summary}이 회수됐어요.', box: '티켓', push: 'event', src: 'ticketService.ts:2255' },
+  { group: '운영자 지급', situ: '운영자가 포인트 지급', title: '${amount}P가 지급됐어요', body: '관리자에 의해 ${amount}P가 지급됐어요.', box: '티켓', push: 'event', src: 'pointService.ts:498' },
+  { group: '운영자 지급', situ: '운영자가 포인트 회수', title: '${amount}P가 회수됐어요', body: '관리자에 의해 ${amount}P가 회수됐어요.', box: '티켓', push: 'event', src: 'pointService.ts:507' },
+  { group: '전환', situ: '이벤트 티켓을 티켓으로 전환', title: '${ticketTypeLabel(rule.source)} 전환이 완료됐어요', body: '${ticketTypeLabel(rule.target)} ${yieldedTarget}장으로 전환됐어요.', box: '티켓', push: 'off', src: 'ticketService.ts:4334' },
+  { group: '전환', situ: '포인트를 티켓으로 전환', title: '포인트·티켓 전환이 완료됐어요', body: '포인트 ${pointsRequired.toLocaleString()}P를 ${ticketTypeLabel(ticket_type)} ${ticketsToReceive}장으로 전환했어요.', box: '티켓', push: 'off', src: 'pointService.ts:1155' },
+  { group: '전환', situ: '티켓을 포인트로 전환', title: '포인트·티켓 전환이 완료됐어요', body: '${ticketTypeLabel(ticket_type)} ${ticketsToSpend}장을 포인트 ${pointsToReceive.toLocaleString()}P로 전환했어요.', box: '티켓', push: 'off', src: 'pointService.ts:1258' },
+  { group: '출석', situ: '쿠팡 구경 출석 포인트', title: '${config.daily_points}P가 적립됐어요', body: '오늘 출석체크로 ${config.daily_points}P를 받았어요.', box: '이벤트', push: 'off', src: 'pointService.ts:270' },
+  { group: '출석', situ: '연속 출석 달성', title: '${config.streak_milestone_days}일 연속 출석 달성!', body: '보너스로 이벤트 티켓 ${streakGrantedAmount}장을 받았어요.', box: '이벤트', push: 'off', src: 'pointService.ts:284' },
+  { group: '출석', situ: '오늘 출석하지 않은 회원에게 알림', title: '오늘 출석체크 잊지 마세요!', body: '지금 출석체크하고 포인트를 받아보세요.', box: '이벤트', push: 'event', src: 'pointService.ts:330 (여러 명에게 한 번에)' },
+  { group: '포인트', situ: '가입 축하 포인트', title: '가입 축하 ${ONBOARDING.REGISTER_POINTS}P!', body: '가입해주셔서 감사해요. ${ONBOARDING.REGISTER_POINTS}P가 즉시 적립됐어요.', box: '이벤트', push: 'off', src: 'userService.ts:386' },
+  { group: '포인트', situ: '첫 쿠팡 구경 포인트', title: '첫 쿠팡 구경 완료! ${ONBOARDING.COUPANG_FIRST_VIEW_POINTS}P', body: '첫 쿠팡 구경으로 ${ONBOARDING.COUPANG_FIRST_VIEW_POINTS}P를 받았어요. 매일 출석 보상과는 별도예요.', box: '이벤트', push: 'off', src: 'pointService.ts:890' },
+  { group: '카카오 연동', situ: '카카오 연동 완료 보상', title: '카카오 연동 완료! 이벤트 티켓 ${grantedAmount}장', body: '카카오 연동을 완료해서 이벤트 티켓 ${grantedAmount}장을 받았어요.', box: '이벤트', push: 'event', src: 'userService.ts:606' },
+  { group: '미션', situ: '연속구매 미션 달성', title: '연속구매 미션 달성!', body: '${g.purchases}회 연속구매를 달성해서 이벤트 티켓 ${granted}장을 받았어요.', box: '이벤트', push: 'event', src: 'ticketService.ts:1419' },
+  { group: '선물 상자', situ: '선물 상자에서 이벤트 티켓 당첨', title: '${label} 당첨!', body: '${label}에서 ${ticketTypeLabel(TicketType.EVENT_TICKET)} ${granted}장을 받았어요.', box: '이벤트', push: 'off', src: 'ticketService.ts:1676', note: 'label' },
+  { group: '선물 상자', situ: '선물 상자에서 포인트 당첨', title: '${label} 당첨!', body: '${label}에서 ${amount}P를 받았어요.', box: '이벤트', push: 'off', src: 'ticketService.ts:1714 · 본문 :1692', note: 'label' },
+  { group: '선물 상자', situ: '선물 상자에서 티켓 당첨', title: '${label} 당첨!', body: '${label}에서 ${ticketLabel} ${amount}장을 받았어요.', box: '이벤트', push: 'off', src: 'ticketService.ts:1796 · 본문 :1732', note: 'label' },
+  { group: '선물 상자', situ: '선물 상자 티켓 당첨, 이전 취소분 차감', title: '${label} 당첨!', body: '${rewardMessage} (이전 구매 취소분 ${debtRepaid}장 차감 후 ${amount - debtRepaid}장 적립)', box: '이벤트', push: 'off', src: 'ticketService.ts:1796 · rewardMessage :1732', note: 'label' },
+  { group: '친구초대', situ: '초대한 친구가 첫 구매 완료 — 초대한 회원', title: '친구 초대 성공! ${rewardPoints}P를 받았어요', body: '${inviterNickname}님이 초대한 친구가 첫 구매를 완료했어요. ${rewardPoints}P가 적립됐어요.', box: '이벤트', push: 'event', src: 'referralService.ts:248 · 제목 :238 · 본문 :203' },
+  { group: '친구초대', situ: '초대받은 친구가 첫 구매 완료 — 초대받은 회원', title: '초대 보상 ${rewardPoints}P를 받았어요', body: '첫 구매를 완료해서 친구 초대 보상 ${rewardPoints}P가 적립됐어요.', box: '이벤트', push: 'event', src: 'referralService.ts:248 · 제목 :243 · 본문 :204' },
+  { group: '경품', situ: '주간 경품 추첨 당첨', title: '경품 추첨에 당첨되셨어요!', body: '당첨을 축하해요! 경품 수령 정보를 1:1 문의로 보내주세요.', box: '이벤트', push: 'event', src: 'prizeDrawService.ts:614' }
 ];
-var NTPL_REQ_KO = { must: '필수(동의 무관)', opt: '선택(동의 필요)' };
-/* 미리보기 예시 값 — 실제 발송 값이 아니다 */
-var NTPL_EX = { '몰': '쿠팡', '금액': '35,000', '구매금액': '70,000', '취소금액': '22,320', '장수': '3', '환수내역': '티켓 2장', '잔여': '1', '회수예정': '1', '사유': '쿠팡 구경 출석체크', '포인트': '10' };
-var NTPL_SAVED = {};
-function ntplDef(key) { return NTPL_DEF.filter(function(d) { return d.key === key; })[0]; }
-/* 지금 쓰이는 문구 — 저장본이 있으면 저장본, 없으면 앱 기본 문구 */
-function ntplCur(key) {
-  var d = ntplDef(key) || {}, sv = NTPL_SAVED[key] || {};
-  return { title: (d.title == null) ? null : (sv.title != null ? sv.title : d.title), body: sv.body != null ? sv.body : d.body };
-}
+var NTPL_PUSH_KO = { purchase: '푸시 · 구매 알림 설정', event: '푸시 · 이벤트·티켓 알림 설정', none: '푸시 · 설정 무관', off: '알림함만' };
+var NTPL_NOTE = {
+  head: '${head} = 쿠팡 ${won(order_total)} 구매 취소 / 쿠팡 ${won(order_total)} 중 ${won(cancel_amount)} 취소 (:2329)',
+  debt: '${debtSentence} = 보유하신 ${ticketLabel}이 모자라 ${debt}장은 회수 예정으로 남았습니다. 다음에 ${ticketLabel}을 받으실 때 자동으로 차감됩니다. (:2364)',
+  label: '${label} = 매일 선물 상자 / 랜덤 선물 상자 (const.ts:510–511)'
+};
 function ntplFill(str, vars) {
   return String(str == null ? '' : str).replace(/\{([^{}]+)\}/g, function(m, k) { return (vars[k] != null && vars[k] !== '') ? String(vars[k]) : m; });
 }
+/* ${...} 자리를 보라색으로 — 안쪽에 중괄호가 한 겹 더 있는 식(${joinSentences(...)})도 통째로 묶는다 */
 function ntplVarsHtml(str) {
-  return ppEsc(str == null ? '' : str).replace(/\{([^{}]+)\}/g, '<span class="ntpl-var">{$1}</span>');
+  var s = String(str == null ? '' : str), out = '', i = 0;
+  while (i < s.length) {
+    var j = s.indexOf('${', i);
+    if (j < 0) { out += ppEsc(s.slice(i)); break; }
+    out += ppEsc(s.slice(i, j));
+    var k = j + 2, depth = 1;
+    while (k < s.length && depth) { if (s[k] === '{') depth++; else if (s[k] === '}') depth--; k++; }
+    out += '<span class="ntpl-var">' + ppEsc(s.slice(j, k)) + '</span>';
+    i = k;
+  }
+  return out;
 }
 function ntplRender() {
   var tb = document.getElementById('ntpl-tbody');
   if (!tb) return;
   tb.innerHTML = NTPL_DEF.map(function(d) {
-    var c = ntplCur(d.key), off = !d.on;
-    return '<tr' + (off ? ' class="ntpl-off"' : '') + '>'
+    var notes = (d.note || '').split(' ').filter(Boolean).map(function(n) { return '<div class="ntpl-note">' + ntplVarsHtml(NTPL_NOTE[n]) + '</div>'; }).join('');
+    return '<tr>'
       + '<td><div class="ntpl-group">' + d.group + '</div><div class="ntpl-chips">'
-      + '<span class="ntpl-chip"><b>알림함</b><span>' + (d.box || '—') + '</span></span>'
-      + (NTPL_REQ_KO[d.req] ? '<span class="ntpl-chip' + (d.req === 'must' ? ' ntpl-chip-must' : '') + '">' + NTPL_REQ_KO[d.req] + '</span>'
-                            : '<span class="ntpl-chip"><b>필수 여부</b><span>—</span></span>')
+      + '<span class="ntpl-chip"><b>알림함</b><span>' + d.box + '</span></span>'
+      + '<span class="ntpl-chip' + (d.push === 'purchase' ? ' ntpl-chip-must' : '') + '">' + NTPL_PUSH_KO[d.push] + '</span>'
+      + (d.night ? '<span class="ntpl-chip">야간에도 발송</span>' : '')
       + '</div></td>'
-      + '<td class="ntpl-l">' + d.situ + '</td>'
-      + '<td class="ntpl-l">' + (off || c.title == null ? '—' : ntplVarsHtml(c.title)) + '</td>'
-      + '<td class="ntpl-l">' + (off ? '—' : ntplVarsHtml(c.body)) + '</td>'
-      + '<td style="text-align:center">' + (off ? '<span class="badge badge-gray">미구현</span>' : '<span class="badge badge-green">사용 중</span>') + '</td>'
-      + '<td style="text-align:center">' + (off ? '<button class="btn btn-ghost btn-sm" disabled>수정</button>' : '<button class="btn btn-ghost btn-sm" onclick="ntplEdit(\'' + d.key + '\')">수정</button>') + '</td></tr>';
+      + '<td class="ntpl-l">' + d.situ + '<div class="ntpl-src">' + ppEsc(d.src) + '</div></td>'
+      + '<td class="ntpl-l no-vi">' + ntplVarsHtml(d.title) + '</td>'
+      + '<td class="ntpl-l no-vi">' + ntplVarsHtml(d.body) + notes + '</td>'
+      + '<td style="text-align:center"><span class="badge badge-green">사용 중</span></td></tr>';
   }).join('');
 }
-function ntplLoad() {
-  return db.collection('settings').doc('notif_templates').get().then(function(doc) {
-    NTPL_SAVED = (doc.exists && doc.data().items) || {};
-  }).catch(function(e) { console.error('ntplLoad', e); NTPL_SAVED = {}; }).then(ntplRender);
-}
-window.ntplEdit = function(key) {
-  var d = ntplDef(key);
-  if (!d || !d.on) return;
-  var c = ntplCur(key);
-  document.getElementById('ntpl-key').value = key;
-  document.getElementById('ntpl-ctx').textContent = d.group + ' · ' + d.situ;
-  document.getElementById('ntpl-title-wrap').style.display = d.frag ? 'none' : '';
-  document.getElementById('ntpl-title').value = c.title || '';
-  document.getElementById('ntpl-body').value = c.body || '';
-  document.getElementById('ntpl-vars').innerHTML = d.vars.length ? d.vars.map(function(v) { return '<span class="ntpl-var">{' + v + '}</span>'; }).join(' ') : '—';
-  openModal('m-ntpl-edit');
-};
-/* 수정 중인 값 — 비었거나 그 줄에 없는 변수를 쓰면 막는다 */
-function ntplDraft() {
-  var key = document.getElementById('ntpl-key').value, d = ntplDef(key);
-  if (!d) return null;
-  var title = d.frag ? null : document.getElementById('ntpl-title').value.trim();
-  var body = document.getElementById('ntpl-body').value.trim();
-  if ((!d.frag && !title) || !body) { toast('제목과 본문을 입력하세요.'); return null; }
-  var bad = [];
-  ((title || '') + ' ' + body).replace(/\{([^{}]+)\}/g, function(m, k) { if (d.vars.indexOf(k) < 0 && bad.indexOf(m) < 0) bad.push(m); return m; });
-  if (bad.length) { toast('쓸 수 없는 변수입니다: ' + bad.join(', ')); return null; }
-  return { key: key, def: d, title: title, body: body };
-}
-/* 그 문구가 들어간 앱 알림 한 건을 예시 값으로 만든다 — 토막(frag)은 끼워 들어가는 알림 안에서 보여 준다 */
-function ntplCompose(dr) {
-  var ex = Object.assign({}, NTPL_EX);
-  function scopeText(scopeKey) { return ntplFill(scopeKey === dr.key ? dr.body : ntplCur(scopeKey).body, ex); }
-  var key = dr.def.frag ? dr.def.parent : dr.key, pd = ntplDef(key);
-  var cur = (key === dr.key) ? { title: dr.title, body: dr.body } : ntplCur(key);
-  if (pd.scope) ex['취소범위'] = scopeText(pd.scope);
-  var desc = ntplFill(cur.body, ex);
-  if (dr.key === 'claw_debt') desc += ' ' + ntplFill(dr.body, ex);
-  return { box: pd.box, head: ntplFill(cur.title, ex), desc: desc };
-}
-window.ntplPreview = function() {
-  var dr = ntplDraft();
-  if (!dr) return;
-  NTPL_PENDING = dr;
-  var v = ntplCompose(dr);
-  document.getElementById('ntpl-pv').innerHTML = '<div class="ntpl-pv-card">'
-    + '<span class="ntpl-pv-tag">' + ppEsc(v.box) + '</span>'
-    + '<div class="ntpl-pv-head">' + ppEsc(v.head) + '</div>'
-    + '<div class="ntpl-pv-desc">' + ppEsc(v.desc) + '</div></div>';
-  closeModal('m-ntpl-edit');
-  openModal('m-ntpl-preview');
-};
-var NTPL_PENDING = null;
-window.ntplBackToEdit = function() { closeModal('m-ntpl-preview'); openModal('m-ntpl-edit'); };
-window.ntplSave = function() {
-  var dr = NTPL_PENDING;
-  if (!dr) return;
-  var btn = document.getElementById('ntpl-save-btn');
-  if (btn) btn.disabled = true;
-  var item = { body: dr.body, updated_at: FS.Timestamp.now() };
-  if (!dr.def.frag) item.title = dr.title;
-  var patch = { items: {} }; patch.items[dr.key] = item;
-  db.collection('settings').doc('notif_templates').set(Object.assign(patch, { updated_at: FS.FieldValue.serverTimestamp() }, ppAdminStamp()), { merge: true }).then(function() {
-    NTPL_SAVED[dr.key] = item;
-    logAdmin('자동 알림 문구 저장: ' + dr.def.group + ' · ' + dr.def.situ);
-    toast('저장했습니다.');
-    closeModal('m-ntpl-preview');
-    NTPL_PENDING = null;
-    ntplRender();
-  }).catch(function(e) { toast('저장하지 못했습니다: ' + (e.message || e)); }).finally(function() { if (btn) btn.disabled = false; });
-};
-
 /* 화면 탭 — 수동 발송 · 발송 기록 · 자동 알림 문구. 내용은 숨긴 채로도 다 그려 둔다(크기를 재는 곳이 없다).
    누를 때는 주소만 바꿔 끼우고(replaceState) 다시 읽지 않는다. 메뉴로 들어오면 첫 탭. */
 var NOTI_MAIN_TABS = ['send', 'history', 'templates'];
@@ -11976,7 +11878,7 @@ function loadNotifications() {
   var tbody = document.getElementById('noti-hist-tbody');
   if (!tbody) return;
   /* 수신 결과 넷(성공·실패·미처리·확인 불가)을 세려면 회원 목록이 먼저 있어야 한다 — 없으면 전원이 「확인 불가」로 잡힌다 */
-  ntplLoad();
+  ntplRender();
   notiLoadUsers().catch(function(){ return []; }).then(function() {
     return db.collection('notifications').orderBy('created_at', 'desc').limit(500).get();
   }).then(function(snap) {
