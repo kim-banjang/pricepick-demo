@@ -3140,13 +3140,7 @@ window.CMS_FEATURES = {
         <div class="stat-card purple"><div class="stat-label">이번달 발송</div><div class="stat-value" id="noti-kpi-month">—</div><div class="stat-change neutral">이번달 누적</div></div>
         <div class="stat-card amber"><div class="stat-label">예약 대기</div><div class="stat-value" id="noti-kpi-scheduled">—</div><div class="stat-change neutral">발송 예정</div></div>
       </div>
-      <!-- 알림 관리 재기획 (김반장 승인 2026-11-05) — ① 자동 알림 문구 ② 알림 작성 · 발송 ③ 발송 기록(수동 · 자동) ④ 발송 정책.
-           설명은 화면에 늘어놓지 않고 Notice 안에 둔다. -->
-      <button type="button" class="ta-notice" onclick="openModal('m-noti-notice')">
-        <span>알림 관리 Notice</span>
-        <span class="ta-notice-mark">!</span>
-      </button>
-      <!-- 화면 탭 (김반장 2026-11-06) — 위의 집계 카드·Notice 는 공통, 아래만 탭으로 가른다.
+      <!-- 화면 탭 (김반장 2026-11-06) — 위의 집계 카드는 공통, 아래만 탭으로 가른다.
            탭은 주소 #notifications/<탭> 에 남아 새로고침해도 그 탭으로 돌아온다(첫 탭은 #notifications). -->
       <div class="terms-nav" id="noti-main-nav">
         <div class="terms-tab active" data-noti-tab="send" onclick="notiMainTab('send')">수동 발송</div>
@@ -3208,15 +3202,11 @@ window.CMS_FEATURES = {
         </div>
       </div>
       <div id="noti-pane-history" style="display:none">
-        <!-- ③ 발송 기록 — 수동(notifications) · 자동(notif_logs) 탭을 가른다. 두 기록은 섞지 않는다. -->
+        <!-- ③ 발송 기록 — 수동 발송(notifications)만. 자동 발송 기록은 빼기로 했다(김반장 2026-11-06 — 회원이 늘면 하루 수만 건이라 목록으로 볼 수 없다). -->
         <div class="card">
           <div class="card-header"><div class="card-title">발송 기록</div><div id="noti-hdr-actions"></div></div>
-          <div style="display:flex;gap:4px;padding:12px 16px 0;border-bottom:1px solid var(--border)">
-            <button type="button" class="dm-tab active" onclick="notiSwitchTab(this,'noti-tab-manual')">수동 발송</button>
-            <button type="button" class="dm-tab" onclick="notiSwitchTab(this,'noti-tab-auto')">자동 발송</button>
-          </div>
           <div id="noti-tab-manual">
-            <!-- 검색 줄 — STG 발송 내역 표 위와 같은 구성(제목 · 대상 · 상태 · 검색). 자동 발송 탭에는 두지 않는다(STG 에 없음, 2026-11-06) -->
+            <!-- 검색 줄 — STG 발송 내역 표 위와 같은 구성(제목 · 대상 · 상태 · 검색) -->
             <div class="srch-row" style="padding:12px 16px;border-bottom:1px solid var(--border)">
               <input class="search-box" id="noti-h-q" placeholder="제목 검색">
               <select class="filter-sel" id="noti-h-target"><option value="">전체 대상</option><option value="all">전체 회원</option><option value="kakao">카카오 연동 회원</option><option value="guest">미연동(게스트) 회원</option><option value="inactive30">30일 미접속</option><option value="new7">신규 가입(7일 이내)</option><option value="purchased">구매 이력 있는 회원</option></select>
@@ -3226,13 +3216,6 @@ window.CMS_FEATURES = {
             <table>
               <thead><tr><th style="text-align:center">발송일시</th><th style="text-align:center">채널</th><th>제목</th><th style="text-align:center">대상 조건</th><th style="text-align:center">대상 수</th><th style="text-align:center">성공</th><th style="text-align:center">실패</th><th style="text-align:center">미처리</th><th style="text-align:center">확인 불가</th><th style="text-align:center">열람율</th><th style="text-align:center">상태 / 액션</th></tr></thead>
               <tbody id="noti-hist-tbody">
-              </tbody>
-            </table>
-          </div>
-          <div id="noti-tab-auto" style="display:none">
-            <table>
-              <thead><tr><th style="text-align:center">발송일시</th><th>알림 종류</th><th>대상 회원</th><th style="text-align:center">결과</th><th>사유</th></tr></thead>
-              <tbody id="ntlog-tbody">
               </tbody>
             </table>
           </div>
@@ -4578,32 +4561,6 @@ window.CMS_FEATURES = {
   </div>
 </div>
 
-<!-- ── 모달: 알림 관리 Notice (2026-11-05) ── 화면에 두던 안내 문구를 여기로 모았다 -->
-<div class="modal-overlay" id="m-noti-notice">
-  <div class="modal" style="width:540px">
-    <div class="modal-header">
-      <div class="modal-title">알림 관리 Notice</div>
-      <button class="modal-close" onclick="closeModal('m-noti-notice')"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
-    </div>
-    <div class="modal-body">
-      <ul class="ta-notice-list">
-        <li><span class="k">자동 알림 문구</span>앱이 상황에 따라 저절로 보내는 알림의 제목·본문입니다. <strong>수정 → 미리보기 → 이대로 저장</strong>을 거쳐야 저장되고, 저장하면 앱 알림함에 바로 반영됩니다.</li>
-        <li><span class="k">변수</span>중괄호로 감싼 낱말은 발송할 때 실제 값으로 바뀝니다. 그 줄에 적힌 변수만 쓸 수 있습니다. 값이 비는 알림에는 앱에 들어 있는 기본 문구가 나갑니다.</li>
-        <li><span class="k">미구현</span>정책서에는 있으나 아직 발송되지 않는 알림입니다. 문구를 고칠 수 없습니다.</li>
-        <li><span class="k">필수 · 선택</span>정책서 기준 분류입니다. 거래 알림은 필수(동의 무관), 이벤트·마케팅성 알림은 선택(동의 필요)입니다.</li>
-        <li><span class="k">발송 채널</span>1단계 발송 채널은 <strong>앱 푸시 단일</strong>입니다. 카카오 알림톡은 서드파티 비용이 발생해 도입하지 않습니다.</li>
-        <li><span class="k">수신 동의</span>마케팅성 알림은 수신 동의 회원에게만 발송됩니다. 서비스 필수 알림(티켓 지급·기프티콘 발송·경품 당첨)은 동의 여부와 무관하게 발송됩니다.</li>
-        <li><span class="k">수동 발송 대상</span>마케팅성 알림이라 <strong>마케팅 정보 수신에 동의한 회원</strong>만 셉니다. 선택 개별 발송은 고른 회원에게만 나갑니다.</li>
-        <li><span class="k">내용 변수</span><span>{닉네임}</span> · <span>{보유티켓}</span>은 받는 회원의 닉네임과 보유 티켓 장수로 바뀝니다.</li>
-        <li><span class="k">예약 발송</span>예약 시각이 지난 건은 이 화면을 열 때 <strong>발송완료</strong>로 넘어갑니다. '예약' 상태만 발송 전 취소할 수 있습니다.</li>
-        <li><span class="k">수동 발송 기록</span>발송 완료 건은 불변 로그입니다. 건을 누르면 수신자 목록이 열립니다. 수신 기록은 90일 보관 후 삭제합니다.</li>
-        <li><span class="k">자동 발송 기록</span>자동 알림이 회원 앱 알림함에 쌓일 때마다 한 줄씩 남습니다.</li>
-        <li><span class="k">데모</span>실제 FCM 발송 연동은 없고 발송 내역만 DB에 기록됩니다. 수동 발송의 성공·실패·미처리는 시연용 값이고, 자동 발송은 앱 알림함에 쌓인 시점을 발송으로 기록합니다.</li>
-        <li><span class="k">발송 정책</span>정책서 「푸시 알림 상한」을 그대로 옮긴 조회 전용 카드입니다.</li>
-      </ul>
-    </div>
-  </div>
-</div>
 <!-- ── 모달: 자동 알림 문구 수정 ── 저장 단추는 두지 않는다 — 미리보기 창의 「이대로 저장」으로만 저장된다 -->
 <div class="modal-overlay" id="m-ntpl-edit">
   <div class="modal" style="width:540px">
@@ -7695,7 +7652,6 @@ Object.assign(KO2VI,{
 /* ── 알림 관리 재기획 (김반장 승인 2026-11-05) — 라벨·안내만 옮긴다. 자동 알림 문구 원문({변수} 포함)은
    회원에게 나가는 한국어 발송본이라 번역하지 않는다(취소·환수 문구 표와 같은 기준). ── */
 Object.assign(KO2VI,{
-  "알림 관리 Notice":"Lưu ý — Quản lý thông báo",
   "자동 알림 문구":"Nội dung thông báo tự động",
   "발송 상황":"Tình huống gửi",
   "본문":"Nội dung",
@@ -7704,7 +7660,6 @@ Object.assign(KO2VI,{
   "발송 기록":"Lịch sử gửi",
   "수동 발송":"Gửi thủ công",
   "자동 발송":"Gửi tự động",
-  "알림 종류":"Loại thông báo",
   "대상 회원":"Hội viên nhận",
   "자동 알림 문구 수정":"Sửa nội dung thông báo tự động",
   "쓸 수 있는 변수":"Biến có thể dùng",
@@ -7734,18 +7689,12 @@ Object.assign(KO2VI,{
   "운영자 티켓 지급":"Quản trị viên cấp vé",
   "기프티콘 구매 취소":"Hủy mua Gifticon",
   "공지 게시":"Đăng thông báo chung",
-  "자동 발송 기록이 없습니다.":"Không có lịch sử gửi tự động.",
   "불러오는 중…":"Đang tải…",
-  "자동 발송 기록을 읽지 못했습니다.":"Không đọc được lịch sử gửi tự động.",
-  "응답이 없습니다.":"Không có phản hồi.",
-  "표시 오류":"Lỗi hiển thị",
   "제목과 본문을 입력하세요.":"Hãy nhập tiêu đề và nội dung.",
   "저장했습니다.":"Đã lưu.",
   "발송완료":"Đã gửi",
   /* Notice */
   "변수":"Biến",
-  "필수 · 선택":"Bắt buộc · tùy chọn",
-  "수동 발송 대상":"Đối tượng gửi thủ công",
   "내용 변수":"Biến nội dung",
   "수동 발송 기록":"Lịch sử gửi thủ công",
   "자동 발송 기록":"Lịch sử gửi tự động",
@@ -7771,25 +7720,7 @@ Object.assign(KO2VI,{
   "제목을 입력해주세요.":"Vui lòng nhập tiêu đề.",
   "내용을 입력해주세요.":"Vui lòng nhập nội dung.",
   "대상 회원을 세지 못했습니다: ":"Không đếm được hội viên nhận: ",
-  "앱이 상황에 따라 저절로 보내는 알림의 제목·본문입니다.":"Là tiêu đề·nội dung của các thông báo app tự gửi theo tình huống.",
-  "수정 → 미리보기 → 이대로 저장":"Sửa → Xem trước → Lưu như thế này",
-  "을 거쳐야 저장되고, 저장하면 앱 알림함에 바로 반영됩니다.":"thì mới được lưu, và khi lưu sẽ phản ánh ngay vào hộp thông báo app.",
-  "중괄호로 감싼 낱말은 발송할 때 실제 값으로 바뀝니다. 그 줄에 적힌 변수만 쓸 수 있습니다. 값이 비는 알림에는 앱에 들어 있는 기본 문구가 나갑니다.":"Từ đặt trong ngoặc nhọn sẽ được thay bằng giá trị thực khi gửi. Chỉ dùng được các biến ghi ở dòng đó. Thông báo có giá trị trống sẽ gửi nội dung mặc định có sẵn trong app.",
-  "정책서에는 있으나 아직 발송되지 않는 알림입니다. 문구를 고칠 수 없습니다.":"Là thông báo có trong tài liệu chính sách nhưng chưa được gửi. Không sửa được nội dung.",
-  "정책서 기준 분류입니다. 거래 알림은 필수(동의 무관), 이벤트·마케팅성 알림은 선택(동의 필요)입니다.":"Phân loại theo tài liệu chính sách. Thông báo giao dịch là bắt buộc (không cần đồng ý), thông báo sự kiện·tiếp thị là tùy chọn (cần đồng ý).",
-  "1단계 발송 채널은":"Kênh gửi ở giai đoạn 1 là",
-  "앱 푸시 단일":"chỉ push app",
-  "입니다. 카카오 알림톡은 서드파티 비용이 발생해 도입하지 않습니다.":". Không dùng Kakao AlimTalk vì phát sinh chi phí bên thứ ba.",
-  "마케팅성 알림이라":"Vì là thông báo tiếp thị nên chỉ đếm",
   "마케팅 정보 수신에 동의한 회원":"hội viên đã đồng ý nhận thông tin tiếp thị",
-  "만 셉니다. 선택 개별 발송은 고른 회원에게만 나갑니다.":". Gửi riêng chỉ gửi tới hội viên đã chọn.",
-  "은 받는 회원의 닉네임과 보유 티켓 장수로 바뀝니다.":"được thay bằng biệt danh và số vé đang giữ của hội viên nhận.",
-  "예약 시각이 지난 건은 이 화면을 열 때":"Mục hẹn giờ đã qua thời điểm hẹn sẽ chuyển sang",
-  "로 넘어갑니다. '예약' 상태만 발송 전 취소할 수 있습니다.":"khi mở màn hình này. Chỉ mục ở trạng thái 'Hẹn giờ' mới hủy được trước khi gửi.",
-  "발송 완료 건은 불변 로그입니다. 건을 누르면 수신자 목록이 열립니다. 수신 기록은 90일 보관 후 삭제합니다.":"Mục đã gửi là nhật ký bất biến. Bấm vào mục sẽ mở danh sách người nhận. Bản ghi nhận được lưu 90 ngày rồi xóa.",
-  "자동 알림이 회원 앱 알림함에 쌓일 때마다 한 줄씩 남습니다.":"Mỗi lần thông báo tự động vào hộp thông báo app của hội viên sẽ ghi lại một dòng.",
-  "실제 FCM 발송 연동은 없고 발송 내역만 DB에 기록됩니다. 수동 발송의 성공·실패·미처리는 시연용 값이고, 자동 발송은 앱 알림함에 쌓인 시점을 발송으로 기록합니다.":"Chưa tích hợp gửi FCM thật, chỉ ghi lịch sử gửi vào DB. Thành công·thất bại·chưa xử lý của gửi thủ công là giá trị minh họa; gửi tự động ghi thời điểm thông báo vào hộp thông báo app là thời điểm gửi.",
-  "정책서 「푸시 알림 상한」을 그대로 옮긴 조회 전용 카드입니다.":"Thẻ chỉ xem, chép nguyên mục 「Giới hạn thông báo push」 của tài liệu chính sách."
 });
 /* ── 11-04 수정 요청 반영 (A-5 대시보드 이번달 · A-13 알림 수신 결과 넷) ── */
 Object.assign(KO2VI,{
@@ -12030,63 +11961,12 @@ window.notiMainTab = function(key, keepUrl) {
     var e2 = document.getElementById('noti-pane-' + k);
     if (e2) e2.style.display = k === key ? 'block' : 'none';
   });
-  if (!keepUrl && key === 'history') loadNotifLogs();
   if (!keepUrl) {
     var h = '#notifications' + (key === 'send' ? '' : '/' + key);
     try { if (location.hash !== h) history.replaceState(null, '', h); } catch (e) { location.hash = h; }
   }
   return key;
 };
-/* ③ 발송 기록 탭 — 수동(notifications) · 자동(notif_logs) */
-window.notiSwitchTab = function(el, id) {
-  el.parentNode.querySelectorAll('.dm-tab').forEach(function(x) { x.classList.remove('active'); });
-  el.classList.add('active');
-  ['noti-tab-manual', 'noti-tab-auto'].forEach(function(tid) {
-    var e2 = document.getElementById(tid);
-    if (e2) e2.style.display = tid === id ? 'block' : 'none';
-  });
-  if (id === 'noti-tab-auto') loadNotifLogs();
-};
-/* 자동 발송 기록 — 앱이 알림함을 그릴 때 새로 생긴 자동 알림을 한 건씩 남긴다(1:1 발송이라 집계 칸이 없다).
-   데모는 실제 푸시가 없어 알림함에 쌓인 시점을 발송으로 본다. */
-/* 읽는 중 · 못 읽음은 빈 표와 구분해 화면에 남긴다(2026-11-06). 15초 안에 답이 없으면 그 사실도 보인다.
-   한 건이 깨져도 나머지는 그린다 — 깨진 건은 「표시 오류」 줄로 남긴다. */
-var NTLOG_SEQ = 0;
-function loadNotifLogs() {
-  var tbody = document.getElementById('ntlog-tbody');
-  if (!tbody) return;
-  var seq = ++NTLOG_SEQ, done = false;
-  if (!PP_PAGED['notif_logs']) tbody.innerHTML = ppEmpty(5, '불러오는 중…');
-  setTimeout(function() {
-    if (!done && seq === NTLOG_SEQ) tbody.innerHTML = ppEmpty(5, '<span style="color:var(--danger)">자동 발송 기록을 읽지 못했습니다.</span> <span>응답이 없습니다.</span>');
-  }, 15000);
-  db.collection('notif_logs').orderBy('sent_at', 'desc').limit(500).get().then(function(snap) {
-    done = true;
-    if (seq !== NTLOG_SEQ) return;
-    ppPaged('notif_logs', tbody, snap.docs.map(function(doc) {
-      try {
-        var d = doc.data(), def = ntplDef(d.tpl_key) || {};
-        return '<tr>'
-          + '<td style="text-align:center;white-space:nowrap"><div style="font-weight:700;color:#333">' + ppDt(d.sent_at) + '</div><div style="color:var(--text-3);font-size:11px">' + ppTm(d.sent_at) + '</div></td>'
-          + '<td>' + (def.situ ? '<div>' + def.situ + '</div>' : '') + '<div style="color:var(--text-3);font-size:11px">' + ppEsc(d.title || '') + '</div></td>'
-          + '<td><div style="font-weight:600">' + ppEsc(d.nickname || '(닉네임 없음)') + '</div><div style="font-size:11px;color:var(--text-3);font-family:monospace">' + ppEsc(d.user_id || '') + '</div></td>'
-          + '<td style="text-align:center">' + notiResultBadge(d.result || 'unknown') + '</td>'
-          + '<td style="color:var(--text-2);font-size:12px">' + (d.reason ? ppEsc(d.reason) : '—') + '</td></tr>';
-      } catch (e) {
-        console.error('loadNotifLogs row', doc.id, e);
-        return '<tr><td colspan="5" style="color:var(--danger);font-size:12px"><span>표시 오류</span> · ' + ppEsc(doc.id) + '</td></tr>';
-      }
-    }), ppEmpty(5, '자동 발송 기록이 없습니다.'));
-  }).catch(function(e) {
-    done = true;
-    if (seq !== NTLOG_SEQ) return;
-    console.error('loadNotifLogs', e);
-    tbody.innerHTML = ppEmpty(5, '<span style="color:var(--danger)">자동 발송 기록을 읽지 못했습니다.</span> ' + ppEsc((e && (e.code || e.message)) || ''));
-    var host = tbody.closest('table').nextElementSibling;
-    if (host && host.classList.contains('pp-pager-host')) host.innerHTML = '';
-  });
-}
-
 /* ── sec-notifications ── notifications collection (실쿼리 + 실 발송기록) */
 var NOTI_CHANNEL_KO = { push:'앱 푸시', kakao:'카카오 알림톡', push_kakao:'푸시+알림톡' };
 var NOTI_TARGET_KO = { all:'전체 회원', kakao:'카카오 연동 회원', guest:'미연동(게스트) 회원', inactive30:'30일 미접속', new7:'신규 가입(7일 이내)', purchased:'구매 이력 있는 회원', custom:'커스텀 세그먼트', test:'개별 발송' };
@@ -12097,7 +11977,6 @@ function loadNotifications() {
   if (!tbody) return;
   /* 수신 결과 넷(성공·실패·미처리·확인 불가)을 세려면 회원 목록이 먼저 있어야 한다 — 없으면 전원이 「확인 불가」로 잡힌다 */
   ntplLoad();
-  loadNotifLogs();
   notiLoadUsers().catch(function(){ return []; }).then(function() {
     return db.collection('notifications').orderBy('created_at', 'desc').limit(500).get();
   }).then(function(snap) {
