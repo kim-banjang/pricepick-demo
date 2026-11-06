@@ -324,6 +324,19 @@ tr:hover td{background:var(--surface-2);}
 .ntpl-code{font-family:monospace;font-size:12px;color:var(--main);background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:0 5px;}
 .ntpl-det-chips{display:flex;gap:6px;flex-wrap:wrap;}
 .ntpl-det-src{grid-column:1 / -1;font-size:13px;color:var(--text-3);}
+/* 구분 정렬 · 구분별 건수 필터 (2026-11-06) — 화면에서만 바뀐다 */
+.ntpl-sort-th{cursor:pointer;user-select:none;}
+.ntpl-sort-th span{vertical-align:middle;}
+.ntpl-sort-ic{width:12px;height:12px;margin-left:4px;vertical-align:middle;color:var(--text-3);opacity:.45;}
+.ntpl-sort-th[aria-sort="ascending"] .ntpl-sort-ic,.ntpl-sort-th[aria-sort="descending"] .ntpl-sort-ic{opacity:1;color:var(--main);}
+.ntpl-sort-th[aria-sort="ascending"] .ntpl-sort-ic .dn,.ntpl-sort-th[aria-sort="descending"] .ntpl-sort-ic .up{opacity:.25;}
+.ntpl-gbar{display:flex;flex-wrap:wrap;align-items:center;gap:4px 2px;padding:0 18px 12px;font-size:12px;color:var(--text-3);}
+.ntpl-gbtn{background:none;border:none;padding:2px 4px;border-radius:4px;font:inherit;font-size:12px;color:var(--text-2);cursor:pointer;}
+.ntpl-gbtn b{font-weight:700;color:var(--text);margin-left:3px;}
+.ntpl-gbtn:hover{background:var(--surface-2);}
+.ntpl-gbtn.on{background:var(--main-soft);color:var(--main-hover);}
+.ntpl-gbtn.on b{color:var(--main-hover);}
+.ntpl-gsep{color:var(--text-3);}
 .ta-notice-list{margin:0;padding:0;list-style:none;}
 .ta-notice-list li{padding:9px 0;border-bottom:1px solid var(--border);font-size:13px;line-height:1.6;color:var(--text-2);}
 .ta-notice-list li:last-child{border-bottom:none;}
@@ -3233,9 +3246,11 @@ window.CMS_FEATURES = {
         <!-- ① 자동 알림 문구 — 실제 서비스 백엔드(inetkr/pricepick-backend)가 보내는 알림 문구 그대로. 조회 전용(서버 코드에 박혀 있다). -->
         <div class="card">
           <div class="card-header"><div><div class="card-title">자동 알림 문구</div><div class="card-sub">서버에서 자동으로 발송하는 알림입니다. 문구 변경은 개발 배포가 필요합니다.</div><div class="card-sub" style="font-size:10px;color:var(--text-3)"><span>기준</span> <span class="no-vi" id="ntpl-base"></span></div></div></div>
+          <!-- 구분별 건수 — 누르면 그 구분만, 다시 누르면 전체(화면에서만, 저장 안 함) -->
+          <div class="ntpl-gbar" id="ntpl-gbar"></div>
           <table class="ntpl-table">
             <colgroup><col style="width:168px"><col style="width:220px"><col style="width:230px"><col><col style="width:84px"></colgroup>
-            <thead><tr><th>구분</th><th>발송 상황</th><th>제목</th><th>본문</th><th>상태</th></tr></thead>
+            <thead><tr><th class="ntpl-sort-th" id="ntpl-sort-th" onclick="ntplSortClick()" aria-sort="none"><span>구분</span><svg class="ntpl-sort-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline class="up" points="8 10 12 6 16 10"/><polyline class="dn" points="8 14 12 18 16 14"/></svg></th><th>발송 상황</th><th>제목</th><th>본문</th><th>상태</th></tr></thead>
             <tbody id="ntpl-tbody"></tbody>
           </table>
         </div>
@@ -11832,6 +11847,34 @@ var NTPL_PUSH_KO = { purchase: '푸시 · 구매 알림 설정', event: '푸시 
 /* 문구 기준 — 이 표가 어느 시점 백엔드 문구인지 표 위에 작게 적는다 */
 var NTPL_BASE = 'inetkr/pricepick-backend stg 2c8a103 · 2026-11-05';
 var NTPL_OPEN = {};
+/* 정렬: 0 원래 순서 · 1 오름차순 · -1 내림차순. 같은 구분 안에서는 원래 순서(발송 흐름 순서)를 지킨다 */
+var NTPL_SORT = 0, NTPL_FILTER = '';
+function ntplOrder() {
+  var list = NTPL_DEF.map(function(d, i) { return { d: d, i: i }; });
+  if (NTPL_FILTER) list = list.filter(function(x) { return x.d.group === NTPL_FILTER; });
+  if (NTPL_SORT) list.sort(function(a, b) { return NTPL_SORT * a.d.group.localeCompare(b.d.group, 'ko') || a.i - b.i; });
+  return list;
+}
+function ntplGroupBar() {
+  var bar = document.getElementById('ntpl-gbar');
+  if (!bar) return;
+  var order = [], cnt = {};
+  NTPL_DEF.forEach(function(d) { if (!cnt[d.group]) { cnt[d.group] = 0; order.push(d.group); } cnt[d.group]++; });
+  bar.innerHTML = order.map(function(g) {
+    return '<button type="button" class="ntpl-gbtn' + (NTPL_FILTER === g ? ' on' : '') + '" onclick="ntplFilterClick(this)" data-g="' + ppEsc(g) + '" aria-pressed="' + (NTPL_FILTER === g) + '"><span>' + g + '</span><b>' + cnt[g] + '</b></button>';
+  }).join('<span class="ntpl-gsep">·</span>');
+}
+window.ntplSortClick = function() {
+  NTPL_SORT = NTPL_SORT === 0 ? 1 : (NTPL_SORT === 1 ? -1 : 0);
+  var th = document.getElementById('ntpl-sort-th');
+  if (th) th.setAttribute('aria-sort', NTPL_SORT === 1 ? 'ascending' : NTPL_SORT === -1 ? 'descending' : 'none');
+  ntplRender();
+};
+window.ntplFilterClick = function(el) {
+  var g = el.getAttribute('data-g');
+  NTPL_FILTER = NTPL_FILTER === g ? '' : g;
+  ntplRender();
+};
 function ntplFill(str, vars) {
   return String(str == null ? '' : str).replace(/\{([^{}]+)\}/g, function(m, k) { return (vars[k] != null && vars[k] !== '') ? String(vars[k]) : m; });
 }
@@ -11866,9 +11909,10 @@ function ntplRender() {
   };
   try {
     if (!NTPL_DEF || !NTPL_DEF.length) { fail(''); return; }
-    tb.innerHTML = NTPL_DEF.map(function(d, i) {
-      var open = !!NTPL_OPEN[i];
-      return '<tr class="ntpl-row' + (open ? ' open' : '') + '" onclick="ntplToggle(' + i + ')" aria-expanded="' + open + '">'
+    ntplGroupBar();
+    tb.innerHTML = ntplOrder().map(function(x) {
+      var d = x.d, i = x.i, open = !!NTPL_OPEN[i];
+      return '<tr class="ntpl-row' + (open ? ' open' : '') + '" data-i="' + i + '" onclick="ntplToggle(' + i + ')" aria-expanded="' + open + '">'
         + '<td><div class="ntpl-cell1">' + ntplChevron() + '<span class="ntpl-group">' + d.group + '</span>'
         + (d.box ? '<span class="ntpl-chip">' + d.box + '</span>' : '<span class="ntpl-chip">푸시 전용</span>') + '</div></td>'
         + '<td class="ntpl-l ntpl-1l">' + d.situ + '</td>'
@@ -11885,8 +11929,7 @@ function ntplRender() {
 /* 펼침 — 여러 행을 동시에 열 수 있다(비교용). 연 상태는 다시 그려도 유지한다 */
 window.ntplToggle = function(i) {
   NTPL_OPEN[i] = !NTPL_OPEN[i];
-  var rows = document.querySelectorAll('#ntpl-tbody tr.ntpl-row');
-  var r = rows[i]; if (!r) return;
+  var r = document.querySelector('#ntpl-tbody tr.ntpl-row[data-i="' + i + '"]'); if (!r) return;
   r.classList.toggle('open', !!NTPL_OPEN[i]);
   r.setAttribute('aria-expanded', !!NTPL_OPEN[i]);
   var dr = r.nextElementSibling; if (dr) dr.style.display = NTPL_OPEN[i] ? '' : 'none';
