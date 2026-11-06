@@ -748,6 +748,8 @@ td.rf-net-col{font-weight:700;color:var(--success);}
 .ncx-ask{font-size:16px;font-weight:700;color:var(--text);text-align:center;margin-top:8px;}
 .ncx-title{margin-top:14px;padding:12px 14px;border:1px solid var(--border);border-radius:12px;font-size:15px;font-weight:700;color:var(--text);text-align:center;overflow-wrap:anywhere;}
 .ncx-note{margin-top:12px;font-size:13px;color:var(--text-3);text-align:center;}
+/* 잠긴 단추가 눌리는 단추처럼 보이지 않게 — 고른 회원이 없을 때 「선택 회원에게 즉시 발송」 */
+#m-noti-test .btn:disabled{opacity:.45;cursor:not-allowed;}
 .ntt-col{display:flex;flex-direction:column;min-width:0;min-height:0;}
 .ntt-box{flex:1;min-height:0;display:flex;flex-direction:column;border:1px solid var(--border);border-radius:var(--r-sm);overflow:hidden;}
 .ntt-list{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;}
@@ -3201,7 +3203,8 @@ window.CMS_FEATURES = {
               </div>
               <div>
                 <label style="font-size:11px;color:var(--text-2);font-weight:600;display:block;margin-bottom:6px;text-transform:uppercase;letter-spacing:.4px">발송 대상</label>
-                <select class="filter-sel" id="noti-target" style="width:100%"><option value="all">전체 회원</option><option value="kakao">카카오 연동 회원</option><option value="guest">미연동(게스트) 회원</option><option value="inactive30">30일 미접속</option><option value="new7">신규 가입(7일 이내)</option><option value="purchased">구매 이력 있는 회원</option></select>
+                <select class="filter-sel" id="noti-target" style="width:100%" onchange="notiSetErr('noti-target', false)"><option value="all">전체 회원</option><option value="kakao">카카오 연동 회원</option><option value="guest">미연동(게스트) 회원</option><option value="inactive30">30일 미접속</option><option value="new7">신규 가입(7일 이내)</option><option value="purchased">구매 이력 있는 회원</option></select>
+                <div class="noti-err-msg" id="noti-target-err"></div>
               </div>
             </div>
             <div style="margin-bottom:14px">
@@ -7678,6 +7681,7 @@ Object.assign(KO2VI,{
   "푸시 · 설정 무관":"Push · không phụ thuộc cài đặt",
   "푸시 미발송":"Không gửi push",
   "문구를 불러오지 못했습니다":"Không tải được nội dung",
+  "받을 회원이 없습니다. 발송 대상을 다시 선택해 주세요.":"Không có hội viên nhận. Hãy chọn lại đối tượng gửi.","받을 회원이 없습니다. 수신 동의 회원이 없어 전원 제외되었습니다.":"Không có hội viên nhận. Không có hội viên đồng ý nhận nên tất cả bị loại.",
   "예약 등록":"Đăng ký hẹn giờ","예약 발송 취소":"Hủy gửi hẹn giờ","예약 발송을 취소하시겠습니까?":"Hủy gửi hẹn giờ này?","취소한 건은 「취소됨」으로 남고 발송되지 않습니다.":"Mục đã hủy sẽ ở trạng thái 「Đã hủy」 và không được gửi.",
   "예약 건은 발송 시점에 대상이 정해집니다.":"Đối tượng của mục hẹn giờ được xác định lúc gửi.","현재 조건 기준":"Theo điều kiện hiện tại","명입니다.":"người.",
   "발송 조건":"Điều kiện gửi","출처":"Nguồn","변수 없음":"Không có biến","푸시 전용":"Chỉ push","알림함 미저장":"Không lưu hộp thông báo","푸시 · 수신 설정 무관":"Push · không phụ thuộc cài đặt nhận","1:1 문의":"Hỏi đáp 1:1",
@@ -12173,7 +12177,16 @@ window.notiSend = function() {
   if (bad.length) { toast('사용할 수 없는 변수입니다: ' + bad.join(', ')); return; }
   if (btn) btn.disabled = true;
   NOTI_USERS = null;
+  notiSetErr('noti-target', false);
   notiTargetSplit(target).then(function(r) {
+    /* 받을 회원이 0명이면 막는다(김반장 2026-11-06) — 조건에 맞는 회원은 있는데 전원 미동의면 그 이유를 적는다 */
+    if (!r.uids.length) {
+      var em = document.getElementById('noti-target-err');
+      if (em) em.textContent = r.excluded > 0 ? '받을 회원이 없습니다. 수신 동의 회원이 없어 전원 제외되었습니다.' : '받을 회원이 없습니다. 발송 대상을 다시 선택해 주세요.';
+      notiSetErr('noti-target', true);
+      var tf = document.getElementById('noti-target'); if (tf) tf.focus();
+      return;
+    }
     NOTI_PENDING = { title: title, body: body, channel: channel, target: target, timing: timing, scheduleAt: scheduleAt, uids: r.uids };
     var hasVar = /\{[^{}]+\}/.test(title + body);
     var set = function(id, v) { var e = document.getElementById(id); if (e) e.textContent = v; };
@@ -12271,6 +12284,7 @@ function notiTestRenderChosen() {
   var ids = Object.keys(NOTI_TEST_PICK);
   /* 「명」은 사전이 아는 낱말이라 따로 떼어 둔다 — 붙여 쓰면 통째 일치가 깨져 한국어로 남는다 */
   if (cnt) cnt.innerHTML = ids.length ? ('· ' + ids.length + ' <span>명</span>') : '';
+  var sb = document.getElementById('noti-test-send-btn'); if (sb) sb.disabled = !ids.length;
   if (!box) return;
   box.innerHTML = ids.length ? ids.map(function(id) {
     return '<div class="ntt-row">'
@@ -12344,7 +12358,13 @@ window.notiOpenTest = function() {
     toast('회원을 불러오지 못했습니다: ' + (e.message||e));
   });
 };
-window.notiSendTest = function() { notiOpenTest(''); };
+/* 제목·내용이 비면 창을 열지 않고 빈 칸을 표시한다(STG handleSendTest 와 같다, 2026-11-06) */
+window.notiSendTest = function() {
+  var t = document.getElementById('noti-title').value.trim(), b = document.getElementById('noti-body').value.trim();
+  notiSetErr('noti-title', !t); notiSetErr('noti-body', !b);
+  if (!t || !b) { var mf = document.getElementById(!t ? 'noti-title' : 'noti-body'); if (mf) mf.focus(); return; }
+  notiOpenTest('');
+};
 
 window.notiTestSend = function() {
   var ids = Object.keys(NOTI_TEST_PICK);
