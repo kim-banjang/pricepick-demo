@@ -3154,6 +3154,8 @@ window.CMS_FEATURES = {
               <div>
                 <label style="font-size:11px;color:var(--text-2);font-weight:600;display:block;margin-bottom:6px;text-transform:uppercase;letter-spacing:.4px">발송 대상</label>
                 <select class="filter-sel" id="noti-target" style="width:100%"><option value="all">전체 회원</option><option value="kakao">카카오 연동 회원</option><option value="guest">미연동(게스트) 회원</option><option value="inactive30">30일 미접속</option><option value="new7">신규 가입(7일 이내)</option><option value="purchased">구매 이력 있는 회원</option></select>
+                <!-- 대상을 고르는 자리에서 바로 읽히게 화면에 둔다(Notice 에도 같은 문장, 김반장 2026-11-06) -->
+                <div class="info-box" style="margin:8px 0 0">마케팅성 알림은 수신 동의 회원에게만 발송됩니다. 서비스 필수 알림(티켓 지급·기프티콘 발송·경품 당첨)은 동의 여부와 무관하게 발송됩니다.</div>
               </div>
             </div>
             <div style="margin-bottom:14px">
@@ -4530,6 +4532,7 @@ window.CMS_FEATURES = {
         <li><span class="k">미구현</span>정책서에는 있으나 아직 발송되지 않는 알림입니다. 문구를 고칠 수 없습니다.</li>
         <li><span class="k">필수 · 선택</span>정책서 기준 분류입니다. 거래 알림은 필수(동의 무관), 이벤트·마케팅성 알림은 선택(동의 필요)입니다.</li>
         <li><span class="k">발송 채널</span>1단계 발송 채널은 <strong>앱 푸시 단일</strong>입니다. 카카오 알림톡은 서드파티 비용이 발생해 도입하지 않습니다.</li>
+        <li><span class="k">수신 동의</span>마케팅성 알림은 수신 동의 회원에게만 발송됩니다. 서비스 필수 알림(티켓 지급·기프티콘 발송·경품 당첨)은 동의 여부와 무관하게 발송됩니다.</li>
         <li><span class="k">수동 발송 대상</span>마케팅성 알림이라 <strong>마케팅 정보 수신에 동의한 회원</strong>만 셉니다. 테스트 발송은 고른 회원에게만 나갑니다.</li>
         <li><span class="k">내용 변수</span><span>{닉네임}</span> · <span>{보유티켓}</span>은 받는 회원의 닉네임과 보유 티켓 장수로 바뀝니다.</li>
         <li><span class="k">예약 발송</span>예약 시각이 지난 건은 이 화면을 열 때 <strong>발송완료</strong>로 넘어갑니다. '예약' 상태만 발송 전 취소할 수 있습니다.</li>
@@ -7689,6 +7692,7 @@ Object.assign(KO2VI,{
   "자동 발송 기록":"Lịch sử gửi tự động",
   "데모":"Demo",
   "발송 정책":"Chính sách gửi",
+  "수신 동의":"Đồng ý nhận",
   "앱이 상황에 따라 저절로 보내는 알림의 제목·본문입니다.":"Là tiêu đề·nội dung của các thông báo app tự gửi theo tình huống.",
   "수정 → 미리보기 → 이대로 저장":"Sửa → Xem trước → Lưu như thế này",
   "을 거쳐야 저장되고, 저장하면 앱 알림함에 바로 반영됩니다.":"thì mới được lưu, và khi lưu sẽ phản ánh ngay vào hộp thông báo app.",
