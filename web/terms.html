@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>프라이스픽 — 약관 및 정책</title>
+<meta name="theme-color" content="#845EEE">
+<link rel="icon" href="/icon-192.png">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<!-- 본문은 데모 앱 「약관 및 정책」 화면과 같은 곳(Firestore terms/service · terms/privacy)에서 읽는다. CMS에서 고치면 여기도 같이 바뀐다. -->
+<style>
+:root{--main:#845EEE;--sub-4:#F1EEFF;--text1:#1A1130;--text2:#5A5370;--text3:#9B93B0;--border:#EEEAF3;color-scheme:light}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Pretendard Variable",Pretendard,-apple-system,BlinkMacSystemFont,system-ui,sans-serif;color:var(--text1);background:#fff;line-height:1.6;word-break:keep-all}
+a{color:inherit;text-decoration:none}
+.top{position:sticky;top:0;background:rgba(255,255,255,.92);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid var(--border);z-index:5}
+.top .in{max-width:820px;margin:0 auto;padding:0 20px;height:56px;display:flex;align-items:center;gap:12px}
+.back{font-size:15px;font-weight:700;color:var(--text2)}
+.tabs{max-width:820px;margin:0 auto;padding:0 20px;display:flex;gap:6px}
+.tabs a{padding:12px 4px;margin-right:14px;font-size:15px;font-weight:700;color:var(--text3);border-bottom:2px solid transparent}
+.tabs a.on{color:var(--text1);border-bottom-color:var(--main)}
+.body{max-width:820px;margin:0 auto;padding:28px 20px 64px}
+.body h1{font-size:24px;font-weight:800;letter-spacing:-.6px;margin-bottom:18px}
+.doc{white-space:pre-wrap;font-size:15px;color:var(--text2)}
+.err{color:var(--text3);font-size:15px}
+</style>
+</head>
+<body>
+<div class="top">
+  <div class="in"><a class="back" href="/web/">← 프라이스픽</a></div>
+  <nav class="tabs"><a href="#service" data-doc="service">이용약관</a><a href="#privacy" data-doc="privacy">개인정보처리방침</a></nav>
+</div>
+<main class="body">
+  <h1 id="ttl"></h1>
+  <div class="doc" id="doc"></div>
+</main>
+<script>
+(function () {
+  var TITLE = { service: '이용약관', privacy: '개인정보처리방침' };
+  var cache = {};
+  var BASE = 'https://firestore.googleapis.com/v1/projects/pricepick-demo/databases/(default)/documents/terms/';
+  function show() {
+    var k = (location.hash || '').replace('#', '');
+    if (!TITLE[k]) k = 'service';
+    document.querySelectorAll('.tabs a').forEach(function (a) { a.classList.toggle('on', a.dataset.doc === k); });
+    document.getElementById('ttl').textContent = TITLE[k];
+    document.title = '프라이스픽 — ' + TITLE[k];
+    var box = document.getElementById('doc');
+    if (cache[k] != null) { box.textContent = cache[k]; return; }
+    box.textContent = '';
+    fetch(BASE + k + '?mask.fieldPaths=body')
+      .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+      .then(function (d) {
+        var b = (((d.fields || {}).body) || {}).stringValue || '';
+        cache[k] = b;
+        if (((location.hash || '').replace('#', '') || 'service') === k) box.textContent = b;
+      })
+      .catch(function () { box.innerHTML = '<p class="err">본문을 불러오지 못했어요. 잠시 후 다시 열어 주세요.</p>'; });
+    window.scrollTo(0, 0);
+  }
+  window.addEventListener('hashchange', show);
+  show();
+})();
+</script>
+</body>
+</html>
