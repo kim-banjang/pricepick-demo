@@ -143,7 +143,7 @@ section{position:relative;scroll-margin-top:60px}
 @keyframes glint{0%,70%{transform:translateX(-60%)}100%{transform:translateX(60%)}}
 @keyframes bob{50%{transform:translateY(-10px)}}
 .ob{position:absolute;transform:translate(calc(var(--px)*var(--k,12px)),calc(var(--py)*var(--k,12px)));transition:transform .5s var(--ease)}
-.ob img{filter:drop-shadow(0 16px 18px rgba(10,4,30,.42));animation:drift var(--t,6s) ease-in-out infinite;animation-delay:var(--dl,0s)}
+.ob>img,.ob>.tks{filter:drop-shadow(0 16px 18px rgba(10,4,30,.42));animation:drift var(--t,6s) ease-in-out infinite;animation-delay:var(--dl,0s)}
 @keyframes drift{0%,100%{transform:translateY(0) rotate(var(--r0,-4deg))}50%{transform:translateY(-14px) rotate(var(--r1,5deg))}}
 .ob.gift{left:-3%;top:14%;width:31%;--k:-18px;--t:6.5s;--dl:-1s}
 .ob.tk{right:-2%;top:8%;width:31%;--k:22px;--t:5.5s;--dl:-2.5s;--r0:6deg;--r1:-6deg}
@@ -160,6 +160,21 @@ section{position:relative;scroll-margin-top:60px}
 .sparks i.c{height:var(--s,14px);border-radius:50%;background:linear-gradient(135deg,var(--gold-a),var(--gold-b))}
 @keyframes rise{0%{transform:translateY(0) rotate(0);opacity:0}10%{opacity:.7}90%{opacity:.5}100%{transform:translateY(-105svh) rotate(260deg);opacity:0}}
 .scroll-cue{display:none}
+
+/* ── 티켓 그림 — 가이드 흐름도와 같은 파일·같은 묶음 (design/guide-20261103.html .tks · .chk 그대로)
+   랜덤 티켓 = ticket-random.svg 빨강 1장 / 티켓(확정) = ticket-gold.svg 금색 3장 겹침 + 초록 체크 ── */
+.tks{position:relative;display:block;width:100%;height:100%;container-type:size}
+.tks img{position:absolute;left:50%;top:50%;width:var(--s);height:var(--s);max-width:none;max-height:none;margin:calc(var(--s) / -2) 0 0 calc(var(--s) / -2);transform:translate(var(--dx,0),var(--dy,0))}
+.tks.one img{--s:150cqmin}
+.tks.many img{--s:128cqmin}
+.tks.many img:nth-child(1){--dx:-13cqmin;--dy:-11cqmin}
+.tks.many img:nth-child(3){--dx:13cqmin;--dy:11cqmin}
+.tks .chk{position:absolute;left:calc(50% + 23cqmin);top:calc(50% - 55cqmin);width:26cqmin;height:26cqmin;border-radius:50%;background:var(--green);border:2px solid #fff;box-shadow:0 4px 10px rgba(34,197,94,.4);display:grid;place-items:center}
+.tks .chk svg{width:58%;height:58%}
+.node.on .chk{animation:iconIn 420ms cubic-bezier(.34,1.45,.5,1) 160ms both}
+@keyframes iconIn{from{opacity:0;transform:scale(.8)}to{opacity:1;transform:none}}
+.ob.tk,.ob.tw{aspect-ratio:1}
+.cc.noart{padding-left:24px}
 
 /* ═════════ 약속 ═════════ */
 .promises{display:grid;gap:12px;margin-top:-28px;position:relative;z-index:3}
@@ -179,7 +194,8 @@ section{position:relative;scroll-margin-top:60px}
 .node{position:relative;z-index:1;display:flex;align-items:center;gap:18px}
 .node .art{flex:none;width:104px;height:104px;border-radius:30px;display:flex;align-items:center;justify-content:center;position:relative;
   background:radial-gradient(circle at 35% 30%,#fff,var(--sub-4) 70%);box-shadow:var(--sh-1),inset 0 -6px 14px rgba(132,94,238,.10)}
-.node .art img{max-width:78%;max-height:78%;width:auto;filter:drop-shadow(0 10px 10px rgba(108,74,182,.22))}
+.node .art>img{max-width:78%;max-height:78%;width:auto;filter:drop-shadow(0 10px 10px rgba(108,74,182,.22))}
+.node .art>.tks{width:70%;height:70%;filter:drop-shadow(0 10px 14px rgba(108,74,182,.30))}
 .node .no{position:absolute;top:-8px;left:-8px;width:30px;height:30px;border-radius:50%;background:var(--main);color:#fff;font-family:Poppins,sans-serif;font-weight:800;font-size:14px;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 14px rgba(132,94,238,.45)}
 .node b{display:block;font-size:19px;font-weight:800;letter-spacing:-.6px}
 .node p{font-size:14px;color:var(--text2);margin-top:3px}
@@ -240,13 +256,9 @@ section{position:relative;scroll-margin-top:60px}
 .cc{position:relative;border-radius:var(--r-lg);padding:20px;display:flex;gap:16px;align-items:center;
   background:linear-gradient(160deg,rgba(255,255,255,.10),rgba(255,255,255,.03));border:1px solid rgba(255,255,255,.12);box-shadow:inset 0 1px 0 rgba(255,255,255,.12);transition:transform .25s var(--ease),border-color .25s,background .25s}
 .cc .art{flex:none;width:76px;height:76px;display:flex;align-items:center;justify-content:center;border-radius:22px;background:radial-gradient(circle at 35% 30%,rgba(255,255,255,.22),rgba(255,255,255,.04) 70%)}
-.cc .art img{max-width:86%;max-height:86%;width:auto;filter:drop-shadow(0 10px 12px rgba(0,0,0,.4));transition:transform .35s var(--pop)}
-.cc:hover .art img{transform:rotate(-8deg) scale(1.08)}
-/* 이벤트 티켓은 오브젝트 그림이 아직 없어 코드로 그린 티켓 모양을 쓴다 */
-.evt{width:52px;height:34px;border-radius:8px;position:relative;background:linear-gradient(135deg,#FF8A5B,#E2492B);box-shadow:0 10px 14px rgba(0,0,0,.35),inset 0 -3px 0 rgba(0,0,0,.15);transform:rotate(-10deg);transition:transform .35s var(--pop)}
-.evt::before,.evt::after{content:'';position:absolute;top:50%;width:12px;height:12px;margin-top:-6px;border-radius:50%;background:#2A1A50}
-.evt::before{left:-6px}.evt::after{right:-6px}
-.cc:hover .evt{transform:rotate(4deg) scale(1.1)}
+.cc .art>img{max-width:86%;max-height:86%;width:auto;filter:drop-shadow(0 10px 12px rgba(0,0,0,.4));transition:transform .35s var(--pop)}
+.cc .art>.tks{width:74%;height:74%;filter:drop-shadow(0 10px 12px rgba(0,0,0,.4));transition:transform .35s var(--pop)}
+.cc:hover .art>img,.cc:hover .art>.tks{transform:rotate(-8deg) scale(1.08)}
 .cc h3{font-size:19px;font-weight:800;letter-spacing:-.5px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;color:#fff}
 .cc h3 i{font-style:normal;font-size:12px;font-weight:700;color:var(--ink);background:var(--sub-2);border-radius:8px;padding:2px 8px}
 .cc h3 i.g{background:linear-gradient(135deg,var(--gold-a),var(--gold-b))}
@@ -311,10 +323,11 @@ section{position:relative;scroll-margin-top:60px}
 .end p{margin-top:12px;color:rgba(255,255,255,.82)}
 .end .stores{justify-content:center;margin-top:28px}
 .end .ob2{position:absolute;width:110px;opacity:.9;pointer-events:none}
-.end .ob2 img{filter:drop-shadow(0 16px 18px rgba(10,4,30,.4));animation:drift 6s ease-in-out infinite}
+.end .ob2>img,.end .ob2>.tks{filter:drop-shadow(0 16px 18px rgba(10,4,30,.4));animation:drift 6s ease-in-out infinite}
+.end .ob2.a{aspect-ratio:1}
 .end .ob2.a{left:-24px;top:18px;width:96px}
 .end .ob2.b{right:-20px;bottom:18px;width:104px}
-.end .ob2.b img{animation-delay:-3s}
+.end .ob2.b>img{animation-delay:-3s}
 
 /* ═════════ 맨 아래 ═════════ */
 .ftr{background:#FAF9FC;border-top:1px solid var(--border);padding:40px 0 52px;font-size:13px;color:var(--text3)}
@@ -447,14 +460,14 @@ section{position:relative;scroll-margin-top:60px}
       <div class="ring r1"></div>
       <div class="ring r2"></div>
       <div class="ob gift"><img src="/web/img/gifticon.webp" alt="" width="1000" height="538"></div>
-      <div class="ob tk"><img src="/web/img/ticket-ok.webp" alt="" width="1000" height="806"></div>
+      <div class="ob tk"><span class="tks many"><img src="/web/img/ticket-gold.svg" alt="" width="512" height="512"><img src="/web/img/ticket-gold.svg" alt="" width="512" height="512"><img src="/web/img/ticket-gold.svg" alt="" width="512" height="512"><span class="chk"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span></span></div>
       <div class="phone"><div class="in">
         <img src="/web/img/phone.webp" alt="" width="609" height="1000">
         <div class="scr"><img src="/web/img/splash.webp" alt="" width="390" height="844"></div>
       </div></div>
       <div class="ob bag"><img src="/web/img/bag.webp" alt="" width="889" height="1000"></div>
       <div class="ob coin"><img src="/web/img/coins.webp" alt="" width="1000" height="644"></div>
-      <div class="ob tw"><img src="/web/img/ticket-wait.webp" alt="" width="1000" height="803"></div>
+      <div class="ob tw"><span class="tks one"><img src="/web/img/ticket-random.svg" alt="" width="512" height="512"></span></div>
     </div>
   </div>
   <a class="scroll-cue" href="#how" aria-label="아래로"></a>
@@ -481,9 +494,9 @@ section{position:relative;scroll-margin-top:60px}
         <div class="tx"><b>앱에서 쇼핑몰로</b><p>프라이스픽 바로가기로 들어가야 적립이 시작돼요.</p></div></li>
       <li class="node"><div class="art"><span class="no">2</span><img src="/web/img/bag.webp" alt="" width="889" height="1000" loading="lazy"></div>
         <div class="tx"><b>평소처럼 구매</b><p>들어간 뒤 24시간 안의 주문 한 건마다 랜덤 티켓 1장.</p></div></li>
-      <li class="node"><div class="art"><span class="no">3</span><img src="/web/img/ticket-wait.webp" alt="" width="1000" height="803" loading="lazy"></div>
+      <li class="node"><div class="art"><span class="no">3</span><span class="tks one"><img src="/web/img/ticket-random.svg" alt="" width="512" height="512"></span></div>
         <div class="tx"><b>구매 확정을 기다려요</b><p>몇 장인지는 확정될 때 공개돼요.</p></div></li>
-      <li class="node"><div class="art"><span class="no">4</span><img src="/web/img/ticket-ok.webp" alt="" width="1000" height="806" loading="lazy"></div>
+      <li class="node"><div class="art"><span class="no">4</span><span class="tks many"><img src="/web/img/ticket-gold.svg" alt="" width="512" height="512"><img src="/web/img/ticket-gold.svg" alt="" width="512" height="512"><img src="/web/img/ticket-gold.svg" alt="" width="512" height="512"><span class="chk"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span></span></div>
         <div class="tx"><b>티켓으로 바뀌어요</b><p>구매확정금액 × 쇼핑몰 적립률 ÷ 10원만큼.</p></div></li>
       <li class="node"><div class="art"><span class="no">5</span><img src="/web/img/gifticon.webp" alt="" width="1000" height="538" loading="lazy"></div>
         <div class="tx"><b>기프티콘으로 교환</b><p>상품 가격 ÷ 10원만큼 티켓을 써요.</p></div></li>
@@ -544,15 +557,14 @@ section{position:relative;scroll-margin-top:60px}
     </div>
     <div class="cur">
       <div class="cc rv" style="--d:0">
-        <div class="art"><img src="/web/img/ticket-wait.webp" alt="" width="1000" height="803" loading="lazy"></div>
+        <div class="art"><span class="tks one"><img src="/web/img/ticket-random.svg" alt="" width="512" height="512"></span></div>
         <div><h3>랜덤 티켓 <i>대기 중</i></h3><p>구매 직후 받는 티켓. 확정되면 몇 장인지 공개되고 티켓으로 바뀌어요.</p></div>
       </div>
       <div class="cc rv" style="--d:1">
-        <div class="art"><img src="/web/img/ticket-ok.webp" alt="" width="1000" height="806" loading="lazy"></div>
+        <div class="art"><span class="tks many"><img src="/web/img/ticket-gold.svg" alt="" width="512" height="512"><img src="/web/img/ticket-gold.svg" alt="" width="512" height="512"><img src="/web/img/ticket-gold.svg" alt="" width="512" height="512"><span class="chk"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span></span></div>
         <div><h3>티켓 <i class="g">1장 = 10원</i></h3><p>확정된 티켓. 기프티콘을 살 때 써요.</p><p class="exp">받은 날부터 1년</p></div>
       </div>
-      <div class="cc rv" style="--d:2">
-        <div class="art"><span class="evt"></span></div>
+      <div class="cc rv noart" style="--d:2">
         <div><h3>이벤트 티켓</h3><p>출석·선물 상자·미션·가입으로 받아요. 랜덤 선물 상자를 열거나 티켓으로 바꿔요.</p><p class="exp">받은 날부터 100일</p></div>
       </div>
       <div class="cc rv" style="--d:3">
@@ -693,7 +705,7 @@ section{position:relative;scroll-margin-top:60px}
 
 <!-- ═════════ 맺음 ═════════ -->
 <section class="end">
-  <div class="ob2 a" aria-hidden="true"><img src="/web/img/ticket-ok.webp" alt="" width="1000" height="806" loading="lazy"></div>
+  <div class="ob2 a" aria-hidden="true"><span class="tks many"><img src="/web/img/ticket-gold.svg" alt="" width="512" height="512"><img src="/web/img/ticket-gold.svg" alt="" width="512" height="512"><img src="/web/img/ticket-gold.svg" alt="" width="512" height="512"><span class="chk"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span></span></div>
   <div class="ob2 b" aria-hidden="true"><img src="/web/img/coins.webp" alt="" width="1000" height="644" loading="lazy"></div>
   <div class="wrap">
     <h2 class="rv">다음 쇼핑부터<br>티켓 받으세요</h2>
