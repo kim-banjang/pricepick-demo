@@ -5,189 +5,323 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>프라이스픽 — 쇼핑하던 그대로, 티켓이 쌓여요</title>
 <meta name="description" content="프라이스픽을 거쳐 쇼핑몰에서 사면 티켓을 드려요. 모은 티켓은 기프티콘으로 바꿔요.">
-<meta name="theme-color" content="#845EEE">
+<meta name="theme-color" content="#2A1760">
 <link rel="icon" href="/icon-192.png">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="preconnect" href="https://cdn.jsdelivr.net">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700;800&display=swap">
+<link rel="preload" as="image" href="/web/img/phone.webp">
 <!--
-  프라이스픽 홈페이지 데모 (2026-11-10, 김반장 지시 「홈페이지 DEMO 를 만들어」)
+  프라이스픽 홈페이지 데모 (2026-11-10)
+  1차: 김반장 「홈페이지 DEMO 를 만들어」 / 2차: 「좀 쌈박하게 만들어봐. 애니매이션도 팍팍 넣어 주고」
   내용 정본: docs/homepage-content-20261110.md 의 「실제」 칸만 쓴다.
-  그림: docs/guide-assets-20261110.md — 가이드 일러스트 2048px 원본(pricepick/design/guide-art/raw-*)에서 오린 투명 오브젝트만 쓴다.
-  다크모드 없음. 휴대폰 먼저.
+  그림: docs/guide-assets-20261110.md — 가이드 일러스트 2048px 원본에서 오린 투명 오브젝트만 쓴다.
+  움직임: CSS + 짧은 스크립트(라이브러리 없음). 휴대폰은 가벼운 것만, prefers-reduced-motion 이면 정지 화면.
+  다크모드 없음.
 -->
 <style>
 :root{
   --main:#845EEE; --main-dark:#6C4AB6; --sub-2:#C6AFFF; --sub-3:#E2D9FF; --sub-4:#F1EEFF;
   --text1:#1A1130; --text2:#5A5370; --text3:#9B93B0; --border:#EEEAF3;
-  --gold:#F5B84A; --green:#22C55E;
-  --r-lg:24px; --r-md:16px; --r-sm:12px;
-  --pad:20px; --maxw:1120px;
-  color-scheme: light;
+  --ink:#170E33; --ink-2:#2A1760; --gold-a:#FFD93B; --gold-b:#E6A800; --green:#22C55E;
+  --r-xl:32px; --r-lg:24px; --r-md:18px; --r-sm:12px;
+  --pad:20px; --maxw:1160px;
+  --ease:cubic-bezier(.2,.8,.2,1); --pop:cubic-bezier(.34,1.56,.64,1);
+  --sh-1:0 1px 2px rgba(23,14,51,.04),0 8px 24px rgba(108,74,182,.10);
+  --sh-2:0 2px 4px rgba(23,14,51,.06),0 22px 48px rgba(108,74,182,.22);
+  color-scheme:light;
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
 body{font-family:"Pretendard Variable",Pretendard,-apple-system,BlinkMacSystemFont,system-ui,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;
   color:var(--text1);background:#fff;font-weight:400;line-height:1.55;letter-spacing:-.2px;word-break:keep-all;overflow-x:hidden}
-img{display:block;max-width:100%;height:auto}
+img{display:block;max-width:100%;height:auto;-webkit-user-drag:none}
 a{color:inherit;text-decoration:none}
 b,strong{font-weight:700}
-.wrap{max-width:var(--maxw);margin:0 auto;padding:0 var(--pad)}
-section{scroll-margin-top:64px}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 var(--pad);position:relative}
+section{position:relative;scroll-margin-top:60px}
 
-/* ── 머리줄 ── */
-.hdr{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.88);backdrop-filter:saturate(1.6) blur(12px);-webkit-backdrop-filter:saturate(1.6) blur(12px);border-bottom:1px solid transparent;transition:border-color .2s}
-.hdr.on{border-bottom-color:var(--border)}
+/* ── 스크롤 진행 막대 ── */
+.prog{position:fixed;left:0;top:0;height:3px;width:100%;z-index:50;transform-origin:0 50%;transform:scaleX(0);
+  background:linear-gradient(90deg,var(--sub-2),var(--main),var(--gold-a))}
+
+/* ── 머리줄 (첫 화면은 어두운 바탕 위 투명, 내려가면 흰 유리) ── */
+.hdr{position:fixed;left:0;right:0;top:0;z-index:40;transition:background .25s,box-shadow .25s}
 .hdr .wrap{display:flex;align-items:center;height:60px;gap:16px}
+.hdr.on{background:rgba(255,255,255,.86);backdrop-filter:saturate(1.6) blur(14px);-webkit-backdrop-filter:saturate(1.6) blur(14px);box-shadow:0 1px 0 var(--border)}
 .logo{display:flex;align-items:center;gap:8px;flex:none}
 .logo svg{width:26px;height:26px}
 .wm{font-family:Poppins,sans-serif;font-size:17px;letter-spacing:.5px;line-height:1}
-.wm .l{font-weight:400;color:var(--text1)} .wm .b{font-weight:700;color:var(--main)}
+.wm .l{font-weight:400;color:#fff;transition:color .25s} .wm .b{font-weight:700;color:var(--sub-2);transition:color .25s}
+.hdr.on .wm .l{color:var(--text1)} .hdr.on .wm .b{color:var(--main)}
 .nav{display:none;gap:28px;margin-left:auto}
-.nav a{font-size:15px;color:var(--text2);font-weight:700}
-.nav a:hover{color:var(--main)}
-.hdr-cta{margin-left:auto;height:36px;padding:0 14px;border-radius:18px;background:var(--main);color:#fff;font-size:14px;font-weight:700;display:flex;align-items:center}
+.nav a{font-size:15px;color:rgba(255,255,255,.78);font-weight:700;transition:color .2s}
+.nav a:hover{color:#fff}
+.hdr.on .nav a{color:var(--text2)} .hdr.on .nav a:hover{color:var(--main)}
+.hdr-cta{margin-left:auto;height:36px;padding:0 16px;border-radius:18px;background:#fff;color:var(--main-dark);font-size:14px;font-weight:800;display:flex;align-items:center;
+  box-shadow:0 6px 18px rgba(0,0,0,.18);transition:transform .15s var(--ease),background .25s,color .25s}
+.hdr.on .hdr-cta{background:var(--main);color:#fff;box-shadow:0 6px 16px rgba(132,94,238,.35)}
+.hdr-cta:active{transform:scale(.95)}
 
-/* ── 공통 ── */
-.eyebrow{display:inline-block;font-size:13px;font-weight:700;color:var(--main);letter-spacing:.2px;margin-bottom:10px}
-.h2{font-size:26px;font-weight:800;letter-spacing:-.8px;line-height:1.3}
-.lead{margin-top:10px;font-size:16px;color:var(--text2)}
-.sec{padding:72px 0}
-.sec.tint{background:var(--sub-4)}
-.sec-head{margin-bottom:32px}
+/* ── 공통 글자 ── */
+.eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:800;color:var(--main);letter-spacing:.3px;margin-bottom:12px;text-transform:uppercase}
+.eyebrow::before{content:'';width:18px;height:2px;border-radius:2px;background:currentColor}
+.h2{font-size:32px;font-weight:800;letter-spacing:-1.2px;line-height:1.18}
+.h2 em{font-style:normal;background:linear-gradient(90deg,var(--main),#B07CFF);-webkit-background-clip:text;background-clip:text;color:transparent}
+.lead{margin-top:12px;font-size:16px;color:var(--text2)}
+.sec{padding:88px 0}
+.sec-head{margin-bottom:36px}
+.dark{color:#fff}
+.dark .eyebrow{color:var(--sub-2)}
+.dark .lead{color:rgba(255,255,255,.72)}
+.dark .h2 em{background:linear-gradient(90deg,var(--sub-2),#fff);-webkit-background-clip:text;background-clip:text}
+
+/* ── 스크롤 등장 (스크립트가 켜졌을 때만 숨겼다가 띄운다 — 스크립트가 없으면 처음부터 다 보인다) ── */
+.js .rv{opacity:0;transform:translateY(22px);transition:opacity .5s var(--ease),transform .5s var(--ease);transition-delay:calc(var(--d,0) * 70ms)}
+.js .rv.in{opacity:1;transform:none}
+.js .rv.pop{transform:translateY(16px) scale(.94)}
+.js .rv.pop.in{transform:none}
 
 /* ── 스토어 단추 (링크는 출시 후 연결) ── */
 .stores{display:flex;gap:10px;flex-wrap:wrap}
-.store{display:flex;align-items:center;gap:10px;height:52px;padding:0 18px 0 14px;border-radius:14px;background:var(--text1);color:#fff;cursor:default}
+.store{display:flex;align-items:center;gap:10px;height:54px;padding:0 20px 0 15px;border-radius:16px;background:#fff;color:var(--text1);cursor:pointer;
+  box-shadow:0 10px 26px rgba(0,0,0,.22),inset 0 -2px 0 rgba(23,14,51,.08);transition:transform .15s var(--ease),box-shadow .2s}
 .store svg{width:22px;height:22px;flex:none}
 .store span{display:flex;flex-direction:column;line-height:1.15}
-.store small{font-size:10px;font-weight:400;opacity:.8}
-.store b{font-size:16px;font-weight:700;letter-spacing:-.2px}
+.store small{font-size:10px;font-weight:400;opacity:.7}
+.store b{font-size:16px;font-weight:800;letter-spacing:-.2px}
+.store:hover{transform:translateY(-2px);box-shadow:0 16px 34px rgba(0,0,0,.26),inset 0 -2px 0 rgba(23,14,51,.08)}
+.store:active{transform:translateY(1px) scale(.97);box-shadow:0 4px 10px rgba(0,0,0,.2),inset 0 2px 0 rgba(23,14,51,.08)}
+.store.dk{background:var(--ink);color:#fff;box-shadow:0 10px 24px rgba(23,14,51,.28),inset 0 -2px 0 rgba(255,255,255,.08)}
 
-/* ── 머리 화면 ── */
-.hero{position:relative;overflow:hidden;background:linear-gradient(180deg,#fff 0%,var(--sub-4) 100%)}
-.hero .wrap{display:flex;flex-direction:column;padding-top:28px;padding-bottom:56px;gap:28px}
-.hero h1{font-size:34px;font-weight:800;letter-spacing:-1.4px;line-height:1.24}
-.hero h1 em{font-style:normal;color:var(--main)}
-.hero .lead{font-size:17px;margin-top:14px}
-.hero .stores{margin-top:24px}
-.hero-art{position:relative;width:100%;max-width:400px;margin:0 auto;aspect-ratio:1/1.02}
-.hero-art .glow{position:absolute;inset:8% 4%;border-radius:50%;background:radial-gradient(closest-side,rgba(198,175,255,.55),rgba(198,175,255,0));filter:blur(6px)}
-/* 임시 히어로 — 정면 폰 오브젝트에 앱 실행 화면을 얹고 가이드 오브젝트를 둘레에 띄운다. 히어로 전용 그림이 생기면 이 묶음째 바꾼다. */
-.phone{position:absolute;left:50%;top:2%;width:52%;transform:translateX(-50%);filter:drop-shadow(0 24px 30px rgba(108,74,182,.22))}
+/* ═════════ 머리 화면 ═════════ */
+.hero{min-height:100svh;padding-top:60px;color:#fff;overflow:hidden;isolation:isolate;
+  background:radial-gradient(120% 80% at 80% 20%,#5B33C9 0%,rgba(91,51,201,0) 60%),
+             radial-gradient(90% 70% at 10% 90%,#7A4AE8 0%,rgba(122,74,232,0) 60%),
+             linear-gradient(160deg,#1B0F3F 0%,#2A1760 45%,#3D1F8C 100%)}
+.hero::after{content:'';position:absolute;left:0;right:0;bottom:-1px;height:120px;background:linear-gradient(180deg,rgba(255,255,255,0),#fff);z-index:-1;opacity:.06}
+.hero .grid-bg{position:absolute;inset:0;z-index:-2;opacity:.18;
+  background-image:linear-gradient(rgba(255,255,255,.08) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.08) 1px,transparent 1px);
+  background-size:44px 44px;mask-image:radial-gradient(70% 60% at 60% 40%,#000,transparent);-webkit-mask-image:radial-gradient(70% 60% at 60% 40%,#000,transparent)}
+.hero .spot{position:absolute;z-index:-1;inset:0;pointer-events:none;
+  background:radial-gradient(420px 420px at var(--mx,70%) var(--my,35%),rgba(198,175,255,.22),transparent 70%)}
+.hero .wrap{display:flex;flex-direction:column;gap:12px;padding-top:28px;padding-bottom:40px}
+.hero .badge{display:inline-flex;align-items:center;gap:8px;height:30px;padding:0 12px 0 8px;border-radius:15px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.16);font-size:13px;font-weight:700;color:#E9E1FF;width:max-content}
+.hero .badge i{width:18px;height:18px;border-radius:50%;background:linear-gradient(135deg,var(--gold-a),var(--gold-b));box-shadow:0 0 12px rgba(255,217,59,.7)}
+.hero h1{margin-top:18px;font-size:42px;font-weight:800;letter-spacing:-2px;line-height:1.12}
+.hero h1 .ln{display:block;overflow:hidden;padding-bottom:4px}
+.hero h1 .ln>span{display:inline-block}
+.shine{background:linear-gradient(100deg,#C6AFFF 0%,#fff 30%,#FFD93B 50%,#fff 70%,#C6AFFF 100%);background-size:220% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:shine 5s linear infinite}
+@keyframes shine{to{background-position:-220% 0}}
+.hero .lead{color:rgba(255,255,255,.76);font-size:17px;margin-top:16px}
+.hero .stores{margin-top:26px}
+.js .hero h1 .ln>span{transform:translateY(105%);animation:lineUp .7s var(--ease) forwards}
+.js .hero h1 .ln:nth-child(2)>span{animation-delay:.08s}
+.js .hero .h-fade{opacity:0;animation:fadeUp .6s var(--ease) .18s forwards}
+.js .hero .h-fade.d2{animation-delay:.28s}
+@keyframes lineUp{to{transform:none}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+
+/* 머리 그림 — 정면 폰 + 둘레를 도는 오브젝트. 히어로 전용 그림이 생기면 .stage 째 바꾼다 */
+.stage{position:relative;width:100%;max-width:440px;margin:6px auto 0;aspect-ratio:1/1.02;--px:0;--py:0}
+.ring{position:absolute;left:50%;top:50%;border-radius:50%;transform:translate(-50%,-50%);border:1.5px dashed rgba(198,175,255,.35)}
+.ring.r1{width:92%;height:92%;animation:spin 38s linear infinite}
+.ring.r2{width:66%;height:66%;border-style:solid;border-color:rgba(198,175,255,.14);animation:spin 26s linear infinite reverse}
+.ring::after{content:'';position:absolute;top:-5px;left:50%;width:10px;height:10px;margin-left:-5px;border-radius:50%;background:var(--gold-a);box-shadow:0 0 14px var(--gold-a)}
+.ring.r2::after{background:var(--sub-2);box-shadow:0 0 14px var(--sub-2);width:8px;height:8px;top:-4px}
+@keyframes spin{to{transform:translate(-50%,-50%) rotate(360deg)}}
+.halo{position:absolute;left:50%;top:48%;width:78%;aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;
+  background:radial-gradient(closest-side,rgba(198,175,255,.55),rgba(132,94,238,.25) 55%,rgba(132,94,238,0));animation:breath 4s ease-in-out infinite}
+@keyframes breath{50%{transform:translate(-50%,-50%) scale(1.06);opacity:.85}}
+.phone{position:absolute;left:50%;top:4%;width:48%;transform:translate(calc(-50% + var(--px)*-6px),calc(var(--py)*-6px));transition:transform .4s var(--ease)}
+.phone .in{animation:bob 5s ease-in-out infinite;filter:drop-shadow(0 30px 34px rgba(10,4,30,.5))}
 .phone .scr{position:absolute;left:12.5%;top:6.3%;width:75.2%;height:87.3%;border-radius:9%/4.4%;overflow:hidden;background:#fff}
 .phone .scr img{width:100%;height:100%;object-fit:cover;object-position:top}
-.fl{position:absolute;filter:drop-shadow(0 14px 16px rgba(108,74,182,.16));animation:float 6s ease-in-out infinite}
-.fl.bag{left:0;bottom:6%;width:31%;animation-delay:-1s}
-.fl.tk{right:0;top:10%;width:30%;animation-delay:-3s}
-.fl.coin{right:2%;bottom:4%;width:27%;animation-delay:-2s}
-.fl.gift{left:-2%;top:14%;width:30%;animation-delay:-4s}
-@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
-@media (prefers-reduced-motion:reduce){.fl{animation:none}}
+.phone .scr::after{content:'';position:absolute;inset:-40% -60%;background:linear-gradient(115deg,transparent 40%,rgba(255,255,255,.55) 50%,transparent 60%);transform:translateX(-60%);animation:glint 6s ease-in-out 1.2s infinite}
+@keyframes glint{0%,70%{transform:translateX(-60%)}100%{transform:translateX(60%)}}
+@keyframes bob{50%{transform:translateY(-10px)}}
+.ob{position:absolute;transform:translate(calc(var(--px)*var(--k,12px)),calc(var(--py)*var(--k,12px)));transition:transform .5s var(--ease)}
+.ob img{filter:drop-shadow(0 16px 18px rgba(10,4,30,.42));animation:drift var(--t,6s) ease-in-out infinite;animation-delay:var(--dl,0s)}
+@keyframes drift{0%,100%{transform:translateY(0) rotate(var(--r0,-4deg))}50%{transform:translateY(-14px) rotate(var(--r1,5deg))}}
+.ob.gift{left:-3%;top:14%;width:31%;--k:-18px;--t:6.5s;--dl:-1s}
+.ob.tk{right:-2%;top:8%;width:31%;--k:22px;--t:5.5s;--dl:-2.5s;--r0:6deg;--r1:-6deg}
+.ob.bag{left:0;bottom:4%;width:32%;--k:16px;--t:7s;--dl:-3s}
+.ob.coin{right:0;bottom:2%;width:29%;--k:-20px;--t:6s;--dl:-.5s;--r0:-8deg;--r1:4deg}
+.ob.tw{left:38%;bottom:-3%;width:24%;--k:10px;--t:6.8s;--dl:-4s;--r0:-10deg;--r1:-2deg;display:none}
+.js .stage .ob,.js .stage .phone{opacity:0;animation:popIn .7s var(--pop) forwards}
+.js .stage .phone{animation-delay:.1s}
+.js .stage .ob.gift{animation-delay:.35s}.js .stage .ob.tk{animation-delay:.45s}.js .stage .ob.bag{animation-delay:.55s}.js .stage .ob.coin{animation-delay:.65s}
+@keyframes popIn{from{opacity:0;scale:.6}to{opacity:1;scale:1}}
+/* 떠오르는 티켓·동전 조각 */
+.sparks{position:absolute;inset:0;z-index:-1;pointer-events:none;overflow:hidden}
+.sparks i{position:absolute;bottom:-30px;width:var(--s,14px);height:calc(var(--s,14px)*.66);border-radius:3px;background:linear-gradient(135deg,var(--sub-2),var(--main));opacity:.0;animation:rise var(--t,9s) linear infinite;animation-delay:var(--dl,0s)}
+.sparks i.c{height:var(--s,14px);border-radius:50%;background:linear-gradient(135deg,var(--gold-a),var(--gold-b))}
+@keyframes rise{0%{transform:translateY(0) rotate(0);opacity:0}10%{opacity:.7}90%{opacity:.5}100%{transform:translateY(-105svh) rotate(260deg);opacity:0}}
+.scroll-cue{display:none}
 
-/* ── 약속 ── */
-.promises{display:grid;grid-template-columns:1fr;gap:12px;margin-top:-24px;position:relative;z-index:2}
-.pm{background:#fff;border:1px solid var(--border);border-radius:var(--r-md);padding:18px 20px;display:flex;gap:14px;align-items:flex-start;box-shadow:0 6px 20px rgba(108,74,182,.06)}
-.pm .n{flex:none;width:28px;height:28px;border-radius:50%;background:var(--sub-4);color:var(--main);font-weight:800;font-size:14px;display:flex;align-items:center;justify-content:center}
-.pm b{display:block;font-size:16px;font-weight:800;letter-spacing:-.4px}
-.pm p{font-size:14px;color:var(--text2);margin-top:2px}
+/* ═════════ 약속 ═════════ */
+.promises{display:grid;gap:12px;margin-top:-28px;position:relative;z-index:3}
+.pm{background:#fff;border-radius:var(--r-md);padding:18px 20px;display:flex;gap:14px;align-items:center;box-shadow:var(--sh-2);transition:transform .25s var(--ease),box-shadow .25s}
+.pm .n{flex:none;width:44px;height:44px;border-radius:14px;background:linear-gradient(135deg,var(--sub-4),var(--sub-3));color:var(--main);font-family:Poppins,sans-serif;font-weight:800;font-size:18px;display:flex;align-items:center;justify-content:center;box-shadow:inset 0 -3px 0 rgba(132,94,238,.12)}
+.pm b{display:block;font-size:17px;font-weight:800;letter-spacing:-.5px}
+.pm p{font-size:14px;color:var(--text2);margin-top:1px}
+.pm .num{color:var(--main)}
 
-/* ── 흐름 ── */
-.flow{list-style:none;display:grid;gap:14px;counter-reset:st}
-.st{display:flex;gap:16px;align-items:center;background:#fff;border:1px solid var(--border);border-radius:var(--r-md);padding:16px}
-.st .art{flex:none;width:84px;height:84px;display:flex;align-items:center;justify-content:center}
-.st .art img{max-height:84px;width:auto}
-.st .k{font-size:12px;font-weight:700;color:var(--main)}
-.st b{display:block;font-size:17px;font-weight:800;letter-spacing:-.4px;margin-top:1px}
-.st p{font-size:14px;color:var(--text2);margin-top:3px}
-.wait{margin-top:20px;border-radius:var(--r-md);background:var(--text1);color:#fff;padding:20px}
-.wait h3{font-size:16px;font-weight:800;letter-spacing:-.3px}
-.wait h3 small{display:block;font-size:13px;font-weight:400;color:rgba(255,255,255,.7);margin-top:4px}
-.wait dl{margin-top:14px;display:grid;gap:10px}
-.wait .row{display:grid;grid-template-columns:96px 1fr;gap:12px;align-items:start;padding-top:10px;border-top:1px solid rgba(255,255,255,.12)}
-.wait dt{font-size:14px;font-weight:700;color:var(--sub-2)}
-.wait dd{font-size:15px}
-.wait dd b{font-weight:800}
+/* ═════════ 흐름 — 선이 그려지고 오브젝트가 튀어나온다 ═════════ */
+.how{background:radial-gradient(60% 50% at 100% 0%,var(--sub-4),transparent 70%),radial-gradient(50% 40% at 0% 100%,#F7F2FF,transparent 70%),#fff}
+.flow{position:relative;list-style:none;display:grid;gap:44px;padding:6px 0}
+.flow svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none;z-index:0}
+.flow .base{fill:none;stroke:var(--sub-3);stroke-width:3;stroke-linecap:round;stroke-dasharray:2 10}
+.flow .seg{fill:none;stroke:url(#flowGrad);stroke-width:4;stroke-linecap:round}
+.flow .dotm{fill:var(--main);filter:drop-shadow(0 0 6px rgba(132,94,238,.8))}
+.node{position:relative;z-index:1;display:flex;align-items:center;gap:18px}
+.node .art{flex:none;width:104px;height:104px;border-radius:30px;display:flex;align-items:center;justify-content:center;position:relative;
+  background:radial-gradient(circle at 35% 30%,#fff,var(--sub-4) 70%);box-shadow:var(--sh-1),inset 0 -6px 14px rgba(132,94,238,.10)}
+.node .art img{max-width:78%;max-height:78%;width:auto;filter:drop-shadow(0 10px 10px rgba(108,74,182,.22))}
+.node .no{position:absolute;top:-8px;left:-8px;width:30px;height:30px;border-radius:50%;background:var(--main);color:#fff;font-family:Poppins,sans-serif;font-weight:800;font-size:14px;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 14px rgba(132,94,238,.45)}
+.node b{display:block;font-size:19px;font-weight:800;letter-spacing:-.6px}
+.node p{font-size:14px;color:var(--text2);margin-top:3px}
+.js .flow.armed .node .art{transform:scale(.4);opacity:0}
+.js .flow.armed .node .tx{opacity:0;transform:translateY(8px)}
+.node .art{transition:transform .45s var(--pop),opacity .25s}
+.node .tx{transition:opacity .35s var(--ease),transform .35s var(--ease)}
+.js .flow .node.on .art{transform:none;opacity:1}
+.js .flow .node.on .tx{opacity:1;transform:none}
+.node.on .art::after{content:'';position:absolute;inset:-6px;border-radius:36px;border:2px solid var(--main);opacity:0;animation:ping .7s var(--ease)}
+@keyframes ping{0%{opacity:.7;transform:scale(.9)}100%{opacity:0;transform:scale(1.15)}}
 
-/* ── 제휴몰 ── */
-.mall-lead{display:flex;align-items:center;gap:16px;background:#fff;border:2px solid var(--main);border-radius:var(--r-lg);padding:20px;box-shadow:0 10px 30px rgba(132,94,238,.14)}
-.mlogo{flex:none;width:56px;height:56px;border-radius:14px;background:var(--sub-4);display:flex;align-items:center;justify-content:center;overflow:hidden;font-weight:800;color:var(--main);font-size:16px;position:relative}
+.wait{margin-top:44px;border-radius:var(--r-lg);color:#fff;padding:26px 22px;position:relative;overflow:hidden;
+  background:radial-gradient(80% 120% at 100% 0%,rgba(132,94,238,.55),transparent 60%),linear-gradient(160deg,#21124B,#170E33);box-shadow:0 24px 50px rgba(23,14,51,.28)}
+.wait h3{font-size:20px;font-weight:800;letter-spacing:-.5px}
+.wait h3 small{display:block;font-size:14px;font-weight:400;color:rgba(255,255,255,.66);margin-top:4px;letter-spacing:-.2px}
+.wait .rows{margin-top:18px;display:grid;gap:12px}
+.wait .row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px;border-radius:var(--r-md);background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1)}
+.wait .who{font-size:14px;font-weight:700;color:var(--sub-2)}
+.wait .who small{display:block;font-size:12px;font-weight:400;color:rgba(255,255,255,.55)}
+.wait .days{display:flex;gap:14px;text-align:right}
+.wait .days div{display:flex;flex-direction:column;align-items:flex-end}
+.wait .days em{font-style:normal;font-size:12px;color:rgba(255,255,255,.6)}
+.wait .days b{font-family:Poppins,sans-serif;font-size:30px;font-weight:800;line-height:1.05;letter-spacing:-1px}
+.wait .days b.g{background:linear-gradient(180deg,#FFE680,var(--gold-b));-webkit-background-clip:text;background-clip:text;color:transparent}
+.wait .days b small{font-family:inherit;font-size:14px;font-weight:700;margin-left:2px}
+.wait .lp{font-size:16px;font-weight:800;text-align:right}
+
+/* ═════════ 제휴몰 ═════════ */
+.malls{background:linear-gradient(180deg,#F4EFFF 0%,#EDE5FF 100%);overflow:hidden}
+.malls::before{content:'';position:absolute;right:-120px;top:-120px;width:360px;height:360px;border-radius:50%;background:radial-gradient(closest-side,rgba(132,94,238,.25),transparent)}
+.mall-lead{position:relative;display:flex;align-items:center;gap:16px;border-radius:var(--r-lg);padding:22px;color:#fff;overflow:hidden;
+  background:linear-gradient(135deg,#7A4AE8 0%,#5B33C9 100%);box-shadow:0 22px 48px rgba(91,51,201,.35);transition:transform .25s var(--ease),box-shadow .25s}
+.mall-lead::after{content:'';position:absolute;inset:-50% -30%;background:linear-gradient(115deg,transparent 42%,rgba(255,255,255,.22) 50%,transparent 58%);transform:translateX(-70%);animation:glint 5s ease-in-out 1s infinite}
+.mlogo{flex:none;width:56px;height:56px;border-radius:16px;background:#fff;display:flex;align-items:center;justify-content:center;overflow:hidden;font-weight:800;color:var(--main);font-size:15px;position:relative;box-shadow:0 6px 14px rgba(23,14,51,.12)}
 .mlogo img{width:100%;height:100%;object-fit:contain;position:absolute;inset:0;background:#fff}
-.mall-lead .mlogo{width:64px;height:64px;border-radius:16px}
-.mall-lead b{display:block;font-size:22px;font-weight:800;letter-spacing:-.6px}
-.mall-lead p{font-size:14px;color:var(--text2)}
-.mall-lead .tag{margin-left:auto;flex:none;font-size:12px;font-weight:800;color:#fff;background:var(--main);border-radius:10px;padding:4px 9px}
-.mall-rest{margin-top:16px}
-.mall-rest h3{font-size:14px;font-weight:700;color:var(--text3);margin:4px 0 12px}
-.mall-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
-.mc{display:flex;align-items:center;gap:10px;background:#fff;border:1px solid var(--border);border-radius:var(--r-sm);padding:10px 12px;min-width:0}
-.mc .mlogo{width:36px;height:36px;border-radius:10px;font-size:12px}
-.mc span{font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.note{font-size:13px;color:var(--text3);margin-top:14px}
+.mall-lead .mlogo{width:72px;height:72px;border-radius:20px}
+.mall-lead b{display:block;font-size:26px;font-weight:800;letter-spacing:-.8px}
+.mall-lead p{font-size:14px;color:rgba(255,255,255,.82)}
+.mall-lead .tag{position:absolute;right:16px;top:16px;font-size:11px;font-weight:800;color:var(--ink);background:linear-gradient(135deg,var(--gold-a),var(--gold-b));border-radius:10px;padding:4px 9px}
+.mall-rest{margin-top:22px}
+.mall-rest h3{font-size:14px;font-weight:700;color:var(--text2);margin-bottom:12px}
+.marquee{position:relative;overflow:hidden;margin:0 calc(var(--pad) * -1);padding:4px 0;
+  mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent);-webkit-mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent)}
+.track{display:flex;gap:10px;width:max-content;animation:slide var(--dur,32s) linear infinite}
+.track.rev{animation-direction:reverse;margin-top:10px}
+.marquee:hover .track{animation-play-state:paused}
+@keyframes slide{to{transform:translateX(-50%)}}
+.mc{flex:none;display:flex;align-items:center;gap:10px;background:#fff;border-radius:14px;padding:9px 16px 9px 9px;box-shadow:var(--sh-1);transition:transform .2s var(--ease)}
+.mc .mlogo{width:36px;height:36px;border-radius:11px;font-size:12px;box-shadow:none;border:1px solid var(--border)}
+.mc span{font-size:14px;font-weight:700;white-space:nowrap}
+.mc:hover{transform:translateY(-3px)}
+.note{font-size:13px;color:var(--text3);margin-top:18px}
 
-/* ── 티켓 · 포인트 ── */
-.cur{display:grid;gap:12px}
-.cc{background:#fff;border:1px solid var(--border);border-radius:var(--r-md);padding:18px;display:flex;gap:14px}
-.cc .art{flex:none;width:64px;height:64px;display:flex;align-items:center;justify-content:center}
-.cc .art img{max-height:64px;width:auto}
-.cc .dot{width:44px;height:30px;border-radius:7px;position:relative}
-.cc .dot::before,.cc .dot::after{content:'';position:absolute;top:50%;width:10px;height:10px;margin-top:-5px;border-radius:50%;background:#fff}
-.cc .dot::before{left:-5px}.cc .dot::after{right:-5px}
-.dot.ev{background:linear-gradient(135deg,#FF8A5B,#E2492B)}
-.cc h3{font-size:17px;font-weight:800;letter-spacing:-.4px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.cc h3 i{font-style:normal;font-size:12px;font-weight:700;color:var(--main);background:var(--sub-4);border-radius:8px;padding:2px 7px}
-.cc p{font-size:14px;color:var(--text2);margin-top:4px}
-.cc .exp{font-size:12px;color:var(--text3);margin-top:6px}
-.conv{margin-top:16px;display:grid;gap:10px}
-.cv{display:flex;align-items:center;gap:10px;background:#fff;border-radius:var(--r-sm);padding:14px 16px;border:1px dashed var(--sub-2);font-size:15px;font-weight:700}
-.cv .ar{color:var(--main);font-weight:800}
-.cv small{margin-left:auto;font-size:12px;font-weight:400;color:var(--text3)}
+/* ═════════ 티켓 · 포인트 (어두운 바탕 + 유리 카드) ═════════ */
+.tix{background:radial-gradient(60% 50% at 15% 10%,rgba(132,94,238,.45),transparent 70%),radial-gradient(50% 50% at 90% 90%,rgba(255,217,59,.12),transparent 70%),linear-gradient(170deg,#1B0F3F,#120A2C);overflow:hidden}
+.cur{display:grid;gap:14px}
+.cc{position:relative;border-radius:var(--r-lg);padding:20px;display:flex;gap:16px;align-items:center;
+  background:linear-gradient(160deg,rgba(255,255,255,.10),rgba(255,255,255,.03));border:1px solid rgba(255,255,255,.12);box-shadow:inset 0 1px 0 rgba(255,255,255,.12);transition:transform .25s var(--ease),border-color .25s,background .25s}
+.cc .art{flex:none;width:76px;height:76px;display:flex;align-items:center;justify-content:center;border-radius:22px;background:radial-gradient(circle at 35% 30%,rgba(255,255,255,.22),rgba(255,255,255,.04) 70%)}
+.cc .art img{max-width:86%;max-height:86%;width:auto;filter:drop-shadow(0 10px 12px rgba(0,0,0,.4));transition:transform .35s var(--pop)}
+.cc:hover .art img{transform:rotate(-8deg) scale(1.08)}
+/* 이벤트 티켓은 오브젝트 그림이 아직 없어 코드로 그린 티켓 모양을 쓴다 */
+.evt{width:52px;height:34px;border-radius:8px;position:relative;background:linear-gradient(135deg,#FF8A5B,#E2492B);box-shadow:0 10px 14px rgba(0,0,0,.35),inset 0 -3px 0 rgba(0,0,0,.15);transform:rotate(-10deg);transition:transform .35s var(--pop)}
+.evt::before,.evt::after{content:'';position:absolute;top:50%;width:12px;height:12px;margin-top:-6px;border-radius:50%;background:#2A1A50}
+.evt::before{left:-6px}.evt::after{right:-6px}
+.cc:hover .evt{transform:rotate(4deg) scale(1.1)}
+.cc h3{font-size:19px;font-weight:800;letter-spacing:-.5px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;color:#fff}
+.cc h3 i{font-style:normal;font-size:12px;font-weight:700;color:var(--ink);background:var(--sub-2);border-radius:8px;padding:2px 8px}
+.cc h3 i.g{background:linear-gradient(135deg,var(--gold-a),var(--gold-b))}
+.cc p{font-size:14px;color:rgba(255,255,255,.72);margin-top:4px}
+.cc .exp{font-size:12px;color:rgba(255,255,255,.45);margin-top:6px}
+.conv{margin-top:18px;display:grid;gap:10px}
+.cv{display:flex;align-items:center;gap:12px;border-radius:var(--r-md);padding:16px 18px;font-size:16px;font-weight:800;color:#fff;
+  background:linear-gradient(90deg,rgba(132,94,238,.35),rgba(132,94,238,.08));border:1px solid rgba(198,175,255,.25)}
+.cv .ar{display:inline-flex;width:34px;height:20px;position:relative;overflow:hidden}
+.cv .ar::before{content:'';position:absolute;left:0;top:50%;width:100%;height:2px;margin-top:-1px;background:linear-gradient(90deg,transparent,var(--sub-2) 30%,var(--gold-a))}
+.cv .ar::after{content:'';position:absolute;right:2px;top:50%;width:8px;height:8px;margin-top:-4px;border-top:2px solid var(--gold-a);border-right:2px solid var(--gold-a);transform:rotate(45deg)}
+.cv small{margin-left:auto;font-size:12px;font-weight:400;color:rgba(255,255,255,.55)}
 
-/* ── 혜택 ── */
-.bf{display:grid;gap:12px}
-.bc{background:#fff;border:1px solid var(--border);border-radius:var(--r-md);padding:18px 18px 16px}
-.bc .top{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
-.bc h3{font-size:17px;font-weight:800;letter-spacing:-.4px}
-.bc .big{font-size:22px;font-weight:800;color:var(--main);letter-spacing:-.6px;white-space:nowrap}
-.bc p{font-size:14px;color:var(--text2);margin-top:6px}
-.bc ul{list-style:none;margin-top:8px;display:grid;gap:4px}
-.bc li{font-size:14px;color:var(--text2);display:flex;justify-content:space-between;gap:10px;border-top:1px solid var(--border);padding-top:6px}
-.bc li b{color:var(--text1)}
-.cap{font-size:13px;color:var(--text3);margin-top:14px}
+/* ═════════ 혜택 ═════════ */
+.bf-sec{background:radial-gradient(60% 40% at 50% 0%,#EEE6FF,transparent 70%),linear-gradient(180deg,#FBF9FF,#fff)}
+.bf{display:grid;gap:14px}
+.bc{position:relative;background:#fff;border-radius:var(--r-lg);padding:22px 20px 20px;box-shadow:var(--sh-1);overflow:hidden;transition:transform .25s var(--ease),box-shadow .25s}
+.bc::before{content:'';position:absolute;right:-40px;top:-40px;width:130px;height:130px;border-radius:50%;background:radial-gradient(closest-side,var(--sub-3),transparent);opacity:.8;transition:transform .4s var(--ease)}
+.bc:hover::before{transform:scale(1.35)}
+.bc .kick{position:relative;font-size:13px;font-weight:800;color:var(--main)}
+.bc .big{position:relative;display:block;margin-top:6px;font-family:Poppins,"Pretendard Variable",sans-serif;font-size:40px;font-weight:800;letter-spacing:-1.6px;line-height:1.05;
+  background:linear-gradient(135deg,var(--main-dark),var(--main) 50%,#B07CFF);-webkit-background-clip:text;background-clip:text;color:transparent}
+.bc .big small{font-family:"Pretendard Variable",Pretendard,sans-serif;font-size:18px;letter-spacing:-.5px;margin-left:3px}
+.bc h3{position:relative;font-size:18px;font-weight:800;letter-spacing:-.5px;margin-top:10px}
+.bc p{position:relative;font-size:14px;color:var(--text2);margin-top:4px}
+.bc ul{position:relative;list-style:none;margin-top:10px;display:grid;gap:6px}
+.bc li{font-size:14px;color:var(--text2);display:flex;justify-content:space-between;gap:10px;border-top:1px solid var(--border);padding-top:7px}
+.bc li b{color:var(--text1);font-weight:800}
+.cap{font-size:13px;color:var(--text3);margin-top:18px}
 
-/* ── 카카오 ── */
-.kk{background:#FEE500;border-radius:var(--r-lg);padding:28px 22px}
+/* ═════════ 카카오 ═════════ */
+.kk-sec{background:#fff}
+.kk{position:relative;border-radius:var(--r-xl);padding:32px 22px;overflow:hidden;
+  background:radial-gradient(70% 90% at 100% 0%,#FFF27A,transparent 60%),linear-gradient(160deg,#FEE500,#F9D400);box-shadow:0 26px 50px rgba(200,170,0,.28)}
+.kk::after{content:'';position:absolute;left:-60px;bottom:-60px;width:220px;height:220px;border-radius:50%;background:radial-gradient(closest-side,rgba(255,255,255,.55),transparent)}
 .kk .h2{color:#191600}
 .kk .lead{color:#3C3500}
-.kk ul{list-style:none;display:grid;gap:10px;margin-top:20px}
-.kk li{background:rgba(255,255,255,.72);border-radius:var(--r-sm);padding:14px 16px;font-size:15px;color:#191600}
-.kk li b{display:block;font-weight:800}
+.kk ul{position:relative;z-index:1;list-style:none;display:grid;gap:10px;margin-top:22px}
+.kk li{display:flex;gap:14px;align-items:center;background:rgba(255,255,255,.8);border-radius:var(--r-md);padding:15px 16px;color:#191600;box-shadow:0 6px 14px rgba(120,100,0,.08);transition:transform .22s var(--ease)}
+.kk li .i{flex:none;width:38px;height:38px;border-radius:12px;background:#191600;color:#FEE500;font-family:Poppins,sans-serif;font-weight:800;font-size:15px;display:flex;align-items:center;justify-content:center}
+.kk li b{display:block;font-size:16px;font-weight:800}
 .kk li span{font-size:14px;color:#4A4300}
+.kk li:hover{transform:translateX(4px)}
 
-/* ── 질문 ── */
+/* ═════════ 질문 ═════════ */
+.faq-sec{background:linear-gradient(180deg,#F7F4FD,#F1EEFF)}
 .faq{display:grid;gap:10px}
-.faq details{background:#fff;border:1px solid var(--border);border-radius:var(--r-md);padding:0 18px}
-.faq summary{list-style:none;cursor:pointer;padding:18px 28px 18px 0;font-size:16px;font-weight:700;position:relative;letter-spacing:-.3px}
+.faq details{background:#fff;border-radius:var(--r-md);padding:0 20px;box-shadow:var(--sh-1);transition:box-shadow .25s}
+.faq details[open]{box-shadow:var(--sh-2)}
+.faq summary{list-style:none;cursor:pointer;padding:19px 34px 19px 0;font-size:16px;font-weight:700;position:relative;letter-spacing:-.4px}
 .faq summary::-webkit-details-marker{display:none}
-.faq summary::after{content:'';position:absolute;right:2px;top:50%;width:9px;height:9px;margin-top:-7px;border-right:2px solid var(--text3);border-bottom:2px solid var(--text3);transform:rotate(45deg);transition:transform .2s}
-.faq details[open] summary::after{transform:rotate(-135deg);margin-top:-2px}
-.faq .a{padding:0 0 18px;font-size:15px;color:var(--text2)}
+.faq summary::after{content:'';position:absolute;right:0;top:50%;width:24px;height:24px;margin-top:-12px;border-radius:50%;background:var(--sub-4) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M7 10l5 5 5-5' fill='none' stroke='%23845EEE' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/16px no-repeat;transition:transform .25s var(--ease)}
+.faq details[open] summary::after{transform:rotate(180deg)}
+.faq .a{padding:0 0 19px;font-size:15px;color:var(--text2)}
 .faq .a ul{padding-left:18px;margin-top:6px;display:grid;gap:4px}
+.js .faq details[open] .a{animation:fadeUp .3s var(--ease)}
 
-/* ── 맺음 ── */
-.end{background:linear-gradient(160deg,var(--main) 0%,var(--main-dark) 100%);color:#fff;text-align:center;padding:64px 0}
-.end h2{font-size:28px;font-weight:800;letter-spacing:-1px;line-height:1.3}
-.end p{margin-top:10px;color:rgba(255,255,255,.82)}
-.end .stores{justify-content:center;margin-top:26px}
-.end .store{background:#fff;color:var(--text1)}
+/* ═════════ 맺음 ═════════ */
+.end{position:relative;overflow:hidden;color:#fff;text-align:center;padding:96px 0 104px;
+  background:radial-gradient(60% 80% at 50% 0%,#9B70FF,transparent 70%),linear-gradient(160deg,#6C4AB6,#3D1F8C)}
+.end h2{font-size:36px;font-weight:800;letter-spacing:-1.6px;line-height:1.18}
+.end p{margin-top:12px;color:rgba(255,255,255,.82)}
+.end .stores{justify-content:center;margin-top:28px}
+.end .ob2{position:absolute;width:110px;opacity:.9;pointer-events:none}
+.end .ob2 img{filter:drop-shadow(0 16px 18px rgba(10,4,30,.4));animation:drift 6s ease-in-out infinite}
+.end .ob2.a{left:-24px;top:18px;width:96px}
+.end .ob2.b{right:-20px;bottom:18px;width:104px}
+.end .ob2.b img{animation-delay:-3s}
 
-/* ── 맨 아래 ── */
-.ftr{background:#FAF9FC;border-top:1px solid var(--border);padding:36px 0 48px;font-size:13px;color:var(--text3)}
-.ftr .links{display:flex;gap:16px;flex-wrap:wrap}
+/* ═════════ 맨 아래 ═════════ */
+.ftr{background:#FAF9FC;border-top:1px solid var(--border);padding:40px 0 52px;font-size:13px;color:var(--text3)}
+.ftr .links{display:flex;gap:18px;flex-wrap:wrap}
 .ftr .links a{color:var(--text2);font-weight:700}
 .ftr .links a.pv{color:var(--text1);font-weight:800}
+.ftr .links a:hover{color:var(--main)}
 .co{margin-top:18px;display:grid;gap:4px}
 .co .row{display:flex;gap:8px}
 .co dt{flex:none;min-width:116px;color:var(--text3)}
@@ -196,46 +330,81 @@ section{scroll-margin-top:64px}
 .co .row:has(dd:empty){display:none}
 .ftr .cp{margin-top:18px}
 
-/* ── PC ── */
-@media (min-width:768px){
-  :root{--pad:32px}
+/* ── 마우스가 있는 화면에서만: 카드 들림 ── */
+@media (hover:hover) and (pointer:fine){
+  .pm:hover,.bc:hover{transform:translateY(-6px);box-shadow:0 4px 8px rgba(23,14,51,.06),0 30px 60px rgba(108,74,182,.24)}
+  .cc:hover{transform:translateY(-6px);border-color:rgba(198,175,255,.45);background:linear-gradient(160deg,rgba(255,255,255,.14),rgba(255,255,255,.05))}
+  .mall-lead:hover{transform:translateY(-4px);box-shadow:0 30px 60px rgba(91,51,201,.42)}
+  .node .art{transition:transform .45s var(--pop),opacity .25s,box-shadow .25s}
+  .node.on:hover .art{transform:translateY(-6px) rotate(-3deg);box-shadow:var(--sh-2)}
+}
+
+/* ═════════ PC ═════════ */
+@media (min-width:860px){
+  :root{--pad:36px}
   .nav{display:flex}
   .hdr-cta{margin-left:0}
-  .sec{padding:104px 0}
-  .h2{font-size:36px;letter-spacing:-1.2px}
-  .lead{font-size:18px}
-  .hero .wrap{flex-direction:row;align-items:center;padding-top:56px;padding-bottom:96px;gap:40px}
-  .hero .txt{flex:1 1 52%}
-  .hero h1{font-size:54px;letter-spacing:-2.2px}
+  .sec{padding:128px 0}
+  .h2{font-size:52px;letter-spacing:-2.4px}
+  .lead{font-size:19px}
+  .hero{display:flex;align-items:center}
+  .hero .wrap{flex-direction:row;align-items:center;width:100%;padding-top:20px;padding-bottom:110px;gap:24px}
+  .hero .txt{flex:1 1 50%}
+  .hero h1{font-size:76px;letter-spacing:-3.6px;line-height:1.06}
   .hero .lead{font-size:20px}
-  .hero-art{flex:1 1 48%;max-width:520px}
-  .promises{grid-template-columns:repeat(3,1fr);gap:16px;margin-top:-40px}
-  .flow{grid-template-columns:repeat(5,1fr);gap:14px}
-  .st{flex-direction:column;text-align:center;padding:24px 14px 20px}
-  .st .art{width:120px;height:120px}
-  .st .art img{max-height:120px}
-  .wait{display:grid;grid-template-columns:280px 1fr;gap:24px;align-items:center;padding:28px 32px}
-  .wait dl{margin-top:0}
-  .mall-lead{padding:28px}
-  .mall-lead .mlogo{width:80px;height:80px;border-radius:20px}
-  .mall-lead b{font-size:28px}
-  .mall-grid{grid-template-columns:repeat(5,1fr)}
-  .cur{grid-template-columns:repeat(2,1fr);gap:16px}
-  .conv{grid-template-columns:repeat(2,1fr)}
-  .bf{grid-template-columns:repeat(3,1fr);gap:16px}
-  .kk{padding:48px;display:grid;grid-template-columns:1fr 1.2fr;gap:40px;align-items:center}
+  .stage{flex:1 1 50%;max-width:600px;margin:0}
+  .ob.tw{display:block}
+  .js .stage .ob.tw{animation-delay:.75s}
+  .scroll-cue{display:flex;position:absolute;left:50%;bottom:26px;transform:translateX(-50%);width:26px;height:42px;border-radius:14px;border:2px solid rgba(255,255,255,.4);justify-content:center;padding-top:7px}
+  .scroll-cue::before{content:'';width:4px;height:8px;border-radius:2px;background:#fff;animation:cue 1.6s ease-in-out infinite}
+  @keyframes cue{0%{transform:translateY(0);opacity:1}100%{transform:translateY(12px);opacity:0}}
+  .promises{grid-template-columns:repeat(3,1fr);gap:18px;margin-top:-56px}
+  .pm{padding:24px}
+  .flow{grid-template-columns:repeat(5,1fr);gap:18px;padding:30px 0}
+  .node{flex-direction:column;text-align:center}
+  li.node:nth-of-type(even){margin-top:90px}
+  .node .no{left:50%;margin-left:-74px}
+  .node .art{width:148px;height:148px;border-radius:40px}
+  .wait{display:grid;grid-template-columns:300px 1fr;gap:32px;align-items:center;padding:36px 40px}
+  .wait .rows{margin-top:0;grid-template-columns:1fr 1fr}
+  .mall-lead{padding:34px 36px}
+  .mall-lead .mlogo{width:96px;height:96px;border-radius:26px}
+  .mall-lead b{font-size:40px;letter-spacing:-1.4px}
+  .mall-lead p{font-size:17px}
+  .cur{grid-template-columns:repeat(2,1fr);gap:18px}
+  .cc{padding:26px}
+  .cc .art{width:96px;height:96px}
+  .conv{grid-template-columns:1fr 1fr}
+  .bf{grid-template-columns:repeat(3,1fr);gap:18px}
+  .bc{padding:28px 26px 24px}
+  .bc .big{font-size:48px}
+  .kk{padding:60px 56px;display:grid;grid-template-columns:1fr 1.15fr;gap:48px;align-items:center}
   .kk ul{margin-top:0}
-  .faq{max-width:820px}
-  .end h2{font-size:40px}
+  .faq{max-width:860px}
+  .end{padding:140px 0}
+  .end h2{font-size:64px;letter-spacing:-3px}
+  .end .ob2{width:200px}.end .ob2.a{left:6%;top:60px;width:180px}.end .ob2.b{right:6%;bottom:60px;width:200px}
+}
+
+/* ── 움직임 끈 사용자 — 정지 화면 ── */
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none !important;transition:none !important;scroll-behavior:auto !important}
+  .js .rv,.js .hero h1 .ln>span,.js .hero .h-fade,.js .stage .ob,.js .stage .phone{opacity:1 !important;transform:none !important}
+  .js .flow.armed .node .art,.js .flow.armed .node .tx{opacity:1 !important;transform:none !important}
+  .sparks{display:none}
+  .marquee{mask-image:none;-webkit-mask-image:none;margin:0}
+  .track{width:auto;flex-wrap:wrap}.track.rev{display:none}.track .dup{display:none}
 }
 </style>
+<script>document.documentElement.classList.add('js')</script>
 </head>
 <body>
+<div class="prog" id="prog" aria-hidden="true"></div>
 
 <header class="hdr" id="hdr">
   <div class="wrap">
     <a class="logo" href="#top" aria-label="프라이스픽">
-      <svg viewBox="0 0 360 363" fill="none" aria-hidden="true"><path d="M178.702 82.6926C125.372 82.6926 82.1367 125.942 82.1367 179.289V277.43H115.611V252.409C132.535 267.036 154.589 275.873 178.702 275.873C232.032 275.873 275.267 232.624 275.267 179.276C275.267 125.929 232.032 82.6797 178.702 82.6797V82.6926ZM178.702 242.401C143.851 242.401 115.611 214.151 115.611 179.289C115.611 144.428 143.851 116.178 178.702 116.178C213.552 116.178 241.792 144.428 241.792 179.289C241.792 214.151 213.552 242.401 178.702 242.401Z" fill="#634C9E"/><path d="M180 0C80.593 0 0 80.6195 0 180.059V363H62.3962V316.368C93.9416 343.627 135.042 360.118 180 360.118C279.407 360.118 360 279.499 360 180.059C360 80.6195 279.42 0 180 0ZM180 297.702C115.045 297.702 62.3962 245.023 62.3962 180.059C62.3962 115.095 115.058 62.4168 180 62.4168C244.942 62.4168 297.604 115.095 297.604 180.059C297.604 245.023 244.942 297.702 180 297.702Z" fill="#7A49DE"/><path d="M208.118 189.436L204.118 182.814C203.278 181.338 202.518 178.546 202.518 176.91V166.818C202.518 153.814 191.918 143.203 178.838 143.203C165.758 143.203 155.158 153.814 155.158 166.818V176.91C155.158 178.546 154.398 181.338 153.558 182.774L149.518 189.436C147.918 192.108 147.558 195.06 148.558 197.773C149.518 200.445 151.798 202.52 154.758 203.517C162.518 206.15 170.678 207.426 178.838 207.426C186.998 207.426 195.158 206.15 202.918 203.557C205.718 202.639 207.878 200.525 208.918 197.773C209.958 195.02 209.678 191.989 208.118 189.436Z" fill="#532E95"/></svg>
+      <svg viewBox="0 0 360 363" fill="none" aria-hidden="true"><path d="M178.702 82.6926C125.372 82.6926 82.1367 125.942 82.1367 179.289V277.43H115.611V252.409C132.535 267.036 154.589 275.873 178.702 275.873C232.032 275.873 275.267 232.624 275.267 179.276C275.267 125.929 232.032 82.6797 178.702 82.6797V82.6926ZM178.702 242.401C143.851 242.401 115.611 214.151 115.611 179.289C115.611 144.428 143.851 116.178 178.702 116.178C213.552 116.178 241.792 144.428 241.792 179.289C241.792 214.151 213.552 242.401 178.702 242.401Z" fill="#634C9E"/><path d="M180 0C80.593 0 0 80.6195 0 180.059V363H62.3962V316.368C93.9416 343.627 135.042 360.118 180 360.118C279.407 360.118 360 279.499 360 180.059C360 80.6195 279.42 0 180 0ZM180 297.702C115.045 297.702 62.3962 245.023 62.3962 180.059C62.3962 115.095 115.058 62.4168 180 62.4168C244.942 62.4168 297.604 115.095 297.604 180.059C297.604 245.023 244.942 297.702 180 297.702Z" fill="#9B6BFF"/><path d="M208.118 189.436L204.118 182.814C203.278 181.338 202.518 178.546 202.518 176.91V166.818C202.518 153.814 191.918 143.203 178.838 143.203C165.758 143.203 155.158 153.814 155.158 166.818V176.91C155.158 178.546 154.398 181.338 153.558 182.774L149.518 189.436C147.918 192.108 147.558 195.06 148.558 197.773C149.518 200.445 151.798 202.52 154.758 203.517C162.518 206.15 170.678 207.426 178.838 207.426C186.998 207.426 195.158 206.15 202.918 203.557C205.718 202.639 207.878 200.525 208.918 197.773C209.958 195.02 209.678 191.989 208.118 189.436Z" fill="#C6AFFF"/></svg>
       <span class="wm"><span class="l">PRICE</span><span class="b">PICK</span></span>
     </a>
     <nav class="nav" aria-label="주요 메뉴">
@@ -251,17 +420,20 @@ section{scroll-margin-top:64px}
 
 <main id="top">
 
-<!-- 머리 화면 -->
-<section class="hero">
+<!-- ═════════ 머리 화면 ═════════ -->
+<section class="hero" id="hero">
+  <div class="grid-bg"></div>
+  <div class="spot"></div>
+  <div class="sparks" id="sparks" aria-hidden="true"></div>
   <div class="wrap">
     <div class="txt">
-      <span class="eyebrow">경유 쇼핑 리워드 앱</span>
-      <h1>쇼핑하던 그대로,<br><em>티켓이 쌓여요</em></h1>
-      <p class="lead">프라이스픽을 거쳐 쇼핑몰에서 사면 티켓을 드려요.<br>모은 티켓은 기프티콘으로 바꿔요.</p>
-      <div class="stores" id="download">
+      <span class="badge h-fade"><i></i>경유 쇼핑 리워드 앱</span>
+      <h1><span class="ln"><span>쇼핑하던 그대로,</span></span><span class="ln"><span class="shine">티켓이 쌓여요</span></span></h1>
+      <p class="lead h-fade">프라이스픽을 거쳐 쇼핑몰에서 사면 티켓을 드려요.<br>모은 티켓은 기프티콘으로 바꿔요.</p>
+      <div class="stores h-fade d2" id="download">
         <!-- 스토어 링크는 출시 후 href 로 연결한다 -->
         <a class="store" role="link" aria-disabled="true" data-store="ios">
-          <svg viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><path d="M16.37 12.6c-.02-2.1 1.72-3.12 1.8-3.17-.98-1.43-2.5-1.63-3.04-1.65-1.29-.13-2.52.76-3.18.76-.66 0-1.67-.74-2.75-.72-1.41.02-2.72.82-3.45 2.09-1.47 2.55-.38 6.33 1.06 8.4.7 1.01 1.53 2.15 2.62 2.11 1.05-.04 1.45-.68 2.72-.68 1.27 0 1.63.68 2.74.66 1.13-.02 1.85-1.03 2.54-2.05.8-1.17 1.13-2.31 1.15-2.37-.03-.01-2.2-.85-2.22-3.37zM14.29 6.42c.58-.7.97-1.68.86-2.65-.83.03-1.84.55-2.44 1.25-.54.62-1.01 1.62-.88 2.57.93.07 1.88-.47 2.46-1.17z"/></svg>
+          <svg viewBox="0 0 24 24" fill="#1A1130" aria-hidden="true"><path d="M16.37 12.6c-.02-2.1 1.72-3.12 1.8-3.17-.98-1.43-2.5-1.63-3.04-1.65-1.29-.13-2.52.76-3.18.76-.66 0-1.67-.74-2.75-.72-1.41.02-2.72.82-3.45 2.09-1.47 2.55-.38 6.33 1.06 8.4.7 1.01 1.53 2.15 2.62 2.11 1.05-.04 1.45-.68 2.72-.68 1.27 0 1.63.68 2.74.66 1.13-.02 1.85-1.03 2.54-2.05.8-1.17 1.13-2.31 1.15-2.37-.03-.01-2.2-.85-2.22-3.37zM14.29 6.42c.58-.7.97-1.68.86-2.65-.83.03-1.84.55-2.44 1.25-.54.62-1.01 1.62-.88 2.57.93.07 1.88-.47 2.46-1.170z"/></svg>
           <span><small>Download on the</small><b>App Store</b></span>
         </a>
         <a class="store" role="link" aria-disabled="true" data-store="android">
@@ -270,170 +442,177 @@ section{scroll-margin-top:64px}
         </a>
       </div>
     </div>
-    <div class="hero-art" aria-hidden="true">
-      <div class="glow"></div>
-      <img class="fl gift" src="/web/img/gifticon.webp" alt="" width="1000" height="538">
-      <img class="fl tk" src="/web/img/ticket-ok.webp" alt="" width="1000" height="806">
-      <div class="phone">
+    <div class="stage" id="stage" aria-hidden="true">
+      <div class="halo"></div>
+      <div class="ring r1"></div>
+      <div class="ring r2"></div>
+      <div class="ob gift"><img src="/web/img/gifticon.webp" alt="" width="1000" height="538"></div>
+      <div class="ob tk"><img src="/web/img/ticket-ok.webp" alt="" width="1000" height="806"></div>
+      <div class="phone"><div class="in">
         <img src="/web/img/phone.webp" alt="" width="609" height="1000">
         <div class="scr"><img src="/web/img/splash.webp" alt="" width="390" height="844"></div>
-      </div>
-      <img class="fl bag" src="/web/img/bag.webp" alt="" width="889" height="1000">
-      <img class="fl coin" src="/web/img/coins.webp" alt="" width="1000" height="644">
+      </div></div>
+      <div class="ob bag"><img src="/web/img/bag.webp" alt="" width="889" height="1000"></div>
+      <div class="ob coin"><img src="/web/img/coins.webp" alt="" width="1000" height="644"></div>
+      <div class="ob tw"><img src="/web/img/ticket-wait.webp" alt="" width="1000" height="803"></div>
     </div>
   </div>
+  <a class="scroll-cue" href="#how" aria-label="아래로"></a>
 </section>
 
 <!-- 약속 -->
 <div class="wrap">
   <div class="promises">
-    <div class="pm"><span class="n">1</span><div><b>닉네임 하나로 시작</b><p>로그인 없이 바로 써요.</p></div></div>
-    <div class="pm"><span class="n">2</span><div><b>주문 한 건마다 티켓</b><p>앱을 거쳐 사기만 하면 돼요.</p></div></div>
-    <div class="pm"><span class="n">3</span><div><b>티켓 1장은 10원</b><p>모아서 기프티콘으로 바꿔요.</p></div></div>
+    <div class="pm rv" style="--d:0"><span class="n">1</span><div><b>닉네임 하나로 시작</b><p>로그인 없이 바로 써요.</p></div></div>
+    <div class="pm rv" style="--d:1"><span class="n">2</span><div><b>주문 한 건마다 티켓</b><p>앱을 거쳐 사기만 하면 돼요.</p></div></div>
+    <div class="pm rv" style="--d:2"><span class="n">3</span><div><b>티켓 1장은 <span class="num" data-count="10">10</span>원</b><p>모아서 기프티콘으로 바꿔요.</p></div></div>
   </div>
 </div>
 
-<!-- 어떻게 되는가 -->
-<section class="sec" id="how">
+<!-- ═════════ 어떻게 되는가 ═════════ -->
+<section class="sec how" id="how">
   <div class="wrap">
-    <div class="sec-head">
-      <span class="eyebrow">이용 방법</span>
-      <h2 class="h2">쇼핑에서 기프티콘까지</h2>
+    <div class="sec-head rv">
+      <span class="eyebrow">How it works</span>
+      <h2 class="h2">쇼핑에서 <em>기프티콘</em>까지</h2>
     </div>
-    <ol class="flow">
-      <li class="st">
-        <div class="art"><img src="/web/img/phone.webp" alt="" width="609" height="1000" loading="lazy"></div>
-        <div><span class="k">1</span><b>앱에서 쇼핑몰로</b><p>프라이스픽의 바로가기로 들어가야 적립이 시작돼요.</p></div>
-      </li>
-      <li class="st">
-        <div class="art"><img src="/web/img/bag.webp" alt="" width="889" height="1000" loading="lazy"></div>
-        <div><span class="k">2</span><b>평소처럼 구매</b><p>들어간 뒤 24시간 안의 주문 한 건마다 랜덤 티켓 1장.</p></div>
-      </li>
-      <li class="st">
-        <div class="art"><img src="/web/img/ticket-wait.webp" alt="" width="1000" height="803" loading="lazy"></div>
-        <div><span class="k">3</span><b>구매 확정을 기다려요</b><p>몇 장인지는 확정될 때 공개돼요.</p></div>
-      </li>
-      <li class="st">
-        <div class="art"><img src="/web/img/ticket-ok.webp" alt="" width="1000" height="806" loading="lazy"></div>
-        <div><span class="k">4</span><b>티켓으로 바뀌어요</b><p>구매확정금액 × 쇼핑몰 적립률 ÷ 10원만큼.</p></div>
-      </li>
-      <li class="st">
-        <div class="art"><img src="/web/img/gifticon.webp" alt="" width="1000" height="538" loading="lazy"></div>
-        <div><span class="k">5</span><b>기프티콘으로 교환</b><p>상품 가격 ÷ 10원만큼 티켓을 써요.</p></div>
-      </li>
+    <ol class="flow" id="flow">
+      <li class="node"><div class="art"><span class="no">1</span><img src="/web/img/phone.webp" alt="" width="609" height="1000" loading="lazy"></div>
+        <div class="tx"><b>앱에서 쇼핑몰로</b><p>프라이스픽 바로가기로 들어가야 적립이 시작돼요.</p></div></li>
+      <li class="node"><div class="art"><span class="no">2</span><img src="/web/img/bag.webp" alt="" width="889" height="1000" loading="lazy"></div>
+        <div class="tx"><b>평소처럼 구매</b><p>들어간 뒤 24시간 안의 주문 한 건마다 랜덤 티켓 1장.</p></div></li>
+      <li class="node"><div class="art"><span class="no">3</span><img src="/web/img/ticket-wait.webp" alt="" width="1000" height="803" loading="lazy"></div>
+        <div class="tx"><b>구매 확정을 기다려요</b><p>몇 장인지는 확정될 때 공개돼요.</p></div></li>
+      <li class="node"><div class="art"><span class="no">4</span><img src="/web/img/ticket-ok.webp" alt="" width="1000" height="806" loading="lazy"></div>
+        <div class="tx"><b>티켓으로 바뀌어요</b><p>구매확정금액 × 쇼핑몰 적립률 ÷ 10원만큼.</p></div></li>
+      <li class="node"><div class="art"><span class="no">5</span><img src="/web/img/gifticon.webp" alt="" width="1000" height="538" loading="lazy"></div>
+        <div class="tx"><b>기프티콘으로 교환</b><p>상품 가격 ÷ 10원만큼 티켓을 써요.</p></div></li>
     </ol>
 
-    <div class="wait">
+    <div class="wait rv">
       <h3>대기 기간<small>랜덤 티켓이 티켓으로 바뀌기까지 걸려요.</small></h3>
-      <dl>
-        <div class="row"><dt>쿠팡</dt><dd>구매 확정 후 카카오 연동 <b>7일</b> · 미연동 <b>30일</b></dd></div>
-        <div class="row"><dt>그 밖의 쇼핑몰</dt><dd>실적 월의 <b>익익월 6일</b> 확정 후</dd></div>
-      </dl>
+      <div class="rows">
+        <div class="row">
+          <div class="who">쿠팡<small>구매 확정 후</small></div>
+          <div class="days">
+            <div><em>카카오 연동</em><b class="g"><span data-count="7">7</span><small>일</small></b></div>
+            <div><em>미연동</em><b><span data-count="30">30</span><small>일</small></b></div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="who">그 밖의 쇼핑몰<small>실적 월 기준</small></div>
+          <div class="lp">익익월 6일<br>확정 후</div>
+        </div>
+      </div>
     </div>
   </div>
 </section>
 
-<!-- 제휴몰 — 쿠팡을 앞세운다.
+<!-- ═════════ 제휴몰 — 쿠팡을 앞세운다 ═════════
      .mall-rest 묶음은 「쿠팡 단독」으로 바뀌면 통째로 들어내면 된다.
      목록은 데모 앱과 같은 곳(CMS 「티켓 적립 설정」의 앱 노출·로고)에서 읽는다. 읽기에 실패하면 아래 기본 목록이 그대로 남는다. -->
-<section class="sec tint" id="malls">
+<section class="sec malls" id="malls">
   <div class="wrap">
-    <div class="sec-head">
-      <span class="eyebrow">제휴몰</span>
-      <h2 class="h2">쓰던 쇼핑몰 그대로</h2>
+    <div class="sec-head rv">
+      <span class="eyebrow">Partners</span>
+      <h2 class="h2">쓰던 쇼핑몰 <em>그대로</em></h2>
     </div>
 
-    <div class="mall-lead" id="mall-lead">
+    <div class="mall-lead rv pop" id="mall-lead">
       <div class="mlogo" data-code="coupang_direct">쿠팡</div>
       <div><b>쿠팡</b><p>주문 한 건마다 랜덤 티켓 1장</p></div>
       <span class="tag">대표 제휴몰</span>
     </div>
 
-    <div class="mall-rest" id="mall-rest">
+    <div class="mall-rest rv" id="mall-rest">
       <h3>그리고 이 쇼핑몰들도</h3>
-      <div class="mall-grid" id="mall-grid">
-        <div class="mc"><div class="mlogo">CJ</div><span>CJ더마켓</span></div>
-        <div class="mc"><div class="mlogo">NS</div><span>NS홈쇼핑</span></div>
-        <div class="mc"><div class="mlogo">GS</div><span>GS SHOP</span></div>
-        <div class="mc"><div class="mlogo">Hm</div><span>Hmall</span></div>
-        <div class="mc"><div class="mlogo">롯데</div><span>롯데홈쇼핑</span></div>
-        <div class="mc"><div class="mlogo">이마</div><span>이마트인터넷쇼핑몰</span></div>
-        <div class="mc"><div class="mlogo">11</div><span>11번가</span></div>
-        <div class="mc"><div class="mlogo">롯데</div><span>롯데온</span></div>
-        <div class="mc"><div class="mlogo">G마</div><span>G마켓</span></div>
-        <div class="mc"><div class="mlogo">옥션</div><span>옥션</span></div>
+      <div class="marquee" id="marquee">
+        <div class="track" id="track-a"></div>
+        <div class="track rev" id="track-b"></div>
       </div>
     </div>
-    <p class="note">제휴몰은 앱에서 바로 확인할 수 있어요. 쇼핑몰마다 적립률이 달라요.</p>
+    <p class="note">쇼핑몰마다 적립률이 달라요. 제휴몰은 앱에서 바로 확인할 수 있어요.</p>
   </div>
 </section>
 
-<!-- 티켓과 포인트 -->
-<section class="sec" id="tickets">
+<!-- ═════════ 티켓과 포인트 ═════════ -->
+<section class="sec tix dark" id="tickets">
   <div class="wrap">
-    <div class="sec-head">
-      <span class="eyebrow">티켓 · 포인트</span>
-      <h2 class="h2">모으는 것은 네 가지</h2>
+    <div class="sec-head rv">
+      <span class="eyebrow">Tickets &amp; Points</span>
+      <h2 class="h2">모으는 것은 <em>네 가지</em></h2>
     </div>
     <div class="cur">
-      <div class="cc">
+      <div class="cc rv" style="--d:0">
         <div class="art"><img src="/web/img/ticket-wait.webp" alt="" width="1000" height="803" loading="lazy"></div>
         <div><h3>랜덤 티켓 <i>대기 중</i></h3><p>구매 직후 받는 티켓. 확정되면 몇 장인지 공개되고 티켓으로 바뀌어요.</p></div>
       </div>
-      <div class="cc">
+      <div class="cc rv" style="--d:1">
         <div class="art"><img src="/web/img/ticket-ok.webp" alt="" width="1000" height="806" loading="lazy"></div>
-        <div><h3>티켓 <i>1장 = 10원</i></h3><p>확정된 티켓. 기프티콘을 살 때 써요.</p><p class="exp">받은 날부터 1년</p></div>
+        <div><h3>티켓 <i class="g">1장 = 10원</i></h3><p>확정된 티켓. 기프티콘을 살 때 써요.</p><p class="exp">받은 날부터 1년</p></div>
       </div>
-      <div class="cc">
-        <div class="art"><span class="dot ev"></span></div>
+      <div class="cc rv" style="--d:2">
+        <div class="art"><span class="evt"></span></div>
         <div><h3>이벤트 티켓</h3><p>출석·선물 상자·미션·가입으로 받아요. 랜덤 선물 상자를 열거나 티켓으로 바꿔요.</p><p class="exp">받은 날부터 100일</p></div>
       </div>
-      <div class="cc">
+      <div class="cc rv" style="--d:3">
         <div class="art"><img src="/web/img/coins.webp" alt="" width="1000" height="644" loading="lazy"></div>
-        <div><h3>포인트 <i>1P = 1원</i></h3><p>출석·친구초대·가입으로 받아요. 티켓으로 바꿔 써요.</p><p class="exp">적립일부터 1년</p></div>
+        <div><h3>포인트 <i class="g">1P = 1원</i></h3><p>출석·친구초대·가입으로 받아요. 티켓으로 바꿔 써요.</p><p class="exp">적립일부터 1년</p></div>
       </div>
     </div>
     <div class="conv">
-      <div class="cv">포인트 10P <span class="ar">→</span> 티켓 1장 <small>되돌릴 수 없어요</small></div>
-      <div class="cv">이벤트 티켓 1장 <span class="ar">→</span> 티켓 2장 <small>되돌릴 수 없어요</small></div>
+      <div class="cv rv">포인트 10P <span class="ar"></span> 티켓 1장 <small>되돌릴 수 없어요</small></div>
+      <div class="cv rv" style="--d:1">이벤트 티켓 1장 <span class="ar"></span> 티켓 2장 <small>되돌릴 수 없어요</small></div>
     </div>
   </div>
 </section>
 
-<!-- 혜택 — 숫자는 정책서 기준(출석 10P · 친구초대 각 500P · 미션 최대 9장) -->
-<section class="sec tint" id="benefits">
+<!-- ═════════ 혜택 — 숫자는 정책서 기준(출석 10P · 친구초대 각 500P · 미션 최대 9장) ═════════ -->
+<section class="sec bf-sec" id="benefits">
   <div class="wrap">
-    <div class="sec-head">
-      <span class="eyebrow">혜택</span>
-      <h2 class="h2">사지 않는 날에도</h2>
+    <div class="sec-head rv">
+      <span class="eyebrow">Benefits</span>
+      <h2 class="h2">사지 않는 날에도 <em>쌓여요</em></h2>
     </div>
     <div class="bf">
-      <div class="bc">
-        <div class="top"><h3>출석 「쿠팡 구경하기」</h3><span class="big">매일 10P</span></div>
+      <div class="bc rv" style="--d:0">
+        <span class="kick">매일</span>
+        <span class="big"><span data-count="10">10</span><small>P</small></span>
+        <h3>출석 「쿠팡 구경하기」</h3>
         <p>앱에서 쿠팡에 들어가 30초 이상 둘러보면 하루 한 번. 5일 연속이면 이벤트 티켓 1장을 더 드려요.</p>
       </div>
-      <div class="bc">
-        <div class="top"><h3>매일 선물 상자</h3><span class="big">하루 1회 무료</span></div>
+      <div class="bc rv" style="--d:1">
+        <span class="kick">하루 한 번 무료</span>
+        <span class="big"><span data-count="1">1</span><small>회</small></span>
+        <h3>매일 선물 상자</h3>
         <p>티켓·이벤트 티켓·포인트 중 하나가 나와요. 꽝도 있어요.</p>
       </div>
-      <div class="bc">
-        <div class="top"><h3>랜덤 선물 상자</h3><span class="big">이벤트 티켓 1장</span></div>
+      <div class="bc rv" style="--d:2">
+        <span class="kick">이벤트 티켓 1장으로</span>
+        <span class="big"><span data-count="10">10</span><small>회까지</small></span>
+        <h3>랜덤 선물 상자</h3>
         <p>이벤트 티켓 1장으로 한 번 열어요. 하루 최대 10회.</p>
       </div>
-      <div class="bc">
-        <div class="top"><h3>친구초대</h3><span class="big">각 500P</span></div>
-        <p>친구가 첫 구매를 하면 친구도 나도 받아요. 한 달 50명까지.</p>
+      <div class="bc rv" style="--d:3">
+        <span class="kick">친구도 나도</span>
+        <span class="big"><span data-count="500">500</span><small>P</small></span>
+        <h3>친구초대</h3>
+        <p>친구가 첫 구매를 하면 둘 다 받아요. 한 달 50명까지.</p>
       </div>
-      <div class="bc">
-        <div class="top"><h3>연속구매 미션</h3><span class="big">최대 9장</span></div>
+      <div class="bc rv" style="--d:4">
+        <span class="kick">이벤트 티켓 최대</span>
+        <span class="big"><span data-count="9">9</span><small>장</small></span>
+        <h3>연속구매 미션</h3>
         <ul>
-          <li>7일 안에 3번 구매 <b>이벤트 티켓 1장</b></li>
+          <li>7일 안에 3번 구매 <b>1장</b></li>
           <li>14일 안에 5번 구매 <b>3장</b></li>
           <li>30일 안에 10번 구매 <b>5장</b></li>
         </ul>
       </div>
-      <div class="bc">
-        <div class="top"><h3>처음 시작하면</h3><span class="big">20P</span></div>
+      <div class="bc rv" style="--d:5">
+        <span class="kick">처음 시작하면</span>
+        <span class="big"><span data-count="20">20</span><small>P</small></span>
+        <h3>시작 보상</h3>
         <ul>
           <li>가입 <b>20P</b></li>
           <li>카카오 연동 <b>이벤트 티켓 1장</b></li>
@@ -442,41 +621,41 @@ section{scroll-margin-top:64px}
         </ul>
       </div>
     </div>
-    <p class="cap">이벤트 티켓은 모든 혜택을 합쳐 하루 5장, 한 달 30장까지 받아요.</p>
+    <p class="cap rv">이벤트 티켓은 모든 혜택을 합쳐 하루 5장, 한 달 30장까지 받아요.</p>
   </div>
 </section>
 
-<!-- 카카오 연동 -->
-<section class="sec" id="kakao">
+<!-- ═════════ 카카오 연동 ═════════ -->
+<section class="sec kk-sec" id="kakao">
   <div class="wrap">
-    <div class="kk">
+    <div class="kk rv pop">
       <div>
         <h2 class="h2">카카오 연동,<br>왜 하나요?</h2>
         <p class="lead">시작은 닉네임만으로. 쓰려면 연동이 필요해요.</p>
       </div>
       <ul>
-        <li><b>티켓·포인트를 쓰려면</b><span>연동 전에는 모으기만 할 수 있어요.</span></li>
-        <li><b>기프티콘은 카카오톡으로</b><span>그래서 기프티샵은 연동 후에 열려요.</span></li>
-        <li><b>쿠팡 대기 30일 → 7일</b><span>연동하면 대기 기간이 줄어요.</span></li>
-        <li><b>앱을 지워도 그대로</b><span>연동 전 기록은 이 기기에만 남아요.</span></li>
+        <li class="rv" style="--d:1"><span class="i">1</span><div><b>티켓·포인트를 쓰려면</b><span>연동 전에는 모으기만 할 수 있어요.</span></div></li>
+        <li class="rv" style="--d:2"><span class="i">2</span><div><b>기프티콘은 카카오톡으로</b><span>그래서 기프티샵은 연동 후에 열려요.</span></div></li>
+        <li class="rv" style="--d:3"><span class="i">3</span><div><b>쿠팡 대기 30일 → 7일</b><span>연동하면 대기 기간이 줄어요.</span></div></li>
+        <li class="rv" style="--d:4"><span class="i">4</span><div><b>앱을 지워도 그대로</b><span>연동 전 기록은 이 기기에만 남아요.</span></div></li>
       </ul>
     </div>
   </div>
 </section>
 
-<!-- 자주 묻는 질문 -->
-<section class="sec tint" id="faq">
+<!-- ═════════ 자주 묻는 질문 ═════════ -->
+<section class="sec faq-sec" id="faq">
   <div class="wrap">
-    <div class="sec-head">
-      <span class="eyebrow">자주 묻는 질문</span>
+    <div class="sec-head rv">
+      <span class="eyebrow">FAQ</span>
       <h2 class="h2">궁금한 것</h2>
     </div>
     <div class="faq">
-      <details>
+      <details class="rv">
         <summary>티켓 값은 어디서 나와요?</summary>
         <div class="a">쇼핑몰이 프라이스픽에 주는 제휴 수수료에서 나와요. 그 일부를 티켓으로 돌려드려요.</div>
       </details>
-      <details>
+      <details class="rv">
         <summary>적립이 안 되는 경우가 있나요?</summary>
         <div class="a">이럴 때는 적립되지 않아요.
           <ul>
@@ -488,23 +667,23 @@ section{scroll-margin-top:64px}
           </ul>
         </div>
       </details>
-      <details>
+      <details class="rv">
         <summary>반품하면 어떻게 돼요?</summary>
         <div class="a">쿠팡은 취소·반품하면 그 주문의 티켓을 바로 회수해요. 그 밖의 쇼핑몰은 확정 전에 취소된 주문이 티켓으로 바뀌지 않아요. 확정 뒤에 환불되면 쓰지 않은 티켓을 회수해요.</div>
       </details>
-      <details>
+      <details class="rv">
         <summary>티켓은 언제까지 쓸 수 있어요?</summary>
         <div class="a">티켓은 받은 날부터 1년, 이벤트 티켓은 100일, 포인트는 적립일부터 1년이에요.</div>
       </details>
-      <details>
+      <details class="rv">
         <summary>현금으로 바꿀 수 있나요?</summary>
         <div class="a">아니요. 티켓과 포인트는 현금으로 돌려드리지 않고, 다른 사람에게 줄 수도 없어요.</div>
       </details>
-      <details>
+      <details class="rv">
         <summary>기프티콘은 어떻게 받아요?</summary>
         <div class="a">카카오톡으로 보내드려요. 처음 바꿀 때 본인인증을 한 번 해요.</div>
       </details>
-      <details>
+      <details class="rv">
         <summary>누가 쓸 수 있어요?</summary>
         <div class="a">만 14세 이상이면 누구나 쓸 수 있어요.</div>
       </details>
@@ -512,14 +691,16 @@ section{scroll-margin-top:64px}
   </div>
 </section>
 
-<!-- 맺음 -->
+<!-- ═════════ 맺음 ═════════ -->
 <section class="end">
+  <div class="ob2 a" aria-hidden="true"><img src="/web/img/ticket-ok.webp" alt="" width="1000" height="806" loading="lazy"></div>
+  <div class="ob2 b" aria-hidden="true"><img src="/web/img/coins.webp" alt="" width="1000" height="644" loading="lazy"></div>
   <div class="wrap">
-    <h2>다음 쇼핑부터<br>티켓 받으세요</h2>
-    <p>닉네임만 정하면 바로 시작해요.</p>
-    <div class="stores">
+    <h2 class="rv">다음 쇼핑부터<br>티켓 받으세요</h2>
+    <p class="rv" style="--d:1">닉네임만 정하면 바로 시작해요.</p>
+    <div class="stores rv" style="--d:2">
       <a class="store" role="link" aria-disabled="true" data-store="ios">
-        <svg viewBox="0 0 24 24" fill="#1A1130" aria-hidden="true"><path d="M16.37 12.6c-.02-2.1 1.72-3.12 1.8-3.17-.98-1.43-2.5-1.63-3.04-1.65-1.29-.13-2.52.76-3.18.76-.66 0-1.67-.74-2.75-.72-1.41.02-2.72.82-3.45 2.09-1.47 2.55-.38 6.33 1.06 8.4.7 1.01 1.53 2.15 2.62 2.11 1.05-.04 1.45-.68 2.72-.68 1.27 0 1.63.68 2.74.66 1.13-.02 1.85-1.03 2.54-2.05.8-1.17 1.13-2.31 1.15-2.37-.03-.01-2.2-.85-2.22-3.37zM14.29 6.42c.58-.7.97-1.68.86-2.65-.83.03-1.84.55-2.44 1.25-.54.62-1.01 1.62-.88 2.57.93.07 1.88-.47 2.46-1.17z"/></svg>
+        <svg viewBox="0 0 24 24" fill="#1A1130" aria-hidden="true"><path d="M16.37 12.6c-.02-2.1 1.72-3.12 1.8-3.17-.98-1.43-2.5-1.63-3.04-1.65-1.29-.13-2.52.76-3.18.76-.66 0-1.67-.74-2.75-.72-1.41.02-2.72.82-3.45 2.09-1.47 2.55-.38 6.33 1.06 8.4.7 1.01 1.53 2.15 2.62 2.11 1.05-.04 1.45-.68 2.72-.68 1.27 0 1.63.68 2.74.66 1.13-.02 1.85-1.03 2.54-2.05.8-1.17 1.13-2.31 1.15-2.37-.03-.01-2.2-.85-2.22-3.37zM14.29 6.42c.58-.7.97-1.68.86-2.65-.83.03-1.84.55-2.44 1.25-.54.62-1.01 1.62-.88 2.57.93.07 1.88-.47 2.46-1.170z"/></svg>
         <span><small>Download on the</small><b>App Store</b></span>
       </a>
       <a class="store" role="link" aria-disabled="true" data-store="android">
@@ -554,19 +735,166 @@ section{scroll-margin-top:64px}
 
 <script>
 (function () {
-  /* 머리줄 — 내려가면 아래 선 */
-  var hdr = document.getElementById('hdr');
-  var onScroll = function () { hdr.classList.toggle('on', window.scrollY > 8); };
-  window.addEventListener('scroll', onScroll, { passive: true }); onScroll();
+  var RM = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var FINE = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+  var WIDE = window.matchMedia('(min-width: 860px)').matches;
 
-  /* 스토어 단추 — 링크가 생기기 전까지 눌러도 이동하지 않는다 */
+  /* ── 머리줄 · 진행 막대 ── */
+  var hdr = document.getElementById('hdr'), prog = document.getElementById('prog');
+  var heroH = document.getElementById('hero').offsetHeight;
+  var ticking = false;
+  function onScroll() {
+    if (ticking) return; ticking = true;
+    requestAnimationFrame(function () {
+      var y = window.scrollY, max = document.documentElement.scrollHeight - innerHeight;
+      hdr.classList.toggle('on', y > heroH - 80);
+      prog.style.transform = 'scaleX(' + (max > 0 ? y / max : 0) + ')';
+      ticking = false;
+    });
+  }
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', function () { heroH = document.getElementById('hero').offsetHeight; onScroll(); });
+  onScroll();
+
+  /* ── 스토어 단추 — 링크가 생기기 전까지 이동하지 않는다 ── */
   document.querySelectorAll('.store[aria-disabled="true"]').forEach(function (a) {
     a.addEventListener('click', function (e) { e.preventDefault(); });
   });
 
-  /* 제휴몰 — 데모 앱 ppLoadMalls 와 같은 기준:
-     settings/ticket_accrual.applied 가 켜진 몰만, 적립률 높은 순, 로고는 CMS 등록본(없으면 이름 앞 두 글자).
-     쿠팡(coupang_direct)은 맨 앞 카드로 따로 둔다. */
+  /* ── 머리 화면: 떠오르는 조각(휴대폰은 적게) · 마우스 시차(PC만) ── */
+  var sp = document.getElementById('sparks');
+  if (!RM && sp) {
+    var n = WIDE ? 16 : 7, h = '';
+    for (var i = 0; i < n; i++) {
+      h += '<i class="' + (i % 3 === 0 ? 'c' : '') + '" style="left:' + (Math.random() * 96).toFixed(1) + '%;--s:' + (8 + Math.random() * 12).toFixed(0) +
+        'px;--t:' + (8 + Math.random() * 7).toFixed(1) + 's;--dl:-' + (Math.random() * 12).toFixed(1) + 's"></i>';
+    }
+    sp.innerHTML = h;
+  }
+  var hero = document.getElementById('hero'), stage = document.getElementById('stage');
+  if (!RM && FINE && hero && stage) {
+    var raf = 0, tx = 0, ty = 0;
+    hero.addEventListener('pointermove', function (e) {
+      var r = hero.getBoundingClientRect();
+      tx = (e.clientX - r.left) / r.width; ty = (e.clientY - r.top) / r.height;
+      if (raf) return;
+      raf = requestAnimationFrame(function () {
+        hero.style.setProperty('--mx', (tx * 100).toFixed(1) + '%');
+        hero.style.setProperty('--my', (ty * 100).toFixed(1) + '%');
+        stage.style.setProperty('--px', ((tx - .5) * 2).toFixed(3));
+        stage.style.setProperty('--py', ((ty - .5) * 2).toFixed(3));
+        raf = 0;
+      });
+    });
+    hero.addEventListener('pointerleave', function () { stage.style.setProperty('--px', 0); stage.style.setProperty('--py', 0); });
+  }
+
+  /* ── 숫자 세기 ── */
+  function countUp(el) {
+    var to = +el.dataset.count; if (!to || RM) { el.textContent = to.toLocaleString('ko-KR'); return; }
+    var dur = to > 50 ? 900 : 600, t0 = 0;
+    function step(t) {
+      if (!t0) t0 = t;
+      var p = Math.min(1, (t - t0) / dur), e = 1 - Math.pow(1 - p, 3);
+      el.textContent = Math.round(to * e).toLocaleString('ko-KR');
+      if (p < 1) requestAnimationFrame(step);
+    }
+    el.textContent = '0'; requestAnimationFrame(step);
+  }
+
+  /* ── 스크롤 등장 ── */
+  var io = 'IntersectionObserver' in window ? new IntersectionObserver(function (es) {
+    es.forEach(function (en) {
+      if (!en.isIntersecting) return;
+      var el = en.target;
+      el.classList.add('in');
+      el.querySelectorAll('[data-count]').forEach(countUp);
+      if (el.dataset.count) countUp(el);
+      io.unobserve(el);
+    });
+  }, { rootMargin: '0px 0px -8% 0px', threshold: .12 }) : null;
+  document.querySelectorAll('.rv').forEach(function (el) { io ? io.observe(el) : el.classList.add('in'); });
+
+  /* ── 흐름도: 노드 사이를 잇는 선을 그리고, 선이 닿으면 오브젝트가 튀어나온다 ── */
+  var flow = document.getElementById('flow');
+  if (flow) {
+    var NS = 'http://www.w3.org/2000/svg';
+    var svg = document.createElementNS(NS, 'svg');
+    svg.setAttribute('aria-hidden', 'true');
+    svg.innerHTML = '<defs><linearGradient id="flowGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#C6AFFF"/><stop offset=".55" stop-color="#845EEE"/><stop offset="1" stop-color="#E6A800"/></linearGradient></defs>';
+    flow.insertBefore(svg, flow.firstChild);
+    var nodes = [].slice.call(flow.querySelectorAll('.node'));
+    var segs = [], base = null, played = false;
+    function layout() {
+      var fr = flow.getBoundingClientRect();
+      var pts = nodes.map(function (n) { var a = n.querySelector('.art').getBoundingClientRect(); return [a.left - fr.left + a.width / 2, a.top - fr.top + a.height / 2, a.width / 2, a.height / 2]; });
+      var horiz = pts.length > 1 && Math.abs(pts[1][1] - pts[0][1]) < Math.abs(pts[1][0] - pts[0][0]);
+      var all = '';
+      segs.forEach(function (s) { s.remove(); }); segs = [];
+      if (base) base.remove();
+      for (var i = 0; i < pts.length - 1; i++) {
+        var a = pts[i], b = pts[i + 1], d;
+        if (horiz) {
+          var x1 = a[0] + a[2] + 8, x2 = b[0] - b[2] - 8, mx = (x1 + x2) / 2;
+          d = 'M' + x1 + ' ' + a[1] + ' C' + mx + ' ' + a[1] + ' ' + mx + ' ' + b[1] + ' ' + x2 + ' ' + b[1];
+        } else {
+          var y1 = a[1] + a[3] + 8, y2 = b[1] - b[3] - 8, my = (y1 + y2) / 2;
+          d = 'M' + a[0] + ' ' + y1 + ' C' + a[0] + ' ' + (my + 30) + ' ' + b[0] + ' ' + (my - 30) + ' ' + b[0] + ' ' + y2;
+        }
+        all += d + ' ';
+        var p = document.createElementNS(NS, 'path'); p.setAttribute('d', d); p.setAttribute('class', 'seg');
+        svg.appendChild(p); segs.push(p);
+        var L = p.getTotalLength(); p.style.strokeDasharray = L; p.style.strokeDashoffset = played || RM ? 0 : L;
+      }
+      base = document.createElementNS(NS, 'path'); base.setAttribute('d', all); base.setAttribute('class', 'base');
+      svg.insertBefore(base, svg.children[1] || null);
+    }
+    function play() {
+      if (played) return; played = true;
+      var STEP = WIDE ? 420 : 360;
+      nodes.forEach(function (n, i) {
+        setTimeout(function () { n.classList.add('on'); }, i * STEP);
+        if (segs[i]) setTimeout(function () {
+          segs[i].style.transition = 'stroke-dashoffset ' + (STEP - 60) + 'ms cubic-bezier(.4,0,.2,1)';
+          segs[i].style.strokeDashoffset = 0;
+        }, i * STEP + 120);
+      });
+    }
+    if (RM || !io) { nodes.forEach(function (n) { n.classList.add('on'); }); played = true; layout(); }
+    else {
+      flow.classList.add('armed');
+      layout();
+      var fio = new IntersectionObserver(function (es) { if (es[0].isIntersecting) { play(); fio.disconnect(); } }, { threshold: .22 });
+      fio.observe(flow);
+    }
+    var rt = 0;
+    window.addEventListener('resize', function () { clearTimeout(rt); rt = setTimeout(layout, 120); });
+    window.addEventListener('load', layout);
+  }
+
+  /* ── 제휴몰 — 데모 앱 ppLoadMalls 와 같은 기준:
+       settings/ticket_accrual.applied 가 켜진 몰만, 적립률 높은 순, 로고는 CMS 등록본(없으면 이름 앞 두 글자).
+       쿠팡(coupang_direct)은 맨 앞 카드로 따로 둔다. ── */
+  var FALLBACK = ['CJ더마켓', 'NS홈쇼핑', 'GS SHOP', 'Hmall', '롯데홈쇼핑', '이마트인터넷쇼핑몰', '11번가', '롯데온', '옥션', 'G마켓'].map(function (n) { return { name: n, logo: '' }; });
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function logoHtml(name, url) {
+    var ab = esc(String(name || '?').trim().slice(0, 2));
+    return ab + (url ? '<img src="' + esc(url) + '" alt="" loading="lazy" onerror="this.remove()">' : '');
+  }
+  function chip(x) { return '<div class="mc"><div class="mlogo">' + logoHtml(x.name, x.logo) + '</div><span>' + esc(x.name) + '</span></div>'; }
+  function renderMalls(list) {
+    var a = document.getElementById('track-a'), b = document.getElementById('track-b');
+    if (!a || !b) return;
+    var half = Math.ceil(list.length / 2);
+    var l1 = list.slice(0, half), l2 = list.slice(half);
+    if (!l2.length) l2 = l1;
+    /* 끊김 없이 돌도록 같은 줄을 한 번 더 붙인다(움직임 끈 사용자는 복제본을 숨긴다) */
+    function row(l) { var s = l.map(chip).join(''); return s + '<div style="display:contents" class="dup" aria-hidden="true">' + s + '</div>'; }
+    a.innerHTML = row(l1); b.innerHTML = row(l2);
+    a.style.setProperty('--dur', Math.max(18, l1.length * 4.2) + 's');
+    b.style.setProperty('--dur', Math.max(18, l2.length * 4.6) + 's');
+  }
+  renderMalls(FALLBACK);
   var BASE = 'https://firestore.googleapis.com/v1/projects/pricepick-demo/databases/(default)/documents/settings/';
   function val(v) {
     if (!v) return null;
@@ -577,22 +905,15 @@ section{scroll-margin-top:64px}
     if ('mapValue' in v) { var o = {}, f = v.mapValue.fields || {}; for (var k in f) o[k] = val(f[k]); return o; }
     return null;
   }
-  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
-  function logoHtml(name, url) {
-    var ab = esc(String(name || '?').trim().slice(0, 2));
-    return ab + (url ? '<img src="' + esc(url) + '" alt="" onerror="this.remove()">' : '');
-  }
   fetch(BASE + 'ticket_accrual?mask.fieldPaths=applied&mask.fieldPaths=logos&mask.fieldPaths=rates')
     .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
     .then(function (d) {
       var f = d.fields || {};
       var applied = val(f.applied) || {}, logos = val(f.logos) || {}, rates = val(f.rates) || {};
-      /* 쿠팡 로고 */
       var lead = document.querySelector('#mall-lead .mlogo');
       if (lead && logos.coupang_direct) lead.innerHTML = logoHtml('쿠팡', logos.coupang_direct);
       var codes = Object.keys(applied).filter(function (c) { return applied[c] === true && c.indexOf('lp:') === 0; });
-      var rest = document.getElementById('mall-rest');
-      if (!codes.length) { if (rest) rest.style.display = 'none'; return; }
+      if (!codes.length) { var rest = document.getElementById('mall-rest'); if (rest) rest.style.display = 'none'; return; }
       var q = codes.map(function (c) { return 'mask.fieldPaths=' + encodeURIComponent('merchants.`' + c.slice(3) + '`.merchant_name'); }).join('&');
       return fetch(BASE + 'linkprice_merchants?' + q)
         .then(function (r) { return r.ok ? r.json() : {}; })
@@ -604,13 +925,10 @@ section{scroll-margin-top:64px}
             return { name: nm, logo: logos[c] || '', rate: typeof rates[c] === 'number' ? rates[c] : 0 };
           });
           list.sort(function (a, b) { return (b.rate - a.rate) || a.name.localeCompare(b.name, 'ko'); });
-          var grid = document.getElementById('mall-grid');
-          if (grid) grid.innerHTML = list.map(function (x) {
-            return '<div class="mc"><div class="mlogo">' + logoHtml(x.name, x.logo) + '</div><span>' + esc(x.name) + '</span></div>';
-          }).join('');
+          renderMalls(list);
         });
     })
-    .catch(function () { /* 읽기 실패 — 마크업의 기본 목록을 그대로 둔다 */ });
+    .catch(function () { /* 읽기 실패 — 기본 목록을 그대로 둔다 */ });
 })();
 </script>
 </body>
