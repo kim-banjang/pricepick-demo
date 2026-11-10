@@ -12,7 +12,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700;800&display=swap">
-<link rel="preload" as="image" href="/web/img/phone.webp">
+<link rel="preload" as="image" href="/web/img/pricepick-splash.png">
 <!--
   프라이스픽 홈페이지 데모 (2026-11-10)
   1차: 김반장 「홈페이지 DEMO 를 만들어」 / 2차: 「좀 쌈박하게 만들어봐. 애니매이션도 팍팍 넣어 주고」
@@ -126,21 +126,19 @@ section{position:relative;scroll-margin-top:60px}
 .halo{position:absolute;left:50%;top:48%;width:78%;aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;
   background:radial-gradient(closest-side,rgba(255,255,255,.95),rgba(226,217,255,.75) 50%,rgba(198,175,255,0));animation:breath 4s ease-in-out infinite}
 @keyframes breath{50%{transform:translate(-50%,-50%) scale(1.06);opacity:.85}}
-.phone{position:absolute;left:50%;top:4%;width:48%;transform:translate(calc(-50% + var(--px)*-6px),calc(var(--py)*-6px));transition:transform .4s var(--ease)}
-.phone .in{animation:bob 5s ease-in-out infinite;filter:drop-shadow(0 26px 30px rgba(108,74,182,.30))}
-.phone .scr{position:absolute;left:12.5%;top:6.3%;width:75.2%;height:87.3%;border-radius:9%/4.4%;overflow:hidden;background:#fff}
-.phone .scr img{width:100%;height:100%;object-fit:cover;object-position:top}
-.phone .scr::after{content:'';position:absolute;inset:-40% -60%;background:linear-gradient(115deg,transparent 40%,rgba(255,255,255,.55) 50%,transparent 60%);transform:translateX(-60%);animation:glint 6s ease-in-out 1.2s infinite}
+.phone{position:absolute;left:50%;top:3%;width:40%;aspect-ratio:390/844;transform:translate(calc(-50% + var(--px)*-6px),calc(var(--py)*-6px));transition:transform .4s var(--ease)}
+.phone .in{width:100%;height:100%;animation:bob 5s ease-in-out infinite}
+.phone .pp-g-splash{border-radius:24px}
 @keyframes glint{0%,70%{transform:translateX(-60%)}100%{transform:translateX(60%)}}
 @keyframes bob{50%{transform:translateY(-10px)}}
 .ob{position:absolute;transform:translate(calc(var(--px)*var(--k,12px)),calc(var(--py)*var(--k,12px)));transition:transform .5s var(--ease)}
 .ob>img,.ob>.tks{filter:drop-shadow(0 14px 16px rgba(108,74,182,.28));animation:drift var(--t,6s) ease-in-out infinite;animation-delay:var(--dl,0s)}
 @keyframes drift{0%,100%{transform:translateY(0) rotate(var(--r0,-4deg))}50%{transform:translateY(-14px) rotate(var(--r1,5deg))}}
-.ob.gift{left:-3%;top:14%;width:31%;--k:-18px;--t:6.5s;--dl:-1s}
-.ob.tk{right:-2%;top:8%;width:31%;--k:22px;--t:5.5s;--dl:-2.5s;--r0:6deg;--r1:-6deg}
-.ob.bag{left:0;bottom:4%;width:32%;--k:16px;--t:7s;--dl:-3s}
-.ob.coin{right:0;bottom:2%;width:29%;--k:-20px;--t:6s;--dl:-.5s;--r0:-8deg;--r1:4deg}
-.ob.tw{left:38%;bottom:-3%;width:24%;--k:10px;--t:6.8s;--dl:-4s;--r0:-10deg;--r1:-2deg;display:none}
+.ob.gift{left:-3%;top:12%;width:30%;--k:-18px;--t:6.5s;--dl:-1s}
+.ob.tk{right:-5%;top:8%;width:29%;--k:22px;--t:5.5s;--dl:-2.5s;--r0:6deg;--r1:-6deg}
+.ob.bag{left:-2%;bottom:4%;width:28%;--k:16px;--t:7s;--dl:-3s}
+.ob.coin{right:-2%;bottom:3%;width:28%;--k:-20px;--t:6s;--dl:-.5s;--r0:-8deg;--r1:4deg}
+.ob.tw{left:3%;top:42%;width:22%;--k:10px;--t:6.8s;--dl:-4s;--r0:-10deg;--r1:-2deg;display:none}
 .js .stage .ob,.js .stage .phone{opacity:0;animation:popIn .7s var(--pop) forwards}
 .js .stage .phone{animation-delay:.1s}
 .js .stage .ob.gift{animation-delay:.35s}.js .stage .ob.tk{animation-delay:.45s}.js .stage .ob.bag{animation-delay:.55s}.js .stage .ob.coin{animation-delay:.65s}
@@ -482,10 +480,8 @@ section{position:relative;scroll-margin-top:60px}
       <div class="ring r2"></div>
       <div class="ob gift"><img src="/web/img/gifticon.webp" alt="" width="1000" height="538"></div>
       <div class="ob tk"><span class="tks many"><img src="/web/img/ticket-gold.svg" alt="" width="512" height="512"><img src="/web/img/ticket-gold.svg" alt="" width="512" height="512"><img src="/web/img/ticket-gold.svg" alt="" width="512" height="512"><span class="chk"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span></span></div>
-      <div class="phone"><div class="in">
-        <img src="/web/img/phone.webp" alt="" width="609" height="1000">
-        <div class="scr"><img src="/web/img/pricepick-splash.png" alt="" width="390" height="844"></div>
-      </div></div>
+      <!-- 가이드 1단계 그림 한 장(pricepick-splash.png) 그대로 — 폰 껍데기와 겹치지 않는다 -->
+      <div class="phone"><div class="in"><span class="pp-g-splash"><img src="/web/img/pricepick-splash.png" alt="" width="390" height="844"></span></div></div>
       <div class="ob bag"><img src="/web/img/bag.webp" alt="" width="889" height="1000"></div>
       <div class="ob coin"><img src="/web/img/coins.webp" alt="" width="1000" height="644"></div>
       <div class="ob tw"><span class="tks one"><img src="/web/img/ticket-random.svg" alt="" width="512" height="512"></span></div>
