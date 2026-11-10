@@ -91,8 +91,10 @@ section{position:relative;scroll-margin-top:60px}
 .store:active{transform:translateY(1px) scale(.97);box-shadow:0 4px 10px rgba(26,17,48,.2)}
 
 /* ═════════ 머리 화면 ═════════ */
-.hero{min-height:100svh;padding-top:60px;color:var(--text1);overflow:hidden;isolation:isolate;
-  background:radial-gradient(70% 55% at 85% 25%,rgba(198,175,255,.55),rgba(198,175,255,0) 70%),radial-gradient(60% 45% at 5% 85%,rgba(226,217,255,.9),rgba(226,217,255,0) 70%),linear-gradient(180deg,var(--sub-4) 0%,#F7F4FF 55%,#fff 100%)}
+.hero{min-height:100svh;padding-top:60px;color:var(--text1);overflow:hidden;isolation:isolate;background:var(--sub-4)}
+/* 사진 배경 — 흐린 매장 전경. 배경일 뿐이라 흐리게 낮추고, 위에 밝은 보라 막을 덮어 아래로 갈수록 흰색으로 */
+.hero-photo{position:absolute;left:0;right:0;top:-8%;height:116%;z-index:-4;background:url(/web/img/bg-hero-storefront-m.webp) 60% 30%/cover no-repeat;opacity:.7;will-change:transform}
+.hero-veil{position:absolute;inset:0;z-index:-3;background:radial-gradient(70% 55% at 85% 25%,rgba(198,175,255,.40),rgba(198,175,255,0) 70%),linear-gradient(180deg,rgba(241,238,255,.70) 0%,rgba(241,238,255,.80) 45%,rgba(248,246,255,.92) 75%,#fff 100%)}
 .hero .grid-bg{position:absolute;inset:0;z-index:-2;opacity:.5;
   background-image:linear-gradient(rgba(132,94,238,.07) 1px,transparent 1px),linear-gradient(90deg,rgba(132,94,238,.07) 1px,transparent 1px);
   background-size:44px 44px;mask-image:radial-gradient(70% 60% at 60% 40%,#000,transparent);-webkit-mask-image:radial-gradient(70% 60% at 60% 40%,#000,transparent)}
@@ -203,12 +205,13 @@ section{position:relative;scroll-margin-top:60px}
 .node.on .art::after{content:'';position:absolute;inset:-6px;border-radius:36px;border:2px solid var(--main);opacity:0;animation:ping .7s var(--ease)}
 @keyframes ping{0%{opacity:.7;transform:scale(.9)}100%{opacity:0;transform:scale(1.15)}}
 
-.wait{margin-top:44px;border-radius:var(--r-lg);padding:26px 22px;position:relative;overflow:hidden;
-  background:radial-gradient(80% 120% at 100% 0%,var(--sub-4),transparent 60%),#fff;border:1px solid var(--sub-3);box-shadow:var(--sh-2)}
+.wait{margin-top:44px;border-radius:var(--r-lg);padding:26px 22px;position:relative;overflow:hidden;isolation:isolate;background:#fff;border:1px solid var(--sub-3);box-shadow:var(--sh-2)}
+.wait-photo{position:absolute;inset:0;z-index:-2;background:url(/web/img/bg-wait-parcels-m.webp) 72% 60%/cover no-repeat}
+.wait-veil{position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,rgba(255,255,255,.90) 0%,rgba(255,255,255,.84) 100%)}
 .wait h3{font-size:20px;font-weight:800;letter-spacing:-.5px}
 .wait h3 small{display:block;font-size:14px;font-weight:400;color:var(--text2);margin-top:4px;letter-spacing:-.2px}
 .wait .rows{margin-top:18px;display:grid;gap:12px}
-.wait .row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px;border-radius:var(--r-md);background:var(--sub-4)}
+.wait .row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px;border-radius:var(--r-md);background:rgba(241,238,255,.92);box-shadow:0 2px 8px rgba(108,74,182,.08)}
 .wait .who{font-size:15px;font-weight:800;color:var(--text1)}
 .wait .who small{display:block;font-size:12px;font-weight:400;color:var(--text3)}
 .wait .days{display:flex;gap:14px;text-align:right}
@@ -393,8 +396,13 @@ section{position:relative;scroll-margin-top:60px}
   .node{flex-direction:column;text-align:center}
   .node .no{left:50%;margin-left:-74px}
   .node .art{width:148px;height:148px;border-radius:40px}
-  .wait{display:grid;grid-template-columns:300px 1fr;gap:32px;align-items:center;padding:36px 40px}
-  .wait .rows{margin-top:0;grid-template-columns:1fr 1fr}
+  /* PC: 글·날짜는 왼쪽 절반에 세로로, 오른쪽 절반은 막을 엷게 해 택배 상자가 보이게 */
+  .wait{display:block;padding:40px 44px;min-height:440px}
+  .wait>h3,.wait .rows{max-width:46%}
+  .hero-photo{background-image:url(/web/img/bg-hero-storefront.webp);background-position:center 35%}
+  .wait-photo{background-image:url(/web/img/bg-wait-parcels.webp);background-position:100% 70%}
+  .wait-veil{background:linear-gradient(90deg,rgba(255,255,255,.94) 0%,rgba(255,255,255,.90) 44%,rgba(255,255,255,.35) 62%,rgba(255,255,255,.12) 100%)}
+  .wait .rows{margin-top:20px}
   .mall-lead{padding:30px 36px;max-width:760px}
   .mall-lead .mlogo{width:96px;height:96px;border-radius:26px}
   .ml-tk{width:96px;height:96px}
@@ -454,6 +462,8 @@ section{position:relative;scroll-margin-top:60px}
 
 <!-- ═════════ 머리 화면 ═════════ -->
 <section class="hero" id="hero">
+  <div class="hero-photo" id="hero-photo" aria-hidden="true"></div>
+  <div class="hero-veil" aria-hidden="true"></div>
   <div class="grid-bg"></div>
   <div class="spot"></div>
   <div class="sparks" id="sparks" aria-hidden="true"></div>
@@ -520,6 +530,7 @@ section{position:relative;scroll-margin-top:60px}
     </ol>
 
     <div class="wait rv">
+      <div class="wait-photo" aria-hidden="true"></div><div class="wait-veil" aria-hidden="true"></div>
       <h3>대기 기간<small>랜덤 티켓이 티켓으로 바뀌기까지 걸려요.</small></h3>
       <div class="rows">
         <div class="row">
@@ -774,7 +785,7 @@ section{position:relative;scroll-margin-top:60px}
   var WIDE = window.matchMedia('(min-width: 860px)').matches;
 
   /* ── 머리줄 · 진행 막대 ── */
-  var hdr = document.getElementById('hdr'), prog = document.getElementById('prog');
+  var hdr = document.getElementById('hdr'), prog = document.getElementById('prog'), hp = document.getElementById('hero-photo');
   var heroH = document.getElementById('hero').offsetHeight;
   var ticking = false;
   function onScroll() {
@@ -783,6 +794,7 @@ section{position:relative;scroll-margin-top:60px}
       var y = window.scrollY, max = document.documentElement.scrollHeight - innerHeight;
       hdr.classList.toggle('on', y > heroH - 80);
       prog.style.transform = 'scaleX(' + (max > 0 ? y / max : 0) + ')';
+      if (hp && !RM && y < heroH) hp.style.transform = 'translate3d(0,' + (y * .3).toFixed(1) + 'px,0)';
       ticking = false;
     });
   }
