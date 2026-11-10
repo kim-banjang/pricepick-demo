@@ -19470,12 +19470,22 @@ function performWithdraw() {
   if (!uid) return Promise.resolve();
   var isPersona = !!PP.personaUserId;
   var now = FS.FieldValue.serverTimestamp();
-  return db.collection('users').doc(uid).set({
-    status: 'withdrawn', withdrawn_at: now,
-    nickname: FS.FieldValue.delete(),
-    kakao_nickname: FS.FieldValue.delete(),
-    kakao_login_id: FS.FieldValue.delete(),
-  }, { merge: true }).catch(function(e) { console.error('withdrawMark', e); }).then(function() {
+  /* STG 백엔드 탈퇴(userService.deleteUser · kakaoInfoClearedFields)와 같게 한다(김반장 2026-11-10).
+     닉네임·티켓·포인트는 그대로 두고 카카오 연동 정보(카카오 닉네임·회원번호·이메일 = kakao_login_id)만 지운다.
+     로그인 아이디는 카카오 연동 회원만 deleted_<회원id> 로 바꾼다(STG는 kakao_ 로 시작하는 username 만 바꾼다).
+     연동 표시(linked_kakao)는 STG가 login_type 을 남기는 것과 같이 남긴다. */
+  var userRef = db.collection('users').doc(uid);
+  return userRef.get().then(function(snap) {
+    var wasLinked = !!(snap.exists && snap.data().linked_kakao);
+    var upd = {
+      status: 'withdrawn', withdrawn_at: now,
+      kakao_nickname: FS.FieldValue.delete(),
+      kakao_login_id: FS.FieldValue.delete(),
+      kakao_id: FS.FieldValue.delete(),
+    };
+    if (wasLinked) upd.username = 'deleted_' + uid;
+    return userRef.set(upd, { merge: true });
+  }).catch(function(e) { console.error('withdrawMark', e); }).then(function() {
     try {
       Object.keys(localStorage).forEach(function(k) {
         if (k.indexOf('pp_') === 0) localStorage.removeItem(k);

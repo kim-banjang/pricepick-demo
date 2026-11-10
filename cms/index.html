@@ -9293,13 +9293,17 @@ window.loadGifticonExchanges = loadGifticonExchanges;
 // 회원 목록/상세 팝업의 상태 한글 라벨 (저장값 active/suspended/withdrawn은 그대로)
 var MEMBER_STATUS_KO = { active:'정상', suspended:'차단', withdrawn:'탈퇴' };
 var MEMBER_STATUS_KO_TO_EN = { '정상':'active', '차단':'suspended', '탈퇴':'withdrawn' };
+/* 회원 목록·상세의 연동 표시 — STG CMS는 카카오 정보(kakao_info)가 있어야 「카카오 연동」으로 본다.
+   탈퇴하면 카카오 정보가 지워지므로(STG kakaoInfoClearedFields) 탈퇴 회원은 연동 표시(linked_kakao)가 남아 있어도
+   게스트로 보인다. linked_kakao 는 STG login_type 처럼 데이터에는 남긴다(2026-11-10). */
+function memLinkedShown(u) { return !!(u && u.linked_kakao) && u.status !== 'withdrawn'; }
 var MEM_CTRL = window.MEM_CTRL = ppMakeListController(10, function(pageItems, state, totalPages) {
   var tbody = document.getElementById('members-tbody');
   var pag = document.getElementById('members-pagination');
   if (!tbody) return;
   if (!pageItems.length) { tbody.innerHTML = '<tr><td colspan="11" style="text-align:center;padding:32px;color:var(--text-3);">조건에 맞는 회원이 없습니다.</td></tr>'; if (pag) pag.innerHTML = ppCtrlPagerHtml('MEM_CTRL', state); return; }
   tbody.innerHTML = pageItems.map(function(u) {
-    var kakaoType = u.linked_kakao
+    var kakaoType = memLinkedShown(u)
       ? '<span class="member-type-kakao">카카오 연동</span>'
       : '<span style="background:var(--warning-soft);color:var(--warning);padding:2px 8px;border-radius:99px;font-size:11px;font-weight:600;">게스트</span>';
     var statusKo = MEMBER_STATUS_KO[u.status] || '정상';
@@ -9330,8 +9334,8 @@ window.memApplyFilters = function() {
   var status = (document.getElementById('mem-filter-status')||{}).value || '';
   MEM_CTRL.applyFilter(function(u) {
     if (q && !ppMatch(u.nickname, q) && !ppMatch(u.kakao_login_id, q)) return false;
-    if (linked === 'kakao' && !u.linked_kakao) return false;
-    if (linked === 'guest' && u.linked_kakao) return false;
+    if (linked === 'kakao' && !memLinkedShown(u)) return false;
+    if (linked === 'guest' && memLinkedShown(u)) return false;
     if (status && (u.status || 'active') !== status) return false;
     return true;
   });
@@ -18487,10 +18491,10 @@ window.openMemberDetail = function(id) {
     document.getElementById('m-member-id').value = id;
     document.getElementById('m-name').value = u.nickname || '';
     document.getElementById('m-status').value = MEMBER_STATUS_KO[u.status] || '정상';
-    document.getElementById('m-join-type').value = u.linked_kakao ? '카카오 연동' : '게스트';
+    document.getElementById('m-join-type').value = memLinkedShown(u) ? '카카오 연동' : '게스트';
     document.getElementById('m-doc-id').value = id;
     var accEl = document.getElementById('m-accounts');
-    accEl.innerHTML = u.linked_kakao
+    accEl.innerHTML = memLinkedShown(u)
       ? '<div style="display:flex;align-items:center;gap:6px;font-size:12px;">'
         + '<span style="display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:5px;background:#FEE500;font-size:11px;font-weight:700;">K</span>'
         + '<span>' + (u.kakao_login_id || '(카카오 로그인ID 미등록)') + '</span></div>'
