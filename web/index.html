@@ -239,9 +239,6 @@ section{position:relative;scroll-margin-top:60px}
 .mall-lead p{font-size:14px;color:var(--text2)}
 .ml-tx{flex:1;min-width:0}
 .ml-side{flex:none;display:flex;align-items:center;gap:10px}
-.ml-rate{text-align:center}
-.ml-rate em{display:block;font-style:normal;font-size:11px;font-weight:700;color:var(--text3)}
-.ml-rate b{display:block;font-family:Poppins,sans-serif;font-size:22px;font-weight:800;color:var(--main);letter-spacing:-.6px;line-height:1.1}
 .ml-tk{width:44px;height:44px;filter:drop-shadow(0 8px 10px rgba(108,74,182,.25))}
 .mall-lead .tag{display:inline-block;font-size:11px;font-weight:800;color:#7A5600;background:#FFF4CC;border-radius:8px;padding:3px 8px;margin-bottom:4px}
 .mall-rest{margin-top:22px}
@@ -408,8 +405,6 @@ section{position:relative;scroll-margin-top:60px}
   .mall-lead .mlogo{width:96px;height:96px;border-radius:26px}
   .ml-tk{width:96px;height:96px}
   .ml-side{gap:28px;padding-right:12px}
-  .ml-rate b{font-size:40px}
-  .ml-rate em{font-size:13px}
   .mall-lead b{font-size:40px;letter-spacing:-1.4px}
   .mall-lead p{font-size:17px}
   .cur{grid-template-columns:repeat(2,1fr);gap:18px}
@@ -564,8 +559,7 @@ section{position:relative;scroll-margin-top:60px}
       <div class="mlogo" data-code="coupang_direct">쿠팡</div>
       <div class="ml-tx"><span class="tag">대표 제휴몰</span><b>쿠팡</b><p>주문 한 건마다 랜덤 티켓 1장</p></div>
       <div class="ml-side">
-        <!-- 적립률은 CMS 「티켓 적립 설정」 값을 읽어 채운다(데모 앱과 같은 값). 못 읽으면 숨긴 채로 둔다 -->
-        <div class="ml-rate" id="cp-rate" hidden><em>적립률</em><b></b></div>
+        <!-- 적립률 숫자는 홈페이지에 쓰지 않는다(제휴 조건에 따라 바뀌는 값 — 김반장 2026-11-10) -->
         <div class="ml-tk"><span class="tks one"><img src="/web/img/ticket-random.svg" alt="" width="512" height="512" loading="lazy"></span></div>
       </div>
     </div>
@@ -577,7 +571,7 @@ section{position:relative;scroll-margin-top:60px}
         <div class="track rev" id="track-b"></div>
       </div>
     </div>
-    <p class="note">쇼핑몰마다 적립률이 달라요. 제휴몰은 앱에서 바로 확인할 수 있어요.</p>
+    <p class="note">쇼핑몰마다 적립률이 달라요. 앱에서 바로 확인할 수 있어요.</p>
   </div>
 </section>
 
@@ -971,8 +965,6 @@ section{position:relative;scroll-margin-top:60px}
       var applied = val(f.applied) || {}, logos = val(f.logos) || {}, rates = val(f.rates) || {};
       var lead = document.querySelector('#mall-lead .mlogo');
       if (lead && logos.coupang_direct) lead.innerHTML = logoHtml('쿠팡', logos.coupang_direct);
-      var cpr = document.getElementById('cp-rate');
-      if (cpr && typeof rates.coupang_direct === 'number') { cpr.querySelector('b').textContent = rates.coupang_direct + '%'; cpr.hidden = false; }
       var codes = Object.keys(applied).filter(function (c) { return applied[c] === true && c.indexOf('lp:') === 0; });
       if (!codes.length) { var rest = document.getElementById('mall-rest'); if (rest) rest.style.display = 'none'; return; }
       var q = codes.map(function (c) { return 'mask.fieldPaths=' + encodeURIComponent('merchants.`' + c.slice(3) + '`.merchant_name'); }).join('&');
