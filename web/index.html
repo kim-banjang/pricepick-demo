@@ -48,7 +48,7 @@ section{position:relative;scroll-margin-top:60px}
   background:linear-gradient(90deg,var(--sub-2),var(--main),var(--gold-a))}
 
 /* ── 머리줄 (첫 화면은 어두운 바탕 위 투명, 내려가면 흰 유리) ── */
-.hdr{position:fixed;left:0;right:0;top:0;z-index:40;transition:background .25s,box-shadow .25s}
+.hdr{position:fixed;left:0;right:0;top:0;z-index:40;background:rgba(255,255,255,.62);backdrop-filter:saturate(1.4) blur(12px);-webkit-backdrop-filter:saturate(1.4) blur(12px);transition:background .25s,box-shadow .25s}
 .hdr .wrap{display:flex;align-items:center;height:60px;gap:16px}
 .hdr.on{background:rgba(255,255,255,.86);backdrop-filter:saturate(1.6) blur(14px);-webkit-backdrop-filter:saturate(1.6) blur(14px);box-shadow:0 1px 0 var(--border)}
 .logo{display:flex;align-items:center;gap:8px;flex:none}
