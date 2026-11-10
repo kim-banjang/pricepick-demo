@@ -52,7 +52,9 @@ section{position:relative;scroll-margin-top:60px}
 .hdr .wrap{display:flex;align-items:center;height:60px;gap:16px}
 .hdr.on{background:rgba(255,255,255,.86);backdrop-filter:saturate(1.6) blur(14px);-webkit-backdrop-filter:saturate(1.6) blur(14px);box-shadow:0 1px 0 var(--border)}
 .logo{display:flex;align-items:center;gap:8px;flex:none}
-.logo svg{width:26px;height:26px}
+.logo-sym{display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:11px;background:#fff;box-shadow:0 4px 12px rgba(0,0,0,.18);transition:background .25s,box-shadow .25s}
+.logo-sym svg{width:26px;height:26px}
+.hdr.on .logo-sym{background:transparent;box-shadow:none}
 .wm{font-family:Poppins,sans-serif;font-size:17px;letter-spacing:.5px;line-height:1}
 .wm .l{font-weight:400;color:#fff;transition:color .25s} .wm .b{font-weight:700;color:var(--sub-2);transition:color .25s}
 .hdr.on .wm .l{color:var(--text1)} .hdr.on .wm .b{color:var(--main)}
@@ -156,8 +158,8 @@ section{position:relative;scroll-margin-top:60px}
 @keyframes popIn{from{opacity:0;scale:.6}to{opacity:1;scale:1}}
 /* 떠오르는 티켓·동전 조각 */
 .sparks{position:absolute;inset:0;z-index:-1;pointer-events:none;overflow:hidden}
-.sparks i{position:absolute;bottom:-30px;width:var(--s,14px);height:calc(var(--s,14px)*.66);border-radius:3px;background:linear-gradient(135deg,var(--sub-2),var(--main));opacity:.0;animation:rise var(--t,9s) linear infinite;animation-delay:var(--dl,0s)}
-.sparks i.c{height:var(--s,14px);border-radius:50%;background:linear-gradient(135deg,var(--gold-a),var(--gold-b))}
+.sparks i{position:absolute;bottom:-30px;width:var(--s,14px);opacity:0;animation:rise var(--t,9s) linear infinite;animation-delay:var(--dl,0s)}
+.sparks i svg{display:block;width:100%;height:auto}
 @keyframes rise{0%{transform:translateY(0) rotate(0);opacity:0}10%{opacity:.7}90%{opacity:.5}100%{transform:translateY(-105svh) rotate(260deg);opacity:0}}
 .scroll-cue{display:none}
 
@@ -176,6 +178,10 @@ section{position:relative;scroll-margin-top:60px}
 .ob.tk,.ob.tw{aspect-ratio:1}
 .cc.noart{padding-left:24px}
 
+.pp-g-splash{display:block;width:100%;height:100%;border-radius:28px;overflow:hidden;border:1px solid rgba(255,255,255,.7);box-shadow:0 18px 36px rgba(108,74,182,.30)}
+.pp-g-splash img{display:block;width:100%;height:100%;max-width:none;max-height:none;object-fit:cover}
+.node .art>.pp-g-splash{width:auto;height:84%;aspect-ratio:390/844;border-radius:10px;box-shadow:0 4px 10px rgba(108,74,182,.30)}
+
 /* ═════════ 약속 ═════════ */
 .promises{display:grid;gap:12px;margin-top:-28px;position:relative;z-index:3}
 .pm{background:#fff;border-radius:var(--r-md);padding:18px 20px;display:flex;gap:14px;align-items:center;box-shadow:var(--sh-2);transition:transform .25s var(--ease),box-shadow .25s}
@@ -186,11 +192,14 @@ section{position:relative;scroll-margin-top:60px}
 
 /* ═════════ 흐름 — 선이 그려지고 오브젝트가 튀어나온다 ═════════ */
 .how{background:radial-gradient(60% 50% at 100% 0%,var(--sub-4),transparent 70%),radial-gradient(50% 40% at 0% 100%,#F7F2FF,transparent 70%),#fff}
-.flow{position:relative;list-style:none;display:grid;gap:44px;padding:6px 0}
+.flow{position:relative;list-style:none;display:grid;gap:60px;padding:6px 0}
 .flow svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none;z-index:0}
-.flow .base{fill:none;stroke:var(--sub-3);stroke-width:3;stroke-linecap:round;stroke-dasharray:2 10}
-.flow .seg{fill:none;stroke:url(#flowGrad);stroke-width:4;stroke-linecap:round}
-.flow .dotm{fill:var(--main);filter:drop-shadow(0 0 6px rgba(132,94,238,.8))}
+.flow .ar{--line:#845EEE;--fd:1.6s;filter:drop-shadow(0 2px 6px rgba(132,94,238,.35))}
+.flow .ln{fill:none;stroke:var(--line);stroke-width:4;stroke-linecap:round;stroke-dasharray:12 10;animation:pp-g-flow var(--fd,1.8s) linear infinite}
+.flow .rv2{fill:none;stroke:#fff;stroke-width:12;stroke-linecap:round;transition:stroke-dashoffset 560ms ease-out}
+.flow .hd{fill:none;stroke:var(--line);stroke-width:4;stroke-linecap:round;stroke-linejoin:round;opacity:0;transition:opacity 120ms 440ms}
+.flow .ar.on .hd{opacity:1}
+@keyframes pp-g-flow{to{stroke-dashoffset:-22}}
 .node{position:relative;z-index:1;display:flex;align-items:center;gap:18px}
 .node .art{flex:none;width:104px;height:104px;border-radius:30px;display:flex;align-items:center;justify-content:center;position:relative;
   background:radial-gradient(circle at 35% 30%,#fff,var(--sub-4) 70%);box-shadow:var(--sh-1),inset 0 -6px 14px rgba(132,94,238,.10)}
@@ -417,7 +426,7 @@ section{position:relative;scroll-margin-top:60px}
 <header class="hdr" id="hdr">
   <div class="wrap">
     <a class="logo" href="#top" aria-label="프라이스픽">
-      <svg viewBox="0 0 360 363" fill="none" aria-hidden="true"><path d="M178.702 82.6926C125.372 82.6926 82.1367 125.942 82.1367 179.289V277.43H115.611V252.409C132.535 267.036 154.589 275.873 178.702 275.873C232.032 275.873 275.267 232.624 275.267 179.276C275.267 125.929 232.032 82.6797 178.702 82.6797V82.6926ZM178.702 242.401C143.851 242.401 115.611 214.151 115.611 179.289C115.611 144.428 143.851 116.178 178.702 116.178C213.552 116.178 241.792 144.428 241.792 179.289C241.792 214.151 213.552 242.401 178.702 242.401Z" fill="#634C9E"/><path d="M180 0C80.593 0 0 80.6195 0 180.059V363H62.3962V316.368C93.9416 343.627 135.042 360.118 180 360.118C279.407 360.118 360 279.499 360 180.059C360 80.6195 279.42 0 180 0ZM180 297.702C115.045 297.702 62.3962 245.023 62.3962 180.059C62.3962 115.095 115.058 62.4168 180 62.4168C244.942 62.4168 297.604 115.095 297.604 180.059C297.604 245.023 244.942 297.702 180 297.702Z" fill="#9B6BFF"/><path d="M208.118 189.436L204.118 182.814C203.278 181.338 202.518 178.546 202.518 176.91V166.818C202.518 153.814 191.918 143.203 178.838 143.203C165.758 143.203 155.158 153.814 155.158 166.818V176.91C155.158 178.546 154.398 181.338 153.558 182.774L149.518 189.436C147.918 192.108 147.558 195.06 148.558 197.773C149.518 200.445 151.798 202.52 154.758 203.517C162.518 206.15 170.678 207.426 178.838 207.426C186.998 207.426 195.158 206.15 202.918 203.557C205.718 202.639 207.878 200.525 208.918 197.773C209.958 195.02 209.678 191.989 208.118 189.436Z" fill="#C6AFFF"/></svg>
+      <span class="logo-sym"><svg width="28" height="28" viewBox="0 0 360 363" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M178.702 82.6926C125.372 82.6926 82.1367 125.942 82.1367 179.289V277.43H115.611V252.409C132.535 267.036 154.589 275.873 178.702 275.873C232.032 275.873 275.267 232.624 275.267 179.276C275.267 125.929 232.032 82.6797 178.702 82.6797V82.6926ZM178.702 242.401C143.851 242.401 115.611 214.151 115.611 179.289C115.611 144.428 143.851 116.178 178.702 116.178C213.552 116.178 241.792 144.428 241.792 179.289C241.792 214.151 213.552 242.401 178.702 242.401Z" fill="#634C9E"/><path d="M180 0C80.593 0 0 80.6195 0 180.059V363H62.3962V316.368C93.9416 343.627 135.042 360.118 180 360.118C279.407 360.118 360 279.499 360 180.059C360 80.6195 279.42 0 180 0ZM180 297.702C115.045 297.702 62.3962 245.023 62.3962 180.059C62.3962 115.095 115.058 62.4168 180 62.4168C244.942 62.4168 297.604 115.095 297.604 180.059C297.604 245.023 244.942 297.702 180 297.702Z" fill="#7A49DE"/><path d="M208.118 189.436L204.118 182.814C203.278 181.338 202.518 178.546 202.518 176.91V166.818C202.518 153.814 191.918 143.203 178.838 143.203C165.758 143.203 155.158 153.814 155.158 166.818V176.91C155.158 178.546 154.398 181.338 153.558 182.774L149.518 189.436C147.918 192.108 147.558 195.06 148.558 197.773C149.518 200.445 151.798 202.52 154.758 203.517C162.518 206.15 170.678 207.426 178.838 207.426C186.998 207.426 195.158 206.15 202.918 203.557C205.718 202.639 207.878 200.525 208.918 197.773C209.958 195.02 209.678 191.989 208.118 189.436Z" fill="#532E95"/><path d="M187.757 144.883C184.997 143.806 181.997 143.207 178.837 143.207C175.717 143.207 172.717 143.766 169.957 144.883C171.677 141.652 175.077 139.617 178.837 139.617C182.637 139.617 185.997 141.652 187.757 144.883Z" fill="#532E95"/><path d="M190.077 211.462C188.397 216.089 183.957 219.4 178.757 219.4C175.597 219.4 172.477 218.123 170.277 215.85C168.997 214.653 168.037 213.057 167.477 211.422C167.997 211.502 168.517 211.542 169.077 211.621C169.997 211.741 170.957 211.861 171.917 211.94C174.197 212.14 176.517 212.26 178.837 212.26C181.117 212.26 183.397 212.14 185.637 211.94C186.477 211.861 187.317 211.821 188.117 211.701C188.757 211.621 189.397 211.542 190.077 211.462Z" fill="#532E95"/></svg></span>
       <span class="wm"><span class="l">PRICE</span><span class="b">PICK</span></span>
     </a>
     <nav class="nav" aria-label="주요 메뉴">
@@ -463,7 +472,7 @@ section{position:relative;scroll-margin-top:60px}
       <div class="ob tk"><span class="tks many"><img src="/web/img/ticket-gold.svg" alt="" width="512" height="512"><img src="/web/img/ticket-gold.svg" alt="" width="512" height="512"><img src="/web/img/ticket-gold.svg" alt="" width="512" height="512"><span class="chk"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span></span></div>
       <div class="phone"><div class="in">
         <img src="/web/img/phone.webp" alt="" width="609" height="1000">
-        <div class="scr"><img src="/web/img/splash.webp" alt="" width="390" height="844"></div>
+        <div class="scr"><img src="/web/img/pricepick-splash.png" alt="" width="390" height="844"></div>
       </div></div>
       <div class="ob bag"><img src="/web/img/bag.webp" alt="" width="889" height="1000"></div>
       <div class="ob coin"><img src="/web/img/coins.webp" alt="" width="1000" height="644"></div>
@@ -490,7 +499,7 @@ section{position:relative;scroll-margin-top:60px}
       <h2 class="h2">쇼핑에서 <em>기프티콘</em>까지</h2>
     </div>
     <ol class="flow" id="flow">
-      <li class="node"><div class="art"><span class="no">1</span><img src="/web/img/phone.webp" alt="" width="609" height="1000" loading="lazy"></div>
+      <li class="node"><div class="art"><span class="no">1</span><span class="pp-g-splash"><img src="/web/img/pricepick-splash.png" alt="" width="390" height="844" loading="lazy"></span></div>
         <div class="tx"><b>앱에서 쇼핑몰로</b><p>프라이스픽 바로가기로 들어가야 적립이 시작돼요.</p></div></li>
       <li class="node"><div class="art"><span class="no">2</span><img src="/web/img/bag.webp" alt="" width="889" height="1000" loading="lazy"></div>
         <div class="tx"><b>평소처럼 구매</b><p>들어간 뒤 24시간 안의 주문 한 건마다 랜덤 티켓 1장.</p></div></li>
@@ -775,11 +784,18 @@ section{position:relative;scroll-margin-top:60px}
 
   /* ── 머리 화면: 떠오르는 조각(휴대폰은 적게) · 마우스 시차(PC만) ── */
   var sp = document.getElementById('sparks');
+  /* 가이드 바탕 장식과 같은 모양(app 가이드 DECO_SHAPE 그대로) — 앞층 색(#845EEE · #E6A800) */
+  var DECO_SHAPE = {
+    ticket: function (c) { return '<svg viewBox="0 0 24 16"><path fill="' + c + '" d="M3 0h18a3 3 0 0 1 3 3v2.5a2.5 2.5 0 0 0 0 5V13a3 3 0 0 1-3 3H3a3 3 0 0 1-3-3v-2.5a2.5 2.5 0 0 0 0-5V3a3 3 0 0 1 3-3Z"/></svg>'; },
+    coin: function (c) { return '<svg viewBox="0 0 20 20"><circle cx="10" cy="10" r="10" fill="' + c + '"/><circle cx="10" cy="10" r="6" fill="none" stroke="' + c + '" stroke-width="2"/></svg>'; },
+    spark: function (c) { return '<svg viewBox="0 0 20 20"><path fill="' + c + '" d="M10 0c.9 5.4 4.6 9.1 10 10-5.4.9-9.1 4.6-10 10-.9-5.4-4.6-9.1-10-10C5.4 9.1 9.1 5.4 10 0Z"/></svg>'; }
+  };
   if (!RM && sp) {
-    var n = WIDE ? 16 : 7, h = '';
+    var n = WIDE ? 16 : 7, h = '', ks = ['ticket', 'coin', 'spark'];
     for (var i = 0; i < n; i++) {
-      h += '<i class="' + (i % 3 === 0 ? 'c' : '') + '" style="left:' + (Math.random() * 96).toFixed(1) + '%;--s:' + (8 + Math.random() * 12).toFixed(0) +
-        'px;--t:' + (8 + Math.random() * 7).toFixed(1) + 's;--dl:-' + (Math.random() * 12).toFixed(1) + 's"></i>';
+      var k = ks[i % 3], c = Math.random() < .4 ? '#E6A800' : '#845EEE';
+      h += '<i style="left:' + (Math.random() * 96).toFixed(1) + '%;--s:' + (10 + Math.random() * 12).toFixed(0) +
+        'px;--t:' + (8 + Math.random() * 7).toFixed(1) + 's;--dl:-' + (Math.random() * 12).toFixed(1) + 's">' + DECO_SHAPE[k](c) + '</i>';
     }
     sp.innerHTML = h;
   }
@@ -827,49 +843,54 @@ section{position:relative;scroll-margin-top:60px}
   }, { rootMargin: '0px 0px -8% 0px', threshold: .12 }) : null;
   document.querySelectorAll('.rv').forEach(function (el) { io ? io.observe(el) : el.classList.add('in'); });
 
-  /* ── 흐름도: 노드 사이를 잇는 선을 그리고, 선이 닿으면 오브젝트가 튀어나온다 ── */
+  /* ── 흐름도: 노드 사이를 잇는 선을 그리고, 선이 닿으면 오브젝트가 튀어나온다.
+       선 모양은 가이드 화살표 그대로 — 보라 점선(12 10, 4px)이 흐르고, 흰 마스크 선(.rv)이 걷히며 드러나고, 끝에 꺾쇠(.hd, 9px 뒤 · 좌우 7px) ── */
   var flow = document.getElementById('flow');
   if (flow) {
     var NS = 'http://www.w3.org/2000/svg';
     var svg = document.createElementNS(NS, 'svg');
     svg.setAttribute('aria-hidden', 'true');
-    svg.innerHTML = '<defs><linearGradient id="flowGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#C6AFFF"/><stop offset=".55" stop-color="#845EEE"/><stop offset="1" stop-color="#E6A800"/></linearGradient></defs>';
     flow.insertBefore(svg, flow.firstChild);
     var nodes = [].slice.call(flow.querySelectorAll('.node'));
-    var segs = [], base = null, played = false;
+    var ars = [], played = false;
+    var f1 = function (v) { return (+v).toFixed(1); };
     function layout() {
       var fr = flow.getBoundingClientRect();
       var pts = nodes.map(function (n) { var a = n.querySelector('.art').getBoundingClientRect(); return [a.left - fr.left + a.width / 2, a.top - fr.top + a.height / 2, a.width / 2, a.height / 2]; });
       var horiz = pts.length > 1 && Math.abs(pts[1][1] - pts[0][1]) < Math.abs(pts[1][0] - pts[0][0]);
-      var all = '';
-      segs.forEach(function (s) { s.remove(); }); segs = [];
-      if (base) base.remove();
+      svg.innerHTML = ''; ars = [];
       for (var i = 0; i < pts.length - 1; i++) {
-        var a = pts[i], b = pts[i + 1], d;
+        var a = pts[i], b = pts[i + 1], x1, y1, x2, y2, c1x, c1y, c2x, c2y;
         if (horiz) {
-          var x1 = a[0] + a[2] + 8, x2 = b[0] - b[2] - 8, mx = (x1 + x2) / 2;
-          d = 'M' + x1 + ' ' + a[1] + ' C' + mx + ' ' + a[1] + ' ' + mx + ' ' + b[1] + ' ' + x2 + ' ' + b[1];
+          x1 = a[0] + a[2] + 12; y1 = a[1]; x2 = b[0] - b[2] - 12; y2 = b[1];
+          var dx = Math.max(12, Math.abs(x2 - x1) * .45); c1x = x1 + dx; c1y = y1; c2x = x2 - dx; c2y = y2;
         } else {
-          var y1 = a[1] + a[3] + 8, y2 = b[1] - b[3] - 8, my = (y1 + y2) / 2;
-          d = 'M' + a[0] + ' ' + y1 + ' C' + a[0] + ' ' + (my + 30) + ' ' + b[0] + ' ' + (my - 30) + ' ' + b[0] + ' ' + y2;
+          x1 = a[0]; y1 = a[1] + a[3] + 12; x2 = b[0]; y2 = b[1] - b[3] - 12;
+          var dy = Math.max(12, Math.abs(y2 - y1) * .45); c1x = x1; c1y = y1 + dy; c2x = x2; c2y = y2 - dy;
         }
-        all += d + ' ';
-        var p = document.createElementNS(NS, 'path'); p.setAttribute('d', d); p.setAttribute('class', 'seg');
-        svg.appendChild(p); segs.push(p);
-        var L = p.getTotalLength(); p.style.strokeDasharray = L; p.style.strokeDashoffset = played || RM ? 0 : L;
+        var d = 'M' + f1(x1) + ' ' + f1(y1) + 'C' + f1(c1x) + ' ' + f1(c1y) + ' ' + f1(c2x) + ' ' + f1(c2y) + ' ' + f1(x2) + ' ' + f1(y2);
+        var ux = x2 - c2x, uy = y2 - c2y, L = Math.hypot(ux, uy) || 1; ux /= L; uy /= L;
+        var bx = x2 - 9 * ux, by = y2 - 9 * uy, nx = -uy * 7, ny = ux * 7;
+        var hd = 'M' + f1(bx + nx) + ' ' + f1(by + ny) + 'L' + f1(x2) + ' ' + f1(y2) + 'L' + f1(bx - nx) + ' ' + f1(by - ny);
+        var id = 'fm' + i;
+        var g = document.createElementNS(NS, 'g'); g.setAttribute('class', 'ar' + (played || RM ? ' on' : ''));
+        g.innerHTML = '<mask id="' + id + '" maskUnits="userSpaceOnUse" x="-200" y="-200" width="' + (fr.width + 400) + '" height="' + (fr.height + 400) + '"><path class="rv2" d="' + d + '"/></mask>' +
+          '<path class="ln" mask="url(#' + id + ')" d="' + d + '"/><path class="hd" d="' + hd + '"/>';
+        svg.appendChild(g);
+        var rv = g.querySelector('.rv2'), RL = rv.getTotalLength();
+        rv.style.strokeDasharray = RL; rv.style.strokeDashoffset = (played || RM) ? 0 : RL;
+        ars.push(g);
       }
-      base = document.createElementNS(NS, 'path'); base.setAttribute('d', all); base.setAttribute('class', 'base');
-      svg.insertBefore(base, svg.children[1] || null);
     }
     function play() {
       if (played) return; played = true;
-      var STEP = WIDE ? 420 : 360;
+      var STEP = WIDE ? 560 : 480;
       nodes.forEach(function (n, i) {
         setTimeout(function () { n.classList.add('on'); }, i * STEP);
-        if (segs[i]) setTimeout(function () {
-          segs[i].style.transition = 'stroke-dashoffset ' + (STEP - 60) + 'ms cubic-bezier(.4,0,.2,1)';
-          segs[i].style.strokeDashoffset = 0;
-        }, i * STEP + 120);
+        if (ars[i]) setTimeout(function () {
+          ars[i].classList.add('on');
+          ars[i].querySelector('.rv2').style.strokeDashoffset = 0;
+        }, i * STEP + 140);
       });
     }
     if (RM || !io) { nodes.forEach(function (n) { n.classList.add('on'); }); played = true; layout(); }
