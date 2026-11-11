@@ -171,31 +171,16 @@ section{position:relative;scroll-margin-top:60px}
 .pp-g-splash img{display:block;width:100%;height:100%;max-width:none;max-height:none;object-fit:cover}
 .node .art>.pp-g-splash{width:auto;height:78%;aspect-ratio:390/844;border-radius:10px;box-shadow:0 4px 10px rgba(108,74,182,.30)}
 
-/* ── 앱 화면 회전 — 폰 네 대가 원을 그리며 돈다(앞 → 오른쪽 → 뒤 → 왼쪽). 앞 폰이 가장 크고 또렷, 옆은 작고 흐리고 기울고, 뒤는 숨김 ── */
+/* ── 앱 화면 — 폰 한 대만. 화면 네 장이 폰 안에서 옆으로 밀려 나가고 들어온다(프레임 밖은 안 보임) ── */
 .hero-shots{position:relative;z-index:1;width:min(62%,250px);aspect-ratio:739/1582;margin:30px auto 46px;perspective:1100px;
   touch-action:pan-y;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}
 .hero-shots.ctl{cursor:grab}.hero-shots.dragging{cursor:grabbing}
 .hero-shots img{-webkit-user-drag:none;user-drag:none}
 .hero-shots .dev{position:absolute;inset:0;padding:7px;border-radius:13%/6%;background:linear-gradient(160deg,#2B2440,#15111F);
-  box-shadow:0 30px 60px rgba(40,20,90,.35),0 6px 16px rgba(40,20,90,.25),inset 0 0 0 1.5px rgba(255,255,255,.14);
-  transition:transform 1s cubic-bezier(.45,.05,.25,1),opacity .4s ease .6s,filter 1s ease;will-change:transform,opacity}
-/* 옆 화면 흐림 막 — 폰 위에 덮는 불투명 계열 막이라 뒤 화면이 비치지 않는다 */
-.hero-shots .dev::after{content:"";position:absolute;inset:0;border-radius:inherit;background:rgba(243,239,255,.62);opacity:0;transition:opacity 1s ease;pointer-events:none}
-.hero-shots .dev[data-pos="1"]::after,.hero-shots .dev[data-pos="3"]::after{opacity:1}
-.hero-shots .dev img{display:block;width:100%;height:100%;border-radius:11%/5.1%;background:#fff}
-.hero-shots .dev[data-pos="0"]{transform:translateX(0) translateZ(0) rotateY(0) scale(1);opacity:1;z-index:4}
-.hero-shots .dev[data-pos="1"]{transform:translateX(48%) translateZ(-160px) rotateY(-32deg) scale(.74);opacity:1;z-index:3;filter:blur(1.5px)}
-.hero-shots .dev[data-pos="2"]{transform:translateX(0) translateZ(-320px) rotateY(180deg) scale(.6);opacity:0;z-index:1;visibility:hidden;transition:transform 1s cubic-bezier(.45,.05,.25,1),opacity .25s ease,visibility 0s linear .25s}
-.hero-shots .dev[data-pos="3"]{transform:translateX(-48%) translateZ(-160px) rotateY(32deg) scale(.74);opacity:1;z-index:3;filter:blur(1.5px)}
-/* 직접 조작(끌기·점) — 스크립트가 매 장면을 직접 그린다. 휴대폰은 흐림 대신 막만(가볍게) */
-.hero-shots.ctl .dev{transition:none}
-.hero-shots.ctl .dev[data-pos]::after{transition:none;opacity:var(--veil,0)}
-/* 유리 반사 — 앞 화면에만, 기울 때만 아주 옅게. 화면 모서리 안쪽으로 잘림 */
-.hero-shots .glare{position:absolute;inset:7px;border-radius:11%/5.1%;overflow:hidden;pointer-events:none;opacity:0}
-.hero-shots .glare::before{content:"";position:absolute;inset:-20% -60%;
-  background:linear-gradient(105deg,transparent 38%,rgba(255,255,255,.22) 50%,transparent 62%);
-  transform:translateX(var(--gx,0%))}
-.hero-shots.tilt .dev[data-pos="0"] .glare{opacity:var(--ga,0)}
+  box-shadow:0 30px 60px rgba(40,20,90,.35),0 6px 16px rgba(40,20,90,.25),inset 0 0 0 1.5px rgba(255,255,255,.14);will-change:transform}
+.hero-shots .scr{position:relative;width:100%;height:100%;border-radius:11%/5.1%;overflow:hidden;background:#fff;isolation:isolate;transform:translateZ(0)}
+.hero-shots .scr img{position:absolute;inset:0;display:block;width:100%;height:100%;background:#fff;will-change:transform}
+.hero-shots .scr img:not(:first-child){visibility:hidden}
 /* 점 네 개 — 지금 화면 표시, 누르면 그 화면으로 */
 .shot-dots{position:absolute;left:50%;top:calc(100% + 12px);transform:translateX(-50%);display:flex;gap:2px;z-index:53}
 .shot-dots button{width:24px;height:24px;padding:0;border:0;background:none;cursor:pointer;display:grid;place-items:center}
@@ -206,7 +191,6 @@ section{position:relative;scroll-margin-top:60px}
 .burst{position:absolute;inset:0;z-index:55;pointer-events:none}
 .burst .bp{position:absolute;left:0;top:0;will-change:transform,opacity;opacity:0}
 .burst .bp img{display:block;width:100%;height:auto;filter:drop-shadow(0 8px 10px rgba(108,74,182,.25))}
-.burst .bp img+img{position:absolute;left:0;top:0;opacity:0}
 @media (min-width:860px){
   /* PC: 스크립트가 배경 사진 속 폰 자리를 계산해 그 위에 세운다 */
   .hero-shots{position:absolute;margin:0;width:clamp(250px,20vw,380px);left:0;top:0;visibility:hidden}
@@ -522,8 +506,7 @@ section{position:relative;scroll-margin-top:60px}
   .js .rv,.js .hero-title .ln>span,.js .hero .h-fade{opacity:1 !important;transform:none !important}
   .js .flow.armed .node .art,.js .flow.armed .node .tx{opacity:1 !important;transform:none !important}
   .sparks{display:none}
-  .hero-shots .dev:not([data-pos="0"]){opacity:0 !important}
-  .hero-shots .glare,.burst{display:none !important}
+  .burst{display:none !important}
   .marquee{mask-image:none;-webkit-mask-image:none;margin:0}
   .track{width:auto;flex-wrap:wrap}.track.rev{display:none}.track .dup{display:none}
 }
@@ -575,10 +558,12 @@ section{position:relative;scroll-margin-top:60px}
     <!-- 앱 실제 화면 네 장이 돌아가는 폰 묶음(김반장 2026-11-11). 맨 앞 폰은 PC에서 배경 사진 속 폰 자리 위에 서서 그 폰을 가린다(폰 두 개 방지).
          화면은 김반장이 데모 앱에서 직접 뜬 것 — ③·④의 마우스 커서는 지웠고, ②는 「혜택」 글자에 걸쳐 그대로 둠 -->
     <div class="hero-shots" id="hero-shots" role="group" aria-label="프라이스픽 앱 화면 — 홈, 혜택, 기프티샵, 상품 상세. 좌우로 끌거나 아래 점을 눌러 넘겨 보세요">
-      <div class="dev" data-pos="0"><img draggable="false" src="img/app-home.webp" alt="" width="725" height="1568"><i class="glare" aria-hidden="true"></i></div>
-      <div class="dev" data-pos="1"><img draggable="false" src="img/app-benefit.webp" alt="" width="725" height="1568" loading="lazy"><i class="glare" aria-hidden="true"></i></div>
-      <div class="dev" data-pos="2"><img draggable="false" src="img/app-giftshop.webp" alt="" width="725" height="1568" loading="lazy"><i class="glare" aria-hidden="true"></i></div>
-      <div class="dev" data-pos="3"><img draggable="false" src="img/app-product.webp" alt="" width="725" height="1568" loading="lazy"><i class="glare" aria-hidden="true"></i></div>
+      <div class="dev"><div class="scr">
+        <img draggable="false" src="img/app-home.webp" alt="" width="725" height="1568">
+        <img draggable="false" src="img/app-benefit.webp" alt="" width="725" height="1568" loading="lazy">
+        <img draggable="false" src="img/app-giftshop.webp" alt="" width="725" height="1568" loading="lazy">
+        <img draggable="false" src="img/app-product.webp" alt="" width="725" height="1568" loading="lazy">
+      </div></div>
       <img class="ho ho-bag" src="img/bag.webp" alt="" width="889" height="1000" aria-hidden="true">
       <img class="ho ho-coin" src="img/coins.webp" alt="" width="1000" height="644" aria-hidden="true">
       <div class="hero-tk" aria-hidden="true"><span class="tks one"><img src="img/ticket-random.svg" alt="" width="512" height="512"></span></div>
@@ -912,44 +897,29 @@ section{position:relative;scroll-margin-top:60px}
   placeShots();
   window.addEventListener('resize', placeShots);
   window.addEventListener('load', placeShots);
-  /* ── 앱 화면 회전 · 직접 조작 ──
-     s = 돌아간 칸 수(실수). 화면 i 의 자리 = (i + s) mod 4 → 0 앞, 1 오른쪽, 2 뒤, 3 왼쪽.
-     끌기(좌우만, 세로는 페이지 스크롤) · 점 누르기 · 4.2초 자동 회전(조작·마우스 올림 중 멈춤).
-     PC(정밀 포인터·860px 이상)만 커서 따라 기울기와 유리 반사. 움직임 끈 사용자는 점으로만 넘김(즉시) */
+  /* ── 앱 화면 넘기기 · 직접 조작 ──
+     폰은 한 대. s = 넘어간 칸 수(실수). 화면 i 의 자리 = (i + s)를 -2~2 로 감은 값 → 0 이면 폰 안, ±1 이면 폰 바로 옆(프레임 밖이라 안 보임).
+     자동은 4.2초마다 다음 화면(오른쪽에서 들어옴). 끌기(좌우만, 세로는 페이지 스크롤) · 점 누르기. 조작·마우스 올림 중엔 자동 멈춤.
+     PC(정밀 포인터·860px 이상)만 커서 따라 기울기. 화면이 바뀌면 금색 티켓이 터진다. 움직임 끈 사용자는 점으로만 즉시 넘김 */
   if (shots) (function () {
-    var devs = [].slice.call(shots.querySelectorAll('.dev'));
+    var dev = shots.querySelector('.dev'), imgs = [].slice.call(shots.querySelectorAll('.scr img'));
     var dots = [].slice.call(document.querySelectorAll('#shot-dots button'));
     var burstEl = document.getElementById('burst');
     var PC = FINE && WIDE && !RM;
-    // 자리별 값: 0 앞 · 1 오른쪽 · 2 뒤 · 3 왼쪽 · 4(=0)
-    var K = { tx: [0, 48, 0, -48, 0], tz: [0, -160, -320, -160, 0], ry: [0, -32, -180, -328, -360], sc: [1, .74, .6, .74, 1], veil: [0, 1, 1, 1, 0] };
     var s = 0, anim = null, drag = null, hover = false, lastAct = performance.now(), raf = 0, settledFront = 0;
     var tilt = { x: 0, y: 0, tx: 0, ty: 0, back: false };
     function mod(a) { return ((a % 4) + 4) % 4; }
     function lerp(a, b, t) { return a + (b - a) * t; }
     function frontIdx() { return mod(-Math.round(s)); }
     function render() {
-      var tiltT = PC ? 'rotateX(' + tilt.x.toFixed(2) + 'deg) rotateY(' + tilt.y.toFixed(2) + 'deg) ' : '';
-      devs.forEach(function (d, i) {
-        var p = mod(i + s), k = Math.floor(p) % 4, t = p - Math.floor(p);
-        var tx = lerp(K.tx[k], K.tx[k + 1], t), tz = lerp(K.tz[k], K.tz[k + 1], t), ry = lerp(K.ry[k], K.ry[k + 1], t), sc = lerp(K.sc[k], K.sc[k + 1], t), veil = lerp(K.veil[k], K.veil[k + 1], t);
-        // 뒤로 빠지는 화면은 빨리 사라지고, 뒤에서 나오는 화면은 늦게 나타난다 → 반투명 화면은 늘 맨 뒤에만 있다
-        var op = k === 1 ? Math.max(0, 1 - t * 4) : k === 2 ? Math.max(0, (t - .75) * 4) : 1;
-        d.style.transform = tiltT + 'translateX(' + tx.toFixed(2) + '%) translateZ(' + tz.toFixed(1) + 'px) rotateY(' + ry.toFixed(2) + 'deg) scale(' + sc.toFixed(4) + ')';
-        d.style.opacity = op.toFixed(3);
-        d.style.visibility = op > 0 ? 'visible' : 'hidden';
-        d.style.zIndex = Math.round((tz + 320) / 8); // 0~40, 둘레 오브젝트(50~)보다 아래
-        d.style.filter = PC && veil > .01 ? 'blur(' + (veil * 1.5).toFixed(2) + 'px)' : 'none';
-        d.style.setProperty('--veil', (veil * op).toFixed(3));
-        d.dataset.pos = Math.round(p) % 4;
+      if (PC) dev.style.transform = 'rotateX(' + tilt.x.toFixed(2) + 'deg) rotateY(' + tilt.y.toFixed(2) + 'deg)';
+      imgs.forEach(function (im, i) {
+        var p = mod(i + s), off = p >= 2 ? p - 4 : p, a = Math.abs(off);
+        im.style.transform = 'translateX(' + (off * 100).toFixed(2) + '%) scale(' + (1 - .06 * Math.min(1, a)).toFixed(4) + ')';
+        im.style.visibility = a < .999 ? 'visible' : 'hidden';
       });
       var f = frontIdx();
       dots.forEach(function (b, i) { b.setAttribute('aria-current', i === f ? 'true' : 'false'); });
-      if (PC) {
-        var m = Math.min(1, (Math.abs(tilt.x) + Math.abs(tilt.y)) / 6);
-        shots.style.setProperty('--ga', (m * .9).toFixed(3));
-        shots.style.setProperty('--gx', (-tilt.y * 2.5).toFixed(1) + '%');
-      }
     }
     function ease(t) { return t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; }
     function easeOut(t) { return 1 - Math.pow(1 - t, 3); }
@@ -959,7 +929,7 @@ section{position:relative;scroll-margin-top:60px}
     }
     function settle() {
       s = mod(Math.round(s)); var f = frontIdx();
-      if (f !== settledFront && !RM) burst(f);
+      if (f !== settledFront && !RM) burst();
       settledFront = f; render();
     }
     function frame(now) {
@@ -979,10 +949,10 @@ section{position:relative;scroll-margin-top:60px}
     }
     function kick() { if (!raf) raf = requestAnimationFrame(frame); }
 
-    /* ── 화면별 터짐 — 홈: 동전이 튀어 올라 떨어짐 / 혜택: 빨간 티켓이 퍼지며 금색으로 / 기프티샵: 바코드·커피와 선물 상자가 사방으로 / 상품 상세: 금색 티켓이 폰 안으로 빨려 듦.
-       왼쪽(휴대폰은 위쪽) 글자 영역에는 들어가지 않는다 — 지나는 점을 전부 재서 걸리면 그 조각은 다른 방향으로 다시 뽑는다 ── */
-    var IMG = { coin: 'img/coins.webp', red: 'img/ticket-random.svg', gold: 'img/ticket-gold.svg', gifticon: 'img/gifticon.webp', boxP: 'img/gift-box-purple.webp', boxG: 'img/gift-box-gold.webp' };
-    if (!RM) window.addEventListener('load', function () { Object.keys(IMG).forEach(function (k) { var im = new Image(); im.src = IMG[k]; }); });
+    /* ── 화면이 바뀔 때 금색 확정 티켓이 폰에서 터져 나와 바깥으로 흩어진다(PC 18장, 휴대폰 10장·덜 멀리, 1~1.2초).
+       왼쪽(휴대폰은 위쪽) 글자 영역에는 들어가지 않는다 — 지나는 점을 전부 재서 걸리면 그 장은 다른 방향으로 다시 뽑는다 ── */
+    var GOLD = 'img/ticket-gold.svg';
+    if (!RM) window.addEventListener('load', function () { var im = new Image(); im.src = GOLD; });
     var live = [];
     function rnd(a, b) { return a + Math.random() * (b - a); }
     function safeZone() {
@@ -993,51 +963,35 @@ section{position:relative;scroll-margin-top:60px}
       return WIDE ? { x: right - r.left + 24, y: -1e9 } : { x: -1e9, y: bottom - r.top + 14 };
     }
     function ok(pts, half, z) { for (var i = 0; i < pts.length; i++) { if (pts[i][0] - half < z.x || pts[i][1] - half < z.y) return false; } return true; }
-    function burst(f) {
+    function burst() {
       if (!burstEl) return;
       live.forEach(function (a) { a.cancel(); }); live = [];
       while (burstEl.firstChild) burstEl.removeChild(burstEl.firstChild);
       var w = shots.offsetWidth, h = shots.offsetHeight, z = safeZone(), N = WIDE ? 18 : 10, RK = WIDE ? 1 : .62; // 휴대폰은 화면이 좁아 덜 멀리, 덜 많이
       var cx = w / 2, cy = h * .42;
       for (var i = 0; i < N; i++) {
-        var srcs, sz, pts, dur = rnd(950, 1200), delay = rnd(0, 160), rot0 = rnd(-30, 30), rot1 = rot0 + rnd(-540, 540), swap = false, inward = false, tries = 0;
+        var sz = w * rnd(.38, .56), pts, dur = rnd(950, 1200), delay = rnd(0, 160), rot0 = rnd(-30, 30), rot1 = rot0 + rnd(-540, 540), tries = 0;
         do {
           pts = [];
-          if (f === 0) { // 동전: 폰 아래쪽에서 튀어 올랐다가 떨어진다
-            srcs = [IMG.coin]; sz = w * rnd(.26, .40);
-            var x0 = w * rnd(.2, .8), y0 = h * rnd(.5, .68), dx = rnd(-1.7, 1.7) * w * RK, up = h * rnd(.12, .30), b = up / .09;
-            for (var k = 0; k <= 8; k++) { var t = k / 8; pts.push([x0 + dx * t, y0 - .6 * b * t + b * t * t]); }
-          } else if (f === 3) { // 금색 티켓: 바깥에서 폰 안으로
-            srcs = [IMG.gold]; sz = w * rnd(.38, .54); inward = true;
-            var a = rnd(0, Math.PI * 2), R = w * rnd(1.3, 2.2) * RK;
-            for (var k = 0; k <= 8; k++) { var t = k / 8, rr = R * (1 - t * t); pts.push([cx + Math.cos(a + t * .9) * rr, cy + Math.sin(a + t * .9) * rr * 1.1]); }
-          } else { // 혜택·기프티샵: 폰에서 바깥으로
-            if (f === 1) { srcs = [IMG.red, IMG.gold]; swap = true; sz = w * rnd(.40, .56); }
-            else { srcs = [[IMG.gifticon, IMG.boxP, IMG.boxG][i % 3]]; sz = w * (i % 3 ? rnd(.32, .46) : rnd(.42, .56)); }
-            var a2 = rnd(0, Math.PI * 2), R2 = w * rnd(1.2, 2.1) * RK, drop = h * rnd(.02, .12);
-            for (var k = 0; k <= 8; k++) { var t = k / 8, e = 1 - Math.pow(1 - t, 2.2); pts.push([cx + Math.cos(a2) * R2 * e, cy + Math.sin(a2) * R2 * e * 1.1 + drop * t * t]); }
-          }
+          var a2 = rnd(0, Math.PI * 2), R2 = w * rnd(1.2, 2.1) * RK, drop = h * rnd(.02, .12);
+          for (var k = 0; k <= 8; k++) { var t = k / 8, e = 1 - Math.pow(1 - t, 2.2); pts.push([cx + Math.cos(a2) * R2 * e, cy + Math.sin(a2) * R2 * e * 1.1 + drop * t * t]); }
         } while (!ok(pts, sz / 2, z) && ++tries < 12);
         if (tries >= 12) continue;
         var el = document.createElement('div'); el.className = 'bp'; el.style.width = sz.toFixed(1) + 'px';
-        srcs.forEach(function (src) { var im = document.createElement('img'); im.src = src; im.alt = ''; im.draggable = false; el.appendChild(im); });
+        var im = document.createElement('img'); im.src = GOLD; im.alt = ''; im.draggable = false; el.appendChild(im);
         burstEl.appendChild(el);
         var kf = pts.map(function (q, k) {
-          var t = k / 8, sc = inward ? 1 - .8 * t * t : (t < .2 ? .45 + 2.9 * t : 1.03 - .13 * (t - .2) / .8);
-          var op = inward ? (t < .15 ? t / .15 : t > .85 ? (1 - t) / .15 : 1) : (t < .08 ? t / .08 : t > .68 ? Math.max(0, (1 - t) / .32) : 1);
+          var t = k / 8, sc = t < .2 ? .45 + 2.9 * t : 1.03 - .13 * (t - .2) / .8;
+          var op = t < .08 ? t / .08 : t > .68 ? Math.max(0, (1 - t) / .32) : 1;
           return { transform: 'translate(' + (q[0] - sz / 2).toFixed(1) + 'px,' + (q[1] - sz / 2).toFixed(1) + 'px) rotate(' + (rot0 + (rot1 - rot0) * t).toFixed(1) + 'deg) scale(' + sc.toFixed(3) + ')', opacity: op, offset: t };
         });
         var an = el.animate(kf, { duration: dur, delay: delay, easing: 'linear', fill: 'both' });
         an.onfinish = (function (node) { return function () { node.remove(); }; })(el);
         live.push(an);
-        if (swap) { // 빨간 랜덤 티켓 → 금색 확정 티켓
-          live.push(el.children[0].animate([{ opacity: 1, offset: 0 }, { opacity: 1, offset: .32 }, { opacity: 0, offset: .5 }, { opacity: 0, offset: 1 }], { duration: dur, delay: delay, fill: 'both' }));
-          live.push(el.children[1].animate([{ opacity: 0, offset: 0 }, { opacity: 0, offset: .32 }, { opacity: 1, offset: .5 }, { opacity: 1, offset: 1 }], { duration: dur, delay: delay, fill: 'both' }));
-        }
       }
     }
 
-    shots.classList.add('ctl'); if (PC) shots.classList.add('tilt');
+    shots.classList.add('ctl');
     render();
 
     // 점
@@ -1066,7 +1020,7 @@ section{position:relative;scroll-margin-top:60px}
           try { shots.setPointerCapture(e.pointerId); } catch (_) {}
           shots.classList.add('dragging');
         }
-        var w = shots.offsetWidth * 1.1;
+        var w = shots.offsetWidth - 14; // 화면 폭만큼 끌면 한 장 — 손가락을 그대로 따라온다
         s = drag.s0 + dx / w;
         var dt = e.timeStamp - drag.lt; if (dt > 0) drag.v = lerp(drag.v, (e.clientX - drag.lx) / w / dt, .5);
         drag.lx = e.clientX; drag.lt = e.timeStamp;
@@ -1087,7 +1041,7 @@ section{position:relative;scroll-margin-top:60px}
       // 자동 회전 — 마지막 조작에서 4.2초 지나면 한 칸
       setInterval(function () {
         if (hover || drag || anim || document.hidden) return;
-        if (performance.now() - lastAct >= 4200) { lastAct = performance.now(); goTo(Math.round(s) + 1, 900, ease); }
+        if (performance.now() - lastAct >= 4200) { lastAct = performance.now(); goTo(Math.round(s) - 1, 800, ease); }
       }, 250);
     }
 
