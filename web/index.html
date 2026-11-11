@@ -97,9 +97,9 @@ section{position:relative;scroll-margin-top:60px}
   background:radial-gradient(420px 420px at var(--mx,70%) var(--my,35%),rgba(198,175,255,.35),transparent 70%)}
 .hero-in{display:grid;grid-template-columns:minmax(0,1fr);padding-top:24px;padding-bottom:52px;min-height:calc(100svh - 60px);align-content:start}
 .hero-title{position:relative;z-index:2;margin:0;font-size:46px;font-weight:800;letter-spacing:-2.3px;line-height:1.06}
-.hero-tk{position:absolute;z-index:6;right:-26%;top:7%;width:40%;aspect-ratio:1;filter:drop-shadow(0 14px 16px rgba(108,74,182,.30));animation:tkFloat 7s ease-in-out infinite;pointer-events:none}
+.hero-tk{position:absolute;z-index:51;right:-26%;top:7%;width:40%;aspect-ratio:1;filter:drop-shadow(0 14px 16px rgba(108,74,182,.30));animation:tkFloat 7s ease-in-out infinite;pointer-events:none}
 /* 폰 둘레 오브젝트 — 큰 것(쇼핑백) 왼쪽 아래, 중간(동전) 오른쪽 아래. 티켓은 오른쪽 위. 반짝이·별 없음 */
-.ho{position:absolute;z-index:5;height:auto;pointer-events:none;filter:drop-shadow(0 16px 18px rgba(108,74,182,.28));animation:hoFloat 8s ease-in-out infinite}
+.ho{position:absolute;z-index:50;height:auto;pointer-events:none;filter:drop-shadow(0 16px 18px rgba(108,74,182,.28));animation:hoFloat 8s ease-in-out infinite}
 .ho-bag{width:52%;left:-38%;bottom:-11%}
 .ho-coin{width:44%;right:-30%;bottom:6%;animation-delay:-2.6s}
 @keyframes hoFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
@@ -172,7 +172,10 @@ section{position:relative;scroll-margin-top:60px}
 .node .art>.pp-g-splash{width:auto;height:78%;aspect-ratio:390/844;border-radius:10px;box-shadow:0 4px 10px rgba(108,74,182,.30)}
 
 /* ── 앱 화면 회전 — 폰 네 대가 원을 그리며 돈다(앞 → 오른쪽 → 뒤 → 왼쪽). 앞 폰이 가장 크고 또렷, 옆은 작고 흐리고 기울고, 뒤는 숨김 ── */
-.hero-shots{position:relative;z-index:1;width:min(62%,250px);aspect-ratio:739/1582;margin:30px auto 8px;perspective:1100px}
+.hero-shots{position:relative;z-index:1;width:min(62%,250px);aspect-ratio:739/1582;margin:30px auto 46px;perspective:1100px;
+  touch-action:pan-y;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}
+.hero-shots.ctl{cursor:grab}.hero-shots.dragging{cursor:grabbing}
+.hero-shots img{-webkit-user-drag:none;user-drag:none}
 .hero-shots .dev{position:absolute;inset:0;padding:7px;border-radius:13%/6%;background:linear-gradient(160deg,#2B2440,#15111F);
   box-shadow:0 30px 60px rgba(40,20,90,.35),0 6px 16px rgba(40,20,90,.25),inset 0 0 0 1.5px rgba(255,255,255,.14);
   transition:transform 1s cubic-bezier(.45,.05,.25,1),opacity .4s ease .6s,filter 1s ease;will-change:transform,opacity}
@@ -184,10 +187,33 @@ section{position:relative;scroll-margin-top:60px}
 .hero-shots .dev[data-pos="1"]{transform:translateX(48%) translateZ(-160px) rotateY(-32deg) scale(.74);opacity:1;z-index:3;filter:blur(1.5px)}
 .hero-shots .dev[data-pos="2"]{transform:translateX(0) translateZ(-320px) rotateY(180deg) scale(.6);opacity:0;z-index:1;visibility:hidden;transition:transform 1s cubic-bezier(.45,.05,.25,1),opacity .25s ease,visibility 0s linear .25s}
 .hero-shots .dev[data-pos="3"]{transform:translateX(-48%) translateZ(-160px) rotateY(32deg) scale(.74);opacity:1;z-index:3;filter:blur(1.5px)}
+/* 직접 조작(끌기·점) — 스크립트가 매 장면을 직접 그린다. 휴대폰은 흐림 대신 막만(가볍게) */
+.hero-shots.ctl .dev{transition:none}
+.hero-shots.ctl .dev[data-pos]::after{transition:none;opacity:var(--veil,0)}
+/* 유리 반사 — 앞 화면에만, 기울 때만 아주 옅게. 화면 모서리 안쪽으로 잘림 */
+.hero-shots .glare{position:absolute;inset:7px;border-radius:11%/5.1%;overflow:hidden;pointer-events:none;opacity:0}
+.hero-shots .glare::before{content:"";position:absolute;inset:-20% -60%;
+  background:linear-gradient(105deg,transparent 38%,rgba(255,255,255,.22) 50%,transparent 62%);
+  transform:translateX(var(--gx,0%))}
+.hero-shots.tilt .dev[data-pos="0"] .glare{opacity:var(--ga,0)}
+/* 점 네 개 — 지금 화면 표시, 누르면 그 화면으로 */
+.shot-dots{position:absolute;left:50%;top:calc(100% + 12px);transform:translateX(-50%);display:flex;gap:2px;z-index:53}
+.shot-dots button{width:24px;height:24px;padding:0;border:0;background:none;cursor:pointer;display:grid;place-items:center}
+.shot-dots button::before{content:"";width:7px;height:7px;border-radius:4px;background:rgba(132,94,238,.28);transition:width .25s var(--ease),background .25s}
+.shot-dots button[aria-current="true"]::before{width:20px;background:var(--main)}
+.shot-dots button:focus-visible{outline:2px solid var(--main);outline-offset:-2px;border-radius:6px}
+/* 기프티샵 화면이 앞으로 나올 때 금색 티켓 한 장 */
+.pop-tk{position:absolute;z-index:52;left:50%;top:3%;width:34%;margin-left:-17%;opacity:0;pointer-events:none;filter:drop-shadow(0 10px 14px rgba(108,74,182,.30))}
+.pop-tk.go{animation:popTk .85s cubic-bezier(.2,.7,.3,1) both}
+@keyframes popTk{0%{opacity:0;transform:translate(0,0) scale(.35) rotate(0)}
+  18%{opacity:1}
+  55%{opacity:1;transform:translate(-125%,-105%) scale(1) rotate(-18deg)}
+  100%{opacity:0;transform:translate(-160%,-140%) scale(.9) rotate(-26deg)}}
 @media (min-width:860px){
   /* PC: 스크립트가 배경 사진 속 폰 자리를 계산해 그 위에 세운다 */
   .hero-shots{position:absolute;margin:0;width:clamp(250px,20vw,380px);left:0;top:0;visibility:hidden}
   .hero-shots.placed{visibility:visible}
+  .hero-shots{z-index:3} /* 제목 줄 상자가 폰 위로 겹쳐 끌기를 막지 않게 */
 }
 
 /* ═════════ 약속 ═════════ */
@@ -499,6 +525,7 @@ section{position:relative;scroll-margin-top:60px}
   .js .flow.armed .node .art,.js .flow.armed .node .tx{opacity:1 !important;transform:none !important}
   .sparks{display:none}
   .hero-shots .dev:not([data-pos="0"]){opacity:0 !important}
+  .hero-shots .glare,.pop-tk{display:none !important}
   .marquee{mask-image:none;-webkit-mask-image:none;margin:0}
   .track{width:auto;flex-wrap:wrap}.track.rev{display:none}.track .dup{display:none}
 }
@@ -549,14 +576,18 @@ section{position:relative;scroll-margin-top:60px}
     </div>
     <!-- 앱 실제 화면 네 장이 돌아가는 폰 묶음(김반장 2026-11-11). 맨 앞 폰은 PC에서 배경 사진 속 폰 자리 위에 서서 그 폰을 가린다(폰 두 개 방지).
          화면은 김반장이 데모 앱에서 직접 뜬 것 — ③·④의 마우스 커서는 지웠고, ②는 「혜택」 글자에 걸쳐 그대로 둠 -->
-    <div class="hero-shots" id="hero-shots" role="img" aria-label="프라이스픽 앱 화면 — 홈, 혜택, 기프티샵, 상품 상세">
-      <div class="dev" data-pos="0"><img src="img/app-home.webp" alt="" width="725" height="1568"></div>
-      <div class="dev" data-pos="1"><img src="img/app-benefit.webp" alt="" width="725" height="1568" loading="lazy"></div>
-      <div class="dev" data-pos="2"><img src="img/app-giftshop.webp" alt="" width="725" height="1568" loading="lazy"></div>
-      <div class="dev" data-pos="3"><img src="img/app-product.webp" alt="" width="725" height="1568" loading="lazy"></div>
+    <div class="hero-shots" id="hero-shots" role="group" aria-label="프라이스픽 앱 화면 — 홈, 혜택, 기프티샵, 상품 상세. 좌우로 끌거나 아래 점을 눌러 넘겨 보세요">
+      <div class="dev" data-pos="0"><img draggable="false" src="img/app-home.webp" alt="" width="725" height="1568"><i class="glare" aria-hidden="true"></i></div>
+      <div class="dev" data-pos="1"><img draggable="false" src="img/app-benefit.webp" alt="" width="725" height="1568" loading="lazy"><i class="glare" aria-hidden="true"></i></div>
+      <div class="dev" data-pos="2"><img draggable="false" src="img/app-giftshop.webp" alt="" width="725" height="1568" loading="lazy"><i class="glare" aria-hidden="true"></i></div>
+      <div class="dev" data-pos="3"><img draggable="false" src="img/app-product.webp" alt="" width="725" height="1568" loading="lazy"><i class="glare" aria-hidden="true"></i></div>
       <img class="ho ho-bag" src="img/bag.webp" alt="" width="889" height="1000" aria-hidden="true">
       <img class="ho ho-coin" src="img/coins.webp" alt="" width="1000" height="644" aria-hidden="true">
       <div class="hero-tk" aria-hidden="true"><span class="tks one"><img src="img/ticket-random.svg" alt="" width="512" height="512"></span></div>
+      <img class="pop-tk" id="pop-tk" src="img/ticket-gold.svg" alt="" width="512" height="512" aria-hidden="true" draggable="false">
+      <div class="shot-dots" id="shot-dots">
+        <button type="button" aria-label="홈 화면 보기" aria-current="true"></button><button type="button" aria-label="혜택 화면 보기" aria-current="false"></button><button type="button" aria-label="기프티샵 화면 보기" aria-current="false"></button><button type="button" aria-label="상품 상세 화면 보기" aria-current="false"></button>
+      </div>
     </div>
   </div>
 </section>
@@ -883,15 +914,139 @@ section{position:relative;scroll-margin-top:60px}
   placeShots();
   window.addEventListener('resize', placeShots);
   window.addEventListener('load', placeShots);
-  if (shots && !RM) {
-    var devs = [].slice.call(shots.querySelectorAll('.dev')), paused = false;
-    shots.addEventListener('mouseenter', function () { paused = true; });
-    shots.addEventListener('mouseleave', function () { paused = false; });
-    setInterval(function () {
-      if (paused || document.hidden) return;
-      devs.forEach(function (d) { d.dataset.pos = (+d.dataset.pos + 1) % 4; });
-    }, 4200);
-  }
+  /* ── 앱 화면 회전 · 직접 조작 ──
+     s = 돌아간 칸 수(실수). 화면 i 의 자리 = (i + s) mod 4 → 0 앞, 1 오른쪽, 2 뒤, 3 왼쪽.
+     끌기(좌우만, 세로는 페이지 스크롤) · 점 누르기 · 4.2초 자동 회전(조작·마우스 올림 중 멈춤).
+     PC(정밀 포인터·860px 이상)만 커서 따라 기울기와 유리 반사. 움직임 끈 사용자는 점으로만 넘김(즉시) */
+  if (shots) (function () {
+    var devs = [].slice.call(shots.querySelectorAll('.dev'));
+    var dots = [].slice.call(document.querySelectorAll('#shot-dots button'));
+    var popTk = document.getElementById('pop-tk');
+    var PC = FINE && WIDE && !RM;
+    // 자리별 값: 0 앞 · 1 오른쪽 · 2 뒤 · 3 왼쪽 · 4(=0)
+    var K = { tx: [0, 48, 0, -48, 0], tz: [0, -160, -320, -160, 0], ry: [0, -32, -180, -328, -360], sc: [1, .74, .6, .74, 1], veil: [0, 1, 1, 1, 0] };
+    var s = 0, anim = null, drag = null, hover = false, lastAct = performance.now(), raf = 0, settledFront = 0;
+    var tilt = { x: 0, y: 0, tx: 0, ty: 0, back: false };
+    function mod(a) { return ((a % 4) + 4) % 4; }
+    function lerp(a, b, t) { return a + (b - a) * t; }
+    function frontIdx() { return mod(-Math.round(s)); }
+    function render() {
+      var tiltT = PC ? 'rotateX(' + tilt.x.toFixed(2) + 'deg) rotateY(' + tilt.y.toFixed(2) + 'deg) ' : '';
+      devs.forEach(function (d, i) {
+        var p = mod(i + s), k = Math.floor(p) % 4, t = p - Math.floor(p);
+        var tx = lerp(K.tx[k], K.tx[k + 1], t), tz = lerp(K.tz[k], K.tz[k + 1], t), ry = lerp(K.ry[k], K.ry[k + 1], t), sc = lerp(K.sc[k], K.sc[k + 1], t), veil = lerp(K.veil[k], K.veil[k + 1], t);
+        // 뒤로 빠지는 화면은 빨리 사라지고, 뒤에서 나오는 화면은 늦게 나타난다 → 반투명 화면은 늘 맨 뒤에만 있다
+        var op = k === 1 ? Math.max(0, 1 - t * 4) : k === 2 ? Math.max(0, (t - .75) * 4) : 1;
+        d.style.transform = tiltT + 'translateX(' + tx.toFixed(2) + '%) translateZ(' + tz.toFixed(1) + 'px) rotateY(' + ry.toFixed(2) + 'deg) scale(' + sc.toFixed(4) + ')';
+        d.style.opacity = op.toFixed(3);
+        d.style.visibility = op > 0 ? 'visible' : 'hidden';
+        d.style.zIndex = Math.round((tz + 320) / 8); // 0~40, 둘레 오브젝트(50~)보다 아래
+        d.style.filter = PC && veil > .01 ? 'blur(' + (veil * 1.5).toFixed(2) + 'px)' : 'none';
+        d.style.setProperty('--veil', (veil * op).toFixed(3));
+        d.dataset.pos = Math.round(p) % 4;
+      });
+      var f = frontIdx();
+      dots.forEach(function (b, i) { b.setAttribute('aria-current', i === f ? 'true' : 'false'); });
+      if (PC) {
+        var m = Math.min(1, (Math.abs(tilt.x) + Math.abs(tilt.y)) / 6);
+        shots.style.setProperty('--ga', (m * .9).toFixed(3));
+        shots.style.setProperty('--gx', (-tilt.y * 2.5).toFixed(1) + '%');
+      }
+    }
+    function ease(t) { return t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; }
+    function easeOut(t) { return 1 - Math.pow(1 - t, 3); }
+    function goTo(target, dur, fn) {
+      if (RM || dur <= 0) { s = target; anim = null; render(); settle(); return; }
+      anim = { from: s, to: target, t0: performance.now(), dur: dur, fn: fn || ease }; kick();
+    }
+    function settle() {
+      s = mod(Math.round(s)); var f = frontIdx();
+      if (f === 2 && settledFront !== 2 && !RM && popTk) { popTk.classList.remove('go'); void popTk.offsetWidth; popTk.classList.add('go'); }
+      settledFront = f; render();
+    }
+    function frame(now) {
+      raf = 0; var busy = false;
+      if (anim) {
+        var k = Math.min(1, (now - anim.t0) / anim.dur); s = lerp(anim.from, anim.to, anim.fn(k));
+        if (k >= 1) { anim = null; lastAct = now; settle(); } else busy = true;
+      }
+      if (drag && drag.on) busy = true;
+      if (PC) {
+        var f = tilt.back ? .05 : .14;
+        tilt.x += (tilt.tx - tilt.x) * f; tilt.y += (tilt.ty - tilt.y) * f;
+        if (Math.abs(tilt.tx - tilt.x) + Math.abs(tilt.ty - tilt.y) > .02) busy = true;
+      }
+      render();
+      if (busy) kick();
+    }
+    function kick() { if (!raf) raf = requestAnimationFrame(frame); }
+
+    shots.classList.add('ctl'); if (PC) shots.classList.add('tilt');
+    render();
+
+    // 점
+    dots.forEach(function (b, k) {
+      b.addEventListener('click', function () {
+        var base = -k, n = Math.round((s - base) / 4);
+        goTo(base + 4 * n, 600, easeOut); lastAct = performance.now();
+      });
+    });
+
+    // 끌기 — 좌우로 움직일 때만. 세로로 먼저 움직이면 손 놓고 페이지가 스크롤된다(touch-action: pan-y)
+    if (!RM) {
+      shots.addEventListener('dragstart', function (e) { e.preventDefault(); });
+      shots.addEventListener('pointerdown', function (e) {
+        if (e.button > 0 || e.target.closest('.shot-dots')) return;
+        if (e.pointerType === 'mouse') e.preventDefault();
+        drag = { id: e.pointerId, x: e.clientX, y: e.clientY, s0: s, on: false, lx: e.clientX, lt: e.timeStamp, v: 0 };
+      });
+      shots.addEventListener('pointermove', function (e) {
+        if (!drag || e.pointerId !== drag.id) return;
+        var dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+        if (!drag.on) {
+          if (Math.abs(dx) < 6 && Math.abs(dy) < 6) return;
+          if (Math.abs(dy) > Math.abs(dx)) { drag = null; return; }
+          drag.on = true; drag.x = e.clientX; drag.s0 = s; dx = 0; anim = null;
+          try { shots.setPointerCapture(e.pointerId); } catch (_) {}
+          shots.classList.add('dragging');
+        }
+        var w = shots.offsetWidth * 1.1;
+        s = drag.s0 + dx / w;
+        var dt = e.timeStamp - drag.lt; if (dt > 0) drag.v = lerp(drag.v, (e.clientX - drag.lx) / w / dt, .5);
+        drag.lx = e.clientX; drag.lt = e.timeStamp;
+        kick();
+      });
+      function end() {
+        if (!drag) return;
+        var d = drag; drag = null; shots.classList.remove('dragging');
+        if (!d.on) return;
+        var fling = Math.max(-.5, Math.min(.5, d.v * 140));
+        goTo(Math.round(s + fling), 420, easeOut); lastAct = performance.now();
+      }
+      shots.addEventListener('pointerup', end);
+      shots.addEventListener('pointercancel', end);
+      shots.addEventListener('lostpointercapture', function (e) { if (e.target === shots) end(); });
+      shots.addEventListener('pointerenter', function (e) { if (e.pointerType === 'mouse') hover = true; });
+      shots.addEventListener('pointerleave', function (e) { if (e.pointerType === 'mouse') { hover = false; lastAct = performance.now(); } });
+      // 자동 회전 — 마지막 조작에서 4.2초 지나면 한 칸
+      setInterval(function () {
+        if (hover || drag || anim || document.hidden) return;
+        if (performance.now() - lastAct >= 4200) { lastAct = performance.now(); goTo(Math.round(s) + 1, 900, ease); }
+      }, 250);
+    }
+
+    // 커서 따라 기울기(PC만, 작게) — 커서가 창 밖으로 나가면 천천히 제자리
+    if (PC) {
+      window.addEventListener('pointermove', function (e) {
+        if (e.pointerType !== 'mouse') return;
+        var r = shots.getBoundingClientRect(), cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+        var nx = Math.max(-1, Math.min(1, (e.clientX - cx) / (innerWidth / 2))), ny = Math.max(-1, Math.min(1, (e.clientY - cy) / (innerHeight / 2)));
+        tilt.ty = nx * 6; tilt.tx = -ny * 4; tilt.back = false; kick();
+      }, { passive: true });
+      document.documentElement.addEventListener('mouseleave', function () { tilt.tx = tilt.ty = 0; tilt.back = true; kick(); });
+      window.addEventListener('blur', function () { tilt.tx = tilt.ty = 0; tilt.back = true; kick(); });
+    }
+  })();
   var hero = document.getElementById('hero'), stage = document.getElementById('stage');
   if (!RM && FINE && hero && stage) {
     var raf = 0, tx = 0, ty = 0;
