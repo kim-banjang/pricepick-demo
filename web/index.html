@@ -101,6 +101,12 @@ section{position:relative;scroll-margin-top:60px}
 .hero-in{display:grid;grid-template-columns:minmax(0,1fr);padding-top:24px;padding-bottom:52px;min-height:calc(100svh - 60px);align-content:start}
 .hero-title{position:relative;z-index:2;margin:0;font-size:46px;font-weight:800;letter-spacing:-2.3px;line-height:1.06}
 .hero-tk{position:absolute;z-index:6;right:-26%;top:7%;width:40%;aspect-ratio:1;filter:drop-shadow(0 14px 16px rgba(108,74,182,.30));animation:tkFloat 7s ease-in-out infinite;pointer-events:none}
+/* 폰 둘레 오브젝트 — 큰 것(쇼핑백) 왼쪽 아래, 중간(동전) 오른쪽 아래, 작은 것(기프티콘) 왼쪽 위. 반짝이·별 없음 */
+.ho{position:absolute;z-index:5;height:auto;pointer-events:none;filter:drop-shadow(0 16px 18px rgba(108,74,182,.28));animation:hoFloat 8s ease-in-out infinite}
+.ho-bag{width:52%;left:-38%;bottom:-11%}
+.ho-coin{width:44%;right:-30%;bottom:6%;animation-delay:-2.6s}
+.ho-gift{width:36%;left:-30%;top:10%;animation-delay:-5.2s}
+@keyframes hoFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
 @keyframes tkFloat{0%,100%{transform:translate(0,0) rotate(-8deg)}50%{transform:translate(-6px,-14px) rotate(6deg)}}
 .hero-sub{position:relative;z-index:2;margin-top:18px}
 .hero .badge{display:inline-flex;align-items:center;gap:8px;height:30px;padding:0 12px 0 8px;border-radius:15px;background:#fff;border:1px solid var(--sub-3);font-size:13px;font-weight:700;color:var(--main-dark);width:max-content;box-shadow:0 4px 12px rgba(132,94,238,.10)}
@@ -297,7 +303,7 @@ section{position:relative;scroll-margin-top:60px}
 @media (min-width:860px){.mall-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;max-width:58%}.malls .sec-head{max-width:58%}.mt{padding:22px 10px 18px}.mt .mlogo{width:60px;height:60px;border-radius:18px}.mt span{font-size:14px}}
 
 /* ═════════ 티켓 · 포인트 (어두운 바탕 + 유리 카드) ═════════ */
-.tix{background:radial-gradient(60% 50% at 10% 0%,rgba(198,175,255,.45),transparent 70%),radial-gradient(50% 50% at 95% 100%,rgba(255,217,59,.12),transparent 70%),linear-gradient(180deg,#fff,var(--sub-4));overflow:hidden}
+.tix{background:#fff;overflow:hidden}
 .cur{display:grid;gap:14px}
 .cc{position:relative;border-radius:var(--r-lg);padding:20px;display:flex;gap:16px;align-items:center;
   background:#fff;box-shadow:var(--sh-1);transition:transform .25s var(--ease),box-shadow .25s}
@@ -312,14 +318,30 @@ section{position:relative;scroll-margin-top:60px}
 .cc p{font-size:14px;color:var(--text2);margin-top:4px}
 .cc .exp{font-size:12px;color:var(--text3);margin-top:6px}
 .cc p b{font-weight:700;color:var(--text1)}
+/* 티켓 섹션 — 흰 카드 대신 그림 색을 따른 옅은 색 카드(그림자 없음) */
+.tix .cc{box-shadow:none;border:0}
+.tix .cc .art{background:#fff;box-shadow:0 6px 16px rgba(26,17,48,.06)}
+.cc.t-red{background:#FFEFF1}.cc.t-gold{background:#FFF5D6}.cc.t-evt{background:#EFE9FF}.cc.t-coin{background:#FFF1DC}
 
 /* ═════════ 혜택 ═════════ */
-.bf-sec{background:radial-gradient(60% 40% at 50% 0%,#EEE6FF,transparent 70%),linear-gradient(180deg,#FBF9FF,#fff)}
+/* 혜택 — 티켓 금색이 포인트. 밝은 크림 바탕 */
+.bf-sec{background:radial-gradient(55% 45% at 85% 0%,rgba(255,217,59,.22),transparent 70%),radial-gradient(45% 40% at 0% 100%,rgba(198,175,255,.22),transparent 70%),linear-gradient(180deg,#FFFBEE,#FFF8E6)}
 .bf{display:grid;gap:14px}
 .bc{position:relative;background:#fff;border-radius:var(--r-lg);padding:22px 20px 20px;box-shadow:var(--sh-1);overflow:hidden;transition:transform .25s var(--ease),box-shadow .25s}
-.bc::before{content:'';position:absolute;right:-40px;top:-40px;width:130px;height:130px;border-radius:50%;background:radial-gradient(closest-side,var(--sub-3),transparent);opacity:.8;transition:transform .4s var(--ease)}
+.bc::before{content:'';position:absolute;right:-40px;top:-40px;width:130px;height:130px;border-radius:50%;background:radial-gradient(closest-side,#FFF0BF,transparent);opacity:.8;transition:transform .4s var(--ease)}
 .bc:hover::before{transform:scale(1.35)}
-.bc .kick{position:relative;font-size:13px;font-weight:800;color:var(--main)}
+.bc .kick{position:relative;font-size:13px;font-weight:800;color:#8A5E00}
+.bc .bart{position:absolute;right:16px;top:16px;width:72px;height:72px;object-fit:contain;filter:drop-shadow(0 10px 12px rgba(108,74,182,.22));transition:transform .35s var(--pop)}
+.bc:hover .bart{transform:rotate(-6deg) scale(1.08)}
+.bc.big-card{padding-right:150px;min-height:200px}
+.bc.big-card .bart{width:130px;height:150px;right:14px;top:auto;bottom:10px}
+.bc.big-card::before{display:none}
+.bc.c-pur{background:linear-gradient(150deg,#F3EEFF,#E6DCFF);box-shadow:0 14px 34px rgba(108,74,182,.16)}
+.bc.c-gold{background:linear-gradient(150deg,#FFF6D2,#FFE89A);box-shadow:0 14px 34px rgba(200,150,0,.18)}
+.bc.c-pur .kick{color:var(--main-dark)}
+.bc.line-card{background:transparent;box-shadow:none;border:1.5px solid rgba(214,160,0,.45)}
+.bc.line-card::before{display:none}
+.bc .bart.tks{width:76px;height:76px}
 .bc .big{position:relative;display:block;margin-top:6px;font-family:Poppins,"Pretendard Variable",sans-serif;font-size:40px;font-weight:800;letter-spacing:-1.6px;line-height:1.05;
   background:linear-gradient(135deg,var(--main-dark),var(--main) 50%,#B07CFF);-webkit-background-clip:text;background-clip:text;color:transparent}
 .bc .big small{font-family:"Pretendard Variable",Pretendard,sans-serif;font-size:18px;letter-spacing:-.5px;margin-left:3px}
@@ -343,12 +365,15 @@ section{position:relative;scroll-margin-top:60px}
 .kk li b{display:block;font-size:16px;font-weight:800}
 .kk li span{font-size:14px;color:#4A4300}
 .kk li:hover{transform:translateX(4px)}
+.kk li>div{flex:1;min-width:0}
+.kk li .ka{flex:none;width:52px;height:44px;object-fit:contain;filter:drop-shadow(0 6px 8px rgba(120,100,0,.18))}
 
 /* ═════════ 질문 ═════════ */
-.faq-sec{background:linear-gradient(180deg,#F7F4FD,#F1EEFF)}
+.faq-sec{background:#EFEAFF}
 .faq{display:grid;gap:10px}
-.faq details{background:#fff;border-radius:var(--r-md);padding:0 20px;box-shadow:var(--sh-1);transition:box-shadow .25s}
-.faq details[open]{box-shadow:var(--sh-2)}
+.faq details{background:transparent;border:1.5px solid #D6C8FF;border-radius:var(--r-md);padding:0 20px;transition:background .25s,border-color .25s,box-shadow .25s}
+.faq details:not([open]) summary::after{background-color:#fff}
+.faq details[open]{background:#fff;border-color:#fff;box-shadow:var(--sh-2)}
 .faq summary{list-style:none;cursor:pointer;padding:19px 34px 19px 0;font-size:16px;font-weight:700;position:relative;letter-spacing:-.4px}
 .faq summary::-webkit-details-marker{display:none}
 .faq summary::after{content:'';position:absolute;right:0;top:50%;width:24px;height:24px;margin-top:-12px;border-radius:50%;background:var(--sub-4) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M7 10l5 5 5-5' fill='none' stroke='%23845EEE' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/16px no-repeat;transition:transform .25s var(--ease)}
@@ -435,7 +460,14 @@ section{position:relative;scroll-margin-top:60px}
   .cur{grid-template-columns:repeat(2,1fr);gap:18px}
   .cc{padding:26px}
   .cc .art{width:96px;height:96px}
-  .bf{grid-template-columns:repeat(3,1fr);gap:18px}
+  .bf{grid-template-columns:repeat(6,1fr);gap:18px}
+  .bf>.bc{grid-column:span 2}
+  .bf>.bc.big-card{grid-column:span 3;min-height:250px;padding-right:220px}
+  .bc.big-card .bart{width:190px;height:210px;right:22px;bottom:14px}
+  .bf>.bc.line-card{grid-column:span 6;display:grid;grid-template-columns:auto auto 1fr;grid-template-rows:auto auto auto;column-gap:40px;align-items:center;padding-right:130px}
+  .bc.line-card .kick{grid-column:1;grid-row:1}.bc.line-card .big{grid-column:1;grid-row:2}.bc.line-card h3{grid-column:1;grid-row:3}
+  .bc.line-card ul{grid-column:2/4;grid-row:1/4;margin-top:0;grid-template-columns:1fr 1fr;column-gap:28px}
+  .bc.line-card .bart{top:50%;margin-top:-38px;right:28px}
   .bc{padding:28px 26px 24px}
   .bc .big{font-size:48px}
   .kk{padding:60px 56px;display:grid;grid-template-columns:1fr 1.15fr;gap:48px;align-items:center}
@@ -524,6 +556,9 @@ section{position:relative;scroll-margin-top:60px}
       <div class="dev" data-pos="1"><img src="/web/img/app-benefit.webp" alt="" width="725" height="1568" loading="lazy"></div>
       <div class="dev" data-pos="2"><img src="/web/img/app-giftshop.webp" alt="" width="725" height="1568" loading="lazy"></div>
       <div class="dev" data-pos="3"><img src="/web/img/app-product.webp" alt="" width="725" height="1568" loading="lazy"></div>
+      <img class="ho ho-bag" src="/web/img/bag.webp" alt="" width="889" height="1000" aria-hidden="true">
+      <img class="ho ho-coin" src="/web/img/coins.webp" alt="" width="1000" height="644" aria-hidden="true">
+      <img class="ho ho-gift" src="/web/img/gifticon.webp" alt="" width="1000" height="538" aria-hidden="true">
       <div class="hero-tk" aria-hidden="true"><span class="tks one"><img src="/web/img/ticket-random.svg" alt="" width="512" height="512"></span></div>
     </div>
   </div>
@@ -595,19 +630,19 @@ section{position:relative;scroll-margin-top:60px}
       <h2 class="h2">모으는 것은 <em>네 가지</em></h2>
     </div>
     <div class="cur">
-      <div class="cc rv" style="--d:0">
+      <div class="cc t-red rv" style="--d:0">
         <div class="art"><span class="tks one"><img src="/web/img/ticket-random.svg" alt="" width="512" height="512"></span></div>
         <div><h3>랜덤 티켓 <i>대기 중</i></h3><p>사자마자 받는 티켓이에요. 구매가 확정되면 티켓으로 바뀌어요.</p></div>
       </div>
-      <div class="cc rv" style="--d:1">
+      <div class="cc t-gold rv" style="--d:1">
         <div class="art"><span class="tks many"><img src="/web/img/ticket-gold.svg" alt="" width="512" height="512"><img src="/web/img/ticket-gold.svg" alt="" width="512" height="512"><img src="/web/img/ticket-gold.svg" alt="" width="512" height="512"><span class="chk"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span></span></div>
         <div><h3>티켓</h3><p>기프티콘을 살 때 쓰는 티켓이에요.</p><p class="exp">받은 날부터 1년</p></div>
       </div>
-      <div class="cc rv" style="--d:2">
+      <div class="cc t-evt rv" style="--d:2">
         <div class="art"><img class="evt" src="/web/img/ico-ticket-event.svg" alt="" width="128" height="128" loading="lazy"></div>
         <div><h3>이벤트 티켓</h3><p>출석·선물 상자·미션·가입으로 받아요. 랜덤 선물 상자를 열거나 <b>1장을 티켓 2장으로</b> 바꿔요. 바꾸면 되돌릴 수 없어요.</p><p class="exp">받은 날부터 100일</p></div>
       </div>
-      <div class="cc rv" style="--d:3">
+      <div class="cc t-coin rv" style="--d:3">
         <div class="art"><img src="/web/img/coins.webp" alt="" width="1000" height="644" loading="lazy"></div>
         <div><h3>포인트</h3><p>출석·친구초대·가입으로 받아요. <b>10P를 티켓 1장으로</b> 바꿔 써요. 바꾸면 되돌릴 수 없어요.</p><p class="exp">받은 날부터 1년</p></div>
       </div>
@@ -624,23 +659,26 @@ section{position:relative;scroll-margin-top:60px}
       <p class="sub">이벤트 티켓은 모든 혜택을 합쳐 하루 5장, 한 달 30장까지 받아요.</p>
     </div>
     <div class="bf">
-      <div class="bc rv" style="--d:0">
-        <span class="kick">매일</span>
-        <span class="big"><span data-count="10">10</span><small>P</small></span>
-        <h3>출석 「쿠팡 구경하기」</h3>
-        <p>앱에서 쿠팡에 들어가 30초 이상 둘러보면 하루 한 번. 5일 연속이면 이벤트 티켓 1장을 더 드려요.</p>
-      </div>
-      <div class="bc rv" style="--d:1">
+      <div class="bc big-card c-pur rv" style="--d:0">
+        <img class="bart" src="/web/img/gift-box-purple.webp" alt="" width="712" height="816" loading="lazy">
         <span class="kick">하루 한 번 무료</span>
         <span class="big"><span data-count="1">1</span><small>회</small></span>
         <h3>매일 선물 상자</h3>
         <p>티켓·이벤트 티켓·포인트 중 하나가 나와요. 꽝도 있어요.</p>
       </div>
-      <div class="bc rv" style="--d:2">
+      <div class="bc big-card c-gold rv" style="--d:1">
+        <img class="bart" src="/web/img/gift-box-gold.webp" alt="" width="714" height="816" loading="lazy">
         <span class="kick">이벤트 티켓 1장으로</span>
         <span class="big"><span data-count="10">10</span><small>회까지</small></span>
         <h3>랜덤 선물 상자</h3>
         <p>이벤트 티켓 1장으로 한 번 열어요. 하루 최대 10회.</p>
+      </div>
+      <div class="bc rv" style="--d:2">
+        <img class="bart" src="/web/img/coins.webp" alt="" width="1000" height="644" loading="lazy">
+        <span class="kick">매일</span>
+        <span class="big"><span data-count="10">10</span><small>P</small></span>
+        <h3>출석 「쿠팡 구경하기」</h3>
+        <p>앱에서 쿠팡에 들어가 30초 이상 둘러보면 하루 한 번. 5일 연속이면 이벤트 티켓 1장을 더 드려요.</p>
       </div>
       <div class="bc rv" style="--d:3">
         <span class="kick">친구도 나도</span>
@@ -649,6 +687,7 @@ section{position:relative;scroll-margin-top:60px}
         <p>친구가 첫 구매를 하면 둘 다 받아요. 한 달 50명까지.</p>
       </div>
       <div class="bc rv" style="--d:4">
+        <img class="bart" src="/web/img/bag.webp" alt="" width="889" height="1000" loading="lazy">
         <span class="kick">이벤트 티켓 최대</span>
         <span class="big"><span data-count="9">9</span><small>장</small></span>
         <h3>연속구매 미션</h3>
@@ -658,7 +697,8 @@ section{position:relative;scroll-margin-top:60px}
           <li>30일 안에 10번 구매 <b>5장</b></li>
         </ul>
       </div>
-      <div class="bc rv" style="--d:5">
+      <div class="bc line-card rv" style="--d:5">
+        <span class="bart tks many"><img src="/web/img/ticket-gold.svg" alt="" width="512" height="512"><img src="/web/img/ticket-gold.svg" alt="" width="512" height="512"><img src="/web/img/ticket-gold.svg" alt="" width="512" height="512"></span>
         <span class="kick">처음 시작하면</span>
         <span class="big"><span data-count="20">20</span><small>P</small></span>
         <h3>시작 보상</h3>
@@ -682,9 +722,9 @@ section{position:relative;scroll-margin-top:60px}
         <p class="lead">시작은 닉네임만으로. 쓰려면 연동이 필요해요.</p>
       </div>
       <ul>
-        <li class="rv" style="--d:1"><span class="i">1</span><div><b>티켓·포인트를 쓰려면</b><span>연동 전에는 모으기만 할 수 있어요.</span></div></li>
-        <li class="rv" style="--d:2"><span class="i">2</span><div><b>기프티콘은 카카오톡으로</b><span>그래서 기프티샵은 연동 후에 열려요.</span></div></li>
-        <li class="rv" style="--d:3"><span class="i">3</span><div><b>더 빨리 쓸 수 있어요</b><span>연동하면 구매가 확정된 티켓을 더 빨리 쓸 수 있어요.</span></div></li>
+        <li class="rv" style="--d:1"><span class="i">1</span><div><b>티켓·포인트를 쓰려면</b><span>연동 전에는 모으기만 할 수 있어요.</span></div><img class="ka" src="/web/img/coins.webp" alt="" width="1000" height="644" loading="lazy"></li>
+        <li class="rv" style="--d:2"><span class="i">2</span><div><b>기프티콘은 카카오톡으로</b><span>그래서 기프티샵은 연동 후에 열려요.</span></div><img class="ka" src="/web/img/gifticon.webp" alt="" width="1000" height="538" loading="lazy"></li>
+        <li class="rv" style="--d:3"><span class="i">3</span><div><b>더 빨리 쓸 수 있어요</b><span>연동하면 구매가 확정된 티켓을 더 빨리 쓸 수 있어요.</span></div><img class="ka" src="/web/img/ticket-gold.svg" alt="" width="512" height="512" loading="lazy"></li>
         <li class="rv" style="--d:4"><span class="i">4</span><div><b>앱을 지워도 그대로</b><span>연동 전 기록은 이 기기에만 남아요.</span></div></li>
       </ul>
     </div>
