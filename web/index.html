@@ -261,13 +261,25 @@ section{position:relative;scroll-margin-top:60px}
   .track .dup{display:none}
 }
 
+.malls-photo{display:none}
+@media (min-width:860px){
+  .malls .wrap{position:relative}
+  /* 로고 칸(왼쪽 58%) 오른쪽부터 화면 오른쪽 끝까지, 섹션 위아래 경계까지 */
+  .malls-photo{display:block;position:absolute;z-index:0;pointer-events:none;left:56%;right:calc((100% - 100vw) / 2);top:-88px;bottom:-88px;
+    background:linear-gradient(180deg,rgba(241,238,255,.18),rgba(255,255,255,.12)),url(/web/img/bg-wait-parcels.webp) 62% 64%/cover no-repeat;
+    -webkit-mask-image:linear-gradient(90deg,transparent 0%,rgba(0,0,0,.55) 22%,#000 42%),linear-gradient(180deg,transparent 0%,#000 18%,#000 80%,transparent 100%);
+    mask-image:linear-gradient(90deg,transparent 0%,rgba(0,0,0,.55) 22%,#000 42%),linear-gradient(180deg,transparent 0%,#000 18%,#000 80%,transparent 100%);
+    -webkit-mask-composite:source-in;mask-composite:intersect}
+  .malls .sec-head,.malls .mall-grid,.malls .note{position:relative;z-index:1}
+}
+
 /* 제휴몰 칸 — 모든 몰 같은 크기 */
 .mall-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
 .mt{display:flex;flex-direction:column;align-items:center;gap:8px;background:#fff;border-radius:16px;padding:16px 8px 14px;box-shadow:var(--sh-1);text-align:center;transition:transform .2s var(--ease),box-shadow .2s}
 .mt .mlogo{width:48px;height:48px;border-radius:14px;font-size:13px;box-shadow:none;border:1px solid var(--border)}
 .mt span{font-size:13px;font-weight:700;line-height:1.3;word-break:break-all}
 @media (hover:hover) and (pointer:fine){.mt:hover{transform:translateY(-4px);box-shadow:var(--sh-2)}}
-@media (min-width:860px){.mall-grid{grid-template-columns:repeat(6,minmax(0,1fr));gap:14px}.mt{padding:22px 10px 18px}.mt .mlogo{width:60px;height:60px;border-radius:18px}.mt span{font-size:14px}}
+@media (min-width:860px){.mall-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;max-width:58%}.malls .sec-head,.malls .note{max-width:58%}.mt{padding:22px 10px 18px}.mt .mlogo{width:60px;height:60px;border-radius:18px}.mt span{font-size:14px}}
 
 /* ═════════ 티켓 · 포인트 (어두운 바탕 + 유리 카드) ═════════ */
 .tix{background:radial-gradient(60% 50% at 10% 0%,rgba(198,175,255,.45),transparent 70%),radial-gradient(50% 50% at 95% 100%,rgba(255,217,59,.12),transparent 70%),linear-gradient(180deg,#fff,var(--sub-4));overflow:hidden}
@@ -337,14 +349,16 @@ section{position:relative;scroll-margin-top:60px}
 .js .faq details[open] .a{animation:fadeUp .3s var(--ease)}
 
 /* ═════════ 맺음 ═════════ */
-.end{position:relative;overflow:hidden;color:var(--text1);text-align:center;padding:96px 0 104px;
-  background:radial-gradient(60% 80% at 50% 100%,rgba(198,175,255,.6),transparent 70%),linear-gradient(180deg,#fff 0%,var(--sub-4) 100%)}
+.end{position:relative;overflow:hidden;isolation:isolate;color:var(--text1);text-align:center;padding:96px 0 104px;background:#F1EEFF}
+/* 흐린 매장 전경 — 섹션 전체 폭. 위는 자주 묻는 질문 바탕색(#F1EEFF)에서, 아래는 회사 정보 바탕색(#FAF9FC)으로 이어지고, 글자 뒤만 둥글게 밝힌다 */
+.end-photo{position:absolute;inset:0;z-index:-2;background:url(/web/img/bg-hero-storefront-m.webp) 55% 40%/cover no-repeat}
+.end-veil{position:absolute;inset:0;z-index:-1;background:radial-gradient(ellipse 46% 52% at 50% 52%,rgba(248,246,255,.86) 0%,rgba(248,246,255,.62) 45%,rgba(248,246,255,0) 75%),linear-gradient(180deg,#F1EEFF 0%,rgba(241,238,255,.55) 18%,rgba(241,238,255,0) 42%,rgba(250,249,252,0) 76%,#FAF9FC 100%)}
 .end h2 em{font-style:normal}
 .end h2{font-size:36px;font-weight:800;letter-spacing:-1.6px;line-height:1.18}
 .end p{margin-top:12px;color:var(--text2)}
 .end .stores{justify-content:center;margin-top:28px}
 .end .ob2{position:absolute;width:110px;opacity:.9;pointer-events:none}
-.end .ob2>img,.end .ob2>.tks{filter:drop-shadow(0 14px 16px rgba(108,74,182,.28));animation:drift 6s ease-in-out infinite}
+.end .ob2>img,.end .ob2>.tks{filter:drop-shadow(0 18px 22px rgba(60,30,120,.35)) drop-shadow(0 2px 4px rgba(60,30,120,.18));animation:drift 6s ease-in-out infinite}
 .end .ob2.a{aspect-ratio:1}
 .end .ob2.a{left:-24px;top:18px;width:96px}
 .end .ob2.b{right:-20px;bottom:18px;width:104px}
@@ -421,8 +435,9 @@ section{position:relative;scroll-margin-top:60px}
   .kk ul{margin-top:0}
   .faq{max-width:860px}
   .end{padding:140px 0}
+  .end-photo{background-image:url(/web/img/bg-hero-storefront.webp);background-position:center 62%}
   .end h2{font-size:64px;letter-spacing:-3px}
-  .end .ob2{width:200px}.end .ob2.a{left:6%;top:60px;width:180px}.end .ob2.b{right:6%;bottom:60px;width:200px}
+  .end .ob2{width:200px}.end .ob2.a{left:max(4%,calc(50% - 760px));top:70px;width:190px}.end .ob2.b{right:max(4%,calc(50% - 760px));bottom:70px;width:210px}
 }
 
 /* 넓은 화면(1200px 이상) — 자주 묻는 질문을 두 줄로 나눠 오른쪽이 비지 않게 */
@@ -535,6 +550,8 @@ section{position:relative;scroll-margin-top:60px}
      목록은 데모 앱과 같은 곳(CMS 「티켓 적립 설정」의 앱 노출·로고)에서 읽고 이름순으로 놓는다. 읽기에 실패하면 아래 기본 목록이 그대로 남는다. -->
 <section class="sec malls" id="malls">
   <div class="wrap">
+    <!-- 택배 상자 사진 — 섹션 오른쪽 빈자리에만(김반장 2026-11-11). 왼쪽·위아래로 갈수록 투명해져 로고 칸 쪽에서 사라진다. 휴대폰은 숨김 -->
+    <div class="malls-photo" aria-hidden="true"></div>
     <div class="sec-head rv">
       <span class="eyebrow">Partners</span>
       <h2 class="h2">쓰던 쇼핑몰 <em>그대로</em></h2>
@@ -714,6 +731,7 @@ section{position:relative;scroll-margin-top:60px}
 
 <!-- ═════════ 맺음 ═════════ -->
 <section class="end">
+  <div class="end-photo" aria-hidden="true"></div><div class="end-veil" aria-hidden="true"></div>
   <div class="ob2 a" aria-hidden="true"><span class="tks many"><img src="/web/img/ticket-gold.svg" alt="" width="512" height="512"><img src="/web/img/ticket-gold.svg" alt="" width="512" height="512"><img src="/web/img/ticket-gold.svg" alt="" width="512" height="512"><span class="chk"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span></span></div>
   <div class="ob2 b" aria-hidden="true"><img src="/web/img/coins.webp" alt="" width="1000" height="644" loading="lazy"></div>
   <div class="wrap">
