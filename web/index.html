@@ -231,6 +231,15 @@ section{position:relative;scroll-margin-top:60px}
 .wait .row.lpr .top{display:flex;align-items:center;justify-content:space-between;gap:12px}
 .wait .row.lpr p{font-size:13px;color:var(--text2);border-top:1px solid var(--sub-3);padding-top:10px}
 
+/* 택배 상자 사진 — 흐름 구역 맨 아래 바탕. 위쪽은 흰색으로 덮고 노드 아래 빈 자리에서만 사진이 드러난다(글자와 겹치지 않음) */
+.how{padding-bottom:240px;overflow:hidden;isolation:isolate}
+.how-photo{position:absolute;left:0;right:0;bottom:0;height:420px;z-index:-1;background:url(/web/img/bg-wait-parcels-m.webp) 62% 70%/cover no-repeat;
+  mask-image:linear-gradient(180deg,transparent 0%,#000 45%);-webkit-mask-image:linear-gradient(180deg,transparent 0%,#000 45%)}
+@media (min-width:860px){
+  .how{padding-bottom:340px}
+  .how-photo{height:560px;background-image:url(/web/img/bg-wait-parcels.webp);background-position:center 68%}
+}
+
 /* ═════════ 제휴몰 ═════════ */
 .malls{background:linear-gradient(180deg,#F4EFFF 0%,#EDE5FF 100%);overflow:hidden}
 .malls::before{content:'';position:absolute;right:-120px;top:-120px;width:360px;height:360px;border-radius:50%;background:radial-gradient(closest-side,rgba(132,94,238,.25),transparent)}
@@ -502,6 +511,7 @@ section{position:relative;scroll-margin-top:60px}
 
 <!-- ═════════ 어떻게 되는가 ═════════ -->
 <section class="sec how" id="how">
+  <div class="how-photo" aria-hidden="true"></div>
   <div class="wrap">
     <div class="sec-head rv">
       <span class="eyebrow">How it works</span>
@@ -511,32 +521,14 @@ section{position:relative;scroll-margin-top:60px}
       <li class="node"><div class="art"><span class="no">1</span><span class="pp-g-splash"><img src="/web/img/pricepick-splash.png" alt="" width="390" height="844" loading="lazy"></span></div>
         <div class="tx"><b>앱에서 쇼핑몰로</b><p>프라이스픽에서 쇼핑몰로 들어가야 티켓이 쌓여요.</p></div></li>
       <li class="node"><div class="art"><span class="no">2</span><img src="/web/img/bag.webp" alt="" width="889" height="1000" loading="lazy"></div>
-        <div class="tx"><b>평소처럼 구매</b><p>들어가서 하루 안에 사면 주문마다 랜덤 티켓을 드려요.</p></div></li>
+        <div class="tx"><b>평소처럼 구매</b><p>평소처럼 사면 주문마다 랜덤 티켓을 드려요.</p></div></li>
       <li class="node"><div class="art"><span class="no">3</span><span class="tks one"><img src="/web/img/ticket-random.svg" alt="" width="512" height="512"></span></div>
-        <div class="tx"><b>구매 확정을 기다려요</b><p>몇 장이 될지는 구매가 확정되면 알려 드려요.</p></div></li>
+        <div class="tx"><b>구매 확정을 기다려요</b><p>구매가 확정되면 쓸 수 있어요. 몇 장인지도 그때 알려 드려요.</p></div></li>
       <li class="node"><div class="art"><span class="no">4</span><span class="tks many"><img src="/web/img/ticket-gold.svg" alt="" width="512" height="512"><img src="/web/img/ticket-gold.svg" alt="" width="512" height="512"><img src="/web/img/ticket-gold.svg" alt="" width="512" height="512"><span class="chk"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span></span></div>
-        <div class="tx"><b>티켓으로 바뀌어요</b><p>구매가 확정되면 티켓으로 바뀌어요. 많이 살수록 많이 받아요.</p></div></li>
+        <div class="tx"><b>티켓으로 바뀌어요</b><p>랜덤 티켓이 티켓으로 바뀌어요. 많이 살수록 많이 받아요.</p></div></li>
       <li class="node"><div class="art"><span class="no">5</span><img src="/web/img/gifticon.webp" alt="" width="1000" height="538" loading="lazy"></div>
         <div class="tx"><b>기프티콘으로 교환</b><p>기프티콘 가격만큼 티켓을 쓰면 돼요. 티켓 1장은 10원이에요.</p></div></li>
     </ol>
-
-    <div class="wait rv">
-      <div class="wait-photo" aria-hidden="true"></div><div class="wait-veil" aria-hidden="true"></div>
-      <h3>대기 기간<small>랜덤 티켓이 티켓으로 바뀌기까지 걸려요.</small></h3>
-      <div class="rows">
-        <div class="row">
-          <div class="who">쿠팡<small>구매 확정 후</small></div>
-          <div class="days">
-            <div><em>카카오 연동</em><b class="g"><span data-count="7">7</span><small>일</small></b></div>
-            <div><em>연동 안 하면</em><b><span data-count="30">30</span><small>일</small></b></div>
-          </div>
-        </div>
-        <div class="row lpr">
-          <div class="top"><div class="who">그 밖의 쇼핑몰</div><div class="lp"><b>두 달 뒤 6일부터</b></div></div>
-          <p>3월에 샀다면 5월 6일이 지나야 티켓으로 바뀌어요. 쇼핑몰에 따라 구매를 확정한 달이나 배송이 끝난 달을 기준으로 해요.</p>
-        </div>
-      </div>
-    </div>
   </div>
 </section>
 
@@ -671,7 +663,7 @@ section{position:relative;scroll-margin-top:60px}
       <ul>
         <li class="rv" style="--d:1"><span class="i">1</span><div><b>티켓·포인트를 쓰려면</b><span>연동 전에는 모으기만 할 수 있어요.</span></div></li>
         <li class="rv" style="--d:2"><span class="i">2</span><div><b>기프티콘은 카카오톡으로</b><span>그래서 기프티샵은 연동 후에 열려요.</span></div></li>
-        <li class="rv" style="--d:3"><span class="i">3</span><div><b>쿠팡 대기가 7일로</b><span>연동하지 않으면 30일, 연동하면 7일이에요.</span></div></li>
+        <li class="rv" style="--d:3"><span class="i">3</span><div><b>더 빨리 쓸 수 있어요</b><span>연동하면 구매가 확정된 티켓을 더 빨리 쓸 수 있어요.</span></div></li>
         <li class="rv" style="--d:4"><span class="i">4</span><div><b>앱을 지워도 그대로</b><span>연동 전 기록은 이 기기에만 남아요.</span></div></li>
       </ul>
     </div>
@@ -695,7 +687,7 @@ section{position:relative;scroll-margin-top:60px}
         <div class="a">이럴 때는 적립되지 않아요.
           <ul>
             <li>앱의 바로가기를 거치지 않은 구매</li>
-            <li>들어간 뒤 24시간이 지나서 한 구매</li>
+            <li>바로가기로 들어간 뒤 한참 지나서 한 구매</li>
             <li>상품권·기프트카드, 게임 아이템·게임머니, 디지털 콘텐츠·소프트웨어, 일부 고가 가전</li>
             <li>하루 5건, 한 달 50건을 넘는 구매</li>
             <li>받을 티켓이 1장도 안 되는 아주 작은 구매</li>
