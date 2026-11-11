@@ -69,10 +69,6 @@
       "destination": "/flutter-web/:path*"
     },
     {
-      "source": "/web",
-      "destination": "/web/index.html"
-    },
-    {
       "source": "/web/",
       "destination": "/web/index.html"
     },
@@ -97,5 +93,12 @@
     "api/asp-admin/*.js": {
       "maxDuration": 30
     }
-  }
+  },
+  "redirects": [
+    {
+      "source": "/web",
+      "destination": "/web/",
+      "permanent": false
+    }
+  ]
 }

@@ -1,0 +1,83 @@
+# 프라이스픽 홈페이지 시안
+
+프라이스픽 소개 홈페이지(한 장짜리 랜딩 페이지)와 약관 페이지다. 빌드 없는 정적 HTML이다.
+
+- 확인용 주소: https://pricepick-demo.vercel.app/web/
+- 정리한 날: 2026-11-11
+
+## 그대로 올리면 되나
+
+| 항목 | 내용 |
+|---|---|
+| 올리는 법 | 이 폴더를 통째로 정적 서버(웹 서버·CDN·호스팅) 아무 경로에 올리면 된다. 첫 화면은 `index.html` |
+| 빌드·설치 | 필요 없다. 라이브러리·프레임워크 없음 |
+| 경로 | 모든 파일을 상대 경로로 부른다. 루트(`/`)든 하위 경로(`/home/`)든 그대로 돈다 |
+| 바깥 연결 | 없다. 글꼴·그림·약관 본문까지 폴더 안에 있다(아래 「바깥에서 불러오는 것」) |
+| 하위 경로에 올릴 때 | 주소 끝에 `/`가 붙게 해 둔다(`/home` → `/home/`). 끝에 `/`가 없으면 상대 경로가 한 단계 위를 가리킨다 |
+| 출시 전에 손볼 것 | 아래 「비어 있는 것」 네 가지 |
+
+## 비어 있는 것 (출시 전에 채워야 함)
+
+| 항목 | 위치 | 지금 상태 |
+|---|---|---|
+| 앱스토어 링크 | `index.html` 의 `<a class="store" data-store="ios">` 2곳 (머리 화면·맨 아래) | `href` 없음. 눌러도 아무 일 없다 |
+| 구글 플레이 링크 | `index.html` 의 `<a class="store" data-store="android">` 2곳 | 위와 같음 |
+| 대표자 | `index.html` 맨 아래 `<div class="row" data-field="ceo">` 의 `<dd>` | 비어 있음 |
+| 사업자등록번호 | `data-field="biz-no"` | 비어 있음 |
+| 통신판매업 신고번호 | `data-field="ecommerce-no"` | 비어 있음 |
+| 주소 | `data-field="address"` | 비어 있음 |
+| 이용약관·개인정보처리방침 | `terms.html` 안 `<template id="doc-service">`, `<template id="doc-privacy">` | 데모 관리 화면에 넣어 둔 시안 문안을 옮겨 적은 것. 실제 문안으로 바꾸거나, 링크(`index.html` 맨 아래 두 줄)를 실제 약관 주소로 바꾼다 |
+
+스토어 링크를 넣을 때는 `href` 를 넣고 `role="link" aria-disabled="true"` 를 지운다. 이 속성이 남아 있으면 스크립트가 클릭을 막는다.
+
+회사 정보는 `<dd>` 가 비어 있으면 그 줄이 화면에 나오지 않는다. 값을 넣으면 바로 보인다.
+
+## 그 밖에 알아둘 것
+
+| 항목 | 내용 |
+|---|---|
+| 제휴몰 목록 | 2026-11-11 데모 관리 화면 기준 11곳을 `index.html` 에 그대로 적어 두었다(이름순). 바뀌면 `id="mall-grid"` 안의 줄을 고친다. 로고가 안 열리면 이름 앞 두 글자가 대신 보인다 |
+| 제휴몰 로고 | 각 쇼핑몰의 상표다. 홈페이지에 싣기 전에 몰별 상표 사용 기준 확인이 필요하다 |
+| 숫자·문구 | 혜택 숫자(출석 10P, 친구초대 500P 등)와 교환 비율은 시안 작성 시점 정책 기준이다. 정책이 바뀌면 같이 고친다 |
+| 다크 모드 | 없다(밝은 화면 하나) |
+| 움직임 | CSS와 짧은 스크립트만 쓴다. 기기에서 「동작 줄이기」를 켜면 회전·떠오르기가 멈춘다 |
+| 소스 안 주석 | `docs/…` 를 가리키는 주석은 시안 작업 기록이다. 지워도 된다 |
+
+## 지원 범위
+
+| 구분 | 범위 |
+|---|---|
+| 브라우저 | 최신 Chrome·Edge·Firefox·삼성 인터넷, Safari 15.4 이상(iOS 15.4 이상). 인터넷 익스플로러는 지원하지 않는다 |
+| 화면 폭 | 360px ~ 2560px에서 확인했다 |
+| 레이아웃 바뀌는 폭 | 860px 미만 휴대폰형 / 860px 이상 PC형 / 1200px 이상 자주 묻는 질문 두 줄 / 1800px 이상 넓은 화면용 크기 |
+
+## 바깥에서 불러오는 것
+
+없다. 원래 바깥에서 받던 글꼴은 폴더 안으로 옮겼다.
+
+| 글꼴 | 위치 | 라이선스 |
+|---|---|---|
+| Pretendard Variable 1.3.9 (한글·본문) | `fonts/pretendard/` (필요한 글자만 내려받는 분할본 92개) | SIL OFL 1.1, `fonts/pretendard/LICENSE.txt` |
+| Poppins 400·700·800 (숫자·영문) | `fonts/poppins/` | SIL OFL 1.1, `fonts/poppins/LICENSE.txt` |
+
+## 파일 목록
+
+| 파일 | 쓰는 곳 |
+|---|---|
+| `index.html` | 홈페이지 본문 |
+| `terms.html` | 이용약관·개인정보처리방침(`#service`, `#privacy`) |
+| `img/favicon-192.png`, `img/apple-touch-icon.png` | 브라우저 탭·홈 화면 아이콘 |
+| `img/bg-hero-sofa.webp` / `-m.webp` | 머리 화면 배경 사진(PC / 휴대폰) |
+| `img/app-home.webp`, `app-benefit.webp`, `app-giftshop.webp`, `app-product.webp` | 머리 화면에서 회전하는 앱 화면 네 장 |
+| `img/ticket-random.svg` | 빨간 랜덤 티켓(머리 화면, 이용 방법 3단계, 티켓 카드) |
+| `img/ticket-gold.svg` | 금색 티켓(이용 방법 4단계, 티켓 카드, 시작 보상, 카카오 연동, 맨 아래) |
+| `img/ico-ticket-event.svg` | 이벤트 티켓 카드 |
+| `img/bag.webp` | 쇼핑백(머리 화면, 이용 방법 2단계, 연속구매 미션) |
+| `img/coins.webp` | 동전(머리 화면, 포인트 카드, 출석, 카카오 연동) |
+| `img/gifticon.webp` | 바코드 상품권·커피(이용 방법 5단계, 카카오 연동) |
+| `img/pricepick-splash.png` | 앱 실행 화면(이용 방법 1단계) |
+| `img/gift-box-purple.webp`, `gift-box-gold.webp` | 매일 선물 상자·랜덤 선물 상자 카드 |
+| `img/bg-malls-parcels.webp` | 제휴몰 섹션 오른쪽 택배 사진(PC만) |
+| `img/bg-end-storefront.webp` / `-m.webp` | 맨 아래 섹션 배경 매장 사진(PC / 휴대폰) |
+| `img/malls/*.png`, `*.jpg` | 제휴몰 로고 11개(파일 이름 = 몰 이름) |
+| `fonts/` | 글꼴(위 표) |

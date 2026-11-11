@@ -6,13 +6,10 @@
 <title>프라이스픽 — 쇼핑하던 그대로, 티켓이 쌓여요</title>
 <meta name="description" content="프라이스픽을 거쳐 쇼핑몰에서 사면 티켓을 드려요. 모은 티켓은 기프티콘으로 바꿔요.">
 <meta name="theme-color" content="#F1EEFF">
-<link rel="icon" href="/icon-192.png">
-<link rel="apple-touch-icon" href="/apple-touch-icon.png">
-<link rel="preconnect" href="https://cdn.jsdelivr.net">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700;800&display=swap">
-<link rel="preload" as="image" href="/web/img/pricepick-splash-3x.webp">
+<link rel="icon" href="img/favicon-192.png">
+<link rel="apple-touch-icon" href="img/apple-touch-icon.png">
+<link rel="stylesheet" href="fonts/pretendard/pretendard.css">
+<link rel="stylesheet" href="fonts/poppins/poppins.css">
 <!--
   프라이스픽 홈페이지 데모 (2026-11-10)
   1차: 김반장 「홈페이지 DEMO 를 만들어」 / 2차: 「좀 쌈박하게 만들어봐. 애니매이션도 팍팍 넣어 주고」
@@ -91,7 +88,7 @@ section{position:relative;scroll-margin-top:60px}
 /* ═════════ 머리 화면 ═════════ */
 .hero{min-height:100svh;padding-top:60px;color:var(--text1);overflow:hidden;isolation:isolate;background:var(--sub-4)}
 /* 사진 배경 — 흐린 매장 전경. 배경일 뿐이라 흐리게 낮추고, 위에 밝은 보라 막을 덮어 아래로 갈수록 흰색으로 */
-.hero-photo{position:absolute;left:0;right:0;top:9%;height:110%;z-index:-4;background:url(/web/img/bg-hero-sofa-m.webp) 50% 0/auto 118% no-repeat;will-change:transform}
+.hero-photo{position:absolute;left:0;right:0;top:9%;height:110%;z-index:-4;background:url(img/bg-hero-sofa-m.webp) 50% 0/auto 118% no-repeat;will-change:transform}
 .hero-veil{position:absolute;inset:0;z-index:-3;background:linear-gradient(180deg,rgba(248,246,255,.86) 0%,rgba(248,246,255,.74) 34%,rgba(248,246,255,0) 52%,rgba(248,246,255,0) 86%,#fff 100%)}
 .hero .grid-bg{position:absolute;inset:0;z-index:-2;opacity:.2;
   background-image:linear-gradient(rgba(132,94,238,.07) 1px,transparent 1px),linear-gradient(90deg,rgba(132,94,238,.07) 1px,transparent 1px);
@@ -289,7 +286,7 @@ section{position:relative;scroll-margin-top:60px}
   .malls .wrap{position:relative}
   /* 로고 칸(왼쪽 58%) 오른쪽부터 화면 오른쪽 끝까지, 섹션 위아래 경계까지 */
   .malls-photo{display:block;position:absolute;z-index:0;pointer-events:none;left:56%;right:calc((100% - 100vw) / 2);top:-88px;bottom:-88px;
-    background:linear-gradient(180deg,rgba(241,238,255,.18),rgba(255,255,255,.12)),url(/web/img/bg-wait-parcels.webp) 62% 64%/cover no-repeat;
+    background:linear-gradient(180deg,rgba(241,238,255,.18),rgba(255,255,255,.12)),url(img/bg-malls-parcels.webp) 62% 64%/cover no-repeat;
     -webkit-mask-image:linear-gradient(90deg,transparent 0%,rgba(0,0,0,.55) 22%,#000 42%),linear-gradient(180deg,transparent 0%,#000 18%,#000 80%,transparent 100%);
     mask-image:linear-gradient(90deg,transparent 0%,rgba(0,0,0,.55) 22%,#000 42%),linear-gradient(180deg,transparent 0%,#000 18%,#000 80%,transparent 100%);
     -webkit-mask-composite:source-in;mask-composite:intersect}
@@ -387,7 +384,7 @@ section{position:relative;scroll-margin-top:60px}
 /* ═════════ 맺음 ═════════ */
 .end{position:relative;overflow:hidden;isolation:isolate;color:var(--text1);text-align:center;padding:96px 0 104px;background:#F1EEFF}
 /* 흐린 매장 전경 — 섹션 전체 폭. 위는 자주 묻는 질문 바탕색(#F1EEFF)에서, 아래는 회사 정보 바탕색(#FAF9FC)으로 이어지고, 글자 뒤만 둥글게 밝힌다 */
-.end-photo{position:absolute;inset:0;z-index:-2;background:url(/web/img/bg-hero-storefront-m.webp) 55% 40%/cover no-repeat}
+.end-photo{position:absolute;inset:0;z-index:-2;background:url(img/bg-end-storefront-m.webp) 55% 40%/cover no-repeat}
 .end-veil{position:absolute;inset:0;z-index:-1;background:radial-gradient(ellipse 46% 52% at 50% 52%,rgba(248,246,255,.86) 0%,rgba(248,246,255,.62) 45%,rgba(248,246,255,0) 75%),linear-gradient(180deg,#F1EEFF 0%,rgba(241,238,255,.55) 18%,rgba(241,238,255,0) 42%,rgba(250,249,252,0) 76%,#FAF9FC 100%)}
 .end h2 em{font-style:normal}
 .end h2{font-size:36px;font-weight:800;letter-spacing:-1.6px;line-height:1.18}
@@ -450,7 +447,7 @@ section{position:relative;scroll-margin-top:60px}
   /* PC: 글·날짜는 왼쪽 절반에 세로로, 오른쪽 절반은 막을 엷게 해 택배 상자가 보이게 */
   .wait{display:block;padding:40px 44px;min-height:440px}
   .wait>h3,.wait .rows{max-width:46%}
-  .hero-photo{top:0;height:100%;background-image:url(/web/img/bg-hero-sofa.webp);background-size:cover;background-position:25% 35%}
+  .hero-photo{top:0;height:100%;background-image:url(img/bg-hero-sofa.webp);background-size:cover;background-position:25% 35%}
   .hero-veil{background:linear-gradient(90deg,rgba(248,246,255,.84) 0%,rgba(248,246,255,.66) 28%,rgba(248,246,255,0) 46%),linear-gradient(180deg,rgba(255,255,255,0) 80%,#fff 100%)}
   .wait .rows{margin-top:20px}
   .mall-lead{padding:30px 36px;max-width:760px}
@@ -476,7 +473,7 @@ section{position:relative;scroll-margin-top:60px}
   .kk ul{margin-top:0}
   .faq{max-width:860px}
   .end{padding:140px 0}
-  .end-photo{background-image:url(/web/img/bg-hero-storefront.webp);background-position:center 62%}
+  .end-photo{background-image:url(img/bg-end-storefront.webp);background-position:center 62%}
   .end h2{font-size:64px;letter-spacing:-3px}
   .end .ob2{width:200px}.end .ob2.a{left:max(4%,calc(50% - 760px));top:70px;width:190px}.end .ob2.b{right:max(4%,calc(50% - 760px));bottom:70px;width:210px}
 }
@@ -554,13 +551,13 @@ section{position:relative;scroll-margin-top:60px}
     <!-- 앱 실제 화면 네 장이 돌아가는 폰 묶음(김반장 2026-11-11). 맨 앞 폰은 PC에서 배경 사진 속 폰 자리 위에 서서 그 폰을 가린다(폰 두 개 방지).
          화면은 김반장이 데모 앱에서 직접 뜬 것 — ③·④의 마우스 커서는 지웠고, ②는 「혜택」 글자에 걸쳐 그대로 둠 -->
     <div class="hero-shots" id="hero-shots" role="img" aria-label="프라이스픽 앱 화면 — 홈, 혜택, 기프티샵, 상품 상세">
-      <div class="dev" data-pos="0"><img src="/web/img/app-home.webp" alt="" width="725" height="1568"></div>
-      <div class="dev" data-pos="1"><img src="/web/img/app-benefit.webp" alt="" width="725" height="1568" loading="lazy"></div>
-      <div class="dev" data-pos="2"><img src="/web/img/app-giftshop.webp" alt="" width="725" height="1568" loading="lazy"></div>
-      <div class="dev" data-pos="3"><img src="/web/img/app-product.webp" alt="" width="725" height="1568" loading="lazy"></div>
-      <img class="ho ho-bag" src="/web/img/bag.webp" alt="" width="889" height="1000" aria-hidden="true">
-      <img class="ho ho-coin" src="/web/img/coins.webp" alt="" width="1000" height="644" aria-hidden="true">
-      <div class="hero-tk" aria-hidden="true"><span class="tks one"><img src="/web/img/ticket-random.svg" alt="" width="512" height="512"></span></div>
+      <div class="dev" data-pos="0"><img src="img/app-home.webp" alt="" width="725" height="1568"></div>
+      <div class="dev" data-pos="1"><img src="img/app-benefit.webp" alt="" width="725" height="1568" loading="lazy"></div>
+      <div class="dev" data-pos="2"><img src="img/app-giftshop.webp" alt="" width="725" height="1568" loading="lazy"></div>
+      <div class="dev" data-pos="3"><img src="img/app-product.webp" alt="" width="725" height="1568" loading="lazy"></div>
+      <img class="ho ho-bag" src="img/bag.webp" alt="" width="889" height="1000" aria-hidden="true">
+      <img class="ho ho-coin" src="img/coins.webp" alt="" width="1000" height="644" aria-hidden="true">
+      <div class="hero-tk" aria-hidden="true"><span class="tks one"><img src="img/ticket-random.svg" alt="" width="512" height="512"></span></div>
     </div>
   </div>
 </section>
@@ -582,22 +579,22 @@ section{position:relative;scroll-margin-top:60px}
       <h2 class="h2">쇼핑에서 <em>기프티콘</em>까지</h2>
     </div>
     <ol class="flow" id="flow">
-      <li class="node"><div class="art"><span class="no">1</span><span class="pp-g-splash"><img src="/web/img/pricepick-splash.png" alt="" width="390" height="844" loading="lazy"></span></div>
+      <li class="node"><div class="art"><span class="no">1</span><span class="pp-g-splash"><img src="img/pricepick-splash.png" alt="" width="390" height="844" loading="lazy"></span></div>
         <div class="tx"><b>앱에서 쇼핑몰로</b><p>프라이스픽에서 쇼핑몰로 들어가야 티켓이 쌓여요.</p></div></li>
-      <li class="node"><div class="art"><span class="no">2</span><img src="/web/img/bag.webp" alt="" width="889" height="1000" loading="lazy"></div>
+      <li class="node"><div class="art"><span class="no">2</span><img src="img/bag.webp" alt="" width="889" height="1000" loading="lazy"></div>
         <div class="tx"><b>평소처럼 구매</b><p>평소처럼 사면 주문마다 랜덤 티켓을 드려요.</p></div></li>
-      <li class="node"><div class="art"><span class="no">3</span><span class="tks one"><img src="/web/img/ticket-random.svg" alt="" width="512" height="512"></span></div>
+      <li class="node"><div class="art"><span class="no">3</span><span class="tks one"><img src="img/ticket-random.svg" alt="" width="512" height="512"></span></div>
         <div class="tx"><b>구매 확정을 기다려요</b><p>구매가 확정되면 쓸 수 있어요. 몇 장인지도 그때 알려 드려요.</p></div></li>
-      <li class="node"><div class="art"><span class="no">4</span><span class="tks many"><img src="/web/img/ticket-gold.svg" alt="" width="512" height="512"><img src="/web/img/ticket-gold.svg" alt="" width="512" height="512"><img src="/web/img/ticket-gold.svg" alt="" width="512" height="512"><span class="chk"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span></span></div>
+      <li class="node"><div class="art"><span class="no">4</span><span class="tks many"><img src="img/ticket-gold.svg" alt="" width="512" height="512"><img src="img/ticket-gold.svg" alt="" width="512" height="512"><img src="img/ticket-gold.svg" alt="" width="512" height="512"><span class="chk"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span></span></div>
         <div class="tx"><b>티켓으로 바뀌어요</b><p>랜덤 티켓이 티켓으로 바뀌어요. 많이 살수록 많이 받아요.</p></div></li>
-      <li class="node"><div class="art"><span class="no">5</span><img src="/web/img/gifticon.webp" alt="" width="1000" height="538" loading="lazy"></div>
+      <li class="node"><div class="art"><span class="no">5</span><img src="img/gifticon.webp" alt="" width="1000" height="538" loading="lazy"></div>
         <div class="tx"><b>기프티콘으로 교환</b><p>모은 티켓으로 원하는 기프티콘을 골라 바꿔요.</p></div></li>
     </ol>
   </div>
 </section>
 
 <!-- ═════════ 제휴몰 — 모든 몰을 같은 크기·같은 모양으로(특정 몰을 앞세우지 않는다 — 김반장 2026-11-11) ═════════
-     목록은 데모 앱과 같은 곳(CMS 「티켓 적립 설정」의 앱 노출·로고)에서 읽고 이름순으로 놓는다. 읽기에 실패하면 아래 기본 목록이 그대로 남는다. -->
+     목록·로고는 2026-11-11 데모 CMS 「티켓 적립 설정」 기준을 옮겨 적었다(이름순, 로고는 img/malls/). 로고가 안 열리면 이름 앞 두 글자가 보인다. -->
 <section class="sec malls" id="malls">
   <div class="wrap">
     <!-- 택배 상자 사진 — 섹션 오른쪽 빈자리에만(김반장 2026-11-11). 왼쪽·위아래로 갈수록 투명해져 로고 칸 쪽에서 사라진다. 휴대폰은 숨김 -->
@@ -608,17 +605,17 @@ section{position:relative;scroll-margin-top:60px}
       <p class="sub">쇼핑몰마다 받는 티켓이 달라요. 앱에서 바로 확인할 수 있어요.</p>
     </div>
     <div class="mall-grid rv" id="mall-grid">
-      <div class="mt"><div class="mlogo">11</div><span>11번가</span></div>
-      <div class="mt"><div class="mlogo">CJ</div><span>CJ더마켓</span></div>
-      <div class="mt"><div class="mlogo">G마</div><span>G마켓</span></div>
-      <div class="mt"><div class="mlogo">GS</div><span>GS SHOP</span></div>
-      <div class="mt"><div class="mlogo">Hm</div><span>Hmall</span></div>
-      <div class="mt"><div class="mlogo">NS</div><span>NS홈쇼핑</span></div>
-      <div class="mt"><div class="mlogo">롯데</div><span>롯데온</span></div>
-      <div class="mt"><div class="mlogo">롯데</div><span>롯데홈쇼핑</span></div>
-      <div class="mt"><div class="mlogo">옥션</div><span>옥션</span></div>
-      <div class="mt"><div class="mlogo">이마</div><span>이마트인터넷쇼핑몰</span></div>
-      <div class="mt"><div class="mlogo">쿠팡</div><span>쿠팡</span></div>
+      <div class="mt"><div class="mlogo">11<img src="img/malls/11st.png" alt="" loading="lazy" onerror="this.remove()"></div><span>11번가</span></div>
+      <div class="mt"><div class="mlogo">CJ<img src="img/malls/cj-themarket.jpg" alt="" loading="lazy" onerror="this.remove()"></div><span>CJ더마켓</span></div>
+      <div class="mt"><div class="mlogo">GS<img src="img/malls/gsshop.png" alt="" loading="lazy" onerror="this.remove()"></div><span>GS SHOP</span></div>
+      <div class="mt"><div class="mlogo">G마<img src="img/malls/gmarket.png" alt="" loading="lazy" onerror="this.remove()"></div><span>G마켓</span></div>
+      <div class="mt"><div class="mlogo">Hm<img src="img/malls/hmall.png" alt="" loading="lazy" onerror="this.remove()"></div><span>Hmall</span></div>
+      <div class="mt"><div class="mlogo">NS<img src="img/malls/ns-homeshopping.png" alt="" loading="lazy" onerror="this.remove()"></div><span>NS홈쇼핑</span></div>
+      <div class="mt"><div class="mlogo">롯데<img src="img/malls/lotteon.png" alt="" loading="lazy" onerror="this.remove()"></div><span>롯데온</span></div>
+      <div class="mt"><div class="mlogo">롯데<img src="img/malls/lotte-homeshopping.png" alt="" loading="lazy" onerror="this.remove()"></div><span>롯데홈쇼핑</span></div>
+      <div class="mt"><div class="mlogo">옥션<img src="img/malls/auction.png" alt="" loading="lazy" onerror="this.remove()"></div><span>옥션</span></div>
+      <div class="mt"><div class="mlogo">이마<img src="img/malls/emart.png" alt="" loading="lazy" onerror="this.remove()"></div><span>이마트인터넷쇼핑몰</span></div>
+      <div class="mt"><div class="mlogo">쿠팡<img src="img/malls/coupang.jpg" alt="" loading="lazy" onerror="this.remove()"></div><span>쿠팡</span></div>
     </div>
   </div>
 </section>
@@ -632,19 +629,19 @@ section{position:relative;scroll-margin-top:60px}
     </div>
     <div class="cur">
       <div class="cc t-red rv" style="--d:0">
-        <div class="art"><span class="tks one"><img src="/web/img/ticket-random.svg" alt="" width="512" height="512"></span></div>
+        <div class="art"><span class="tks one"><img src="img/ticket-random.svg" alt="" width="512" height="512"></span></div>
         <div><h3>랜덤 티켓 <i>대기 중</i></h3><p>사자마자 받는 티켓이에요. 구매가 확정되면 티켓으로 바뀌어요.</p></div>
       </div>
       <div class="cc t-gold rv" style="--d:1">
-        <div class="art"><span class="tks many"><img src="/web/img/ticket-gold.svg" alt="" width="512" height="512"><img src="/web/img/ticket-gold.svg" alt="" width="512" height="512"><img src="/web/img/ticket-gold.svg" alt="" width="512" height="512"><span class="chk"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span></span></div>
+        <div class="art"><span class="tks many"><img src="img/ticket-gold.svg" alt="" width="512" height="512"><img src="img/ticket-gold.svg" alt="" width="512" height="512"><img src="img/ticket-gold.svg" alt="" width="512" height="512"><span class="chk"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span></span></div>
         <div><h3>티켓</h3><p>기프티콘을 살 때 쓰는 티켓이에요.</p><p class="exp">받은 날부터 1년</p></div>
       </div>
       <div class="cc t-evt rv" style="--d:2">
-        <div class="art"><img class="evt" src="/web/img/ico-ticket-event.svg" alt="" width="128" height="128" loading="lazy"></div>
+        <div class="art"><img class="evt" src="img/ico-ticket-event.svg" alt="" width="128" height="128" loading="lazy"></div>
         <div><h3>이벤트 티켓</h3><p>출석·선물 상자·미션·가입으로 받아요. 랜덤 선물 상자를 열거나 <b>1장을 티켓 2장으로</b> 바꿔요. 바꾸면 되돌릴 수 없어요.</p><p class="exp">받은 날부터 100일</p></div>
       </div>
       <div class="cc t-coin rv" style="--d:3">
-        <div class="art"><img src="/web/img/coins.webp" alt="" width="1000" height="644" loading="lazy"></div>
+        <div class="art"><img src="img/coins.webp" alt="" width="1000" height="644" loading="lazy"></div>
         <div><h3>포인트</h3><p>출석·친구초대·가입으로 받아요. <b>10P를 티켓 1장으로</b> 바꿔 써요. 바꾸면 되돌릴 수 없어요.</p><p class="exp">받은 날부터 1년</p></div>
       </div>
     </div>
@@ -661,21 +658,21 @@ section{position:relative;scroll-margin-top:60px}
     </div>
     <div class="bf">
       <div class="bc big-card c-pur rv" style="--d:0">
-        <img class="bart" src="/web/img/gift-box-purple.webp" alt="" width="712" height="816" loading="lazy">
+        <img class="bart" src="img/gift-box-purple.webp" alt="" width="712" height="816" loading="lazy">
         <span class="kick">하루 한 번 무료</span>
         <span class="big"><span data-count="1">1</span><small>회</small></span>
         <h3>매일 선물 상자</h3>
         <p>티켓·이벤트 티켓·포인트 중 하나가 나와요. 꽝도 있어요.</p>
       </div>
       <div class="bc big-card c-gold rv" style="--d:1">
-        <img class="bart" src="/web/img/gift-box-gold.webp" alt="" width="714" height="816" loading="lazy">
+        <img class="bart" src="img/gift-box-gold.webp" alt="" width="714" height="816" loading="lazy">
         <span class="kick">이벤트 티켓 1장으로</span>
         <span class="big"><span data-count="10">10</span><small>회까지</small></span>
         <h3>랜덤 선물 상자</h3>
         <p>이벤트 티켓 1장으로 한 번 열어요. 하루 최대 10회.</p>
       </div>
       <div class="bc rv" style="--d:2">
-        <img class="bart" src="/web/img/coins.webp" alt="" width="1000" height="644" loading="lazy">
+        <img class="bart" src="img/coins.webp" alt="" width="1000" height="644" loading="lazy">
         <span class="kick">매일</span>
         <span class="big"><span data-count="10">10</span><small>P</small></span>
         <h3>출석 「쿠팡 구경하기」</h3>
@@ -688,7 +685,7 @@ section{position:relative;scroll-margin-top:60px}
         <p>친구가 첫 구매를 하면 둘 다 받아요. 한 달 50명까지.</p>
       </div>
       <div class="bc rv" style="--d:4">
-        <img class="bart" src="/web/img/bag.webp" alt="" width="889" height="1000" loading="lazy">
+        <img class="bart" src="img/bag.webp" alt="" width="889" height="1000" loading="lazy">
         <span class="kick">이벤트 티켓 최대</span>
         <span class="big"><span data-count="9">9</span><small>장</small></span>
         <h3>연속구매 미션</h3>
@@ -699,7 +696,7 @@ section{position:relative;scroll-margin-top:60px}
         </ul>
       </div>
       <div class="bc line-card rv" style="--d:5">
-        <span class="bart tks many"><img src="/web/img/ticket-gold.svg" alt="" width="512" height="512"><img src="/web/img/ticket-gold.svg" alt="" width="512" height="512"><img src="/web/img/ticket-gold.svg" alt="" width="512" height="512"></span>
+        <span class="bart tks many"><img src="img/ticket-gold.svg" alt="" width="512" height="512"><img src="img/ticket-gold.svg" alt="" width="512" height="512"><img src="img/ticket-gold.svg" alt="" width="512" height="512"></span>
         <span class="kick">처음 시작하면</span>
         <span class="big"><span data-count="20">20</span><small>P</small></span>
         <h3>시작 보상</h3>
@@ -723,9 +720,9 @@ section{position:relative;scroll-margin-top:60px}
         <p class="lead">시작은 닉네임만으로. 쓰려면 연동이 필요해요.</p>
       </div>
       <ul>
-        <li class="rv" style="--d:1"><span class="i">1</span><div><b>티켓·포인트를 쓰려면</b><span>연동 전에는 모으기만 할 수 있어요.</span></div><img class="ka" src="/web/img/coins.webp" alt="" width="1000" height="644" loading="lazy"></li>
-        <li class="rv" style="--d:2"><span class="i">2</span><div><b>기프티콘은 카카오톡으로</b><span>그래서 기프티샵은 연동 후에 열려요.</span></div><img class="ka" src="/web/img/gifticon.webp" alt="" width="1000" height="538" loading="lazy"></li>
-        <li class="rv" style="--d:3"><span class="i">3</span><div><b>더 빨리 쓸 수 있어요</b><span>연동하면 구매가 확정된 티켓을 더 빨리 쓸 수 있어요.</span></div><img class="ka" src="/web/img/ticket-gold.svg" alt="" width="512" height="512" loading="lazy"></li>
+        <li class="rv" style="--d:1"><span class="i">1</span><div><b>티켓·포인트를 쓰려면</b><span>연동 전에는 모으기만 할 수 있어요.</span></div><img class="ka" src="img/coins.webp" alt="" width="1000" height="644" loading="lazy"></li>
+        <li class="rv" style="--d:2"><span class="i">2</span><div><b>기프티콘은 카카오톡으로</b><span>그래서 기프티샵은 연동 후에 열려요.</span></div><img class="ka" src="img/gifticon.webp" alt="" width="1000" height="538" loading="lazy"></li>
+        <li class="rv" style="--d:3"><span class="i">3</span><div><b>더 빨리 쓸 수 있어요</b><span>연동하면 구매가 확정된 티켓을 더 빨리 쓸 수 있어요.</span></div><img class="ka" src="img/ticket-gold.svg" alt="" width="512" height="512" loading="lazy"></li>
         <li class="rv" style="--d:4"><span class="i">4</span><div><b>앱을 지워도 그대로</b><span>연동 전 기록은 이 기기에만 남아요.</span></div></li>
       </ul>
     </div>
@@ -783,8 +780,8 @@ section{position:relative;scroll-margin-top:60px}
 <!-- ═════════ 맺음 ═════════ -->
 <section class="end">
   <div class="end-photo" aria-hidden="true"></div><div class="end-veil" aria-hidden="true"></div>
-  <div class="ob2 a" aria-hidden="true"><span class="tks many"><img src="/web/img/ticket-gold.svg" alt="" width="512" height="512"><img src="/web/img/ticket-gold.svg" alt="" width="512" height="512"><img src="/web/img/ticket-gold.svg" alt="" width="512" height="512"><span class="chk"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span></span></div>
-  <div class="ob2 b" aria-hidden="true"><img src="/web/img/coins.webp" alt="" width="1000" height="644" loading="lazy"></div>
+  <div class="ob2 a" aria-hidden="true"><span class="tks many"><img src="img/ticket-gold.svg" alt="" width="512" height="512"><img src="img/ticket-gold.svg" alt="" width="512" height="512"><img src="img/ticket-gold.svg" alt="" width="512" height="512"><span class="chk"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span></span></div>
+  <div class="ob2 b" aria-hidden="true"><img src="img/coins.webp" alt="" width="1000" height="644" loading="lazy"></div>
   <div class="wrap">
     <h2 class="rv">다음 쇼핑부터<br><em class="shine">티켓 받으세요</em></h2>
     <p class="rv" style="--d:1">닉네임만 정하면 바로 시작해요.</p>
@@ -806,8 +803,8 @@ section{position:relative;scroll-margin-top:60px}
 <footer class="ftr">
   <div class="wrap">
     <div class="links">
-      <a href="/web/terms.html#service">이용약관</a>
-      <a class="pv" href="/web/terms.html#privacy">개인정보처리방침</a>
+      <a href="terms.html#service">이용약관</a>
+      <a class="pv" href="terms.html#privacy">개인정보처리방침</a>
     </div>
     <!-- 회사 정보 — 값이 비어 있는 줄은 화면에 나오지 않는다. 받는 대로 dd 에 채운다. -->
     <dl class="co">
@@ -1002,53 +999,6 @@ section{position:relative;scroll-margin-top:60px}
     window.addEventListener('load', layout);
   }
 
-  /* ── 제휴몰 — 데모 앱 ppLoadMalls 와 같은 기준:
-       settings/ticket_accrual.applied 가 켜진 몰만, 이름순(적립률은 불러오지 않는다), 로고는 CMS 등록본(없으면 이름 앞 두 글자).
-       쿠팡(coupang_direct)은 맨 앞 카드로 따로 둔다. ── */
-  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
-  function logoHtml(name, url) {
-    var ab = esc(String(name || '?').trim().slice(0, 2));
-    return ab + (url ? '<img src="' + esc(url) + '" alt="" loading="lazy" onerror="this.remove()">' : '');
-  }
-  function renderMalls(list) {
-    var g = document.getElementById('mall-grid');
-    if (!g || !list.length) return;
-    g.innerHTML = list.map(function (x) { return '<div class="mt"><div class="mlogo">' + logoHtml(x.name, x.logo) + '</div><span>' + esc(x.name) + '</span></div>'; }).join('');
-  }
-
-  var BASE = 'https://firestore.googleapis.com/v1/projects/pricepick-demo/databases/(default)/documents/settings/';
-  function val(v) {
-    if (!v) return null;
-    if ('booleanValue' in v) return v.booleanValue;
-    if ('stringValue' in v) return v.stringValue;
-    if ('doubleValue' in v) return v.doubleValue;
-    if ('integerValue' in v) return Number(v.integerValue);
-    if ('mapValue' in v) { var o = {}, f = v.mapValue.fields || {}; for (var k in f) o[k] = val(f[k]); return o; }
-    return null;
-  }
-  fetch(BASE + 'ticket_accrual?mask.fieldPaths=applied&mask.fieldPaths=logos')
-    .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
-    .then(function (d) {
-      var f = d.fields || {};
-      var applied = val(f.applied) || {}, logos = val(f.logos) || {};
-      var codes = Object.keys(applied).filter(function (c) { return applied[c] === true && c.indexOf('lp:') === 0; });
-      var q = codes.map(function (c) { return 'mask.fieldPaths=' + encodeURIComponent('merchants.`' + c.slice(3) + '`.merchant_name'); }).join('&');
-      return fetch(BASE + 'linkprice_merchants?' + q)
-        .then(function (r) { return r.ok ? r.json() : {}; })
-        .catch(function () { return {}; })
-        .then(function (m) {
-          var mer = val(((m.fields || {}).merchants)) || {};
-          var list = codes.map(function (c) {
-            var id = c.slice(3), nm = (mer[id] && mer[id].merchant_name) || id;
-            return { name: nm, logo: logos[c] || '' };
-          });
-          /* 쿠팡(직접 제휴)도 다른 몰과 같은 칸으로 — 앞세우지 않고 이름순에 섞는다 */
-          list.push({ name: '쿠팡', logo: logos.coupang_direct || '' });
-          list.sort(function (a, b) { return a.name.localeCompare(b.name, 'ko'); });
-          renderMalls(list);
-        });
-    })
-    .catch(function () { /* 읽기 실패 — 기본 목록을 그대로 둔다 */ });
 })();
 </script>
 </body>
