@@ -68,13 +68,13 @@ section{position:relative;scroll-margin-top:60px}
 .h2{font-size:32px;font-weight:800;letter-spacing:-1.2px;line-height:1.18}
 .h2 em{font-style:normal;background:linear-gradient(90deg,var(--main),#B07CFF);-webkit-background-clip:text;background-clip:text;color:transparent}
 .lead{margin-top:12px;font-size:16px;color:var(--text2)}
-.sec{padding:88px 0}
-.sec-head{margin-bottom:36px}
+.sec{padding:64px 0}
+.sec-head{margin-bottom:28px}
 
 /* ── 스크롤 등장 (스크립트가 켜졌을 때만 숨겼다가 띄운다 — 스크립트가 없으면 처음부터 다 보인다) ── */
-.js .rv{opacity:0;transform:translateY(22px);transition:opacity .5s var(--ease),transform .5s var(--ease);transition-delay:calc(var(--d,0) * 70ms)}
-.js .rv.in{opacity:1;transform:none}
-.js .rv.pop{transform:translateY(16px) scale(.94)}
+.js .rv{transform:translateY(18px);transition:transform .5s var(--ease);transition-delay:calc(var(--d,0) * 60ms)}
+.js .rv.in{transform:none}
+.js .rv.pop{transform:translateY(14px) scale(.97)}
 .js .rv.pop.in{transform:none}
 
 /* ── 스토어 단추 (링크는 출시 후 연결) ── */
@@ -199,8 +199,7 @@ section{position:relative;scroll-margin-top:60px}
 .node .no{position:absolute;top:-8px;left:-8px;width:30px;height:30px;border-radius:50%;background:var(--main);color:#fff;font-family:Poppins,sans-serif;font-weight:800;font-size:14px;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 14px rgba(132,94,238,.45)}
 .node b{display:block;font-size:19px;font-weight:800;letter-spacing:-.6px}
 .node p{font-size:14px;color:var(--text2);margin-top:3px}
-.js .flow.armed .node .art{transform:scale(.4);opacity:0}
-.js .flow.armed .node .tx{opacity:0;transform:translateY(8px)}
+.js .flow.armed .node .art{transform:scale(.88)}
 .node .art{transition:transform .45s var(--pop),opacity .25s}
 .node .tx{transition:opacity .35s var(--ease),transform .35s var(--ease)}
 .js .flow .node.on .art{transform:none;opacity:1}
@@ -229,11 +228,6 @@ section{position:relative;scroll-margin-top:60px}
 
 /* ═════════ 제휴몰 ═════════ */
 .malls{background:linear-gradient(180deg,#F4EFFF 0%,#EDE5FF 100%);overflow:hidden;isolation:isolate}
-/* 택배 상자 사진 — 쇼핑몰에서 사면 택배가 온다. 섹션 아래쪽에만 은은하게: 위로 갈수록 투명해지고(마스크) 흰 막을 한 겹 덮는다. 로고·카드 뒤로는 올라오지 않는다 */
-.sec.malls{padding-bottom:170px}
-.malls-photo{position:absolute;left:0;right:0;bottom:0;height:260px;z-index:-1;pointer-events:none;will-change:transform;
-  background:linear-gradient(180deg,rgba(241,238,255,.55),rgba(255,255,255,.30)),url(/web/img/bg-wait-parcels-m.webp) 50% 82%/cover no-repeat;opacity:.75;
-  mask-image:linear-gradient(180deg,transparent 0%,rgba(0,0,0,.6) 40%,#000 75%);-webkit-mask-image:linear-gradient(180deg,transparent 0%,rgba(0,0,0,.6) 40%,#000 75%)}
 .malls::before{content:'';position:absolute;right:-120px;top:-120px;width:360px;height:360px;border-radius:50%;background:radial-gradient(closest-side,rgba(132,94,238,.25),transparent)}
 .mall-lead{position:relative;display:flex;align-items:center;gap:16px;border-radius:var(--r-lg);padding:20px;color:var(--text1);overflow:hidden;
   background:radial-gradient(70% 140% at 100% 50%,var(--sub-4),transparent 70%),#fff;border:2px solid var(--main);box-shadow:0 22px 48px rgba(132,94,238,.22);transition:transform .25s var(--ease),box-shadow .25s}
@@ -386,7 +380,8 @@ section{position:relative;scroll-margin-top:60px}
 @media (min-width:860px){
   :root{--pad:36px}
   .nav{display:flex}
-  .sec{padding:128px 0}
+  .sec{padding:88px 0}
+  .sec-head{margin-bottom:40px}
   .h2{font-size:52px;letter-spacing:-2.4px}
   .lead{font-size:19px}
   .hero{display:flex;align-items:center}
@@ -414,9 +409,6 @@ section{position:relative;scroll-margin-top:60px}
   .hero-veil{background:linear-gradient(90deg,rgba(248,246,255,.82) 0%,rgba(248,246,255,.66) 30%,rgba(248,246,255,0) 52%),linear-gradient(180deg,rgba(255,255,255,0) 74%,#fff 100%)}
   .wait .rows{margin-top:20px}
   .mall-lead{padding:30px 36px;max-width:760px}
-  .sec.malls{padding-bottom:270px}
-  /* PC: 사진을 줄여 오른쪽 아래 구석에만, 왼쪽은 섹션 바탕색으로 흐려지게 */
-  .malls-photo{height:300px;opacity:.6;background-image:linear-gradient(90deg,#EEE7FF 0%,#EEE7FF 38%,rgba(238,231,255,0) 62%),linear-gradient(180deg,rgba(241,238,255,.55),rgba(255,255,255,.30)),url(/web/img/bg-wait-parcels.webp);background-size:100% 100%,100% 100%,960px auto;background-position:0 0,0 0,right -40px bottom -70px;background-repeat:no-repeat}
   .mall-lead .mlogo{width:96px;height:96px;border-radius:26px}
   .ml-tk{width:96px;height:96px}
   .ml-side{gap:28px;padding-right:12px}
@@ -435,6 +427,23 @@ section{position:relative;scroll-margin-top:60px}
   .end{padding:140px 0}
   .end h2{font-size:64px;letter-spacing:-3px}
   .end .ob2{width:200px}.end .ob2.a{left:6%;top:60px;width:180px}.end .ob2.b{right:6%;bottom:60px;width:200px}
+}
+
+/* 넓은 화면(1200px 이상) — 자주 묻는 질문을 두 줄로 나눠 오른쪽이 비지 않게 */
+@media (min-width:1200px){
+  .faq{max-width:none;grid-template-columns:1fr 1fr;align-items:start;gap:12px 18px}
+}
+
+/* ═════════ 아주 넓은 화면(1800px 이상) — 내용 폭과 머리 화면을 키워 좌우가 허전하지 않게. 배경은 원래 화면 끝까지 ═════════ */
+@media (min-width:1800px){
+  :root{--maxw:1360px;--pad:48px}
+  .hero-in{grid-template-columns:minmax(0,1fr) 500px}
+  .hero-title{font-size:132px;letter-spacing:-6.6px}
+  .hero-stage{width:390px;margin-left:-40px}
+  .hero-sub{max-width:520px}
+  .hero .lead{font-size:22px}
+  .h2{font-size:60px;letter-spacing:-2.8px}
+  .node .art{width:168px;height:168px}
 }
 
 /* ── 움직임 끈 사용자 — 정지 화면 ── */
@@ -533,7 +542,6 @@ section{position:relative;scroll-margin-top:60px}
 <!-- ═════════ 제휴몰 — 모든 몰을 같은 크기·같은 모양으로(특정 몰을 앞세우지 않는다 — 김반장 2026-11-11) ═════════
      목록은 데모 앱과 같은 곳(CMS 「티켓 적립 설정」의 앱 노출·로고)에서 읽고 이름순으로 놓는다. 읽기에 실패하면 아래 기본 목록이 그대로 남는다. -->
 <section class="sec malls" id="malls">
-  <div class="malls-photo" id="malls-photo" aria-hidden="true"></div>
   <div class="wrap">
     <div class="sec-head rv">
       <span class="eyebrow">Partners</span>
@@ -761,7 +769,7 @@ section{position:relative;scroll-margin-top:60px}
   var WIDE = window.matchMedia('(min-width: 860px)').matches;
 
   /* ── 머리줄 · 진행 막대 ── */
-  var hdr = document.getElementById('hdr'), prog = document.getElementById('prog'), hp = document.getElementById('hero-photo'), mp = document.getElementById('malls-photo');
+  var hdr = document.getElementById('hdr'), prog = document.getElementById('prog'), hp = document.getElementById('hero-photo');
   var heroH = document.getElementById('hero').offsetHeight;
   var ticking = false;
   function onScroll() {
@@ -771,7 +779,6 @@ section{position:relative;scroll-margin-top:60px}
       hdr.classList.toggle('on', y > heroH - 80);
       prog.style.transform = 'scaleX(' + (max > 0 ? y / max : 0) + ')';
       if (hp && !RM && y < heroH) hp.style.transform = 'translate3d(0,' + (y * .3).toFixed(1) + 'px,0)';
-      if (mp && !RM) { var mr = mp.parentNode.getBoundingClientRect(); if (mr.top < innerHeight && mr.bottom > 0) mp.style.transform = 'translate3d(0,' + ((mr.bottom - innerHeight) * .12).toFixed(1) + 'px,0)'; }
       ticking = false;
     });
   }
