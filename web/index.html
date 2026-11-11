@@ -230,7 +230,12 @@ section{position:relative;scroll-margin-top:60px}
 .wait .row.lpr p{font-size:13px;color:var(--text2);border-top:1px solid var(--sub-3);padding-top:10px}
 
 /* ═════════ 제휴몰 ═════════ */
-.malls{background:linear-gradient(180deg,#F4EFFF 0%,#EDE5FF 100%);overflow:hidden}
+.malls{background:linear-gradient(180deg,#F4EFFF 0%,#EDE5FF 100%);overflow:hidden;isolation:isolate}
+/* 택배 상자 사진 — 쇼핑몰에서 사면 택배가 온다. 섹션 아래쪽에만 은은하게: 위로 갈수록 투명해지고(마스크) 흰 막을 한 겹 덮는다. 로고·카드 뒤로는 올라오지 않는다 */
+.sec.malls{padding-bottom:170px}
+.malls-photo{position:absolute;left:0;right:0;bottom:0;height:260px;z-index:-1;pointer-events:none;will-change:transform;
+  background:linear-gradient(180deg,rgba(241,238,255,.55),rgba(255,255,255,.30)),url(/web/img/bg-wait-parcels-m.webp) 50% 82%/cover no-repeat;opacity:.75;
+  mask-image:linear-gradient(180deg,transparent 0%,rgba(0,0,0,.6) 40%,#000 75%);-webkit-mask-image:linear-gradient(180deg,transparent 0%,rgba(0,0,0,.6) 40%,#000 75%)}
 .malls::before{content:'';position:absolute;right:-120px;top:-120px;width:360px;height:360px;border-radius:50%;background:radial-gradient(closest-side,rgba(132,94,238,.25),transparent)}
 .mall-lead{position:relative;display:flex;align-items:center;gap:16px;border-radius:var(--r-lg);padding:20px;color:var(--text1);overflow:hidden;
   background:radial-gradient(70% 140% at 100% 50%,var(--sub-4),transparent 70%),#fff;border:2px solid var(--main);box-shadow:0 22px 48px rgba(132,94,238,.22);transition:transform .25s var(--ease),box-shadow .25s}
@@ -404,6 +409,8 @@ section{position:relative;scroll-margin-top:60px}
   .hero-veil{background:linear-gradient(90deg,rgba(248,246,255,.82) 0%,rgba(248,246,255,.66) 30%,rgba(248,246,255,0) 52%),linear-gradient(180deg,rgba(255,255,255,0) 74%,#fff 100%)}
   .wait .rows{margin-top:20px}
   .mall-lead{padding:30px 36px;max-width:760px}
+  .sec.malls{padding-bottom:230px}
+  .malls-photo{height:360px;background-image:linear-gradient(180deg,rgba(241,238,255,.55),rgba(255,255,255,.30)),url(/web/img/bg-wait-parcels.webp);background-position:center,center 74%}
   .mall-lead .mlogo{width:96px;height:96px;border-radius:26px}
   .ml-tk{width:96px;height:96px}
   .ml-side{gap:28px;padding-right:12px}
@@ -522,6 +529,7 @@ section{position:relative;scroll-margin-top:60px}
      .mall-rest 묶음은 「쿠팡 단독」으로 바뀌면 통째로 들어내면 된다.
      목록은 데모 앱과 같은 곳(CMS 「티켓 적립 설정」의 앱 노출·로고)에서 읽는다. 읽기에 실패하면 아래 기본 목록이 그대로 남는다. -->
 <section class="sec malls" id="malls">
+  <div class="malls-photo" id="malls-photo" aria-hidden="true"></div>
   <div class="wrap">
     <div class="sec-head rv">
       <span class="eyebrow">Partners</span>
@@ -753,7 +761,7 @@ section{position:relative;scroll-margin-top:60px}
   var WIDE = window.matchMedia('(min-width: 860px)').matches;
 
   /* ── 머리줄 · 진행 막대 ── */
-  var hdr = document.getElementById('hdr'), prog = document.getElementById('prog'), hp = document.getElementById('hero-photo');
+  var hdr = document.getElementById('hdr'), prog = document.getElementById('prog'), hp = document.getElementById('hero-photo'), mp = document.getElementById('malls-photo');
   var heroH = document.getElementById('hero').offsetHeight;
   var ticking = false;
   function onScroll() {
@@ -763,6 +771,7 @@ section{position:relative;scroll-margin-top:60px}
       hdr.classList.toggle('on', y > heroH - 80);
       prog.style.transform = 'scaleX(' + (max > 0 ? y / max : 0) + ')';
       if (hp && !RM && y < heroH) hp.style.transform = 'translate3d(0,' + (y * .3).toFixed(1) + 'px,0)';
+      if (mp && !RM) { var mr = mp.parentNode.getBoundingClientRect(); if (mr.top < innerHeight && mr.bottom > 0) mp.style.transform = 'translate3d(0,' + ((mr.bottom - innerHeight) * .12).toFixed(1) + 'px,0)'; }
       ticking = false;
     });
   }
