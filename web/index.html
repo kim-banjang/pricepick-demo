@@ -272,6 +272,14 @@ section{position:relative;scroll-margin-top:60px}
   .track .dup{display:none}
 }
 
+/* 제휴몰 칸 — 모든 몰 같은 크기 */
+.mall-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.mt{display:flex;flex-direction:column;align-items:center;gap:8px;background:#fff;border-radius:16px;padding:16px 8px 14px;box-shadow:var(--sh-1);text-align:center;transition:transform .2s var(--ease),box-shadow .2s}
+.mt .mlogo{width:48px;height:48px;border-radius:14px;font-size:13px;box-shadow:none;border:1px solid var(--border)}
+.mt span{font-size:13px;font-weight:700;line-height:1.3;word-break:break-all}
+@media (hover:hover) and (pointer:fine){.mt:hover{transform:translateY(-4px);box-shadow:var(--sh-2)}}
+@media (min-width:860px){.mall-grid{grid-template-columns:repeat(6,minmax(0,1fr));gap:14px}.mt{padding:22px 10px 18px}.mt .mlogo{width:60px;height:60px;border-radius:18px}.mt span{font-size:14px}}
+
 /* ═════════ 티켓 · 포인트 (어두운 바탕 + 유리 카드) ═════════ */
 .tix{background:radial-gradient(60% 50% at 10% 0%,rgba(198,175,255,.45),transparent 70%),radial-gradient(50% 50% at 95% 100%,rgba(255,217,59,.12),transparent 70%),linear-gradient(180deg,#fff,var(--sub-4));overflow:hidden}
 .cur{display:grid;gap:14px}
@@ -409,9 +417,9 @@ section{position:relative;scroll-margin-top:60px}
   .hero-veil{background:linear-gradient(90deg,rgba(248,246,255,.82) 0%,rgba(248,246,255,.66) 30%,rgba(248,246,255,0) 52%),linear-gradient(180deg,rgba(255,255,255,0) 74%,#fff 100%)}
   .wait .rows{margin-top:20px}
   .mall-lead{padding:30px 36px;max-width:760px}
-  .sec.malls{padding-bottom:190px}
+  .sec.malls{padding-bottom:270px}
   /* PC: 사진을 줄여 오른쪽 아래 구석에만, 왼쪽은 섹션 바탕색으로 흐려지게 */
-  .malls-photo{height:300px;opacity:.6;background-image:linear-gradient(90deg,#EEE7FF 0%,rgba(238,231,255,0) 50%),linear-gradient(180deg,rgba(241,238,255,.55),rgba(255,255,255,.30)),url(/web/img/bg-wait-parcels.webp);background-size:100% 100%,100% 100%,960px auto;background-position:0 0,0 0,right -40px bottom -70px;background-repeat:no-repeat}
+  .malls-photo{height:300px;opacity:.6;background-image:linear-gradient(90deg,#EEE7FF 0%,#EEE7FF 38%,rgba(238,231,255,0) 62%),linear-gradient(180deg,rgba(241,238,255,.55),rgba(255,255,255,.30)),url(/web/img/bg-wait-parcels.webp);background-size:100% 100%,100% 100%,960px auto;background-position:0 0,0 0,right -40px bottom -70px;background-repeat:no-repeat}
   .mall-lead .mlogo{width:96px;height:96px;border-radius:26px}
   .ml-tk{width:96px;height:96px}
   .ml-side{gap:28px;padding-right:12px}
@@ -526,9 +534,8 @@ section{position:relative;scroll-margin-top:60px}
   </div>
 </section>
 
-<!-- ═════════ 제휴몰 — 쿠팡을 앞세운다 ═════════
-     .mall-rest 묶음은 「쿠팡 단독」으로 바뀌면 통째로 들어내면 된다.
-     목록은 데모 앱과 같은 곳(CMS 「티켓 적립 설정」의 앱 노출·로고)에서 읽는다. 읽기에 실패하면 아래 기본 목록이 그대로 남는다. -->
+<!-- ═════════ 제휴몰 — 모든 몰을 같은 크기·같은 모양으로(특정 몰을 앞세우지 않는다 — 김반장 2026-11-11) ═════════
+     목록은 데모 앱과 같은 곳(CMS 「티켓 적립 설정」의 앱 노출·로고)에서 읽고 이름순으로 놓는다. 읽기에 실패하면 아래 기본 목록이 그대로 남는다. -->
 <section class="sec malls" id="malls">
   <div class="malls-photo" id="malls-photo" aria-hidden="true"></div>
   <div class="wrap">
@@ -536,24 +543,20 @@ section{position:relative;scroll-margin-top:60px}
       <span class="eyebrow">Partners</span>
       <h2 class="h2">쓰던 쇼핑몰 <em>그대로</em></h2>
     </div>
-
-    <div class="mall-lead rv pop" id="mall-lead">
-      <div class="mlogo" data-code="coupang_direct">쿠팡</div>
-      <div class="ml-tx"><span class="tag">대표 제휴몰</span><b>쿠팡</b><p>주문마다 랜덤 티켓을 드려요</p></div>
-      <div class="ml-side">
-        <!-- 적립률 숫자는 홈페이지에 쓰지 않는다(제휴 조건에 따라 바뀌는 값 — 김반장 2026-11-10) -->
-        <div class="ml-tk"><span class="tks one"><img src="/web/img/ticket-random.svg" alt="" width="512" height="512" loading="lazy"></span></div>
-      </div>
+    <div class="mall-grid rv" id="mall-grid">
+      <div class="mt"><div class="mlogo">11</div><span>11번가</span></div>
+      <div class="mt"><div class="mlogo">CJ</div><span>CJ더마켓</span></div>
+      <div class="mt"><div class="mlogo">G마</div><span>G마켓</span></div>
+      <div class="mt"><div class="mlogo">GS</div><span>GS SHOP</span></div>
+      <div class="mt"><div class="mlogo">Hm</div><span>Hmall</span></div>
+      <div class="mt"><div class="mlogo">NS</div><span>NS홈쇼핑</span></div>
+      <div class="mt"><div class="mlogo">롯데</div><span>롯데온</span></div>
+      <div class="mt"><div class="mlogo">롯데</div><span>롯데홈쇼핑</span></div>
+      <div class="mt"><div class="mlogo">옥션</div><span>옥션</span></div>
+      <div class="mt"><div class="mlogo">이마</div><span>이마트인터넷쇼핑몰</span></div>
+      <div class="mt"><div class="mlogo">쿠팡</div><span>쿠팡</span></div>
     </div>
-
-    <div class="mall-rest rv" id="mall-rest">
-      <h3>그리고 이 쇼핑몰들도</h3>
-      <div class="marquee" id="marquee">
-        <div class="track" id="track-a"></div>
-        <div class="track rev" id="track-b"></div>
-      </div>
-    </div>
-    <p class="note">쇼핑몰마다 받는 티켓이 달라요. 앱에서 바로 확인할 수 있어요.</p>
+    <p class="note rv">쇼핑몰마다 받는 티켓이 달라요. 앱에서 바로 확인할 수 있어요.</p>
   </div>
 </section>
 
@@ -691,7 +694,7 @@ section{position:relative;scroll-margin-top:60px}
       </details>
       <details class="rv">
         <summary>반품하면 어떻게 돼요?</summary>
-        <div class="a">쿠팡은 취소·반품하면 그 주문의 티켓을 바로 회수해요. 그 밖의 쇼핑몰은 확정 전에 취소된 주문이 티켓으로 바뀌지 않아요. 확정 뒤에 환불되면 쓰지 않은 티켓을 회수해요.</div>
+        <div class="a">구매가 확정되기 전에 취소·반품하면 그 주문의 티켓은 생기지 않아요. 확정 뒤에 환불되면 쓰지 않은 티켓을 회수해요.</div>
       </details>
       <details class="rv">
         <summary>티켓은 언제까지 쓸 수 있어요?</summary>
@@ -911,26 +914,17 @@ section{position:relative;scroll-margin-top:60px}
   /* ── 제휴몰 — 데모 앱 ppLoadMalls 와 같은 기준:
        settings/ticket_accrual.applied 가 켜진 몰만, 이름순(적립률은 불러오지 않는다), 로고는 CMS 등록본(없으면 이름 앞 두 글자).
        쿠팡(coupang_direct)은 맨 앞 카드로 따로 둔다. ── */
-  var FALLBACK = ['CJ더마켓', 'NS홈쇼핑', 'GS SHOP', 'Hmall', '롯데홈쇼핑', '이마트인터넷쇼핑몰', '11번가', '롯데온', '옥션', 'G마켓'].map(function (n) { return { name: n, logo: '' }; });
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   function logoHtml(name, url) {
     var ab = esc(String(name || '?').trim().slice(0, 2));
     return ab + (url ? '<img src="' + esc(url) + '" alt="" loading="lazy" onerror="this.remove()">' : '');
   }
-  function chip(x) { return '<div class="mc"><div class="mlogo">' + logoHtml(x.name, x.logo) + '</div><span>' + esc(x.name) + '</span></div>'; }
   function renderMalls(list) {
-    var a = document.getElementById('track-a'), b = document.getElementById('track-b');
-    if (!a || !b) return;
-    var half = Math.ceil(list.length / 2);
-    var l1 = list.slice(0, half), l2 = list.slice(half);
-    if (!l2.length) l2 = l1;
-    /* 끊김 없이 돌도록 같은 줄을 한 번 더 붙인다(움직임 끈 사용자는 복제본을 숨긴다) */
-    function row(l) { var s = l.map(chip).join(''); return s + '<div class="dup" aria-hidden="true">' + s + '</div>'; }
-    a.innerHTML = row(l1); b.innerHTML = row(l2);
-    a.style.setProperty('--dur', Math.max(18, l1.length * 4.2) + 's');
-    b.style.setProperty('--dur', Math.max(18, l2.length * 4.6) + 's');
+    var g = document.getElementById('mall-grid');
+    if (!g || !list.length) return;
+    g.innerHTML = list.map(function (x) { return '<div class="mt"><div class="mlogo">' + logoHtml(x.name, x.logo) + '</div><span>' + esc(x.name) + '</span></div>'; }).join('');
   }
-  renderMalls(FALLBACK);
+
   var BASE = 'https://firestore.googleapis.com/v1/projects/pricepick-demo/databases/(default)/documents/settings/';
   function val(v) {
     if (!v) return null;
@@ -946,10 +940,7 @@ section{position:relative;scroll-margin-top:60px}
     .then(function (d) {
       var f = d.fields || {};
       var applied = val(f.applied) || {}, logos = val(f.logos) || {};
-      var lead = document.querySelector('#mall-lead .mlogo');
-      if (lead && logos.coupang_direct) lead.innerHTML = logoHtml('쿠팡', logos.coupang_direct);
       var codes = Object.keys(applied).filter(function (c) { return applied[c] === true && c.indexOf('lp:') === 0; });
-      if (!codes.length) { var rest = document.getElementById('mall-rest'); if (rest) rest.style.display = 'none'; return; }
       var q = codes.map(function (c) { return 'mask.fieldPaths=' + encodeURIComponent('merchants.`' + c.slice(3) + '`.merchant_name'); }).join('&');
       return fetch(BASE + 'linkprice_merchants?' + q)
         .then(function (r) { return r.ok ? r.json() : {}; })
@@ -960,6 +951,8 @@ section{position:relative;scroll-margin-top:60px}
             var id = c.slice(3), nm = (mer[id] && mer[id].merchant_name) || id;
             return { name: nm, logo: logos[c] || '' };
           });
+          /* 쿠팡(직접 제휴)도 다른 몰과 같은 칸으로 — 앞세우지 않고 이름순에 섞는다 */
+          list.push({ name: '쿠팡', logo: logos.coupang_direct || '' });
           list.sort(function (a, b) { return a.name.localeCompare(b.name, 'ko'); });
           renderMalls(list);
         });
