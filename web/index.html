@@ -97,11 +97,11 @@ section{position:relative;scroll-margin-top:60px}
   background:radial-gradient(420px 420px at var(--mx,70%) var(--my,35%),rgba(198,175,255,.35),transparent 70%)}
 .hero-in{display:grid;grid-template-columns:minmax(0,1fr);padding-top:24px;padding-bottom:52px;min-height:calc(100svh - 60px);align-content:start}
 .hero-title{position:relative;z-index:2;margin:0;font-size:46px;font-weight:800;letter-spacing:-2.3px;line-height:1.06}
-.hero-tk{position:absolute;z-index:6;left:35%;bottom:-22%;width:30%;aspect-ratio:1;filter:drop-shadow(0 14px 16px rgba(108,74,182,.30));animation:tkFloat 7s ease-in-out infinite;pointer-events:none}
-/* 폰 둘레 오브젝트 — 회전하는 화면(옆 화면 포함)이 지나가는 자리 밖에만. 휴대폰: 폰 아래 한 줄(쇼핑백·티켓·동전), PC: 폰 오른쪽 한 줄(티켓·동전·쇼핑백). 반짝이·별 없음 */
+.hero-tk{position:absolute;z-index:6;right:-26%;top:7%;width:40%;aspect-ratio:1;filter:drop-shadow(0 14px 16px rgba(108,74,182,.30));animation:tkFloat 7s ease-in-out infinite;pointer-events:none}
+/* 폰 둘레 오브젝트 — 큰 것(쇼핑백) 왼쪽 아래, 중간(동전) 오른쪽 아래. 티켓은 오른쪽 위. 반짝이·별 없음 */
 .ho{position:absolute;z-index:5;height:auto;pointer-events:none;filter:drop-shadow(0 16px 18px rgba(108,74,182,.28));animation:hoFloat 8s ease-in-out infinite}
-.ho-bag{width:46%;left:-22%;bottom:-24%}
-.ho-coin{width:42%;right:-22%;bottom:-16%;animation-delay:-2.6s}
+.ho-bag{width:52%;left:-38%;bottom:-11%}
+.ho-coin{width:44%;right:-30%;bottom:6%;animation-delay:-2.6s}
 @keyframes hoFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
 @keyframes tkFloat{0%,100%{transform:translate(0,0) rotate(-8deg)}50%{transform:translate(-6px,-14px) rotate(6deg)}}
 .hero-sub{position:relative;z-index:2;margin-top:18px}
@@ -172,23 +172,22 @@ section{position:relative;scroll-margin-top:60px}
 .node .art>.pp-g-splash{width:auto;height:78%;aspect-ratio:390/844;border-radius:10px;box-shadow:0 4px 10px rgba(108,74,182,.30)}
 
 /* ── 앱 화면 회전 — 폰 네 대가 원을 그리며 돈다(앞 → 오른쪽 → 뒤 → 왼쪽). 앞 폰이 가장 크고 또렷, 옆은 작고 흐리고 기울고, 뒤는 숨김 ── */
-.hero-shots{position:relative;z-index:1;width:min(62%,250px);aspect-ratio:739/1582;margin:30px auto 118px;perspective:1100px}
+.hero-shots{position:relative;z-index:1;width:min(62%,250px);aspect-ratio:739/1582;margin:30px auto 8px;perspective:1100px}
 .hero-shots .dev{position:absolute;inset:0;padding:7px;border-radius:13%/6%;background:linear-gradient(160deg,#2B2440,#15111F);
   box-shadow:0 30px 60px rgba(40,20,90,.35),0 6px 16px rgba(40,20,90,.25),inset 0 0 0 1.5px rgba(255,255,255,.14);
-  transition:transform 1s cubic-bezier(.45,.05,.25,1),opacity 1s ease,filter 1s ease;will-change:transform,opacity}
+  transition:transform 1s cubic-bezier(.45,.05,.25,1),opacity .4s ease .6s,filter 1s ease;will-change:transform,opacity}
+/* 옆 화면 흐림 막 — 폰 위에 덮는 불투명 계열 막이라 뒤 화면이 비치지 않는다 */
+.hero-shots .dev::after{content:"";position:absolute;inset:0;border-radius:inherit;background:rgba(243,239,255,.62);opacity:0;transition:opacity 1s ease;pointer-events:none}
+.hero-shots .dev[data-pos="1"]::after,.hero-shots .dev[data-pos="3"]::after{opacity:1}
 .hero-shots .dev img{display:block;width:100%;height:100%;border-radius:11%/5.1%;background:#fff}
 .hero-shots .dev[data-pos="0"]{transform:translateX(0) translateZ(0) rotateY(0) scale(1);opacity:1;z-index:4}
-.hero-shots .dev[data-pos="1"]{transform:translateX(48%) translateZ(-160px) rotateY(-32deg) scale(.82);opacity:.5;z-index:3}
-.hero-shots .dev[data-pos="2"]{transform:translateX(0) translateZ(-320px) rotateY(180deg) scale(.6);opacity:0;z-index:1}
-.hero-shots .dev[data-pos="3"]{transform:translateX(-48%) translateZ(-160px) rotateY(32deg) scale(.82);opacity:.5;z-index:3}
+.hero-shots .dev[data-pos="1"]{transform:translateX(48%) translateZ(-160px) rotateY(-32deg) scale(.74);opacity:1;z-index:3;filter:blur(1.5px)}
+.hero-shots .dev[data-pos="2"]{transform:translateX(0) translateZ(-320px) rotateY(180deg) scale(.6);opacity:0;z-index:1;visibility:hidden;transition:transform 1s cubic-bezier(.45,.05,.25,1),opacity .25s ease,visibility 0s linear .25s}
+.hero-shots .dev[data-pos="3"]{transform:translateX(-48%) translateZ(-160px) rotateY(32deg) scale(.74);opacity:1;z-index:3;filter:blur(1.5px)}
 @media (min-width:860px){
   /* PC: 스크립트가 배경 사진 속 폰 자리를 계산해 그 위에 세운다 */
   .hero-shots{position:absolute;margin:0;width:clamp(250px,20vw,380px);left:0;top:0;visibility:hidden}
   .hero-shots.placed{visibility:visible}
-  .hero-tk{left:142%;right:auto;top:0;bottom:auto;width:36%}
-  .ho-coin{left:140%;right:auto;top:37%;bottom:auto;width:44%}
-  .ho-bag{left:138%;bottom:1%;width:50%}
-  .hero-shots .dev[data-pos="1"],.hero-shots .dev[data-pos="3"]{filter:blur(1.2px) saturate(.9)}
 }
 
 /* ═════════ 약속 ═════════ */
