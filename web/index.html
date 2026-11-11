@@ -947,7 +947,7 @@ section{position:relative;scroll-margin-top:60px}
     }
     function settle() {
       s = mod(Math.round(s)); var f = frontIdx();
-      if (f !== settledFront && !RM) burst();
+      // 티켓 터짐 삭제(김반장 「티켓 날라다니는것 정신 사납다」)
       settledFront = f; render();
     }
     function frame(now) {
