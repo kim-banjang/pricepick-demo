@@ -420,7 +420,7 @@ section{position:relative;scroll-margin-top:60px}
 .co dt{flex:none;min-width:116px;color:var(--text3)}
 .co dd{color:var(--text2)}
 /* 값이 비어 있는 회사 정보 줄은 화면에 내지 않는다(대표자·사업자등록번호 등은 받는 대로 dd 에 채운다) */
-.co .row:has(dd:empty){display:none}
+.co .row:has(dd:empty),.co .row[hidden]{display:none}
 .ftr .cp{margin-top:18px}
 
 /* ── 마우스가 있는 화면에서만: 카드 들림 ── */
@@ -601,7 +601,7 @@ section{position:relative;scroll-margin-top:60px}
       <li class="node"><div class="art"><span class="no">3</span><span class="tks one"><img src="img/ticket-random.svg" alt="" width="512" height="512"></span></div>
         <div class="tx"><b>구매 확정을 기다려요</b><p>구매가 확정되면 쓸 수 있어요. 몇 장인지도 그때 알려 드려요.</p></div></li>
       <li class="node"><div class="art"><span class="no">4</span><span class="tks many"><img src="img/ticket-gold.svg" alt="" width="512" height="512"><img src="img/ticket-gold.svg" alt="" width="512" height="512"><img src="img/ticket-gold.svg" alt="" width="512" height="512"><span class="chk"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span></span></div>
-        <div class="tx"><b>티켓으로 바뀌어요</b><p>랜덤 티켓이 티켓으로 바뀌어요. 많이 살수록 많이 받아요.</p></div></li>
+        <div class="tx"><b>티켓이 들어와요</b><p>구매가 확인되면 티켓이 들어와요.</p></div></li>
       <li class="node"><div class="art"><span class="no">5</span><img src="img/gifticon.webp" alt="" width="1000" height="538" loading="lazy"></div>
         <div class="tx"><b>기프티콘으로 교환</b><p>모은 티켓으로 원하는 기프티콘을 골라 바꿔요.</p></div></li>
     </ol>
@@ -645,7 +645,7 @@ section{position:relative;scroll-margin-top:60px}
     <div class="cur">
       <div class="cc t-red rv" style="--d:0">
         <div class="art"><span class="tks one"><img src="img/ticket-random.svg" alt="" width="512" height="512"></span></div>
-        <div><h3>랜덤 티켓 <i>대기 중</i></h3><p>사자마자 받는 티켓이에요. 구매가 확정되면 티켓으로 바뀌어요.</p></div>
+        <div><h3>랜덤 티켓 <i>대기 중</i></h3><p>구매가 확인되면 받는 대기 티켓이에요. 구매가 확정되면 티켓으로 바뀌어요.</p></div>
       </div>
       <div class="cc t-gold rv" style="--d:1">
         <div class="art"><span class="tks many"><img src="img/ticket-gold.svg" alt="" width="512" height="512"><img src="img/ticket-gold.svg" alt="" width="512" height="512"><img src="img/ticket-gold.svg" alt="" width="512" height="512"><span class="chk"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span></span></div>
@@ -681,10 +681,10 @@ section{position:relative;scroll-margin-top:60px}
       </div>
       <div class="bc big-card c-gold rv" style="--d:1">
         <img class="bart" src="img/gift-box-gold.webp" alt="" width="714" height="816" loading="lazy">
-        <span class="kick">이벤트 티켓 1장으로</span>
-        <span class="big"><span data-count="10">10</span><small>회까지</small></span>
+        <span class="kick">하루 최대</span>
+        <span class="big"><span data-count="10">10</span><small>회</small></span>
         <h3>랜덤 선물 상자</h3>
-        <p>이벤트 티켓 1장으로 한 번 열어요. 하루 최대 10회.</p>
+        <p>열 때마다 이벤트 티켓 1장이 사용돼요.</p>
       </div>
       <div class="bc rv" style="--d:2">
         <img class="bart" src="img/coins.webp" alt="" width="1000" height="644" loading="lazy">
@@ -737,8 +737,8 @@ section{position:relative;scroll-margin-top:60px}
       <ul>
         <li class="rv" style="--d:1"><span class="i">1</span><div><b>티켓·포인트를 쓰려면</b><span>연동 전에는 모으기만 할 수 있어요.</span></div><img class="ka" src="img/coins.webp" alt="" width="1000" height="644" loading="lazy"></li>
         <li class="rv" style="--d:2"><span class="i">2</span><div><b>기프티콘은 카카오톡으로</b><span>그래서 기프티샵은 연동 후에 열려요.</span></div><img class="ka" src="img/gifticon.webp" alt="" width="1000" height="538" loading="lazy"></li>
-        <li class="rv" style="--d:3"><span class="i">3</span><div><b>더 빨리 쓸 수 있어요</b><span>연동하면 구매가 확정된 티켓을 더 빨리 쓸 수 있어요.</span></div><img class="ka" src="img/ticket-gold.svg" alt="" width="512" height="512" loading="lazy"></li>
-        <li class="rv" style="--d:4"><span class="i">4</span><div><b>앱을 지워도 그대로</b><span>연동 전 기록은 이 기기에만 남아요.</span></div></li>
+        <li class="rv" style="--d:3"><span class="i">3</span><div><b>더 빨리 쓸 수 있어요</b><span>쿠팡에서 산 티켓은 연동하면 더 빨리 쓸 수 있어요.</span></div><img class="ka" src="img/ticket-gold.svg" alt="" width="512" height="512" loading="lazy"></li>
+        <li class="rv" style="--d:4"><span class="i">4</span><div><b>앱을 지워도 그대로</b><span>연동하면 앱을 지우거나 폰을 바꿔도 기록이 남아요. 연동 전에 앱을 지우면 복구되지 않아요.</span></div></li>
       </ul>
     </div>
   </div>
@@ -753,15 +753,15 @@ section{position:relative;scroll-margin-top:60px}
     </div>
     <div class="faq">
       <details class="rv">
-        <summary>티켓 값은 어디서 나와요?</summary>
-        <div class="a">쇼핑몰이 프라이스픽에 주는 제휴 수수료에서 나와요. 그 일부를 티켓으로 돌려드려요.</div>
+        <summary>티켓 적립에 추가 비용이 드나요?</summary>
+        <div class="a">티켓 적립을 위해 따로 내는 비용은 없어요. 적립 대상과 조건은 앱에서 확인해 주세요.</div>
       </details>
       <details class="rv">
         <summary>적립이 안 되는 경우가 있나요?</summary>
         <div class="a">이럴 때는 적립되지 않아요.
           <ul>
             <li>앱의 바로가기를 거치지 않은 구매</li>
-            <li>바로가기로 들어간 뒤 한참 지나서 한 구매</li>
+            <li>바로가기로 들어간 뒤 쇼핑몰이 정한 인정 시간이 지나서 한 구매<br>사기 직전에 프라이스픽을 거쳐 주세요.</li>
             <li>상품권·기프트카드, 게임 아이템·게임머니, 디지털 콘텐츠·소프트웨어, 일부 고가 가전</li>
             <li>하루 5건, 한 달 50건을 넘는 구매</li>
             <li>받을 티켓이 1장도 안 되는 아주 작은 구매</li>
@@ -896,6 +896,8 @@ section{position:relative;scroll-margin-top:60px}
     shots.style.top = (pr.top - hr.top + top).toFixed(1) + 'px';
     shots.classList.add('placed');
   }
+  /* 회사 정보 — 값이 비어 있는 줄은 숨긴다(값을 넣으면 그대로 보임). CSS :has 를 못 쓰는 브라우저와 공백만 든 칸까지 */
+  [].forEach.call(document.querySelectorAll('.co .row'), function (r) { var d = r.querySelector('dd'); if (d && !d.textContent.trim()) r.hidden = true; });
   placeShots();
   window.addEventListener('resize', placeShots);
   window.addEventListener('load', placeShots);
