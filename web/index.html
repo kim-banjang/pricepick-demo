@@ -422,6 +422,8 @@ section{position:relative;scroll-margin-top:60px}
 /* 값이 비어 있는 회사 정보 줄은 화면에 내지 않는다(대표자·사업자등록번호 등은 받는 대로 dd 에 채운다) */
 .co .row:has(dd:empty),.co .row[hidden]{display:none}
 .ftr .cp{margin-top:18px}
+/* 판 번호 — 고쳐 배포할 때마다 올린다(규칙·이력은 README 「판 번호」) */
+.ftr .ver{margin-left:10px;font-size:11px;color:var(--text3);opacity:.7;letter-spacing:0;white-space:nowrap}
 
 /* ── 마우스가 있는 화면에서만: 카드 들림 ── */
 @media (hover:hover) and (pointer:fine){
@@ -831,7 +833,7 @@ section{position:relative;scroll-margin-top:60px}
       <div class="row" data-field="cs"><dt>고객센터</dt><dd>앱 1:1 문의 · 평일 10–18시</dd></div>
       <div class="row" data-field="privacy-mail"><dt>개인정보 문의</dt><dd>appmix001@gmail.com</dd></div>
     </dl>
-    <p class="cp">© 2026 주식회사 앱믹스</p>
+    <p class="cp">© 2026 주식회사 앱믹스<span class="ver">v1.0 · 2026-11-12</span></p>
   </div>
 </footer>
 
